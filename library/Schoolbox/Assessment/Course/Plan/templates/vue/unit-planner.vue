@@ -175,6 +175,8 @@ window.Vue.onUnmounted(() => {
         background-color: #fff;
         font-size: 0.8125rem;
         border-bottom: 2px solid var(--body-background);
+        text-wrap: wrap;
+        overflow-wrap: anywhere;
 
         &:not(:last-child) {
             border-right: 1px solid var(--body-background);
