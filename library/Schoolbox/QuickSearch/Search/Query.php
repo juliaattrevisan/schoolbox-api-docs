@@ -81,7 +81,7 @@ class Query
 
             if (count($matchingFolderInfoById) > 0) {
                 $result['data'] = array_merge($result['data'], $this->getFolderData($matchingFolderInfoById, $viewer));
-                $result['metadata']['totalCount'] = $this->getTotalCountForFolders($keyword);
+                $result['metadata']['totalCountFolders'] = $this->getTotalCountForFolders($keyword);
             }
         }
 
