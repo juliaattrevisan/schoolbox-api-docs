@@ -156,7 +156,7 @@ function onModalClosed() {
                             <span
                                 data-tooltip
                                 class="has-tip tip-top hint"
-                                title="This setting applies only to notifications due to changes to content within this group.  It does not apply to notifications due to changes of group membership."
+                                title="This controls the notifications on content within the group. If this is off, notifications related to group membership changes will still be delivered."
                                 >?</span
                             >
                         </label>
