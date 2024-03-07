@@ -3,6 +3,7 @@ import Toast from "@schoolboxVue/components/toast.vue";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
+import { ColumnType, createTabs } from "./unitPlannerConfig";
 import ContentContainer from "./content-container.vue";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
@@ -18,15 +19,6 @@ const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 
-const selectedTab = window.Vue.ref("all");
-const tabs = window.Vue.ref([
-    { id: "all", label: "All" },
-    { id: "overview", label: "Overview" },
-    { id: "activities", label: "Learning Activities" },
-    { id: "rubric-capabilities", label: "Rubric Capabilities" },
-    { id: "curriculum-overview", label: "Curriculum Overview" },
-]);
-
 // Get a list of every textbox that could be shown in a unit
 // in case a unit doesn't have a textbox for a particular key
 // Ensures that the table will always show all possible textboxes
@@ -39,6 +31,10 @@ const allTextboxKeys: string[] = (() => {
     });
     return Array.from(keysSet);
 })();
+
+const tabs = createTabs(allTextboxKeys);
+
+const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
 const tabsEl = window.Vue.ref<HTMLElement>();
 const tableHeaderEl = window.Vue.ref<HTMLElement>();
@@ -127,187 +123,149 @@ window.Vue.onUnmounted(() => {
 
 <template>
     <dl ref="tabsEl" class="tabs">
-        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
-            <a @click="selectedTab = tab.id">{{ tab.label }}</a>
+        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab }">
+            <a @click="selectedTab = tab">{{ tab.label }}</a>
         </dd>
     </dl>
-    <div ref="unitPlannerContainerEl" class="scrollable" :style="{ height: containerHeight + 'px' }">
-        <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
-            <thead ref="tableHeaderEl">
-                <tr>
-                    <th>Unit</th>
-                    <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
-                        <th v-for="textboxKey in allTextboxKeys" :key="textboxKey">
-                            {{ textboxKey }}
-                        </th>
-                    </template>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'activities'">Learning Activities</th>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">Rubric Capabilities</th>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'">Curriculum Overview</th>
-                </tr>
-            </thead>
-            <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
-                <tr id="unitplanner-dropdown-container">
-                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
-                        The specific placement of this element ensures that the dropdowns are still contained within the table -->
-                </tr>
-                <tr
-                    v-for="unit in store.orderedUnits"
-                    :key="unit.id"
-                    :data-unit-id="unit.id"
+    <div
+        ref="unitPlannerContainerEl"
+        class="scrollable"
+        :style="{ height: containerHeight + 'px', '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1 }"
+    >
+        <div id="unitplanner-dropdown-container">
+            <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                The specific placement of this element ensures that the dropdowns are still contained within the table -->
+        </div>
+        <div class="unit-planner">
+            <div class="grid-row header-row">
+                <div
+                    v-for="column in selectedTab.columns"
+                    :key="column.id"
+                    class="fixed-top"
+                    :class="{ 'fixed-left': column.fixedLeft }"
+                >
+                    {{ column.label }}
+                </div>
+            </div>
+
+            <div v-for="unit in store.orderedUnits" :key="unit.id" :data-unit-id="unit.id" class="grid-row unit-row">
+                <div
+                    v-for="column in selectedTab.columns"
+                    :key="column.id"
+                    :data-column-type="column.type"
+                    :class="{ 'unit-content-padded': column.cellPadding, 'fixed-left': column.fixedLeft }"
                     :style="{
                         height: store.expandedUnits.includes(unit.id) ? 'auto' : store.unexpandedUnitHeight + 'px',
                     }"
                 >
-                    <td>
-                        <div class="unit-wrapper">
-                            <i v-if="props.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
-                            <div>
-                                <a :href="unit.homepage">
-                                    <strong>{{ unit.title }}</strong>
-                                </a>
-                                <p v-if="unit.extraTextboxes > 0" class="meta">
-                                    {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
-                                </p>
-                            </div>
+                    <template v-if="column.type === ColumnType.UNIT">
+                        <i v-if="props.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
+                        <div>
+                            <a :href="unit.homepage">
+                                <strong>{{ unit.title }}</strong>
+                            </a>
+                            <p v-if="unit.extraTextboxes > 0" class="meta">
+                                {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
+                            </p>
                         </div>
-                    </td>
-                    <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
-                        <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
-                            <content-container :unit-id="unit.id">
-                                <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
-                            </content-container>
-                        </td>
                     </template>
-                    <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <content-container :unit-id="unit.id">
-                            <ul class="information-list">
-                                <activities-list-item
-                                    v-for="activity in unit.activities"
-                                    ref="activityListItem"
-                                    :key="activity.id"
-                                    :activity="activity"
-                                />
-                            </ul>
-                        </content-container>
-                    </td>
-                    <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
-                        <content-container :unit-id="unit.id">
-                            <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
-                        </content-container>
-                    </td>
-                    <td
-                        v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'"
-                        class="curriculum-codes-container"
-                    >
-                        <content-container :unit-id="unit.id">
-                            <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
-                            <curriculum-details-modal />
-                        </content-container>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+
+                    <content-container v-if="column.type === ColumnType.OVERVIEW" :unit-id="unit.id">
+                        <textbox-content
+                            v-if="unit.textboxes[column.label] !== null"
+                            :textbox="unit.textboxes[column.label]!"
+                        ></textbox-content>
+                    </content-container>
+
+                    <content-container v-if="column.type === ColumnType.ACTIVITIES" :unit-id="unit.id">
+                        <ul class="information-list">
+                            <activities-list-item
+                                v-for="activity in unit.activities"
+                                ref="activityListItem"
+                                :key="activity.id"
+                                :activity="activity"
+                            />
+                        </ul>
+                    </content-container>
+
+                    <content-container v-if="column.type === ColumnType.RUBRIC_CAPABILITIES" :unit-id="unit.id">
+                        <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
+                    </content-container>
+
+                    <content-container v-if="column.type === ColumnType.CURRICULUM_OVERVIEW" :unit-id="unit.id">
+                        <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
+                        <curriculum-details-modal />
+                    </content-container>
+                </div>
+            </div>
+        </div>
     </div>
 
     <toast ref="toastEl"></toast>
 </template>
 
 <style scoped lang="scss">
-/* Use :deep to ensure elements created by sortable are styled correctly.
- *
- * > is used to ensure the styles are only applied to the direct children of the unit-planner
- * component. Otherwise, they may apply to other tables nested within content containers too.
- */
-.unit-planner:deep() {
-    position: relative; // Ensure sortable placeholders are positioned correctly and cannot escape the table
+.scrollable {
+    overflow: auto;
+}
 
-    > thead > tr,
-    > tbody > tr {
-        /* Fix the unit title column to the left */
-        > th,
-        > td {
-            background-color: white;
+.unit-planner {
+    display: grid;
+    grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
+}
 
-            &:first-child {
-                border-right: 1px solid var(--body-background);
-                min-width: 200px;
-                left: 0;
-                position: sticky;
-                width: 200px;
-                z-index: 2; // Behind the dropdowns and table header, but on top of the content
-            }
+.grid-row {
+    display: contents; // Allow the children to be displayed as a grid
 
-            &:not(:first-child) {
-                border-left: 1px solid var(--body-background);
-                min-width: 400px;
-                width: 400px;
-            }
+    > div {
+        background-color: #fff;
+        font-size: 0.8125rem;
+        border-bottom: 2px solid var(--body-background);
+
+        &:not(:last-child) {
+            border-right: 1px solid var(--body-background);
+        }
+
+        &:not(:first-child) {
+            border-left: 1px solid var(--body-background);
         }
     }
 
-    // Pin the header to the top of the table when scrolling
-    > thead {
-        position: sticky;
-        top: 0;
-        z-index: 4; // On top of both the left column and the dropdowns
+    &.header-row > div {
+        color: #000;
+        font-weight: 600;
+        padding: 0.625rem;
+        white-space: nowrap;
     }
 
-    > tbody {
+    &.unit-row > div {
         overflow: hidden;
-        position: relative;
-        > tr {
-            transition: height 0.5s ease;
+        text-overflow: ellipsis;
 
-            > td:not(:first-child) {
-                padding: 0px;
-            }
+        &.unit-content-padded {
+            padding: 5px;
+        }
 
-            &.ui-sortable-helper {
-                display: table; /* Keep widths consistent */
-                border-top: 1px solid var(--body-background);
-                border-bottom: 1px solid var(--body-background);
-                width: 100% !important;
-
-                height: v-bind('store.unexpandedUnitHeight + "px"') !important;
-
-                > td > div > .content-container {
-                    height: v-bind('store.unexpandedUnitHeight + "px"') !important;
-                }
-            }
-
-            &.ui-sortable-placeholder {
-                height: v-bind('store.unexpandedUnitHeight + "px"');
-
-                > td {
-                    background-color: #dddddd;
-                    border-left: none;
-                    border-right: none;
-                }
-            }
-
-            // A unit that is currentl being sorted
-            &[style*="display: none"] {
-                display: table-row !important;
-
-                > td {
-                    background-color: #fafafa;
-
-                    > div {
-                        opacity: 0.2;
-                    }
-                }
-            }
+        &[data-column-type="unit"] {
+            display: flex;
+            text-wrap: wrap;
         }
     }
+}
 
-    .curriculum-codes-container {
-        max-width: 500px;
-    }
+.fixed-top.fixed-left {
+    z-index: 5; // On top of both the left column, the header, and the dropdowns
+}
 
-    .unit-wrapper {
-        display: flex;
-    }
+.fixed-left {
+    position: sticky;
+    left: 0;
+    z-index: 2; // Behind the dropdowns and table header, but on top of the content
+}
+.fixed-top {
+    position: sticky;
+    top: 0;
+    z-index: 4; // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
