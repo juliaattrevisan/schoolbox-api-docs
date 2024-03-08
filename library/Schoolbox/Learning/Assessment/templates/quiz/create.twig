@@ -1,6 +1,5 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 <input type="hidden" name="learnosityReference" id="learnosity-reference" value="{{ assessment.learnosityReference }}" />
 
@@ -14,16 +13,19 @@
     {# ----------------------------------------------------------- #}
     {# Work Type #}
     {# ----------------------------------------------------------- #}
-    <label>
-        Work Type
-        <select name="workType">
-            <option value="" selected>None</option>
-            {% for workType in allWorkTypes %}
-                <option value="{{ workType.id }}" {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
+    <label class="required">Work Type</label>
+    <select name="workType" required>
+        {% for workType in allWorkTypes %}
+            <option value="{{ workType.id }}"
+                {% if assessment.workType.id ?? '' == workType.id or (workType.name == 'None' and not assessment.workType) %}
+                    selected="selected"
+                {% endif %}
+                {% if workType.name == 'None' or courseManaged.isReadonly %}
+                    disabled
+                {% endif %}
+            >{{ workType.name }}</option>
+        {% endfor %}
+    </select>
 
     {# ----------------------------------------------------------- #}
     {# Description #}
@@ -78,11 +80,9 @@
         </div>
     </div>
 
-
     {# ----------------------------------------------------------- #}
     {# Default Activity Duration #}
     {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
 
     {# ----------------------------------------------------------- #}
     {# Allowed Time #}
@@ -136,7 +136,6 @@
         </div>
     </div>
 
-
     <div class="row">
         {# Shuffle Items #}
         <div class="small-12 medium-6 columns">
@@ -166,7 +165,6 @@
     {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>
 
-
 {# ----------------------------------------------------------- #}
 {# Dates #}
 {# ----------------------------------------------------------- #}
@@ -176,7 +174,6 @@
         {% include '@learningAssessment/fragments/dates.twig' %}
     </fieldset>
 {% endif %}
-
 
 {# ----------------------------------------------------------- #}
 {# Grading #}
