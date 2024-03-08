@@ -32,26 +32,19 @@
         {% endif %}
 
         <div class="small-12 {{ columnCss }} columns">
-            <label>
-                Work Type
-                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %}>
-                    <option value="" selected
-                        {% if courseManaged.isReadonly %}
+            <label class="required">Work Type</label>
+              <select name="workType" {% if courseManaged.isReadonly %}readonly{% else %}required{% endif %}>
+                {% for workType in allWorkTypes %}
+                    <option value="{{ workType.id }}"
+                        {% if assessment.workType.id ?? '' == workType.id or (workType.name == 'None' and not assessment.workType) %}
+                            selected="selected"
+                        {% endif %}
+                        {% if workType.name == 'None' or courseManaged.isReadonly %}
                             disabled
                         {% endif %}
-                    >None
-                    </option>
-                    {% for workType in allWorkTypes %}
-                        <option value="{{ workType.id }}"
-                            {% if assessment.workType.id ?? '' == workType.id %}
-                                selected="selected"
-                            {% elseif courseManaged.isReadonly %}
-                                disabled
-                            {% endif %}
-                        >{{ workType.name }}</option>
-                    {% endfor %}
-                </select>
-            </label>
+                    >{{ workType.name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         {% if courseManaged.isVisible %}
