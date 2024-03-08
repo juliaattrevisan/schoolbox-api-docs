@@ -489,7 +489,6 @@ class Query
      *
      * @param FolderModel $folder
      * @param User $viewer
-     * @param Access $access
      * @return array
      */
     private function formatMetadataForFolder(FolderModel $folder, User $viewer): array
