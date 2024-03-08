@@ -15,6 +15,13 @@ group oAuth authorization code grant
         UserAgent -> Schoolbox : approves Paperly
         Schoolbox -> Paperly : sends authorization code
         Paperly -> Schoolbox : sends request for access token
+        note right of Schoolbox
+          Paperly does not know the internal ID of Schoolbox users:
+          only their SIS ID and role type.
+
+          This means that the access token must contain claims
+          identifying the user's SIS ID and role type.
+        end note
         Schoolbox -> Paperly : sends access token
         Paperly -> Paperly : creates session for user identified by access token
         activate Paperly
