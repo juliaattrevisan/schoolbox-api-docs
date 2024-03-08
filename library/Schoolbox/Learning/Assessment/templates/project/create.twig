@@ -39,7 +39,6 @@
 <label for="description">Description</label>
 <textarea id="description" name="description">{{ assessment.description }}</textarea>
 
-
 {# ----------------------------------------------------------- #}
 {# Assessment Location #}
 {# ----------------------------------------------------------- #}
@@ -150,6 +149,5 @@
 } %}
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.project.proper} %}
-
 
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

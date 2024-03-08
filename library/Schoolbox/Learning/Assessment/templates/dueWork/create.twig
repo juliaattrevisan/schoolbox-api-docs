@@ -73,7 +73,6 @@
     <label for="assessment-description">Description</label>
     <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
 
-
     {% include 'sub/attachzone.twig' %}
 
     {# ----------------------------------------------------------- #}
@@ -206,7 +205,6 @@
     } only %}
 </fieldset>
 
-
 {# ----------------------------------------------------------- #}
 {# Participation #}
 {# ----------------------------------------------------------- #}
@@ -222,12 +220,10 @@
     courseManagedReadonly: courseManaged.isReadonly
 } %}
 
-
 {# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-
 
 {# ----------------------------------------------------------- #}
 {# General Scripts #}
@@ -287,7 +283,6 @@
         });
     });
 </script>
-
 
 {# ----------------------------------------------------------- #}
 {# Rubric Scripts #}
@@ -378,7 +373,6 @@
              */
             $rubric.on('change', '[data-group-max-value]', calculateGridTotal);
 
-
             // Change a descriptor value: update the group's total
             // (cascades to grid total, too)
             $rubric.on(
@@ -395,13 +389,11 @@
                 }
             );
 
-
             /**
              * Catch a custom event that's fired on rubric csv import
              * Use it to re-init the entire rubric grid
              */
             $('#rubric-attachable').on('rubric-grid-imported', initRubricGrid);
-
 
             /**
              * Calculates max available marks for all groups, and then the overall
@@ -539,7 +531,6 @@
                 // Set and validate the max mark
                 $('#maxMark').val(max).valid();
             }
-
 
             function calculateGroupTotal(groupIdentifier) {
                 var $thisMaxValueInput = $(),
