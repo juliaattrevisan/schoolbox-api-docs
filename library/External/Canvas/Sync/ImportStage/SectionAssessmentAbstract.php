@@ -284,16 +284,21 @@ abstract class SectionAssessmentAbstract
                         $allDayDate = $assessment['all_day_date'];
                     }
 
-                    $assessableImpl = $this->syncAssessableImpl(
-                        $assessmentCanvasId,
-                        $unitImpl,
-                        $classTeacher,
-                        $unlockAt,
-                        $lockAt,
-                        $dueAt,
-                        $allDay,
-                        $allDayDate
-                    );
+                    try {
+                        $assessableImpl = $this->syncAssessableImpl(
+                            $assessmentCanvasId,
+                            $unitImpl,
+                            $classTeacher,
+                            $unlockAt,
+                            $lockAt,
+                            $dueAt,
+                            $allDay,
+                            $allDayDate
+                        );
+                    } catch (Mapper\Exception\Deleted $exception) {
+                        $this->log->warning("Skipping because object is deleted {$canvasEntity} '{$assessment['title']}' (CanvasId: $assessmentCanvasId)");
+                        continue;
+                    }
 
                     if (!$assessableImpl) {
                         continue;
