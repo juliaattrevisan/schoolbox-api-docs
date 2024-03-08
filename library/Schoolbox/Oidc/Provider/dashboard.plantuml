@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor UserAgent
+
+activate UserAgent
+UserAgent -> Schoolbox : visits dashboard
+
+note left of Schoolbox
+    How is the request to Paperly to be verified?
+
+    It will need to contain identifying claims for the
+    user agent (SIS ID + role type), as well as some
+    method for authenticating with Paperly
+    (presumably a client ID + secret).
+end note
+
+Schoolbox -> Paperly : back-channel request to Paperly
+Paperly -> Schoolbox : JSON response
+
+Schoolbox -> Schoolbox : converts JSON to HTML for rendering
+Schoolbox -> UserAgent : sends converted HTML as part of response
+
+@enduml
