@@ -50,7 +50,7 @@ class Api implements IApi
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
-    private const MAX_PAYLOADS = 100;
+    private const MAX_PAYLOADS = 1000;
 
 
     /**
@@ -259,7 +259,6 @@ class Api implements IApi
     private function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
-        $payload = null;
         $n = 0;
 
         /* Iterate all pages from Civica.
@@ -268,13 +267,25 @@ class Api implements IApi
          * 2. If you're requesting your first payload
          * 3. The payload size == page size
          */
-        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['values']) === IApi::PAGE_SIZE)) {
+        while ($n < self::MAX_PAYLOADS) {
             $params = array_merge($params, [
                 'pageNumber' => $pageNum,
                 'pageSize'  => $pageSize
             ]);
 
             $payload = $this->retrieveOne($method, $endpoint, $params);
+
+            /* Exit if this payload is literally empty
+             */
+            if (!isset($payload['values'])) {
+                break;
+            }
+
+            /* Exit if there aren't any values in this payload
+             */
+            if (is_iterable($payload['values']) && !\count($payload['values'])) {
+                break;
+            }
 
             $pageNum++;
             $n++;
