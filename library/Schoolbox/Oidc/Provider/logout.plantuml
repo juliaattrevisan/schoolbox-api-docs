@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'see https://ashend.medium.com/openid-connect-backchannel-logout-144a3198d2a
+'for a quick description of back-channel logout.
+
+actor UserAgent
+participant Schoolbox
+participant Paperly
+
+activate UserAgent
+activate Paperly
+
+note left of UserAgent
+  The user agent has a valid Schoolbox and Paperly session.
+
+  The standard back-channel logout process is for the
+  oAuth provider (Schoolbox) to track its relying parties
+  (in this case Paperly), and send a back-channel logout
+  request to each one.
+end note
+
+UserAgent -> Schoolbox : sends logout request
+Schoolbox -> Schoolbox : checks if a Paperly session exists
+Schoolbox -> Paperly : sends logout token
+Paperly -> Paperly : verifies logout token
+Paperly -> Paperly : destroys session
+deactivate Paperly
+
+Paperly -> Schoolbox : responds with status of logout request
+
+deactivate UserAgent
+
+Schoolbox -> UserAgent : displays login page
+
+@enduml
