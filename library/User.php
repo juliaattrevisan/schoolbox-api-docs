@@ -283,7 +283,7 @@ class User extends DeprecatedModel
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $query .= "( synergy_id = :externalId ) ";
-                $params['externalId'] = [$keyword];
+                $params['externalId'] = $keyword;
             } else {
                 // TODO account for preferred name:
                 //      alternately remove and replace with API search
