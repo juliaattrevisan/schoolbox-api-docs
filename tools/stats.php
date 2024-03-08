@@ -138,6 +138,58 @@ $app = new class extends CliTool\App {
                                     and assess.deleted_at is null
                                     and assess_section.deleted_at is null',
 
+            // More quiz info:
+            // Quizzes which for some reason have no Learnosity reference
+            'quiz_without_learnosity_reference' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_reference IS NULL
+                AND deleted_at IS NULL
+            ",
+            // Quizzes which for some reason have an empty Learnosity reference:
+            // I've seen this happen before, and am not sure why
+            'quiz_with_empty_learnosity_reference' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_reference = ''
+                AND deleted_at IS NULL
+            ",
+            // Quizzes pending processing:
+            // some number is acceptable, but a consistent number might indicate
+            // a quiz unable to even begin processing
+            'quiz_status_pending' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_job_status = 'pending'
+                AND deleted_at IS NULL
+            ",
+            // Quizzes currently processing:
+            // again, some number is acceptable
+            'quiz_status_processing' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_job_status = 'processing'
+                AND deleted_at IS NULL
+            ",
+            // Quizzes failed processing:
+            // eventually this number should revert to zero, as they will be put
+            // back to pending and eventually unprocessable
+            'quiz_status_failed' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_job_status = 'failed'
+                AND deleted_at IS NULL
+            ",
+            // Quizzes unprocessable:
+            // clearly these quizzes have an issue preventing them from being
+            // processed
+            'quiz_status_unprocessable' => "
+                SELECT COUNT(*) FROM assess
+                WHERE assessment_id IS NOT NULL
+                AND learnosity_job_status = 'unprocessable'
+                AND deleted_at IS NULL
+            ",
+
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',

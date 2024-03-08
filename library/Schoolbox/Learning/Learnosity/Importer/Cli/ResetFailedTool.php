@@ -21,6 +21,20 @@ use Schoolbox\Mapper\Exception as MapperException;
 class ResetFailedTool extends BaseTool
 {
     /**
+     * Name of this tool's lock.
+     */
+    public const LOCK_NAME = 'learnosity_reset_failed';
+
+    /**
+     * Expected maximum seconds for this lock to be held per iteration of
+     * `processQuiz`.
+     *
+     * This allows 30 seconds for the setting of a quiz from failed to pending,
+     * but shouldn't need that long.
+     */
+    private const LOCK_TIMEOUT = 30;
+
+    /**
      * This tool works upon quizzes currently being processed.
      */
     protected function getTargetedQuizStatus(): string
@@ -52,6 +66,22 @@ class ResetFailedTool extends BaseTool
     protected function getToolName(): string
     {
         return 'Reset failed quiz duplication tool';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockName(): string
+    {
+        return self::LOCK_NAME;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getLockTimeout(): int
+    {
+        return self::LOCK_TIMEOUT;
     }
 
     /**

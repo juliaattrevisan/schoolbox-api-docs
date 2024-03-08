@@ -22,6 +22,9 @@ use Schoolbox\External\Connector\Liss\Base\Endpoint\Cli\Replay;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
+use Schoolbox\Learning\Learnosity\Importer\Cli\PollProcessingTool;
+use Schoolbox\Learning\Learnosity\Importer\Cli\ResetFailedTool;
+use Schoolbox\Learning\Learnosity\Importer\Cli\RestartPendingTool;
 use Schoolbox\Learning\Turnitin\Cli\CleanserTool;
 use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
 use Schoolbox\Learning\Turnitin\Cli\ReportTool;
@@ -105,7 +108,12 @@ class Inspector extends CliTool\App
 
         /* Search build index tool.
          */
-        IndexBuilder::LOCK_NAME => 'Search build index tool (./tools/search/buildIndex.php)'
+        IndexBuilder::LOCK_NAME => 'Search build index tool (./tools/search/buildIndex.php)',
+
+        // Learnosity state transition tools
+        RestartPendingTool::LOCK_NAME => 'Restart pending quiz duplication (./tools/learnosity/restart-pending.php)',
+        PollProcessingTool::LOCK_NAME => 'Poll processing quiz duplication (./tools/learnosity/poll-processing.php)',
+        ResetFailedTool::LOCK_NAME    => 'Reset failed quiz duplication (./tools/learnosity/reset-failed.php)',
     ];
 
 

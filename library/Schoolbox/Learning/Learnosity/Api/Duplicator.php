@@ -12,12 +12,13 @@ namespace Schoolbox\Learning\Learnosity\Api;
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Generator;
 use LearnositySdk\Exceptions\ValidationException;
+use LearnositySdk\Utils\Uuid;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
-use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
+use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -73,6 +74,8 @@ class Duplicator
      * @throws \DomainException
      * @throws ValidationException
      * @throws \RuntimeException
+     * @throws SourceAssociationException if `$source` has no Learnosity reference: an empty source can't be copied to
+     *                                    a destination.
      */
     public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
@@ -84,6 +87,16 @@ class Duplicator
         /* Clone a Learnosity Reference in Learnosity land
          */
         $oldLearnosityReference = $source->getLearnosityReference();
+
+        // Does this not have a Learnosity reference at all? That's an error.
+        // I've seen empty but not null Learnosity references: not sure why they
+        // happen, though.
+        if (!isset($oldLearnosityReference)) {
+            throw new SourceAssociationException('Source assessment has no Learnosity reference');
+        }
+        if (!Uuid::isValid($oldLearnosityReference)) {
+            throw new SourceAssociationException('Source assessment Learnosity reference is not a valid UUID');
+        }
 
         /* See if there are any items in it;
          * Learnosity crashes when you try to clone an itemless quiz
@@ -106,7 +119,7 @@ class Duplicator
              *  or assign a random uuidv4() arbitrarily, and use that instead...
              *  ...and hope that Learnosity is okay with it
              */
-            $newLearnosityReference = (string)Uuid::uuid4();
+            $newLearnosityReference = Uuid::generate();
 
             /* Make a massive assumption that this _just worked_
              * You could lean on the polling system to find out when this cloning has finished,

@@ -21,6 +21,19 @@ use Schoolbox\Mapper\Exception as MapperException;
 class RestartPendingTool extends BaseTool
 {
     /**
+     * Name of this tool's lock.
+     */
+    public const LOCK_NAME = 'learnosity_restart_pending';
+
+    /**
+     * Expected maximum seconds for this lock to be held per iteration of
+     * `processQuiz`.
+     *
+     * This allows 3 minutes for the duplicate quiz process to be kicked off.
+     */
+    private const LOCK_TIMEOUT = 180;
+
+    /**
      * This tool works upon pending quizzes.
      */
     protected function getTargetedQuizStatus(): string
@@ -117,6 +130,22 @@ class RestartPendingTool extends BaseTool
     protected function getToolName(): string
     {
         return 'Restart pending quiz duplication tool';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockName(): string
+    {
+        return self::LOCK_NAME;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getLockTimeout(): int
+    {
+        return self::LOCK_TIMEOUT;
     }
 
     /**

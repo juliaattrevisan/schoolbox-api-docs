@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
+use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\GenericCollection;
@@ -20,6 +21,10 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
+/**
+ * Base class for the tools for transitioning a Learnosity quiz duplication
+ * through its states.
+ */
 abstract class BaseTool extends CliTool\App
 {
     /**
@@ -91,9 +96,38 @@ abstract class BaseTool extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        $baseUrl = (new Factory($this->getConfig()))->buildFullyQualified();
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in perform mode (-p): quizzes will be changed.');
+        } else {
+            $this->getLogger()->notice('Running in planning mode: use -p to commit changes to quizzes.');
+        }
+
+        // Firstly, check if the importer is running: if it is, exit.
+        // Can't let these tools run whilst the importer is running, because it
+        // is possible this tool will attempt to duplicate a quiz which has a
+        // Learnosity reference, but its content has not yet synced across.
+        try {
+            $importerLock = $this->acquireLock(ImporterTool::LOCK_NAME, 1);
+        } catch (RuntimeException) {
+            $this->getLogger()->warning(
+                'Importer lock is held by another process (likely the Learnosity importer): aborting due to possible conflict',
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        }
+        $importerLock->release();
+        unset($importerLock);
+
+        // Also ensure that this tool is not already running:
+        // the process _should_ be idempotent, but still would prefer that no
+        // more than one is running at once.
+        try {
+            $toolLock = $this->acquireLock($this->getLockName(), $this->getLockTimeout());
+        } catch (RuntimeException) {
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        }
 
         // Build duplicator
+        $baseUrl          = (new Factory($this->getConfig()))->buildFullyQualified();
         $this->duplicator = new Api\Duplicator(
             new Api(
                 $baseUrl->getHost(),
@@ -118,6 +152,7 @@ abstract class BaseTool extends CliTool\App
         $this->getLogger()->info(sprintf('Found %d quizzes', count($quizzes)));
         foreach ($quizzes as $quiz) {
             // Not a quiz somehow? Skip
+            $toolLock->refresh();
             if (!$quiz instanceof QuizDomainModel) {
                 $this->getLogger()->warning(
                     sprintf(
@@ -132,6 +167,9 @@ abstract class BaseTool extends CliTool\App
             /** @noinspection PhpUnhandledExceptionInspection - I want this exception to fall on carpet */
             $this->processQuiz($quiz);
         }
+
+        $toolLock->release();
+        $this->getLogger()->notice($this->perform() ? 'Quizzes modified.' : 'Planning finished.');
     }
 
     /**
@@ -211,6 +249,22 @@ abstract class BaseTool extends CliTool\App
      * @return string
      */
     abstract protected function getToolName(): string;
+
+    /**
+     * Retrieve the name of the lock for this tool.
+     *
+     * @return string
+     */
+    abstract protected function getLockName(): string;
+
+    /**
+     * Retrieve the expected maximum time (in seconds) for a single iteration of
+     * `processQuiz`: the lock will be held and refreshed for this amount of
+     * time.
+     *
+     * @return int
+     */
+    abstract protected function getLockTimeout(): int;
 
     /**
      * Print the help text's description.
