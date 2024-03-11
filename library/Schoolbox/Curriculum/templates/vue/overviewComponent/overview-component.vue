@@ -36,6 +36,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <oc-empty-state
+        v-if="store.hasNoNodes"
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"

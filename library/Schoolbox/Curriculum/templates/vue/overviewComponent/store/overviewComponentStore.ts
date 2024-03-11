@@ -8,8 +8,10 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useStore = defineStore("overviewComponentStore", () => {
     const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
+    const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
 
     return {
         nodes,
+        hasNoNodes,
     };
 });
