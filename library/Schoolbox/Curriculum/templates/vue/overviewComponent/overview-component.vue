@@ -8,10 +8,11 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
+import { useStore } from "./store/overviewComponentStore";
 import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
-    // nodes: Node[] | null; // The curriculum nodes to display
+    nodes: Node[] | null; // The curriculum nodes to display
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     selectedNodes: Node[]; // The nodes already previously selected
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
@@ -22,6 +23,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const store = useStore();
 const selectorStore = useSelectorStore();
 
 /**
