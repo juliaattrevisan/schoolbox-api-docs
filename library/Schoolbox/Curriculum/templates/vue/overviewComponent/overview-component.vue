@@ -10,9 +10,10 @@ import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsMo
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
 import { useStore } from "./store/overviewComponentStore";
 import OcEmptyState from "./oc-empty-state.vue";
+import OcViewNode from "./oc-view-node.vue";
 
 interface Props {
-    nodes: Node[] | null; // The curriculum nodes to display
+    nodes: Node[]; // The curriculum nodes to display
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     selectedNodes: Node[]; // The nodes already previously selected
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
@@ -25,11 +26,13 @@ const props = defineProps<Props>();
 
 const store = useStore();
 const selectorStore = useSelectorStore();
+const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 
 /**
  * Start loading the curriculum data
  */
 window.Vue.onMounted(() => {
+    store.init(props.nodes);
     selectorStore.init(props);
 });
 </script>
@@ -41,6 +44,9 @@ window.Vue.onMounted(() => {
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
+    <div v-else class="l-flex-col">
+        <oc-view-node v-for="node in store.nodes" :key="node.id" :node="node" :depth="depth" />
+    </div>
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal />
 </template>

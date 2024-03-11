@@ -1,0 +1,54 @@
+<script setup lang="ts">
+/**
+ * Show a single node and any of its children
+ */
+
+import type { Node } from "@schoolboxCurriculum/types/Node";
+
+interface Props {
+    node: Node; // the assigned node to display
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+}
+
+const props = defineProps<Props>();
+
+/**
+ * to gradually add more marginLeft to indicate node level depth
+ * @returns {number} - the calculated marginLeft value
+ */
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
+
+/**
+ * To determine whether we need to display further child nodes within this node
+ * @returns {boolean}
+ */
+const showChildren = window.Vue.computed(() => props.node.children && props.node.children.length > 0);
+
+/**
+ * If there's a code available, which means it can be removed from the selected nodes or
+ * the code can be selected to open the curriculum details modal
+ * @returns {boolean}
+ */
+const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
+
+/**
+ * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
+ * or we are at the root level node, or if the search is active
+ * @returns { boolean }
+ */
+// const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+</script>
+
+<template>
+    <div>{{ props.node.name }}</div>
+    <template v-if="showChildren">
+        <oc-view-node
+            v-for="viewNode in props.node.children"
+            :key="viewNode.id"
+            :node="viewNode"
+            :depth="props.depth + 1"
+        />
+    </template>
+</template>
+
+<style scoped></style>
