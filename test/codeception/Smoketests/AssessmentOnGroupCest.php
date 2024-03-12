@@ -124,6 +124,7 @@ class AssessmentOnGroupCest
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
         $newAssessmentRequest->setFormParam('useRubric', 'on');
+        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
 
         $i->amGoingTo("Send request create assessment with rubric on Group Page #{$groupPage->getId()}");
