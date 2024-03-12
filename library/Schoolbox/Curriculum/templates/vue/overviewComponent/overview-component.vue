@@ -46,7 +46,7 @@ window.Vue.onMounted(() => {
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
-    <div v-else class="l-flex-col">
+    <div v-else class="l-flex-col l-pad-s--horiz l-pad-s--top">
         <oc-view-node v-for="node in store.nodeTrees" :key="node.id" :node="node" :depth="depth" />
     </div>
     <oc-actions v-if="!props.isReadOnly" />

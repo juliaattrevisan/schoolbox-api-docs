@@ -57,16 +57,20 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--justify-space l-flex--align-center l-pad-xs" :style="{ marginLeft: marginLeft }">
+    <div class="node l-flex-row l-flex--justify-space l-flex--align-center" :style="{ marginLeft: marginLeft }">
         <div class="l-flex-row l-gap-xs">
             <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
                 >[{{ props.node.code }}]
             </a>
             <h3 class="f-no-margins">{{ props.node.name }}</h3>
         </div>
-        <button v-if="hasCode" @click.prevent="onRemoveSelected">Remove</button>
+        <button
+            v-if="hasCode"
+            class="f-no-icon-button icon-close l-flex-row l-flex--center"
+            aria-label="Remove node"
+            @click.prevent="onRemoveSelected"
+        ></button>
     </div>
-
     <template v-if="showChildren">
         <oc-view-node
             v-for="viewNode in props.node.children"
@@ -77,4 +81,8 @@ function onRemoveSelected() {
     </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+.node:not(:last-child) {
+    border-bottom: 1px solid var(--body-background);
+}
+</style>

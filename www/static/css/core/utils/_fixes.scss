@@ -48,3 +48,15 @@
 .f-container {
     padding: var(--spacing-m);
 }
+
+// to display a icon only button without the typical .actions-small-1 context
+.f-no-icon-button {
+    background: none;
+    color: var(--content-ui-foreground);
+    margin: 0;
+    // min-height: 42px;
+    // min-width: 40px;
+    &:hover {
+        background: var(--content-ui-background);
+    }
+}
