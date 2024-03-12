@@ -49,10 +49,10 @@ function onCodeSelected() {
 }
 
 /**
- * When the code is selected, open the curriculum details modal
+ * Remove the node from the selected nodes
  */
 function onRemoveSelected() {
-    console.warn("remove selected");
+    store.removeNode(props.node);
 }
 </script>
 
