@@ -84,9 +84,7 @@ HELP;
         $nRecordsExported = 0;
 
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
-            $pastoralRecords = $pastoralMapper->findByPredicates($builder->in('id', $pastoralRecordIds));
-
-            foreach ($pastoralRecords as $pastoralRecord) {
+            foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 try {
                     $externalPastoral->syncPastoral($pastoralRecord);
