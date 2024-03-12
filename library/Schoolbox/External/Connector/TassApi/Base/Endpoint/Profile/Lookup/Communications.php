@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
@@ -26,13 +25,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 class Communications
 {
     /**
-     * These endpoint args determine which segment of Parent data you're trying to obtain
-     */
-    public const PARENTS_CURRENT = 'current';
-    public const PARENTS_FUTURE = 'future';
-
-
-    /**
      * This add_num is always used in a pseudo-mandatory way across the fleet.
      * As far as I can tell this is consistently used as a global catch-all
      * for communications across the tass platform
@@ -44,27 +36,23 @@ class Communications
 
 
     /**
-     * Communication Rules constructor.
+     * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
-     * @param LoggerInterface $log
-     * @param IApi $api
+     * @param IApi $api                  $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      * @param int $addnumFather          The add_num field in the getCommunicationRulesDetails payload
      *                                   that refers to a father specifically, as determined by schools' instances
      * @param int $addnumMother          The add_num field in the getCommunicationRulesDetails payload
      *                                   that refers to a mother specifically, as determined by schools' instances
      * @param string $communicationTypes TASS communication rules type codes (in comma separated format) for all guardian relationships
      *                                   that can be associated with students
-     * @param string $parentType         Whether we should process Current or Future parents' communication rules
      */
     public function __construct(
-        private LoggerInterface $log,
         private IApi $api,
         private int $addnumFather,
         private int $addnumMother,
-        private string $communicationTypes,
-        private string $parentType
+        private string $communicationTypes
     ) {
     }
 
@@ -75,53 +63,15 @@ class Communications
      */
     public function generate(): array
     {
-        if (self::PARENTS_CURRENT === $this->parentType) {
-            /* The usual guys: current parents
-             */
-            $this->log->debug('Processing Current parents');
+        $stack = [];
 
-            return $this->processAddresses($this->getCommRules(self::PARENTS_CURRENT));
-        }
-
-        if (self::PARENTS_FUTURE === $this->parentType) {
-            /* Or process Future Parents if turned on in SUDS Control Panel
-             */
-            $this->log->debug('Processing Future parents');
-
-            return $this->processAddresses($this->getCommRules(self::PARENTS_FUTURE));
-        }
-
-        return [];
-    }
-
-
-    /**
-     * Use the api endpoint to get all the data, so we don't have to smash the api
-     * all day. It'll be faster, and we won't incur rate limiting wrath from tass
-     *
-     * @param string $currentStatus
-     * @return array
-     * @throws RuntimeException
-     */
-    public function getCommRules(string $currentStatus): array
-    {
-        return $this->api->retrieveDocument('getCommunicationRulesDetails', [
-            'currentstatus' => $currentStatus,
+        /* Use the api endpoint to get all the data, so we don't have to smash the api
+         * all day. It'll be faster, and we won't incur rate limiting wrath from tass
+         */
+        $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
+            'currentstatus' => 'current',
             'commtype' => $this->communicationTypes
         ]);
-    }
-
-
-    /**
-     * Process the given set of comm rules $addresses, pushing them onto the hash
-     * lookup $stack
-     *
-     * @param array $addresses
-     * @return array
-     */
-    public function processAddresses(array $addresses): array
-    {
-        $stack = [];
 
         /* Inspect each element from the returned data. Family code is stored in
          * parent_code array element and we should index with that; parents in a family
