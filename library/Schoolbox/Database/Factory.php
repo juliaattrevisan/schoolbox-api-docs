@@ -277,6 +277,7 @@ class Factory
                 string(241) "Error connecting to database.
                 DSN String: sqlsrv:Server=172.31.15.10;Database=Synergetic_AUVIC_ALARESS_PRD;LoginTimeout=2;MultipleActiveResultSets=0;
                 PDO Error: SQLSTATE[HYT00]: [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired"
+             *
              */
             // var_dump($e->getMessage());
         }
