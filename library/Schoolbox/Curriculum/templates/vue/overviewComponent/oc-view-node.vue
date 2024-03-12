@@ -67,7 +67,8 @@ function onRemoveSelected() {
         <button
             v-if="hasCode"
             class="f-no-icon-button icon-close l-flex-row l-flex--center"
-            aria-label="Remove node"
+            :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
+            :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
             @click.prevent="onRemoveSelected"
         ></button>
     </div>
