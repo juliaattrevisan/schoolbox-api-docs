@@ -132,8 +132,8 @@ HELP;
 
         // And done
         $log->info("$nRecordsExported pastoral records exported.");
+        $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
         if (count($skippedRecordIds) > 0) {
-            $log->info(count($skippedRecordIds) . " pastoral records skipped because of errors during export.");
             $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
         }
     }
