@@ -9,6 +9,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 export const useStore = defineStore("overviewComponentStore", () => {
     const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
     const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
+    const selectedDetailsNodeId = window.Vue.ref<number | null>(null); // the currently selected node id to display the details of
 
     /**
      * set up the passed properties and start loading the node data
@@ -21,6 +22,7 @@ export const useStore = defineStore("overviewComponentStore", () => {
     return {
         nodes,
         hasNoNodes,
+        selectedDetailsNodeId,
         init,
     };
 });

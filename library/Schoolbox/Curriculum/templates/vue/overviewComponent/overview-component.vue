@@ -48,5 +48,5 @@ window.Vue.onMounted(() => {
         <oc-view-node v-for="node in store.nodes" :key="node.id" :node="node" :depth="depth" />
     </div>
     <cs-modal v-if="selectorStore.hasLoadedOk" />
-    <curriculum-details-modal />
+    <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />
 </template>

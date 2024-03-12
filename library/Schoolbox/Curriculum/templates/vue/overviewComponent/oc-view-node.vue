@@ -4,6 +4,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useStore } from "./store/overviewComponentStore";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -11,6 +12,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const store = useStore();
 
 /**
  * to gradually add more marginLeft to indicate node level depth
@@ -42,7 +45,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * When the code is selected, open the curriculum details modal
  */
 function onCodeSelected() {
-    console.warn("Code selected");
+    store.selectedDetailsNodeId = props.node.id;
 }
 
 /**
@@ -54,9 +57,11 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--justify-space l-pad-xs" :style="{ marginLeft: marginLeft }">
-        <div class="l-flex-row l-pad-xs">
-            <button v-if="hasCode" @click.prevent="onCodeSelected">[{{ props.node.code }}]</button>
+    <div class="l-flex-row l-flex--justify-space l-flex--align-center l-pad-xs" :style="{ marginLeft: marginLeft }">
+        <div class="l-flex-row l-gap-xs">
+            <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
+                >[{{ props.node.code }}]
+            </a>
             <h3 class="f-no-margins">{{ props.node.name }}</h3>
         </div>
         <button v-if="hasCode" @click.prevent="onRemoveSelected">Remove</button>

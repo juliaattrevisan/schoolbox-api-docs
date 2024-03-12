@@ -1,10 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const selectedNode = window.Vue.ref(getEmptyNode());
 const modalEl = window.Vue.ref(null);
+
+interface Props {
+    selectedNodeId: number; // the assigned node to display
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    selectedNodeId: UNSET_ID,
+});
+
+/**
+ * start searching once the search is active, watching the query string for input
+ */
+window.Vue.watch(
+    () => props.selectedNodeId,
+    () => {
+        if (props.selectedNodeId !== UNSET_ID) {
+            selectedNode.value = { id: props.selectedNodeId };
+            modalEl.value.open();
+        }
+    },
+);
 
 /**
  * a node link has been selected, so open up the details modal,
@@ -13,10 +34,10 @@ const modalEl = window.Vue.ref(null);
  * details will be loaded in
  * @param { Event } event - the click event
  */
-function onNodeLinkSelected(event) {
+function onNodeLinkSelected(event: Event) {
     event.preventDefault();
-    const href = event.currentTarget.href;
-    const selectedNodeId = parseInt(href.substring(href.indexOf("#") + 1, href.length));
+    const { href } = event.currentTarget as HTMLAnchorElement;
+    const selectedNodeId = parseInt(href.substring(href.indexOf("#") + 1, href.length), 10);
     selectedNode.value = { id: selectedNodeId };
     modalEl.value.open();
 }
@@ -32,7 +53,7 @@ function findNodeLinks() {
 }
 
 window.Vue.onMounted(() => {
-    window.Vue.nextTick(() => {
+    void window.Vue.nextTick(() => {
         findNodeLinks();
     });
 });
