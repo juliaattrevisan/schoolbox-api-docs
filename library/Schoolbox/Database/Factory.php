@@ -271,7 +271,7 @@ class Factory
             return $connectorExternal;
         } catch (Exception $e) {
             /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
-             * here, which is annoying. This makes a NullConnetor which, for some usages of the external db,
+             * here, which is annoying. This makes a NullConnector which, for some usages of the external db,
              * causes it to successfully fail silently. It's not logged anywhere.
              *
                 string(241) "Error connecting to database.
