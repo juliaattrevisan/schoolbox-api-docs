@@ -70,13 +70,31 @@ HELP;
         }
 
         // Retrieve all pastoral records and re-save
-        $log->info("Beginning export of pastoral records...");
-        $pastoralRecords = $pastoralMapper->findAll();
+        $log->info('Finding pastoral records to export...');
+        $pastoralRecordIds = $pastoralMapper->findAllIds(['deleted' => false]);
+        $log->info("Beginning export of " . count($pastoralRecordIds) . " pastoral records...");
 
-        foreach ($pastoralRecords as $pastoralRecord) {
+        $skippedRecordIds = [];
+        $nRecordsExported = 0;
+
+        foreach ($pastoralRecordIds as $pastoralRecordId) {
+            try {
+                $pastoralRecord = $pastoralMapper->findById($pastoralRecordId);
+            } catch (\Exception $e) {
+                $log->info("Could not export pastoral record with id $pastoralRecordId.  Error: {$e->getMessage()}");
+                continue;
+            }
+
             $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
-            $externalPastoral->syncPastoral($pastoralRecord);
+            try {
+                $externalPastoral->syncPastoral($pastoralRecord);
+            } catch (\Exception $e) {
+                $log->debug("Could not syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                $skippedRecordIds[] = $pastoralRecord->getId();
+            }
             $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
+
+            $nRecordsExported++;
 
             // Re-process all attachments (only if attachment upload is on)
             if (!$externalPastoralUpload) {
@@ -108,6 +126,10 @@ HELP;
         }
 
         // And done
-        $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
+        $log->info("$nRecordsExported pastoral records exported.");
+        if (count($skippedRecordIds) > 0) {
+            $log->info(count($skippedRecordIds) . " pastoral records skipped because of errors during export.");
+            $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
+        }
     }
 }
