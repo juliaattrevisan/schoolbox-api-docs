@@ -36,18 +36,67 @@ class Family
 
 
     /**
+     * Default spouse prefix
+     *
+     * @var string
+     */
+    private const DEFAULT_SPOUSE_PREFIX = 'S';
+
+
+    /**
      * Parents records are actually Family records; Family records contain exactly two nodes,
      * one for each parent, plus some miscellaneous stuff.
      *
      * These two nodes have the following keys and we use them to identify father and mother details.
      */
-    public const PARENT_PERSON_NODES = ['person2', 'person1'];
+    private const PARENT_PERSON_NODES = ['person2', 'person1'];
 
 
     /**
      * 'N' means someone is alive; we disregard the dead.
      */
     private const DECEASED_FLAG = 'N';
+
+
+    /**
+     * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
+     *
+     * @var IApi
+     */
+    private IApi $api;
+
+
+    /**
+     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
+     * because tass doesn't treat parents independently of families.
+     *
+     * @var string
+     */
+    private string $spousePrefix;
+
+
+    /**
+     * Set in admin, corresponds to external_tass_addnum_father
+     *
+     * @var int
+     */
+    private int $addnumFather;
+
+
+    /**
+     * Set in admin, corresponds to external_tass_addnum_mother
+     *
+     * @var int
+     */
+    private int $addnumMother;
+
+
+    /**
+     * An array of phone numbers indexed by family code
+     *
+     * @var array
+     */
+    private array $phones;
 
 
     /**
@@ -59,33 +108,74 @@ class Family
 
 
     /**
-     * @var ParentExternalId
-     */
-    private ParentExternalId $externalIdGenerator;
-
-
-    /**
      * Family constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
      * @param LoggerInterface $log
-     * @param IApi            $api            $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
-     * @param string          $spousePrefix   Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     *                                        because tass doesn't treat parents independently of families.
-     * @param int             $addnumFather   Set in admin, corresponds to external_tass_addnum_father
-     * @param int             $addnumMother   Set in admin, corresponds to external_tass_addnum_mother
-     * @param array           $phones         An array of phone numbers indexed by family code
+     * @param IApi            $api
+     * @param string          $spousePrefix
+     * @param int             $addnumFather
+     * @param int             $addnumMother
+     * @param array           $phones
      */
     public function __construct(
         private LoggerInterface $log,
-        private IApi $api,
+        IApi $api,
         string $spousePrefix,
-        private int $addnumFather,
-        private int $addnumMother,
-        private array $phones,
+        int $addnumFather,
+        int $addnumMother,
+        array $phones,
     ) {
-        $this->externalIdGenerator = new ParentExternalId($spousePrefix);
+        $this->api = $api;
+
+        /* Calculate a spouse prefix if one was set; otherwise use a default
+         * Shanked from that Tass Helper class
+         */
+        $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
+
+        /* Some admin vars we'll use in this place
+         */
+        $this->addnumFather = $addnumFather;
+        $this->addnumMother = $addnumMother;
+
+        /* Phone lookup; data from another endpoint
+         */
+        $this->phones = $phones;
+    }
+
+
+    /**
+     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
+     * I guess sfa_num stands for Split Family Access number or something
+     *
+     * @param string $node
+     * @param string $identifier
+     * @param string $sfaNum
+     * @return string
+     */
+    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    {
+        /* Do some funny prefix stuff for parents
+         */
+        if (self::FATHER_NODE === $node) {
+            $externalId = "P{$identifier}";
+        } else {
+            $externalId = "{$this->spousePrefix}{$identifier}";
+        }
+
+        /* If this was a split family, chuck a $sfaNum into the mix
+         *
+         * After 99,999 students pass through a tass system, this scheme will stop working
+         * due to collisions between old ids and new ones with prefix
+         *
+         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
+         */
+        if ('' !== $sfaNum) {
+            $externalId .= $sfaNum ;
+        }
+
+        return $externalId;
     }
 
 
@@ -192,7 +282,7 @@ class Family
                         /* Only process the living
                          */
                         if ($this->isAlive($node, $family)) {
-                            $personExternalId = $this->externalIdGenerator->derive($node, (string)$family['user_code'], '');
+                            $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
                             $this->processParentNode($node, $personExternalId, $family);
                         } else {
@@ -255,7 +345,7 @@ class Family
                             /* Only process the living
                              */
                             if ($this->isAlive(self::FATHER_NODE, $subfamily)) {
-                                $personExternalId = $this->externalIdGenerator->derive(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                                $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
                                     self::FATHER_NODE,
@@ -279,7 +369,7 @@ class Family
                             /* Only process the living
                              */
                             if ($this->isAlive(self::MOTHER_NODE, $subfamily)) {
-                                $personExternalId = $this->externalIdGenerator->derive(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                                $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
                                     self::MOTHER_NODE,
