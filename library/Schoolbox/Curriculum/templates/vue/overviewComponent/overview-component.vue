@@ -13,7 +13,7 @@ import OcEmptyState from "./oc-empty-state.vue";
 import OcViewNode from "./oc-view-node.vue";
 
 interface Props {
-    nodes: Node[]; // The curriculum nodes to display
+    nodeTrees: Node[]; // The curriculum nodes trees to display
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     selectedNodes: Node[]; // The nodes already previously selected
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
@@ -32,7 +32,7 @@ const depth = window.Vue.ref(0); // to increment each time we go down the node t
  * Start loading the curriculum data
  */
 window.Vue.onMounted(() => {
-    store.init(props.nodes);
+    store.init(props.nodeTrees, props.selectedNodes);
     selectorStore.init(props);
 });
 </script>
@@ -45,7 +45,7 @@ window.Vue.onMounted(() => {
         :locale-unit="props.localeUnit"
     />
     <div v-else class="l-flex-col">
-        <oc-view-node v-for="node in store.nodes" :key="node.id" :node="node" :depth="depth" />
+        <oc-view-node v-for="node in store.nodeTrees" :key="node.id" :node="node" :depth="depth" />
     </div>
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />

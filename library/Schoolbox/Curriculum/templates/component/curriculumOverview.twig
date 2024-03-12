@@ -1,6 +1,6 @@
 <div data-overview-component>
     <overview-component
-        :nodes="{{ nodes | json_encode }}"
+        :node-trees="{{ nodes|json_encode }}"
         :is-read-only="false"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"

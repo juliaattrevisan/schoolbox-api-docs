@@ -5,22 +5,27 @@
 
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 export const useStore = defineStore("overviewComponentStore", () => {
-    const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
-    const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
-    const selectedDetailsNodeId = window.Vue.ref<number | null>(null); // the currently selected node id to display the details of
+    const nodeTrees = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
+    const selectedNodes = window.Vue.ref<Node[]>([]); // the currently selected nodes (just those that are selected, not the children within)
+    const hasNoNodes = window.Vue.computed(() => nodeTrees.value.length === 0);
+    const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // the currently selected node id to display the details of
 
     /**
      * set up the passed properties and start loading the node data
-     * @param {Node[]} $nodes - the nodes to display
+     * @param {Node[]} $nodeTrees - the node trees to display
+     * @param {Node[]} $selectedNodes - the nodes selected
      */
-    function init($nodes: Node[]): void {
-        nodes.value = $nodes;
+    function init($nodeTrees: Node[], $selectedNodes: Node[]): void {
+        nodeTrees.value = $nodeTrees;
+        selectedNodes.value = $selectedNodes;
     }
 
     return {
-        nodes,
+        nodeTrees,
+        selectedNodes,
         hasNoNodes,
         selectedDetailsNodeId,
         init,
