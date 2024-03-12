@@ -78,9 +78,9 @@ class Factory
     public static function getInstanceExternal(): ?IConnector
     {
         // TODO SA-8354: use DI'd database instead
-//        if (!isset(self::$connectorExternal)) {
+        if (!isset(self::$connectorExternal)) {
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
-//        }
+        }
 
         return (self::$connectorExternal instanceof NullConnector ? null : self::$connectorExternal);
     }
@@ -277,7 +277,6 @@ class Factory
                 string(241) "Error connecting to database.
                 DSN String: sqlsrv:Server=172.31.15.10;Database=Synergetic_AUVIC_ALARESS_PRD;LoginTimeout=2;MultipleActiveResultSets=0;
                 PDO Error: SQLSTATE[HYT00]: [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired"
-             *
              */
             // var_dump($e->getMessage());
         }
