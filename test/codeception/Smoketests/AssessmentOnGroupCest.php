@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests\Smoketests;
 
 use Tests\Support\IntegrationTester;
+use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
 use Tests\Support\Payload\Assessable\Grading\AssessmentMark;
 use Tests\Support\Payload\Group\AddMembers;
@@ -82,7 +83,7 @@ class AssessmentOnGroupCest
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo('Send request create assessment on Group Page #' . $groupPage->getId());
         $i->sendRequest($newAssessmentRequest);
         $i->seeResponseCodeIs(303);
@@ -125,7 +126,7 @@ class AssessmentOnGroupCest
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
         $newAssessmentRequest->setFormParam('useRubric', 'on');
-        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
 
         $i->amGoingTo("Send request create assessment with rubric on Group Page #{$groupPage->getId()}");
@@ -168,7 +169,7 @@ class AssessmentOnGroupCest
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title = 'Testing Submit Assessment On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -221,7 +222,7 @@ class AssessmentOnGroupCest
         $assessment_title     = 'Testing Mark Assessment with rubric On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessmentRequest->setTitle($assessment_title);
         $newAssessmentRequest->setFormParam('useRubric', 'on');
-        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $this->setDefaultRubric($i, $newAssessmentRequest, $groupPage->getId());
         $i->amGoingTo('Send request create asessment on Group Page #' . $groupPage->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -279,7 +280,7 @@ class AssessmentOnGroupCest
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create assessment on Group Page #' . $groupPage->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -332,7 +333,7 @@ class AssessmentOnGroupCest
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title = 'Testing Submit Assessment by attaching a file On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -391,7 +392,7 @@ class AssessmentOnGroupCest
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title = 'Testing Submit Assessment by typing something in the ckeditor On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -440,7 +441,7 @@ class AssessmentOnGroupCest
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title = 'Testing  Write User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -492,7 +493,7 @@ class AssessmentOnGroupCest
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
         $assessment_title = 'Testing  Full Access User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -542,7 +543,7 @@ class AssessmentOnGroupCest
         $assessment_title = 'Testing  Read Only User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
         $newAssessment->setFormParam('acceptOnline', 1);
-        $newAssessment->setFormParam('workType', 1); // Required form parameter.
+        $newAssessment->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
@@ -605,7 +606,7 @@ class AssessmentOnGroupCest
     ): IAssessable {
         $newAssessmentRequest = new Payload\Assessable\Create($contextType, $contextId, $folderId, $assessmentType);
         $newAssessmentRequest->setTitle($title);
-        $newAssessmentRequest->setFormParam('workType', 1); // Required form parameter.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo("Send request create $assessmentType on Folder #$folderId for context $contextType ($contextId)");
         $i->sendRequest($newAssessmentRequest);
         $i->seeResponseCodeIs(303);

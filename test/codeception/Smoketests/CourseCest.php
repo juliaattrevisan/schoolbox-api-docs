@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests\Smoketests;
 
 use Tests\Support\IntegrationTester;
+use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -129,7 +130,7 @@ class CourseCest
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('workType', 1); // Cannot be null;
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create assessment on Unit spec #' . $unitSpec->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -139,7 +140,7 @@ class CourseCest
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_PROJECT);
         $newAssessmentRequest->setTitle($project_name);
-        $newAssessmentRequest->setFormParam('workType', 1); // Cannot be null;
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create project on Unit spec #' . $unitSpec->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -147,7 +148,7 @@ class CourseCest
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_PROJECT, $projectSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($project_duework_name);
-        $newAssessmentRequest->setFormParam('workType', 1); // Cannot be null;
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create due work on Project #' . $unitSpec->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -268,7 +269,7 @@ class CourseCest
         $project_duework_name = 'Assessment for project in class at ' . $timestamp;
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_PROJECT, $projectSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($project_duework_name);
-        $newAssessmentRequest->setFormParam('workType', 1); // Cannot be null;
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create due work on Project #' . $unitSpec->getId());
         $i->sendRequest($newAssessmentRequest);
@@ -536,7 +537,7 @@ class CourseCest
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpecId, $unitFolderId, $assessmentType);
 
         $newAssessmentRequest->setTitle($assessment_title);
-        $newAssessmentRequest->setFormParam('workType', 1); // Cannot be null.
+        $newAssessmentRequest->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Send request create assessment on Unit spec #' . $unitSpecId);
         $i->sendRequest($newAssessmentRequest);
@@ -551,7 +552,7 @@ class CourseCest
     {
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($courseSpecId);
         $unitSpecPayload->setFormParam('name', $unit_name);
-        $unitSpecPayload->setFormParam('workType', 1); // Cannot be null.
+        $unitSpecPayload->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
         $i->amGoingTo('Send request create a unit spec');
         $i->sendRequest($unitSpecPayload);
     }
