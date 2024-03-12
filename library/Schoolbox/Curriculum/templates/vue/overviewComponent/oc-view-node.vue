@@ -39,7 +39,9 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * or we are at the root level node, or if the search is active
  * @returns { boolean }
  */
-// const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+const showRemove = window.Vue.computed(
+    () => hasCode.value && store.selectedNodesStore.nodesIds.includes(props.node.id),
+);
 
 /**
  * When the code is selected, open the curriculum details modal
@@ -65,7 +67,7 @@ function onRemoveSelected() {
             <h3 class="f-no-margins">{{ props.node.name }}</h3>
         </div>
         <button
-            v-if="hasCode"
+            v-if="showRemove"
             class="f-no-icon-button icon-close l-flex-row l-flex--center"
             :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
             :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
@@ -83,6 +85,10 @@ function onRemoveSelected() {
 </template>
 
 <style scoped>
+.node {
+    min-height: 2.5rem;
+}
+
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
 }

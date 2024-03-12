@@ -45,6 +45,7 @@ export const useStore = defineStore("overviewComponent", () => {
         nodeTrees,
         hasNoNodes,
         selectedDetailsNodeId,
+        selectedNodesStore,
         init,
         removeSelectedNode,
     };
