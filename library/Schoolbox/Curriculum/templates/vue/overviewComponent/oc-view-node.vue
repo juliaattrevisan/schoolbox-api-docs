@@ -52,7 +52,7 @@ function onCodeSelected() {
  * Remove the node from the selected nodes
  */
 function onRemoveSelected() {
-    store.removeNode(props.node);
+    store.removeSelectedNode(props.node);
 }
 </script>
 

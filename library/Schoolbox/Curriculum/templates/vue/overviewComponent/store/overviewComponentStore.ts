@@ -16,7 +16,7 @@ export const useStore = defineStore("overviewComponent", () => {
     const selectedNodesStore = useSelectedNodesStore();
 
     /**
-     * to open the modal when requested
+     * to update the backend with the latest selected nodes, so the nodeTree can be updated
      */
     window.Vue.watch(
         () => selectedNodesStore.nodes,
@@ -40,8 +40,8 @@ export const useStore = defineStore("overviewComponent", () => {
      * which will then trigger the watch to update the nodeTree
      * @param {Node} node - the node to remove
      */
-    function removeNode(node: Node): void {
-        selectedNodesStore.removeNode(node);
+    function removeSelectedNode(node: Node): void {
+        selectedNodesStore.remove(node);
     }
 
     return {
@@ -50,6 +50,6 @@ export const useStore = defineStore("overviewComponent", () => {
         hasNoNodes,
         selectedDetailsNodeId,
         init,
-        removeNode,
+        removeSelectedNode,
     };
 });

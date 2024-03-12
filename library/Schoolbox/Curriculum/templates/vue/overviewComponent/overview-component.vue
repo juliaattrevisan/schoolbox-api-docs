@@ -11,6 +11,7 @@ import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.
 import { useStore } from "./store/overviewComponentStore";
 import OcEmptyState from "./oc-empty-state.vue";
 import OcViewNode from "./oc-view-node.vue";
+import OcActions from "./oc-actions.vue";
 
 interface Props {
     nodeTrees: Node[]; // The curriculum nodes trees to display
@@ -47,6 +48,7 @@ window.Vue.onMounted(() => {
     <div v-else class="l-flex-col">
         <oc-view-node v-for="node in store.nodeTrees" :key="node.id" :node="node" :depth="depth" />
     </div>
+    <oc-actions v-if="!props.isReadOnly" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />
 </template>
