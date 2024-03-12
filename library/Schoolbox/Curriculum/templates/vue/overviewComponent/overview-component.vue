@@ -30,10 +30,11 @@ const selectorStore = useSelectorStore();
 const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 
 /**
- * Start loading the curriculum data
+ * Store the nodeTrees and start loading the initial curriculum data
+ * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store.init(props.nodeTrees, props.selectedNodes);
+    store.init(props.nodeTrees);
     selectorStore.init(props);
 });
 </script>

@@ -10,7 +10,6 @@ import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelect
 
 export const useStore = defineStore("overviewComponent", () => {
     const nodeTrees = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
-    const selectedNodes = window.Vue.ref<Node[]>([]); // the currently selected nodes (just those that are selected, not the children within)
     const hasNoNodes = window.Vue.computed(() => nodeTrees.value.length === 0);
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // the currently selected node id to display the details of
     const selectedNodesStore = useSelectedNodesStore();
@@ -26,13 +25,11 @@ export const useStore = defineStore("overviewComponent", () => {
     );
 
     /**
-     * set up the passed properties and start loading the node data
+     * Store a reference to the nodeTrees to display
      * @param {Node[]} $nodeTrees - the node trees to display
-     * @param {Node[]} $selectedNodes - the nodes selected
      */
-    function init($nodeTrees: Node[], $selectedNodes: Node[]): void {
+    function init($nodeTrees: Node[]): void {
         nodeTrees.value = $nodeTrees;
-        selectedNodes.value = $selectedNodes;
     }
 
     /**
@@ -46,7 +43,6 @@ export const useStore = defineStore("overviewComponent", () => {
 
     return {
         nodeTrees,
-        selectedNodes,
         hasNoNodes,
         selectedDetailsNodeId,
         init,

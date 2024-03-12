@@ -15,7 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /**
- * start searching once the search is active, watching the query string for input
+ * An alternative to findNodeLinks() is to pass the selectedNodeId prop
+ * and changes will trigger the details modal to open
  */
 window.Vue.watch(
     () => props.selectedNodeId,
