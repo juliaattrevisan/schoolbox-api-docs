@@ -78,9 +78,9 @@ class Factory
     public static function getInstanceExternal(): ?IConnector
     {
         // TODO SA-8354: use DI'd database instead
-        if (!isset(self::$connectorExternal)) {
+//        if (!isset(self::$connectorExternal)) {
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
-        }
+//        }
 
         return (self::$connectorExternal instanceof NullConnector ? null : self::$connectorExternal);
     }
@@ -270,7 +270,15 @@ class Factory
 
             return $connectorExternal;
         } catch (Exception $e) {
-            // noop
+            /* If the connectivity doesn't work for some throwable reason, you'll find it silently discarded
+             * here, which is annoying. This makes a NullConnetor which, for some usages of the external db,
+             * causes it to successfully fail silently. It's not logged anywhere.
+             *
+                string(241) "Error connecting to database.
+                DSN String: sqlsrv:Server=172.31.15.10;Database=Synergetic_AUVIC_ALARESS_PRD;LoginTimeout=2;MultipleActiveResultSets=0;
+                PDO Error: SQLSTATE[HYT00]: [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired"
+             */
+            // var_dump($e->getMessage());
         }
         return new NullConnector();
     }
