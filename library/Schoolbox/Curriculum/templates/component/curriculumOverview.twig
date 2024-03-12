@@ -1,6 +1,9 @@
+<!-- selectedNodes below for testing only -->
+{% set selectedNodes = [{"id":128,"name":"Outcome 1: Children have a strong sense of identity","code":"EYLF-1","description":"<p>The foundation of children's learning, development, and well-being is a healthy identity. Children develop their own identities and learn about themselves through their interactions with other kids, their families, and their communities. This encompasses the interactions they have with other people, places, and objects as well as the deeds and reactions of others. Identity is not static; it evolves over time as a result of experiences. As they transition from one environment to another, children might have many identities.&nbsp;<br>The building blocks of identity - \"Who I am,\" \"How I belong,\" and \"What is my influence?\" - are relationships. Children's development of a positive sense of self-worth depends on the connections between educators, families, and children, which are supported by relational pedagogy. Children establish their identity through relationships and interactions with people, participating in the complexities and joys of life, and learning how to overcome problems that they face on a daily basis.</p>","reference":null,"children":[],"breadcrumb":"","uuid":null,"enabled":true}] %}
+
 <div data-overview-component>
     <overview-component
-        :node-trees="{{ nodes|json_encode }}"
+        :node-trees="{{ (nodes ?? []) | json_encode }}"
         :is-read-only="false"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
