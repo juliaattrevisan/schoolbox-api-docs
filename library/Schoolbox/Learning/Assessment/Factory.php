@@ -162,7 +162,7 @@ class Factory
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
-        $this->setWorkType(empty($post['workType']) ? null : (int)trim($post['workType']));
+        $this->setWorkType((int)trim($post['workType'])); // Note assessment.work_type_id cannot be null.
         $this->setDescription(trim($post['description'] ?? ''));
         $this->setCreator($creator);
         $this->setWeight((float)(trim($post['weight'] ?? '')));
