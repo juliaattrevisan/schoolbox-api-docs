@@ -16,7 +16,7 @@ const props = defineProps<Props>();
  * to gradually add more marginLeft to indicate node level depth
  * @returns {number} - the calculated marginLeft value
  */
-const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 1}rem)`);
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -37,10 +37,31 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * @returns { boolean }
  */
 // const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+
+/**
+ * When the code is selected, open the curriculum details modal
+ */
+function onCodeSelected() {
+    console.warn("Code selected");
+}
+
+/**
+ * When the code is selected, open the curriculum details modal
+ */
+function onRemoveSelected() {
+    console.warn("remove selected");
+}
 </script>
 
 <template>
-    <div>{{ props.node.name }}</div>
+    <div class="l-flex-row l-flex--justify-space l-pad-xs" :style="{ marginLeft: marginLeft }">
+        <div class="l-flex-row l-pad-xs">
+            <button v-if="hasCode" @click.prevent="onCodeSelected">[{{ props.node.code }}]</button>
+            <h3 class="f-no-margins">{{ props.node.name }}</h3>
+        </div>
+        <button v-if="hasCode" @click.prevent="onRemoveSelected">Remove</button>
+    </div>
+
     <template v-if="showChildren">
         <oc-view-node
             v-for="viewNode in props.node.children"
