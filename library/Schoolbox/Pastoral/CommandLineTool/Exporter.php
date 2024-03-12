@@ -77,7 +77,12 @@ HELP;
         $skippedRecordIds = [];
         $nRecordsExported = 0;
 
-        foreach ($pastoralRecordIds as $pastoralRecordId) {
+        for ($i = 0; $i < count($pastoralRecordIds); ++$i) {
+            if ($i % 100 === 0) {
+                $log->info("Now processing record $i of " . count($pastoralRecordIds) . '.  ' . round((100 * $i) / count($pastoralRecordIds)) . '% complete.');
+            }
+
+            $pastoralRecordId = $pastoralRecordIds[$i];
             try {
                 $pastoralRecord = $pastoralMapper->findById($pastoralRecordId);
             } catch (\Exception $e) {
