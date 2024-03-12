@@ -128,7 +128,7 @@ HELP;
             $nRecordsProcessed = ($batchIndex + 1) * self::BATCH_SIZE;
 
             if ($nPastoralRecordIds > self::BATCH_SIZE) {
-                $log->info("Processed $nRecordsProcessed records of $nPastoralRecordIds.  " . round($nRecordsProcessed / $nPastoralRecordIds) . '% complete.');
+                $log->info("Processed $nRecordsProcessed records of $nPastoralRecordIds.  " . round(100 * $nRecordsProcessed / $nPastoralRecordIds) . '% complete.');
             }
         }
 
