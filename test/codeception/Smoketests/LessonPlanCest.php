@@ -84,6 +84,8 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
+        $lessonPlanCreate->setFormParam('workType', 1);
+
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
         $i->sendRequest($lessonPlanCreate);
@@ -155,6 +157,8 @@ class LessonPlanCest
             $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][template]', '' . ($lessonPlanTemplateFieldId + $j));
             $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][body]', 'Body field text updated' . ($lessonPlanFieldId  + $j));
         }
+
+        $lessonPlanUpdate->setFormParam('workType', 1); // Cannot be null.
 
         $i->amGoingTo('Check the lesson plan is updated');
         $i->sendRequest($lessonPlanUpdate);
@@ -317,6 +321,8 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][template]', '' . ($lessonPlanTemplateFieldId1 + $j));
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
+
+        $lessonPlanCreate->setFormParam('workType', 1); // Cannot be null.
 
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
