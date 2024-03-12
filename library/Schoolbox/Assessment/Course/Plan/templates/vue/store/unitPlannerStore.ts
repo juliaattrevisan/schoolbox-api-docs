@@ -1,36 +1,44 @@
+import { gsap } from "gsap";
+import { Draggable } from "gsap/Draggable";
+import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Unit } from "../unitPlannerTypes";
 
-const defaultUnexpandedUnitHeight = 300;
-/* The height of a unit when it is being dragged, in px */
-const dragUnitHeight = 80;
+gsap.registerPlugin(Draggable);
+gsap.registerPlugin(ScrollToPlugin);
+
+const defaultUnexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
+const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
 
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const isDragging = window.Vue.ref(false);
     const isDraggingNextTick = window.Vue.ref(false);
     window.Vue.watch(isDragging, (newValue) => {
+        // Wait until the next tick to set isDraggingNextTick to true
+        // Ensures CSS transitions are not interrupted
+        // Note: Using Vue.nextTick() here does not work as expected
         if (newValue) {
-            isDraggingNextTick.value = true;
-        } else {
-            // Wait until the next tick to set isDraggingNextTick to false
-            // Ensures CSS transitions are not interrupted
-            //
-            // Note: Using Vue.nextTick() here does not work as expected
             setTimeout(() => {
-                isDraggingNextTick.value = false;
+                isDraggingNextTick.value = true;
             }, 0);
+        } else {
+            isDraggingNextTick.value = false;
         }
     });
 
     const unexpandedUnitHeight = window.Vue.computed(() => {
         return isDraggingNextTick.value ? dragUnitHeight : defaultUnexpandedUnitHeight;
     });
-    const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight.value}px`);
 
     const units = window.Vue.ref<Unit[]>([]);
     const routeFolderSequence = window.Vue.ref<string | null>(null);
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
+
+    // Allow the refs to be passed in instead of creating and monitoring two
+    let unitPlannerContainerEl: ReturnType<typeof window.Vue.ref<HTMLElement>>;
+    let headerRowHeight: ReturnType<typeof window.Vue.computed<number>>;
+    let unitPlannerContainerScrollTop: ReturnType<typeof window.Vue.ref<number>>;
 
     const expandedUnitIDs = window.Vue.ref<Unit["id"][]>([]);
     const expandedUnits = window.Vue.computed(() => {
@@ -48,15 +56,81 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         });
     });
 
+    const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
+    const dragCurrentPointerY = window.Vue.ref<number | null>(null);
+    const dragInitial = window.Vue.ref<{
+        y: number;
+        deltaY: number;
+        offsetY: number;
+        pointerY: number;
+        scrollTop: number;
+    } | null>(null);
+
+    const dragPlaceholderY = window.Vue.computed(() => {
+        if (
+            dragCurrentPointerY.value === null ||
+            dragInitial.value === null ||
+            unitPlannerContainerEl.value === undefined ||
+            unitPlannerContainerScrollTop.value === undefined
+        ) {
+            return -1;
+        }
+
+        return Math.max(
+            0,
+            Math.min(
+                dragCurrentPointerY.value -
+                    unitPlannerContainerEl.value.getBoundingClientRect().top +
+                    unitPlannerContainerScrollTop.value -
+                    headerRowHeight.value -
+                    dragInitial.value.offsetY,
+                dragUnitHeight * units.value.length,
+            ),
+        );
+    });
+
+    // Reorder the selected unit in the list based on the drag position
+    const dragOrderedUnits = window.Vue.computed(() => {
+        if (dragCurrentUnit.value === null || dragInitial.value === null) {
+            return units.value;
+        }
+
+        const dragIndex = Math.floor(Math.max(0, dragPlaceholderY.value) / dragUnitHeight);
+        const dragUnitIndex = units.value.findIndex((u) => u.id === dragCurrentUnit.value!.id);
+
+        if (dragIndex === dragUnitIndex) {
+            return units.value;
+        }
+
+        const newOrderedUnits = [...units.value];
+        newOrderedUnits.splice(dragUnitIndex, 1);
+        newOrderedUnits.splice(dragIndex, 0, dragCurrentUnit.value);
+
+        return newOrderedUnits;
+    });
+
     /**
      * store any passed through properties
      * @param { Unit[] } $units - the units to store
      * @param { string|null } $routeFolderSequence - the route to use when resequencing, if the user has access to do so
+     * @param { ReturnType<typeof window.Vue.ref<HTMLElement>> } $unitPlannerContainerEl - the unit planner scrollable container element
+     * @param { ReturnType<typeof window.Vue.computed<number>> } $headerRowHeight - the height of the header row
+     * @param { ReturnType<typeof window.Vue.ref<number>> } $unitPlannerContainerScrollTop - the scroll position of the unit planner container
      * @param { typeof Toast } $toastEl - the toast element
      */
-    function init($units: Unit[], $routeFolderSequence: string | null, $toastEl: typeof Toast) {
+    function init(
+        $units: Unit[],
+        $routeFolderSequence: string | null,
+        $unitPlannerContainerEl: typeof unitPlannerContainerEl,
+        $headerRowHeight: typeof headerRowHeight,
+        $unitPlannerContainerScrollTop: typeof unitPlannerContainerScrollTop,
+        $toastEl: typeof Toast,
+    ) {
         units.value = $units;
         routeFolderSequence.value = $routeFolderSequence;
+        unitPlannerContainerEl = $unitPlannerContainerEl;
+        headerRowHeight = $headerRowHeight;
+        unitPlannerContainerScrollTop = $unitPlannerContainerScrollTop;
         toastEl.value = $toastEl.value;
     }
 
@@ -114,7 +188,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     }
 
     /**
-     * Resequences the units
+     * Resequences and saves the units
      * @param { number[] } unitIDs - the ids of the units to resequence
      */
     function resequenceUnits(unitIDs: Unit["id"][]) {
@@ -131,16 +205,76 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         });
     }
 
+    /**
+     * While the user is dragging a unit
+     * @param { Draggable } draggable - the draggable instance
+     * @returns { void }
+     */
+    function onDragMove(draggable: Draggable) {
+        dragCurrentPointerY.value = draggable.pointerY;
+    }
+
+    /**
+     * When the user starts dragging a unit
+     * @param { Draggable } draggable - the draggable instance
+     * @param { Unit } unit - the unit to start dragging
+     * @returns { void }
+     */
+    function onDragStart(draggable: Draggable, unit: Unit) {
+        const pointerEvent = draggable.pointerEvent as PointerEvent;
+        const pointerTarget = pointerEvent.target as HTMLElement;
+
+        dragCurrentPointerY.value = draggable.pointerY;
+        dragCurrentUnit.value = unit;
+        dragInitial.value = {
+            y: draggable.y,
+            deltaY: draggable.deltaY,
+            offsetY:
+                pointerEvent.offsetY +
+                pointerTarget.getBoundingClientRect().top -
+                pointerTarget.parentElement!.getBoundingClientRect().top,
+            pointerY: draggable.pointerY,
+            scrollTop: unitPlannerContainerEl.value?.scrollTop || 0,
+        };
+
+        isDragging.value = true;
+    }
+
+    /**
+     * When the user stops dragging a unit
+     * @param { Draggable } draggable - the draggable instance
+     * @returns { void }
+     */
+    function onDragEnd(draggable: Draggable) {
+        if (dragInitial.value !== null) {
+            gsap.to(draggable.target, {
+                y: dragInitial.value.y,
+                duration: 0,
+            });
+        }
+
+        resequenceUnits(dragOrderedUnits.value.map((u) => u.id));
+
+        isDragging.value = false;
+        dragCurrentUnit.value = null;
+        dragCurrentPointerY.value = null;
+        dragInitial.value = null;
+    }
+
     return {
         init,
         isDragging,
+        dragPlaceholderY,
+        dragOrderedUnits,
+        dragCurrentUnit,
+        onDragStart,
+        onDragMove,
+        onDragEnd,
         unexpandedUnitHeight,
-        unexpandedUnitHeightStyle,
         units,
         routeFolderSequence,
         toastEl,
         expandedUnits,
-        expandedUnitIDs,
         orderedUnits,
         toggleExpanded,
         resequenceUnits,

@@ -12,9 +12,14 @@ const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
 
 const showViewMore = window.Vue.computed(() => {
-    if (contentHeight.value <= store.unexpandedUnitHeight) return true;
-    if (store.expandedUnits.includes(props.unitId)) return true;
-    return false;
+    if (!store.isDragging && store.expandedUnits.includes(props.unitId)) return false;
+    return contentHeight.value > store.unexpandedUnitHeight;
+});
+const showViewMoreButton = window.Vue.computed(() => {
+    contentHeight.value = contentEl.value?.offsetHeight || 0;
+    if (store.isDragging) return false;
+    if (store.expandedUnits.includes(props.unitId)) return false;
+    return showViewMore.value;
 });
 
 window.Vue.onMounted(() => {
@@ -23,33 +28,25 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <div
-            class="content-container"
-            :style="{
-                height: store.expandedUnits.includes(props.unitId) ? 'auto' : store.unexpandedUnitHeight + 'px',
-            }"
-        >
-            <div ref="contentEl"><slot></slot></div>
-        </div>
+    <div class="content-container" :data-content-height="contentHeight">
+        <div ref="contentEl"><slot></slot></div>
 
-        <div v-if="!showViewMore" class="show-more-container">
-            <button @click.prevent="store.toggleExpanded(unitId)">Show More</button>
+        <div class="show-more-container" :style="{ opacity: showViewMore ? 1 : 0 }">
+            <button :style="{ opacity: showViewMoreButton ? 1 : 0 }" @click.prevent="store.toggleExpanded(unitId)">
+                Show More
+            </button>
         </div>
     </div>
 </template>
 
 <style scoped>
-.content-container {
-    overflow: hidden;
-    transition: height 0.5s ease;
-}
 .show-more-container {
     bottom: 0;
     position: absolute;
     width: 100%;
     background: linear-gradient(0deg, #fff 0%, #fff0 100%);
     pointer-events: none;
+    transition: opacity 0.3s;
 }
 .show-more-container button {
     margin: 5px;

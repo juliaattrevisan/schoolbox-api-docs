@@ -36,8 +36,25 @@ const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
 const headerRowEl = window.Vue.ref<HTMLElement>();
 const resizeObserver = window.Vue.ref<ResizeObserver>();
 
+const headerRowHeight = window.Vue.computed(() => {
+    if (!headerRowEl.value) return 0;
+
+    const headerRowChild = headerRowEl.value.firstElementChild as HTMLElement;
+    return headerRowChild.offsetHeight;
+});
+
 // Use a ref instead of a computed property so that we can force the height to be recomputed
+const unitPlannerContainerScrollTop = window.Vue.ref(0);
 const containerHeight = window.Vue.ref(window.innerHeight);
+
+/**
+ * Updates the scroll position of the unit planner container to allow draggables to position themselves correctly
+ * @returns {void}
+ */
+function updateScrollPosition(): void {
+    if (!unitPlannerContainerEl.value) return;
+    unitPlannerContainerScrollTop.value = unitPlannerContainerEl.value.scrollTop;
+}
 
 /**
  * Updates the height of the scrollable area, such that no vertical scrollbar is shown for the whole page.
@@ -45,7 +62,7 @@ const containerHeight = window.Vue.ref(window.innerHeight);
  * @returns {void}
  */
 function updateContainerHeight(): void {
-    if (!tabsEl.value || !headerRowEl.value || !unitPlannerContainerEl.value) {
+    if (!tabsEl.value || !unitPlannerContainerEl.value) {
         containerHeight.value = window.innerHeight;
         return;
     }
@@ -61,43 +78,37 @@ function updateContainerHeight(): void {
     const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
 
     // Prevent the container from being too small, this ensures one unit is always visible
-    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight + headerRowEl.value.offsetHeight);
+    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight);
+
+    // Ensure the scroll position is updated to match the new height
+    window.Vue.nextTick(updateScrollPosition).catch(() => {
+        // noop
+    });
 }
 
-window.Vue.onMounted(async () => {
-    store.init(props.units, props.routeFolderSequence, toastEl);
+const unitElements = window.Vue.ref<HTMLElement[]>([]);
 
-    // Whether to allow the user to resequence the units
-    if (props.routeFolderSequence) {
-        await window.Vue.nextTick();
+// Ensure the container is monitored for scroll events after it is first available
+window.Vue.watch(
+    () => unitPlannerContainerEl.value,
+    (newValue) => {
+        if (newValue) {
+            newValue.addEventListener("scroll", updateScrollPosition);
+            updateScrollPosition();
+        }
+    },
+    { once: true },
+);
 
-        const sortableTarget = $("[data-sortable]");
-        sortableTarget.sortable({
-            handle: ".grip",
-            helper: "clone",
-            axis: "y",
-            placeholder: "ui-sortable-placeholder",
-            update: () => {
-                // Adjust the sequence of the units
-                const unitIds: Unit["id"][] = sortableTarget
-                    .sortable("toArray", { attribute: "data-unit-id" })
-                    .map(Number);
-                store.resequenceUnits(unitIds);
-            },
-            start: () => {
-                store.isDragging = true;
-
-                // After transitioning to new heights, refreshPositions
-                sortableTarget.sortable("refreshPositions");
-                setTimeout(() => {
-                    sortableTarget.sortable("refreshPositions");
-                }, 500);
-            },
-            stop: () => {
-                store.isDragging = false;
-            },
-        });
-    }
+window.Vue.onMounted(() => {
+    store.init(
+        props.units,
+        props.routeFolderSequence,
+        unitPlannerContainerEl,
+        headerRowHeight,
+        unitPlannerContainerScrollTop,
+        toastEl,
+    );
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
@@ -113,25 +124,33 @@ window.Vue.onUnmounted(() => {
     if (resizeObserver.value) {
         resizeObserver.value.disconnect();
     }
+
+    unitPlannerContainerEl.value?.removeEventListener("scroll", updateScrollPosition);
 });
 </script>
 
 <template>
     <dl ref="tabsEl" class="tabs">
-        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab }">
+        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
             <a @click="selectedTab = tab">{{ tab.label }}</a>
         </dd>
     </dl>
     <div
         ref="unitPlannerContainerEl"
         class="scrollable"
-        :style="{ height: containerHeight + 'px', '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1 }"
+        :style="{
+            height: containerHeight + 'px',
+            '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
+            '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
+            '--UnitUnexpandedHeight': store.unexpandedUnitHeight + 'px',
+        }"
     >
         <div id="unitplanner-dropdown-container">
             <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
                 The specific placement of this element ensures that the dropdowns are still contained within the table -->
         </div>
-        <div class="unit-planner">
+        <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+            <div id="unit-planner-sortable-container"></div>
             <div ref="headerRowEl" class="grid-row header-row">
                 <div
                     v-for="column in selectedTab.columns"
@@ -143,14 +162,38 @@ window.Vue.onUnmounted(() => {
                 </div>
             </div>
 
-            <div v-for="unit in store.orderedUnits" :key="unit.id" :data-unit-id="unit.id" class="grid-row unit-row">
+            <div
+                v-for="unit in store.isDragging ? store.dragOrderedUnits : store.orderedUnits"
+                :key="unit.id"
+                ref="unitElements"
+                :data-unit-id="unit.id"
+                class="grid-row unit-row"
+            >
                 <unit-planner-unit-cell
                     v-for="column in selectedTab.columns"
                     :key="column.id"
                     :unit="unit"
                     :column="column"
-                    :route-folder-sequence="props.routeFolderSequence"
+                    :is-sortable-placeholder="false"
                 ></unit-planner-unit-cell>
+            </div>
+
+            <div
+                class="unit-planner-sortable-placeholder grid-row"
+                :style="{
+                    display: store.isDragging ? 'grid' : 'none',
+                    top: `calc(${store.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                }"
+            >
+                <template v-if="store.dragCurrentUnit">
+                    <unit-planner-unit-cell
+                        v-for="column in selectedTab.columns"
+                        :key="column.id"
+                        :unit="store.dragCurrentUnit"
+                        :column="column"
+                        :is-sortable-placeholder="true"
+                    ></unit-planner-unit-cell>
+                </template>
             </div>
         </div>
     </div>
@@ -164,6 +207,7 @@ window.Vue.onUnmounted(() => {
 }
 
 .unit-planner {
+    position: relative;
     display: grid;
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
 }
@@ -173,17 +217,22 @@ window.Vue.onUnmounted(() => {
 
     > div {
         background-color: #fff;
+        border-color: var(--body-background);
+        border-style: solid;
+        border-width: 0; // Unless overridden below
         font-size: 0.8125rem;
-        border-bottom: 2px solid var(--body-background);
-        text-wrap: wrap;
         overflow-wrap: anywhere;
+        text-wrap: wrap;
+
+        border-bottom-width: 1px;
+        border-top-width: 1px;
 
         &:not(:last-child) {
-            border-right: 1px solid var(--body-background);
+            border-right-width: 1px;
         }
 
         &:not(:first-child) {
-            border-left: 1px solid var(--body-background);
+            border-left-width: 1px;
         }
     }
 
@@ -192,6 +241,7 @@ window.Vue.onUnmounted(() => {
         font-weight: 600;
         padding: 0.625rem;
         white-space: nowrap;
+        border-top-width: 0px;
     }
 }
 
@@ -214,5 +264,22 @@ window.Vue.onUnmounted(() => {
     height: 0;
     position: sticky;
     z-index: 3; // On top of left column, but behind the header
+}
+
+#unit-planner-sortable-container {
+    position: absolute;
+    top: var(--UnitPlannerTableHeaderHeight);
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--UnitPlannerTableHeaderHeight));
+    z-index: -1;
+}
+
+.unit-planner-sortable-placeholder {
+    background: white;
+    position: absolute;
+    z-index: 8;
+    width: 100%;
+    grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
 }
 </style>
