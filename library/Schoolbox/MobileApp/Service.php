@@ -40,13 +40,13 @@ class Service implements ISoftDeletable
     private $key;
 
     /**
-     * Public key for this mobile app: only relevant for Firebase.
+     * Public configuration for this mobile app: only relevant for Firebase.
      *
      * This is a JavaScript object which may be copied from Firebase, via:
      * Project Settings > General > Your apps > (your app nickname) > SDK setup and configuration > Config.
      * This should be only the {, } and contents.
      */
-    private ?string $publicKey = null;
+    private ?string $publicConfiguration = null;
 
     /**
      * Web push public key for this mobile app: only relevant for Firebase, it
@@ -148,19 +148,19 @@ class Service implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getPublicKey(): ?string
+    public function getPublicConfiguration(): ?string
     {
-        return $this->publicKey;
+        return $this->publicConfiguration;
     }
 
 
     /**
-     * @param string|null $publicKey
+     * @param string|null $publicConfiguration
      * @return $this
      */
-    public function setPublicKey(?string $publicKey): self
+    public function setPublicConfiguration(?string $publicConfiguration): self
     {
-        $this->publicKey = $publicKey;
+        $this->publicConfiguration = $publicConfiguration;
         return $this;
     }
 
