@@ -58,6 +58,9 @@ const activityLink = window.Vue.computed(() => {
                     props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
                 }}</a>
             </li>
+            <li>
+                <a :href="returnUrl(props.activity._links.delete)" class="icon-delete">Delete</a>
+            </li>
             <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
                 <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
             </li>

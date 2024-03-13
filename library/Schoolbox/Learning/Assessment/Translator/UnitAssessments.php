@@ -62,6 +62,10 @@ class UnitAssessments
                 'modify' => $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
+                ]),
+                'delete' => $this->routeGenerator->generate('learningAssessment.postDeleteAssessment', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
                 ])
             ];
             // if quiz we have special links
