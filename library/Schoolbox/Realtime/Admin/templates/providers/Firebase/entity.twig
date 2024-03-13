@@ -8,7 +8,7 @@
         <dt class="small-12 medium-4">Provider</dt>
         <dd class="small-12 medium-8"><p>Firebase</p></dd>
 
-        <dt class="small-12 medium-4">Firebase Private Key</dt>
+        <dt class="small-12 medium-4">Configuration</dt>
         <dd class="small-12 medium-8">
             <p>
                 <em>Provided</em>
@@ -24,9 +24,18 @@
                 <input type="hidden" name="provider" value="{{ app.providerName }}" />
                 <div class="row">
                     <div class="small-12 column">
-                        <label>New Firebase Private Key
+                        <label>New Public Configuration
+                            <textarea name="public_configuration"></textarea>
+                        </label>
+
+                        <label>New Private Key
                             <textarea name="key"></textarea>
                         </label>
+
+                        <label>New Web Push Public Key
+                            <input type="text" name="web_push_public_key" />
+                        </label>
+
                     </div>
                     <div class="small-12 column">
                         <input type="submit" value="Install New Key">
