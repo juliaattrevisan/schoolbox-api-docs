@@ -11,7 +11,7 @@
         <dt class="small-12 medium-4">Public Configuration</dt>
         <dd class="small-12 medium-8">
             <p>
-                <code>{{ app.publicKey }}</code>
+                <code>{{ app.publicConfiguration }}</code>
                 (<a href="#" data-open="change-firebase-{{ appId }}">Change</a>)
             </p>
         </dd>
@@ -40,15 +40,33 @@
                 <input type="hidden" name="provider" value="{{ app.providerName }}" />
                 <div class="row">
                     <div class="small-12 column">
-                        <label>New Public Configuration
+                        <label>Public Configuration
+                            <p class="meta">Publicly available configuration for Firebase app for this Schoolbox instance.</p>
+                            <p class="meta">
+                                This is a JavaScript object which may be copied from Firebase, via:
+                                &ldquo;Project Settings > General > Your apps > (your app nickname) > SDK setup and configuration > Config.&ldquo;:
+                                paste in only the {, } and their contents.
+                            </p>
                             <textarea name="publicConfiguration">{{ app.publicConfiguration }}</textarea>
                         </label>
 
                         <label>New Private Key
+                            <p class="meta">New private configuration for Firebase app for this Schoolbox instance.</p>
+                            <p class="meta">
+                                This is a JSON object which may be downloaded from Firebase, via:
+                                &ldquo;Project Settings > Service Accounts > Firebase Admin SDK > Generate new private key&ldquo;:
+                                Paste its contents into this field.
+                            </p>
                             <textarea name="key"></textarea>
                         </label>
 
-                        <label>New Web Push Public Key
+                        <label>Web Push Public Key
+                            <p class="meta">Public key for Firebase app for this Schoolbox instance, used for registering a device with Firebase.</p>
+                            <p class="meta">
+                                This is a key which may be generated within Firebase, via:
+                                &ldquo;Project Settings > Cloud Messaging > Web configuration > Web push certificates > Generate key pair&rdquo;:
+                                Paste its value into this field.
+                            </p>
                             <input type="text" name="webPushPublicKey" value="{{ app.webPushPublicKey }}" />
                         </label>
 
