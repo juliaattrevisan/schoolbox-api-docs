@@ -10,7 +10,7 @@ WHERE lct.type = 'Pastoral Care'
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
    'external_pastoral_title_include',
-   '0',
+   '1',
    'Include pastoral title in SIS writeback',
    "If toggled to 'ON' this will send the pastoral title back to your SIS.",
    (SELECT id FROM lu_config_field WHERE field = 'boolean'),
