@@ -473,7 +473,8 @@ class Profile implements IStrategy
      * @return void
      * @throws Exception
      */
-    private function importParentsOfFutureStudents(array $familiesLookup): void {
+    private function importParentsOfFutureStudents(array $familiesLookup): void
+    {
         foreach ($familiesLookup as $parentId => $parent) {
             $this->importParentsOfStudent(null, $familiesLookup);
         }

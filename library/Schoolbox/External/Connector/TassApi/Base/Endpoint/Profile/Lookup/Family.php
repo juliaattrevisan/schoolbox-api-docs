@@ -123,7 +123,8 @@ class Family
      * @param array $commrules
      * @return array
      */
-    public function generateCurrent(array $commrules): array {
+    public function generateCurrent(array $commrules): array
+    {
         return $this->generate($commrules, self::CURRENT);
     }
 
@@ -134,7 +135,8 @@ class Family
      * @param array $commrules
      * @return array
      */
-    public function generateFuture(array $commrules): array {
+    public function generateFuture(array $commrules): array
+    {
         return $this->generate($commrules, self::FUTURE);
     }
 
