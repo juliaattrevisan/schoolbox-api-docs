@@ -10,27 +10,10 @@ gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
-    const defaultUnexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
+    const unexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
     const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
 
     const isDragging = window.Vue.ref(false);
-    const isDraggingNextTick = window.Vue.ref(false);
-    window.Vue.watch(isDragging, (newValue) => {
-        // Wait until the next tick to set isDraggingNextTick to true
-        // Ensures CSS transitions are not interrupted
-        // Note: Using Vue.nextTick() here does not work as expected
-        if (newValue) {
-            setTimeout(() => {
-                isDraggingNextTick.value = true;
-            }, 0);
-        } else {
-            isDraggingNextTick.value = false;
-        }
-    });
-
-    const unexpandedUnitHeight = window.Vue.computed(() => {
-        return isDraggingNextTick.value ? dragUnitHeight : defaultUnexpandedUnitHeight;
-    });
 
     const units = window.Vue.ref<Unit[]>([]);
     const routeFolderSequence = window.Vue.ref<string | null>(null);
@@ -91,10 +74,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const dragCurrentPointerY = window.Vue.ref<number | null>(null);
     const dragInitial = window.Vue.ref<{
         y: number;
-        deltaY: number;
         offsetY: number;
-        pointerY: number;
-        scrollTop: number;
     } | null>(null);
 
     const dragPlaceholderY = window.Vue.computed(() => {
@@ -104,41 +84,90 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             unitPlannerContainerEl.value === undefined ||
             unitPlannerContainerScrollTop.value === undefined
         ) {
+            // Not ready to calculate the placeholder position yet, either not dragging or not initialised yet
             return -1;
         }
 
-        return Math.max(
-            0,
-            Math.min(
-                dragCurrentPointerY.value -
-                    unitPlannerContainerEl.value.getBoundingClientRect().top +
-                    unitPlannerContainerScrollTop.value -
-                    headerRowHeight.value -
-                    dragInitial.value.offsetY,
-                Math.max(
-                    unitPlannerContainerEl.value.clientHeight - dragUnitHeight - headerRowHeight.value,
-                    dragUnitHeight * units.value.length,
-                ),
-            ),
+        // The optimal placeholder position is:
+        // - the current mouse pointer Y position
+        // - minus the top of the unit planner container
+        // - plus the current scroll position of the unit planner container
+        // - minus the height of the header row (which is fixed)
+        // - minus the initial offset of the drag (which is the difference between where the user grabbed the drag handle, and the top of the unit)
+        const targetHeight =
+            dragCurrentPointerY.value -
+            unitPlannerContainerEl.value.getBoundingClientRect().top +
+            unitPlannerContainerScrollTop.value -
+            headerRowHeight.value -
+            dragInitial.value.offsetY;
+
+        // Clamp the target height to between:
+        // - Min of 0 (right under the header row)
+        // - Max of the largest of:
+        //   - The height of the unit planner container (excluding header), minus 1 drag unit height (to allow for the drag placeholder to be below the last unit)
+        //   - The cumulative height of all the non-dragged units (in case it's larger than the container and needs to scroll)
+        //     Does not include the height of the dragged unit height, as we are based on the top of the placeholder
+        const minDragHeight = 0;
+        const maxDragHeight = Math.max(
+            unitPlannerContainerEl.value.clientHeight - dragUnitHeight - headerRowHeight.value,
+            orderedUnits.value.reduce((acc, unit) => {
+                if (unit.id === dragCurrentUnit.value?.id) {
+                    return acc + dragUnitHeight;
+                }
+
+                if (expandedUnitIDs.value.includes(unit.id)) {
+                    const unitHeights = unitContentHeights.value[unit.id] || {};
+                    return acc + Math.max(...Object.values(unitHeights), unexpandedUnitHeight);
+                }
+
+                return acc + unexpandedUnitHeight;
+            }, 0),
         );
+        return Math.max(minDragHeight, Math.min(targetHeight, maxDragHeight));
     });
 
     // Reorder the selected unit in the list based on the drag position
     const dragOrderedUnits = window.Vue.computed(() => {
         if (dragCurrentUnit.value === null || dragInitial.value === null) {
-            return units.value;
+            return orderedUnits.value;
         }
 
-        const dragIndex = Math.floor(Math.max(0, dragPlaceholderY.value) / dragUnitHeight);
-        const dragUnitIndex = units.value.findIndex((u) => u.id === dragCurrentUnit.value!.id);
+        // Use reduce to find the index where the unit should be inserted
+        const initialReduceVals = { cumulativeHeight: 0, foundDragIndex: 0, found: false };
+        const reduceResult = orderedUnits.value.reduce((acc, unit, index) => {
+            if (acc.found) return acc; // Skip further processing if index is found
 
-        if (dragIndex === dragUnitIndex) {
-            return units.value;
-        }
+            // The unit height is:
+            // - unexpandedUnitHeight if it's not the unit being dragged and it's not expanded
+            // - dragUnitHeight if it's the unit being dragged
+            // - the maximum of the content heights if it's expanded and not being dragged
 
-        const newOrderedUnits = [...units.value];
-        newOrderedUnits.splice(dragUnitIndex, 1);
-        newOrderedUnits.splice(dragIndex, 0, dragCurrentUnit.value);
+            let currentUnitHeight = unexpandedUnitHeight;
+            if (unit.id === dragCurrentUnit.value?.id) {
+                currentUnitHeight = dragUnitHeight;
+            } else if (expandedUnitIDs.value.includes(unit.id)) {
+                const unitHeights = unitContentHeights.value[unit.id] || {};
+                currentUnitHeight = Math.max(...Object.values(unitHeights), unexpandedUnitHeight);
+            }
+
+            const newCumulativeHeight = acc.cumulativeHeight + currentUnitHeight;
+
+            // If the new cumulative height is greater than the top of the drag placeholder (just above the mouse position), then we've found the index
+            if (newCumulativeHeight >= dragPlaceholderY.value && !acc.found) {
+                return { ...acc, foundDragIndex: index, found: true };
+            }
+
+            // Otherwise, continue to the next unit
+            return { ...acc, cumulativeHeight: newCumulativeHeight, foundDragIndex: index + 1 };
+        }, initialReduceVals);
+
+        const adjustedDragIndex = Math.min(reduceResult.foundDragIndex, orderedUnits.value.length - 1);
+
+        // Reorder the units based on the new index
+        const newOrderedUnits = [...orderedUnits.value];
+        const dragUnitIndex = orderedUnits.value.findIndex((u) => u.id === dragCurrentUnit.value?.id);
+        const [draggedUnit] = newOrderedUnits.splice(dragUnitIndex, 1);
+        newOrderedUnits.splice(adjustedDragIndex, 0, draggedUnit);
 
         return newOrderedUnits;
     });
@@ -261,14 +290,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragCurrentPointerY.value = draggable.pointerY;
         dragCurrentUnit.value = unit;
         dragInitial.value = {
+            // The initial position of the drag handle
             y: draggable.y,
-            deltaY: draggable.deltaY,
+            // The difference between the pointer position and the top of the unit row
             offsetY:
                 pointerEvent.offsetY +
                 pointerTarget.getBoundingClientRect().top -
                 pointerTarget.parentElement!.getBoundingClientRect().top,
-            pointerY: draggable.pointerY,
-            scrollTop: unitPlannerContainerEl.value?.scrollTop || 0,
         };
 
         isDragging.value = true;
@@ -281,6 +309,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      */
     function onDragEnd(draggable: Draggable) {
         if (dragInitial.value !== null) {
+            // Move the drag handle back to its original position
             gsap.to(draggable.target, {
                 y: dragInitial.value.y,
                 duration: 0,
