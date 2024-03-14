@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -268,6 +269,14 @@ class Family
         $nuclear = 0;
         $split = 0;
 
+        /* Announce the usage of Parent Lounge Required (web_access must be 1 for parents to be imported)
+         */
+        $webAccessRequired = $this->api->getOptions()['webaccessrequired'] ?? false;
+
+        if ($webAccessRequired) {
+            $this->log->info('Parent Lounge access is required for parents.');
+        }
+
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
@@ -275,6 +284,17 @@ class Family
                  * associated with the student in suds; use validCommRule boolean to decide
                  */
                 if (isset($family['students'])) {
+                    /* Skip if we require web_access, but this family doesn't have web_access
+                     */
+                    if ($webAccessRequired && !$family['web_access']) {
+                        $this->log->debug(sprintf(
+                            'Family %s does not have web-access set; skipping.',
+                            $parentId
+                        ));
+
+                        continue;
+                    }
+
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
                      */
@@ -316,6 +336,17 @@ class Family
                      * in particular for each student in $lookup
                      */
                     foreach ($family as $subfamily) {
+                        /* Skip if we require web_access, but this family doesn't have web_access
+                         */
+                        if ($webAccessRequired && !$subfamily['web_access']) {
+                            $this->log->debug(sprintf(
+                                'Family %s does not have web-access set; skipping.',
+                                $parentId
+                            ));
+
+                            continue;
+                        }
+
                         /* Note that some schools try to switch primary parents to mother
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
