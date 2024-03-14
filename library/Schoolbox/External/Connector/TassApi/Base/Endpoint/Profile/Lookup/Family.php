@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -60,6 +59,13 @@ class Family
 
 
     /**
+     * Decide which set of comm rules to obtain using these two consts as args.
+     */
+    private const CURRENT = 'current';
+    private const FUTURE = 'future';
+
+
+    /**
      * A local cache of getParents endpoint since we might optionally recompile families using a different
      * set of comm rules to fulfil Future Parents; we only need to download getParents once.
      *
@@ -86,7 +92,6 @@ class Family
      * @param string          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
      * @param int             $addnumFather Set in admin, corresponds to external_tass_addnum_father
      * @param int             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
-     * @param array           $commrules An array of phone numbers indexed by family code
      */
     public function __construct(
         private LoggerInterface $log,
@@ -94,7 +99,6 @@ class Family
         private string $spousePrefix,
         private int $addnumFather,
         private int $addnumMother,
-        private array $commrules,
     ) {
         /* Calculate a spouse prefix if one was set; otherwise use a default
          * Shanked from that Tass Helper class
@@ -104,11 +108,33 @@ class Family
 
 
     /**
+     * Generate a lookup consisting of current parents
+     *
+     * @param array $commrules
+     * @return array
+     */
+    public function generateCurrent(array $commrules): array {
+        return $this->generate($commrules, self::CURRENT);
+    }
+
+
+    /**
+     * Generate a family lookup consisting of future parents
+     *
+     * @param array $commrules
+     * @return array
+     */
+    public function generateFuture(array $commrules): array {
+        return $this->generate($commrules, self::FUTURE);
+    }
+
+
+    /**
      * Preload parents into a lookup
      *
      * This is probably going to be faster if we build a hash lookup of parents
      */
-    public function generate(): array
+    private function generate(array $commrules, string $type): array
     {
         /* Grab all the families just once
          */
@@ -196,14 +222,11 @@ class Family
 
         /* Announce the usage of Parent Lounge Required (web_access must be 1 for parents to be imported)
          */
-        $webAccessRequired = $this->api->getOptions()['webaccessrequired'] ?? false;
-
-        if ($webAccessRequired) {
-            $this->log->info('Parent Lounge access is required for parents.');
-        }
-
         foreach ($this->families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
+//                if (in_array($parentId, ['SUN003', 'GUN004', 'SMI060'])) {
+//                    print_r($family);
+//                }
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
                  * associated with the student in suds; use validCommRule boolean to decide
@@ -211,7 +234,7 @@ class Family
                 if (isset($family['students'])) {
                     /* Skip if we require web_access, but this family doesn't have web_access
                      */
-                    if ($webAccessRequired && !$family['web_access']) {
+                    if (self::FUTURE === $type && !$family['web_access']) {
                         $this->log->debug(sprintf(
                             'Family %s does not have web-access set; skipping.',
                             $parentId
@@ -229,7 +252,7 @@ class Family
                         if ($this->isAlive($node, $family)) {
                             $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                            $this->processParentNode($node, $personExternalId, $family);
+                            $this->processParentNode($commrules, $node, $personExternalId, $family, $type);
                         } else {
                             $this->log->debug(sprintf(
                                 'Parent %s %s in nuclear family is not classified as living: skipping.',
@@ -263,7 +286,7 @@ class Family
                     foreach ($family as $subfamily) {
                         /* Skip if we require web_access, but this family doesn't have web_access
                          */
-                        if ($webAccessRequired && !$subfamily['web_access']) {
+                        if (self::FUTURE === $type && !$subfamily['web_access']) {
                             $this->log->debug(sprintf(
                                 'Family %s does not have web-access set; skipping.',
                                 $parentId
@@ -304,10 +327,12 @@ class Family
                                 $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
+                                    $commrules,
                                     self::FATHER_NODE,
                                     $personExternalId,
                                     $subfamily,
-                                    $this->addnumFather
+                                    $this->addnumFather,
+                                    $type
                                 );
                             } else {
                                 $this->log->debug(sprintf(
@@ -328,10 +353,12 @@ class Family
                                 $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
+                                    $commrules,
                                     self::MOTHER_NODE,
                                     $personExternalId,
                                     $subfamily,
-                                    $this->addnumMother
+                                    $this->addnumMother,
+                                    $type
                                 );
                             } else {
                                 $this->log->debug(sprintf(
@@ -430,13 +457,15 @@ class Family
     /**
      * Update $parent details by mining Split Parent format in a particular way to get their email addresses
      *
+     * @param array  $commrules
      * @param string $node
      * @param string $externalId
      * @param array  $family
      * @param int    $addnum
+     * @param string $type Whether this parent was created in the 'current' or 'future' parent context
      * @return array
      */
-    private function processSplitParentNode(string $node, string $externalId, array $family, int $addnum): array
+    private function processSplitParentNode(array $commrules, string $node, string $externalId, array $family, int $addnum, string $type): array
     {
         /* Prioritise preferred names over official names
          */
@@ -451,7 +480,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->commrules[$family['user_code']][$node] ?? [
+        $person = $commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
@@ -460,7 +489,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
-            'validCommRule' => false
+            'validCommRule' => false,
         ];
 
         /* Find the first non-empty email address from the two possibilities
@@ -498,12 +527,14 @@ class Family
     /**
      * Facade method for compiling some parental details
      *
+     * @param array  $commrules
      * @param string $node
      * @param string $externalId
      * @param array  $family
+     * @param string $type Whether this parent was created in the 'current' or 'future' parent context
      * @return array
      */
-    private function processParentNode(string $node, string $externalId, array $family): array
+    private function processParentNode(array $commrules, string $node, string $externalId, array $family, string $type): array
     {
         /* Prioritise preferred names over official names
          */
@@ -518,7 +549,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->commrules[$family['user_code']][$node] ?? [
+        $person = $commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
@@ -527,7 +558,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
-            'validCommRule' => false
+            'validCommRule' => false,
         ];
 
         /* Assign an externalId to this person
