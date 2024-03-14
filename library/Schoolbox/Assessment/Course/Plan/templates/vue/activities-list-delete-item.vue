@@ -21,14 +21,6 @@ window.Vue.watch(
         isOpen ? modalEl.value.open() : modalEl.value.close();
     },
 );
-console.info("activities-list-delete-item.vue onAction() 3");
-
-/**
- * delete the node when confirmed
- */
-function onConfirmDeleteActivity() {
-    deleteActivityStore.deleteActivity();
-}
 
 /**
  * so we can track the progress of the activity removal
@@ -66,21 +58,6 @@ const deleteButtonText = window.Vue.computed(() =>
  * @returns { Boolean }
  */
 const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessing);
-
-/**
- * to close the modal
- */
-function onCancelDeleteActivity() {
-    deleteActivityStore.cancel();
-}
-
-/**
- * ensure the isOpen is kept up to date
- * as we can currently also use foundation to close the modal
- */
-function onModalClosed() {
-    deleteActivityStore.cancel();
-}
 </script>
 
 <template>
@@ -88,7 +65,7 @@ function onModalClosed() {
         ref="modalEl"
         :is-close-disabled="isModalDisabled"
         :close-on-background-click="false"
-        @closed="onModalClosed"
+        @closed="deleteActivityStore.cancel"
     >
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to delete this activity?</p>
@@ -99,7 +76,7 @@ function onModalClosed() {
                     class="button icon-approve submit"
                     data-test-confirm-delete-activity
                     :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="onConfirmDeleteActivity"
+                    @click.prevent="deleteActivityStore.deleteActivity"
                 >
                     {{ deleteButtonText }}
                 </button>
@@ -109,7 +86,7 @@ function onModalClosed() {
                     class="button icon-close"
                     data-test-cancel-delete-activity
                     :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="onCancelDeleteActivity"
+                    @click.prevent="deleteActivityStore.cancel"
                 >
                     No, keep it
                 </button>
