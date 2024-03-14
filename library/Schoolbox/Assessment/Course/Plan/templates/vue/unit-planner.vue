@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from "vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
@@ -104,7 +105,7 @@ window.Vue.onMounted(() => {
     store.init(
         props.units,
         props.routeFolderSequence,
-        unitPlannerContainerEl,
+        unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
         headerRowHeight,
         unitPlannerContainerScrollTop,
         toastEl,

@@ -1,3 +1,4 @@
+import type { Ref } from "vue";
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
@@ -20,9 +21,9 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     // Allow the refs to be passed in instead of creating and monitoring two
-    let unitPlannerContainerEl: ReturnType<typeof window.Vue.ref<HTMLElement>>;
-    let headerRowHeight: ReturnType<typeof window.Vue.computed<number>>;
-    let unitPlannerContainerScrollTop: ReturnType<typeof window.Vue.ref<number>>;
+    let unitPlannerContainerEl: Ref<HTMLElement>;
+    let headerRowHeight: Ref<number>;
+    let unitPlannerContainerScrollTop: Ref<number>;
 
     const expandedUnitIDs = window.Vue.ref<Unit["id"][]>([]);
     const expandedUnits = window.Vue.computed(() => {
@@ -176,17 +177,17 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * store any passed through properties
      * @param { Unit[] } $units - the units to store
      * @param { string|null } $routeFolderSequence - the route to use when resequencing, if the user has access to do so
-     * @param { ReturnType<typeof window.Vue.ref<HTMLElement>> } $unitPlannerContainerEl - the unit planner scrollable container element
-     * @param { ReturnType<typeof window.Vue.computed<number>> } $headerRowHeight - the height of the header row
-     * @param { ReturnType<typeof window.Vue.ref<number>> } $unitPlannerContainerScrollTop - the scroll position of the unit planner container
+     * @param { Ref<HTMLElement> } $unitPlannerContainerEl - the unit planner scrollable container element
+     * @param { Ref<number> } $headerRowHeight - the height of the header row
+     * @param { Ref<number> } $unitPlannerContainerScrollTop - the scroll position of the unit planner container
      * @param { typeof Toast } $toastEl - the toast element
      */
     function init(
         $units: Unit[],
         $routeFolderSequence: string | null,
-        $unitPlannerContainerEl: typeof unitPlannerContainerEl,
-        $headerRowHeight: typeof headerRowHeight,
-        $unitPlannerContainerScrollTop: typeof unitPlannerContainerScrollTop,
+        $unitPlannerContainerEl: Ref<HTMLElement>,
+        $headerRowHeight: Ref<number>,
+        $unitPlannerContainerScrollTop: Ref<number>,
         $toastEl: typeof Toast,
     ) {
         units.value = $units;
