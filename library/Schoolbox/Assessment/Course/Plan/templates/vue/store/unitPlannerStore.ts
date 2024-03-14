@@ -115,7 +115,10 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                     unitPlannerContainerScrollTop.value -
                     headerRowHeight.value -
                     dragInitial.value.offsetY,
-                dragUnitHeight * units.value.length,
+                Math.max(
+                    unitPlannerContainerEl.value.clientHeight - dragUnitHeight - headerRowHeight.value,
+                    dragUnitHeight * units.value.length,
+                ),
             ),
         );
     });
