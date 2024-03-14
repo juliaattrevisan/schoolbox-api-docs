@@ -3,15 +3,16 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { Column } from "../unitPlannerConfig";
 import { Unit } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
-const defaultUnexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
-const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
-
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
+    const defaultUnexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
+    const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
+
     const isDragging = window.Vue.ref(false);
     const isDraggingNextTick = window.Vue.ref(false);
     window.Vue.watch(isDragging, (newValue) => {
@@ -56,7 +57,37 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         });
     });
 
+    const unitContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
+    /**
+     * As content is loaded, we need to keep track of the height so we can correctly
+     * size other cells from that unit when it is expanded.
+     * @param { Unit } unit - the unit to set the content height for
+     * @param { Column } column - the column to set the content height for
+     * @param { number } height - the height to set
+     */
+    function setUnitContentHeight(unit: Unit, column: Column, height: number) {
+        if (unitContentHeights.value[unit.id] === undefined) {
+            unitContentHeights.value[unit.id] = {};
+        }
+
+        // Prevent overwriting the height if it's already been set
+        if (unitContentHeights.value[unit.id][column.id] === undefined) {
+            unitContentHeights.value[unit.id][column.id] = height;
+        }
+    }
+
     const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
+
+    // Allow components to react to changes to the drag unit the tick after it actually changes
+    // This is useful for example with the height transition of the drag placeholder where we need to initialise it with
+    // the unexpanded height, and then set it to the drag height, otherwise it'll skip the transition.
+    const dragCurrentUnitNextTick = window.Vue.ref<Unit | null>(null);
+    window.Vue.watch(dragCurrentUnit, (value) => {
+        setTimeout(() => {
+            dragCurrentUnitNextTick.value = value;
+        }, 0);
+    });
+
     const dragCurrentPointerY = window.Vue.ref<number | null>(null);
     const dragInitial = window.Vue.ref<{
         y: number;
@@ -267,10 +298,14 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragPlaceholderY,
         dragOrderedUnits,
         dragCurrentUnit,
+        dragCurrentUnitNextTick,
         onDragStart,
         onDragMove,
         onDragEnd,
+        dragUnitHeight,
         unexpandedUnitHeight,
+        unitContentHeights,
+        setUnitContentHeight,
         units,
         routeFolderSequence,
         toastEl,

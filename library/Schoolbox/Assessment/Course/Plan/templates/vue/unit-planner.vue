@@ -142,7 +142,6 @@ window.Vue.onUnmounted(() => {
             height: containerHeight + 'px',
             '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
             '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
-            '--UnitUnexpandedHeight': store.unexpandedUnitHeight + 'px',
         }"
     >
         <div id="unitplanner-dropdown-container">
@@ -166,7 +165,6 @@ window.Vue.onUnmounted(() => {
                 v-for="unit in store.isDragging ? store.dragOrderedUnits : store.orderedUnits"
                 :key="unit.id"
                 ref="unitElements"
-                :data-unit-id="unit.id"
                 class="grid-row unit-row"
             >
                 <unit-planner-unit-cell
