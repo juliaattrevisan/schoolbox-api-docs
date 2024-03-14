@@ -29,7 +29,7 @@ class Controller extends Base
     public function getServiceWorker(): void
     {
         $this->setAllowBackToTheFuture(false);
-        $dataGenerator  = new DataGenerator($this->getConfigLoader(), ServiceMapper::getInstance());
+        $dataGenerator  = new DataGenerator(ServiceMapper::getInstance());
         $this->response = $this
             ->responseFromTemplateUnthemed(
                 '@firebaseServiceWorker/service-worker.js.twig',

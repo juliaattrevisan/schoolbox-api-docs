@@ -770,7 +770,6 @@ abstract class Kernel
                     }
 
                     $dataGenerators['firebase'] = new \Schoolbox\Firebase\DataGenerator(
-                        $config,
                         $mapperFactory->get(\Schoolbox\MobileApp\ServiceMapper::class),
                     );
 
