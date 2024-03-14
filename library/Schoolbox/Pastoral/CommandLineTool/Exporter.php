@@ -28,7 +28,7 @@ class Exporter extends CliTool\App
     /**
      * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
      */
-    private const BATCH_SIZE = 2;
+    private const BATCH_SIZE = 100;
 
     /** @inheritdoc */
     public function getLongOpts(): array
