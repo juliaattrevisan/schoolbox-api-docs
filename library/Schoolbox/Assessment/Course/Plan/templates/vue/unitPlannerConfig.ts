@@ -1,3 +1,4 @@
+// All types of content that can be shown in a column
 export enum ColumnType {
     UNIT = "unit",
     OVERVIEW = "overview",
@@ -6,23 +7,30 @@ export enum ColumnType {
     CURRICULUM_OVERVIEW = "curriculum-overview",
 }
 
+// For linking a column type to specific configuration options for that column
+// Saves if-else logic in the component. This is mainly options needed when initially iterating over the columns
 interface ColumnConfig {
     label: string | null; // If null, the label must be set by some other condition
-    cellPadding: boolean;
-    fixedLeft: boolean;
+    cellPadding: boolean; // Whether cells in that column should have additional padding
+    fixedLeft: boolean; // Whether the column should be fixed to the left of the grid
 }
+
+// Configuration options for a tab
 interface TabConfig {
     id: string;
     label: string;
-    columnTypeIDs: ColumnType[];
+    columnTypeIDs: ColumnType[]; // The column types, in order, to display in the tab
 }
 
+// An implemented column as given to the unit planner under a tab.
+// This is the merged configuration of the column type, along width the relevant label and ID
 export interface Column extends ColumnConfig {
-    id: number;
+    id: string; // Vue requires unique keys for v-for loops, but they must be the same across tabs for the same column
     type: ColumnType;
     label: string;
 }
 
+// An implemented tab as given to the unit planner, linking the tab with implemented columns to display
 interface Tab extends TabConfig {
     columns: Column[];
 }
@@ -71,16 +79,18 @@ export function createTabs(allTextboxKeys: string[]) {
         tabInfo.columnTypeIDs.forEach((columnTypeID) => {
             const newColumnBase = {
                 ...columnConfig[columnTypeID],
-                id: tabColumns.length,
+                id: `${columnTypeID}-1`,
                 type: columnTypeID,
                 label: columnConfig[columnTypeID].label || columnTypeID,
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
+                let columnId = 0;
                 allTextboxKeys.forEach((textboxKey) => {
+                    columnId += 1;
                     tabColumns.push({
                         ...newColumnBase,
-                        id: tabColumns.length,
+                        id: `${columnTypeID}-${columnId}`,
                         label: textboxKey,
                     });
                 });
