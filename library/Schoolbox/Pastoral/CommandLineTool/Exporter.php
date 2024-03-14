@@ -25,6 +25,10 @@ class Exporter extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    /**
+     * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
+     */
+    private const BATCH_SIZE = 100;
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -33,7 +37,6 @@ class Exporter extends CliTool\App
             self::OPT_LONG_HELP,
         ];
     }
-
 
     /** @inheritDoc */
     public function run(): void
@@ -70,44 +73,69 @@ HELP;
         }
 
         // Retrieve all pastoral records and re-save
-        $log->info("Beginning export of pastoral records...");
-        $pastoralRecords = $pastoralMapper->findAll();
+        $log->info('Finding pastoral records to export...');
+        $pastoralRecordIds = $pastoralMapper->findAllIds(['deleted' => false]);
+        $nPastoralRecordIds = count($pastoralRecordIds);
+        $log->info("Beginning export of $nPastoralRecordIds pastoral records...");
 
-        foreach ($pastoralRecords as $pastoralRecord) {
-            $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
-            $externalPastoral->syncPastoral($pastoralRecord);
-            $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
+        $builder = $pastoralMapper->getPredicateBuilder();
 
-            // Re-process all attachments (only if attachment upload is on)
-            if (!$externalPastoralUpload) {
-                continue;
-            }
+        $skippedRecordIds = [];
+        $nRecordsExported = 0;
 
-            // Note that only public attachments get synced
-            $attachments = $pastoralAttachmentMapper->findByColumnList([
-                'pastoral_id' => $pastoralRecord->getId(),
-                'private'     => false,
-            ]);
-            if (count($attachments)) {
-                $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
-                foreach ($attachments as $attachment) {
-                    $log->debug(
-                        sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
-                    );
+        foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
+            foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
+                $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
+                try {
+                    $externalPastoral->syncPastoral($pastoralRecord);
+                } catch (\Exception $e) {
+                    $log->debug("Could not syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                    $skippedRecordIds[] = $pastoralRecord->getId();
+                }
+                $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
 
-                    // Only re-sync if it's not already in the Q
-                    $queueCount = $pastoralUploadQueueMapper->countByColumnList([
-                        'pastoral_id' => $pastoralRecord->getId(),
-                        'hash'        => $attachment->getStorage()->getHash(),
-                    ]);
-                    if ($queueCount === 0) {
-                        $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                $nRecordsExported++;
+
+                // Re-process all attachments (only if attachment upload is on)
+                if (!$externalPastoralUpload) {
+                    continue;
+                }
+
+                // Note that only public attachments get synced
+                $attachments = $pastoralAttachmentMapper->findByColumnList([
+                    'pastoral_id' => $pastoralRecord->getId(),
+                    'private'     => false,
+                ]);
+                if (count($attachments)) {
+                    $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
+                    foreach ($attachments as $attachment) {
+                        $log->debug(
+                            sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
+                        );
+
+                        // Only re-sync if it's not already in the Q
+                        $queueCount = $pastoralUploadQueueMapper->countByColumnList([
+                            'pastoral_id' => $pastoralRecord->getId(),
+                            'hash'        => $attachment->getStorage()->getHash(),
+                        ]);
+                        if ($queueCount === 0) {
+                            $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                        }
                     }
                 }
             }
+
+            $nRecordsProcessed = min(($batchIndex + 1) * self::BATCH_SIZE, $nPastoralRecordIds);
+
+            if ($nPastoralRecordIds > self::BATCH_SIZE) {
+                $log->info("Processed $nRecordsProcessed records of $nPastoralRecordIds.  " . round(100 * $nRecordsProcessed / $nPastoralRecordIds) . '% complete.');
+            }
         }
 
-        // And done
-        $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
+        $log->info("$nRecordsExported pastoral records exported.");
+        $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
+        if (count($skippedRecordIds) > 0) {
+            $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
+        }
     }
 }
