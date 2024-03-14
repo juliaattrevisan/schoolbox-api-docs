@@ -224,9 +224,12 @@ class Family
          */
         foreach ($this->families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
-//                if (in_array($parentId, ['SUN003', 'GUN004', 'SMI060'])) {
-//                    print_r($family);
-//                }
+                /* TODO Remove diagnostic
+                 */
+                if (!in_array($parentId, ['SUN003', 'GUN004', 'SMI060'])) {
+                    continue;
+                }
+
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
                  * associated with the student in suds; use validCommRule boolean to decide
@@ -515,9 +518,17 @@ class Family
         $person['students'] = $family['students'];
 
         /* Index each parent by their externalId
+         *
+         * Future Parents don't have any associated students; their $person['students'] array is empty
+         * all the time, making it impossible to correlate a student with this parent. Instead, use the
+         * comm rules to decide and stash future parents into a special area of the lookup.
          */
-        foreach ($person['students'] as $studentExternalId) {
-            $this->lookup[$studentExternalId][$externalId] = $person;
+        if (self::CURRENT === $type) {
+            foreach ($person['students'] as $studentExternalId) {
+                $this->lookup['currentparents'][$studentExternalId][$externalId] = $person;
+            }
+        } else {
+            $this->lookup['futureparents'][$externalId] = $person;
         }
 
         return $person;
@@ -571,9 +582,17 @@ class Family
         $person['students'] = $family['students'];
 
         /* Index each parent by their externalId
+         *
+         * Future Parents don't have any associated students; their $person['students'] array is empty
+         * all the time, making it impossible to correlate a student with this parent. Instead, use the
+         * comm rules to decide and stash future parents into a special area of the lookup.
          */
-        foreach ($person['students'] as $studentExternalId) {
-            $this->lookup[$studentExternalId][$externalId] = $person;
+        if (self::CURRENT === $type) {
+            foreach ($person['students'] as $studentExternalId) {
+                $this->lookup['currentparents'][$studentExternalId][$externalId] = $person;
+            }
+        } else {
+            $this->lookup['futureparents'][$externalId] = $person;
         }
 
         return $person;
