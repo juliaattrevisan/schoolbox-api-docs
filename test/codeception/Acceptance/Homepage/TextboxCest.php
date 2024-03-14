@@ -211,7 +211,7 @@ class TextboxCest
         $i->amGoingTo("Unlock the components and edit the textbox settings");
         $homepage->clickLockToggle();
         $homepage->clickComponentSettings();
-        $homepage->typeTextBoxHeading('Jana to be hidden');
+        $homepage->typeTextBoxHeading('Jana to be hidden Test');
         $i->amGoingTo("Hide the textbox title from read only users");
         $componentId = $i->grabFromDatabase('component_instance', 'id', ['identifier' => $homepageId]);
         $homepage->uncheckComponentCheckbox($componentId, 'showComponentTitle');
@@ -231,11 +231,13 @@ class TextboxCest
         $i->canSee('Jamal to be presented', '//article/p');
         $common->search('Jana');
         $searchPage->clickApplyFilters();
-        $i->amGoingTo('expect to see an empty results warning');
-        $searchPage->verifyNoResults();
+        $i->amGoingTo('expect to see the textbox with Untitled textbox header');
+        $i->canSee('Jamal to be presented');
+        $i->canSee('Untitled textbox', '//h6/a');
+        $i->cantSee('Jana to be hidden Test');
         $i->amGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         $i->amOnPage('/homepage/' . $homepageId);
         $i->canSee('Jamal to be presented');
-        $i->cantSee('Jana to be hidden');
+        $i->cantSee('Jana to be hidden Test');
     }
 }
