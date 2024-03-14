@@ -60,47 +60,6 @@ class Family
 
 
     /**
-     * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
-     *
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     * because tass doesn't treat parents independently of families.
-     *
-     * @var string
-     */
-    private string $spousePrefix;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * An array of phone numbers indexed by family code
-     *
-     * @var array
-     */
-    private array $phones;
-
-
-    /**
      * A list of (studentExternalId, parentExternalId) tuples
      *
      * @var array
@@ -114,35 +73,24 @@ class Family
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
      * @param LoggerInterface $log
-     * @param IApi            $api
-     * @param string          $spousePrefix
-     * @param int             $addnumFather
-     * @param int             $addnumMother
-     * @param array           $phones
+     * @param IApi            $api $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
+     * @param string          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
+     * @param int             $addnumFather Set in admin, corresponds to external_tass_addnum_father
+     * @param int             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
+     * @param array           $phones An array of phone numbers indexed by family code
      */
     public function __construct(
         private LoggerInterface $log,
-        IApi $api,
-        string $spousePrefix,
-        int $addnumFather,
-        int $addnumMother,
-        array $phones,
+        private IApi $api,
+        private string $spousePrefix,
+        private int $addnumFather,
+        private int $addnumMother,
+        private array $phones,
     ) {
-        $this->api = $api;
-
         /* Calculate a spouse prefix if one was set; otherwise use a default
          * Shanked from that Tass Helper class
          */
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
-
-        /* Some admin vars we'll use in this place
-         */
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-
-        /* Phone lookup; data from another endpoint
-         */
-        $this->phones = $phones;
     }
 
 
