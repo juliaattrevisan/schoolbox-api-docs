@@ -436,6 +436,11 @@ $masonry-drop-background: $input-focus-bg-color;
     color: $icon-color-lesson-plan;
 }
 
+.icon-masonry-Schoolbox_Learning_Component_Homepage_CurrentLessonPlanController:before {
+    @extend .icon-lesson-plan;
+    color: $icon-color-lesson-plan;
+}
+
 .icon-masonry-Schoolbox_Paperly_Component_Dashboard_Controller:before {
     @extend .icon-paperly;
     color: $icon-color-paperly;
