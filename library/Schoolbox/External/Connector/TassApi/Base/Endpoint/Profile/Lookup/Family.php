@@ -224,12 +224,6 @@ class Family
          */
         foreach ($this->families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
-                /* TODO Remove diagnostic
-                 */
-                if (!in_array($parentId, ['SUN003', 'GUN004', 'SMI060'])) {
-                    continue;
-                }
-
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
                  * associated with the student in suds; use validCommRule boolean to decide

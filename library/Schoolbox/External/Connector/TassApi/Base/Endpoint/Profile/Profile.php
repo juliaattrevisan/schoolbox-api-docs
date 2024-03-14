@@ -553,7 +553,7 @@ class Profile implements IStrategy
             if ($this->validStrats->isFamiliesStratEnabled()) {
                 $this->importParentsOfStudent(
                     $studentBaseProfile,
-                    $familiesLookup['lookup']['current'][$studentBaseProfile->getExternalId()] ?? null
+                    $familiesLookup['lookup']['currentparents'][$studentBaseProfile->getExternalId()] ?? null
                 );
             }
         }
