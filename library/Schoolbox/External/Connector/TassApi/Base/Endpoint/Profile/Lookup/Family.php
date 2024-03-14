@@ -60,6 +60,15 @@ class Family
 
 
     /**
+     * A local cache of getParents endpoint since we might optionally recompile families using a different
+     * set of comm rules to fulfil Future Parents; we only need to download getParents once.
+     *
+     * @var array|null
+     */
+    private ?array $families = null;
+
+
+    /**
      * A list of (studentExternalId, parentExternalId) tuples
      *
      * @var array
@@ -95,51 +104,19 @@ class Family
 
 
     /**
-     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
-     * I guess sfa_num stands for Split Family Access number or something
-     *
-     * @param string $node
-     * @param string $identifier
-     * @param string $sfaNum
-     * @return string
-     */
-    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
-    {
-        /* Do some funny prefix stuff for parents
-         */
-        if (self::FATHER_NODE === $node) {
-            $externalId = "P{$identifier}";
-        } else {
-            $externalId = "{$this->spousePrefix}{$identifier}";
-        }
-
-        /* If this was a split family, chuck a $sfaNum into the mix
-         *
-         * After 99,999 students pass through a tass system, this scheme will stop working
-         * due to collisions between old ids and new ones with prefix
-         *
-         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
-         */
-        if ('' !== $sfaNum) {
-            $externalId .= $sfaNum ;
-        }
-
-        return $externalId;
-    }
-
-
-    /**
      * Preload parents into a lookup
      *
      * This is probably going to be faster if we build a hash lookup of parents
      */
     public function generate(): array
     {
-        /* Grab all the families
+        /* Grab all the families just once
          */
-        $families = $this->api->retrieveDocument('getParents', [
-            'user_code' => 'all'
-        ]);
+        if (null === $this->families) {
+            $this->families = $this->api->retrieveDocument('getParents', [
+                'user_code' => 'all'
+            ]);
+        }
 
         $unknown = [];
 
@@ -225,7 +202,7 @@ class Family
             $this->log->info('Parent Lounge access is required for parents.');
         }
 
-        foreach ($families['parents'] as $row) {
+        foreach ($this->families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
@@ -382,6 +359,40 @@ class Family
                 'unknown' => \count($unknown),
             ],
         ];
+    }
+
+
+    /**
+     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
+     * I guess sfa_num stands for Split Family Access number or something
+     *
+     * @param string $node
+     * @param string $identifier
+     * @param string $sfaNum
+     * @return string
+     */
+    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    {
+        /* Do some funny prefix stuff for parents
+         */
+        if (self::FATHER_NODE === $node) {
+            $externalId = "P{$identifier}";
+        } else {
+            $externalId = "{$this->spousePrefix}{$identifier}";
+        }
+
+        /* If this was a split family, chuck a $sfaNum into the mix
+         *
+         * After 99,999 students pass through a tass system, this scheme will stop working
+         * due to collisions between old ids and new ones with prefix
+         *
+         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
+         */
+        if ('' !== $sfaNum) {
+            $externalId .= $sfaNum ;
+        }
+
+        return $externalId;
     }
 
 
