@@ -143,6 +143,19 @@
                         <input id='tap4start' type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" data-datepicker data-datesync-enddate="#tap4end" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Parent Lounge</h4>
+                <p class="meta">If enabled, Parent Lounge access is required for parents to be imported into schoolbox from TASS. This corresponds to the web_access flag in the TASS API.</p>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="dsn[tassapi][options][webaccessrequired]" value="0" />
+                        <input id="webaccessrequired" type="checkbox" name="dsn[tassapi][options][webaccessrequired]" value="1" {% if options.webaccessrequired ?? false %}checked="checked"{% endif %} />
+                        <label for="webaccessrequired" class="checkbox-label">Require web_access</label>
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>
