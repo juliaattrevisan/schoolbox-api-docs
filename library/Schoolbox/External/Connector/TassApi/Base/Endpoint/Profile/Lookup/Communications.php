@@ -36,6 +36,13 @@ class Communications
 
 
     /**
+     * Decide which set of comm rules to obtain using these two consts as args.
+     */
+    private const CURRENT = 'current';
+    private const FUTURE = 'future';
+
+
+    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
@@ -58,10 +65,32 @@ class Communications
 
 
     /**
+     * Generate a set of comm rules for current parents
+     *
      * @return array
-     * @throws RuntimeException
      */
-    public function generate(): array
+    public function generateCurrent(): array
+    {
+        return $this->generate(self::CURRENT);
+    }
+
+
+    /**
+     * Generate a set of comm rules for future parents
+     *
+     * @return array
+     */
+    public function generateFuture(): array
+    {
+        return $this->generate(self::FUTURE);
+    }
+
+
+    /**
+     * @param string $type
+     * @return array
+     */
+    private function generate(string $type): array
     {
         $stack = [];
 
@@ -69,7 +98,7 @@ class Communications
          * all day. It'll be faster, and we won't incur rate limiting wrath from tass
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
-            'currentstatus' => 'current',
+            'currentstatus' => $type,
             'commtype' => $this->communicationTypes
         ]);
 
