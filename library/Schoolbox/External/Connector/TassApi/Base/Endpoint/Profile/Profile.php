@@ -551,7 +551,13 @@ class Profile implements IStrategy
 //            }
 //
 //            if ($this->validStrats->isFamiliesStratEnabled()) {
-//                $this->importParentsOfStudent($studentBaseProfile, true, $familiesLookup['lookup']['current'][$studentBaseProfile->getExternalId()] ?? null);
+//                $this->importParentsOfStudent(
+//                    $studentBaseProfile->getIexternalId(),
+//                    $studentBaseProfile->getFirstname(),
+//                    $studentBaseProfile->getLastname(),
+//                    true,
+//                    $familiesLookup['lookup']['current'][$studentBaseProfile->getExternalId()] ?? null
+//                );
 //            }
 //        }
 
@@ -592,7 +598,13 @@ class Profile implements IStrategy
      */
     private function importParentsOfFutureStudents(array $familiesLookup): void {
         foreach ($familiesLookup as $parentId => $parent) {
-            $this->log->info($parentId);
+            $this->importParentsOfStudent(
+                null,
+                null,
+                null,
+                false,
+                $familiesLookup
+            );
         }
     }
 
@@ -752,15 +764,22 @@ class Profile implements IStrategy
      * Optionally, create a relationship record betweeen a parent and student profile;
      * this is optional for the Future Parents use case where parents exist without students.
      *
-     * @param Model      $studentBaseProfile
-     * @param bool       $createRelationship
-     * @param array|null $familiesLookup
+     * @param string|null $studentId
+     * @param string|null $studentFirstname
+     * @param string|null $studentLastname
+     * @param bool        $createRelationship
+     * @param array|null  $familiesLookup
      * @throws Exception
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, bool $createRelationship, ?array $familiesLookup): void
+    private function importParentsOfStudent(
+        ?string $studentId,
+        ?string $studentFirstname,
+        ?string $studentLastname,
+        bool $createRelationship,
+        ?array $familiesLookup
+    ): void
     {
-        $studentId = $studentBaseProfile->getExternalId();
-        $studentFullname = trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+        $studentFullname = trim("{$studentFirstname} {$studentLastname}");
 
         /* Parents that were preloaded for this student will exist in the lookup array
          * Otherwise the student doesn't have any parents in tass, for whatever reason
@@ -769,121 +788,7 @@ class Profile implements IStrategy
             foreach ($familiesLookup as $externalId => $parent) {
                 /* Each parent in the family
                  */
-                $email = trim((string)$parent['email']);
-                $firstname = trim((string)$parent['firstname']);
-                $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
-                $lastname = trim((string)$parent['surname']);
-                $phoneHome = trim((string)$parent['home']);
-                $phoneMobile = trim((string)$parent['mobile']);
-                $phoneWork = trim((string)$parent['work']);
-                $relationship = trim((string)$parent['relationship']);
-                $title = '';
-
-                /* A shortcut for convenience in logging
-                 * (Sometimes people don't have all the parts of their name; odd but ok)
-                 */
-                $fullname = trim("{$firstname} {$lastname}");
-
-                /* $parent is an array that contains a boolean key, validCommRule
-                 * This bool decides whether $parent should be associated with the student
-                 * in schoolbox; if not, log it here and skip them
-                 */
-                if (!$parent['validCommRule']) {
-                    $this->log->debug(sprintf(
-                        'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    continue;
-                }
-
-                /* Parents might inadvertently have the same externalId as someone else's
-                 * base profile (e.g. parent has same external id as student)
-                 *
-                 * This is not usually supposed to happen.
-                 * some sis implementations let you have broken data in this way
-                 *
-                 * Try and load a parent profile based on external id. If it exists, just reuse
-                 * those pieces. If it doesn't exist, first check if there's an existing base
-                 * profile before making a whole new one (this is how you end up with fk issues)
-                 */
-                try {
-                    $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-                    $parentBaseProfile = $parentProfile->getBaseProfile();
-                } catch (Exception $e) {
-                    $parentProfile = $this->parentProfileMapper->createModel();
-
-                    try {
-                        $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
-                    } catch (Exception $e) {
-                        $parentBaseProfile = $this->baseProfileMapper->createModel();
-                    }
-
-                    $parentProfile->setBaseProfile($parentBaseProfile);
-                }
-
-                $parentBaseProfile
-                    ->setExternalId($externalId)
-                    ->setTitle($title)
-                    ->setFirstname($firstname)
-                    ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
-
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->baseProfileMapper->save($parentBaseProfile);
-                }
-
-                $parentProfile
-                    ->setPhoneHome($phoneHome)
-                    ->setPhoneWork($phoneWork)
-                    ->setMobile($phoneMobile)
-                    ->setEmail($email);
-
-                /* Log it
-                 */
-                $this->log->info(sprintf(
-                    'Adding parent profile for %s (preferred: %s) (%s)',
-                    $fullname,
-                    $firstnamePreferred,
-                    $externalId
-                ));
-
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->parentProfileMapper->save($parentProfile);
-                }
-
-                /* Manufacture relations, if elected
-                 */
-                if ($createRelationship) {
-                    /* Log it
-                     */
-                    $this->log->info(sprintf(
-                        'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
-                        $fullname,
-                        $firstnamePreferred,
-                        $externalId,
-                        $relationship,
-                        $studentFullname,
-                        $studentId
-                    ));
-
-                    /* Then save it
-                     */
-                    if ($this->perform) {
-                        $relationship = $this->relationshipMapper->createModel()
-                            ->setUserProfile($parentBaseProfile)
-                            ->setChildProfile($studentBaseProfile)
-                            ->setType($relationship);
-
-                        $this->relationshipMapper->save($relationship);
-                    }
-                }
+                $this->processParentProfile($externalId, $parent, $createRelationship);
             }
         } else {
             $this->log->warning(sprintf(
@@ -893,6 +798,137 @@ class Profile implements IStrategy
             ));
         }
     }
+
+
+    /**
+     * Create a parent profile in suds
+     *
+     * Services both current parents and future parents
+     *
+     * @param string $externalId
+     * @param array  $parent
+     * @return void
+     * @throws Exception
+     */
+    private function processParentProfile(string $externalId, array $parent, bool $createRelationship): void
+    {
+        $email = trim((string)$parent['email']);
+        $firstname = trim((string)$parent['firstname']);
+        $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
+        $lastname = trim((string)$parent['surname']);
+        $phoneHome = trim((string)$parent['home']);
+        $phoneMobile = trim((string)$parent['mobile']);
+        $phoneWork = trim((string)$parent['work']);
+        $relationship = trim((string)$parent['relationship']);
+        $title = '';
+
+        /* A shortcut for convenience in logging
+         * (Sometimes people don't have all the parts of their name; odd but ok)
+         */
+        $fullname = trim("{$firstname} {$lastname}");
+
+        /* $parent is an array that contains a boolean key, validCommRule
+         * This bool decides whether $parent should be associated with the student
+         * in schoolbox; if not, log it here and skip them
+         */
+        if (!$parent['validCommRule']) {
+            $this->log->debug(sprintf(
+                'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
+                $firstname,
+                $lastname,
+                $externalId
+            ));
+
+            return;
+        }
+
+        /* Parents might inadvertently have the same externalId as someone else's
+         * base profile (e.g. parent has same external id as student)
+         *
+         * This is not usually supposed to happen.
+         * some sis implementations let you have broken data in this way
+         *
+         * Try and load a parent profile based on external id. If it exists, just reuse
+         * those pieces. If it doesn't exist, first check if there's an existing base
+         * profile before making a whole new one (this is how you end up with fk issues)
+         */
+        try {
+            $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+            $parentBaseProfile = $parentProfile->getBaseProfile();
+        } catch (Exception $e) {
+            $parentProfile = $this->parentProfileMapper->createModel();
+
+            try {
+                $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+            } catch (Exception $e) {
+                $parentBaseProfile = $this->baseProfileMapper->createModel();
+            }
+
+            $parentProfile->setBaseProfile($parentBaseProfile);
+        }
+
+        $parentBaseProfile
+            ->setExternalId($externalId)
+            ->setTitle($title)
+            ->setFirstname($firstname)
+            ->setFirstnamePreferred($firstnamePreferred)
+            ->setLastname($lastname);
+
+        /* Then save it
+         */
+        if ($this->perform) {
+            $this->baseProfileMapper->save($parentBaseProfile);
+        }
+
+        $parentProfile
+            ->setPhoneHome($phoneHome)
+            ->setPhoneWork($phoneWork)
+            ->setMobile($phoneMobile)
+            ->setEmail($email);
+
+        /* Log it
+         */
+        $this->log->info(sprintf(
+            'Adding parent profile for %s (preferred: %s) (%s)',
+            $fullname,
+            $firstnamePreferred,
+            $externalId
+        ));
+
+        /* Then save it
+         */
+        if ($this->perform) {
+            $this->parentProfileMapper->save($parentProfile);
+        }
+
+        /* Manufacture relations, if elected
+         */
+        if ($createRelationship) {
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
+                $fullname,
+                $firstnamePreferred,
+                $externalId,
+                $relationship,
+                $studentFullname,
+                $studentId
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationship);
+
+                $this->relationshipMapper->save($relationship);
+            }
+        }
+    }
+
 
 
     /**
