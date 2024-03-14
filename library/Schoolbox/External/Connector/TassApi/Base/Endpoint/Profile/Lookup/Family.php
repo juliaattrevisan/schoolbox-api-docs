@@ -36,6 +36,16 @@ class Family
 
 
     /**
+     * These array nodes contain a set of current parents and future parents respectively.
+     * They're a bit awkward to access without consts, since naming them wrongly will successfully fail
+     * by null coalesce to avoid syntax fatals.
+     */
+    public const PARENTS_LOOKUP = 'lookup';
+    public const PARENTS_CURRENT = 'currentparents';
+    public const PARENTS_FUTURE = 'futureparents';
+
+
+    /**
      * Default spouse prefix
      *
      * @var string

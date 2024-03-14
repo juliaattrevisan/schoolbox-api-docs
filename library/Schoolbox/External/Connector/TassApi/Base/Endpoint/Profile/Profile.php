@@ -553,7 +553,7 @@ class Profile implements IStrategy
             if ($this->validStrats->isFamiliesStratEnabled()) {
                 $this->importParentsOfStudent(
                     $studentBaseProfile,
-                    $familiesLookup['lookup']['currentparents'][$studentBaseProfile->getExternalId()] ?? null
+                    $familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_CURRENT][$studentBaseProfile->getExternalId()] ?? null
                 );
             }
         }
@@ -578,7 +578,7 @@ class Profile implements IStrategy
 
                 $familiesLookup = $familiesLookupGenerator->generateFuture($futureCommRules);
 
-                $this->importParentsOfFutureStudents($familiesLookup['lookup']['futureparents']);
+                $this->importParentsOfFutureStudents($familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_FUTURE]);
             }
         }
     }
