@@ -86,7 +86,7 @@ class Family
      * @param string          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
      * @param int             $addnumFather Set in admin, corresponds to external_tass_addnum_father
      * @param int             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
-     * @param array           $phones An array of phone numbers indexed by family code
+     * @param array           $commrules An array of phone numbers indexed by family code
      */
     public function __construct(
         private LoggerInterface $log,
@@ -94,7 +94,7 @@ class Family
         private string $spousePrefix,
         private int $addnumFather,
         private int $addnumMother,
-        private array $phones,
+        private array $commrules,
     ) {
         /* Calculate a spouse prefix if one was set; otherwise use a default
          * Shanked from that Tass Helper class
@@ -451,7 +451,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->phones[$family['user_code']][$node] ?? [
+        $person = $this->commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
@@ -518,7 +518,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->phones[$family['user_code']][$node] ?? [
+        $person = $this->commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
