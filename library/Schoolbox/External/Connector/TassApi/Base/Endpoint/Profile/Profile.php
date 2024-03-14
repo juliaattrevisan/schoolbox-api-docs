@@ -337,7 +337,7 @@ class Profile implements IStrategy
               https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getStudentsDetails.md
            Using getStudents for now, so that we don't have to make a call for each student.
          */
-        $this->log->info('Downloading student data (this might take a while)');
+        $this->log->info('Downloading current student data (this might take a while)');
 
         $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current',
@@ -545,6 +545,53 @@ class Profile implements IStrategy
             if ($this->validStrats->isFamiliesStratEnabled()) {
                 $this->importParentsOfStudent($studentBaseProfile, true, $familiesLookup);
             }
+        }
+
+        /* This optionally processes the parents of future students
+         * FIXME make conditional
+         */
+        $this->importParentsOfFutureStudents($familiesLookup);
+    }
+
+
+    /**
+     * Optionally also import the parents of future students, which are guys who have yet to formally commence
+     * their enrolment. They come out of the getStudents endpoint with currentstatus future, specifically.
+     * The parent profiles that spawn here aren't related to any student profiles, they just exist in isolation.
+     *
+     * @param array $familiesLookup
+     * @return void
+     * @throws Exception
+     */
+    private function importParentsOfFutureStudents(array $familiesLookup): void {
+        $this->log->info('Downloading future student data (this might take a while)');
+
+        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+            'currentstatus' => 'future',
+            'includephoto'  => $this->includePhoto
+        ]);
+
+        foreach ($students['students'] as $student) {
+            /* A placeholder mostly used for logging purposes, a little bit of copypasta that I don't want to avoid
+             * for the time being.
+             */
+            $externalId = trim((string)$student['general_details']['student_code']);
+            $firstname = trim((string)$student['general_details']['first_name']);
+
+            /* Some students have a preference in their surname
+             * If preferred_surname has a meaningful value, use that in preference to the usual
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $student['general_details']['preferred_surname'],
+                $student['general_details']['surname']
+            ]);
+
+            $studentBaseProfile = $this->baseProfileMapper->createModel()
+                ->setExternalId($externalId)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            $this->importParentsOfStudent($studentBaseProfile, false, $familiesLookup);
         }
     }
 
