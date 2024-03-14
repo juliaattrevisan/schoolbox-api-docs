@@ -955,19 +955,23 @@
     content: "\e92b";
     font-family: $font-family-icon;
 }
+
 .icon-paperly:before {
     content: "\e92e";
     font-family: $font-family-icon;
 }
+
 .icon-paperly-excursions:before {
-    content: "\e92d";
-    font-family: $font-family-icon;
-}
-.icon-paperly-forms:before {
     content: "\e92f";
     font-family: $font-family-icon;
 }
-.icon-paperly-pti:before {
+
+.icon-paperly-forms:before {
     content: "\e930";
+    font-family: $font-family-icon;
+}
+
+.icon-paperly-pti:before {
+    content: "\e931";
     font-family: $font-family-icon;
 }
