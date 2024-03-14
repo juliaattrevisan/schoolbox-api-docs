@@ -28,7 +28,7 @@ class Exporter extends CliTool\App
     /**
      * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
      */
-    private const BATCH_SIZE = 100;
+    private const BATCH_SIZE = 2;
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -125,7 +125,7 @@ HELP;
                 }
             }
 
-            $nRecordsProcessed = ($batchIndex + 1) * self::BATCH_SIZE;
+            $nRecordsProcessed = min(($batchIndex + 1) * self::BATCH_SIZE, $nPastoralRecordIds);
 
             if ($nPastoralRecordIds > self::BATCH_SIZE) {
                 $log->info("Processed $nRecordsProcessed records of $nPastoralRecordIds.  " . round(100 * $nRecordsProcessed / $nPastoralRecordIds) . '% complete.');
