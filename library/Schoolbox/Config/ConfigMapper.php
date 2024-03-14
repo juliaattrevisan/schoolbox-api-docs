@@ -284,11 +284,6 @@ class ConfigMapper extends Mapper
     public const EXTERNAL_ISAMS_STUDENT_REGISTERS = 'external_isams_student_registers';
     public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
 
-    // Firebase config
-    public const NAME_FIREBASE_PUBLIC_CONFIG       = 'firebase_public_config';
-    public const NAME_FIREBASE_PRIVATE_KEY         = 'firebase_private_key';
-    public const NAME_FIREBASE_WEB_PUSH_PUBLIC_KEY = 'firebase_web_push_public_key';
-
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *
