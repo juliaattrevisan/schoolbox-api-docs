@@ -4,15 +4,21 @@ import { initializeApp, getMessaging, onBackgroundMessage } from '/static/js/bun
 {#const b = self.importScripts('/static/js/bundle/firebaseMessaging.js');#}
 {#console.log(b);#}
 
-// Build Firebase config here
-const firebaseConfig = {{ firebase.publicConfig | raw }};
+const firebaseApps = [];
+{% for app in firebase.apps %}
+{# Firebase public configuration will generally be provided as JS, so must be output raw #}
+firebaseApps.push({
+    appIdentifier: '{{ app.appIdentifier ?? '' }}',
+    publicConfiguration: {{ (app.publicConfiguration ?? 'null') | raw }},
+    webPushPublicKey: '{{ app.webPushPublicKey ?? '' }}',
+});
+{% endfor %}
 
-// Needs to know:
-// * Token for this user session: store in a long-lasting cookie?
-// * Firebase configuration?
-const firebaseApp = initializeApp(firebaseConfig);
-const messaging   = getMessaging(firebaseApp);
-console.log(messaging);
-onBackgroundMessage(messaging, (payload) => {
-    console.log(payload);
-})
+window.sbProps.firebaseApps.forEach((app) => {
+    const firebaseApp = initializeApp(app.publicConfiguration);
+    const messaging   = getMessaging(firebaseApp);
+    console.log(messaging);
+    onBackgroundMessage(messaging, (payload) => {
+        console.log(payload);
+    })
+});
