@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
 use InvalidArgumentException;
-use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -21,15 +20,12 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Communicat
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use UnexpectedValueException;
 
 /**
  * Class Profile
@@ -81,69 +77,8 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
+     * private string $communicationTypes;
      *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
-    /**
-     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     * because tass doesn't treat parents independently of families.
-     *
-     * @var string
-     */
-    private string $spousePrefix;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      *
@@ -164,47 +99,7 @@ class Profile implements IStrategy
      *
      * $communicationTypes uses "tkco" as a default, if empty in admin
      * Otherwise, use the csv string provided there
-     *
-     * @var string
      */
-    private string $communicationTypes;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var StorageMapper
-     */
-    private StorageMapper $storageMapper;
-
 
     /**
      * Profile constructor.
@@ -214,10 +109,10 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param array                           $api
      * @param array                           $watchlist
-     * @param int                             $addnumFather
-     * @param int                             $addnumMother
+     * @param int                             $addnumFather Set in admin, corresponds to external_tass_addnum_father
+     * @param int                             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
      * @param bool                            $includePhoto
-     * @param string                          $spousePrefix
+     * @param string                          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
      * @param string                          $communicationTypes
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -227,52 +122,37 @@ class Profile implements IStrategy
      * @param StorageMapper                   $storageMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        array $watchlist,
-        int $addnumFather,
-        int $addnumMother,
-        bool $includePhoto,
-        string $spousePrefix,
-        string $communicationTypes,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        StorageMapper $storageMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private array $watchlist,
+        private int $addnumFather,
+        private int $addnumMother,
+        private bool $includePhoto,
+        private string $spousePrefix,
+        private string $communicationTypes,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private StorageMapper $storageMapper
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->watchlist = $watchlist;
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-        $this->includePhoto = $includePhoto;
-        $this->spousePrefix = $spousePrefix;
-
         /* Decide default communication rule identifiers
          * If $communicationTypes is an empty string, default it to "tkco"
          * which is the default communication rule specified by TASS The Organisation
          */
         $this->communicationTypes = '' === $communicationTypes ? self::DEFAULT_COMMUNICATION_RULE : $communicationTypes;
-
-        /* Various mappers
-         */
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
-        $this->storageMapper = $storageMapper;
     }
 
 
     /**
      * Import user profile data into sis_user_profile*
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
      */
     public function import(): void
     {
@@ -673,7 +553,7 @@ class Profile implements IStrategy
                 $stack[$name] = [
                     'name' => $name,
                     'phone' => (string)$homePhone,
-                    'alt' => (string)$mobilePhone
+                    'alt' => $mobilePhone
                 ];
             }
         }
@@ -924,7 +804,6 @@ class Profile implements IStrategy
     }
 
 
-
     /**
      * Staff members actually consist of two populations: Teachers and Non-Teachers
      *
@@ -1137,6 +1016,10 @@ class Profile implements IStrategy
 
     /**
      * Import staff profile data
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
      */
     private function importStaff(): void
     {
