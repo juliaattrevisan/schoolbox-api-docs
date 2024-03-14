@@ -28,10 +28,7 @@ declare global {
             imageSlideshows: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
-            // Firebase config: not always set?
-            firebaseConfig?: { [key: string]: string } | null;
-            firebaseWebPushPublicKey?: string | null;
-            firebaseAppIdentifiers?: Array<string> | null;
+            firebaseApps: Array<{ appIdentifier: string, publicConfiguration: { [key: string]: any }, webPushPublicKey: string }>;
         };
         schoolboxUser: {
             id: number;

@@ -116,19 +116,15 @@
         window.sbProps.hasEditorAI = true;
         {% endif %}
 
-        {% if firebase.publicConfig ?? null %}
-        {# Firebase public config is a JavaScript object, not a JSON value #}
-        window.sbProps.firebaseConfig = {{ firebase.publicConfig | raw }};
-        {% endif %}
-
-        {% if firebase.webPushPublicKey ?? null %}
-        window.sbProps.firebaseWebPushPublicKey = '{{ firebase.webPushPublicKey }}';
-        {% endif %}
-
-        {% if firebase.appIdentifiers ?? null %}
-        {# Firebase public config is a JSON value #}
-        window.sbProps.firebaseAppIdentifiers = {{ firebase.appIdentifiers | json_encode | raw }};
-        {% endif %}
+        window.sbProps.firebaseApps = [];
+        {% for app in firebase.apps %}
+        {# Firebase public configuration will generally be provided as JS, so must be output raw #}
+        window.sbProps.firebaseApps.push({
+            appIdentifier: '{{ app.appIdentifier ?? '' }}',
+            publicConfiguration: {{ (app.publicConfiguration ?? 'null') | raw }},
+            webPushPublicKey: '{{ app.webPushPublicKey ?? '' }}',
+        });
+        {% endfor %}
 
     </script>
     {% endautoescape %}

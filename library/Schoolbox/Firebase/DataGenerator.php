@@ -42,10 +42,10 @@ class DataGenerator implements IDataGenerator
             'apps' => $this->serviceMapper
                 ->findByColumn('provider', Registry::PROVIDER_FIREBASE)
                 ->map(fn (Service $service) => [
-                    'id'                   => $service->getId(),
-                    'app_identifier'       => $service->getAppIdentifier(),
-                    'public_configuration' => $service->getPublicConfiguration(),
-                    'web_push_public_key'  => $service->getWebPushPublicKey(),
+                    'id'                  => $service->getId(),
+                    'appIdentifier'       => $service->getAppIdentifier(),
+                    'publicConfiguration' => $service->getPublicConfiguration(),
+                    'webPushPublicKey'    => $service->getWebPushPublicKey(),
                 ]),
         ];
     }
