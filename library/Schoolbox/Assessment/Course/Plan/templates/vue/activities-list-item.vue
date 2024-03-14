@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
+
+const deleteActivityStore = useDeleteActivityStore();
 
 interface Props {
     activity: Activity;
@@ -33,6 +36,15 @@ const activityLink = window.Vue.computed(() => {
     // Otherwise, use the summary link
     return props.activity._links.summary;
 });
+
+/**
+ * delete the node when confirmed
+ */
+function onDeleteActivity() {
+    console.info("activities-list-item.vue onDeleteActivity() e");
+    deleteActivityStore.prompt();
+    console.info("activities-list-item.vue onDeleteActivity() x");
+}
 </script>
 
 <template>
@@ -59,7 +71,9 @@ const activityLink = window.Vue.computed(() => {
                 }}</a>
             </li>
             <li>
-                <a :href="returnUrl(props.activity._links.delete)" class="icon-delete">Delete</a>
+                <a :href="returnUrl(props.activity._links.delete)" @click.prevent="onDeleteActivity" class="icon-delete"
+                    >Delete</a
+                >
             </li>
             <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
                 <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>

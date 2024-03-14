@@ -18,7 +18,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     const units = window.Vue.ref<Unit[]>([]);
     const routeFolderSequence = window.Vue.ref<string | null>(null);
-    const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
+    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     // Allow the refs to be passed in instead of creating and monitoring two
     let unitPlannerContainerEl: Ref<HTMLElement>;
@@ -119,7 +119,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                 }
 
                 return acc + unexpandedUnitHeight;
-            }, 0),
+            }, 0)
         );
         return Math.max(minDragHeight, Math.min(targetHeight, maxDragHeight));
     });
@@ -185,7 +185,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         $unitPlannerContainerEl: Ref<HTMLElement>,
         $headerRowHeight: Ref<number>,
         $unitPlannerContainerScrollTop: Ref<number>,
-        $toastEl: typeof Toast,
+        $toastEl: typeof Toast
     ) {
         units.value = $units;
         routeFolderSequence.value = $routeFolderSequence;
@@ -327,6 +327,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragInitial.value = null;
     }
 
+    console.info("unitPlannerStore.ts useUnitPlannerStore() x");
     return {
         init,
         isDragging,

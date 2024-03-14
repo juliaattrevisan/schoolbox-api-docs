@@ -5,6 +5,7 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
+import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
 
 interface Props {
     units: Unit[];
@@ -13,6 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
+console.info("unit-planner.vue calling useUnitPlannerStore()");
 const store = useUnitPlannerStore();
 
 // Get a list of every textbox that could be shown in a unit
@@ -98,7 +100,7 @@ window.Vue.watch(
             updateScrollPosition();
         }
     },
-    { once: true },
+    { once: true }
 );
 
 window.Vue.onMounted(() => {
@@ -108,7 +110,7 @@ window.Vue.onMounted(() => {
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
         headerRowHeight,
         unitPlannerContainerScrollTop,
-        toastEl,
+        toastEl
     );
 
     // Initialize the ResizeObserver
@@ -197,6 +199,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
 
+    <activities-list-delete-item />
     <toast ref="toastEl"></toast>
 </template>
 
