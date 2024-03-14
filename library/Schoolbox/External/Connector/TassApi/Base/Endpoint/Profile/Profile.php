@@ -543,7 +543,7 @@ class Profile implements IStrategy
             }
 
             if ($this->validStrats->isFamiliesStratEnabled()) {
-                $this->importParentsOfStudent($studentBaseProfile, $familiesLookup);
+                $this->importParentsOfStudent($studentBaseProfile, true, $familiesLookup);
             }
         }
     }
@@ -701,15 +701,15 @@ class Profile implements IStrategy
 
     /**
      * Import parent profile data for a given student
+     * Optionally, create a relationship record betweeen a parent and student profile;
+     * this is optional for the Future Parents use case where parents exist without students.
      *
      * @param Model      $studentBaseProfile
+     * @param bool       $createRelationship
      * @param array|null $familiesLookup
-     * @throws DefinitionException
      * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $familiesLookup): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, bool $createRelationship, ?array $familiesLookup): void
     {
         $studentId = $studentBaseProfile->getExternalId();
         $studentFullname = trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
@@ -810,30 +810,31 @@ class Profile implements IStrategy
                     $this->parentProfileMapper->save($parentProfile);
                 }
 
-                /* Manufacture relations
+                /* Manufacture relations, if elected
                  */
+                if ($createRelationship) {
+                    /* Log it
+                     */
+                    $this->log->info(sprintf(
+                        'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
+                        $fullname,
+                        $firstnamePreferred,
+                        $externalId,
+                        $relationship,
+                        $studentFullname,
+                        $studentId
+                    ));
 
-                /* Log it
-                 */
-                $this->log->info(sprintf(
-                    'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
-                    $fullname,
-                    $firstnamePreferred,
-                    $externalId,
-                    $relationship,
-                    $studentFullname,
-                    $studentId
-                ));
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $relationship = $this->relationshipMapper->createModel()
+                            ->setUserProfile($parentBaseProfile)
+                            ->setChildProfile($studentBaseProfile)
+                            ->setType($relationship);
 
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $relationship = $this->relationshipMapper->createModel()
-                        ->setUserProfile($parentBaseProfile)
-                        ->setChildProfile($studentBaseProfile)
-                        ->setType($relationship);
-
-                    $this->relationshipMapper->save($relationship);
+                        $this->relationshipMapper->save($relationship);
+                    }
                 }
             }
         } else {
