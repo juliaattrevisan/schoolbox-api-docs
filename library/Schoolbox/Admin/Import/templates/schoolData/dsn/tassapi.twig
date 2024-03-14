@@ -146,14 +146,16 @@
 
                 <hr />
 
-                <h4 class="no-margin">Parent Lounge</h4>
-                <p class="meta">If enabled, Parent Lounge access is required for parents to be imported into schoolbox from TASS. This corresponds to the web_access flag in the TASS API.</p>
+                <h4 class="no-margin">Future Parents</h4>
+                <p class="meta">If enabled, we will also look for parents of students who have yet to commence their enrolment. These parents must
+                    Parent Lounge access to be imported into schoolbox from TASS; this corresponds to the web_access flag in the TASS API.
+                </p>
 
                 <div class="row">
                     <div class="small-12 columns">
-                        <input type="hidden" name="dsn[tassapi][options][webaccessrequired]" value="0" />
-                        <input id="webaccessrequired" type="checkbox" name="dsn[tassapi][options][webaccessrequired]" value="1" {% if options.webaccessrequired ?? false %}checked="checked"{% endif %} />
-                        <label for="webaccessrequired" class="checkbox-label">Require web_access</label>
+                        <input type="hidden" name="dsn[tassapi][options][futureparents]" value="0" />
+                        <input id="futureparents" type="checkbox" name="dsn[tassapi][options][futureparents]" value="1" {% if options.futureparents ?? false %}checked="checked"{% endif %} />
+                        <label for="futureparents" class="checkbox-label">Enable processing of future parents</label>
                     </div>
                 </div>
             </div>

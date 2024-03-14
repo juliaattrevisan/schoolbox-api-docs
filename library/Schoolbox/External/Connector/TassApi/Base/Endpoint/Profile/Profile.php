@@ -295,6 +295,7 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     * @throws Exception
      */
     private function importStudents(): void
     {
@@ -547,10 +548,12 @@ class Profile implements IStrategy
             }
         }
 
-        /* This optionally processes the parents of future students
-         * FIXME make conditional
+        /* Future Parents (optional)
+         * This optionally processes the parents of future students
          */
-        $this->importParentsOfFutureStudents($familiesLookup);
+        if ($this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions()['futureparents'] ?? false) {
+            $this->importParentsOfFutureStudents($familiesLookup);
+        }
     }
 
 
@@ -566,6 +569,8 @@ class Profile implements IStrategy
     private function importParentsOfFutureStudents(array $familiesLookup): void {
         $this->log->info('Downloading future student data (this might take a while)');
 
+        /* We need the parents of these guys
+         */
         $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'future',
             'includephoto'  => $this->includePhoto
