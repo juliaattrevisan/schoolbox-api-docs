@@ -255,17 +255,22 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * @param { number[] } unitIDs - the ids of the units to resequence
      */
     function resequenceUnits(unitIDs: Unit["id"][]) {
+        let hasChanged = false;
+
         // As the sequence for units is largest to smallest, we need to reverse the array
         unitIDs.reverse().forEach((id, index) => {
             const unit = units.value.find((u) => u.id === id);
-            if (unit) {
+            if (unit && unit.sequence !== index + 1) {
                 unit.sequence = index + 1;
+                hasChanged = true;
             }
         });
 
-        saveUnitSequence().catch(() => {
-            // noop
-        });
+        if (hasChanged) {
+            saveUnitSequence().catch(() => {
+                // noop
+            });
+        }
     }
 
     /**
