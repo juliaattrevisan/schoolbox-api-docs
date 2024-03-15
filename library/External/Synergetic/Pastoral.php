@@ -577,6 +577,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function syncPastoral(Pastoral $pastoral, bool $prependTitle = false): bool
     {
+        (new \Alaress_Log_File('/tmp/pastoral.log'))->log('16383 sync pastoral started', '');
         if (!$this->isExternalCodeValid($pastoral)) {
             return false;
         }

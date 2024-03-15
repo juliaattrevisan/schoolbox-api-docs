@@ -87,7 +87,7 @@ HELP;
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 try {
-                    $externalPastoral->syncPastoral($pastoralRecord, $prependTitle);
+                    $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
                     $log->debug("Could not syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
                     $skippedRecordIds[] = $pastoralRecord->getId();
