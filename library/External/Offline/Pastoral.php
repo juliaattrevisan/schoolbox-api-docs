@@ -31,7 +31,7 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
     /**
      * {@inheritDoc}
      */
-    public function syncPastoral(PastoralModel $pastoral): bool
+    public function syncPastoral(PastoralModel $pastoral, bool $prependTitle = false): bool
     {
         // NOOP
         return false;

@@ -50,9 +50,9 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function syncPastoral(Pastoral\Model $pastoral): bool
+    public function syncPastoral(Pastoral\Model $pastoral, bool $prependTitle = false): bool
     {
-        return $this->database->syncPastoral($pastoral);
+        return $this->database->syncPastoral($pastoral, $prependTitle);
     }
 
     /**

@@ -47,9 +47,10 @@ interface External_PastoralInterface extends External\IConnector
      * Returns whether we *created* a record in the SIS (ie, an update will return false)
      *
      * @param Pastoral\Model $pastoral
+     * @param bool           $prependTitle
      * @return bool
      */
-    public function syncPastoral(Pastoral\Model $pastoral): bool;
+    public function syncPastoral(Pastoral\Model $pastoral, bool $prependTitle = false): bool;
 
     /**
      * Deletes an existing pastoral record
