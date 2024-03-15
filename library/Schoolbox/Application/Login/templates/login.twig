@@ -247,9 +247,11 @@
             <li><a href="{{ routeLookup('policy.getPolicy') }}">Guidelines of Use and Privacy Policy</a></li>
             <li><a href="https://schoolbox.education" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
                 {{ config.site_version }}</li>
-            {% if config.feedback_url and config.feedback_text %}
-                <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
-            {% endif %}
+            {% block feedbackLink %}
+                {% if config.feedback_url and config.feedback_text %}
+                    <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                {% endif %}
+            {% endblock %}
             {% if not config.show_default_login %}
                 <script>
                     $(function() {
