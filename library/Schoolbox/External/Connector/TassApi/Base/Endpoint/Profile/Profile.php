@@ -458,25 +458,12 @@ class Profile implements IStrategy
 
                 $familiesLookup = $familiesLookupGenerator->generateFuture($futureCommRules);
 
-                $this->importParentsOfFutureStudents($familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_FUTURE]);
+                /* Optionally also import the parents of future students, which are guys who have yet to formally commence
+                 * their enrolment. They come out of the getStudents endpoint with currentstatus future, specifically.
+                 * The parent profiles that spawn here aren't related to any student profiles, they just exist in isolation.
+                 */
+                $this->importParentsOfStudent(null, $familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_FUTURE]);
             }
-        }
-    }
-
-
-    /**
-     * Optionally also import the parents of future students, which are guys who have yet to formally commence
-     * their enrolment. They come out of the getStudents endpoint with currentstatus future, specifically.
-     * The parent profiles that spawn here aren't related to any student profiles, they just exist in isolation.
-     *
-     * @param array $familiesLookup
-     * @return void
-     * @throws Exception
-     */
-    private function importParentsOfFutureStudents(array $familiesLookup): void
-    {
-        foreach ($familiesLookup as $parentId => $parent) {
-            $this->importParentsOfStudent(null, $familiesLookup);
         }
     }
 
