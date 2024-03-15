@@ -78,7 +78,6 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         return [
             "indexNow$paramKeySuffix"                        => Alaress_Date_Format::now()->getDatabase(),
             "indexKeyword$paramKeySuffix"                    => $keyword,
-            "indexKeywordLike$paramKeySuffix"                => "%" . $keyword . "%",
             "indexKeywordUnquoted$paramKeySuffix"            => $keywordUnquoted,
             "RELEVANCE_WEIGHTING_TITLE$paramKeySuffix"       => self::RELEVANCE_WEIGHTING_TITLE,
             "RELEVANCE_WEIGHTING_CONTENT$paramKeySuffix"     => self::RELEVANCE_WEIGHTING_CONTENT,
