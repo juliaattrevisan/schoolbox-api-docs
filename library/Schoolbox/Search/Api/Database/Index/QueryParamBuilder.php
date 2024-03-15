@@ -101,14 +101,13 @@ class QueryParamBuilder extends BaseQueryParamBuilder
         // includes computations that determine whether a row will be included in the search result.
         // The 'exact match on title' test is required so that searches for filenames such as 'shutterstock_282889763'
         // will return expected results.  MATCH...AGAINST alone will not work in that case because of the underscore.
-        // Changed to include partially matching class codes as well.  These need not affect relevance scores.
         return (
             "IF(" .
                 "si.title = :indexKeywordUnquoted$paramKeySuffix OR " .
                 "MATCH (si.title) AGAINST (:indexKeyword$paramKeySuffix IN NATURAL LANGUAGE MODE) > 0," .
                 "1, " .
                 "0" .
-            ") OR (si.type = 'page.class' AND si.title LIKE :indexKeywordLike$paramKeySuffix)"
+            ")"
         );
     }
 
