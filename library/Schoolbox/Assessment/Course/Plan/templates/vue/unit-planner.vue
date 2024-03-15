@@ -14,7 +14,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
-console.info("unit-planner.vue calling useUnitPlannerStore()");
 const store = useUnitPlannerStore();
 
 // Get a list of every textbox that could be shown in a unit

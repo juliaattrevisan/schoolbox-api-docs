@@ -5,6 +5,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { Unit } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
@@ -327,7 +328,42 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragInitial.value = null;
     }
 
-    console.info("unitPlannerStore.ts useUnitPlannerStore() x");
+    /**
+     * @param {Unit} unitToWhichActivityBelongs The unit to which the activity to be deleted belongs
+     * @param {Activity} activityToRemove The activity to be deleted
+     * @returns {void}
+     */
+    function removeActivityFromUnit(unitToWhichActivityBelongs: Unit, activityToRemove: Activity): void {
+        // Find unit in units.
+        let foundUnit: Unit | null = null;
+        for (const unit of units.value) {
+            if (unit.id === unitToWhichActivityBelongs.id) {
+                foundUnit = unit;
+            }
+        }
+        if (foundUnit === null) {
+            // Could not find unit, so do nothing.
+            return;
+        }
+
+        // Find activity in units[index].activities.
+        let foundActivity = null;
+        for (const activity of foundUnit.activities) {
+            if (activity.id === activityToRemove.id) {
+                foundActivity = activity;
+            }
+        }
+        if (foundActivity === null) {
+            // Could not find unit, so do nothing.
+            return;
+        }
+
+        // Remove the found activity.
+        foundUnit.activities = foundUnit.activities.filter((a) => {
+            return a.id !== activityToRemove.id;
+        });
+    }
+
     return {
         init,
         isDragging,
@@ -349,5 +385,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         orderedUnits,
         toggleExpanded,
         resequenceUnits,
+        removeActivityFromUnit,
     };
 });

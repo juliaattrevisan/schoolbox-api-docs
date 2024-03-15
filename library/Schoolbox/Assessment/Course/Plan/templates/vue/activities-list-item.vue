@@ -2,10 +2,12 @@
 import { kebabCase } from "lodash";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
+import type { Unit } from "./unitPlannerTypes";
 
 const deleteActivityStore = useDeleteActivityStore();
 
 interface Props {
+    unit: Unit; // The id of the unit to which the activity belongs.
     activity: Activity;
 }
 
@@ -62,7 +64,9 @@ const activityLink = window.Vue.computed(() => {
                 }}</a>
             </li>
             <li>
-                <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.activity)">Delete</a>
+                <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.unit, props.activity)"
+                    >Delete</a
+                >
             </li>
             <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
                 <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>

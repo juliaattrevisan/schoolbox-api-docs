@@ -7,7 +7,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
 
-console.info("activities-list-delete-item.vue calling useUnitPlannerStore()");
 const unitPlannerStore = useUnitPlannerStore();
 const deleteActivityStore = useDeleteActivityStore();
 const modalEl = window.Vue.ref(null);
@@ -27,8 +26,6 @@ window.Vue.watch(
  * and update the UI accordingly
  */
 deleteActivityStore.$onAction(({ name, after, onError }) => {
-    console.info("activities-list-delete-item.vue onAction() e");
-    console.info("activities-list-delete-item.vue onAction() name, after, onError: ", name, after, onError);
     if (name === "deleteActivity") {
         unitPlannerStore.toastEl.activate("Deleting...");
         after((result) => {
@@ -38,7 +35,6 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
             console.warn(error);
         });
     }
-    console.info("activities-list-delete-item.vue onAction() x");
 });
 
 /**

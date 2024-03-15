@@ -4,19 +4,26 @@
 
 import { defineStore } from "pinia";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Unit } from "../unitPlannerTypes";
+import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
 
 export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
-    const activity = window.Vue.ref<Activity>(null);
+    const unit = window.Vue.ref<Unit>(null); // The unit to which the activity to be deleted belongs.
+    const activity = window.Vue.ref<Activity>(null); // The activity to be deleted.
+
+    const unitPlannerStore = useUnitPlannerStore();
 
     /**
      * Display a prompt to confirm a node removal.
+     * @param {Unit} unitToWhichActivityBelongs The unit to which the activity belongs
      * @param {Activity} activityToDelete The activity to delete
      */
-    function prompt(activityToDelete: Activity) {
+    function prompt(unitToWhichActivityBelongs: Unit, activityToDelete: Activity) {
         isOpen.value = true;
         activity.value = activityToDelete;
+        unit.value = unitToWhichActivityBelongs;
     }
 
     /**
@@ -32,23 +39,20 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
      * @returns {void}
      */
     async function deleteActivity() {
-        console.info("unitPlannerDeleteActivityStore.ts deleteActivity() e");
         try {
             isProcessing.value = true;
-            console.info(
-                "unitPlannerDeleteActivityStore.ts deleteActivity() TODO: Ask server to delete activity using POST /learning/assessments/{assessmentID}/delete",
-            );
             const response = await window.fetch(activity.value._links.delete, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });
             if (response.ok) {
-                console.info("unitPlannerDeleteActivityStore.ts deleteActivity() response is okay!");
                 isProcessing.value = false;
                 isOpen.value = false;
+
+                unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
+
                 return "Activity deleted";
             } else {
-                console.info("unitPlannerDeleteActivityStore.ts deleteActivity() response is not okay.");
                 throw new Error();
             }
         } catch (error) {
@@ -56,7 +60,6 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
         } finally {
             isProcessing.value = false;
         }
-        console.info("unitPlannerDeleteActivityStore.ts deleteActivity() x");
     }
 
     return {
