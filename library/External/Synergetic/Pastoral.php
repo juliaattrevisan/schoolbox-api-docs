@@ -575,7 +575,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function syncPastoral(Pastoral $pastoral): bool
+    public function syncPastoral(Pastoral $pastoral, bool $prependTitle = false): bool
     {
         if (!$this->isExternalCodeValid($pastoral)) {
             return false;
@@ -651,7 +651,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             if (!$inOuterTransaction) {
                 $this->connector->beginTransaction();
             }
-            $params = $this->getQueryParameters($pastoral);
+            $params = $this->getQueryParameters($pastoral, $prependTitle);
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
@@ -1421,11 +1421,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * Return an array ready to shunt into the Synergetic DB query
      *
      * @param Pastoral $pastoral
-     *
+     * @param bool     $prependTitle
      * @return array
      * @throws ExternalException
+     * @throws MapperException
      */
-    private function getQueryParameters($pastoral)
+    private function getQueryParameters($pastoral, bool $prependTitle = false)
     {
         // Get the students Synergetic ID
 
@@ -1484,7 +1485,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         $this->htmlConverter->setHtml($pastoral->getBodyPublic());
-        $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
+
+        /* Some schools don't like prepending the heading since it can contain metadata
+         * that shouldn't be revealed to students. Some schools are okay with that, but
+         * some schools aren't; hence, a per-school configuration as per SA-16383
+         */
+        if ($prependTitle) {
+            $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
+        } else {
+            $bodyPublicText = $this->htmlConverter->getText();
+        }
 
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
