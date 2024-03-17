@@ -4,14 +4,14 @@
 
 import { defineStore } from "pinia";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
-import type { Unit } from "../unitPlannerTypes";
 import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
+import type { Unit } from "../unitPlannerTypes";
 
 export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
-    const unit = window.Vue.ref<Unit>(null); // The unit to which the activity to be deleted belongs.
-    const activity = window.Vue.ref<Activity>(null); // The activity to be deleted.
+    const unit = window.Vue.ref<Unit | null>(null); // The unit to which the activity to be deleted belongs.
+    const activity = window.Vue.ref<Activity | null>(null); // The activity to be deleted.
 
     const unitPlannerStore = useUnitPlannerStore();
 
@@ -36,25 +36,29 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
     /**
      * Activity removal has been confirmed so ask the server to delete the activity,
      * and then remove it from the UI if the back end did its part.
-     * @returns {void}
+     * @returns {string} The toast message to display
      */
-    async function deleteActivity() {
+    async function deleteActivity(): Promise<string> {
         try {
             isProcessing.value = true;
-            const response = await window.fetch(activity.value._links.delete, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
-            if (response.ok) {
-                isProcessing.value = false;
-                isOpen.value = false;
+            if (activity.value !== null) {
+                const response = await window.fetch(activity.value._links.delete, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                });
+                if (response.ok) {
+                    isProcessing.value = false;
+                    isOpen.value = false;
 
-                unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
+                    if (unit.value !== null) {
+                        unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
+                    }
 
-                return "Activity deleted";
-            } else {
-                throw new Error();
+                    return "Activity deleted";
+                }
             }
+
+            throw new Error();
         } catch (error) {
             throw new Error();
         } finally {

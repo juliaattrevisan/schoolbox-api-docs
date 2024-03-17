@@ -216,7 +216,10 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             return; // User does not have access to resequence
         }
 
-        toastEl.value.activate("Saving...");
+        if (toastEl.value !== null) {
+            toastEl.value.activate("Saving...");
+        }
+
         try {
             const currentSequence = orderedUnits.value.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -243,9 +246,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                 throw new Error(responseText);
             }
 
-            toastEl.value.timeout("Save successful", true, 2000);
+            if (toastEl.value !== null) {
+                toastEl.value.timeout("Save successful", true, 2000);
+            }
         } catch (error) {
-            toastEl.value.timeout(error, false, 2000);
+            if (toastEl.value !== null) {
+                toastEl.value.timeout(error, false, 2000);
+            }
         }
     }
 

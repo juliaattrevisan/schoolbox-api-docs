@@ -14,11 +14,11 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
- * Get the current url; these redirects are used after backend processing
- * so you can return to your current location afterwards
+ * Get the current url; these redirects are used after backend processing,
+ * so you can return to your current location afterward.
  *
  * Use the base64encoded version of the url's pathname, so it can work in
- * conjunection with Class Redirect in the back end
+ * conjunction with Class Redirect in the back end
  * @param {string} url - The url to go to
  * @returns {string} - The url with the returnUrl parameter appended
  */

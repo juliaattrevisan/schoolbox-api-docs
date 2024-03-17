@@ -9,7 +9,7 @@ import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
 
 const unitPlannerStore = useUnitPlannerStore();
 const deleteActivityStore = useDeleteActivityStore();
-const modalEl = window.Vue.ref(null);
+const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 
 /**
  * to open the modal when requested
@@ -17,7 +17,13 @@ const modalEl = window.Vue.ref(null);
 window.Vue.watch(
     () => deleteActivityStore.isOpen,
     (isOpen) => {
-        isOpen ? modalEl.value.open() : modalEl.value.close();
+        if (modalEl.value !== null) {
+            if (isOpen) {
+                modalEl.value.open();
+            } else {
+                modalEl.value.close();
+            }
+        }
     },
 );
 
@@ -26,10 +32,12 @@ window.Vue.watch(
  * and update the UI accordingly
  */
 deleteActivityStore.$onAction(({ name, after, onError }) => {
-    if (name === "deleteActivity") {
+    if (name === "deleteActivity" && unitPlannerStore.toastEl !== null) {
         unitPlannerStore.toastEl.activate("Deleting...");
         after((result) => {
-            unitPlannerStore.toastEl.timeout(result, true, 5000);
+            if (unitPlannerStore.toastEl !== null) {
+                unitPlannerStore.toastEl.timeout(result, true, 5000);
+            }
         });
         onError((error) => {
             console.warn(error);
@@ -40,18 +48,15 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
 /**
  * To instantly notify the user that the node is being deleted
  * by updating the button text
- *
- * @returns { String }
+ * @returns {string} The button text
  */
 const deleteButtonText = window.Vue.computed(() =>
     deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
 );
 
 /**
- * to prevent the user from moving away from the modal while
- * processing is taking place
- *
- * @returns { Boolean }
+ * To prevent the user from moving away from the modal while processing is taking place
+ * @returns {boolean} whether the modal is disabled
  */
 const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessing);
 </script>
