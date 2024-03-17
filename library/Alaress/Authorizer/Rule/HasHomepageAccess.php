@@ -36,7 +36,7 @@ class HasHomepageAccess extends All
      *
      * If it's not callable, it is the static value of the identifier.
      *
-     * @var int|callable
+     * @var int|(callable(array, ?User): int)
      */
     protected $homepageIdentifier;
 
@@ -50,9 +50,9 @@ class HasHomepageAccess extends All
     /**
      * Constructor (obviously)
      *
-     * @param int          $accessLevel
-     * @param int|callable $categoryIdentifier
-     * @param Access       $access
+     * @param int                               $accessLevel
+     * @param int|(callable(array, ?User): int) $categoryIdentifier
+     * @param Access                            $access
      */
     public function __construct($accessLevel, $categoryIdentifier, Access $access)
     {
