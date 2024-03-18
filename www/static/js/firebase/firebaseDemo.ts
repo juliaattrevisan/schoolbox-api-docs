@@ -42,7 +42,7 @@ function sendTokenToServer(currentToken: string) {
         // TODO(developer): Send the current token to your server.
         setTokenSentToServer(true);
     } else {
-        console.warn("Token already sent to server so won't send it again unless it changes");
+        console.warn("Token already sent to server so won't send it again unless it changes. Token: ", currentToken);
     }
 }
 
@@ -92,6 +92,7 @@ function requestPermission() {
             console.warn("An error occurred while retrieving token. ", err);
         });
 }
+requestPermissionButton.addEventListener("click", requestPermission);
 
 /**
  * Send a message to the device using the FCM server
@@ -121,6 +122,7 @@ function sendTestMessage() {
             console.warn(error);
         });
 }
+testMessageButton.addEventListener("click", sendTestMessage);
 
 /**
  * Add a message to the messages element.
@@ -145,9 +147,6 @@ function appendMessage(payload: MessagePayload) {
 onMessage(messaging, (payload) => {
     appendMessage(payload);
 });
-
-requestPermissionButton.addEventListener("click", requestPermission);
-testMessageButton.addEventListener("click", sendTestMessage);
 
 // to send a test message, we'll need the device token
 getDeviceToken();
