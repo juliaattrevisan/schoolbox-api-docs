@@ -35,7 +35,7 @@ class Module extends BaseModule
          */
         $isStaff = new Rule\HasRole(Role::STAFF);
 
-        $this->register('GET', '/civica/attendance', 'getCivicaAttendance', $isStaff);
+        $this->register('GET', '/civica/attendance/{encodedUrl}', 'getCivicaAttendance', $isStaff);
     }
 
 

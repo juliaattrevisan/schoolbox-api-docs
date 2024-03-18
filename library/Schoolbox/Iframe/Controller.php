@@ -24,11 +24,10 @@ class Controller extends Base
     /**
      * Load an iframe with the specified url
      */
-    public function getCivicaAttendance(): void
+    public function getCivicaAttendance(string $encodedUrl): void
     {
-
         $this->response = $this->responseFromTemplate('@iframe/index.twig', [
-            'url' => $this->requestQuery->get('url', base64_decode('aHR0cHM6Ly93d3cuc2Nob29sYm94LmVkdWNhdGlvbg=='))
+            'url' => base64_decode($encodedUrl)
         ], 'Civica Attendance');
     }
 }

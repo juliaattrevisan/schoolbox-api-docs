@@ -30,7 +30,7 @@ class Reader
          * I don't have access to a $router here, so I guess we have to harcode it for now
          */
         return sprintf(
-            '/iframe/civica/attendance?url=%s',
+            '/iframe/civica/attendance/%s',
             base64_encode($attendanceUrl)
         );
     }
