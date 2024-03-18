@@ -56,9 +56,9 @@ class Module extends \Alaress\Module\Module
                 new Rule\All(
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_WRITE,
-                        static function (array $params): FolderModel {
+                        static function (array $params): int {
                             if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpec\Model) {
-                                return $params['unitSpec']->getFolder();
+                                return $params['unitSpec']->getFolder()->getId();
                             }
                             throw new NotFound('No context preloaded');
                         },
