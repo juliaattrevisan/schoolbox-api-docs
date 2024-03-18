@@ -125,7 +125,7 @@ class Broker extends Base
         try {
             $this->pdo->prepare('SET SESSION innodb_ft_user_stopword_table = ?')
                 ->execute([$this->getDatabase() . '/' . self::INNODB_FT_STOPWORD_TABLE_NAME]);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             // Can't configure the stopwords table?
             // Let's not bring down the whole application.  We'll just live with the default stopwords table.
             // Carry on.
