@@ -67,18 +67,6 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 $this->curriculumNodes->add($node);
             }
 
-            // make sure that the node or node's ancestors do not already in the list
-            // to avoid same hierarchy appears twice in the component
-            $selectedNodeIds = $this->curriculumNodes->getPropertyValues('id');
-            foreach ($this->curriculumNodes as $offset => $node) {
-                $nodeMapper->loadAncestors($node);
-                $ancestorIds = $this->getAllAncestorIds($node);
-                $diff        = array_diff($ancestorIds, $selectedNodeIds);
-                if (count($diff) !== count($ancestorIds)) {
-                    $this->curriculumNodes->offsetUnset($offset);
-                }
-            }
-
             // Sort the list of nodes into a tree structure.
             // This can be done by flattening it first, and then restructuring
             // it into a tree.
