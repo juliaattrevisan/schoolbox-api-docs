@@ -50,7 +50,7 @@ class Controller extends Base
 
         // Verify that all new nodes from form exist in the DB:
         // raise error if any do not
-        $newNodesFromFormNotInDb = $newNodes->diff($newNodesFromDb);
+        $newNodesFromFormNotInDb = $newNodes->diffBy($newNodesFromDb, 'id');
         if ($newNodesFromFormNotInDb->count() > 0) {
             $this->sendJsonError(
                 sprintf(
