@@ -41,7 +41,8 @@ const arrowCounter = window.Vue.ref(-1); // Want to automatically select the fir
 const formElement = window.Vue.ref<HTMLFormElement | null>(null);
 const minKeywordLength = 2;
 const paths = {
-    searchEndpoint: "/quicksearch/search?keyword=",
+    portrait: "/portrait.php?id=",
+    searchEndpoint: "/headersearch/search?keyword=",
     userPage: "/search/user/",
     searchPage: "/search",
     searchPageWithKeyword: "/search?keyword=",
