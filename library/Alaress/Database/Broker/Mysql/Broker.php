@@ -11,7 +11,6 @@
 namespace Alaress\Database\Broker\Mysql;
 
 use Alaress\Database\Broker\Base;
-use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Iterator\Mysql\Iterator;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
