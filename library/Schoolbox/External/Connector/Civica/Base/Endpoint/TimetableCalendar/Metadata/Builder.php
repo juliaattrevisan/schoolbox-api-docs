@@ -100,7 +100,7 @@ class Builder
          */
         $fromIframe = 'true';
 
-        return sprintf(
+        $attendanceUrl = base64_encode(sprintf(
             '%s/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s&fromIframe=%s',
             self::HOST,
             $teachingGroupId,
@@ -111,6 +111,14 @@ class Builder
             $singleSession,
             $schoolContextId,
             $fromIframe
+        ));
+
+        /* Slap it into a format that our iframer can use
+         * I don't have access to a $router here, so I guess we have to harcode it for now
+         */
+        return sprintf(
+            '/iframe/civica/attendance?url=%s',
+            $attendanceUrl
         );
     }
 }
