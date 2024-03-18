@@ -40,7 +40,7 @@ class Module extends BaseModule
         $preload = function ($params) {
             return [
                 'node'   => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-                'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['id']),
+                'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
             ];
         };
         $this->register(self::METHOD_POST, $path, 'postFolderUsage', $permission, $preload);
