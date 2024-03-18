@@ -49,7 +49,7 @@ class Controller extends Base
         $newNodesFromDb = $this->nodeMapper->findByColumn('id', $newNodes->getPropertyValues('id'));
 
         // Verify that all new nodes from form exist in the DB:
-        // raise error if not
+        // raise error if any do not
         $newNodesFromFormNotInDb = $newNodes->diff($newNodesFromDb);
         if ($newNodesFromFormNotInDb->count() > 0) {
             $this->sendJsonError(
