@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
-namespace Schoolbox\QuickSearch;
+namespace Schoolbox\HeaderSearch;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;

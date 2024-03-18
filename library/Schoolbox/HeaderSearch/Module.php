@@ -4,7 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  */
 
-namespace Schoolbox\QuickSearch;
+namespace Schoolbox\HeaderSearch;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -12,7 +12,7 @@ use Alaress\Web\Controller\Base;
 
 class Module extends BaseModule
 {
-    protected $basename = 'quicksearch';
+    protected $basename = 'headersearch';
 
     /**
      * {@inheritdoc}

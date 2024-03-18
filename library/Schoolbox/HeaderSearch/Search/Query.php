@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\QuickSearch\Search;
+namespace Schoolbox\HeaderSearch\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Image\Transformation\Storage;
