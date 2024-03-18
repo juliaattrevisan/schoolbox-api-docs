@@ -57,7 +57,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             $this->curriculumNodes = $nodeMapper->createCollection();
 
             foreach ($context->getCurriculumNodes() as $node) {
-                if (!$node->getEnabled() || '' === $node->getCode()) {
+                if (!$node->getEnabled()) {
                     continue;
                 }
 
