@@ -23,13 +23,29 @@ class Controller extends Base
      * Constructor
      *
      * @param Folder\Mapper $folderMapper Folder mapper: used for saving changes to folder
+     * @param Node\Mapper   $nodeMapper   Curriculum node mapper: used for verifying that nodes to be set on a folder
+     *                                    actually exist
      */
-    public function __construct(private Folder\Mapper $folderMapper)
+    public function __construct(private Folder\Mapper $folderMapper, private Node\Mapper $nodeMapper)
     {
     }
 
     /**
-     * Add a curriculum node to a folder.
+     * Set curriculum nodes associated with a folder.
+     *
+     * @api POST /api/curriculum/usage/folder/{folderId}
+     * @since 24.0
+     *
+     * @param Folder\Model $folder
+     * @return void
+     */
+    public function postFolderUsage(Folder\Model $folder): void
+    {
+
+    }
+
+    /**
+     * Add a single curriculum node to a folder.
      *
      * @api POST /api/curriculum/usage/{id}/folder/{folderId}
      * @since 24.0
@@ -38,7 +54,7 @@ class Controller extends Base
      * @param Folder\Model $folder
      * @return void
      */
-    public function postFolderUsage(Node\Model $node, Folder\Model $folder): void
+    public function postSingleFolderUsage(Node\Model $node, Folder\Model $folder): void
     {
         // Is $node in the folder already? Show conflict response if so
         if ($folder->getCurriculumNodes()->contains($node)) {
@@ -51,7 +67,7 @@ class Controller extends Base
     }
 
     /**
-     * Remove a curriculum node to a folder.
+     * Remove a single curriculum node from a folder.
      *
      * @api DELETE /api/curriculum/usage/{id}/folder/{folderId}
      * @since 24.0
@@ -60,7 +76,7 @@ class Controller extends Base
      * @param Folder\Model $folder
      * @return void
      */
-    public function deleteFolderUsage(Node\Model $node, Folder\Model $folder): void
+    public function deleteSingleFolderUsage(Node\Model $node, Folder\Model $folder): void
     {
         // Is $node not in the folder already? Show 404 not found if so
         if (!$folder->getCurriculumNodes()->contains($node)) {

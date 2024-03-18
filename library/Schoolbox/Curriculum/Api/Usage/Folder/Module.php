@@ -11,7 +11,7 @@ namespace Schoolbox\Curriculum\Api\Usage\Folder;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Schoolbox\Curriculum\Node\Mapper;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -31,20 +31,25 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $path       = '/{id:\\d+}/folder/{folderId:\\d+}';
+        // Routes for adding/removing a single node from a folder
+        $path       = '/{nodeId:\\d+}/folder/{folderId:\\d+}';
         $permission = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             fn ($params) => $params['folderId'],
             Access::getInstance(),
         );
-        $preload = function ($params) {
-            return [
-                'node'   => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+        $preload    = function ($params) {
+            $return = [
                 'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
             ];
+            if (isset($params['nodeId'])) {
+                $return['node'] = $this->getMapperFactory()->get(NodeMapper::class)->findById($params['nodeId']);
+            }
+            return $return;
         };
         $this->register(self::METHOD_POST, $path, 'postFolderUsage', $permission, $preload);
-        $this->register(self::METHOD_DELETE, $path, 'deleteFolderUsage', $permission, $preload);
+        $this->register(self::METHOD_POST, $path, 'postSingleFolderUsage', $permission, $preload);
+        $this->register(self::METHOD_DELETE, $path, 'deleteSingleFolderUsage', $permission, $preload);
     }
 
     /**
@@ -54,6 +59,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(NodeMapper::class),
         );
     }
 }
