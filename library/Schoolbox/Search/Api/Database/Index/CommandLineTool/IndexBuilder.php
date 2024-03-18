@@ -102,10 +102,9 @@ class IndexBuilder extends App
 
         $dbi = $this->getDatabaseInternal();
 
-        // Some queries run during the filling of the search_index table can take a long time to run.
-        // It is crucial that these queries be allowed to finish, because if they are interrupted, the search_index
-        // table will not be filled, and the search feature will not work as expected.
-        // So here we set max_statement_time to 0 (no limit).
+        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
+        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
+        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
         // https://mariadb.com/kb/en/aborting-statements/
         $dbi->execute('SET SESSION max_statement_time = 0;');
         $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
