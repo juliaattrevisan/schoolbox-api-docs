@@ -637,9 +637,9 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(array $school): ?string
     {
-//        if ($school['medicalAlert']) {
-//            return 'This student has medical conditions.';
-//        }
+        if ($school['medicalAlert']) {
+            return 'This student has medical conditions.';
+        }
 
         return null;
     }
