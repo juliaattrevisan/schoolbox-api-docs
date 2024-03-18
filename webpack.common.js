@@ -238,6 +238,9 @@ module.exports = {
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
 
+        // Firebase demo
+        firebaseDemo: "./www/static/js/firebase/firebaseDemo.ts",
+
         //Sass
         core: "./www/static/css/core/core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
@@ -398,7 +401,7 @@ module.exports = {
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
             "@schoolboxLearningMomentEvidence": path.resolve(
                 __dirname,
-                "library/Schoolbox/Learning/Moment/Evidence/vue"
+                "library/Schoolbox/Learning/Moment/Evidence/vue",
             ),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),
