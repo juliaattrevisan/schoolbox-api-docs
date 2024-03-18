@@ -60,10 +60,11 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 if (!$node->getEnabled() || '' === $node->getCode()) {
                     continue;
                 }
-                if (empty($this->getConfig('curriculumCode')) || ($node->getCode() == $this->getConfig('curriculumCode'))) {
-                    $nodeMapper->loadDescendants($node);
-                    $this->curriculumNodes->add($node);
-                }
+
+                // Load this node's descendants and ancestors
+                $nodeMapper->loadAncestors($node);
+                $nodeMapper->loadDescendants($node);
+                $this->curriculumNodes->add($node);
             }
 
             // make sure that the node or node's ancestors do not already in the list
