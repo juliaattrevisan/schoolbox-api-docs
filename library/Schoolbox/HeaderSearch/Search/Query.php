@@ -455,6 +455,7 @@ class Query
                 // array returned by the advanced search feature (see Page/Hydrator.php).
                 'id'    => $folderId,
                 'type'  => $folderType,
+                'url'   => (new Uri())->withPath('/homepage/' . $folder->getId()),
                 'title' => $folder->getNameWithCodes(),
                 'meta'  => $this->formatMetadataForFolder($folder, $viewer),
                 'icon'  => (
