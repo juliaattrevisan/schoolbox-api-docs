@@ -78,6 +78,13 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                     $this->curriculumNodes->offsetUnset($offset);
                 }
             }
+
+            // Sort the list of nodes into a tree structure.
+            // This can be done by flattening it first, and then restructuring
+            // it into a tree.
+            $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
+                $nodeMapper->getCollectionAsFlat($this->curriculumNodes),
+            );
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
