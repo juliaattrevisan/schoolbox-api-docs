@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Api\Usage\Folder;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
@@ -41,7 +43,28 @@ class Controller extends Base
      */
     public function postFolderUsage(Folder\Model $folder): void
     {
+        $data           = $this->request->getParsedBody();
+        $translator     = new ArrayToModel();
+        $newNodes       = new GenericCollection(Node\Model::class, array_map($translator, $data));
+        $newNodesFromDb = $this->nodeMapper->findByColumn('id', $newNodes->getPropertyValues('id'));
 
+        // Verify that all new nodes from form exist in the DB:
+        // raise error if not
+        $newNodesFromFormNotInDb = $newNodes->diff($newNodesFromDb);
+        if ($newNodesFromFormNotInDb->count() > 0) {
+            $this->sendJsonError(
+                sprintf(
+                    'Not all curriculum nodes exist (missing nodes: %s)',
+                    implode(',', $newNodes->getPropertyValues('id')),
+                ),
+                HttpResponse::HTTP_NOT_FOUND,
+            );
+            return;
+        }
+
+        $folder = $folder->setCurriculumNodes($newNodesFromDb);
+        $this->folderMapper->save($folder);
+        $this->response = $this->responseEmpty();
     }
 
     /**
