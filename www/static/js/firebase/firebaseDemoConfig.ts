@@ -19,3 +19,11 @@ export const firebaseConfig = {
  * It's used to connect to Firebase push services
  */
 export const vapidKey = "BJdVmfYHH81o3fyEUxRf34vVyYiu2DYH753ncdluKbLfnQKH6PGChmTRzQ-GNKkXc3LD8EwLh11xxwoeyfwF7tw";
+
+/**
+ * This is the server key, which is used to send messages to the Firebase Cloud Messaging service
+ * Note this is used by Cloud Messaging API (Legacy), and we should be moving to Firebase Cloud Messaging API (V1)
+ * in the very near future
+ */
+export const serverKey =
+    "AAAAzmovUO0:APA91bGe0pQsYrAymeU3FSppWeMuAU7cDI3te2VqQYI_hn5JUt48n1fccB1012ShkdBZr2nXOaL0BePr1eZn0qIGuNvnAoT4yoidc9rBZUyk0ewW0xUk-jLEvQWAcoC-feB9400BaW2k";
