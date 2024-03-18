@@ -36,7 +36,7 @@ $app = new class extends CliTool\App {
         // The desired effect is that MySQL uses the stopwords table when recreating the fulltext indexes below.
         // (This is set for other sessions in library/Alaress/Database/Broker/Mysql/Broker->connect().)
         $dbNameSlashTableName = SQL_db . '/' . self::STOPWORDS_TABLE_NAME;
-        $dbc->execute("SET SESSION innodb_ft_user_stopword_table = '$dbNameSlashTableName'");
+        $dbc->prepareQuery('SET SESSION innodb_ft_user_stopword_table = ?', [$dbNameSlashTableName])->execute();
         $log->info("Set innodb_ft_user_stopword_table to '$dbNameSlashTableName'.");
 
         // Rebuild the search indexes.
