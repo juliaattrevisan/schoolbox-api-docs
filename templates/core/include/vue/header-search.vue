@@ -20,6 +20,7 @@ interface Result {
     type: string;
     image: string;
     icon: string;
+    url: string;
 }
 
 interface AllResults {
@@ -271,7 +272,7 @@ const searchButtonText = window.Vue.computed(() => {
                     v-for="(result, i) in userResults"
                     :key="i"
                     :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
-                    :href="paths.userPage + result.id"
+                    :href="result.url"
                     :data-test="`header-search-user-result-link-${result.title}`"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
@@ -310,7 +311,7 @@ const searchButtonText = window.Vue.computed(() => {
                     :class="`c-card c-card--link c-card--border-end ${
                         i + userResults.length === arrowCounter ? 'c-card--active' : ''
                     }`"
-                    :href="`${paths.searchPage}${result.id}`"
+                    :href="result.url"
                     :data-test="`header-search-user-result-link-${result.title}`"
                     @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
