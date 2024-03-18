@@ -55,7 +55,7 @@ class Controller extends Base
             $this->sendJsonError(
                 sprintf(
                     'Not all curriculum nodes exist (missing nodes: %s)',
-                    implode(',', $newNodes->getPropertyValues('id')),
+                    implode(',', $newNodesFromFormNotInDb->getPropertyValues('id')),
                 ),
                 HttpResponse::HTTP_NOT_FOUND,
             );
