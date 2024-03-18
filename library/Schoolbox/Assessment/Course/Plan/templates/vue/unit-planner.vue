@@ -13,7 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const toastEl = window.Vue.ref<typeof Toast | null>(null);
+const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 
 // Get a list of every textbox that could be shown in a unit
