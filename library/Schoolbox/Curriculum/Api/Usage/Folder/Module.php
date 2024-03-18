@@ -47,9 +47,11 @@ class Module extends BaseModule
             }
             return $return;
         };
-        $this->register(self::METHOD_POST, $path, 'postFolderUsage', $permission, $preload);
         $this->register(self::METHOD_POST, $path, 'postSingleFolderUsage', $permission, $preload);
         $this->register(self::METHOD_DELETE, $path, 'deleteSingleFolderUsage', $permission, $preload);
+
+        // Route for updating folder's nodes all at once
+        $this->register(self::METHOD_POST, '/folder/{folderId:\\d+}', 'postFolderUsage', $permission, $preload);
     }
 
     /**
