@@ -845,17 +845,21 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * Processes $collection into a hierarchical structure.
+     * Processes `$collection` into a hierarchical structure.
      *
-     * @param  Collection $collection  The flat structure
+     * @template T of Collection
+     * @param  T          $collection  The flat structure
      * @param  string     $parentField The name of the parent field. For most
-     *                                 hierarchical mappers, this is "parent'
+     *                                 hierarchical mappers, this is "parent"
      * @param  string     $childField  The name of the children field.
-     * @return Collection
+     * @return T
      */
-    public function getCollectionAsTree($collection, $parentField = 'parent', $childField = 'children')
-    {
-        $treeList = new Collection();
+    public function getCollectionAsTree(
+        Collection $collection,
+        string $parentField = 'parent',
+        string $childField = 'children',
+    ): Collection {
+        $treeList = $collection->emptyClone();
 
         // Process $collection into a tree list.
         // This can all be done in one pass, because objects are stored by
@@ -889,12 +893,13 @@ abstract class Mapper implements IMapper
      * All parents and children of all items in `$collection` are rendered into
      * a single-dimension list, with parents and children intact.
      *
-     * @param Collection $collection  The tree structure to flatten.
+     * @template T of Collection
+     * @param T          $collection  The tree structure to flatten.
      * @param string     $parentField The name of the parent field:
      *                                "parent" for most hierarchical mappers.
      * @param string     $childField  The name of the child field:
      *                                "children" for most hierarchical mappers.
-     * @return Collection
+     * @return T
      */
     public function getCollectionAsFlat(
         Collection $collection,
