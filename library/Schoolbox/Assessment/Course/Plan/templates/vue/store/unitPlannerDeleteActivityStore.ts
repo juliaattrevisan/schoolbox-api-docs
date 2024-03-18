@@ -39,9 +39,9 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
      * @returns {string} The toast message to display
      */
     async function deleteActivity(): Promise<string> {
-        try {
-            isProcessing.value = true;
-            if (activity.value !== null) {
+        if (activity.value !== null) {
+            try {
+                isProcessing.value = true;
                 const response = await window.fetch(activity.value._links.delete, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -56,14 +56,16 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
 
                     return "Activity deleted";
                 }
+            } catch (error) {
+                throw new Error();
+            } finally {
+                isProcessing.value = false;
             }
-
-            throw new Error();
-        } catch (error) {
-            throw new Error();
-        } finally {
-            isProcessing.value = false;
         }
+
+        // It is expected that the request will be sent, and the response will be okay.
+        // So if execution gets to here, an error has occurred.
+        throw new Error();
     }
 
     return {
