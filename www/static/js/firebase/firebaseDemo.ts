@@ -123,15 +123,27 @@ function sendTestMessage() {
 }
 
 /**
+ * Add a message to the messages element.
+ * @param {MessagePayload} payload - The message payload to add to the UI.
+ */
+function appendMessage(payload: MessagePayload) {
+    const messagesElement = document.querySelector("#messages")!;
+    const dataHeaderElement = document.createElement("h5");
+    const dataElement = document.createElement("pre");
+    dataHeaderElement.textContent = "Received message:";
+    dataElement.textContent = JSON.stringify(payload, null, 2);
+    messagesElement.appendChild(dataHeaderElement);
+    messagesElement.appendChild(dataElement);
+}
+
+/**
  * Handle incoming messages. Called when:
  * - a message is received while the app has focus
  * - the user clicks on an app notification created by a service worker
  *   `messaging.onBackgroundMessage` handler.
  */
 onMessage(messaging, (payload) => {
-    console.warn("Message received. ", payload);
-    // Update the UI to include the received message.
-    //   appendMessage(payload);
+    appendMessage(payload);
 });
 
 requestPermissionButton.addEventListener("click", requestPermission);
