@@ -10,6 +10,9 @@ initializeApp(firebaseConfig); // Initialize Firebase
 const messaging = getMessaging(); // Retrieve Firebase Messaging object.
 let token = ""; // The current device token
 
+const requestPermissionButton = document.getElementById("request-permission-button") as HTMLElement; // The button to request permission
+const testMessageButton = document.getElementById("test-message-button") as HTMLElement; // The button to send a test message
+
 /**
  * Mock server check, just using localStorage instead for now
  * @returns {boolean} - true if the token is in localStorage
@@ -53,11 +56,11 @@ function getDeviceToken() {
             if (currentToken) {
                 sendTokenToServer(currentToken);
                 // updateUIForPushEnabled(currentToken);
+                requestPermissionButton.style.display = "none"; // Hide the button if already have permission
             } else {
                 // Show permission request.
                 console.log("No registration token available. Request permission to generate one.");
-                // Show permission UI.
-                // updateUIForPushPermissionRequired();
+                requestPermissionButton.style.display = "block"; // show the button if we don't have permission
                 setTokenSentToServer(false);
             }
         })
@@ -131,5 +134,8 @@ onMessage(messaging, (payload) => {
     //   appendMessage(payload);
 });
 
-document.getElementById("request-permission-button")!.addEventListener("click", requestPermission);
-document.getElementById("test-message-button")!.addEventListener("click", sendTestMessage);
+requestPermissionButton.addEventListener("click", requestPermission);
+testMessageButton.addEventListener("click", sendTestMessage);
+
+// to send a test message, we'll need the device token
+getDeviceToken();
