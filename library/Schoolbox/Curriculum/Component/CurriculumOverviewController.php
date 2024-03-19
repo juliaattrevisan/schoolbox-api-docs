@@ -105,19 +105,4 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             ]
         );
     }
-
-    /**
-     * Find all ancestor ids to remove duplicates
-     * @param Node\Model $node
-     * @return array
-     */
-    private function getAllAncestorIds(Node\Model $node): array
-    {
-        $parentIds = [];
-        if ($node->getParent() instanceof Node\Model) {
-            $parentIds   = $this->getAllAncestorIds($node->getParent());
-            $parentIds[] = $node->getParent()->getId();
-        }
-        return $parentIds;
-    }
 }
