@@ -188,15 +188,21 @@ class Builder implements MembershipServiceServerBuilderInterface
      * @param User   $user
      * @param string $role
      * @param string $status
-     * @return MemberInterface
+     * @return MemberInterface|null null if `$user` somehow doesn't encode
      */
-    private function mapUserToMember(User $user, string $role, string $status = MemberInterface::STATUS_ACTIVE): MemberInterface
-    {
+    private function mapUserToMember(
+        User $user,
+        string $role,
+        string $status = MemberInterface::STATUS_ACTIVE,
+    ): ?MemberInterface {
         // Share minimal information by default, as per
         // http://www.imsglobal.org/spec/lti-nrps/v2p0#sharing-of-personal-data
         // (Not yet sure how to receive data sharing consent, but TII requires
         //  at least full name + email)
         $encodedUser = $this->userCodec->encode($user);
+        if (!isset($encodedUser)) {
+            return null;
+        }
         return new Member(
             new UserIdentity(
                 $encodedUser,
@@ -220,9 +226,9 @@ class Builder implements MembershipServiceServerBuilderInterface
      * Map function: convert a user to a learner-type member object.
      *
      * @param User $user
-     * @return MemberInterface
+     * @return MemberInterface|null
      */
-    private function mapUserToLearner(User $user): MemberInterface
+    private function mapUserToLearner(User $user): ?MemberInterface
     {
         return $this->mapUserToMember($user, 'Learner');
     }
@@ -234,15 +240,18 @@ class Builder implements MembershipServiceServerBuilderInterface
      * otherwise it contains a message appropriate for the assessment.
      *
      * @param Participant $participant
-     * @return MemberInterface
+     * @return MemberInterface|null
      */
-    private function mapParticipantToLearner(Participant $participant): MemberInterface
+    private function mapParticipantToLearner(Participant $participant): ?MemberInterface
     {
         $member = $this->mapUserToMember(
             $participant->getUser(),
             'Learner',
             $participant->isExcluded() ? MemberInterface::STATUS_INACTIVE : MemberInterface::STATUS_ACTIVE,
         );
+        if (!isset($member)) {
+            return null;
+        }
 
         $assessment = $participant->getAssessable();
         if (!$participant->isExcluded() && $assessment instanceof LtiAssessment) {
@@ -255,9 +264,9 @@ class Builder implements MembershipServiceServerBuilderInterface
      * Map function: convert a user to an instructor-type member object.
      *
      * @param User $user
-     * @return MemberInterface
+     * @return MemberInterface|null
      */
-    private function mapUserToInstructor(User $user): MemberInterface
+    private function mapUserToInstructor(User $user): ?MemberInterface
     {
         return $this->mapUserToMember($user, 'Instructor');
     }
@@ -268,12 +277,12 @@ class Builder implements MembershipServiceServerBuilderInterface
      *
      * @param User          $user
      * @param LtiAssessment $assessment
-     * @return MemberInterface
+     * @return MemberInterface|null
      */
-    private function mapUserToInstructorWithAssessment(User $user, LtiAssessment $assessment): MemberInterface
+    private function mapUserToInstructorWithAssessment(User $user, LtiAssessment $assessment): ?MemberInterface
     {
         $member = $this->mapUserToInstructor($user);
-        return $member->setMessage($this->buildMessage($user, $assessment));
+        return $member?->setMessage($this->buildMessage($user, $assessment));
     }
 
     /**
@@ -328,7 +337,8 @@ class Builder implements MembershipServiceServerBuilderInterface
                         true,
                         true,
                     )
-                    ->map(Closure::fromCallable([$this, 'mapUserToLearner']))
+                    ->map($this->mapUserToLearner(...))
+                    ->filter(fn ($x) => isset($x))
             );
     }
 
@@ -350,7 +360,8 @@ class Builder implements MembershipServiceServerBuilderInterface
             ->merge(
                 $assessment
                     ->getAllParticipants()
-                    ->map(Closure::fromCallable([$this, 'mapParticipantToLearner']))
+                    ->map($this->mapParticipantToLearner(...))
+                    ->filter(fn ($x) => isset($x))
             );
     }
 
@@ -372,7 +383,8 @@ class Builder implements MembershipServiceServerBuilderInterface
                         true,
                         false,
                     )
-                    ->map(Closure::fromCallable([$this, 'mapUserToInstructor']))
+                    ->map($this->mapUserToInstructor(...))
+                    ->filter(fn ($x) => isset($x))
             );
     }
 
@@ -403,6 +415,7 @@ class Builder implements MembershipServiceServerBuilderInterface
                     ->map(function (User $user) use ($assessment) {
                         return $this->mapUserToInstructorWithAssessment($user, $assessment);
                     })
+                    ->filter(fn ($x) => isset($x))
             );
     }
 
