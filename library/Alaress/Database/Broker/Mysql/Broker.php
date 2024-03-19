@@ -15,9 +15,16 @@ use Alaress\Database\Iterator\Mysql\Iterator;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
 use PDO;
+use PDOException;
 
 class Broker extends Base
 {
+    /**
+     * InnoDB full-text search stopword table name.
+     * @see https://mariadb.com/kb/en/innodb-system-variables/#innodb_ft_user_stopword_table
+     */
+    const INNODB_FT_STOPWORD_TABLE_NAME = 'innodb_ft_stopword';
+
     // These return MySQL specific statement objects
 
     /**
@@ -83,7 +90,14 @@ class Broker extends Base
             PDO::ATTR_TIMEOUT => self::QUERY_TIMEOUT,
         ];
 
-        return parent::connect($options);
+        $success = parent::connect($options);
+
+        if ($success) {
+            $this->setInnodbFullTextStopwordsTable();
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -99,5 +113,21 @@ class Broker extends Base
             ->prepare("SET time_zone = ?")
             ->execute([$timezone])
             ;
+    }
+
+    /**
+     * Set up a custom stopwords table for full-text searches.
+     * @return void
+     */
+    private function setInnodbFullTextStopwordsTable(): void
+    {
+        try {
+            $this->pdo->prepare('SET SESSION innodb_ft_user_stopword_table = ?')
+                ->execute([$this->getDatabase() . '/' . self::INNODB_FT_STOPWORD_TABLE_NAME]);
+        } catch (PDOException) {
+            // Can't configure the stopwords table?
+            // Let's not bring down the whole application.  We'll just live with the default stopwords table.
+            // Carry on.
+        }
     }
 }

@@ -61,11 +61,6 @@ parameters:
 			path: library/Alaress/Database/Broker/Base.php
 
 		-
-			message: "#^PHPDoc tag @throws with type Alaress\\\\Database\\\\Broker\\\\Mysql\\\\PDOException is not subtype of Throwable$#"
-			count: 1
-			path: library/Alaress/Database/Broker/Mysql/Broker.php
-
-		-
 			message: "#^Method Alaress\\\\Database\\\\Broker\\\\Sqlsrv\\\\Broker\\:\\:prepareQuery\\(\\) should return Alaress\\\\Database\\\\Statement\\\\Query\\\\IQuery but returns Alaress\\\\Database\\\\Statement\\\\Query\\\\Sqlsrv\\\\Query\\.$#"
 			count: 1
 			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
