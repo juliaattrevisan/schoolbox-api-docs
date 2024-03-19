@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
@@ -20,6 +21,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
+const textboxStore = useUnitPlannerTextboxStore();
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -62,7 +64,7 @@ const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 const contentIsSaved = window.Vue.computed(() => {
-    return !store.unsavedTextboxes[props.unit.id]?.[props.column.id];
+    return !textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id];
 });
 
 const contentIsFocused = window.Vue.computed(() => {
@@ -100,7 +102,7 @@ function onOverviewSaveClicked() {
     if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
     isOverviewContentSaving.value = true;
 
-    store
+    textboxStore
         .saveTextboxContent(props.unit.id, props.column)
         .catch((err) => {
             throw err;

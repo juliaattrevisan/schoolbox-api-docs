@@ -4,6 +4,7 @@ import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
 
@@ -15,6 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(["updateContentHeight"]);
 const store = useUnitPlannerStore();
+const textboxStore = useUnitPlannerTextboxStore();
 
 const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].body);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
@@ -37,7 +39,7 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
         window.Vue.nextTick()
             .then(() => {
                 emit("updateContentHeight");
-                store.updateTextboxContent(props.unit.id, props.column, editor.getData());
+                textboxStore.updateTextboxContent(props.unit.id, props.column, editor.getData());
             })
             .catch(() => {
                 // noop
