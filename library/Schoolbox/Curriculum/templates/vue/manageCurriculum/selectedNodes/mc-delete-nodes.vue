@@ -20,7 +20,7 @@ window.Vue.watch(
     () => deleteNodesStore.isOpen,
     (isOpen) => {
         isOpen ? modalEl.value.open() : modalEl.value.close();
-    }
+    },
 );
 
 /**
@@ -42,7 +42,7 @@ deleteNodesStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
-            // store.toastEl.value.timeout('Unable to delete node', false, 5000);
+            store.toastEl.value.timeout("Unable to delete node", false, 5000);
         });
     }
 });
