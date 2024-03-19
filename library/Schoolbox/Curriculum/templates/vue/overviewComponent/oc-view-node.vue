@@ -60,7 +60,7 @@ function onRemoveSelected() {
 
 <template>
     <div class="node l-flex-row l-flex--justify-space l-flex--align-center" :style="{ marginLeft: marginLeft }">
-        <div class="l-flex-row l-gap-xs">
+        <div class="l-flex-row l-flex--no-wrap l-gap-xs">
             <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
                 >[{{ props.node.code }}]
             </a>
