@@ -14,7 +14,7 @@ import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
-    nodeTrees: Node[]; // The curriculum nodes trees to display
+    nodes: Node[]; // The curriculum nodes trees to display
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     selectedNodes: Node[]; // The nodes already previously selected
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
@@ -33,7 +33,7 @@ const selectorStore = useSelectorStore();
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store.init(props.nodeTrees);
+    store.init(props.nodes);
     selectorStore.init(props);
 });
 </script>
@@ -45,7 +45,7 @@ window.Vue.onMounted(() => {
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
-    <folder-nodes v-else class="l-flex-col l-pad-s--horiz l-pad-s--top" :node-trees="props.nodeTrees" />
+    <folder-nodes v-else :nodes="props.nodes" />
     <fn-actions v-if="!props.isReadOnly" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />

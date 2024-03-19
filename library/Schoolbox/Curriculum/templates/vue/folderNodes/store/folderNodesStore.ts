@@ -9,8 +9,8 @@ import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 
 export const useStore = defineStore("folderNodes", () => {
-    const nodeTrees = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
-    const hasNoNodes = window.Vue.computed(() => nodeTrees.value.length === 0);
+    const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
+    const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // the currently selected node id to display the details of
     const selectedNodesStore = useSelectedNodesStore();
 
@@ -25,11 +25,11 @@ export const useStore = defineStore("folderNodes", () => {
     );
 
     /**
-     * Store a reference to the nodeTrees to display
-     * @param {Node[]} $nodeTrees - the node trees to display
+     * Store a reference to the nodes to display
+     * @param {Node[]} $nodes - the node trees to display
      */
-    function init($nodeTrees: Node[]): void {
-        nodeTrees.value = $nodeTrees;
+    function init($nodes: Node[]): void {
+        nodes.value = $nodes;
     }
 
     /**
@@ -42,7 +42,7 @@ export const useStore = defineStore("folderNodes", () => {
     }
 
     return {
-        nodeTrees,
+        nodes,
         hasNoNodes,
         selectedDetailsNodeId,
         selectedNodesStore,
