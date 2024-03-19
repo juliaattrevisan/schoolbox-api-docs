@@ -54,7 +54,7 @@ const paths = {
  * @returns {Result[]} - the user results
  */
 const userResults = window.Vue.computed(() => {
-    return results.value.filter((result) => result.type.includes("user"));
+    return results.value.filter((res) => res.type.includes("user"));
 });
 
 /**
@@ -62,7 +62,7 @@ const userResults = window.Vue.computed(() => {
  * @returns {Result[]} - the page results
  */
 const pageResults = window.Vue.computed(() => {
-    return results.value.filter((result) => result.type.includes("page"));
+    return results.value.filter((res) => res.type.includes("page"));
 });
 
 /**
@@ -134,8 +134,8 @@ window.Vue.watch(keyword, () => {
  * Navigate to the chosen result or submit the form to go to the search page
  */
 function onEnter() {
-    if (arrowCounter.value > 0) {
-        window.location.href = `${paths.userPage}${results.value[arrowCounter.value].id}`;
+    if (arrowCounter.value >= 0) {
+        window.location.href = allResults.value[arrowCounter.value].url;
     } else {
         (formElement.value as HTMLFormElement).submit();
     }
@@ -292,14 +292,6 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </a>
-                <a
-                    v-if="userResults.length && totalCount > userResults.length"
-                    class="c-card c-card--link c-card--active l-pad-s"
-                    :href="`${paths.searchPageWithKeyword}${keyword}&${paths.usersFilter}`"
-                >
-                    View all {{ totalCount }} users
-                </a>
-
                 <div
                     v-if="pageResults.length && pageResults.length !== totalCount"
                     class="c-card c-card--border-end l-pad-s"
@@ -335,13 +327,6 @@ const searchButtonText = window.Vue.computed(() => {
                             >
                         </div>
                     </div>
-                </a>
-                <a
-                    v-if="userResults.length && totalCount > userResults.length"
-                    class="c-card c-card--link c-card--active l-pad-s"
-                    :href="`${paths.searchPageWithKeyword}${keyword}&${paths.usersFilter}`"
-                >
-                    View all {{ totalCount }} pages
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
                     <div class="l-flex-row l-gap-s l-pad-s">
