@@ -2,11 +2,12 @@
  * Cloud Messaging API (Legacy)
  * This method is deprecated and will be removed in the future.
  * So we should be aiming for the new Firebase Cloud Messaging API (V1)
+ * Note the deviceToken will need to be the latest token from the device.
  */
 const serverKey =
     "AAAAzmovUO0:APA91bGe0pQsYrAymeU3FSppWeMuAU7cDI3te2VqQYI_hn5JUt48n1fccB1012ShkdBZr2nXOaL0BePr1eZn0qIGuNvnAoT4yoidc9rBZUyk0ewW0xUk-jLEvQWAcoC-feB9400BaW2k";
 const deviceToken =
-    "dd5gaA6KxrHNqnXFS-6iml:APA91bHxWdVhACgVAaOzj6XnJNH1S-hJD1CAPoHXNhMf_UfAdwmpxrunUeE2rj2N95ygSBYamUZZfQDdOUn3Z8Ln7DuN-tyDo-jdOd4jcEsXqkH1fOBBj37mDKxUEgwOceF7bj640Xyx";
+    "dd5gaA6KxrHNqnXFS-6iml:APA91bGtVYhcQPv2wpqIeL65fGoZtZ2UMKbpAtPYHsLv6qUQpW1Iy8V-Hu9PkvhU-1vHr-OYMQBVXm8l162NHYg3zDMAZsTtSlhTIDtTtAelIi4QaKAQBeo6KMwLcmScaCo439mbOix-";
 const notification = {
     title: "Here's a message for you",
     body: "And here's the body of the message",

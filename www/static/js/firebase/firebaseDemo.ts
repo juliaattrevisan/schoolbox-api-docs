@@ -212,3 +212,5 @@ onMessage(messaging, (payload) => {
 
 // to send a test message, we'll need the device token
 getDeviceToken();
+
+window.localStorage.setItem("notificationTitle", "Local storage title");
