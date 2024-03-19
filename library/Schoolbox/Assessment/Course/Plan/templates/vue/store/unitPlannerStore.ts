@@ -25,10 +25,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     let headerRowHeight: Ref<number>;
     let unitPlannerContainerScrollTop: Ref<number>;
 
-    const expandedUnitIDs = window.Vue.ref<Unit["id"][]>([]);
-    const expandedUnits = window.Vue.computed(() => {
-        return isDragging.value ? [] : expandedUnitIDs.value;
-    });
+    const expandedUnits = window.Vue.ref<Unit["id"][]>([]);
 
     const orderedUnits = window.Vue.computed<Unit[]>(() => {
         return units.value.sort((a, b) => {
@@ -116,7 +113,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                     return acc + dragUnitHeight;
                 }
 
-                if (expandedUnitIDs.value.includes(unit.id)) {
+                if (expandedUnits.value.includes(unit.id)) {
                     const unitHeights = unitContentHeights.value[unit.id] || {};
                     return acc + Math.max(...Object.values(unitHeights), unexpandedUnitHeight);
                 }
@@ -146,7 +143,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             let currentUnitHeight = unexpandedUnitHeight;
             if (unit.id === dragCurrentUnit.value?.id) {
                 currentUnitHeight = dragUnitHeight;
-            } else if (expandedUnitIDs.value.includes(unit.id)) {
+            } else if (expandedUnits.value.includes(unit.id)) {
                 const unitHeights = unitContentHeights.value[unit.id] || {};
                 currentUnitHeight = Math.max(...Object.values(unitHeights), unexpandedUnitHeight);
             }
@@ -203,10 +200,10 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * @param { number } unitId - the id of the unit to toggle
      */
     function toggleExpanded(unitId: Unit["id"]) {
-        if (expandedUnitIDs.value.includes(unitId)) {
-            expandedUnitIDs.value = expandedUnitIDs.value.filter((id) => id !== unitId);
+        if (expandedUnits.value.includes(unitId)) {
+            expandedUnits.value = expandedUnits.value.filter((id) => id !== unitId);
         } else {
-            expandedUnitIDs.value.push(unitId);
+            expandedUnits.value.push(unitId);
         }
     }
 
