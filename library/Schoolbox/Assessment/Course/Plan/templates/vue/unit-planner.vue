@@ -1,64 +1,69 @@
 <script setup lang="ts">
+import type { Ref } from "vue";
 import Toast from "@schoolboxVue/components/toast.vue";
-import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { Unit } from "./unitPlannerTypes";
-import ContentContainer from "./content-container.vue";
-import RubricCapabilities from "./rubric-capabilities.vue";
-import CurriculumCodesList from "./curriculum-codes-list.vue";
-import TextboxContent from "./textbox-content.vue";
-import ActivitiesListItem from "./activities-list-item.vue";
+import { createTabs } from "./unitPlannerConfig";
+import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
 
 interface Props {
     units: Unit[];
     routeFolderSequence: string | null;
 }
 
-const unexpandedUnitHeight = 300;
-const unexpandedUnitHeightStyle = window.Vue.computed(() => `${unexpandedUnitHeight}px`);
-
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 
-const selectedTab = window.Vue.ref("all");
-const tabs = window.Vue.ref([
-    { id: "all", label: "All" },
-    { id: "overview", label: "Overview" },
-    { id: "activities", label: "Learning Activities" },
-    { id: "rubric-capabilities", label: "Rubric Capabilities" },
-    { id: "curriculum-overview", label: "Curriculum Overview" },
-]);
-
 // Get a list of every textbox that could be shown in a unit
 // in case a unit doesn't have a textbox for a particular key
 // Ensures that the table will always show all possible textboxes
-type TextboxKey = keyof Unit["textboxes"];
-const allTextboxKeys = window.Vue.computed(() => {
-    const keysSet = new Set<TextboxKey>();
+const allTextboxKeys: string[] = (() => {
+    const keysSet = new Set<keyof Unit["textboxes"]>();
     props.units.forEach((unit) => {
         Object.keys(unit.textboxes).forEach((key) => {
             keysSet.add(key);
         });
     });
-    return [...keysSet];
-});
+    return Array.from(keysSet);
+})();
+
+const tabs = createTabs(allTextboxKeys);
+
+const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
 const tabsEl = window.Vue.ref<HTMLElement>();
-const tableHeaderEl = window.Vue.ref<HTMLElement>();
 const unitPlannerContainerEl = window.Vue.ref<HTMLElement>();
+const headerRowEl = window.Vue.ref<HTMLElement>();
 const resizeObserver = window.Vue.ref<ResizeObserver>();
 
+const headerRowHeight = window.Vue.computed(() => {
+    if (!headerRowEl.value) return 0;
+
+    const headerRowChild = headerRowEl.value.firstElementChild as HTMLElement;
+    return headerRowChild.offsetHeight;
+});
+
 // Use a ref instead of a computed property so that we can force the height to be recomputed
+const unitPlannerContainerScrollTop = window.Vue.ref(0);
 const containerHeight = window.Vue.ref(window.innerHeight);
 
 /**
- * Updates the height of the scrollable area (table), such that no vertical scrollbar is shown for the whole page.
- * This is to ensure the horizontal scrollbar of the unit planner table is always visible.
+ * Updates the scroll position of the unit planner container to allow draggables to position themselves correctly
+ * @returns {void}
+ */
+function updateScrollPosition(): void {
+    if (!unitPlannerContainerEl.value) return;
+    unitPlannerContainerScrollTop.value = unitPlannerContainerEl.value.scrollTop;
+}
+
+/**
+ * Updates the height of the scrollable area, such that no vertical scrollbar is shown for the whole page.
+ * This is to ensure the horizontal scrollbar of the unit planner is always visible.
  * @returns {void}
  */
 function updateContainerHeight(): void {
-    if (!tabsEl.value || !tableHeaderEl.value || !unitPlannerContainerEl.value) {
+    if (!tabsEl.value || !unitPlannerContainerEl.value) {
         containerHeight.value = window.innerHeight;
         return;
     }
@@ -74,29 +79,37 @@ function updateContainerHeight(): void {
     const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
 
     // Prevent the container from being too small, this ensures one unit is always visible
-    containerHeight.value = Math.max(newHeight, unexpandedUnitHeight + tableHeaderEl.value.offsetHeight);
+    containerHeight.value = Math.max(newHeight, store.unexpandedUnitHeight);
+
+    // Ensure the scroll position is updated to match the new height
+    window.Vue.nextTick(updateScrollPosition).catch(() => {
+        // noop
+    });
 }
 
-window.Vue.onMounted(async () => {
-    store.init(props.units, props.routeFolderSequence, toastEl);
+const unitElements = window.Vue.ref<HTMLElement[]>([]);
 
-    // Whether to allow the user to resequence the units
-    if (props.routeFolderSequence) {
-        await window.Vue.nextTick();
+// Ensure the container is monitored for scroll events after it is first available
+window.Vue.watch(
+    () => unitPlannerContainerEl.value,
+    (newValue) => {
+        if (newValue) {
+            newValue.addEventListener("scroll", updateScrollPosition);
+            updateScrollPosition();
+        }
+    },
+    { once: true },
+);
 
-        const sortableTarget = $("[data-sortable]");
-        sortableTarget.sortable({
-            handle: ".grip",
-            axis: "y",
-            update: () => {
-                // Adjust the sequence of the units
-                const unitIds: Unit["id"][] = sortableTarget
-                    .sortable("toArray", { attribute: "data-unit-id" })
-                    .map(Number);
-                store.resequenceUnits(unitIds);
-            },
-        });
-    }
+window.Vue.onMounted(() => {
+    store.init(
+        props.units,
+        props.routeFolderSequence,
+        unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
+        headerRowHeight,
+        unitPlannerContainerScrollTop,
+        toastEl,
+    );
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
@@ -112,172 +125,160 @@ window.Vue.onUnmounted(() => {
     if (resizeObserver.value) {
         resizeObserver.value.disconnect();
     }
+
+    unitPlannerContainerEl.value?.removeEventListener("scroll", updateScrollPosition);
 });
 </script>
 
 <template>
     <dl ref="tabsEl" class="tabs">
-        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }">
-            <a @click="selectedTab = tab.id">{{ tab.label }}</a>
+        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
+            <a @click="selectedTab = tab">{{ tab.label }}</a>
         </dd>
     </dl>
-    <div ref="unitPlannerContainerEl" class="scrollable" :style="{ height: containerHeight + 'px' }">
-        <table class="unit-planner" :class="{ sortable: props.routeFolderSequence }">
-            <thead ref="tableHeaderEl">
-                <tr>
-                    <th>Unit</th>
-                    <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
-                        <th v-for="textboxKey in allTextboxKeys" :key="textboxKey">
-                            {{ textboxKey }}
-                        </th>
-                    </template>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'activities'">Learning Activities</th>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">Rubric Capabilities</th>
-                    <th v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'">Curriculum Overview</th>
-                </tr>
-            </thead>
-            <tbody v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
-                <tr id="unitplanner-dropdown-container">
-                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
-                        The specific placement of this element ensures that the dropdowns are still contained within the table -->
-                </tr>
-                <tr
-                    v-for="unit in store.orderedUnits"
-                    :key="unit.id"
-                    :data-unit-id="unit.id"
-                    :class="{ collapsed: !store.expandedUnits.includes(unit.id) }"
+    <div
+        ref="unitPlannerContainerEl"
+        class="scrollable"
+        :style="{
+            height: containerHeight + 'px',
+            '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
+            '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
+        }"
+    >
+        <div id="unitplanner-dropdown-container">
+            <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                The specific placement of this element ensures that the dropdowns are still contained within the table -->
+        </div>
+        <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+            <div id="unit-planner-sortable-container"></div>
+            <div ref="headerRowEl" class="grid-row header-row">
+                <div
+                    v-for="column in selectedTab.columns"
+                    :key="column.id"
+                    class="fixed-top"
+                    :class="{ 'fixed-left': column.fixedLeft }"
                 >
-                    <td>
-                        <div class="unit-wrapper">
-                            <i v-if="props.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
-                            <div>
-                                <a :href="unit.homepage">
-                                    <strong>{{ unit.title }}</strong>
-                                </a>
-                                <p v-if="unit.extraTextboxes > 0" class="meta">
-                                    {{ unit.extraTextboxes }} extra textbox{{ unit.extraTextboxes === 1 ? "" : "es" }}
-                                </p>
-                            </div>
-                        </div>
-                    </td>
-                    <template v-if="selectedTab === 'all' || selectedTab === 'overview'">
-                        <td v-for="(textbox, textboxKey) in unit.textboxes" :key="textboxKey">
-                            <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
-                                <textbox-content v-if="textbox !== null" :textbox="textbox"></textbox-content>
-                            </content-container>
-                        </td>
-                    </template>
-                    <td v-if="selectedTab === 'all' || selectedTab === 'activities'">
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
-                            <ul class="information-list">
-                                <activities-list-item
-                                    v-for="activity in unit.activities"
-                                    ref="activityListItem"
-                                    :key="activity.id"
-                                    :activity="activity"
-                                />
-                            </ul>
-                        </content-container>
-                    </td>
-                    <td v-if="selectedTab === 'all' || selectedTab === 'rubric-capabilities'">
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
-                            <rubric-capabilities :rubric-capabilities="unit.rubricCapabilities"></rubric-capabilities>
-                        </content-container>
-                    </td>
-                    <td
-                        v-if="selectedTab === 'all' || selectedTab === 'curriculum-overview'"
-                        class="curriculum-codes-container"
-                    >
-                        <content-container :unit-id="unit.id" :unexpanded-height="unexpandedUnitHeight">
-                            <curriculum-codes-list :curriculum-codes="unit.curriculumCodes"></curriculum-codes-list>
-                            <curriculum-details-modal />
-                        </content-container>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    {{ column.label }}
+                </div>
+            </div>
+
+            <div
+                v-for="unit in store.isDragging ? store.dragOrderedUnits : store.orderedUnits"
+                :key="unit.id"
+                ref="unitElements"
+                class="grid-row unit-row"
+            >
+                <unit-planner-unit-cell
+                    v-for="column in selectedTab.columns"
+                    :key="column.id"
+                    :unit="unit"
+                    :column="column"
+                    :is-sortable-placeholder="false"
+                ></unit-planner-unit-cell>
+            </div>
+
+            <div
+                class="unit-planner-sortable-placeholder grid-row"
+                :style="{
+                    display: store.isDragging ? 'grid' : 'none',
+                    top: `calc(${store.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                }"
+            >
+                <template v-if="store.dragCurrentUnit">
+                    <unit-planner-unit-cell
+                        v-for="column in selectedTab.columns"
+                        :key="column.id"
+                        :unit="store.dragCurrentUnit"
+                        :column="column"
+                        :is-sortable-placeholder="true"
+                    ></unit-planner-unit-cell>
+                </template>
+            </div>
+        </div>
     </div>
 
     <toast ref="toastEl"></toast>
 </template>
 
 <style scoped lang="scss">
-/* Use :deep to ensure elements created by sortable are styled correctly.
- *
- * > is used to ensure the styles are only applied to the direct children of the unit-planner
- * component. Otherwise, they may apply to other tables nested within content containers too.
- */
-.unit-planner:deep() {
-    > thead > tr,
-    > tbody > tr {
-        /* Fix the unit title column to the left */
-        > th,
-        > td {
-            background-color: white;
+.scrollable {
+    overflow: auto;
+}
 
-            &:first-child {
-                border-right: 1px solid var(--body-background);
-                min-width: 200px;
-                left: 0;
-                position: sticky;
-                width: 200px;
-                z-index: 2; // Behind the dropdowns and table header, but on top of the content
-            }
+.unit-planner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
+}
 
-            &:not(:first-child) {
-                border-left: 1px solid var(--body-background);
-                min-width: 400px;
-                width: 400px;
-            }
+.grid-row {
+    display: contents; // Allow the children to be displayed as a grid
+
+    > div {
+        background-color: #fff;
+        border-color: var(--body-background);
+        border-style: solid;
+        border-width: 0; // Unless overridden below
+        font-size: 0.8125rem;
+        overflow-wrap: anywhere;
+        text-wrap: wrap;
+
+        border-bottom-width: 1px;
+        border-top-width: 1px;
+
+        &:not(:last-child) {
+            border-right-width: 1px;
+        }
+
+        &:not(:first-child) {
+            border-left-width: 1px;
         }
     }
 
-    // Pin the header to the top of the table when scrolling
-    > thead {
-        position: sticky;
-        top: 0;
-        z-index: 4; // On top of both the left column and the dropdowns
+    &.header-row > div {
+        color: #000;
+        font-weight: 600;
+        padding: 0.625rem;
+        white-space: nowrap;
+        border-top-width: 0px;
     }
+}
 
-    > tbody {
-        overflow: hidden;
-        position: relative;
-        > tr {
-            height: v-bind(unexpandedUnitHeightStyle);
+.fixed-top.fixed-left {
+    z-index: 5; // On top of both the left column, the header, and the dropdowns
+}
 
-            > td:not(:first-child) {
-                padding: 0px;
-            }
-
-            &.ui-sortable-helper {
-                display: table; /* Keep widths consistent */
-                border: 1px solid var(--body-background);
-            }
-
-            &.ui-sortable-placeholder {
-                visibility: visible !important;
-
-                > td {
-                    background-color: #dddddd;
-                    border-left: none;
-                    border-right: none;
-                }
-            }
-        }
-    }
-
-    .curriculum-codes-container {
-        max-width: 500px;
-    }
-
-    .unit-wrapper {
-        display: flex;
-    }
+.fixed-left {
+    position: sticky;
+    left: 0;
+    z-index: 2; // Behind the dropdowns and table header, but on top of the content
+}
+.fixed-top {
+    position: sticky;
+    top: 0;
+    z-index: 4; // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
     height: 0;
     position: sticky;
     z-index: 3; // On top of left column, but behind the header
+}
+
+#unit-planner-sortable-container {
+    position: absolute;
+    top: var(--UnitPlannerTableHeaderHeight);
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--UnitPlannerTableHeaderHeight));
+    z-index: -1;
+}
+
+.unit-planner-sortable-placeholder {
+    background: white;
+    position: absolute;
+    z-index: 8;
+    width: 100%;
+    grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
 }
 </style>
