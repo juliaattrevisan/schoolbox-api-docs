@@ -21,8 +21,15 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
+const storeUnit = window.Vue.computed(() => {
+    return store.units.find((unit) => unit.id === props.unit.id);
+});
+
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
+
+const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
+const componentActionHeight = window.Vue.ref(0);
 
 const unitMaxContentHeight = window.Vue.computed(() => {
     // unitContentHeights is a map of unit IDs to column IDs to heights
@@ -43,7 +50,7 @@ const cellMaxHeight = window.Vue.computed(() => {
 });
 
 const showViewMoreGradient = window.Vue.computed(() => {
-    return contentHeight.value > cellMaxHeight.value;
+    return contentHeight.value + componentActionHeight.value > cellMaxHeight.value;
 });
 const showViewMoreInner = window.Vue.computed(() => {
     if (store.dragCurrentUnitNextTick === props.unit) return false;
@@ -54,12 +61,79 @@ const showViewMoreInner = window.Vue.computed(() => {
 const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
+const contentIsSaved = window.Vue.computed(() => {
+    return !store.unsavedTextboxes[props.unit.id]?.[props.column.id];
+});
+
+const contentIsFocused = window.Vue.computed(() => {
+    return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
+});
+
+/**
+ * Update the content height in the store when the content height changes
+ */
+function updateContentHeight() {
+    contentHeight.value = contentEl.value?.offsetHeight || 0;
+    componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
+    store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
+}
+
+/**
+ * When the modify button is clicked.
+ */
+function onOverviewModifyClicked() {
+    if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
+    if (!contentEl.value) return;
+
+    const editorEl = contentEl.value.querySelector(".editor-content") as HTMLElement;
+    if (!editorEl) return;
+
+    editorEl.focus();
+}
+
+const isOverviewContentSaving = window.Vue.ref(false);
+
+/**
+ * When the save button is clicked.
+ */
+function onOverviewSaveClicked() {
+    if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
+    isOverviewContentSaving.value = true;
+
+    store
+        .saveTextboxContent(props.unit.id, props.column)
+        .catch((err) => {
+            throw err;
+        })
+        .finally(() => {
+            isOverviewContentSaving.value = false;
+        });
+}
+
+/**
+ * When the content is clicked
+ * @param {MouseEvent} event - the click event
+ */
+function onContentClicked(event: MouseEvent) {
+    // If the target is not the contentEl or a child, or its parent (the cell), return
+    if (contentEl.value === null || !event.target) return;
+
+    if (
+        !contentEl.value.contains(event.target as Node) &&
+        event.target !== contentEl.value &&
+        event.target !== contentEl.value.parentElement
+    ) {
+        return;
+    }
+
+    if (props.column.type === ColumnType.OVERVIEW) {
+        onOverviewModifyClicked();
+    }
+}
+
 window.Vue.onMounted(() => {
     // Wait a tick to ensure the content has been rendered before measuring its height
-    setTimeout(() => {
-        contentHeight.value = contentEl.value?.offsetHeight || 0;
-        store.setUnitContentHeight(props.unit, props.column, contentHeight.value);
-    }, 0);
+    setTimeout(updateContentHeight, 0);
 
     // Whether to allow the user to resequence the units
     if (store.routeFolderSequence) {
@@ -102,8 +176,11 @@ window.Vue.onUnmounted(() => {
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'sortable-placeholder': props.isSortablePlaceholder,
+            'content-unsaved': !contentIsSaved,
+            'content-focused': contentIsFocused,
         }"
         :style="{ height: `${cellMaxHeight}px` }"
+        @click="onContentClicked"
     >
         <div ref="contentEl">
             <template v-if="props.column.type === ColumnType.UNIT">
@@ -131,8 +208,9 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.OVERVIEW">
                 <textbox-content
-                    v-if="props.unit.textboxes[props.column.label] !== null"
-                    :textbox="props.unit.textboxes[props.column.label]!"
+                    :unit="props.unit"
+                    :column="props.column"
+                    @update-content-height="updateContentHeight"
                 ></textbox-content>
             </template>
 
@@ -158,19 +236,47 @@ window.Vue.onUnmounted(() => {
             </template>
         </div>
 
-        <div class="show-more-container" :data-visible="showViewMoreGradient">
-            <button
-                :data-visible="showViewMoreInner"
-                :tabindex="showViewMoreInner ? 0 : -1"
-                @click.prevent="store.toggleExpanded(props.unit.id)"
-            >
-                Show More
-            </button>
+        <div class="content-container-fixed">
+            <div class="content-overlay">
+                <div class="show-more-container" :data-visible="showViewMoreGradient">
+                    <button
+                        :data-visible="showViewMoreInner"
+                        :tabindex="showViewMoreInner ? 0 : -1"
+                        @click.prevent="store.toggleViewMore(props.unit.id)"
+                    >
+                        Show More
+                    </button>
+                </div>
+            </div>
+
+            <template v-if="props.column.type === ColumnType.OVERVIEW">
+                <div ref="componentActionEl" class="component-action">
+                    <section>
+                        <button v-if="!contentIsSaved && !isOverviewContentSaving" data-role="dirty-indicator" disabled>
+                            Changes not saved
+                        </button>
+
+                        <a v-if="isOverviewContentSaving" class="button"> Saving... </a>
+
+                        <a v-else-if="contentIsSaved" class="button" @click.prevent="onOverviewModifyClicked">
+                            {{
+                                storeUnit && storeUnit.textboxes[props.column.label].id > 0
+                                    ? "Modify"
+                                    : "Create Textbox"
+                            }}
+                        </a>
+                        <!-- Use mouse down as clicking this will remove focus from the content, and cause it to collapse. -->
+                        <a v-else class="button" @mousedown="onOverviewSaveClicked"> Save </a>
+                    </section>
+                </div>
+            </template>
         </div>
     </div>
 </template>
 
 <style scoped lang="scss">
+@import "www/static/css/core/base/_variables.scss";
+
 .unit-cell {
     transition: height 0.5s ease;
 
@@ -180,16 +286,6 @@ window.Vue.onUnmounted(() => {
 
     &.unit-content-padded {
         padding: 5px;
-    }
-
-    &[data-column-type="unit"] > div > div:not(.sortable-holder) {
-        display: flex;
-        text-wrap: wrap;
-
-        // Avoid the content being pushed around by the draggable holder
-        position: absolute;
-        top: 5px;
-        left: 5px;
     }
 
     &.sortable-dropzone {
@@ -212,29 +308,76 @@ window.Vue.onUnmounted(() => {
     }
 }
 
-.show-more-container {
+.content-container-fixed {
     bottom: 0;
+    left: 0;
     position: absolute;
     width: 100%;
-    background: linear-gradient(0deg, #fff 0%, #fff0 100%);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
     pointer-events: none;
-    transition: opacity 0.3s;
-    opacity: 0;
 
-    &[data-visible="true"] {
-        opacity: 1;
+    .content-overlay {
+        display: flex;
+        width: 100%;
+        flex-grow: 1;
+        flex-direction: column;
+        justify-content: end;
     }
 
-    button {
-        margin: 5px;
-        float: right;
-        pointer-events: none;
+    .show-more-container {
+        // bottom: 0;
+        // position: absolute;
+        // width: 100%;
+        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
         transition: opacity 0.3s;
         opacity: 0;
 
         &[data-visible="true"] {
             opacity: 1;
-            pointer-events: all;
+        }
+
+        button {
+            margin: 5px;
+            float: right;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
+
+            &[data-visible="true"] {
+                opacity: 1;
+                pointer-events: all;
+            }
+        }
+    }
+
+    .component-action section {
+        border-bottom: 0;
+        pointer-events: all;
+    }
+}
+
+/* Overrides for column type specific styles */
+[data-column-type="unit"] {
+    &.unit-cell > div > div:not(.sortable-holder) {
+        display: flex;
+        text-wrap: wrap;
+
+        // Avoid the content being pushed around by the draggable holder
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+}
+
+[data-column-type="overview"] {
+    cursor: text;
+
+    &.content-focused {
+        .content-container-fixed .content-overlay {
+            border: 1px solid $form-border-color !important;
         }
     }
 }

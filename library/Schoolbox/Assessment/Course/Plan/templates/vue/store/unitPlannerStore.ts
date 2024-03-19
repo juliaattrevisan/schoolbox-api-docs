@@ -26,7 +26,39 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     let headerRowHeight: Ref<number>;
     let unitPlannerContainerScrollTop: Ref<number>;
 
-    const expandedUnits = window.Vue.ref<Unit["id"][]>([]);
+    // Units that are focused, e.g. when the user is editing a textbox (focused on the editor)
+    const focusedUnitCells = window.Vue.ref<Record<number, string[]>>({});
+    // Units that have been expanded by clicking "view more"
+    const viewMoreUnitIDs = window.Vue.ref<Unit["id"][]>([]);
+    // The final list of units that should be expanded
+    const expandedUnits = window.Vue.computed(() => {
+        const focusedUnitIDs = Object.keys(focusedUnitCells.value);
+        return [...new Set([...focusedUnitIDs.map(Number), ...viewMoreUnitIDs.value])];
+    });
+    /**
+     * Updates the focus state of a unit+column
+     * @param { number } unitId - the unit to update the focus state for
+     * @param { Column } column - the column to update the focus state for
+     * @param { boolean } isFocused - whether the column is focused
+     */
+    function updateFocusedUnitCells(unitId: number, column: Column, isFocused: boolean) {
+        if (isFocused) {
+            if (focusedUnitCells.value[unitId] === undefined) {
+                focusedUnitCells.value[unitId] = [];
+            }
+
+            focusedUnitCells.value[unitId].push(column.id);
+        } else {
+            if (focusedUnitCells.value[unitId] === undefined) {
+                return;
+            }
+
+            focusedUnitCells.value[unitId] = focusedUnitCells.value[unitId].filter((c) => c !== column.id);
+            if (focusedUnitCells.value[unitId].length === 0) {
+                delete focusedUnitCells.value[unitId];
+            }
+        }
+    }
 
     const orderedUnits = window.Vue.computed<Unit[]>(() => {
         return units.value.sort((a, b) => {
@@ -52,10 +84,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             unitContentHeights.value[unit.id] = {};
         }
 
-        // Prevent overwriting the height if it's already been set
-        if (unitContentHeights.value[unit.id][column.id] === undefined) {
-            unitContentHeights.value[unit.id][column.id] = height;
-        }
+        unitContentHeights.value[unit.id][column.id] = Math.max(height, unexpandedUnitHeight);
     }
 
     const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
@@ -120,7 +149,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                 }
 
                 return acc + unexpandedUnitHeight;
-            }, 0)
+            }, 0),
         );
         return Math.max(minDragHeight, Math.min(targetHeight, maxDragHeight));
     });
@@ -186,7 +215,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         $unitPlannerContainerEl: Ref<HTMLElement>,
         $headerRowHeight: Ref<number>,
         $unitPlannerContainerScrollTop: Ref<number>,
-        $toastEl: typeof Toast
+        $toastEl: typeof Toast,
     ) {
         units.value = $units;
         routeFolderSequence.value = $routeFolderSequence;
@@ -197,14 +226,14 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     }
 
     /**
-     * toggle the expanded state of a unit
+     * toggle the view more (expanded) state of a unit
      * @param { number } unitId - the id of the unit to toggle
      */
-    function toggleExpanded(unitId: Unit["id"]) {
-        if (expandedUnits.value.includes(unitId)) {
-            expandedUnits.value = expandedUnits.value.filter((id) => id !== unitId);
+    function toggleViewMore(unitId: Unit["id"]) {
+        if (viewMoreUnitIDs.value.includes(unitId)) {
+            viewMoreUnitIDs.value = viewMoreUnitIDs.value.filter((id) => id !== unitId);
         } else {
-            expandedUnits.value.push(unitId);
+            viewMoreUnitIDs.value.push(unitId);
         }
     }
 
@@ -371,6 +400,58 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         });
     }
 
+    const unsavedTextboxes = window.Vue.ref<Record<number, Record<string, string>>>({});
+
+    /**
+     * Update the textbox content for a unit+column
+     * @param { number } unitId - the unit to update the textbox content for
+     * @param { Column } column - the column to update the textbox content for
+     * @param { string } content - the content to update
+     */
+    function updateTextboxContent(unitId: number, column: Column, content: string) {
+        if (unsavedTextboxes.value[unitId] === undefined) {
+            unsavedTextboxes.value[unitId] = {};
+        }
+
+        // If the content is the same as the current content, then it's no longer unsaved
+        if (units.value.find((u) => u.id === unitId)?.textboxes[column.label]?.body === content) {
+            delete unsavedTextboxes.value[unitId][column.id];
+            return;
+        }
+
+        unsavedTextboxes.value[unitId][column.id] = content;
+    }
+
+    /**
+     * Save the updated textbox content for a unit+column
+     * @param { number } unitId - the unit to save the textbox content for
+     * @param { Column } column - the column to save the textbox content for
+     */
+    function saveTextboxContent(unitId: number, column: Column) {
+        const storeUnit = units.value.find((u) => u.id === unitId);
+        if (!storeUnit) {
+            throw new Error("Unit not found");
+        }
+        const content = unsavedTextboxes.value[unitId]?.[column.id];
+        if (content === undefined) {
+            return;
+        }
+
+        toastEl.value.activate("Saving...");
+
+        try {
+            // TODO
+
+            // To finish off, update the store with the new content and remove the unsaved state
+            storeUnit.textboxes[column.label].body = content;
+            delete unsavedTextboxes.value[unitId][column.id];
+
+            toastEl.value.timeout("Save successful", true, 2000);
+        } catch (error) {
+            toastEl.value.timeout(error, false, 2000);
+        }
+    }
+
     return {
         init,
         isDragging,
@@ -382,6 +463,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         onDragMove,
         onDragEnd,
         dragUnitHeight,
+        updateFocusedUnitCells,
         unexpandedUnitHeight,
         unitContentHeights,
         setUnitContentHeight,
@@ -389,9 +471,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         routeFolderSequence,
         toastEl,
         expandedUnits,
+        focusedUnitCells,
         orderedUnits,
-        toggleExpanded,
+        toggleViewMore,
         resequenceUnits,
         removeActivityFromUnit,
+        unsavedTextboxes,
+        updateTextboxContent,
+        saveTextboxContent,
     };
 });
