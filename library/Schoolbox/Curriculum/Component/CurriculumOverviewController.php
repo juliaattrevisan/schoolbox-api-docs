@@ -63,28 +63,17 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             }
 
             // Fetch every node which is an ancestor or descendant of one of
-            // this folder's nodes.
-            // Skip fetch descendants which are not enabled, though: there isn't
-            // a need to see them.
-            // Ancestors which are not enabled should still show though, so the
-            // tree structure remains in place.
-            $nodeMapper           = Node\Mapper::getInstance();
-            $idColumn             = 'id';
-            $parentColumn         = 'curriculum_node_parent_id';
-            $enabledColumn        = 'enabled';
-            $ancestorIds          = $nodeMapper->findAncestorIds($nodeIds, $parentColumn);
-            $descendantIds        = $nodeMapper->findDescendantIds($nodeIds, $parentColumn);
-            $enabledDescendantIds = $nodeMapper->findScalarByPredicates(
-                $idColumn,
-                $nodeMapper->getPredicateBuilder()
-                           ->in($idColumn, $descendantIds)
-                           ->isTrue($enabledColumn)
-            );
-            $nodeIds = array_merge($nodeIds, $enabledDescendantIds, $ancestorIds);
+            // this folder's nodes, and is still enabled:
+            // only enabled nodes should be selectable.
+            $nodeMapper    = Node\Mapper::getInstance();
+            $parentColumn  = 'curriculum_node_parent_id';
+            $ancestorIds   = $nodeMapper->findAncestorIds($nodeIds, $parentColumn);
+            $descendantIds = $nodeMapper->findDescendantIds($nodeIds, $parentColumn);
+            $nodeIds       = array_merge($nodeIds, $descendantIds, $ancestorIds);
 
             // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
-                $nodeMapper->findByColumn('id', $nodeIds),
+                $nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
             );
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
