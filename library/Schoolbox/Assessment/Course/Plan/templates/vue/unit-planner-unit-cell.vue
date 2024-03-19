@@ -172,7 +172,6 @@ window.Vue.onUnmounted(() => {
         :data-column-type="props.column.type"
         class="unit-cell"
         :class="{
-            'unit-content-padded': props.column.cellPadding,
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'sortable-placeholder': props.isSortablePlaceholder,
@@ -284,10 +283,6 @@ window.Vue.onUnmounted(() => {
     overflow: clip; // Use clip to avoid focus scrolling the cell content
     text-overflow: ellipsis;
 
-    &.unit-content-padded {
-        padding: 5px;
-    }
-
     &.sortable-dropzone {
         background-color: #f8f8f8;
         > div {
@@ -361,7 +356,9 @@ window.Vue.onUnmounted(() => {
 
 /* Overrides for column type specific styles */
 [data-column-type="unit"] {
-    &.unit-cell > div > div:not(.sortable-holder) {
+    padding: 5px;
+
+    > div > div:not(.sortable-holder) {
         display: flex;
         text-wrap: wrap;
 

@@ -11,7 +11,6 @@ export enum ColumnType {
 // Saves if-else logic in the component. This is mainly options needed when initially iterating over the columns
 interface ColumnConfig {
     label: string | null; // If null, the label must be set by some other condition
-    cellPadding: boolean; // Whether cells in that column should have additional padding
     fixedLeft: boolean; // Whether the column should be fixed to the left of the grid
 }
 
@@ -57,14 +56,13 @@ const tabConfig: TabConfig[] = [
 
 // The configuration for the columns in the unit planner. Specifies:
 // - The label of the column
-// - Whether cells in that column should have additional padding
 // - Whether the column should be fixed to the left of the table
 const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", cellPadding: true, fixedLeft: true },
-    [ColumnType.OVERVIEW]: { label: null, cellPadding: true, fixedLeft: false }, // The label is set by the textbox keys
-    [ColumnType.ACTIVITIES]: { label: "Learning Activities", cellPadding: false, fixedLeft: false },
-    [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", cellPadding: false, fixedLeft: false },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", cellPadding: false, fixedLeft: false },
+    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
+    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
+    [ColumnType.ACTIVITIES]: { label: "Learning Activities", fixedLeft: false },
+    [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", fixedLeft: false },
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", fixedLeft: false },
 };
 
 /**
