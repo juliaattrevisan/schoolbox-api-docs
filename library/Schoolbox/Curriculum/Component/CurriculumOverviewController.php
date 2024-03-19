@@ -64,12 +64,23 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
             // Fetch every node which is an ancestor or descendant of one of
             // this folder's nodes.
-            $nodeMapper = Node\Mapper::getInstance();
-            $nodeIds    = array_merge(
-                $nodeIds,
-                $nodeMapper->findDescendantIds($nodeIds, 'curriculum_node_parent_id'),
-                $nodeMapper->findAncestorIds($nodeIds, 'curriculum_node_parent_id'),
+            // Skip fetch descendants which are not enabled, though: there isn't
+            // a need to see them.
+            // Ancestors which are not enabled should still show though, so the
+            // tree structure remains in place.
+            $nodeMapper           = Node\Mapper::getInstance();
+            $idColumn             = 'id';
+            $parentColumn         = 'curriculum_node_parent_id';
+            $enabledColumn        = 'enabled';
+            $ancestorIds          = $nodeMapper->findAncestorIds($nodeIds, $parentColumn);
+            $descendantIds        = $nodeMapper->findDescendantIds($nodeIds, $parentColumn);
+            $enabledDescendantIds = $nodeMapper->findScalarByPredicates(
+                $idColumn,
+                $nodeMapper->getPredicateBuilder()
+                           ->in($idColumn, $descendantIds)
+                           ->isTrue($enabledColumn)
             );
+            $nodeIds = array_merge($nodeIds, $enabledDescendantIds, $ancestorIds);
 
             // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
