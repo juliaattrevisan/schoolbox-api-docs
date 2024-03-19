@@ -1,6 +1,8 @@
 /**
  * The following demonstrates the core functionality of using Firebase Messaging in a web app.
  */
+
+import { timeout } from "@js/util/jsUtils";
 import { initializeApp } from "firebase/app";
 import { MessagePayload, deleteToken, getMessaging, getToken, onMessage } from "firebase/messaging";
 import { firebaseConfig, vapidKey, serverKey } from "./firebaseDemoConfig";
@@ -12,7 +14,8 @@ let token = ""; // The current device token
 
 const requestPermissionButton = document.getElementById("request-permission-button") as HTMLElement; // The button to request permission
 const deleteTokenButton = document.getElementById("delete-token-button") as HTMLElement; // The button to delete a token
-const testMessageButton = document.getElementById("test-message-button") as HTMLElement; // The button to send a test message
+const testFrgMessageButton = document.getElementById("test-frg-message-button") as HTMLElement; // The button to send a foreground test message
+const testBkgMessageButton = document.getElementById("test-bkg-message-button") as HTMLElement; // The button to send a background test message
 const deviceTokenElement = document.getElementById("device-token") as HTMLElement; // The element to display the device token
 
 /**
@@ -121,34 +124,67 @@ function deleteTokenFromFirebase() {
 deleteTokenButton.addEventListener("click", deleteTokenFromFirebase);
 
 /**
- * Send a message to the device using the FCM server
+ * Send a message to the device using the FCM server using Cloud Messaging API (Legacy)
  */
-function sendTestMessage() {
+async function sendForegroundTestMessage() {
     const notification = {
-        title: "Portugal vs. Denmark",
-        body: "5 to 1",
-        icon: "firebase-logo.png",
-        click_action: "http://localhost:8081",
+        title: "Foreground message",
+        body: "You have focus and received a message!",
+        icon: "",
+        click_action: "https://vagrant.dev.schoolbox.cloud/greenhouse/donny",
     };
-    fetch("https://fcm.googleapis.com/fcm/send", {
-        method: "POST",
-        headers: {
-            Authorization: `key=${serverKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            notification,
-            to: token,
-        }),
-    })
-        .then((response) => {
-            console.warn(response);
-        })
-        .catch((error) => {
-            console.warn(error);
+    try {
+        const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+            method: "POST",
+            headers: {
+                Authorization: `key=${serverKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                notification,
+                to: token,
+            }),
         });
+        console.warn(response);
+    } catch (error) {
+        console.warn(error);
+    }
 }
-testMessageButton.addEventListener("click", sendTestMessage);
+testFrgMessageButton.addEventListener("click", () => {
+    void sendForegroundTestMessage();
+});
+
+/**
+ * Send a message to the device using the FCM server using Cloud Messaging API (Legacy)
+ */
+async function sendBackgroundTestMessage() {
+    await timeout(3000);
+    const notification = {
+        title: "Background message",
+        body: "You didn't have focus and received a message! You should have received a browser notification informing you of this message.",
+        icon: "",
+        click_action: "https://vagrant.dev.schoolbox.cloud/greenhouse/donny",
+    };
+    try {
+        const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+            method: "POST",
+            headers: {
+                Authorization: `key=${serverKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                notification,
+                to: token,
+            }),
+        });
+        console.warn(response);
+    } catch (error) {
+        console.warn(error);
+    }
+}
+testBkgMessageButton.addEventListener("click", () => {
+    void sendBackgroundTestMessage();
+});
 
 /**
  * Add a message to the messages element.
