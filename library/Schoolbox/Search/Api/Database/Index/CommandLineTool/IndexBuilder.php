@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\Index\CommandLineTool;
 
 use Alaress\Database\Exception;
 use Alaress\Lock\LockRefreshException;
-use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
@@ -25,7 +24,6 @@ class IndexBuilder extends App
 {
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
-
     private const OPT_LONG_FROM = 'from:';
     private const OPT_LONG_TO = 'to:';
     private const OPT_LONG_CLEAR = 'clear';
@@ -71,28 +69,30 @@ class IndexBuilder extends App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        $logger = $this->getLogger();
+
         try {
             $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
             $toDate   = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
         } catch (InvalidArgumentException $e) {
-            $this->getLogger()->error($e->getMessage());
+            $logger->error($e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $this->getLogger()->debug('Acquiring lock.');
+        $logger->debug('Acquiring lock.');
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return;
         }
 
         if ($this->perform()) {
-            $this->getLogger()->notice('Running in perform mode: search index will be rebuilt');
+            $logger->notice('Running in perform mode: search index will be rebuilt');
         } else {
-            $this->getLogger()->notice('Running in dry-run mode: provide the `-p` flag to rebuild index');
+            $logger->notice('Running in dry-run mode: provide the `-p` flag to rebuild index');
         }
 
-        $this->getLogger()->notice(
+        $logger->notice(
             sprintf(
                 'Building search index from %s to %s',
                 ($fromDate ? $fromDate->getDatabase() : 'earliest result'),
@@ -100,29 +100,40 @@ class IndexBuilder extends App
             ),
         );
 
+        $dbi = $this->getDatabaseInternal();
+
+        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
+        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
+        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
+        // https://mariadb.com/kb/en/aborting-statements/
+        $dbi->execute('SET SESSION max_statement_time = 0;');
+        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $maxStatementTime = $rows[0]['Value'];
+        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
+
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
-            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
-            ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($this->getDatabaseInternal(), $this->getLogger()),
+            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
+            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
+            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($dbi, $logger),
+            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($dbi, $logger),
+            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($dbi, $logger),
+            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($dbi, $logger),
+            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($dbi, $logger),
+            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($dbi, $logger),
+            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($dbi, $logger),
+            ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($dbi, $logger),
+            ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($dbi, $logger),
+            ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($dbi, $logger),
         ];
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
-            $this->getLogger()->notice('Building search index for all result types');
+            $logger->notice('Building search index for all result types');
         } else {
             $types = is_array($types) ? $types : [$types];
             foreach ($types as $type) {
                 if (!isset($indexBuilders[$type])) {
-                    $this->getLogger()->error(
+                    $logger->error(
                         sprintf(
                             'Result type "%s" is not recognised (recognised types: %s): exiting',
                             $type,
@@ -132,7 +143,7 @@ class IndexBuilder extends App
                     exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
                 }
             }
-            $this->getLogger()->notice(
+            $logger->notice(
                 sprintf(
                     'Building search index for result types: %s',
                     implode(', ', $types),
@@ -141,26 +152,26 @@ class IndexBuilder extends App
         }
 
         // Run for as long as you need to?
-        $this->getDatabaseInternal()->executeDirectly('SET MAX_STATEMENT_TIME=0');
+        $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {
             if (empty($types)) {
-                $this->getLogger()->notice('Clearing ALL existing indices before rebuilding!');
+                $logger->notice('Clearing ALL existing indices before rebuilding!');
                 if ($this->perform()) {
-                    $this->getDatabaseInternal()->execute('TRUNCATE search_index');
+                    $dbi->execute('TRUNCATE search_index');
                 }
             } else {
-                $this->getLogger()->notice('Clearing indices for provided types before rebuilding!');
-                $deleteIndexQuery = $this->getDatabaseInternal()->prepareQuery(
+                $logger->notice('Clearing indices for provided types before rebuilding!');
+                $deleteIndexQuery = $dbi->prepareQuery(
                     'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike',
                 );
                 foreach ($types as $type) {
-                    $this->getLogger()->notice(sprintf('Clearing indices for type: %s', $type));
+                    $logger->notice(sprintf('Clearing indices for type: %s', $type));
                     if ($this->perform()) {
                         $deleteIndexQuery->execute([
                             'type'     => $type,
-                            'typeLike' => $this->getDatabaseInternal()->getQuoter()->escapeForLike($type . '.') . '%',
+                            'typeLike' => $dbi->getQuoter()->escapeForLike($type . '.') . '%',
                         ]);
                     }
                 }
@@ -168,7 +179,7 @@ class IndexBuilder extends App
         }
 
         // Actually create data
-        $updateStatement = $this->getDatabaseInternal()->prepareQuery("
+        $updateStatement = $dbi->prepareQuery("
             REPLACE INTO search_index (
                 type,
                 identifier,
@@ -189,7 +200,7 @@ class IndexBuilder extends App
                 :fulltextIndex
             )
         ");
-        $deleteStatement = $this->getDatabaseInternal()->prepareQuery("
+        $deleteStatement = $dbi->prepareQuery("
             DELETE FROM search_index WHERE type = :type AND identifier = :identifier
         ");
 
@@ -201,9 +212,9 @@ class IndexBuilder extends App
             }
 
             try {
-                $this->getLogger()->debug('Refreshing lock.');
+                $logger->debug('Refreshing lock.');
                 $this->refreshLock($lock);
-            } catch (LockRefreshException $e) {
+            } catch (LockRefreshException) {
                 // Carry on.
             }
 
@@ -224,7 +235,7 @@ class IndexBuilder extends App
                         'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
                     ]);
                 } catch (Exception $e) {
-                    $this->getLogger()->warning(
+                    $logger->warning(
                         sprintf(
                             'Unexpected database error when index for "%s:%s" (%s): ignoring',
                             $updatedIndex->getType(),
@@ -247,7 +258,7 @@ class IndexBuilder extends App
             }
         }
 
-        $this->getLogger()->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));
+        $logger->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));
 
         // Run OPTIMIZE TABLE after fully rebuilding the search_index table.
         // Note running OPTIMIZE TABLE on an InnoDB table is equivalent to:
@@ -263,12 +274,12 @@ class IndexBuilder extends App
         // Both types of errors described above have been seen in testing.
         if ($fromDate === null && $toDate === null) {
             $time = microtime(true);
-            $this->getLogger()->notice("Running OPTIMIZE TABLE search_index...");
-            $this->getDatabaseInternal()->execute('OPTIMIZE TABLE search_index');
-            $this->getLogger()->notice(sprintf("Finished running OPTIMIZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
+            $logger->notice("Running OPTIMIZE TABLE search_index...");
+            $dbi->execute('OPTIMIZE TABLE search_index');
+            $logger->notice(sprintf("Finished running OPTIMIZE TABLE search_index.  Time taken: %0.2fs", microtime(true) - $time));
         }
 
-        $this->getLogger()->debug('Releasing lock.');
+        $logger->debug('Releasing lock.');
         $lock->release();
     }
 
