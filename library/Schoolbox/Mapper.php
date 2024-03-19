@@ -1115,6 +1115,50 @@ abstract class Mapper implements IMapper
     }
 
     /**
+     * Recursively finds all IDs of ancestors of the given IDs.
+     *
+     * This should only recurse n times, where n = max depth of tree above
+     * `$ids`.
+     *
+     * @param array  $ids          IDs to find ancestors for.
+     * @param string $parentColumn The DB column which stores the parent ID
+     * @param int    $maxDepth     The maximum depth to traverse: defaults to 50
+     * @param int    $currentDepth The current depth of this traversal:
+     *                             incremented after each recursion.
+     * @return array
+     */
+    public function findAncestorIds(
+        array $ids,
+        string $parentColumn,
+        int $maxDepth = 50,
+        int $currentDepth = 1,
+    ): array {
+        // Recursive relation protection
+        if ($currentDepth > $maxDepth) {
+            return [];
+        }
+
+        if ($ids === []) {
+            return [];
+        }
+        $ancestorIds = $this->findScalarByPredicates(
+            $parentColumn,
+            $this->getPredicateBuilder()->in($this->getIdentifierColumn(), $ids),
+        );
+        if ($ancestorIds === []) {
+            return [];
+        }
+
+        $grandAncestorIds = $this->findAncestorIds(
+            $ancestorIds,
+            $parentColumn,
+            $maxDepth,
+            $currentDepth + 1,
+        );
+        return array_merge($ancestorIds, $grandAncestorIds);
+    }
+
+    /**
      * Recursively finds all IDs of descendants of the given IDs.
      *
      * This should only recurse n times, where n = max depth of tree beneath

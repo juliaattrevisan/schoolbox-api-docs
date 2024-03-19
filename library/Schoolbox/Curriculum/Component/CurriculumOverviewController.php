@@ -53,25 +53,27 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
-            $nodeMapper            = Node\Mapper::getInstance();
-            $this->curriculumNodes = $nodeMapper->createCollection();
-
+            $nodeIds = [];
             foreach ($context->getCurriculumNodes() as $node) {
                 if (!$node->getEnabled()) {
                     continue;
                 }
 
-                // Load this node's descendants and ancestors
-                $nodeMapper->loadAncestors($node);
-                $nodeMapper->loadDescendants($node);
-                $this->curriculumNodes->add($node);
+                $nodeIds[] = $node->getId();
             }
 
-            // Sort the list of nodes into a tree structure.
-            // This can be done by flattening it first, and then restructuring
-            // it into a tree.
+            // Fetch every node which is an ancestor or descendant of one of
+            // this folder's nodes.
+            $nodeMapper = Node\Mapper::getInstance();
+            $nodeIds    = array_merge(
+                $nodeIds,
+                $nodeMapper->findDescendantIds($nodeIds, 'curriculum_node_parent_id'),
+                $nodeMapper->findAncestorIds($nodeIds, 'curriculum_node_parent_id'),
+            );
+
+            // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
-                $nodeMapper->getCollectionAsFlat($this->curriculumNodes),
+                $nodeMapper->findByColumn('id', $nodeIds),
             );
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
