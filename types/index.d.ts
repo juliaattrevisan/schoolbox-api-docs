@@ -20,6 +20,7 @@ declare global {
             iframelyLicenseKey: string;
             colourDefaults: { [key: string]: any };
             editors: { [key: string]: Editor };
+            ckeditorReady: boolean;
             hasEditorAI: boolean; // to display the AI features within the editor
             lightGallery: Function;
             lightGalleryInit: Function;

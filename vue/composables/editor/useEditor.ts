@@ -3,20 +3,28 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  */
 
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { Ref } from "vue";
 import { EditorEvent, type EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Initialise the composable
- * @param { string } $currentValue - the initial string value to input into the ckeditor
- * @param { string } ckeditorSelector - the selector to target the CKEditor
+ * @param { string | Ref<string> } $currentValue - the initial string value to input into the ckeditor, or a ref to the value
+ * @param { string | HTMLElement } ckeditorSelector - the selector to target the CKEditor, or the element itself
  * @param { EditorConfig } editorConfig - the config to use when creating the editor
- * @returns { string } - the current value of the editor input
+ * @param { boolean } isMounted - whether or not we are already mounted, and to skip the onMounted hook
+ * @param { Function } callback - a callback to run after the editor is created including EditorCreatedEventInfo
+ * @returns { Ref<string> } - the current value of the editor input as a ref
  */
-export function useEditor($currentValue: string, ckeditorSelector: string, editorConfig: EditorConfig) {
-    const currentValue = window.Vue.ref($currentValue);
+export function useEditor(
+    $currentValue: string | Ref<string>,
+    ckeditorSelector: string | HTMLElement,
+    editorConfig: EditorConfig,
+    isMounted: boolean = false,
+    callback?: (event: EditorCreatedEventInfo) => void,
+) {
+    const currentValue = typeof $currentValue === "string" ? window.Vue.ref($currentValue) : $currentValue;
 
     /**
      * When a new editor is created
@@ -24,12 +32,17 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
      */
     function onEditorCreated(event: CustomEvent) {
         const { editor } = event.detail as EditorCreatedEventInfo;
+
         if (currentValue.value !== null) {
             editor.setData(currentValue.value); // set the initial data
         }
         editor.model.document.on("change:data", () => {
             currentValue.value = editor.getData();
         });
+
+        if (callback) {
+            callback(event.detail as EditorCreatedEventInfo);
+        }
     }
 
     /**
@@ -42,7 +55,23 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
-            const ckeditorElement = document.getElementById(ckeditorSelector) as HTMLElement;
+
+            // Wait for the script to load if it hasn't already
+            if (!window.sbProps.ckeditorReady) {
+                await new Promise<void>((resolve) => {
+                    const interval = setInterval(() => {
+                        if (window.sbProps.ckeditorReady) {
+                            clearInterval(interval);
+                            resolve();
+                        }
+                    }, 100);
+                });
+            }
+
+            const ckeditorElement =
+                typeof ckeditorSelector === "string"
+                    ? (document.querySelector(ckeditorSelector) as HTMLElement)
+                    : ckeditorSelector;
 
             // avoid creating multiple editors for the same selector
             // @todo - this currently prevents a watch() from working once it's been unmounted/remounted
@@ -59,16 +88,22 @@ export function useEditor($currentValue: string, ckeditorSelector: string, edito
             document.dispatchEvent(
                 new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: editorConfig,
-                })
+                }),
             );
         } catch (error) {
             throw new Error(error);
         }
     }
 
-    window.Vue.onMounted(async () => {
-        await loadCKEditor();
-    });
+    if (isMounted === true) {
+        loadCKEditor().catch((error) => {
+            throw new Error(error);
+        });
+    } else {
+        window.Vue.onMounted(async () => {
+            await loadCKEditor();
+        });
+    }
 
     return currentValue;
 }
