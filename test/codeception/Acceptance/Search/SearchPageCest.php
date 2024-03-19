@@ -90,14 +90,17 @@ class SearchPageCest
         $searchPage = new SearchPage($i);
 
         $i->amGoingTo('input a valid keyword, clear all filters and search');
-        $searchPage->inputKeyword('help');
+        $searchPage->inputKeyword('Reed');
         $searchPage->clearFilters();
         $searchPage->clickSearchButton();
 
-        $i->amGoingTo('I expected to see 14 results');
-        $searchPage->verifyResultsCount(14);
+        $i->amGoingTo('I expected to see 10 results');
+        $searchPage->verifyResultsCount(10);
 
         $i->amGoingTo('load more sub results under Admin Help and expect to see 6 sub results');
+        $searchPage->inputKeyword('help');
+        $searchPage->clearFilters();
+        $searchPage->clickSearchButton();
         $searchPage->clickLoadMoreSubResults(168);
         $searchPage->verifySubResultsCount(168, 6);
     }
