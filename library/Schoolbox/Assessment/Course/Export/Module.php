@@ -45,30 +45,34 @@ class Module extends \Alaress\Module\Module
     protected function registerRoutes(): void
     {
         // Permissions:
+        // * User is a superuser OR
         // * User must be able to create an assessment in the spec folder
+        // * AND
         // * User must be an instructor of the assessment the folder is within
         $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
-                    static function (array $params): FolderModel {
-                        if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpec\Model) {
-                            return $params['unitSpec']->getFolder();
+                new Rule\All(
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        static function (array $params): int {
+                            if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpec\Model) {
+                                return $params['unitSpec']->getFolder()->getId();
+                            }
+                            throw new NotFound('No context preloaded');
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    ),
+                    new IsInstructor(
+                        $this->getMapperFactory()->get(Access::class),
+                        static function (array $params): FolderModel {
+                            if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+                                return $params['assessment']->getBaseContext()->getFolder();
+                            }
+                            throw new NotFound('No context preloaded');
                         }
-                        throw new NotFound('No context preloaded');
-                    },
-                    $this->getMapperFactory()->get(Access::class),
-                ),
-                new IsInstructor(
-                    $this->getMapperFactory()->get(Access::class),
-                    static function (array $params): FolderModel {
-                        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
-                            return $params['assessment']->getBaseContext()->getFolder();
-                        }
-                        throw new NotFound('No context preloaded');
-                    }
+                    ),
                 ),
             ),
         );
