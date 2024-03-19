@@ -14,9 +14,6 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
     const unitPlannerStore = useUnitPlannerStore();
     const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
 
-    const isDragging = window.Vue.ref(false);
-    const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
-
     // Allow the refs to be passed in instead of creating and monitoring two
     let unitPlannerContainerEl: Ref<HTMLElement>;
     let headerRowHeight: Ref<number>;
@@ -42,6 +39,14 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
         unitPlannerContainerScrollTop = $unitPlannerContainerScrollTop;
     }
 
+    const isDragging = window.Vue.ref(false);
+    const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
+    const dragCurrentPointerY = window.Vue.ref<number | null>(null);
+    const dragInitial = window.Vue.ref<{
+        y: number;
+        offsetY: number;
+    } | null>(null);
+
     // Allow components to react to changes to the drag unit the tick after it actually changes
     // This is useful for example with the height transition of the drag placeholder where we need to initialise it with
     // the unexpanded height, and then set it to the drag height, otherwise it'll skip the transition.
@@ -51,12 +56,6 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             dragCurrentUnitNextTick.value = value;
         }, 0);
     });
-
-    const dragCurrentPointerY = window.Vue.ref<number | null>(null);
-    const dragInitial = window.Vue.ref<{
-        y: number;
-        offsetY: number;
-    } | null>(null);
 
     const dragPlaceholderY = window.Vue.computed(() => {
         if (
@@ -269,16 +268,15 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     return {
         init,
+        dragUnitHeight,
+        routeFolderSequence,
         isDragging,
-        dragPlaceholderY,
-        dragOrderedUnits,
         dragCurrentUnit,
         dragCurrentUnitNextTick,
+        dragPlaceholderY,
+        dragOrderedUnits,
         onDragStart,
         onDragMove,
         onDragEnd,
-        dragUnitHeight,
-        routeFolderSequence,
-        resequenceUnits,
     };
 });

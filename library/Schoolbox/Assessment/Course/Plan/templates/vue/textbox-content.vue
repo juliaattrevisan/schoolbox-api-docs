@@ -31,11 +31,11 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
     const editor = event.editor as InlineEditor;
 
     editor.editing.view.document.on("change:isFocused", (_, __, isFocused: boolean) => {
-        store.updateFocusedUnitCells(props.unit.id, props.column, isFocused);
+        store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
     });
 
     editor.model.document.on("change", () => {
-        store.updateFocusedUnitCells(props.unit.id, props.column, true);
+        store.updateFocusedUnitCell(props.unit.id, props.column, true);
         window.Vue.nextTick()
             .then(() => {
                 emit("updateContentHeight");
@@ -57,7 +57,7 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
         if (editor.editing.view.document.isFocused) {
-            store.updateFocusedUnitCells(props.unit.id, props.column, true);
+            store.updateFocusedUnitCell(props.unit.id, props.column, true);
         }
     }).catch(() => {
         // noop
