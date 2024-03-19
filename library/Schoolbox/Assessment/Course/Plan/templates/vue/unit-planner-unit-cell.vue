@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
@@ -21,6 +22,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
+const dragStore = useUnitPlannerDragStore();
 const textboxStore = useUnitPlannerTextboxStore();
 
 const storeUnit = window.Vue.computed(() => {
@@ -42,7 +44,7 @@ const unitMaxContentHeight = window.Vue.computed(() => {
 const cellMaxHeight = window.Vue.computed(() => {
     // Ensure the height of the component initially renders as if it wasn't being dragged to ensure
     // the height transition is able to occur.
-    if (store.dragCurrentUnitNextTick === props.unit) return store.dragUnitHeight;
+    if (dragStore.dragCurrentUnitNextTick === props.unit) return dragStore.dragUnitHeight;
 
     // If the unit is expanded, allow it to grow to fit its content
     if (store.expandedUnits.includes(props.unit.id)) return unitMaxContentHeight.value;
@@ -55,7 +57,7 @@ const showViewMoreGradient = window.Vue.computed(() => {
     return contentHeight.value + componentActionHeight.value > cellMaxHeight.value;
 });
 const showViewMoreInner = window.Vue.computed(() => {
-    if (store.dragCurrentUnitNextTick === props.unit) return false;
+    if (dragStore.dragCurrentUnitNextTick === props.unit) return false;
     if (store.expandedUnits.includes(props.unit.id)) return false;
     return showViewMoreGradient.value;
 });
@@ -138,7 +140,7 @@ window.Vue.onMounted(() => {
     setTimeout(updateContentHeight, 0);
 
     // Whether to allow the user to resequence the units
-    if (store.routeFolderSequence) {
+    if (dragStore.routeFolderSequence) {
         if (draggableEl.value) {
             draggableInstance = Draggable.create(draggableEl.value, {
                 type: "y",
@@ -147,15 +149,15 @@ window.Vue.onMounted(() => {
                 allowContextMenu: true,
                 onPress: () => {
                     if (!draggableInstance) return;
-                    store.onDragStart(draggableInstance[0], props.unit);
+                    dragStore.onDragStart(draggableInstance[0], props.unit);
                 },
                 onDrag: () => {
                     if (!draggableInstance) return;
-                    store.onDragMove(draggableInstance[0]);
+                    dragStore.onDragMove(draggableInstance[0]);
                 },
                 onRelease: () => {
                     if (!draggableInstance) return;
-                    store.onDragEnd(draggableInstance[0]);
+                    dragStore.onDragEnd(draggableInstance[0]);
                 },
             });
         }
@@ -175,7 +177,7 @@ window.Vue.onUnmounted(() => {
         class="unit-cell"
         :class="{
             'fixed-left': props.column.fixedLeft,
-            'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
+            'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
             'sortable-placeholder': props.isSortablePlaceholder,
             'content-unsaved': !contentIsSaved,
             'content-focused': contentIsFocused,
@@ -186,14 +188,14 @@ window.Vue.onUnmounted(() => {
         <div ref="contentEl">
             <template v-if="props.column.type === ColumnType.UNIT">
                 <div
-                    v-if="store.routeFolderSequence"
+                    v-if="dragStore.routeFolderSequence"
                     ref="draggableEl"
                     class="sortable-holder"
-                    :class="{ isDragging: store.dragCurrentUnit === props.unit }"
+                    :class="{ isDragging: dragStore.dragCurrentUnit === props.unit }"
                 ></div>
 
                 <div>
-                    <i v-if="store.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
+                    <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
                     <div>
                         <a :href="props.unit.homepage">
                             <strong>{{ props.unit.title }}</strong>
