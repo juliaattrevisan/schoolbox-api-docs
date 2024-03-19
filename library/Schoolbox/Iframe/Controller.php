@@ -38,7 +38,7 @@ class Controller extends Base
 
         /* $url isn't safe; exit
          */
-        if (!(new Validator($this->getConfigLoader()->get('')))->isValid($url)) {
+        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($url)) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
