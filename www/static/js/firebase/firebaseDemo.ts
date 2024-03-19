@@ -11,7 +11,9 @@ const messaging = getMessaging(); // Retrieve Firebase Messaging object.
 let token = ""; // The current device token
 
 const requestPermissionButton = document.getElementById("request-permission-button") as HTMLElement; // The button to request permission
+const deleteTokenButton = document.getElementById("delete-token-button") as HTMLElement; // The button to delete a token
 const testMessageButton = document.getElementById("test-message-button") as HTMLElement; // The button to send a test message
+const deviceTokenElement = document.getElementById("device-token") as HTMLElement; // The element to display the device token
 
 /**
  * Mock server check, just using localStorage instead for now
@@ -37,6 +39,7 @@ function setTokenSentToServer(sent: boolean) {
  */
 function sendTokenToServer(currentToken: string) {
     token = currentToken;
+    deviceTokenElement.textContent = currentToken;
     if (!isTokenSentToServer()) {
         console.warn("Sending token to server...", currentToken);
         // TODO(developer): Send the current token to your server.
@@ -57,10 +60,12 @@ function getDeviceToken() {
                 sendTokenToServer(currentToken);
                 // updateUIForPushEnabled(currentToken);
                 requestPermissionButton.style.display = "none"; // Hide the button if already have permission
+                deleteTokenButton.style.display = "block"; // show the button as we now have a token
             } else {
                 // Show permission request.
-                console.log("No registration token available. Request permission to generate one.");
+                console.warn("No registration token available. Request permission to generate one.");
                 requestPermissionButton.style.display = "block"; // show the button if we don't have permission
+                deleteTokenButton.style.display = "none"; // hide the button as we no longer have a token
                 setTokenSentToServer(false);
             }
         })
@@ -79,10 +84,7 @@ function requestPermission() {
     Notification.requestPermission()
         .then((permission) => {
             if (permission === "granted") {
-                console.log("Notification permission granted.");
-                // TODO(developer): Retrieve a registration token for use with FCM.
-                // In many cases once an app has been granted notification permission,
-                // it should update its UI reflecting this.
+                console.warn("Notification permission granted.");
                 getDeviceToken();
             } else {
                 console.warn("Unable to get permission to notify.");
@@ -93,6 +95,30 @@ function requestPermission() {
         });
 }
 requestPermissionButton.addEventListener("click", requestPermission);
+
+/**
+ * Delete registration token.
+ */
+function deleteTokenFromFirebase() {
+    getToken(messaging)
+        .then((currentToken) => {
+            deleteToken(messaging)
+                .then(() => {
+                    console.warn("Token deleted.", currentToken);
+                    setTokenSentToServer(false);
+                    requestPermissionButton.style.display = "block"; // show the button as we no longer have permission and the device token
+                    deleteTokenButton.style.display = "none"; // hide the button as we no longer have a token
+                    deviceTokenElement.textContent = "No token.";
+                })
+                .catch((err) => {
+                    console.warn("Unable to delete token. ", err);
+                });
+        })
+        .catch((err) => {
+            console.warn("Error retrieving registration token. ", err);
+        });
+}
+deleteTokenButton.addEventListener("click", deleteTokenFromFirebase);
 
 /**
  * Send a message to the device using the FCM server
