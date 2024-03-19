@@ -24,7 +24,7 @@ window.Vue.watch(
                 modalEl.value.close();
             }
         }
-    },
+    }
 );
 
 /**
@@ -41,7 +41,9 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
-            unitPlannerStore.toastEl.timeout("Server error", false, 5000);
+            if (unitPlannerStore.toastEl !== null) {
+                unitPlannerStore.toastEl.timeout("Server error", false, 5000);
+            }
         });
     }
 });
@@ -52,7 +54,7 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
  * @returns {string} The button text
  */
 const deleteButtonText = window.Vue.computed(() =>
-    deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
+    deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete"
 );
 
 /**
@@ -70,8 +72,7 @@ const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessi
         @closed="deleteActivityStore.cancel"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this activity?</p>
-        <div class="alert-box alert">WARNING: All student responses, feedback, and marks will also be deleted.</div>
+        <p>Are you sure you wish to delete this activity? You will be unable to import this activity into classes.</p>
         <ul class="flex-list">
             <li>
                 <button
