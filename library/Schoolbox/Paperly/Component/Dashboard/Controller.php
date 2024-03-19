@@ -11,7 +11,6 @@ use Component_Dashboard_ControllerAbstract;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Loads the grid component into its set configuration.
      * @return bool
