@@ -75,12 +75,7 @@ function onRemoveSelected() {
         ></button>
     </div>
     <template v-if="showChildren">
-        <oc-view-node
-            v-for="viewNode in props.node.children"
-            :key="viewNode.id"
-            :node="viewNode"
-            :depth="props.depth + 1"
-        />
+        <fn-node v-for="viewNode in props.node.children" :key="viewNode.id" :node="viewNode" :depth="props.depth + 1" />
     </template>
 </template>
 

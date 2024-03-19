@@ -5,7 +5,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import FntNode from "./fnt-node.vue";
+import FnNode from "./fn-node.vue";
 
 interface Props {
     nodeTrees: Node[]; // The curriculum nodes trees to display
@@ -17,7 +17,7 @@ const depth = window.Vue.ref(0); // to increment each time we go down the node t
 
 <template>
     <div class="l-flex-col l-pad-s--horiz l-pad-s--top">
-        <fnt-node v-for="node in props.nodeTrees" :key="node.id" :node="node" :depth="depth" />
+        <fn-node v-for="node in props.nodeTrees" :key="node.id" :node="node" :depth="depth" />
     </div>
 </template>
 

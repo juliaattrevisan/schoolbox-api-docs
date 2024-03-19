@@ -8,10 +8,10 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
-import FolderNodesTrees from "@schoolboxCurriculum/vue/folderNodes/folder-nodes-trees.vue";
+import FolderNodes from "@schoolboxCurriculum/vue/folderNodes/folder-nodes.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
+import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import OcEmptyState from "./oc-empty-state.vue";
-import OcActions from "./oc-actions.vue";
 
 interface Props {
     nodeTrees: Node[]; // The curriculum nodes trees to display
@@ -45,9 +45,8 @@ window.Vue.onMounted(() => {
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
-    <folder-nodes-trees v-else class="l-flex-col l-pad-s--horiz l-pad-s--top" :node-trees="props.nodeTrees" />
-    <oc-actions v-if="!props.isReadOnly" />
+    <folder-nodes v-else class="l-flex-col l-pad-s--horiz l-pad-s--top" :node-trees="props.nodeTrees" />
+    <fn-actions v-if="!props.isReadOnly" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />
 </template>
-../folderNodes/store/overviewComponentStore
