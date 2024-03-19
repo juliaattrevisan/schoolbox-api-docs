@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
+import { extractErrorMessage } from "@js/util/fetchUtils";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
@@ -427,11 +428,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * @param { number } unitId - the unit to save the textbox content for
      * @param { Column } column - the column to save the textbox content for
      */
-    function saveTextboxContent(unitId: number, column: Column) {
+    async function saveTextboxContent(unitId: number, column: Column) {
         const storeUnit = units.value.find((u) => u.id === unitId);
         if (!storeUnit) {
             throw new Error("Unit not found");
         }
+        const selectedTextbox = storeUnit.textboxes[column.label];
+
         const content = unsavedTextboxes.value[unitId]?.[column.id];
         if (content === undefined) {
             return;
@@ -440,7 +443,68 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         toastEl.value.activate("Saving...");
 
         try {
-            // TODO
+            let response = null;
+            if (selectedTextbox.id < 0) {
+                // Textbox has not been created yet, so create one
+
+                // First create a new component
+                const formData = new FormData();
+                formData.append("cid", storeUnit.folderId.toString());
+                formData.append("add", "44");
+
+                const responseComponent = await fetch("/homepage/configForm.php", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Accept: "application/json",
+                    },
+                });
+
+                if (!responseComponent.ok) {
+                    throw new Error(await extractErrorMessage(responseComponent));
+                }
+
+                const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
+
+                // Then create the textbox
+                response = await fetch(
+                    `/textbox/folder/${storeUnit.folderId}/component/${responseComponentJSON.instanceID}`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            body: content,
+                            heading: column.label,
+                            id: null,
+                        }),
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    },
+                );
+            } else {
+                response = await fetch(`/textbox/${selectedTextbox.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        body: content,
+                        heading: column.label,
+                    }),
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    },
+                });
+            }
+
+            if (!response.ok) {
+                throw new Error(await extractErrorMessage(response));
+            }
+
+            if (selectedTextbox.id < 0) {
+                // If we just created a textbox, then we need to update the store with the new textbox id
+                const responseJSON = (await response.json()) as { id: number };
+                storeUnit.textboxes[column.label].id = responseJSON.id;
+            }
 
             // To finish off, update the store with the new content and remove the unsaved state
             storeUnit.textboxes[column.label].body = content;
