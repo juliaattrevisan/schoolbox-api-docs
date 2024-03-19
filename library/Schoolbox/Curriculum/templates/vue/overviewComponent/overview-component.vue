@@ -8,9 +8,9 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
-import { useStore } from "./store/overviewComponentStore";
+import FolderNodesTrees from "@schoolboxCurriculum/vue/folderNodes/folder-nodes-trees.vue";
+import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import OcEmptyState from "./oc-empty-state.vue";
-import OcViewNode from "./oc-view-node.vue";
 import OcActions from "./oc-actions.vue";
 
 interface Props {
@@ -27,7 +27,6 @@ const props = defineProps<Props>();
 
 const store = useStore();
 const selectorStore = useSelectorStore();
-const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 
 /**
  * Store the nodeTrees and start loading the initial curriculum data
@@ -46,10 +45,9 @@ window.Vue.onMounted(() => {
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
-    <div v-else class="l-flex-col l-pad-s--horiz l-pad-s--top">
-        <oc-view-node v-for="node in store.nodeTrees" :key="node.id" :node="node" :depth="depth" />
-    </div>
+    <folder-nodes-trees v-else class="l-flex-col l-pad-s--horiz l-pad-s--top" :node-trees="props.nodeTrees" />
     <oc-actions v-if="!props.isReadOnly" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />
 </template>
+../folderNodes/store/overviewComponentStore

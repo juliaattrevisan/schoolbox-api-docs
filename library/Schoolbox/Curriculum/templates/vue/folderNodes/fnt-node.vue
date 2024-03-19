@@ -4,7 +4,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { useStore } from "./store/overviewComponentStore";
+import { useStore } from "./store/folderNodesStore";
 
 interface Props {
     node: Node; // the assigned node to display

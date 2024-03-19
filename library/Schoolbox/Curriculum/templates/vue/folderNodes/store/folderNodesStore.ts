@@ -8,7 +8,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 
-export const useStore = defineStore("overviewComponent", () => {
+export const useStore = defineStore("folderNodes", () => {
     const nodeTrees = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
     const hasNoNodes = window.Vue.computed(() => nodeTrees.value.length === 0);
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // the currently selected node id to display the details of
