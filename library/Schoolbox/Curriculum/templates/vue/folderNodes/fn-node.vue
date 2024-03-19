@@ -13,7 +13,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const store = useStore();
+const store = useStore(2);
 
 /**
  * to gradually add more marginLeft to indicate node level depth
@@ -40,21 +40,21 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * @returns { boolean }
  */
 const showRemove = window.Vue.computed(
-    () => hasCode.value && store.selectedNodesStore.nodesIds.includes(props.node.id),
+    () => hasCode.value && store().selectedNodesStore.nodesIds.includes(props.node.id),
 );
 
 /**
  * When the code is selected, open the curriculum details modal
  */
 function onCodeSelected() {
-    store.selectedDetailsNodeId = props.node.id;
+    store().selectedDetailsNodeId = props.node.id;
 }
 
 /**
  * Remove the node from the selected nodes
  */
 function onRemoveSelected() {
-    store.removeSelectedNode(props.node);
+    store().removeSelectedNode(props.node);
 }
 </script>
 

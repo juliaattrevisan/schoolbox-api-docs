@@ -15,6 +15,7 @@ import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
     nodes: Node[]; // The curriculum nodes trees to display
+    folderId: number; // The folder id to display the nodes for
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     selectedNodes: Node[]; // The nodes already previously selected
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
@@ -25,28 +26,28 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore();
+const store = useStore(2);
 const selectorStore = useSelectorStore();
 
 /**
- * Store the nodeTrees and start loading the initial curriculum data
+ * Store the nodes and start loading the initial curriculum data
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store.init(props.nodes);
+    store().init(props.nodes);
     selectorStore.init(props);
 });
 </script>
 
 <template>
     <oc-empty-state
-        v-if="store.hasNoNodes"
+        v-if="store().hasNoNodes"
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
     />
-    <folder-nodes v-else :nodes="props.nodes" />
+    <folder-nodes v-else :folder-id="props.folderId" />
     <fn-actions v-if="!props.isReadOnly" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
-    <curriculum-details-modal :selected-node-id="store.selectedDetailsNodeId" />
+    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
 </template>
