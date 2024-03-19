@@ -46,8 +46,9 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                 });
+                isProcessing.value = false;
+
                 if (response.ok) {
-                    isProcessing.value = false;
                     isOpen.value = false;
 
                     if (unit.value !== null) {
@@ -58,8 +59,6 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
                 }
             } catch (error) {
                 throw new Error();
-            } finally {
-                isProcessing.value = false;
             }
         }
 

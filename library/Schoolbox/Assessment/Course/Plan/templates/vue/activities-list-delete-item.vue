@@ -41,6 +41,7 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
+            unitPlannerStore.toastEl.timeout("Server error", false, 5000);
         });
     }
 });
