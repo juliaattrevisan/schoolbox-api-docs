@@ -18,7 +18,7 @@ function onModifySelected() {
 <template>
     <div class="component-action">
         <section>
-            <button @click.prevent="onModifySelected">Modify Curriculum</button>
+            <button @click.prevent="onModifySelected">Update Curriculum</button>
         </section>
     </div>
 </template>
