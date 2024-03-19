@@ -99,7 +99,7 @@ window.Vue.watch(
             updateScrollPosition();
         }
     },
-    { once: true }
+    { once: true },
 );
 
 window.Vue.onMounted(() => {
@@ -109,7 +109,7 @@ window.Vue.onMounted(() => {
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
         headerRowHeight,
         unitPlannerContainerScrollTop,
-        toastEl
+        toastEl.value!,
     );
 
     // Initialize the ResizeObserver

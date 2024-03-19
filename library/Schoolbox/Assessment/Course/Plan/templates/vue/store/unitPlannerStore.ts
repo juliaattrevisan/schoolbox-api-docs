@@ -20,7 +20,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     const units = window.Vue.ref<Unit[]>([]);
     const routeFolderSequence = window.Vue.ref<string | null>(null);
-    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
+    const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     // Allow the refs to be passed in instead of creating and monitoring two
     let unitPlannerContainerEl: Ref<HTMLElement>;
@@ -223,7 +223,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitPlannerContainerEl = $unitPlannerContainerEl;
         headerRowHeight = $headerRowHeight;
         unitPlannerContainerScrollTop = $unitPlannerContainerScrollTop;
-        toastEl.value = $toastEl.value;
+        toastEl.value = $toastEl;
     }
 
     /**
@@ -246,10 +246,8 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             return; // User does not have access to resequence
         }
 
-        if (toastEl.value !== null) {
-            toastEl.value.activate("Saving...");
-        }
-
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+        toastEl.value!.activate("Saving...");
         try {
             const currentSequence = orderedUnits.value.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -264,25 +262,14 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             });
 
             if (!response.ok) {
-                let responseText = await response.text();
-
-                // If the response is JSON, then parse it correctly for the response text
-                const contentType = response.headers.get("content-type");
-                if (contentType && contentType.indexOf("application/json") !== -1) {
-                    const responseJSON = JSON.parse(responseText) as { title: string; type: string; status: number };
-                    responseText = responseJSON.title;
-                }
-
-                throw new Error(responseText);
+                throw new Error(await extractErrorMessage(response));
             }
 
-            if (toastEl.value !== null) {
-                toastEl.value.timeout("Save successful", true, 2000);
-            }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            toastEl.value!.timeout("Save successful", true, 2000);
         } catch (error) {
-            if (toastEl.value !== null) {
-                toastEl.value.timeout(error, false, 2000);
-            }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            toastEl.value!.timeout(error, false, 2000);
         }
     }
 
@@ -440,7 +427,8 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             return;
         }
 
-        toastEl.value.activate("Saving...");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+        toastEl.value.!activate("Saving...");
 
         try {
             let response = null;
@@ -510,9 +498,11 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             storeUnit.textboxes[column.label].body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
-            toastEl.value.timeout("Save successful", true, 2000);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            toastEl.value.!timeout("Save successful", true, 2000);
         } catch (error) {
-            toastEl.value.timeout(error, false, 2000);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            toastEl.value.!timeout(error, false, 2000);
         }
     }
 
