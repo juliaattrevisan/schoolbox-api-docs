@@ -231,8 +231,10 @@ class TextboxCest
         $i->canSee('Jamal to be presented', '//article/p');
         $common->search('Jana');
         $searchPage->clickApplyFilters();
-        $i->amGoingTo('expect to see an empty results warning');
-        $searchPage->verifyNoResults();
+        $i->amGoingTo('expect to see the textbox with Untitled textbox header');
+        $i->canSee('Jamal to be presented');
+        $i->canSee('Untitled textbox', '//h6/a');
+        $i->cantSee('Jana to be hidden');
         $i->amGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         $i->amOnPage('/homepage/' . $homepageId);
         $i->canSee('Jamal to be presented');
