@@ -678,7 +678,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
-            'allWorkTypes'             => $this->workTypeMapper->findAll(),
+            'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['name' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
              * so we don't need a different method than the existing getAllMarkTypes
