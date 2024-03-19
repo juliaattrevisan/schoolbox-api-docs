@@ -26,7 +26,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore(2);
+const store = useStore(props.folderId);
 const selectorStore = useSelectorStore();
 
 /**
@@ -34,7 +34,7 @@ const selectorStore = useSelectorStore();
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store().init(props.nodes);
+    store().init(props.nodes, props.selectedNodes);
     selectorStore.init(props);
 });
 </script>

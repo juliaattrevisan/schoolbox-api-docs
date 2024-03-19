@@ -8,12 +8,13 @@ import { useStore } from "./store/folderNodesStore";
 
 interface Props {
     node: Node; // the assigned node to display
+    folderId: number; // The folder id to display the nodes for, primarily used to reference the appropriate store
     depth: number; // to gradually add more marginLeft to indicate node level depth
 }
 
 const props = defineProps<Props>();
 
-const store = useStore(2);
+const store = useStore(props.folderId);
 
 /**
  * to gradually add more marginLeft to indicate node level depth
@@ -39,9 +40,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * or we are at the root level node, or if the search is active
  * @returns { boolean }
  */
-const showRemove = window.Vue.computed(
-    () => hasCode.value && store().selectedNodesStore.nodesIds.includes(props.node.id),
-);
+const showRemove = window.Vue.computed(() => hasCode.value && store().selectedNodeIds.includes(props.node.id));
 
 /**
  * When the code is selected, open the curriculum details modal
@@ -75,7 +74,13 @@ function onRemoveSelected() {
         ></button>
     </div>
     <template v-if="showChildren">
-        <fn-node v-for="viewNode in props.node.children" :key="viewNode.id" :node="viewNode" :depth="props.depth + 1" />
+        <fn-node
+            v-for="viewNode in props.node.children"
+            :key="viewNode.id"
+            :node="viewNode"
+            :folder-id="props.folderId"
+            :depth="props.depth + 1"
+        />
     </template>
 </template>
 

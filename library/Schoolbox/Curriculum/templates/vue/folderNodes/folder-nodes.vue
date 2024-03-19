@@ -18,7 +18,7 @@ const depth = window.Vue.ref(0); // to increment each time we go down the node t
 
 <template>
     <div class="l-flex-col l-pad-s--horiz l-pad-s--top">
-        <fn-node v-for="node in store().nodes" :key="node.id" :node="node" :depth="depth" />
+        <fn-node v-for="node in store().nodes" :key="node.id" :node="node" :folder-id="props.folderId" :depth="depth" />
     </div>
 </template>
 

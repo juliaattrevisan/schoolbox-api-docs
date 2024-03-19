@@ -7,47 +7,40 @@
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
-import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 
 export const useStore = (folderId: number) =>
     defineStore(`folderNodes/${folderId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
+        const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
+        const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
-        const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // the currently selected node id to display the details of
-        const selectedNodesStore = useSelectedNodesStore();
-
-        /**
-         * to update the backend with the latest selected nodes, so the nodeTree can be updated
-         */
-        window.Vue.watch(
-            () => selectedNodesStore.nodes,
-            () => {
-                // notify the backend of the latest selected nodes, updating the nodeTree with the returned data
-            },
-        );
+        const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
 
         /**
          * Store a reference to the nodes to display
          * @param {Node[]} $nodes - the node trees to display
+         * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
          */
-        function init($nodes: Node[]): void {
+        function init($nodes: Node[], $selectedNodes: Node[]): void {
             nodes.value = $nodes;
+            selectedNodes.value = $selectedNodes;
         }
 
         /**
-         * To remove a node from the nodeTree, pass through the the selectedNodesStore
-         * which will then trigger the watch to update the nodeTree
+         * To remove a node from the selectedNodes, after which we'll notify the backend of the change
          * @param {Node} node - the node to remove
          */
         function removeSelectedNode(node: Node): void {
-            selectedNodesStore.remove(node);
+            selectedNodes.value = selectedNodes.value.filter((selectedNode) => selectedNode.id !== node.id);
+            // notify the backend of the latest selected nodes, updating the nodes with the returned data
         }
 
         return {
             nodes,
+            selectedNodes,
+            selectedNodeIds,
             hasNoNodes,
             selectedDetailsNodeId,
-            selectedNodesStore,
             init,
             removeSelectedNode,
         };
