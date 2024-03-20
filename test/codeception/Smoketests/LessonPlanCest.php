@@ -85,7 +85,7 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
-        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
+        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_NONE); // Required form parameter.
 
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
@@ -323,7 +323,7 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
-        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
+        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_NONE); // Required form parameter.
 
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
