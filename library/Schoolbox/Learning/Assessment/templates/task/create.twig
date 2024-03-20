@@ -17,10 +17,10 @@
     <select name="workType" required>
         {% for workType in allWorkTypes %}
             <option value="{{ workType.id }}"
-                {% if assessment.workType.id ?? '' == workType.id or (workType.name == 'None' and not assessment.workType) %}
+                {% if assessment.workType.id ?? '' == workType.id or (workType.name == WORKTYPE_NONE_NAME and not assessment.workType) %}
                     selected="selected"
                 {% endif %}
-                {% if workType.name == 'None' or courseManaged.isReadonly %}
+                {% if workType.name == WORKTYPE_NONE_NAME or courseManaged.isReadonly %}
                     disabled
                 {% endif %}
             >{{ workType.name }}</option>

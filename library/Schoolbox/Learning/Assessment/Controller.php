@@ -25,10 +25,10 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataM
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Learnosity\Helper;
-use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkTypeModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -678,6 +678,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
+            'WORKTYPE_NONE_NAME'       => WorkTypeModel::WORKTYPE_NONE_NAME,
             'allWorkTypes'             => $this->workTypeMapper->findAll(['order' => ['sequence' => 'asc']]),
 
             /* Capabilities happen to have the same mark types as its DueWork IAssessable container,
