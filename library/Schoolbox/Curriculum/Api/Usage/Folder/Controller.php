@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Api\Usage\Folder;
 
 use Alaress\Web\Controller\Base;
+use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
@@ -64,7 +65,7 @@ class Controller extends Base
 
         $folder = $folder->setCurriculumNodes($newNodesFromDb);
         $this->folderMapper->save($folder);
-        $this->response = $this->responseEmpty();
+        $this->response = $this->buildFlatResponse($folder);
     }
 
     /**
@@ -86,7 +87,7 @@ class Controller extends Base
         }
         $folder = $folder->setCurriculumNodes($folder->getCurriculumNodes()->add($node));
         $this->folderMapper->save($folder);
-        $this->response = $this->responseEmpty();
+        $this->response = $this->buildFlatResponse($folder);
     }
 
     /**
@@ -110,6 +111,30 @@ class Controller extends Base
             $folder->getCurriculumNodes()->filter(fn (Node\Model $existing) => $existing->getId() !== $node->getId()),
         );
         $this->folderMapper->save($folder);
-        $this->response = $this->responseEmpty();
+        $this->response = $this->buildFlatResponse($folder);
+    }
+
+    /**
+     * Returns a response representing the folder's curriculum nodes in a flat
+     * structure.
+     *
+     * @param Folder\Model $folder
+     * @return ResponseInterface
+     */
+    private function buildFlatResponse(Folder\Model $folder): ResponseInterface
+    {
+        return $this->responseAsJson($folder->getCurriculumNodes()->reindex());
+    }
+
+    /**
+     * Returns a response representing the folder's curriculum nodes in a tree
+     * structure.
+     *
+     * @param Folder\Model $folder
+     * @return ResponseInterface
+     */
+    private function buildTreeResponse(Folder\Model $folder): ResponseInterface
+    {
+        //
     }
 }

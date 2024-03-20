@@ -844,6 +844,8 @@ abstract class Mapper implements IMapper
         return new Collection(array($object));
     }
 
+
+
     /**
      * Processes `$collection` into a hierarchical structure.
      *
@@ -1013,6 +1015,35 @@ abstract class Mapper implements IMapper
             }
         }
         return $object;
+    }
+
+    /**
+     * Recursively finds all IDs of the family tree of `$ids`.
+     *
+     * This includes:
+     * * `$ids` themselves
+     * * all ancestors, up to `$maxAncestors` levels
+     * * all descendants, down to `$maxDescendants` levels
+     *
+     * @param array<int> $ids            IDs to find family tree for.
+     * @param string     $parentColumn   DB column which stores the parent ID.
+     * @param int        $maxAncestors   The max levels of ancestry to fetch:
+     *                                   defaults to 50.
+     * @param int        $maxDescendants The max levels of descent to fetch:
+     *                                   defaults to 50
+     * @return array<int>
+     */
+    public function findFamilyTreeIds(
+        array $ids,
+        string $parentColumn,
+        int $maxAncestors = 50,
+        int $maxDescendants = 50,
+    ): array {
+        return array_merge(
+            $ids,
+            $this->findAncestorIds($ids, $parentColumn, $maxAncestors),
+            $this->findDescendantIds($ids, $parentColumn, $maxDescendants),
+        );
     }
 
     /**

@@ -65,11 +65,8 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             // Fetch every node which is an ancestor or descendant of one of
             // this folder's nodes, and is still enabled:
             // only enabled nodes should be selectable.
-            $nodeMapper    = Node\Mapper::getInstance();
-            $parentColumn  = 'curriculum_node_parent_id';
-            $ancestorIds   = $nodeMapper->findAncestorIds($nodeIds, $parentColumn);
-            $descendantIds = $nodeMapper->findDescendantIds($nodeIds, $parentColumn);
-            $nodeIds       = array_merge($nodeIds, $descendantIds, $ancestorIds);
+            $nodeMapper = Node\Mapper::getInstance();
+            $nodeIds    = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
 
             // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
