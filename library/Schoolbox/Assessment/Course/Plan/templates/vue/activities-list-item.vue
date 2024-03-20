@@ -63,13 +63,13 @@ const activityLink = window.Vue.computed(() => {
                     props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
                 }}</a>
             </li>
+            <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
+                <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+            </li>
             <li>
                 <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.unit, props.activity)"
                     >Delete</a
                 >
-            </li>
-            <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
-                <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
             </li>
         </ul>
     </li>
