@@ -24,7 +24,7 @@ window.Vue.watch(
                 modalEl.value.close();
             }
         }
-    }
+    },
 );
 
 /**
@@ -42,7 +42,7 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
         onError((error) => {
             console.warn(error);
             if (unitPlannerStore.toastEl !== null) {
-                unitPlannerStore.toastEl.timeout("Server error", false, 5000);
+                unitPlannerStore.toastEl.timeout("Delete failed", false, 5000);
             }
         });
     }
@@ -54,7 +54,7 @@ deleteActivityStore.$onAction(({ name, after, onError }) => {
  * @returns {string} The button text
  */
 const deleteButtonText = window.Vue.computed(() =>
-    deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete"
+    deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
 );
 
 /**
