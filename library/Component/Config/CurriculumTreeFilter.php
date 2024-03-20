@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Aura\Router\Generator;
+use Schoolbox\Curriculum\Node\Mapper;
 
 /**
  * Curriculum tree filter component configuration.
@@ -24,6 +25,14 @@ class Component_Config_CurriculumTreeFilter extends Component_Config_Abstract
         $page->setVar(
             'COMPONENT_CONFIG_CURRICULUMTREEFILTER_SEARCH_NODE_ENDPOINT',
             $routeGenerator->generate('curriculumApi.searchNode'),
+        );
+
+        // Load currently selected nodes into curriculum selector
+        $mapper = Mapper::getInstance();
+        $nodes  = $mapper->findByColumn('id', explode(',', $configValue))->reindex();
+        $page->setVar(
+            'COMPONENT_CONFIG_CURRICULUMTREEFILTER_SEARCH_SELECTED',
+            Scrub::text(json_encode($nodes)),
         );
     }
 
