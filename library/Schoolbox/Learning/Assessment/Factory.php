@@ -178,11 +178,10 @@ class Factory
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
 
-        $workTypeMapper = new WorkTypeMapper();
         try {
-            $workType = $workTypeMapper->findById($post['workType']);
+            $workType = WorkTypeMapper::getInstance()->findById($post['workType']);
         } catch (MapperException) {
-            $workType = $workTypeMapper->findOneByColumn('name', WorkType::NONE);
+            $workType = WorkTypeMapper::getInstance()->findOneByColumn('name', WorkType::NONE);
         }
         $this->setWorkType($workType->getId());
 
