@@ -7,6 +7,8 @@
 
 declare(strict_types=1);
 
+use Aura\Router\Generator;
+
 /**
  * Curriculum tree filter component configuration.
  */
@@ -17,6 +19,11 @@ class Component_Config_CurriculumTreeFilter extends Component_Config_Abstract
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        // TODO: Implement parse() method.
+        /** @var Generator $routeGenerator */
+        $routeGenerator = $page->getDi()->get('router.generator');
+        $page->setVar(
+            'COMPONENT_CONFIG_CURRICULUMTREEFILTER_SEARCH_NODE_ENDPOINT',
+            $routeGenerator->generate('curriculumApi.searchNode'),
+        );
     }
 }
