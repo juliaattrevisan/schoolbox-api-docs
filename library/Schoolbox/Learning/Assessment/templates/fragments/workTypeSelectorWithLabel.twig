@@ -7,13 +7,21 @@
 <label for="workTypeSelector" class="required">Work Type</label>
 <select id="workTypeSelector" name="workType" required>
     {% for workType in allWorkTypes %}
-        <option value="{{ workType.id }}"
-            {% if assessment.workType.id ?? '' == workType.id or (workType.isNone and not assessment.workType) %}
-                selected="selected"
-            {% endif %}
-            {% if workType.isNone or courseManaged.isReadonly %}
-                disabled
-            {% endif %}
-        >{% if workType.isNone %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
+        {#
+         # Display the option if:
+         #  * it is not the 'None' option OR
+         #  * we are creating a new assessment (in which case use the text 'Please select a work type' instead of 'None') OR
+         #  * the current work type is 'None' (assessments used to be allowed to have no work type)
+         #}
+        {% if not workType.isNone or not assessment.workType or assessment.workType.isNone %}
+            <option value="{{ workType.id }}"
+                {% if assessment.workType.id ?? '' == workType.id or (workType.isNone and not assessment.workType) %}
+                    selected="selected"
+                {% endif %}
+                {% if workType.isNone or courseManaged.isReadonly %}
+                    disabled
+                {% endif %}
+            >{% if workType.isNone and not assessment.workType %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
+        {% endif %}
     {% endfor %}
 </select>
