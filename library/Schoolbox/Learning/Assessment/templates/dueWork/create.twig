@@ -32,19 +32,17 @@
         {% endif %}
 
         <div class="small-12 {{ columnCss }} columns">
-            <label class="required">Work Type</label>
-            <select name="workType" {% if courseManaged.isReadonly %}readonly{% else %}required{% endif %}>
-                {% for workType in allWorkTypes %}
-                    <option value="{{ workType.id }}"
-                        {% if assessment.workType.id ?? '' == workType.id or (workType.name == WORKTYPE_NONE_NAME and not assessment.workType) %}
-                            selected="selected"
-                        {% endif %}
-                        {% if workType.name == WORKTYPE_NONE_NAME or courseManaged.isReadonly %}
-                            disabled
-                        {% endif %}
-                    >{% if workType.name == WORKTYPE_NONE_NAME %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
-                {% endfor %}
-            </select>
+            {# ----------------------------------------------------------- #}
+            {# Work Type #}
+            {# ----------------------------------------------------------- #}
+            {% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+                with {
+                    allWorkTypes: allWorkTypes,
+                    assessment: assessment,
+                    courseManaged: courseManaged,
+                    WORKTYPE_NONE_NAME: WORKTYPE_NONE_NAME
+                } only
+            %}
         </div>
 
         {% if courseManaged.isVisible %}

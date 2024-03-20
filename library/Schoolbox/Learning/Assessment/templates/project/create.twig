@@ -22,19 +22,14 @@
 {# ----------------------------------------------------------- #}
 {# Work Type #}
 {# ----------------------------------------------------------- #}
-<label class="required">Work Type</label>
-<select name="workType" required>
-    {% for workType in allWorkTypes %}
-        <option value="{{ workType.id }}"
-            {% if assessment.workType.id ?? '' == workType.id or (workType.name == WORKTYPE_NONE_NAME and not assessment.workType) %}
-                selected="selected"
-            {% endif %}
-            {% if workType.name == WORKTYPE_NONE_NAME or courseManaged.isReadonly %}
-                disabled
-            {% endif %}
-        >{% if workType.name == WORKTYPE_NONE_NAME %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
-    {% endfor %}
-</select>
+{% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+    with {
+        allWorkTypes: allWorkTypes,
+        assessment: assessment,
+        courseManaged: courseManaged,
+        WORKTYPE_NONE_NAME: WORKTYPE_NONE_NAME
+    } only
+%}
 
 <label for="description">Description</label>
 <textarea id="description" name="description">{{ assessment.description }}</textarea>
