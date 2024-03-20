@@ -1,10 +1,7 @@
-<!-- selectedNodes below for testing only -->
-{% set selectedNodes = [{"id":127,"name":"Early Years Learning Framework V2.0","code":"EYLF","description":"<p><a href=\"https://www.acecqa.gov.au/sites/default/files/2023-01/EYLF-2022-V2.0.pdf\">https://www.acecqa.gov.au/sites/default/files/2023-01/EYLF-2022-V2.0.pdf</a></p>","reference":null,"children":[],"breadcrumb":"","uuid":null,"enabled":true}] %}
-
 <div data-overview-component>
     <overview-component
         :nodes="{{ (nodes ?? []) | json_encode }}"
-        :folder-id="2"
+        :folder-id="{{ context.id }}"
         :is-read-only="false"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"

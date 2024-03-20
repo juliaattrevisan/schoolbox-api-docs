@@ -101,6 +101,8 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             [
                 'context'           => $this->getContext(),
                 'nodes'             => $this->curriculumNodes,
+                // Placeholder value for selected nodes: just all selected nodes
+                'selectedNodes'     => $this->getContext()->getCurriculumNodes()->reindex(),
                 'curriculumTagging' => $this->curriculumTagging,
             ]
         );
