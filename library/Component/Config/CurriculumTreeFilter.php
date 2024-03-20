@@ -26,4 +26,19 @@ class Component_Config_CurriculumTreeFilter extends Component_Config_Abstract
             $routeGenerator->generate('curriculumApi.searchNode'),
         );
     }
+
+    /**
+     * `$value` should always be an array: reduce it to a comma-separated list.
+     *
+     * @param mixed                        $value
+     * @param Component_ControllerAbstract $controller
+     * @return mixed
+     */
+    public function dehydrate($value, Component_ControllerAbstract $controller)
+    {
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        return $value;
+    }
 }
