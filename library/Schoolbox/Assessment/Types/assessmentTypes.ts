@@ -17,6 +17,7 @@ export type Activity = {
         modify: string;
         modifyContent: string | null; // learnosity modify contents
         delete: string;
+        export: string | null; // Spec assessments can be exported
     };
     completionCount: number | null;
     studentCount: number | null;
