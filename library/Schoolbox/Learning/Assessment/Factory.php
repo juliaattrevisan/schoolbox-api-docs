@@ -33,9 +33,12 @@ use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkTypeModel;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -155,14 +158,14 @@ class Factory
      * @param array            $post (an array of post vars from the create/update forms)
      * @param string|null      $assessmentType
      * @param IAssessable|null $original
-     * @throws UnexpectedValueException
+     * @throws MapperException
+     * @throws Deleted
      */
     public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
     {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
-        $this->setWorkType((int)trim($post['workType'])); // Note assessment.work_type_id cannot be null.
         $this->setDescription(trim($post['description'] ?? ''));
         $this->setCreator($creator);
         $this->setWeight((float)(trim($post['weight'] ?? '')));
@@ -174,6 +177,19 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
+
+        $workTypeMapper = new WorkTypeMapper();
+        try {
+            $workType = $workTypeMapper->findById($post['workType']);
+        } catch (MapperException) {
+            $workType = null;
+        }
+        if ($workType === null) {
+            // The client supplied an invalid work type, so try to use the WorkTypeModel::WORKTYPE_NONE_NAME work type.
+            // This will throw a MapperException if that work type does not exist in the database.
+            $workType = $workTypeMapper->findOneByColumn('name', WorkTypeModel::WORKTYPE_NONE_NAME);
+        }
+        $this->setWorkType($workType->getId());
 
         /* Projects need this to instantiate
          */
