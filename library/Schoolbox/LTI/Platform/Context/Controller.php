@@ -193,7 +193,7 @@ class Controller extends BaseController
     /**
      * Generate a deep linking request for the given folder and tool.
      *
-     * @api   GET /lti-platform/context//folder/{folderId}/deep-linking-request/{toolId}
+     * @api   GET /lti-platform/context/folder/{folderId}/deep-linking-request/{toolId}
      * @since 21.1.0
      *
      * @param ToolModel $tool

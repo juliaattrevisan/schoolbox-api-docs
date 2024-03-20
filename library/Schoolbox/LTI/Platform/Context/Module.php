@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\Context;
 
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Component_Homepage_Factory;
@@ -40,6 +41,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        $loggedInPermission = new IsLoggedIn();
         $this->register(
             self::METHOD_GET,
             '/folder/{folderId}/memberships',
@@ -57,7 +59,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/folder/{folderId}/launch/component/{componentId}',
             'getLaunchResourceLinkRequestForFolderAndComponent',
-            null,
+            $loggedInPermission,
             function (array $params) {
                 try {
                     /** @var Component_InstanceMapper $componentInstanceMapper */
@@ -85,7 +87,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/folder/{folderId}/deep-linking-request/{toolId}',
             'getGenerateDeepLinkingRequestForFolder',
-            null,
+            $loggedInPermission,
             function (array $params) {
                 try {
                     return [
