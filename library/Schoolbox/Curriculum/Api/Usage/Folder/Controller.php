@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  */
 class Controller extends Base
 {
+    private const MAX_ANCESTORS   = 50;
+    private const MAX_DESCENDANTS = 50;
+
     /**
      * Constructor
      *
@@ -65,7 +68,7 @@ class Controller extends Base
 
         $folder = $folder->setCurriculumNodes($newNodesFromDb);
         $this->folderMapper->save($folder);
-        $this->response = $this->buildFlatResponse($folder);
+        $this->response = $this->buildResponse($folder);
     }
 
     /**
@@ -87,7 +90,7 @@ class Controller extends Base
         }
         $folder = $folder->setCurriculumNodes($folder->getCurriculumNodes()->add($node));
         $this->folderMapper->save($folder);
-        $this->response = $this->buildFlatResponse($folder);
+        $this->response = $this->buildResponse($folder);
     }
 
     /**
@@ -111,7 +114,23 @@ class Controller extends Base
             $folder->getCurriculumNodes()->filter(fn (Node\Model $existing) => $existing->getId() !== $node->getId()),
         );
         $this->folderMapper->save($folder);
-        $this->response = $this->buildFlatResponse($folder);
+        $this->response = $this->buildResponse($folder);
+    }
+
+    /**
+     * Returns a response representing the folder's curriculum nodes:
+     * * a tree if query string value `returnFormat` is `tree`
+     * * a flat structure otherwise
+     *
+     * @param Folder\Model $folder
+     * @return ResponseInterface
+     */
+    private function buildResponse(Folder\Model $folder): ResponseInterface
+    {
+        return match (strtolower($this->requestQuery->get('returnFormat', ''))) {
+            'tree' => $this->buildTreeResponse($folder),
+            default => $this->buildFlatResponse($folder),
+        };
     }
 
     /**
@@ -138,7 +157,18 @@ class Controller extends Base
         return $this->responseAsJson(
             $this->nodeMapper->getCollectionAsTree(
                 $this->nodeMapper->findByColumnList([
-                    'id'      => $folder->getCurriculumNodes()->getPropertyValues('id'),
+                    'id'      => $this->nodeMapper->findFamilyTreeIds(
+                        $folder->getCurriculumNodes()->getPropertyValues('id'),
+                        'curriculum_node_parent_id',
+                        min(
+                            self::MAX_ANCESTORS,
+                            max(0, $this->requestQuery->getInt('ancestors', self::MAX_ANCESTORS)),
+                        ),
+                        min(
+                            self::MAX_DESCENDANTS,
+                            max(0, $this->requestQuery->getInt('descendants', self::MAX_DESCENDANTS)),
+                        ),
+                    ),
                     'enabled' => true,
                 ]),
             ),
