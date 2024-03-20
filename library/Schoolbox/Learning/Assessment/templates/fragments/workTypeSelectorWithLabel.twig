@@ -3,18 +3,17 @@
  #    allWorkTypes
  #    assessment
  #    courseManaged
- #    WORKTYPE_NONE_NAME
  ##}
 <label for="workTypeSelector" class="required">Work Type</label>
 <select id="workTypeSelector" name="workType" required>
     {% for workType in allWorkTypes %}
         <option value="{{ workType.id }}"
-            {% if assessment.workType.id ?? '' == workType.id or (workType.name == WORKTYPE_NONE_NAME and not assessment.workType) %}
+            {% if assessment.workType.id ?? '' == workType.id or (workType.isNone and not assessment.workType) %}
                 selected="selected"
             {% endif %}
-            {% if workType.name == WORKTYPE_NONE_NAME or courseManaged.isReadonly %}
+            {% if workType.isNone or courseManaged.isReadonly %}
                 disabled
             {% endif %}
-        >{% if workType.name == WORKTYPE_NONE_NAME %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
+        >{% if workType.isNone %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
     {% endfor %}
 </select>

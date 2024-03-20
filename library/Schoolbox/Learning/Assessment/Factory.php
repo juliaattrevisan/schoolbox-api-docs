@@ -34,7 +34,7 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkTypeModel;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -185,9 +185,9 @@ class Factory
             $workType = null;
         }
         if ($workType === null) {
-            // The client supplied an invalid work type, so try to use the WorkTypeModel::WORKTYPE_NONE_NAME work type.
+            // The client supplied an invalid work type, so try to use the WorkType::NONE work type.
             // This will throw a MapperException if that work type does not exist in the database.
-            $workType = $workTypeMapper->findOneByColumn('name', WorkTypeModel::WORKTYPE_NONE_NAME);
+            $workType = $workTypeMapper->findOneByColumn('name', WorkType::NONE);
         }
         $this->setWorkType($workType->getId());
 
