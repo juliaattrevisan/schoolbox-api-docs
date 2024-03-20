@@ -491,7 +491,7 @@ class Factory
                 ->setUpdatedAt(Alaress_Date_Format::now());
 
             if ($this->workType) {
-                $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+                $assessment->setWorkType((new WorkType())->setId($this->workType));
             } else {
                 $assessment->setWorkType(null);
             }
