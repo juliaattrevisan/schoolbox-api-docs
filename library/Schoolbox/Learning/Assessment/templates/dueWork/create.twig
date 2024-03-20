@@ -42,7 +42,7 @@
                         {% if workType.name == WORKTYPE_NONE_NAME or courseManaged.isReadonly %}
                             disabled
                         {% endif %}
-                    >{{ workType.name }}</option>
+                    >{% if workType.name == WORKTYPE_NONE_NAME %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
                 {% endfor %}
             </select>
         </div>
