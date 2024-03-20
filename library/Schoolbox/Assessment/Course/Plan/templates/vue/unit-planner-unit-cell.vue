@@ -66,7 +66,7 @@ const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 const contentIsSaved = window.Vue.computed(() => {
-    return !textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id];
+    return textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id] === undefined;
 });
 
 const contentIsFocused = window.Vue.computed(() => {
