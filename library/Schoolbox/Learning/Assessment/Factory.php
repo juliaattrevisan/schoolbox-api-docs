@@ -182,11 +182,6 @@ class Factory
         try {
             $workType = $workTypeMapper->findById($post['workType']);
         } catch (MapperException) {
-            $workType = null;
-        }
-        if ($workType === null) {
-            // The client supplied an invalid work type, so try to use the WorkType::NONE work type.
-            // This will throw a MapperException if that work type does not exist in the database.
             $workType = $workTypeMapper->findOneByColumn('name', WorkType::NONE);
         }
         $this->setWorkType($workType->getId());
