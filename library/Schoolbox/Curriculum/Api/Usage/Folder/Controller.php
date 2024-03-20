@@ -135,6 +135,13 @@ class Controller extends Base
      */
     private function buildTreeResponse(Folder\Model $folder): ResponseInterface
     {
-        //
+        return $this->responseAsJson(
+            $this->nodeMapper->getCollectionAsTree(
+                $this->nodeMapper->findByColumnList([
+                    'id'      => $folder->getCurriculumNodes()->getPropertyValues('id'),
+                    'enabled' => true,
+                ]),
+            ),
+        );
     }
 }
