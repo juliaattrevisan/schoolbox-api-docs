@@ -19,14 +19,14 @@ const { ltiAssessmentsEnabled } = window.sbProps;
 <template>
     <ul :id="props.contentId" class="f-dropdown" data-dropdown-content>
         <li>
-            <a :href="getReturnUrl(`${props.createUrl}?type=project`)" class="icon-project">{{
-                store.locale?.project.proper || "Project"
-            }}</a>
+            <a :href="getReturnUrl(`${props.createUrl}?type=project`)" class="icon-project">
+                {{ store.locale?.project.proper || "Project" }}
+            </a>
         </li>
         <li>
-            <a :href="getReturnUrl(`${props.createUrl}?type=dueWork`)" class="icon-due-work">{{
-                store.locale?.dueWork.proper || "Due Work"
-            }}</a>
+            <a :href="getReturnUrl(`${props.createUrl}?type=dueWork`)" class="icon-due-work">
+                {{ store.locale?.dueWork.proper || "Due Work" }}
+            </a>
         </li>
         <li>
             <a :href="getReturnUrl(`${props.createUrl}?type=quiz`)" class="icon-quiz">Quiz</a>
