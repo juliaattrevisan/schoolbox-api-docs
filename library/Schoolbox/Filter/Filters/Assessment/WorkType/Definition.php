@@ -28,11 +28,8 @@ class Definition extends Filter\AbstractDefinition
     // The name to expose in the UI
     protected const NAME = 'Work Type';
 
-    // If assessment does not have a WorkType at all
-    public const KEY_NONE = 'none';
-
     /**
-     * Indexed by workType.id
+     * Indexed by workType.id.
      *
      * @var GenericCollection|WorkType\Model[]
      */
@@ -63,9 +60,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [
-            self::KEY_NONE,
-        ];
+        return [];
     }
 
 
@@ -115,9 +110,6 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        if (self::KEY_NONE === $key) {
-            return '(none)';
-        }
         return $this->workTypes[$key]->getName();
     }
 
