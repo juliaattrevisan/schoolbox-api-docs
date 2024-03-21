@@ -20,7 +20,7 @@ const store = useStore(props.folderId);
  * to gradually add more marginLeft to indicate node level depth
  * @returns {number} - the calculated marginLeft value
  */
-const marginLeft = window.Vue.computed(() => `calc(${props.depth * 1}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 1}rem + 1rem)`);
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -61,13 +61,17 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div>
+    <div classs="">
         <div
-            class="node l-flex-row l-flex--justify-space l-flex--align-center l-flex--no-wrap"
+            class="node l-flex-row l-flex--justify-space l-flex--no-wrap l-pad-xs--vert"
             :style="{ marginLeft: marginLeft }"
         >
             <div class="l-flex-row l-flex--no-wrap l-gap-xs">
-                <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
+                <a
+                    v-if="hasCode"
+                    class="f-no-margins l-flex__item--0-shrink"
+                    :href="`#${props.node.id}`"
+                    @click.prevent="onCodeSelected"
                     >[{{ props.node.code }}]
                 </a>
                 <h3 class="f-no-margins">{{ props.node.name }}</h3>
@@ -96,11 +100,16 @@ function onRemoveSelected() {
 
 <style scoped>
 .node {
-    min-height: 2.5rem;
+    /* ssssssssssssssssssssssssssssssssssssssssmin-height: 2.5rem; */
 }
 
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
+}
+
+.remove-node {
+    max-height: 2.5rem;
+    width: 2.5rem;
 }
 
 .list-enter-active,
