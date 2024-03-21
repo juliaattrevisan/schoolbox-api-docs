@@ -18,6 +18,7 @@ const props = defineProps<Props>();
                 :content-id="`dropdown-unitplanner-activity-${props.column.id}-${props.unit.id}`"
                 button-text="Create Activity"
                 move-to="#unitplanner-dropdown-container"
+                is-component-action
             ></sbx-pop-out>
             <activities-create-inner
                 :content-id="`dropdown-unitplanner-activity-${props.column.id}-${props.unit.id}`"
