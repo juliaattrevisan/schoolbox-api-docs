@@ -59,33 +59,37 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div
-        class="node l-flex-row l-flex--justify-space l-flex--align-center l-flex--no-wrap"
-        :style="{ marginLeft: marginLeft }"
-    >
-        <div class="l-flex-row l-flex--no-wrap l-gap-xs">
-            <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
-                >[{{ props.node.code }}]
-            </a>
-            <h3 class="f-no-margins">{{ props.node.name }}</h3>
+    <div>
+        <div
+            class="node l-flex-row l-flex--justify-space l-flex--align-center l-flex--no-wrap"
+            :style="{ marginLeft: marginLeft }"
+        >
+            <div class="l-flex-row l-flex--no-wrap l-gap-xs">
+                <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
+                    >[{{ props.node.code }}]
+                </a>
+                <h3 class="f-no-margins">{{ props.node.name }}</h3>
+            </div>
+            <button
+                v-if="showRemove"
+                class="remove-node f-no-icon-button icon-close l-flex-row l-flex--center"
+                :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
+                :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
+                @click.prevent="onRemoveSelected"
+            ></button>
         </div>
-        <button
-            v-if="showRemove"
-            class="f-no-icon-button icon-close l-flex-row l-flex--center"
-            :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
-            :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
-            @click.prevent="onRemoveSelected"
-        ></button>
+        <template v-if="showChildren">
+            <transition-group name="list" tag="div">
+                <fn-node
+                    v-for="viewNode in props.node.children"
+                    :key="viewNode.id"
+                    :node="viewNode"
+                    :folder-id="props.folderId"
+                    :depth="props.depth + 1"
+                />
+            </transition-group>
+        </template>
     </div>
-    <template v-if="showChildren">
-        <fn-node
-            v-for="viewNode in props.node.children"
-            :key="viewNode.id"
-            :node="viewNode"
-            :folder-id="props.folderId"
-            :depth="props.depth + 1"
-        />
-    </template>
 </template>
 
 <style scoped>
@@ -95,5 +99,14 @@ function onRemoveSelected() {
 
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
+}
+
+.list-enter-active,
+.list-leave-active {
+    transition: opacity 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
 }
 </style>

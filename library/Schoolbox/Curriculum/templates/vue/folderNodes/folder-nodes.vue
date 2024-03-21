@@ -17,9 +17,18 @@ const depth = window.Vue.ref(0); // to increment each time we go down the node t
 </script>
 
 <template>
-    <div class="l-flex-col l-pad-s--horiz l-pad-s--top">
+    <transition-group name="list" tag="div" class="l-flex-col l-pad-s--horiz l-pad-s--top">
         <fn-node v-for="node in store().nodes" :key="node.id" :node="node" :folder-id="props.folderId" :depth="depth" />
-    </div>
+    </transition-group>
 </template>
 
-<style scoped></style>
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+    transition: opacity 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+}
+</style>
