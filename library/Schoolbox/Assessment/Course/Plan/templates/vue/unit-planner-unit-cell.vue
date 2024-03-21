@@ -217,14 +217,15 @@ window.Vue.onUnmounted(() => {
                 </div>
             </div>
 
-            <template v-if="props.column.type === ColumnType.OVERVIEW">
-                <textbox-action
-                    ref="componentActionEl"
-                    :unit="props.unit"
-                    :column="props.column"
-                    @modify-clicked="textboxContentComponent?.focusEditor"
-                />
-            </template>
+            <div ref="componentActionEl">
+                <template v-if="props.column.type === ColumnType.OVERVIEW">
+                    <textbox-action
+                        :unit="props.unit"
+                        :column="props.column"
+                        @modify-clicked="textboxContentComponent?.focusEditor"
+                    />
+                </template>
+            </div>
         </div>
     </div>
 </template>
