@@ -5,7 +5,7 @@
  #    courseManaged
  ##}
 <label for="workTypeSelector" class="required">Work Type</label>
-<select id="workTypeSelector" name="workType" required>
+<select id="workTypeSelector" name="workType" {% if assessment.familyName == 'dueWork' and courseManaged.isReadonly %}disabled{% else %}required{% endif %}>
     {% for workType in allWorkTypes %}
         {#
          # Display the option if:
@@ -17,9 +17,8 @@
             <option value="{{ workType.id }}"
                 {% if assessment.workType.id ?? '' == workType.id or (workType.isNone and not assessment.workType) %}
                     selected="selected"
-                {% endif %}
-                {% if workType.isNone or courseManaged.isReadonly %}
-                    disabled
+                {% else %}
+                    {% if workType.isNone or courseManaged.isReadonly %}disabled{% endif %}
                 {% endif %}
             >{% if workType.isNone and not assessment.workType %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
         {% endif %}
