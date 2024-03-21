@@ -108,26 +108,14 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      */
     function removeActivityFromUnit(unitToWhichActivityBelongs: Unit, activityToRemove: Activity): void {
         // Find unit in units.
-        let foundUnit: Unit | null = null;
-        for (const unit of units.value) {
-            if (unit.id === unitToWhichActivityBelongs.id) {
-                foundUnit = unit;
-            }
-        }
-        if (foundUnit === null) {
-            // Could not find unit, so do nothing.
+        const foundUnit = units.value.find((unit) => unit.id === unitToWhichActivityBelongs.id) as Unit | undefined;
+        if (foundUnit === undefined) {
             return;
         }
 
         // Find activity in units[index].activities.
-        let foundActivity = null;
-        for (const activity of foundUnit.activities) {
-            if (activity.id === activityToRemove.id) {
-                foundActivity = activity;
-            }
-        }
-        if (foundActivity === null) {
-            // Could not find unit, so do nothing.
+        const foundActivity = foundUnit.activities.find((activity) => activity.id === activityToRemove.id);
+        if (foundActivity === undefined) {
             return;
         }
 
