@@ -24,7 +24,6 @@ use function array_merge;
  */
 class Definition extends Filter\AbstractDefinition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Work Type';
 
