@@ -6,6 +6,7 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
@@ -15,12 +16,11 @@ import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
-    nodes: Node[]; // The curriculum nodes trees to display
     folderId: number; // The folder id to display the nodes for
-    dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
+    nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
+    dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
-    formValueName: string; // the input to update with the selected nodes
     isSuperUser: boolean; // Whether the user is a super user
     hasTagging: boolean; // Whether curriculum tagging is enabled
     localeUnit: string; // the localised term for a Unit
@@ -29,7 +29,8 @@ const props = defineProps<Props>();
 
 const store = useStore(props.folderId);
 const selectorStore = useSelectorStore(); // The store for the curriculum selector modal
-const modalStore = useModalStore();
+const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
+const modalStore = useModalStore(); // to open the modal
 
 /**
  * Store the nodes and start loading the initial curriculum data
@@ -37,8 +38,24 @@ const modalStore = useModalStore();
  */
 window.Vue.onMounted(() => {
     store().init(props.nodes, props.selectedNodes);
-    selectorStore.init(props); // note props.selectedNodes is passed in here, so the modal is kept up to date with the latest changes
+    selectorStore.init({
+        isReadOnly: props.isReadOnly,
+        formValueName: "", // not required in this context
+        dataEndpoint: props.dataEndpoint,
+        selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
+    });
 });
+
+/**
+ * to notify the selectedNodes linked to the curriculum selector modal
+ * that the selected nodes have been updated
+ */
+window.Vue.watch(
+    () => store().selectedNodes,
+    () => {
+        selectedNodesStore.update(store().selectedNodes);
+    },
+);
 
 /**
  * To open the curriculum code mapping modal
