@@ -37,7 +37,7 @@ const modalStore = useModalStore(); // to open the modal
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store().init(props.nodes, props.selectedNodes);
+    store().init(props.nodes, props.selectedNodes, props.isReadOnly);
     selectorStore.init({
         isReadOnly: props.isReadOnly,
         formValueName: "", // not required in this context

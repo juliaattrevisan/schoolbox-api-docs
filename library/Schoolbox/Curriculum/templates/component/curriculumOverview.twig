@@ -4,7 +4,7 @@
         :nodes="{{ (nodes ?? []) | json_encode }}"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
-        :is-read-only="false"
+        :is-read-only="{{ readonly ? 'true' : 'false' }}"
         :is-super-user="{{ USER.isSuperuser ? "true" : "false" }}"
         :has-tagging="{{ curriculumTagging ? "true" : "false" }}"
         locale-unit="{{ locale.unit }}"

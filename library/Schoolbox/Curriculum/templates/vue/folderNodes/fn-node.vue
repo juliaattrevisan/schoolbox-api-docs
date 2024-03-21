@@ -40,7 +40,9 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * or we are at the root level node, or if the search is active
  * @returns { boolean }
  */
-const showRemove = window.Vue.computed(() => hasCode.value && store().selectedNodeIds.includes(props.node.id));
+const showRemove = window.Vue.computed(
+    () => !store().isReadOnly && hasCode.value && store().selectedNodeIds.includes(props.node.id),
+);
 
 /**
  * When the code is selected, open the curriculum details modal
