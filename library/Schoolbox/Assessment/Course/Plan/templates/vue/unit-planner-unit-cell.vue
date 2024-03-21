@@ -142,6 +142,7 @@ window.Vue.onUnmounted(() => {
                         v-for="activity in props.unit.activities"
                         ref="activityListItem"
                         :key="activity.id"
+                        :unit="unit"
                         :activity="activity"
                     />
                 </ul>

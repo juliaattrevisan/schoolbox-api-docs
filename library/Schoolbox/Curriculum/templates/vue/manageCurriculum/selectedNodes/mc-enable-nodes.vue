@@ -20,7 +20,7 @@ window.Vue.watch(
     () => enableNodesStore.isOpen,
     (isOpen) => {
         isOpen ? modalEl.value.open() : modalEl.value.close();
-    }
+    },
 );
 
 /**
@@ -42,7 +42,7 @@ enableNodesStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
-            // store.toastEl.value.timeout('Unable to enabled node', false, 5000);
+            store.toastEl.value.timeout("Unable to process request", false, 5000);
         });
     }
 });

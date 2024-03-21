@@ -5,6 +5,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { Unit } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
@@ -18,7 +19,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     const units = window.Vue.ref<Unit[]>([]);
     const routeFolderSequence = window.Vue.ref<string | null>(null);
-    const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
+    const toastEl = window.Vue.ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     // Allow the refs to be passed in instead of creating and monitoring two
     let unitPlannerContainerEl: Ref<HTMLElement>;
@@ -119,7 +120,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                 }
 
                 return acc + unexpandedUnitHeight;
-            }, 0),
+            }, 0)
         );
         return Math.max(minDragHeight, Math.min(targetHeight, maxDragHeight));
     });
@@ -185,7 +186,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         $unitPlannerContainerEl: Ref<HTMLElement>,
         $headerRowHeight: Ref<number>,
         $unitPlannerContainerScrollTop: Ref<number>,
-        $toastEl: typeof Toast,
+        $toastEl: typeof Toast
     ) {
         units.value = $units;
         routeFolderSequence.value = $routeFolderSequence;
@@ -215,7 +216,10 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
             return; // User does not have access to resequence
         }
 
-        toastEl.value.activate("Saving...");
+        if (toastEl.value !== null) {
+            toastEl.value.activate("Saving...");
+        }
+
         try {
             const currentSequence = orderedUnits.value.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -242,9 +246,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
                 throw new Error(responseText);
             }
 
-            toastEl.value.timeout("Save successful", true, 2000);
+            if (toastEl.value !== null) {
+                toastEl.value.timeout("Save successful", true, 2000);
+            }
         } catch (error) {
-            toastEl.value.timeout(error, false, 2000);
+            if (toastEl.value !== null) {
+                toastEl.value.timeout(error, false, 2000);
+            }
         }
     }
 
@@ -327,6 +335,42 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragInitial.value = null;
     }
 
+    /**
+     * @param {Unit} unitToWhichActivityBelongs The unit to which the activity to be deleted belongs
+     * @param {Activity} activityToRemove The activity to be deleted
+     * @returns {void}
+     */
+    function removeActivityFromUnit(unitToWhichActivityBelongs: Unit, activityToRemove: Activity): void {
+        // Find unit in units.
+        let foundUnit: Unit | null = null;
+        for (const unit of units.value) {
+            if (unit.id === unitToWhichActivityBelongs.id) {
+                foundUnit = unit;
+            }
+        }
+        if (foundUnit === null) {
+            // Could not find unit, so do nothing.
+            return;
+        }
+
+        // Find activity in units[index].activities.
+        let foundActivity = null;
+        for (const activity of foundUnit.activities) {
+            if (activity.id === activityToRemove.id) {
+                foundActivity = activity;
+            }
+        }
+        if (foundActivity === null) {
+            // Could not find unit, so do nothing.
+            return;
+        }
+
+        // Remove the found activity.
+        foundUnit.activities = foundUnit.activities.filter((a) => {
+            return a.id !== activityToRemove.id;
+        });
+    }
+
     return {
         init,
         isDragging,
@@ -348,5 +392,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         orderedUnits,
         toggleExpanded,
         resequenceUnits,
+        removeActivityFromUnit,
     };
 });

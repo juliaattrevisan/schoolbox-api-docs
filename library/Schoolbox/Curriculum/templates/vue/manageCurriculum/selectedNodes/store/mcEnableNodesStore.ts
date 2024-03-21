@@ -46,7 +46,7 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
                     body: JSON.stringify({
                         enabled: enabled.value,
                     }),
-                })
+                }),
             );
         });
         return fetchList;
@@ -74,19 +74,23 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
         try {
             isProcessing.value = true;
             const nodeEnables = await Promise.all(getFetches());
+            isProcessing.value = false;
+
             const enableResponses = nodeEnables.map((response) => response.ok);
             const isAllResponsesOk = enableResponses.every((response) => response === true);
             if (isAllResponsesOk) {
-                const successMessage = getSuccessMessage();
+                const successMessage = getSuccessMessage(); // Must get success message before selectedNodesStore is emptied following enableNodes() below.
                 useSelectedNodesStore().enableNodes();
-                isProcessing.value = false;
                 cancel();
                 return successMessage;
             }
-            throw new Error();
         } catch (error) {
-            console.warn(error);
+            throw new Error();
         }
+
+        // It is expected that the request will be sent, and all responses will be okay.
+        // So if execution gets to here, an error has occurred.
+        throw new Error();
     }
 
     return {

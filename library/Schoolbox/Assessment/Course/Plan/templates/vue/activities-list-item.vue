@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
+import type { Unit } from "./unitPlannerTypes";
+
+const deleteActivityStore = useDeleteActivityStore();
 
 interface Props {
+    unit: Unit; // The id of the unit to which the activity belongs.
     activity: Activity;
 }
 
 const props = defineProps<Props>();
 
 /**
- * Get the current url; these redirects are used after backend processing
- * so you can return to your current location afterwards
+ * Get the current url; these redirects are used after backend processing,
+ * so you can return to your current location afterward.
  *
  * Use the base64encoded version of the url's pathname, so it can work in
- * conjunection with Class Redirect in the back end
+ * conjunction with Class Redirect in the back end
  * @param {string} url - The url to go to
  * @returns {string} - The url with the returnUrl parameter appended
  */
@@ -60,6 +65,11 @@ const activityLink = window.Vue.computed(() => {
             </li>
             <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
                 <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+            </li>
+            <li>
+                <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.unit, props.activity)"
+                    >Delete</a
+                >
             </li>
         </ul>
     </li>

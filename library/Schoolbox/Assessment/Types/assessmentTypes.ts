@@ -16,6 +16,7 @@ export type Activity = {
         summary: string;
         modify: string;
         modifyContent: string | null; // learnosity modify contents
+        delete: string;
     };
     completionCount: number | null;
     studentCount: number | null;

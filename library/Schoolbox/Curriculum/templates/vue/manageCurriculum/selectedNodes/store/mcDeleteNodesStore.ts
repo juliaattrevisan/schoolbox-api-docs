@@ -33,7 +33,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                })
+                }),
             );
         });
         return fetchList;
@@ -66,6 +66,8 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
         try {
             isProcessing.value = true;
             const nodeDeletions = await Promise.all(getFetches());
+            isProcessing.value = false;
+
             const deleteResponses = nodeDeletions.map((response) => response.ok);
             const isAllResponsesOk = deleteResponses.every((response) => response === true);
             if (isAllResponsesOk) {
@@ -74,12 +76,13 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
                 cancel();
                 return successMessage;
             }
-            throw new Error();
         } catch (error) {
             throw new Error();
-        } finally {
-            isProcessing.value = false;
         }
+
+        // It is expected that the request will be sent, and all responses will be okay.
+        // So if execution gets to here, an error has occurred.
+        throw new Error();
     }
 
     return {
