@@ -96,11 +96,11 @@ class ExternalEvents extends Base implements IExternalEvents
         $whereQuery = "
             NOT (
                 CASE
-                    WHEN ec.end_time IS NOT NULL THEN ec.end_date + CAST(ec.end_time AS TIME(0))
+                    WHEN ec.end_time IS NOT NULL THEN SMALLDATETIMEFROMPARTS(DATEPART(year, ec.end_date), DATEPART(month, ec.end_date), DATEPART(day, ec.end_date), DATEPART(hour, ec.end_time), DATEPART(minute, ec.end_time))
                     ELSE ec.end_date
                 END < :startTime{$paramSuffix} OR
                 CASE
-                    WHEN ec.start_time IS NOT NULL THEN ec.start_date + CAST(ec.start_time AS TIME(0))
+                    WHEN ec.start_time IS NOT NULL THEN SMALLDATETIMEFROMPARTS(DATEPART(year, ec.start_date), DATEPART(month, ec.start_date), DATEPART(day, ec.start_date), DATEPART(hour, ec.start_time), DATEPART(minute, ec.start_time))
                     ELSE ec.start_date
                 END >= :endTime{$paramSuffix}
             )
