@@ -24,6 +24,14 @@ const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
 
 /**
+ * Focus the editor
+ */
+function focusEditor() {
+    if (!editorContentEl.value) return;
+    editorContentEl.value.focus();
+}
+
+/**
  * When a new editor is created
  * @param { EditorCreatedEventInfo } event - the editor created event data
  */
@@ -89,6 +97,9 @@ window.Vue.onBeforeMount(() => {
     document.addEventListener("DOMContentLoaded", initEditor);
 });
 window.Vue.onMounted(initEditor);
+
+// Allow the parent component to focus the editor
+defineExpose({ focusEditor });
 </script>
 
 <template>

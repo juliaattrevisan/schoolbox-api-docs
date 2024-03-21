@@ -4,12 +4,12 @@ import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
+import TextboxAction from "./textbox-action.vue";
 import ActivitiesListItem from "./activities-list-item.vue";
 
 gsap.registerPlugin(Draggable);
@@ -23,11 +23,6 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
-const textboxStore = useUnitPlannerTextboxStore();
-
-const storeUnit = window.Vue.computed(() => {
-    return store.units.find((unit) => unit.id === props.unit.id);
-});
 
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
@@ -35,7 +30,7 @@ const contentHeight = window.Vue.ref(0);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
-const unitMaxContentHeight = window.Vue.computed(() => {
+const contentMaxHeight = window.Vue.computed(() => {
     // unitContentHeights is a map of unit IDs to column IDs to heights
     if (!store.unitContentHeights[props.unit.id]) return 0;
     return Math.max(...Object.values(store.unitContentHeights[props.unit.id]).map((height) => height || 0));
@@ -47,7 +42,7 @@ const cellMaxHeight = window.Vue.computed(() => {
     if (dragStore.dragCurrentUnitNextTick === props.unit) return dragStore.dragUnitHeight;
 
     // If the unit is expanded, allow it to grow to fit its content
-    if (store.expandedUnits.includes(props.unit.id)) return unitMaxContentHeight.value;
+    if (store.expandedUnits.includes(props.unit.id)) return contentMaxHeight.value;
 
     // Otherwise, limit the height to the unexpanded height
     return store.unexpandedUnitHeight;
@@ -65,10 +60,6 @@ const showViewMoreInner = window.Vue.computed(() => {
 const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
-const contentIsSaved = window.Vue.computed(() => {
-    return textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id] === undefined;
-});
-
 const contentIsFocused = window.Vue.computed(() => {
     return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
 });
@@ -82,46 +73,19 @@ function updateContentHeight() {
     store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
 }
 
-/**
- * When the modify button is clicked.
- */
-function onOverviewModifyClicked() {
-    if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
-    if (!contentEl.value) return;
-
-    const editorEl = contentEl.value.querySelector(".editor-content") as HTMLElement;
-    if (!editorEl) return;
-
-    editorEl.focus();
-}
-
-const isOverviewContentSaving = window.Vue.ref(false);
-
-/**
- * When the save button is clicked.
- */
-function onOverviewSaveClicked() {
-    if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
-    isOverviewContentSaving.value = true;
-
-    textboxStore
-        .saveTextboxContent(props.unit.id, props.column)
-        .catch((err) => {
-            throw err;
-        })
-        .finally(() => {
-            isOverviewContentSaving.value = false;
-        });
-}
+// Provide access to exposed focusEditor from the TextboxContent component
+// Only relevant when props.column.type === ColumnType.OVERVIEW
+const textboxContentComponent = window.Vue.ref<(typeof TextboxContent & { focusEditor: () => void }) | null>(null);
 
 /**
  * When the content is clicked
  * @param {MouseEvent} event - the click event
  */
 function onContentClicked(event: MouseEvent) {
-    // If the target is not the contentEl or a child, or its parent (the cell), return
     if (contentEl.value === null || !event.target) return;
 
+    // If the target is not the contentEl, a child of the contentEl, or its parent (the cell),
+    // then the click wasn't on the content, and instead on the view more button or component action.
     if (
         !contentEl.value.contains(event.target as Node) &&
         event.target !== contentEl.value &&
@@ -130,8 +94,9 @@ function onContentClicked(event: MouseEvent) {
         return;
     }
 
-    if (props.column.type === ColumnType.OVERVIEW) {
-        onOverviewModifyClicked();
+    // If there's a textbox content component, focus the editor
+    if (textboxContentComponent.value) {
+        textboxContentComponent.value.focusEditor();
     }
 }
 
@@ -179,7 +144,6 @@ window.Vue.onUnmounted(() => {
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
             'sortable-placeholder': props.isSortablePlaceholder,
-            'content-unsaved': !contentIsSaved,
             'content-focused': contentIsFocused,
         }"
         :style="{ height: `${cellMaxHeight}px` }"
@@ -211,6 +175,7 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.OVERVIEW">
                 <textbox-content
+                    ref="textboxContentComponent"
                     :unit="props.unit"
                     :column="props.column"
                     @update-content-height="updateContentHeight"
@@ -253,25 +218,12 @@ window.Vue.onUnmounted(() => {
             </div>
 
             <template v-if="props.column.type === ColumnType.OVERVIEW">
-                <div ref="componentActionEl" class="component-action">
-                    <section>
-                        <button v-if="!contentIsSaved && !isOverviewContentSaving" data-role="dirty-indicator" disabled>
-                            Changes not saved
-                        </button>
-
-                        <a v-if="isOverviewContentSaving" class="button"> Saving... </a>
-
-                        <a v-else-if="contentIsSaved" class="button" @click.prevent="onOverviewModifyClicked">
-                            {{
-                                storeUnit && storeUnit.textboxes[props.column.label].id > 0
-                                    ? "Modify"
-                                    : "Create Textbox"
-                            }}
-                        </a>
-                        <!-- Use mouse down as clicking this will remove focus from the content, and cause it to collapse. -->
-                        <a v-else class="button" @mousedown="onOverviewSaveClicked"> Save </a>
-                    </section>
-                </div>
+                <textbox-action
+                    ref="componentActionEl"
+                    :unit="props.unit"
+                    :column="props.column"
+                    @modify-clicked="textboxContentComponent?.focusEditor"
+                />
             </template>
         </div>
     </div>
@@ -351,11 +303,6 @@ window.Vue.onUnmounted(() => {
             }
         }
     }
-
-    .component-action section {
-        border-bottom: 0;
-        pointer-events: all;
-    }
 }
 
 /* Overrides for column type specific styles */
@@ -375,6 +322,10 @@ window.Vue.onUnmounted(() => {
 
 [data-column-type="overview"] {
     cursor: text;
+
+    .content-container-fixed {
+        cursor: default;
+    }
 
     &.content-focused {
         .content-container-fixed .content-overlay {
