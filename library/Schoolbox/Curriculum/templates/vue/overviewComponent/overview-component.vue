@@ -47,22 +47,24 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * to notify the selectedNodes linked to the curriculum selector modal
- * that the selected nodes have been updated
- */
-window.Vue.watch(
-    () => store().selectedNodes,
-    () => {
-        selectedNodesStore.update(store().selectedNodes);
-    },
-);
-
-/**
- * To open the curriculum code mapping modal
+ * To open the curriculum code mapping modal,
+ * ensuring the latest selected nodes are displayed
  */
 function onUpdateSelected() {
+    selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
     modalStore.open();
 }
+
+/**
+ * Changes have been made to the selected nodes via the modal,
+ * so update the folder store
+ */
+window.Vue.watch(
+    () => selectedNodesStore.nodes,
+    () => {
+        void store().updateNodes(selectedNodesStore.nodes);
+    },
+);
 </script>
 
 <template>

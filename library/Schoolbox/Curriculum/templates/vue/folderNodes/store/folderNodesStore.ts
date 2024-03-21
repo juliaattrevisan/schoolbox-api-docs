@@ -30,7 +30,7 @@ export const useStore = (folderId: number) =>
         /**
          * To notify the backend of a change in the selected nodes
          */
-        async function updateNodes() {
+        async function pushChanges() {
             try {
                 isProcessing.value = true;
                 const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
@@ -55,7 +55,16 @@ export const useStore = (folderId: number) =>
          */
         async function removeNode(node: Node): Promise<void> {
             selectedNodes.value = selectedNodes.value.filter((selectedNode) => selectedNode.id !== node.id);
-            await updateNodes();
+            await pushChanges();
+        }
+
+        /**
+         * To update the selectedNodes with new nodes, after which we'll notify the backend of the change
+         * @param {Node[]} $nodes - the new nodes to update the selectedNodes with
+         */
+        async function updateNodes($nodes: Node[]): Promise<void> {
+            selectedNodes.value = $nodes;
+            await pushChanges();
         }
 
         return {
@@ -67,5 +76,6 @@ export const useStore = (folderId: number) =>
             isProcessing,
             init,
             removeNode,
+            updateNodes,
         };
     });
