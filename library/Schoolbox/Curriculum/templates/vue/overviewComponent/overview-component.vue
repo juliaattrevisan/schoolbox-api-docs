@@ -4,6 +4,7 @@
  * to display all or a single curriculum node (and all its children)
  */
 
+import { watchIgnorable } from "@vueuse/core";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
@@ -13,6 +14,7 @@ import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.
 import FolderNodes from "@schoolboxCurriculum/vue/folderNodes/folder-nodes.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
@@ -33,16 +35,30 @@ const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNod
 const modalStore = useModalStore(); // to open the modal
 
 /**
+ * Changes have been made to the selected nodes via the modal,
+ * so update the folder store
+ */
+const { ignoreUpdates } = watchIgnorable(
+    () => selectedNodesStore.nodes,
+    () => {
+        void store().updateNodes(selectedNodesStore.nodes);
+    },
+);
+
+/**
  * Store the nodes and start loading the initial curriculum data
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    store().init(props.nodes, props.selectedNodes, props.isReadOnly);
-    selectorStore.init({
-        isReadOnly: props.isReadOnly,
-        formValueName: "", // not required in this context
-        dataEndpoint: props.dataEndpoint,
-        selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
+    // don't fire off the watch when we are setting the initial nodes
+    ignoreUpdates(() => {
+        store().init(props.nodes, props.selectedNodes, props.isReadOnly);
+        selectorStore.init({
+            isReadOnly: props.isReadOnly,
+            formValueName: "", // not required in this context
+            dataEndpoint: props.dataEndpoint,
+            selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
+        });
     });
 });
 
@@ -51,20 +67,11 @@ window.Vue.onMounted(() => {
  * ensuring the latest selected nodes are displayed
  */
 function onUpdateSelected() {
-    selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
+    ignoreUpdates(() => {
+        selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
+    });
     modalStore.open();
 }
-
-/**
- * Changes have been made to the selected nodes via the modal,
- * so update the folder store
- */
-window.Vue.watch(
-    () => selectedNodesStore.nodes,
-    () => {
-        void store().updateNodes(selectedNodesStore.nodes);
-    },
-);
 </script>
 
 <template>
@@ -79,4 +86,5 @@ window.Vue.watch(
     <fn-actions v-if="!props.isReadOnly" @update-selected="onUpdateSelected" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
+    <toast ref="toastEl"></toast>
 </template>

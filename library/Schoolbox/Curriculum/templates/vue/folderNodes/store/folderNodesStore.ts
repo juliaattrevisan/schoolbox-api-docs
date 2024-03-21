@@ -43,6 +43,7 @@ export const useStore = (folderId: number) =>
                     },
                     body: JSON.stringify([...selectedNodes.value]),
                 });
+                console.warn("eh");
                 const newNodes = (await response.json()) as Node[];
                 nodes.value = newNodes;
             } catch (error) {
