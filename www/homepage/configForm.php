@@ -118,7 +118,6 @@ if (is_numeric($_REQUEST['cid'])) {
             $page->outputJson(array('instanceID' => $instanceID), false, 200);
         } else {
             if (!($component instanceof Component_ControllerAbstract)) {
-
                 exit("<div class='alert alert-box'>Couldn't create component.</div>");
             }
             $folder   = $folderMapper->findById($cid);
