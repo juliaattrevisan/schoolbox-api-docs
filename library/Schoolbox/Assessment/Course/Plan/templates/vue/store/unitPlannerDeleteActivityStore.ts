@@ -38,33 +38,31 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
      * and then remove it from the UI if the back end did its part.
      * @returns {string} The toast message to display
      */
-    async function deleteActivity(): Promise<string> {
-        if (activity.value !== null) {
-            try {
-                isProcessing.value = true;
-                const response = await window.fetch(activity.value._links.delete, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                });
-                isProcessing.value = false;
-
-                if (response.ok) {
-                    isOpen.value = false;
-
-                    if (unit.value !== null) {
-                        unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
-                    }
-
-                    return "Activity deleted";
-                }
-            } catch (error) {
-                throw new Error();
-            }
+    async function deleteActivity(): string {
+        if (activity.value === null) {
+            throw new Error("Delete request not sent because activity not initialised.");
         }
 
-        // It is expected that the request will be sent, and the response will be okay.
-        // So if execution gets to here, an error has occurred.
-        throw new Error();
+        isProcessing.value = true;
+        let response;
+        try {
+            response = await window.fetch(activity.value._links.delete, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
+        } catch (error) {
+            throw new Error("Error during fetch call.");
+        }
+        isProcessing.value = false;
+
+        if (!response.ok) {
+            throw new Error("Delete response not ok.");
+        }
+
+        unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
+        isOpen.value = false;
+
+        return "Activity deleted";
     }
 
     return {

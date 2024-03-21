@@ -28,25 +28,20 @@ window.Vue.watch(
 );
 
 /**
- * so we can track the progress of the activity removal
- * and update the UI accordingly
+ * Use the deleteActivityStore to delete the activity, and display toast messages.
  */
-deleteActivityStore.$onAction(({ name, after, onError }) => {
-    if (name === "deleteActivity" && unitPlannerStore.toastEl !== null) {
-        unitPlannerStore.toastEl.activate("Deleting...");
-        after((result) => {
-            if (unitPlannerStore.toastEl !== null) {
-                unitPlannerStore.toastEl.timeout(result, true, 5000);
-            }
-        });
-        onError((error) => {
+async function deleteActivityUsingStore() {
+    unitPlannerStore.toastEl.activate("Deleting...");
+    await deleteActivityStore
+        .deleteActivity()
+        .then((successMessage) => {
+            unitPlannerStore.toastEl.timeout(successMessage, true, 5000);
+        })
+        .catch((error) => {
             console.warn(error);
-            if (unitPlannerStore.toastEl !== null) {
-                unitPlannerStore.toastEl.timeout("Delete failed", false, 5000);
-            }
+            unitPlannerStore.toastEl.timeout("Delete failed", false, 5000);
         });
-    }
-});
+}
 
 /**
  * To instantly notify the user that the node is being deleted
@@ -79,7 +74,7 @@ const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessi
                     class="button icon-approve submit"
                     data-test-confirm-delete-activity
                     :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="deleteActivityStore.deleteActivity"
+                    @click.prevent="deleteActivityUsingStore"
                 >
                     {{ deleteButtonText }}
                 </button>
