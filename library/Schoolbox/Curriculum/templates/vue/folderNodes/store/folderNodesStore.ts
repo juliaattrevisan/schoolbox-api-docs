@@ -35,19 +35,25 @@ export const useStore = (folderId: number) =>
          */
         async function pushChanges() {
             try {
+                // toastEl.value.activate("Saving...");
                 isProcessing.value = true;
                 const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify([...selectedNodes.value]),
+                    body: JSON.stringify({ id: [...selectedNodes.value] }),
                 });
-                console.warn("eh");
-                const newNodes = (await response.json()) as Node[];
-                nodes.value = newNodes;
+                if (response.ok) {
+                    const newNodes = (await response.json()) as Node[];
+                    nodes.value = newNodes;
+                    // toastEl.value.timeout("Curriculum updated", true, 2000);
+                } else {
+                    const responseText = (await response.json()) as { title: string; type: string; status: number };
+                    // toastEl.value.timeout(responseText.title, false, 2000);
+                }
             } catch (error) {
-                throw new Error();
+                // toastEl.value.timeout("There was an unexpected error", false, 2000);
             } finally {
                 isProcessing.value = false;
             }
