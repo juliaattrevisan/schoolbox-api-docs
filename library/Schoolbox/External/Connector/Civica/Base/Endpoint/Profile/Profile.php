@@ -637,8 +637,18 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(array $school): ?string
     {
-        if ($school['medicalAlert']) {
-            return 'This student has medical conditions.';
+        if ($school['medicalAlerts'] && is_iterable($school['medicalAlerts'])) {
+            $medicalAlerts = [];
+
+            /* Collate them all (arguably this is an unordered list, but ok)
+             */
+            foreach ($school['medicalAlerts'] as $medicalAlert) {
+                $medicalAlerts[] = sprintf("\n\n%s", trim((string)$medicalAlert));
+            }
+
+            /* Crush them all down ito a single string
+             */
+            return implode('', $medicalAlerts);
         }
 
         return null;
