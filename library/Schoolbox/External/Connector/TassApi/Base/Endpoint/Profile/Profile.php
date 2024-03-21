@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
 use InvalidArgumentException;
-use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -21,15 +20,12 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Communicat
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use UnexpectedValueException;
 
 /**
  * Class Profile
@@ -81,69 +77,8 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
+     * private string $communicationTypes;
      *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
-    /**
-     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     * because tass doesn't treat parents independently of families.
-     *
-     * @var string
-     */
-    private string $spousePrefix;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      *
@@ -164,47 +99,7 @@ class Profile implements IStrategy
      *
      * $communicationTypes uses "tkco" as a default, if empty in admin
      * Otherwise, use the csv string provided there
-     *
-     * @var string
      */
-    private string $communicationTypes;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var StorageMapper
-     */
-    private StorageMapper $storageMapper;
-
 
     /**
      * Profile constructor.
@@ -214,10 +109,10 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param array                           $api
      * @param array                           $watchlist
-     * @param int                             $addnumFather
-     * @param int                             $addnumMother
+     * @param int                             $addnumFather Set in admin, corresponds to external_tass_addnum_father
+     * @param int                             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
      * @param bool                            $includePhoto
-     * @param string                          $spousePrefix
+     * @param string                          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
      * @param string                          $communicationTypes
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -227,52 +122,37 @@ class Profile implements IStrategy
      * @param StorageMapper                   $storageMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        array $watchlist,
-        int $addnumFather,
-        int $addnumMother,
-        bool $includePhoto,
-        string $spousePrefix,
-        string $communicationTypes,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        StorageMapper $storageMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private array $watchlist,
+        private int $addnumFather,
+        private int $addnumMother,
+        private bool $includePhoto,
+        private string $spousePrefix,
+        private string $communicationTypes,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private StorageMapper $storageMapper
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->watchlist = $watchlist;
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-        $this->includePhoto = $includePhoto;
-        $this->spousePrefix = $spousePrefix;
-
         /* Decide default communication rule identifiers
          * If $communicationTypes is an empty string, default it to "tkco"
          * which is the default communication rule specified by TASS The Organisation
          */
         $this->communicationTypes = '' === $communicationTypes ? self::DEFAULT_COMMUNICATION_RULE : $communicationTypes;
-
-        /* Various mappers
-         */
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
-        $this->storageMapper = $storageMapper;
     }
 
 
     /**
      * Import user profile data into sis_user_profile*
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
      */
     public function import(): void
     {
@@ -295,9 +175,20 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     *
+     * @throws Exception
+     * @throws \JsonException
      */
     private function importStudents(): void
     {
+        $familiesLookupGenerator = (new Lookup\Family(
+            $this->log,
+            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
+            $this->spousePrefix,
+            $this->addnumFather,
+            $this->addnumMother,
+        ));
+
         /* Build some lookups to save on traversal and api banging
          */
         $this->log->debug(sprintf(
@@ -316,19 +207,16 @@ class Profile implements IStrategy
              */
             $this->log->info('Downloading parent data (this might take a while)');
 
-            $familiesLookup = (new Lookup\Family(
-                $this->log,
-                $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
-                $this->spousePrefix,
+            $currentCommRules = (new Communications(
+                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                 $this->addnumFather,
                 $this->addnumMother,
-                (new Communications(
-                    $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
-                    $this->addnumFather,
-                    $this->addnumMother,
-                    $this->communicationTypes
-                ))->generate()
-            ))->generate();
+                $this->communicationTypes,
+            ))->generateCurrent();
+
+            $this->log->debug('Generating current parent lookup');
+
+            $familiesLookup = $familiesLookupGenerator->generateCurrent($currentCommRules);
         }
 
         /* Process each current student, and their parents too.
@@ -337,7 +225,7 @@ class Profile implements IStrategy
               https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getStudentsDetails.md
            Using getStudents for now, so that we don't have to make a call for each student.
          */
-        $this->log->info('Downloading student data (this might take a while)');
+        $this->log->info('Downloading current student data (this might take a while)');
 
         $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current',
@@ -543,7 +431,38 @@ class Profile implements IStrategy
             }
 
             if ($this->validStrats->isFamiliesStratEnabled()) {
-                $this->importParentsOfStudent($studentBaseProfile, $familiesLookup);
+                $this->importParentsOfStudent(
+                    $studentBaseProfile,
+                    $familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_CURRENT][$studentBaseProfile->getExternalId()] ?? null
+                );
+            }
+        }
+
+        /* Future Parents (optional)
+         * This optionally processes the parents of future students
+         */
+        if ($this->validStrats->isFamiliesStratEnabled()) {
+            if ($this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions()['futureparents'] ?? false) {
+                /* Regenerate comm rules for future parents
+                 */
+                $futureCommRules = (new Communications(
+                    $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+                    $this->addnumFather,
+                    $this->addnumMother,
+                    $this->communicationTypes
+                ))->generateFuture();
+
+                /* Regenerate family lookup for future parents
+                 */
+                $this->log->debug('Generating future parent lookup');
+
+                $familiesLookup = $familiesLookupGenerator->generateFuture($futureCommRules);
+
+                /* Optionally also import the parents of future students, which are guys who have yet to formally commence
+                 * their enrolment. They come out of the getStudents endpoint with currentstatus future, specifically.
+                 * The parent profiles that spawn here aren't related to any student profiles, they just exist in isolation.
+                 */
+                $this->importParentsOfStudent(null, $familiesLookup[Lookup\Family::PARENTS_LOOKUP][Lookup\Family::PARENTS_FUTURE]);
             }
         }
     }
@@ -622,7 +541,7 @@ class Profile implements IStrategy
                 $stack[$name] = [
                     'name' => $name,
                     'phone' => (string)$homePhone,
-                    'alt' => (string)$mobilePhone
+                    'alt' => $mobilePhone
                 ];
             }
         }
@@ -701,147 +620,174 @@ class Profile implements IStrategy
 
     /**
      * Import parent profile data for a given student
+     * Optionally, create a relationship record betweeen a parent and student profile;
+     * this is optional for the Future Parents use case where parents exist without students.
      *
-     * @param Model      $studentBaseProfile
+     * @param Model|null $studentBaseProfile
      * @param array|null $familiesLookup
-     * @throws DefinitionException
      * @throws Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $familiesLookup): void
+    private function importParentsOfStudent(?\Schoolbox\External\Profile\Model $studentBaseProfile, ?array $familiesLookup): void
     {
-        $studentId = $studentBaseProfile->getExternalId();
-        $studentFullname = trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
-
         /* Parents that were preloaded for this student will exist in the lookup array
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
-        if (isset($familiesLookup['lookup'][$studentId])) {
-            foreach ($familiesLookup['lookup'][$studentId] as $externalId => $parent) {
+        if (null !== $familiesLookup) {
+            foreach ($familiesLookup as $externalId => $parent) {
                 /* Each parent in the family
                  */
-                $email = trim((string)$parent['email']);
-                $firstname = trim((string)$parent['firstname']);
-                $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
-                $lastname = trim((string)$parent['surname']);
-                $phoneHome = trim((string)$parent['home']);
-                $phoneMobile = trim((string)$parent['mobile']);
-                $phoneWork = trim((string)$parent['work']);
-                $relationship = trim((string)$parent['relationship']);
-                $title = '';
-
-                /* A shortcut for convenience in logging
-                 * (Sometimes people don't have all the parts of their name; odd but ok)
-                 */
-                $fullname = trim("{$firstname} {$lastname}");
-
-                /* $parent is an array that contains a boolean key, validCommRule
-                 * This bool decides whether $parent should be associated with the student
-                 * in schoolbox; if not, log it here and skip them
-                 */
-                if (!$parent['validCommRule']) {
-                    $this->log->debug(sprintf(
-                        'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    continue;
-                }
-
-                /* Parents might inadvertently have the same externalId as someone else's
-                 * base profile (e.g. parent has same external id as student)
-                 *
-                 * This is not usually supposed to happen.
-                 * some sis implementations let you have broken data in this way
-                 *
-                 * Try and load a parent profile based on external id. If it exists, just reuse
-                 * those pieces. If it doesn't exist, first check if there's an existing base
-                 * profile before making a whole new one (this is how you end up with fk issues)
-                 */
-                try {
-                    $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-                    $parentBaseProfile = $parentProfile->getBaseProfile();
-                } catch (Exception $e) {
-                    $parentProfile = $this->parentProfileMapper->createModel();
-
-                    try {
-                        $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
-                    } catch (Exception $e) {
-                        $parentBaseProfile = $this->baseProfileMapper->createModel();
-                    }
-
-                    $parentProfile->setBaseProfile($parentBaseProfile);
-                }
-
-                $parentBaseProfile
-                    ->setExternalId($externalId)
-                    ->setTitle($title)
-                    ->setFirstname($firstname)
-                    ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
-
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->baseProfileMapper->save($parentBaseProfile);
-                }
-
-                $parentProfile
-                    ->setPhoneHome($phoneHome)
-                    ->setPhoneWork($phoneWork)
-                    ->setMobile($phoneMobile)
-                    ->setEmail($email);
-
-                /* Log it
-                 */
-                $this->log->info(sprintf(
-                    'Adding parent profile for %s (preferred: %s) (%s)',
-                    $fullname,
-                    $firstnamePreferred,
-                    $externalId
-                ));
-
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->parentProfileMapper->save($parentProfile);
-                }
-
-                /* Manufacture relations
-                 */
-
-                /* Log it
-                 */
-                $this->log->info(sprintf(
-                    'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
-                    $fullname,
-                    $firstnamePreferred,
+                $this->processParentProfile(
                     $externalId,
-                    $relationship,
-                    $studentFullname,
-                    $studentId
-                ));
-
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $relationship = $this->relationshipMapper->createModel()
-                        ->setUserProfile($parentBaseProfile)
-                        ->setChildProfile($studentBaseProfile)
-                        ->setType($relationship);
-
-                    $this->relationshipMapper->save($relationship);
-                }
+                    $parent,
+                    $studentBaseProfile
+                );
             }
         } else {
-            $this->log->warning(sprintf(
-                'No parents found for student %s (%s)',
-                $studentFullname,
-                $studentId
+            if (null !== $studentBaseProfile) {
+                $studentFullname = trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
+
+                $this->log->warning(sprintf(
+                    'No parents found for student %s (%s)',
+                    $studentFullname,
+                    $studentBaseProfile->getExternalId()
+                ));
+            }
+        }
+    }
+
+
+    /**
+     * Create a parent profile in suds
+     *
+     * Services both current parents and future parents, the latter use case does not
+     * have any associated students due to an idiosyncrasy in tass
+     *
+     * @param string     $externalId
+     * @param array      $parent
+     * @param Model|null $studentBaseProfile
+     * @return void
+     * @throws Exception
+     */
+    private function processParentProfile(
+        string $externalId,
+        array $parent,
+        ?\Schoolbox\External\Profile\Model $studentBaseProfile
+    ): void {
+        $email = trim((string)$parent['email']);
+        $firstname = trim((string)$parent['firstname']);
+        $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
+        $lastname = trim((string)$parent['surname']);
+        $phoneHome = trim((string)$parent['home']);
+        $phoneMobile = trim((string)$parent['mobile']);
+        $phoneWork = trim((string)$parent['work']);
+        $relationship = trim((string)$parent['relationship']);
+        $title = '';
+
+        /* A shortcut for convenience in logging
+         * (Sometimes people don't have all the parts of their name; odd but ok)
+         */
+        $fullname = trim("{$firstname} {$lastname}");
+
+        /* $parent is an array that contains a boolean key, validCommRule
+         * This bool decides whether $parent should be associated with the student
+         * in schoolbox; if not, log it here and skip them
+         */
+        if (!$parent['validCommRule']) {
+            $this->log->debug(sprintf(
+                'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
+                $firstname,
+                $lastname,
+                $externalId
             ));
+
+            return;
+        }
+
+        /* Parents might inadvertently have the same externalId as someone else's
+         * base profile (e.g. parent has same external id as student)
+         *
+         * This is not usually supposed to happen.
+         * some sis implementations let you have broken data in this way
+         *
+         * Try and load a parent profile based on external id. If it exists, just reuse
+         * those pieces. If it doesn't exist, first check if there's an existing base
+         * profile before making a whole new one (this is how you end up with fk issues)
+         */
+        try {
+            $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+            $parentBaseProfile = $parentProfile->getBaseProfile();
+        } catch (Exception $e) {
+            $parentProfile = $this->parentProfileMapper->createModel();
+
+            try {
+                $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+            } catch (Exception $e) {
+                $parentBaseProfile = $this->baseProfileMapper->createModel();
+            }
+
+            $parentProfile->setBaseProfile($parentBaseProfile);
+        }
+
+        $parentBaseProfile
+            ->setExternalId($externalId)
+            ->setTitle($title)
+            ->setFirstname($firstname)
+            ->setFirstnamePreferred($firstnamePreferred)
+            ->setLastname($lastname);
+
+        /* Then save it
+         */
+        if ($this->perform) {
+            $this->baseProfileMapper->save($parentBaseProfile);
+        }
+
+        $parentProfile
+            ->setPhoneHome($phoneHome)
+            ->setPhoneWork($phoneWork)
+            ->setMobile($phoneMobile)
+            ->setEmail($email);
+
+        /* Log it
+         */
+        $this->log->info(sprintf(
+            'Adding parent profile for %s (preferred: %s) (%s)',
+            $fullname,
+            $firstnamePreferred,
+            $externalId
+        ));
+
+        /* Then save it
+         */
+        if ($this->perform) {
+            $this->parentProfileMapper->save($parentProfile);
+        }
+
+        /* Manufacture relations, if elected
+         */
+        if (null !== $studentBaseProfile) {
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding relation between %s (preferred: %s) (%s), the %s of %s %s (%s)',
+                $fullname,
+                $firstnamePreferred,
+                $externalId,
+                $relationship,
+                $studentBaseProfile->getFirstname(),
+                $studentBaseProfile->getLastname(),
+                $studentBaseProfile->getExternalId()
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationship);
+
+                $this->relationshipMapper->save($relationship);
+            }
         }
     }
 
@@ -1058,6 +1004,10 @@ class Profile implements IStrategy
 
     /**
      * Import staff profile data
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
      */
     private function importStaff(): void
     {

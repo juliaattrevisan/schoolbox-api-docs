@@ -36,6 +36,16 @@ class Family
 
 
     /**
+     * These array nodes contain a set of current parents and future parents respectively.
+     * They're a bit awkward to access without consts, since naming them wrongly will successfully fail
+     * by null coalesce to avoid syntax fatals.
+     */
+    public const PARENTS_LOOKUP = 'lookup';
+    public const PARENTS_CURRENT = 'currentparents';
+    public const PARENTS_FUTURE = 'futureparents';
+
+
+    /**
      * Default spouse prefix
      *
      * @var string
@@ -59,44 +69,19 @@ class Family
 
 
     /**
-     * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
-     *
-     * @var IApi
+     * Decide which set of comm rules to obtain using these two consts as args.
      */
-    private IApi $api;
+    private const CURRENT = 'current';
+    private const FUTURE = 'future';
 
 
     /**
-     * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
-     * because tass doesn't treat parents independently of families.
+     * A local cache of getParents endpoint since we might optionally recompile families using a different
+     * set of comm rules to fulfil Future Parents; we only need to download getParents once.
      *
-     * @var string
+     * @var array|null
      */
-    private string $spousePrefix;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * An array of phone numbers indexed by family code
-     *
-     * @var array
-     */
-    private array $phones;
+    private ?array $families = null;
 
 
     /**
@@ -113,69 +98,46 @@ class Family
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
      * @param LoggerInterface $log
-     * @param IApi            $api
-     * @param string          $spousePrefix
-     * @param int             $addnumFather
-     * @param int             $addnumMother
-     * @param array           $phones
+     * @param IApi            $api $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
+     * @param string          $spousePrefix Set in Admin. This var deconflicts shared usernames by putting a letter in front, because tass doesn't treat parents independently of families.
+     * @param int             $addnumFather Set in admin, corresponds to external_tass_addnum_father
+     * @param int             $addnumMother Set in admin, corresponds to external_tass_addnum_mother
      */
     public function __construct(
         private LoggerInterface $log,
-        IApi $api,
-        string $spousePrefix,
-        int $addnumFather,
-        int $addnumMother,
-        array $phones,
+        private IApi $api,
+        private string $spousePrefix,
+        private int $addnumFather,
+        private int $addnumMother,
     ) {
-        $this->api = $api;
-
         /* Calculate a spouse prefix if one was set; otherwise use a default
          * Shanked from that Tass Helper class
          */
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
-
-        /* Some admin vars we'll use in this place
-         */
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-
-        /* Phone lookup; data from another endpoint
-         */
-        $this->phones = $phones;
     }
 
 
     /**
-     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
-     * I guess sfa_num stands for Split Family Access number or something
+     * Generate a lookup consisting of current parents
      *
-     * @param string $node
-     * @param string $identifier
-     * @param string $sfaNum
-     * @return string
+     * @param array $commrules
+     * @return array
      */
-    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    public function generateCurrent(array $commrules): array
     {
-        /* Do some funny prefix stuff for parents
-         */
-        if (self::FATHER_NODE === $node) {
-            $externalId = "P{$identifier}";
-        } else {
-            $externalId = "{$this->spousePrefix}{$identifier}";
-        }
+        return $this->generate($commrules, self::CURRENT);
+    }
 
-        /* If this was a split family, chuck a $sfaNum into the mix
-         *
-         * After 99,999 students pass through a tass system, this scheme will stop working
-         * due to collisions between old ids and new ones with prefix
-         *
-         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
-         */
-        if ('' !== $sfaNum) {
-            $externalId .= $sfaNum ;
-        }
 
-        return $externalId;
+    /**
+     * Generate a family lookup consisting of future parents
+     *
+     * @param array $commrules
+     * @return array
+     */
+    public function generateFuture(array $commrules): array
+    {
+        return $this->generate($commrules, self::FUTURE);
     }
 
 
@@ -184,13 +146,15 @@ class Family
      *
      * This is probably going to be faster if we build a hash lookup of parents
      */
-    public function generate(): array
+    private function generate(array $commrules, string $type): array
     {
-        /* Grab all the families
+        /* Grab all the families just once
          */
-        $families = $this->api->retrieveDocument('getParents', [
-            'user_code' => 'all'
-        ]);
+        if (null === $this->families) {
+            $this->families = $this->api->retrieveDocument('getParents', [
+                'user_code' => 'all'
+            ]);
+        }
 
         $unknown = [];
 
@@ -268,13 +232,26 @@ class Family
         $nuclear = 0;
         $split = 0;
 
-        foreach ($families['parents'] as $row) {
+        /* Announce the usage of Parent Lounge Required (web_access must be 1 for parents to be imported)
+         */
+        foreach ($this->families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
                 /* Everyone coming out of getParents() is a physical parent, known to tass.
                  * The communication rules decide whether this physical parent should be
                  * associated with the student in suds; use validCommRule boolean to decide
                  */
                 if (isset($family['students'])) {
+                    /* Skip if we require web_access, but this family doesn't have web_access
+                     */
+                    if (self::FUTURE === $type && !$family['web_access']) {
+                        $this->log->debug(sprintf(
+                            'Family %s does not have web-access set; skipping.',
+                            $parentId
+                        ));
+
+                        continue;
+                    }
+
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
                      */
@@ -284,7 +261,7 @@ class Family
                         if ($this->isAlive($node, $family)) {
                             $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                            $this->processParentNode($node, $personExternalId, $family);
+                            $this->processParentNode($commrules, $node, $personExternalId, $family, $type);
                         } else {
                             $this->log->debug(sprintf(
                                 'Parent %s %s in nuclear family is not classified as living: skipping.',
@@ -316,6 +293,17 @@ class Family
                      * in particular for each student in $lookup
                      */
                     foreach ($family as $subfamily) {
+                        /* Skip if we require web_access, but this family doesn't have web_access
+                         */
+                        if (self::FUTURE === $type && !$subfamily['web_access']) {
+                            $this->log->debug(sprintf(
+                                'Family %s does not have web-access set; skipping.',
+                                $parentId
+                            ));
+
+                            continue;
+                        }
+
                         /* Note that some schools try to switch primary parents to mother
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
@@ -348,10 +336,12 @@ class Family
                                 $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
+                                    $commrules,
                                     self::FATHER_NODE,
                                     $personExternalId,
                                     $subfamily,
-                                    $this->addnumFather
+                                    $this->addnumFather,
+                                    $type
                                 );
                             } else {
                                 $this->log->debug(sprintf(
@@ -372,10 +362,12 @@ class Family
                                 $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
+                                    $commrules,
                                     self::MOTHER_NODE,
                                     $personExternalId,
                                     $subfamily,
-                                    $this->addnumMother
+                                    $this->addnumMother,
+                                    $type
                                 );
                             } else {
                                 $this->log->debug(sprintf(
@@ -403,6 +395,40 @@ class Family
                 'unknown' => \count($unknown),
             ],
         ];
+    }
+
+
+    /**
+     * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
+     * I guess sfa_num stands for Split Family Access number or something
+     *
+     * @param string $node
+     * @param string $identifier
+     * @param string $sfaNum
+     * @return string
+     */
+    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    {
+        /* Do some funny prefix stuff for parents
+         */
+        if (self::FATHER_NODE === $node) {
+            $externalId = "P{$identifier}";
+        } else {
+            $externalId = "{$this->spousePrefix}{$identifier}";
+        }
+
+        /* If this was a split family, chuck a $sfaNum into the mix
+         *
+         * After 99,999 students pass through a tass system, this scheme will stop working
+         * due to collisions between old ids and new ones with prefix
+         *
+         * P100001 (parent of student 10000 + split family 1) == P100001 (parent of student 100001)
+         */
+        if ('' !== $sfaNum) {
+            $externalId .= $sfaNum ;
+        }
+
+        return $externalId;
     }
 
 
@@ -440,13 +466,15 @@ class Family
     /**
      * Update $parent details by mining Split Parent format in a particular way to get their email addresses
      *
+     * @param array  $commrules
      * @param string $node
      * @param string $externalId
      * @param array  $family
      * @param int    $addnum
+     * @param string $type Whether this parent was created in the 'current' or 'future' parent context
      * @return array
      */
-    private function processSplitParentNode(string $node, string $externalId, array $family, int $addnum): array
+    private function processSplitParentNode(array $commrules, string $node, string $externalId, array $family, int $addnum, string $type): array
     {
         /* Prioritise preferred names over official names
          */
@@ -461,7 +489,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->phones[$family['user_code']][$node] ?? [
+        $person = $commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
@@ -470,7 +498,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
-            'validCommRule' => false
+            'validCommRule' => false,
         ];
 
         /* Find the first non-empty email address from the two possibilities
@@ -496,9 +524,17 @@ class Family
         $person['students'] = $family['students'];
 
         /* Index each parent by their externalId
+         *
+         * Future Parents don't have any associated students; their $person['students'] array is empty
+         * all the time, making it impossible to correlate a student with this parent. Instead, use the
+         * comm rules to decide and stash future parents into a special area of the lookup.
          */
-        foreach ($person['students'] as $studentExternalId) {
-            $this->lookup[$studentExternalId][$externalId] = $person;
+        if (self::CURRENT === $type) {
+            foreach ($person['students'] as $studentExternalId) {
+                $this->lookup['currentparents'][$studentExternalId][$externalId] = $person;
+            }
+        } else {
+            $this->lookup['futureparents'][$externalId] = $person;
         }
 
         return $person;
@@ -508,12 +544,14 @@ class Family
     /**
      * Facade method for compiling some parental details
      *
+     * @param array  $commrules
      * @param string $node
      * @param string $externalId
      * @param array  $family
+     * @param string $type Whether this parent was created in the 'current' or 'future' parent context
      * @return array
      */
-    private function processParentNode(string $node, string $externalId, array $family): array
+    private function processParentNode(array $commrules, string $node, string $externalId, array $family, string $type): array
     {
         /* Prioritise preferred names over official names
          */
@@ -528,7 +566,7 @@ class Family
          * then they have one of the commsrules that determines suds parentage
          * and should be associated with the student
          */
-        $person = $this->phones[$family['user_code']][$node] ?? [
+        $person = $commrules[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
@@ -537,7 +575,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
-            'validCommRule' => false
+            'validCommRule' => false,
         ];
 
         /* Assign an externalId to this person
@@ -550,9 +588,17 @@ class Family
         $person['students'] = $family['students'];
 
         /* Index each parent by their externalId
+         *
+         * Future Parents don't have any associated students; their $person['students'] array is empty
+         * all the time, making it impossible to correlate a student with this parent. Instead, use the
+         * comm rules to decide and stash future parents into a special area of the lookup.
          */
-        foreach ($person['students'] as $studentExternalId) {
-            $this->lookup[$studentExternalId][$externalId] = $person;
+        if (self::CURRENT === $type) {
+            foreach ($person['students'] as $studentExternalId) {
+                $this->lookup['currentparents'][$studentExternalId][$externalId] = $person;
+            }
+        } else {
+            $this->lookup['futureparents'][$externalId] = $person;
         }
 
         return $person;

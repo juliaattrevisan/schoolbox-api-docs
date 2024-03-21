@@ -143,6 +143,21 @@
                         <input id='tap4start' type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" data-datepicker data-datesync-enddate="#tap4end" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Future Parents</h4>
+                <p class="meta">If enabled, we will also look for parents of students who have yet to commence their enrolment. These parents must
+                    have Parent Lounge access to be imported from TASS; this corresponds to the web_access flag in the TASS API.
+                </p>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="dsn[tassapi][options][futureparents]" value="0" />
+                        <input id="futureparents" type="checkbox" name="dsn[tassapi][options][futureparents]" value="1" {% if options.futureparents ?? false %}checked="checked"{% endif %} />
+                        <label for="futureparents" class="checkbox-label">Enable processing of future parents</label>
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>
