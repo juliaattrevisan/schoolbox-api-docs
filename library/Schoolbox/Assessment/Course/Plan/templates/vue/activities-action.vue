@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Column } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
-import activitiesCreateInner from "./activities-create-inner.vue";
+import ActivitiesCreateInner from "./activities-create-inner.vue";
 
 interface Props {
     unit: Unit;
