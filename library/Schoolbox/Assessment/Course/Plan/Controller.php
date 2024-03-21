@@ -186,6 +186,22 @@ class Controller extends Base
              */
             $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
 
+            $activitiesLinks = [
+                'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
+                    'contextType' => 'unitspecs',
+                    'contextId' => $unit->getId(),
+                    'context' => $unit,
+                ]]
+            ];
+
+            foreach ($activitiesLinks as $key => $link) {
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
+                    $activitiesLinks[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+                } else {
+                    $activitiesLinks[$key] = null;
+                }
+            }
+
             /* Aggregated data for each unit appears as a row in the Unit Planner
              * on the front end - this is basically the contract between back- and
              * front-end implementations and the basis of an api-first philosophy
@@ -203,12 +219,15 @@ class Controller extends Base
                 'extraTextboxes' => $textboxData['extraTextboxes'],
                 /* All the assessment specs in this unit
                  */
-                'activities' => $assessments->map(new UnitAssessments(
-                    $this->routeGenerator,
-                    $this->getAuthorizer(),
-                    $this->getUser(),
-                    $this->getUser()
-                )),
+                'activities' => [
+                    '_links' => $activitiesLinks,
+                    'items' => $assessments->map(new UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser()
+                    )),
+                ],
                 /* All the rubric capabilities and indicators that are in use among all
                  * the assessment specs in this unit
                  */
@@ -217,7 +236,7 @@ class Controller extends Base
                  * in this unit
                  */
                 'curriculumCodes' => $curriculumNodes,
-                'sequence' => $unit->getFolder()->getSequence()
+                'sequence' => $unit->getFolder()->getSequence(),
             ];
 
             // add this units data to the whole course units collection.
@@ -500,8 +519,8 @@ class Controller extends Base
                 /* Did we really need these right now?
                  * Temporarily disabled for speed; re-enable when you actually need it
                  */
-//                $this->nodeMapper->loadAncestors($node);
-//                $this->nodeMapper->loadDescendants($node);
+                //                $this->nodeMapper->loadAncestors($node);
+                //                $this->nodeMapper->loadDescendants($node);
 
                 $ancestorIds = $this->getAllAncestorIds($node);
                 $diff = array_diff($ancestorIds, $curriculumNodes->keys());

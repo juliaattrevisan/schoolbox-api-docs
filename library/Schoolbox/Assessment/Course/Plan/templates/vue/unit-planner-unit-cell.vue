@@ -190,7 +190,7 @@ window.Vue.onUnmounted(() => {
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <ul class="information-list">
                     <activities-list-item
-                        v-for="activity in props.unit.activities"
+                        v-for="activity in props.unit.activities.items"
                         ref="activityListItem"
                         :key="activity.id"
                         :unit="unit"

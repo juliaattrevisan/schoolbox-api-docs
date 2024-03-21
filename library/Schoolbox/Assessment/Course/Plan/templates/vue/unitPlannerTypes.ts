@@ -24,7 +24,12 @@ export type Unit = {
     title: string;
     homepage: string;
     folderId: number;
-    activities: Activity[];
+    activities: {
+        _links: {
+            create: string | null;
+        };
+        items: Activity[];
+    };
     curriculumCodes: Node[];
     rubricCapabilities: RubricCapability[];
     textboxes: Record<string, TextboxContent>;
