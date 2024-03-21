@@ -20,7 +20,8 @@ declare global {
             iframelyLicenseKey: string;
             colourDefaults: { [key: string]: any };
             editors: { [key: string]: Editor };
-            hasEditorAI: boolean; // to display the AI features within the editor
+            hasEditorAI: true | undefined; // to display the AI features within the editor
+            ltiAssessmentsEnabled: true | undefined;
             lightGallery: Function;
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };

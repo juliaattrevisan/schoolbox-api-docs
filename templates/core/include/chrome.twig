@@ -125,6 +125,9 @@
             webPushPublicKey: '{{ app.webPushPublicKey ?? '' }}',
         });
         {% endfor %}
+        {% if config.lti_assessments_enable %}
+        window.sbProps.ltiAssessmentsEnabled = true;
+        {% endif %}
 
     </script>
     {% endautoescape %}
