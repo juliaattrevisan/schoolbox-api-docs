@@ -159,7 +159,13 @@ class IndexBuilder extends App
             if (empty($types)) {
                 $logger->notice('Clearing ALL existing indices before rebuilding!');
                 if ($this->perform()) {
-                    $dbi->execute('TRUNCATE search_index');
+                    // This used to TRUNCATE instead of DELETE:
+                    // whilst TRUNCATE should be faster, it is susceptible to
+                    // crashing the database server for reasons I haven't
+                    // been able to determine.
+                    // Tt must acquire a lock, as it deletes and recreates the
+                    // table: this lock isn't always acquirable.
+                    $dbi->execute('DELETE FROM search_index');
                 }
             } else {
                 $logger->notice('Clearing indices for provided types before rebuilding!');
