@@ -3,15 +3,15 @@
  * To further modify the linked curriculum
  */
 
-import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
-
-const modalStore = useModalStore();
+const emit = defineEmits<{
+    updateSelected: [];
+}>();
 
 /**
- * Open the curriculum code mapping modal
+ * To open the curriculum code mapping modal
  */
 function onModifySelected() {
-    modalStore.open();
+    emit("updateSelected");
 }
 </script>
 

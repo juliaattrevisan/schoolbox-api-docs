@@ -7,6 +7,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
+import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
 import FolderNodes from "@schoolboxCurriculum/vue/folderNodes/folder-nodes.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
@@ -27,7 +28,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore(props.folderId);
-const selectorStore = useSelectorStore();
+const selectorStore = useSelectorStore(); // The store for the curriculum selector modal
+const modalStore = useModalStore();
 
 /**
  * Store the nodes and start loading the initial curriculum data
@@ -35,8 +37,15 @@ const selectorStore = useSelectorStore();
  */
 window.Vue.onMounted(() => {
     store().init(props.nodes, props.selectedNodes);
-    selectorStore.init(props);
+    selectorStore.init(props); // note props.selectedNodes is passed in here, so the modal is kept up to date with the latest changes
 });
+
+/**
+ * To open the curriculum code mapping modal
+ */
+function onUpdateSelected() {
+    modalStore.open();
+}
 </script>
 
 <template>
@@ -45,9 +54,10 @@ window.Vue.onMounted(() => {
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
+        @map-selected="onUpdateSelected"
     />
     <folder-nodes v-else :folder-id="props.folderId" />
-    <fn-actions v-if="!props.isReadOnly" />
+    <fn-actions v-if="!props.isReadOnly" @update-selected="onUpdateSelected" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
 </template>
