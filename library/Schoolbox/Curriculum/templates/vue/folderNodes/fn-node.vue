@@ -53,12 +53,16 @@ function onCodeSelected() {
  * Remove the node from the selected nodes
  */
 function onRemoveSelected() {
-    store().removeSelectedNode(props.node);
+    if (store().isProcessing) return;
+    void store().removeNode(props.node);
 }
 </script>
 
 <template>
-    <div class="node l-flex-row l-flex--justify-space l-flex--align-center" :style="{ marginLeft: marginLeft }">
+    <div
+        class="node l-flex-row l-flex--justify-space l-flex--align-center l-flex--no-wrap"
+        :style="{ marginLeft: marginLeft }"
+    >
         <div class="l-flex-row l-flex--no-wrap l-gap-xs">
             <a v-if="hasCode" class="f-no-margins" :href="`#${props.node.id}`" @click.prevent="onCodeSelected"
                 >[{{ props.node.code }}]

@@ -15,6 +15,7 @@ export const useStore = (folderId: number) =>
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
+        const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
 
         /**
          * Store a reference to the nodes to display
@@ -27,12 +28,34 @@ export const useStore = (folderId: number) =>
         }
 
         /**
+         * To notify the backend of a change in the selected nodes
+         */
+        async function updateNodes() {
+            try {
+                isProcessing.value = true;
+                const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify([...selectedNodes.value]),
+                });
+                const newNodes = (await response.json()) as Node[];
+                nodes.value = newNodes;
+            } catch (error) {
+                throw new Error();
+            } finally {
+                isProcessing.value = false;
+            }
+        }
+
+        /**
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
          * @param {Node} node - the node to remove
          */
-        function removeSelectedNode(node: Node): void {
+        async function removeNode(node: Node): Promise<void> {
             selectedNodes.value = selectedNodes.value.filter((selectedNode) => selectedNode.id !== node.id);
-            // notify the backend of the latest selected nodes, updating the nodes with the returned data
+            await updateNodes();
         }
 
         return {
@@ -41,7 +64,8 @@ export const useStore = (folderId: number) =>
             selectedNodeIds,
             hasNoNodes,
             selectedDetailsNodeId,
+            isProcessing,
             init,
-            removeSelectedNode,
+            removeNode,
         };
     });
