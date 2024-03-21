@@ -100,17 +100,6 @@ class IndexBuilder extends App
             ),
         );
 
-        $dbi = $this->getDatabaseInternal();
-
-        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
-        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
-        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
-        // https://mariadb.com/kb/en/aborting-statements/
-        $dbi->execute('SET SESSION max_statement_time = 0;');
-        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $maxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
-
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
             ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
@@ -151,7 +140,18 @@ class IndexBuilder extends App
             );
         }
 
-        // Run for as long as you need to?
+        $dbi = $this->getDatabaseInternal();
+
+        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
+        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
+        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
+        // https://mariadb.com/kb/en/aborting-statements/
+        $dbi->execute('SET SESSION max_statement_time = 0;');
+        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $maxStatementTime = $rows[0]['Value'];
+        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
+
+        // Set this on the server as well: I'm not sure this makes a difference
         $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
         // Clear indices if required
