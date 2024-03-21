@@ -31,3 +31,12 @@ export type Unit = {
     extraTextboxes: number;
     sequence: number;
 };
+
+export type UnitPlannerLocale = {
+    project: {
+        proper: string;
+    };
+    dueWork: {
+        proper: string;
+    };
+};

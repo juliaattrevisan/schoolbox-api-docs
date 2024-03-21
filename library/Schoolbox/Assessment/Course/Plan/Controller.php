@@ -27,6 +27,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig\Error\Error;
 
@@ -40,6 +41,10 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $textboxStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $rubricStatement;
 
+    /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
 
     /**
      * Controller constructor.
@@ -48,9 +53,15 @@ class Controller extends Base
      * @param RubricIndicatorMapper $rubricIndicatorMapper
      * @param Mapper $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param RosettaStone $rosettaStone
      */
-    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper, private \Component_InstanceMapper $componentInstanceMapper)
-    {
+    public function __construct(
+        private AssessmentMapperProxy $assessmentMapper,
+        private RubricIndicatorMapper $rubricIndicatorMapper,
+        private Node\Mapper $nodeMapper,
+        private \Component_InstanceMapper $componentInstanceMapper,
+        RosettaStone $rosettaStone
+    ) {
         /* Only prepare the textbox statement once
          */
         $this->textboxStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
@@ -118,6 +129,8 @@ class Controller extends Base
             AND sb.use_rubric = 1
             ORDER BY rc.id, riu.sequence, ri.name
         ");
+
+        $this->rosettaStone = $rosettaStone;
     }
 
 
@@ -211,9 +224,19 @@ class Controller extends Base
             $units[] = $unitOut;
         }
 
+        $locale = [
+            'project' => [
+                'proper' => $this->rosettaStone->translate('project', false, true),
+            ],
+            'dueWork' => [
+                'proper' => $this->rosettaStone->translate('dueWork', false, true),
+            ],
+        ];
+
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
-            'units' => $units
+            'units' => $units,
+            'locale' => $locale
         ], "Unit Planner - {$course->getTitle()}");
     }
 

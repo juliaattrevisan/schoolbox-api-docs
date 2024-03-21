@@ -3,13 +3,14 @@ import type { Ref } from "vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit } from "./unitPlannerTypes";
+import { Unit, UnitPlannerLocale } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
 import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
 
 interface Props {
     units: Unit[];
+    locale: UnitPlannerLocale;
     routeFolderSequence: string | null;
 }
 
@@ -105,7 +106,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.units, toastEl.value!);
+    store.init(props.units, props.locale, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,
