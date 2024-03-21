@@ -36,9 +36,11 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
     /**
      * Activity removal has been confirmed so ask the server to delete the activity,
      * and then remove it from the UI if the back end did its part.
-     * @returns {string} The toast message to display
+     * @returns { string } The toast message to display
      */
-    async function deleteActivity(): string {
+    async function deleteActivity(): Promise<string> {
+        if (unit.value === null) return "Unit not found";
+
         if (activity.value === null) {
             throw new Error("Delete request not sent because activity not initialised.");
         }

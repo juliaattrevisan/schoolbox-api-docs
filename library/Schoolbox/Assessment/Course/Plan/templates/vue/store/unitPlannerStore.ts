@@ -3,8 +3,8 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
-import { Column } from "../unitPlannerConfig";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { Column } from "../unitPlannerConfig";
 import { Unit } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
