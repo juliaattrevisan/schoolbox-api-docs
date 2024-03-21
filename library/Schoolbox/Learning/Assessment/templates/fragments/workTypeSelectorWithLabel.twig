@@ -11,7 +11,7 @@
  #  * For disabled selectors, the user cannot change the selected option, and cannot click on the selector to see the other options.
  # https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/readonly
  #}
-<select id="workTypeSelector" name="workType" {% if assessment.familyName == 'dueWork' and courseManaged.isReadonly %}disabled{% else %}required{% endif %}>
+<select id="workTypeSelector" name="workType" {% if assessment.familyName == 'dueWork' and courseManaged.isReadonly %}readonly{% else %}required{% endif %}>
     {% for workType in allWorkTypes %}
         {#
          # Display the option if:
