@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { kebabCase } from "lodash";
+import { kebabCase, startCase } from "lodash";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
 import type { Unit } from "./unitPlannerTypes";
@@ -12,19 +13,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-/**
- * Get the current url; these redirects are used after backend processing,
- * so you can return to your current location afterward.
- *
- * Use the base64encoded version of the url's pathname, so it can work in
- * conjunction with Class Redirect in the back end
- * @param {string} url - The url to go to
- * @returns {string} - The url with the returnUrl parameter appended
- */
-function returnUrl(url: string): string {
-    return `${url}?returnUrl=${window.btoa(window.location.pathname)}`;
-}
 
 const activityLink = window.Vue.computed(() => {
     // If the activity is a project, use the status link
@@ -44,8 +32,11 @@ const activityLink = window.Vue.computed(() => {
     <li class="actions-small-1">
         <div class="list-item">
             <div class="card small-12 compact wrap-down">
-                <a :href="returnUrl(activityLink)">
-                    <span :class="'icon-' + kebabCase(props.activity.assessmentType)"></span>
+                <a :href="getReturnUrl(activityLink)">
+                    <span
+                        :class="'icon-' + kebabCase(props.activity.assessmentType)"
+                        :title="startCase(props.activity.assessmentType)"
+                    ></span>
                     <p>{{ props.activity.title }}</p>
                 </a>
             </div>
@@ -67,12 +58,12 @@ const activityLink = window.Vue.computed(() => {
                 >
             </li>
             <li>
-                <a :href="returnUrl(props.activity._links.modify)" class="icon-modify">{{
+                <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
                     props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
                 }}</a>
             </li>
             <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
-                <a :href="returnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+                <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
             </li>
             <li>
                 <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.unit, props.activity)"
