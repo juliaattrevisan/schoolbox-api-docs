@@ -4,8 +4,9 @@
  #    assessment
  #    courseManaged
  ##}
-<label for="workTypeSelector" class="required">Work Type</label>
-<select id="workTypeSelector" name="workType" {% if assessment.familyName == 'dueWork' and courseManaged.isReadonly %}disabled{% else %}required{% endif %}>
+{% set selectIsDisabled = assessment.familyName == 'dueWork' and courseManaged.isReadonly %}
+<label for="workTypeSelector" {% if selectIsDisabled %}{% else %}class="required"{% endif %}>Work Type</label>
+<select id="workTypeSelector" name="workType" {% if selectIsDisabled %}disabled{% else %}required{% endif %}>
     {% for workType in allWorkTypes %}
         {#
          # Display the option if:
