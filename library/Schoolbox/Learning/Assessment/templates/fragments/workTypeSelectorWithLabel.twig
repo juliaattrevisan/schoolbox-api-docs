@@ -21,11 +21,11 @@
          #}
         {% if not workType.isNone or not assessment.workType or assessment.workType.isNone %}
             <option value="{{ workType.id }}"
-                {% if assessment.workType.id ?? '' == workType.id or (workType.isNone and not assessment.workType) %}
+                {% if assessment.workType.id ?? '' == workType.id or (not assessment.workType and workType.isNone) %}
                     selected="selected"
-                {% else %}
-                    {% if workType.isNone or courseManaged.isReadonly %}disabled{% endif %}
                 {% endif %}
+                {# Note that it if assessment.workType is not set, the 'None' option needs to be both selected and disabled. #}
+                {% if workType.isNone or courseManaged.isReadonly %}disabled{% endif %}
             >{% if workType.isNone and not assessment.workType %}Please select a work type{% else %}{{ workType.name }}{% endif %}</option>
         {% endif %}
     {% endfor %}
