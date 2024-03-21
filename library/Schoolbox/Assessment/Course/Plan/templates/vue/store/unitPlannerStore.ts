@@ -3,7 +3,6 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
-import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { Column } from "../unitPlannerConfig";
 import { Unit } from "../unitPlannerTypes";
 
@@ -101,30 +100,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitContentHeights.value[unit.id][column.id] = Math.max(height, unexpandedUnitHeight);
     }
 
-    /**
-     * @param {Unit} unitToWhichActivityBelongs The unit to which the activity to be deleted belongs
-     * @param {Activity} activityToRemove The activity to be deleted
-     * @returns {void}
-     */
-    function removeActivityFromUnit(unitToWhichActivityBelongs: Unit, activityToRemove: Activity): void {
-        // Find unit in units.
-        const foundUnit = units.value.find((unit) => unit.id === unitToWhichActivityBelongs.id) as Unit | undefined;
-        if (foundUnit === undefined) {
-            return;
-        }
-
-        // Find activity in units[index].activities.
-        const foundActivity = foundUnit.activities.find((activity) => activity.id === activityToRemove.id);
-        if (foundActivity === undefined) {
-            return;
-        }
-
-        // Remove the found activity.
-        foundUnit.activities = foundUnit.activities.filter((a) => {
-            return a.id !== activityToRemove.id;
-        });
-    }
-
     return {
         init,
         unexpandedUnitHeight,
@@ -137,6 +112,5 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         toggleViewMore,
         unitContentHeights,
         setUnitContentHeight,
-        removeActivityFromUnit,
     };
 });
