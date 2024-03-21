@@ -11,6 +11,7 @@ import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListItem from "./activities-list-item.vue";
+import ActivitiesAction from "./activities-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -223,13 +224,18 @@ window.Vue.onUnmounted(() => {
             </div>
 
             <div ref="componentActionEl">
-                <template v-if="props.column.type === ColumnType.OVERVIEW">
-                    <textbox-action
-                        :unit="props.unit"
-                        :column="props.column"
-                        @modify-clicked="textboxContentComponent?.focusEditor"
-                    />
-                </template>
+                <textbox-action
+                    v-if="props.column.type === ColumnType.OVERVIEW"
+                    :unit="props.unit"
+                    :column="props.column"
+                    @modify-clicked="textboxContentComponent?.focusEditor"
+                />
+
+                <activities-action
+                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                    :unit="props.unit"
+                    :column="props.column"
+                />
             </div>
         </div>
     </div>

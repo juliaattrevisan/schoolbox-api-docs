@@ -87,7 +87,7 @@ function onSaveClicked() {
     </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .component-action section {
     border-bottom: 0;
     pointer-events: all;
