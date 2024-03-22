@@ -5,6 +5,8 @@
  */
 
 import { defineStore } from "pinia";
+import { ToastEvent } from "@schoolboxVue/components/toast/sbxToastEvent";
+import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
@@ -35,7 +37,11 @@ export const useStore = (folderId: number) =>
          */
         async function pushChanges() {
             try {
-                // toastEl.value.activate("Saving...");
+                document.dispatchEvent(
+                    new CustomEvent(ToastEvent.ACTIVATE, {
+                        detail: { text: "Saving..." } as ToastActivateEventDetail,
+                    }),
+                );
                 isProcessing.value = true;
                 const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
                     method: "POST",
@@ -47,13 +53,25 @@ export const useStore = (folderId: number) =>
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
-                    // toastEl.value.timeout("Curriculum updated", true, 2000);
+                    document.dispatchEvent(
+                        new CustomEvent(ToastEvent.TIMEOUT, {
+                            detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
+                        }),
+                    );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
-                    // toastEl.value.timeout(responseText.title, false, 2000);
+                    document.dispatchEvent(
+                        new CustomEvent(ToastEvent.TIMEOUT, {
+                            detail: { text: responseText.title, isSuccess: false } as ToastTimeoutEventDetail,
+                        }),
+                    );
                 }
             } catch (error) {
-                // toastEl.value.timeout("There was an unexpected error", false, 2000);
+                document.dispatchEvent(
+                    new CustomEvent(ToastEvent.TIMEOUT, {
+                        detail: { text: "There was an unexpected error", isSuccess: false } as ToastTimeoutEventDetail,
+                    }),
+                );
             } finally {
                 isProcessing.value = false;
             }

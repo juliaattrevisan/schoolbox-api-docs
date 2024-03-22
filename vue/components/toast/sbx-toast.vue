@@ -6,6 +6,9 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
+import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "./sbxToastEvent";
+import { ToastEvent } from "./sbxToastEvent";
+
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";
 const STATE_DONE = "done";
@@ -20,14 +23,6 @@ const state = window.Vue.ref(STATE_HIDDEN);
 const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
 const hidden = window.Vue.ref(true);
 
-window.Vue.onMounted(() => {
-    console.warn("yep");
-    // document.addEventListener("TOAST_ACTIVATE", (event) => {
-    //     const { text, successful, duration, fadeDuration, timeoutCallback } = event.detail;
-    //     timeout(text, successful, duration, fadeDuration, timeoutCallback);
-    // });
-});
-
 /**
  * Activate this toast.
  * @param {string} $text - The text to put in it
@@ -41,24 +36,24 @@ function activate($text: string) {
 /**
  * Display this toast with a timeout.
  * @param {string} $text - The text to put in it
- * @param {boolean} successful -  Was the operation that displays this toast
+ * @param {boolean} isSuccess -  Was the operation that displays this toast
  * @param {number} $duration - How long should the toast show?
  * @param {number} $fadeDuration - How long to wait before the toast disappears? (in ms)
- * @param {Function|null} timeoutCallback If callable, call this
+ * @param {() => void|undefined} timeoutCallback If callable, call this
  *                        when the toast times out
  */
 function timeout(
     $text: string,
-    successful: boolean,
-    $duration: number,
-    $fadeDuration: number,
-    timeoutCallback: Function | null,
+    isSuccess: boolean | undefined,
+    $duration: number | undefined,
+    $fadeDuration: number | undefined,
+    timeoutCallback: () => void | undefined,
 ) {
     text.value = $text;
-    state.value = successful ? STATE_DONE : STATE_FAILED;
+    state.value = isSuccess || isSuccess === undefined ? STATE_DONE : STATE_FAILED;
     let duration;
     if ($duration === undefined) {
-        duration = successful ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
+        duration = isSuccess ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
     } else {
         duration = $duration;
     }
@@ -73,6 +68,26 @@ function timeout(
         }
     }, duration);
 }
+
+/**
+ * Listen for toast events
+ */
+window.Vue.onMounted(() => {
+    document.addEventListener(ToastEvent.ACTIVATE, (event) => {
+        const eventDetail = (event as CustomEvent).detail as ToastActivateEventDetail;
+        activate(eventDetail.text);
+    });
+    document.addEventListener(ToastEvent.TIMEOUT, (event) => {
+        const eventDetail = (event as CustomEvent).detail as ToastTimeoutEventDetail;
+        timeout(
+            eventDetail.text,
+            eventDetail.isSuccess,
+            eventDetail.duration,
+            eventDetail.fadeDuration,
+            eventDetail.timeoutCallback,
+        );
+    });
+});
 </script>
 
 <template>
