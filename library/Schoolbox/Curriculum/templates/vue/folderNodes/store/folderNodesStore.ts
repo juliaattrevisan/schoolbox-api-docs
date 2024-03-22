@@ -48,7 +48,7 @@ export const useStore = (folderId: number) =>
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ id: [...selectedNodes.value] }),
+                    body: JSON.stringify([...selectedNodes.value]),
                 });
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
