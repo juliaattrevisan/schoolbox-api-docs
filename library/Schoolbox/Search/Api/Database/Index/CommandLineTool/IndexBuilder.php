@@ -14,6 +14,7 @@ use Alaress\Lock\LockRefreshException;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 
@@ -100,7 +101,13 @@ class IndexBuilder extends App
             ),
         );
 
-        $dbi = $this->getDatabaseInternal();
+        // Run all queries against the write database, rather than a possible
+        // read replica.
+        // This ensures that `SET max_statement_time = 0` happens on the same
+        // database as the `SELECT` statements.
+        /** @var DatabaseFactory $dbFactory */
+        $dbFactory = $this->getDi()->get('databaseFactory');
+        $dbi       = $dbFactory->getInternalWriteDatabase();
 
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
