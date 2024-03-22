@@ -1,8 +1,10 @@
-
-import { initializeApp, getMessaging, onBackgroundMessage } from '/static/js/bundle/firebaseMessaging.js';
-
-{#const b = self.importScripts('/static/js/bundle/firebaseMessaging.js');#}
-{#console.log(b);#}
+/**
+ * Give the service worker access to Firebase Messaging.
+ * Note that you can only use Firebase Messaging here. Other Firebase libraries
+ * are not available in the service worker.
+ */
+importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js");
 
 const firebaseApps = [];
 {% for app in firebase.apps %}
@@ -14,11 +16,17 @@ firebaseApps.push({
 });
 {% endfor %}
 
-window.sbProps.firebaseApps.forEach((app) => {
-    const firebaseApp = initializeApp(app.publicConfiguration);
-    const messaging   = getMessaging(firebaseApp);
-    console.log(messaging);
-    onBackgroundMessage(messaging, (payload) => {
-        console.log(payload);
-    })
+firebaseApps.forEach((app) => {
+    firebase.initializeApp(app.publicConfiguration);
+    const messaging = firebase.messaging();
+    messaging.onBackgroundMessage(function (payload) {
+        console.warn("[firebase-messaging-sw.js] Received background message ", payload);
+        // Customize notification here
+        const notificationTitle = "Background Message Title";
+        const notificationOptions = {
+            body: "Background Message body.",
+            icon: "/firebase-logo.png",
+        };
+        self.registration.showNotification(notificationTitle, notificationOptions);
+    });
 });
