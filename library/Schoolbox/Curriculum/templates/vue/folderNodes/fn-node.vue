@@ -78,7 +78,7 @@ function onRemoveSelected() {
             </div>
             <button
                 v-if="showRemove"
-                class="remove-node f-no-icon-button icon-close l-flex-row l-flex--center"
+                class="remove-node f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
                 :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
                 @click.prevent="onRemoveSelected"
@@ -99,10 +99,6 @@ function onRemoveSelected() {
 </template>
 
 <style scoped>
-.node {
-    /* ssssssssssssssssssssssssssssssssssssssssmin-height: 2.5rem; */
-}
-
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
 }
