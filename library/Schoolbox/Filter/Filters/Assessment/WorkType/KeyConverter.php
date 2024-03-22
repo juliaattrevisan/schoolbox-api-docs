@@ -16,7 +16,9 @@ use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 /**
- * Converts between concrete keys workType.ids and workType.ids
+ * The purpose of this file was previously to convert between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL.
+ * Assessment.work_type_id has since been changed to be non-nullable, so conversion is no longer necessary.
+ * However, all filter types must have a KeyConverter, so this class has been left in place.
  */
 class KeyConverter extends AbstractKeyConverter
 {
