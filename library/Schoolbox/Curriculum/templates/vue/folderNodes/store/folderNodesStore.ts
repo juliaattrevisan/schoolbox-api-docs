@@ -16,7 +16,7 @@ export const useStore = (folderId: number) =>
         const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
         const isReadOnly = window.Vue.ref<boolean>(true); // whether the user can edit nodes or not
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
-        const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
+        const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
 
@@ -100,7 +100,7 @@ export const useStore = (folderId: number) =>
             selectedNodes,
             isReadOnly,
             selectedNodeIds,
-            hasNoNodes,
+            hasNodes,
             selectedDetailsNodeId,
             isProcessing,
             init,

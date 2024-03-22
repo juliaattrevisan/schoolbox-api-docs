@@ -30,7 +30,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore(props.folderId);
-const selectorStore = useSelectorStore(); // The store for the curriculum selector modal
+const selectorStore = useSelectorStore(); // for the curriculum selector modal
 const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
 const modalStore = useModalStore(); // to open the modal
 
@@ -50,7 +50,7 @@ const { ignoreUpdates } = watchIgnorable(
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    // don't fire off the watch when we are setting the initial nodes
+    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes
     ignoreUpdates(() => {
         store().init(props.nodes, props.selectedNodes, props.isReadOnly);
         selectorStore.init({
@@ -76,14 +76,14 @@ function onUpdateSelected() {
 
 <template>
     <oc-empty-state
-        v-if="store().hasNoNodes"
+        v-if="!store().hasNodes"
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
         @map-selected="onUpdateSelected"
     />
     <folder-nodes v-else :folder-id="props.folderId" />
-    <fn-actions v-if="!props.isReadOnly" @update-selected="onUpdateSelected" />
+    <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
     <toast ref="toastEl"></toast>
