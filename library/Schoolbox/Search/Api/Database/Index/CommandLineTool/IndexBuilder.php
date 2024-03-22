@@ -100,6 +100,8 @@ class IndexBuilder extends App
             ),
         );
 
+        $dbi = $this->getDatabaseInternal();
+
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
             ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
@@ -139,8 +141,6 @@ class IndexBuilder extends App
                 )
             );
         }
-
-        $dbi = $this->getDatabaseInternal();
 
         // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
         // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
