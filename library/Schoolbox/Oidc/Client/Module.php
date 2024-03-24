@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Application\Login\Oidc;
+namespace Schoolbox\Oidc\Client;
 
 use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
