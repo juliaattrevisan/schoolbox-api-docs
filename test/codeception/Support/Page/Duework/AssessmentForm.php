@@ -38,7 +38,7 @@ class AssessmentForm
     public const WORKTYPE_ASSESSMENT_TASK = 1;
     public const WORKTYPE_ASSIGNMENT = 2;
     public const WORKTYPE_HOMEWORK = 3;
-
+    public const WORKTYPE_NONE = 7;
     // Mark type
     public const MARK_TYPE_NONE = 0;
     public const MARK_TYPE_PERCENTAGE = 1;
