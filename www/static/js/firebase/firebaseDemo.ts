@@ -5,7 +5,6 @@
 import { timeout } from "@js/util/jsUtils";
 import { initializeApp } from "firebase/app";
 import { MessagePayload, deleteToken, getMessaging, getToken, onMessage } from "firebase/messaging";
-import { serverKey } from "./firebaseDemoConfig";
 
 // Assume only one Firebase app to initialize
 let firebaseApp = null;
@@ -143,16 +142,9 @@ if (firebaseApp && vapidKey) {
             click_action: "https://vagrant.dev.schoolbox.cloud/greenhouse/donny",
         };
         try {
-            const response = await fetch("https://fcm.googleapis.com/fcm/send", {
-                method: "POST",
-                headers: {
-                    Authorization: `key=${serverKey}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    notification,
-                    to: token,
-                }),
+            // Instead send to Schoolbox's test endpoint
+            const response = await fetch("/adminv2/messages/puush/1?live=1", {
+                method: "GET",
             });
             console.warn(response);
         } catch (error) {
@@ -175,16 +167,8 @@ if (firebaseApp && vapidKey) {
             click_action: "https://vagrant.dev.schoolbox.cloud/greenhouse/donny",
         };
         try {
-            const response = await fetch("https://fcm.googleapis.com/fcm/send", {
-                method: "POST",
-                headers: {
-                    Authorization: `key=${serverKey}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    notification,
-                    to: token,
-                }),
+            const response = await fetch("/adminv2/messages/puush/1?live=1", {
+                method: "GET",
             });
             console.warn(response);
         } catch (error) {
