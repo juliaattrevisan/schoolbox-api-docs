@@ -114,7 +114,7 @@ function onSelectedNodeModalClosed() {
 
 <template>
     <div ref="curriculumSelectorEl">
-        <cs-selected-nodes />
+        <cs-selected-nodes :is-single-select="props.isSingleSelect" />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>

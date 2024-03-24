@@ -7,6 +7,17 @@ import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import CsSelectedNode from "./cs-selected-node.vue";
 
+const props = defineProps({
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
+
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const selectEl = window.Vue.ref(null);
@@ -48,13 +59,19 @@ window.Vue.watch(
             const event = new Event("change");
             selectEl.value.dispatchEvent(event);
         });
-    }
+    },
 );
 </script>
 
 <template>
     <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
-        <cs-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
+        <cs-selected-node
+            v-for="node in selectedNodesStore.nodes"
+            :key="node.id"
+            :node="node"
+            :is-single-select="props.isSingleSelect"
+            data-test-node
+        />
     </div>
     <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
