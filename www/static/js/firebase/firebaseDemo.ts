@@ -143,7 +143,7 @@ if (firebaseApp && vapidKey) {
         };
         try {
             // Instead send to Schoolbox's test endpoint
-            const response = await fetch("/adminv2/messages/puush/1?live=1", {
+            const response = await fetch(`/adminv2/messages/puush/${window.schoolboxUser.id}?live=1`, {
                 method: "GET",
             });
             console.warn(response);
@@ -167,7 +167,7 @@ if (firebaseApp && vapidKey) {
             click_action: "https://vagrant.dev.schoolbox.cloud/greenhouse/donny",
         };
         try {
-            const response = await fetch("/adminv2/messages/puush/1?live=1", {
+            const response = await fetch(`/adminv2/messages/puush/${window.schoolboxUser.id}?live=1`, {
                 method: "GET",
             });
             console.warn(response);
