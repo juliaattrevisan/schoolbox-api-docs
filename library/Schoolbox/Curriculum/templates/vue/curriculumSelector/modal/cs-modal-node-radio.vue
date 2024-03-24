@@ -19,14 +19,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /**
- * Only show the checkbox if the node has an id and a code
- * @returns {boolean} - whether the checkbox is visible or not
+ * Only show the checkbox if the node has an id
+ * @returns {boolean} - whether the radio is visible or not
  */
 const isVisible = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 /**
- * Update the status of the checkbox based on whether it's selected or not
- * @returns {boolean} - whether the checkbox is checked or not
+ * Update the status of the radio based on whether it's selected or not
+ * @returns {boolean} - whether the radio is checked or not
  */
 const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(props.node));
 

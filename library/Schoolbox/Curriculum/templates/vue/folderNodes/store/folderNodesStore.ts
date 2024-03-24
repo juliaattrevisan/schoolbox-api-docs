@@ -2,6 +2,7 @@
  * The store to manage the nodes linked to a folder.
  * As several of these stores could be created in a single Vue App (for example in the Unit Planner),
  * we need to be able to create a store for each folder, and manage the nodes for that folder.
+ * So we padd the folderId to the useStore function to create a unique store for each folder.
  */
 
 import { defineStore } from "pinia";
