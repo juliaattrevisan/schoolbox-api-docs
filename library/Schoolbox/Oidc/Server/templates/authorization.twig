@@ -1,0 +1,26 @@
+{% extends 'include/styledIframe.twig' %}
+
+{% block title %}Share your identity with $relyingParty?{% endblock title %}
+
+{% block customHead %}
+    <style>
+        body {
+            background-color: white;
+        }
+    </style>
+{% endblock customHead %}
+
+{% block content %}
+    <h1>Share your identity with $relyingParty?</h1>
+    <p>
+        $relyingParty will have access to your:
+    </p>
+    <ul>
+        <li>Name</li>
+        <li>Email address</li>
+    </ul>
+    <ul class="flex-list buttons">
+        <li><a href="#" class="submit">Allow</a></li>
+        <li><a href="#">Deny</a></li>
+    </ul>
+{% endblock content %}
