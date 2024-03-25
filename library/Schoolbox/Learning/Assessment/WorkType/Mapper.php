@@ -20,7 +20,6 @@ use UnexpectedValueException;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */
