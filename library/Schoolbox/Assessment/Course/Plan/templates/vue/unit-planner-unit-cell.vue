@@ -285,9 +285,8 @@ window.Vue.onUnmounted(() => {
     }
 
     .show-more-container {
-        // bottom: 0;
-        // position: absolute;
-        // width: 100%;
+        display: flex;
+        justify-content: end;
         background: linear-gradient(0deg, #fff 0%, #fff0 100%);
         transition: opacity 0.3s;
         opacity: 0;
@@ -298,7 +297,6 @@ window.Vue.onUnmounted(() => {
 
         button {
             margin: 5px;
-            float: right;
             pointer-events: none;
             transition: opacity 0.3s;
             opacity: 0;
