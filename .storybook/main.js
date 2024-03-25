@@ -8,7 +8,7 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-storysource",
         "@storybook/addon-mdx-gfm",
-        "@storybook/addon-webpack5-compiler-swc"
+        "@storybook/addon-webpack5-compiler-swc",
     ],
     features: {
         postcss: false,
