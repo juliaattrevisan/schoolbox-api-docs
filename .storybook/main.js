@@ -8,13 +8,14 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-storysource",
         "@storybook/addon-mdx-gfm",
+        "@storybook/addon-webpack5-compiler-swc"
     ],
     features: {
         postcss: false,
     },
     framework: {
         name: "@storybook/vue3-webpack5",
-        options: { builder: { useSWC: true } },
+        options: { builder: {} },
     },
     staticDirs: ["../stories/assets"],
     stories: [
