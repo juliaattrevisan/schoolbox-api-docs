@@ -49,12 +49,12 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @inheritDoc
      */
-    public function delete($object): void
+    public function delete($object): bool
     {
         if ($object->getName() === Model::NONE) {
             throw new UnexpectedValueException('The ' . Model::NONE . ' option may not be deleted.');
         }
 
-        parent::delete($object);
+        return parent::delete($object);
     }
 }
