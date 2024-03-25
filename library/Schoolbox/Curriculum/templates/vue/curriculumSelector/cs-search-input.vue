@@ -149,7 +149,13 @@ function onBrowseSelected() {
  * @returns {boolean} - whether the search input is active
  */
 const isActive = window.Vue.computed(() => {
-    return props.isSingleSelect && !selectedNodesStore.hasNodes && !store.isReadOnly;
+    if (store.isReadOnly) {
+        return false;
+    }
+    if (props.isSingleSelect && selectedNodesStore.hasNodes) {
+        return false;
+    }
+    return true;
 });
 </script>
 
