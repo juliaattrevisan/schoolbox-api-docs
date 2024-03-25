@@ -59,8 +59,12 @@ class Admin extends ModuleLoader
         // Admin navigation
         $this->loadModule($di, \Schoolbox\Admin\Navigation\Module::class, '/adminv2/navigation');
 
-        // oAuth-specific settings
+        // oAuth provider settings
         $this->loadModule($di, \Schoolbox\Admin\Oauth\Module::class, '/adminv2/oauth');
+
+        // oAuth client settings
+        $this->loadModule($di, \Schoolbox\Admin\Oauth\Client\Module::class, '/adminv2/oauth/client');
+        $this->loadModule($di, \Schoolbox\Admin\Oauth\Client\Api\Module::class, '/adminv2/oauth/client/api');
 
         // Route list
         $this->loadModule($di, \Schoolbox\Admin\RouteSummary\Module::class, '/adminv2/routes');
