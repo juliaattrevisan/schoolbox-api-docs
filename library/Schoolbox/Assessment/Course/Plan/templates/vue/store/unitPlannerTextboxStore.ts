@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { extractErrorMessage } from "@js/util/fetchUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 

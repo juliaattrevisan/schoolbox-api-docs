@@ -13,6 +13,7 @@ export async function extractErrorMessage(response: Response): Promise<string> {
     // If the response is JSON, then parse it correctly for the response text
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
+        // Usually errors from SchoolBox should include a title, type, and status code:
         const responseJSON = JSON.parse(errorMessage) as { title: string; type: string; status: number };
         errorMessage = responseJSON.title || errorMessage;
     }

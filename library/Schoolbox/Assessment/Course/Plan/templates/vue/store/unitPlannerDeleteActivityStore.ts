@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
-import { extractErrorMessage } from "@js/util/fetchUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Unit } from "../unitPlannerTypes";
 
 export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", () => {
