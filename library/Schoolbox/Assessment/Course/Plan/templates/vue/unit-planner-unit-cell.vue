@@ -24,6 +24,10 @@ const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 
+const storeUnit = window.Vue.computed(() => {
+    return store.units.find((unit) => unit.id === props.unit.id);
+});
+
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
 
@@ -145,6 +149,7 @@ window.Vue.onUnmounted(() => {
             'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
             'sortable-placeholder': props.isSortablePlaceholder,
             'content-focused': contentIsFocused,
+            'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
         }"
         :style="{ height: `${cellMaxHeight}px` }"
         @click="onContentClicked"
@@ -322,15 +327,18 @@ window.Vue.onUnmounted(() => {
 }
 
 [data-column-type="overview"] {
-    cursor: text;
+    // These styles only apply to textboxes that already
+    &.overview-has-created-textbox {
+        cursor: text;
 
-    .content-container-fixed {
-        cursor: default;
-    }
+        .content-container-fixed {
+            cursor: default;
+        }
 
-    &.content-focused {
-        .content-container-fixed .content-overlay {
-            border: 1px solid $form-border-color !important;
+        &.content-focused {
+            .content-container-fixed .content-overlay {
+                border: 1px solid $form-border-color !important;
+            }
         }
     }
 }

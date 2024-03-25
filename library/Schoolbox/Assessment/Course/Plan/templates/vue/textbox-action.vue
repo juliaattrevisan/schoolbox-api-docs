@@ -25,7 +25,8 @@ const contentIsSaved = window.Vue.computed(() => {
     return textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id] === undefined;
 });
 
-const isOverviewContentSaving = window.Vue.ref(false);
+const isCreatingTextbox = window.Vue.ref(false);
+const isContentSaving = window.Vue.ref(false);
 
 /**
  * When the modify button is clicked.
@@ -37,11 +38,22 @@ function onModifyClicked() {
 }
 
 /**
+ * When the create button is clicked.
+ */
+async function onCreateClicked() {
+    isCreatingTextbox.value = true;
+    await textboxStore.createTextbox(props.unit.id, props.column);
+    await window.Vue.nextTick();
+    isCreatingTextbox.value = false;
+    onModifyClicked();
+}
+
+/**
  * When the save button is clicked.
  */
 function onSaveClicked() {
     if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
-    isOverviewContentSaving.value = true;
+    isContentSaving.value = true;
 
     textboxStore
         .saveTextboxContent(props.unit.id, props.column)
@@ -49,7 +61,7 @@ function onSaveClicked() {
             throw err;
         })
         .finally(() => {
-            isOverviewContentSaving.value = false;
+            isContentSaving.value = false;
         });
 }
 </script>
@@ -57,15 +69,21 @@ function onSaveClicked() {
 <template>
     <div class="component-action">
         <section>
-            <button v-if="!contentIsSaved && !isOverviewContentSaving" data-role="dirty-indicator" disabled>
+            <button v-if="!contentIsSaved && !isContentSaving" data-role="dirty-indicator" disabled>
                 Changes not saved
             </button>
 
-            <button v-if="isOverviewContentSaving" class="button">Saving...</button>
+            <button v-if="isContentSaving" class="button">Saving...</button>
+            <button v-else-if="isCreatingTextbox" class="button">Creating Textbox...</button>
 
-            <button v-else-if="contentIsSaved" class="button" @click="onModifyClicked">
-                {{ (storeTextbox?.id || 0) >= 0 ? "Modify" : "Create Textbox" }}
+            <button v-else-if="contentIsSaved && (storeTextbox?.id || 0) >= 0" class="button" @click="onModifyClicked">
+                Modify
             </button>
+
+            <button v-else-if="contentIsSaved && (storeTextbox?.id || 0) < 0" class="button" @click="onCreateClicked">
+                Create Textbox
+            </button>
+
             <!-- Use mouse down as clicking this will remove focus from the content, and cause it to collapse. -->
             <button v-else class="button" @mousedown="onSaveClicked">Save</button>
         </section>

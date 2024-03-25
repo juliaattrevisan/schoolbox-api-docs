@@ -18,6 +18,11 @@ const emit = defineEmits(["updateContentHeight"]);
 const store = useUnitPlannerStore();
 const textboxStore = useUnitPlannerTextboxStore();
 
+// Whether the textbox exists in the backend, or if it still needs to be created
+const textboxIsCreated = window.Vue.computed(() => {
+    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+});
+
 const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].body);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
@@ -28,8 +33,13 @@ const editorCreated = window.Vue.ref(false);
  */
 function focusEditor() {
     if (!editorContentEl.value) return;
+    if (!textboxIsCreated.value) return; // Don't focus if the textbox hasn't been created yet
+
     editorContentEl.value.focus();
 }
+
+// Allow the parent component to focus the editor
+defineExpose({ focusEditor });
 
 /**
  * When a new editor is created
@@ -97,13 +107,10 @@ window.Vue.onBeforeMount(() => {
     document.addEventListener("DOMContentLoaded", initEditor);
 });
 window.Vue.onMounted(initEditor);
-
-// Allow the parent component to focus the editor
-defineExpose({ focusEditor });
 </script>
 
 <template>
-    <div class="editor-wrapper">
+    <div class="editor-wrapper" :style="{ display: textboxIsCreated ? 'block' : 'none' }">
         <!-- eslint-disable vue/no-v-html | initial textboxes are scrubbed-->
         <div ref="editorContentEl" class="editor-content" v-html="props.unit.textboxes[props.column.label].body"></div>
         <!-- eslint-enable vue/no-v-html -->
