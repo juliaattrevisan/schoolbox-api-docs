@@ -115,7 +115,7 @@ function onSelectedNodeModalClosed() {
 <template>
     <div ref="curriculumSelectorEl">
         <cs-selected-nodes />
-        <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
+        <cs-search-input :curriculum-selector-el="curriculumSelectorEl" :is-single-select="props.isSingleSelect" />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
     <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />

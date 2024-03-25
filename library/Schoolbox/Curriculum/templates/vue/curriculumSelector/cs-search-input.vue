@@ -5,13 +5,15 @@
 
 import debounce from "lodash/debounce";
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import { useModalStore } from "./store/csModalStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 
 const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
-const queryInputEl = window.Vue.ref(null); //to deterch if the search input is currently active
+const queryInputEl = window.Vue.ref(null); // to detect if the search input is currently active
 
 const props = defineProps({
     /**
@@ -19,6 +21,14 @@ const props = defineProps({
      */
     curriculumSelectorEl: {
         required: true,
+    },
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 
@@ -116,7 +126,7 @@ window.Vue.watch(
             searchStore.enableSearch();
             debounceSearch();
         }
-    }
+    },
 );
 
 /**
@@ -132,10 +142,19 @@ const debounceSearch = debounce(() => {
 function onBrowseSelected() {
     modalStore.open();
 }
+
+/**
+ * Only display when the component is not read only or if
+ * single select is active and no selection has been made
+ * @returns {boolean} - whether the search input is active
+ */
+const isActive = window.Vue.computed(() => {
+    return props.isSingleSelect && !selectedNodesStore.hasNodes && !store.isReadOnly;
+});
 </script>
 
 <template>
-    <div v-if="!store.isReadOnly" class="input-group" :data-is-small-container="store.isSmallContainer">
+    <div v-if="isActive" class="input-group" :data-is-small-container="store.isSmallContainer">
         <input
             v-model="searchStore.query"
             ref="queryInputEl"
