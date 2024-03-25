@@ -137,4 +137,16 @@ class BadgesCest
         $i->amOnPage($badges::URL);
         $i->cantSee('Automation Badge Updated');
     }
+
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Badge%"]);
+    }
 }
