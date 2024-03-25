@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\WorkType;
 
 use Schoolbox;
+use UnexpectedValueException;
 
 /**
  * @method Model findById($identifierValue)
@@ -44,5 +45,17 @@ class Mapper extends Schoolbox\Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete($object): void
+    {
+        if ($object->getName() === Model::NONE) {
+            throw new UnexpectedValueException('The ' . Model::NONE . ' option may not be deleted.');
+        }
+
+        parent::delete($object);
     }
 }
