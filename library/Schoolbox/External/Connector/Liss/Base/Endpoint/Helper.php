@@ -28,21 +28,12 @@ class Helper
 
 
     /**
-     * Logs the things that happened, in a text file
-     *
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
      * Constructor.
      *
-     * @param LoggerInterface $log
+     * @param LoggerInterface $log Logs the things that happened, in a text file
      */
-    public function __construct(LoggerInterface $log)
+    public function __construct(private LoggerInterface $log)
     {
-        $this->log = $log;
     }
 
 
