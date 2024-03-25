@@ -40,8 +40,8 @@ $app = new class extends CliTool\App {
         $log->info("Set innodb_ft_user_stopword_table to '$dbNameSlashTableName'.");
 
         // Rebuild the search indexes.
-        $dbc->execute('ALTER TABLE search_index DROP KEY `search_index_fulltext_index_index`');
-        $dbc->execute('ALTER TABLE search_index DROP KEY `search_index_title_index`');
+        $dbc->execute('ALTER TABLE search_index DROP KEY IF EXISTS `search_index_fulltext_index_index`');
+        $dbc->execute('ALTER TABLE search_index DROP KEY IF EXISTS `search_index_title_index`');
         $dbc->execute('CREATE FULLTEXT INDEX `search_index_fulltext_index_index` ON search_index (`fulltext_index`)');
         $dbc->execute('CREATE FULLTEXT INDEX `search_index_title_index` ON search_index (`title`)');
         $log->info('Rebuilt search indexes.');
