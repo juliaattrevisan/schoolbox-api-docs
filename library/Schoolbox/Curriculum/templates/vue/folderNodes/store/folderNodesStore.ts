@@ -22,18 +22,6 @@ export const useStore = (folderId: number) =>
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
 
         /**
-         * Store a reference to the nodes to display
-         * @param {Node[]} $nodes - the node trees to display
-         * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
-         * @param {boolean} $isReadOnly - whether the user can edit nodes or not
-         */
-        function init($nodes: Node[], $selectedNodes: Node[], $isReadOnly: boolean): void {
-            nodes.value = $nodes;
-            selectedNodes.value = $selectedNodes;
-            isReadOnly.value = $isReadOnly;
-        }
-
-        /**
          * To notify the backend of a change in the selected nodes
          */
         async function pushChanges() {
@@ -76,6 +64,19 @@ export const useStore = (folderId: number) =>
             } finally {
                 isProcessing.value = false;
             }
+        }
+
+        /**
+         * Store a reference to the nodes to display
+         * @param {Node[]} $nodes - the node trees to display
+         * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
+         * @param {boolean} $isReadOnly - whether the user can edit nodes or not
+         */
+        function init($nodes: Node[], $selectedNodes: Node[], $isReadOnly: boolean): void {
+            nodes.value = $nodes;
+            selectedNodes.value = $selectedNodes;
+            isReadOnly.value = $isReadOnly;
+            void pushChanges();
         }
 
         /**
