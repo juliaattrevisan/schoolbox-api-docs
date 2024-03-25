@@ -22,14 +22,6 @@ const props = defineProps({
             };
         },
     },
-    /**
-     * so can only select a single node
-     */
-    isSingleSelect: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
 });
 
 const store = useStore();
@@ -67,7 +59,7 @@ function onRemoveSelected() {
             @click.prevent="onTitleSelected"
             data-test-title-button
         >
-            {{ props.isSingleSelect ? props.node.name : props.node.code }}
+            {{ props.node.code === "" ? props.node.name : props.node.code }}
         </button>
         <button
             type="button"
