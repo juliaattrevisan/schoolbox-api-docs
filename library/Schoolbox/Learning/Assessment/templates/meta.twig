@@ -1,11 +1,12 @@
 {##
- # @param IAssessable                   assessment          an IAssesssable instance
- # @param bool                          submissionsBlocked  whether you can submit to this assessment, I guess
- # @param User                          student             the student currently being viewed
- # @param string                        icon                a css class representing the assessable
- # @param bool                          canShowcase         a boolean for students' ability to Showcase to their eportfolio
- # @param bool                          isShowcased         whether this assessment is already showcased on a user's eportfolio
- # @param null|Participant\Model        participant         an instance if the student is excluded from the assessment or deleted
+ # @param IAssessable                   assessment              an IAssesssable instance
+ # @param bool                          assessmentIsLessonPlan  an IAssesssable instance
+ # @param bool                          submissionsBlocked      whether you can submit to this assessment, I guess
+ # @param User                          student                 the student currently being viewed
+ # @param string                        icon                    a css class representing the assessable
+ # @param bool                          canShowcase             a boolean for students' ability to Showcase to their eportfolio
+ # @param bool                          isShowcased             whether this assessment is already showcased on a user's eportfolio
+ # @param null|Participant\Model        participant             an instance if the student is excluded from the assessment or deleted
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% apply spaceless %}
@@ -14,7 +15,11 @@
     <li class="icon-eportfolio">Published to ePortfolio</li>
     {% endif %}
     {% include '@learning/fragments/meta/dueDate.twig' %}
-    {% include '@learning/fragments/meta/workType.twig' %}
+
+    {% if not assessmentIsLessonPlan %}
+        {% include '@learning/fragments/meta/workType.twig' %}
+    {% endif %}
+
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
@@ -43,7 +48,7 @@
     {% for parent in lastViews.parents %}
         {% if parent.date is not null %}
         <li class="icon-staff" title="{{ parent.date }}">
-                <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
+            <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
             {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.activity }}{% else %} the feedback {% endif %}
         </li>
         {% endif %}

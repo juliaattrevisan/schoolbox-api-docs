@@ -266,13 +266,14 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'        => $assessment,
-            'student'           => $student,
-            'returnUrl'         => $returnUrl,
-            'courseAssessments' => $courseAssessments,
-            'linkedAssessments' => (
+            'lastViews'              => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
+            'breadcrumbs'            => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'             => $assessment,
+            'assessmentIsLessonPlan' => ($assessment instanceof Model),
+            'student'                => $student,
+            'returnUrl'              => $returnUrl,
+            'courseAssessments'      => $courseAssessments,
+            'linkedAssessments'      => (
                 $linkedAssessments
                 ? $linkedAssessments->reindex()->map($unitAssessmentsTranslator)
                 : []
