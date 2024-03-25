@@ -1,4 +1,4 @@
-<div data-cs-container>
+<div data-cs-container class="tree-filter">
     <curriculum-selector
         :is-read-only="false"
         :selected-nodes="{COMPONENT_CONFIG_CURRICULUMTREEFILTER_SEARCH_SELECTED}"
@@ -8,3 +8,8 @@
     />
 </div>
 <script src="{CDN_PREFIX}/js/bundle/curriculumSelector.js?v={SITE_VERSION}"></script>
+<style>
+.tree-filter {
+    margin-bottom: 1rem;
+}
+</style>
