@@ -19,6 +19,7 @@ const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED"; // the event to trigge
 type UpdateEventDetail = {
     updatedComponentInstanceId: number;
     updatedNodes: Node[];
+    updatedSelectedNodes: Node[];
 };
 
 export const useStore = (folderId: number, componentInstanceId: number) =>
@@ -62,6 +63,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                             detail: {
                                 updatedComponentInstanceId: componentInstanceId,
                                 updatedNodes: newNodes,
+                                updatedSelectedNodes: selectedNodes.value,
                             } as UpdateEventDetail,
                         }),
                     );
@@ -94,6 +96,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 const eventDetail = (event as CustomEvent).detail as UpdateEventDetail;
                 if (eventDetail.updatedComponentInstanceId !== componentInstanceId) {
                     nodes.value = eventDetail.updatedNodes;
+                    selectedNodes.value = eventDetail.updatedSelectedNodes;
                 }
             });
         }
