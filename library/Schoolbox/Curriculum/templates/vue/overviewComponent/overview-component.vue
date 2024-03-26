@@ -21,6 +21,7 @@ interface Props {
     folderId: number; // The folder id to display the nodes for
     nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
+    filter: Node[]; // The node filter to apply to the nodes, only displaying nodes that are children of this node
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
     isSuperUser: boolean; // Whether the user is a super user

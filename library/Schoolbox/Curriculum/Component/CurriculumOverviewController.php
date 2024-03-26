@@ -39,6 +39,15 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
     protected ?GenericCollection $selectedNodes = null;
 
     /**
+     * The selected curriculum tree filter node. The node that will be used to
+     * to filter the component to display only the nodes that are descendants of
+     * this node.
+     *
+     * @var GenericCollection<Node\Model>|null
+     */
+    // protected ?GenericCollection $curriculumTreeFilter = null;
+
+    /**
      * Is curriculum tagging turned on
      */
     protected bool $curriculumTagging = false;
@@ -100,6 +109,12 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
         $this->selectedNodes = $this->getContext()->getCurriculumNodes()->reindex();
 
+        // Load curriculum tree filter node
+        // $this->curriculumTreeFilter = $nodeMapper->findByColumn(
+        //     'id',
+        //     explode(',', $this->getConfig('curriculumTreeFilter', '')),
+        // );
+
         return true;
     }
 
@@ -115,6 +130,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'context'           => $this->getContext(),
                 'nodes'             => $this->curriculumNodes,
                 'selectedNodes'     => $this->selectedNodes,
+                // 'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
                     'curriculum.edit',
