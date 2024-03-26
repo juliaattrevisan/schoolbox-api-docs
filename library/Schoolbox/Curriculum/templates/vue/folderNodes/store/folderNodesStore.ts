@@ -15,6 +15,7 @@ export const useStore = (folderId: number) =>
     defineStore(`folderNodes/${folderId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
         const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
+        const filter = window.Vue.ref<Node>({} as Node); // the node filter to apply to the nodes, only displaying nodes that are children of this node
         const isReadOnly = window.Vue.ref<boolean>(true); // whether the user can edit nodes or not
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
@@ -70,11 +71,13 @@ export const useStore = (folderId: number) =>
          * Store a reference to the nodes to display
          * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
+         * @param {Node} $filter - the node filter to apply to the nodes, only displaying nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
-        function init($nodes: Node[], $selectedNodes: Node[], $isReadOnly: boolean): void {
+        function init($nodes: Node[], $selectedNodes: Node[], $filter: Node, $isReadOnly: boolean): void {
             nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
+            filter.value = $filter;
             isReadOnly.value = $isReadOnly;
             void pushChanges();
         }
