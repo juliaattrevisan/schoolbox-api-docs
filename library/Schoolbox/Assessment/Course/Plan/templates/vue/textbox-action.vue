@@ -14,11 +14,13 @@ const emit = defineEmits(["modifyClicked"]);
 const store = useUnitPlannerStore();
 const textboxStore = useUnitPlannerTextboxStore();
 
-const storeTextbox = window.Vue.computed(() => {
-    const storeUnit = store.units.find((unit) => unit.id === props.unit.id);
+// Whether the textbox exists in the backend, or if it still needs to be created
+const textboxIsCreated = window.Vue.computed(() => {
+    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+});
 
-    if (!storeUnit) return null;
-    return storeUnit.textboxes[props.column.label];
+const contentIsFocused = window.Vue.computed(() => {
+    return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
 });
 
 const contentIsSaved = window.Vue.computed(() => {
@@ -75,15 +77,10 @@ function onSaveClicked() {
 
             <button v-if="isContentSaving" class="button">Saving...</button>
             <button v-else-if="isCreatingTextbox" class="button">Creating Textbox...</button>
-
-            <button v-else-if="contentIsSaved && (storeTextbox?.id || 0) >= 0" class="button" @click="onModifyClicked">
+            <button v-else-if="!textboxIsCreated" class="button" @click="onCreateClicked">Create Textbox</button>
+            <button v-else-if="contentIsSaved && !contentIsFocused" class="button" @click="onModifyClicked">
                 Modify
             </button>
-
-            <button v-else-if="contentIsSaved && (storeTextbox?.id || 0) < 0" class="button" @click="onCreateClicked">
-                Create Textbox
-            </button>
-
             <!-- Use mouse down as clicking this will remove focus from the content, and cause it to collapse. -->
             <button v-else class="button" @mousedown="onSaveClicked">Save</button>
         </section>
