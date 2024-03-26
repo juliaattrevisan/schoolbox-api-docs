@@ -7,7 +7,7 @@
 {% set selectIsDisabled = assessment.familyName == 'dueWork' and courseManaged.isReadonly %}
 <label for="workTypeSelector" {% if not selectIsDisabled %}class="required"{% endif %}>Work Type</label>
 <select id="workTypeSelector" name="workType" {% if selectIsDisabled %}disabled{% else %}required{% endif %}>
-    <option value="" disabled>Select work type</option>
+    <option value="" disabled{% if not assessment.workType %} selected="selected"{% endif %}>Select work type</option>
     {% for workType in allWorkTypes %}
         <option value="{{ workType.id }}"
             {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}
