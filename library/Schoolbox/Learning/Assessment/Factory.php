@@ -15,6 +15,7 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
@@ -151,6 +152,8 @@ class Factory
     /** @var IAssessable */
     private $original;
 
+    private $errorMapper;
+
     /**
      * Factory constructor.
      * @param User             $creator
@@ -160,7 +163,7 @@ class Factory
      * @throws MapperException
      * @throws Deleted
      */
-    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
+    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original, $errorMapper)
     {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
@@ -176,15 +179,19 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
+        $this->errorMapper = $errorMapper;
 
-        // Work type should always be null for lesson plans.
-        // For other assessment types, look up the work type to make sure it is valid before setting.
-        // If it is not valid (e.g. it does not exist or is soft-deleted) throw an exception.
-        $this->setWorkType(
-            $assessmentType === AssessmentType::TYPE_LESSON_PLAN
-            ? null
-            : WorkTypeMapper::getInstance()->findById($post['workType'])->getId()
-        );
+        if ($assessmentType === AssessmentType::TYPE_LESSON_PLAN) {
+            // Work type should always be null for lesson plans.
+            $this->setWorkType(null);
+        } else {
+            try {
+                // If an invalid work type has been supplied by the client, treat as information missing.
+                $this->setWorkType(WorkTypeMapper::getInstance()->findById($post['workType'])->getId());
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
+        }
 
         /* Projects need this to instantiate
          */
