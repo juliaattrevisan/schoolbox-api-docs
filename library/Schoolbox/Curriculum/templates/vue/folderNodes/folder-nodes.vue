@@ -14,23 +14,27 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore(props.folderId, props.componentInstanceId);
-const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 </script>
 
 <template>
-    <transition-group name="list" tag="div" class="l-flex-col">
+    <transition-group name="list" tag="ul" class="nodes l-flex-col">
         <fn-node
             v-for="node in store().filteredNodes"
             :key="node.id"
             :node="node"
             :folder-id="props.folderId"
             :component-instance-id="props.componentInstanceId"
-            :depth="depth"
         />
     </transition-group>
 </template>
 
 <style scoped>
+.nodes {
+    /* move the spacing in a bit */
+    margin-inline-start: var(--spacing-m);
+    margin-block-end: 0;
+    padding-inline-start: var(--spacing-m);
+}
 .list-enter-active,
 .list-leave-active {
     transition: opacity 0.5s ease;
