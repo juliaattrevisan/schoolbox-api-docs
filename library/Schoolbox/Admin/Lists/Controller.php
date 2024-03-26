@@ -75,7 +75,6 @@ class Controller extends Base
         if (class_exists($mapperName)) {
             /** @var Mapper $mapper */
             $mapper = $mapperName::getInstance();
-
             try {
                 $record = $mapper->findById($post['id']);
                 $result = $mapper->delete($record);
