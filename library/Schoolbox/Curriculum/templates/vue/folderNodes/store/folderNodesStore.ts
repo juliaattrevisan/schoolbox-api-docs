@@ -2,7 +2,7 @@
  * The store to manage the nodes linked to a folder.
  * As several of these stores could be created in a single Vue App (for example in the Unit Planner),
  * we need to be able to create a store for each folder, and manage the nodes for that folder.
- * So we padd the folderId to the useStore function to create a unique store for each folder.
+ * So we pass the folderId and componentInstanceId to the useStore function to create a unique store for each folder.
  */
 
 import { defineStore } from "pinia";
@@ -26,7 +26,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
     defineStore(`folderNodes/${folderId}-${componentInstanceId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
         const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
-        const filter = window.Vue.ref<Node>({} as Node); // the node filter to apply to the nodes, only displaying nodes that are children of this node
+        const filter = window.Vue.ref<Node>({} as Node); // to only display nodes that are children of this node
         const isReadOnly = window.Vue.ref<boolean>(true); // whether the user can edit nodes or not
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
@@ -87,9 +87,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         }
 
         /**
-         * Multiple instances of the component linked to this store could exist on the page in entirely different Vue apps.
+         * Multiple instances of the component linked to this store could exist on the page,
+         * even in entirely different Vue apps.
          * As such we need to ensure that when a change is made in one instance,
-         * that the other instances are updated to reflect the change
+         * the other instances are updated to reflect the latest changes
          */
         function initEventListener() {
             document.addEventListener(FOLDER_NODES_UPDATED, (event) => {
@@ -105,7 +106,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * Store a reference to the nodes to display
          * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
-         * @param {Node} $filter - the node filter to apply to the nodes, only displaying nodes that are children of this node
+         * @param {Node} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
         function init($nodes: Node[], $selectedNodes: Node[], $filter: Node, $isReadOnly: boolean): void {
@@ -157,7 +158,6 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         }
 
         return {
-            filter,
             selectedNodes,
             filteredNodes,
             isReadOnly,

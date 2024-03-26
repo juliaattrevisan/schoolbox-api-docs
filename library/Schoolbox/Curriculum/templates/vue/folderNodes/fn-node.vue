@@ -55,7 +55,7 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <li classs="">
+    <li>
         <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-gap-xs">
                 <a

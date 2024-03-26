@@ -23,7 +23,7 @@ interface Props {
     componentInstanceId: number; // The component instance id, to ensure the store is unique
     nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
-    filter: Node; // The node filter to apply to the nodes, only displaying nodes that are children of this node
+    filter: Node; // to only display nodes that are children of this node
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
     isSuperUser: boolean; // Whether the user is a super user
@@ -53,7 +53,7 @@ const { ignoreUpdates } = watchIgnorable(
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes
+    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes, otherwise we'll end up in a infinte loop!
     ignoreUpdates(() => {
         store().init(props.nodes, props.selectedNodes, props.filter, props.isReadOnly);
         selectorStore.init({
@@ -78,6 +78,7 @@ function onUpdateSelected() {
 
 /**
  * The modal has been closed, so reset the selected details node id
+ * to allow it to be opened again on the same node if required
  */
 function onModalClosed() {
     store().selectedDetailsNodeId = UNSET_ID;
