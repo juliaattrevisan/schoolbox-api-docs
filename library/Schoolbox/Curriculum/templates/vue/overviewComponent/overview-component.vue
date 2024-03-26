@@ -94,7 +94,7 @@ function onModalClosed() {
     />
     <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
-    <cs-modal v-if="selectorStore.hasLoadedOk" />
+    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
     <toast ref="toastEl"></toast>
 </template>
