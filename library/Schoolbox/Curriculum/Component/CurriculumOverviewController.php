@@ -127,9 +127,10 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@curriculum/component/curriculumOverview.twig',
             [
-                'context'           => $this->getContext(),
-                'nodes'             => $this->curriculumNodes,
-                'selectedNodes'     => $this->selectedNodes,
+                'context' => $this->getContext(),
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'nodes' => $this->curriculumNodes,
+                'selectedNodes' => $this->selectedNodes,
                 // 'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(

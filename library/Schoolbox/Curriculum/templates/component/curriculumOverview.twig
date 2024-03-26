@@ -2,6 +2,7 @@
 <div data-overview-component>
     <overview-component
         :folder-id="{{ context.id }}"
+        :component-instance-id="{{ componentInstanceId }}"
         :nodes="{{ (nodes ?? []) | json_encode }}"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         :filter="{{ curriculumTreeFilter | json_encode }}"

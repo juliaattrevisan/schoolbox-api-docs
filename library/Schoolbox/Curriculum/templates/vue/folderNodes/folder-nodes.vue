@@ -9,10 +9,11 @@ import FnNode from "./fn-node.vue";
 
 interface Props {
     folderId: number; // The folder id to display the nodes for
+    componentInstanceId: number; // The component instance id to display the nodes on
 }
 const props = defineProps<Props>();
 
-const store = useStore(props.folderId);
+const store = useStore(props.folderId, props.componentInstanceId);
 const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 </script>
 
@@ -23,6 +24,7 @@ const depth = window.Vue.ref(0); // to increment each time we go down the node t
             :key="node.id"
             :node="node"
             :folder-id="props.folderId"
+            :component-instance-id="props.componentInstanceId"
             :depth="depth"
         />
     </transition-group>

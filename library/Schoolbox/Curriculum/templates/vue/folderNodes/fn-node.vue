@@ -9,12 +9,13 @@ import { useStore } from "./store/folderNodesStore";
 interface Props {
     node: Node; // the assigned node to display
     folderId: number; // The folder id to display the nodes for, primarily used to reference the appropriate store
+    componentInstanceId: number; // The component instance id to display the nodes on
     depth: number; // to gradually add more marginLeft to indicate node level depth
 }
 
 const props = defineProps<Props>();
 
-const store = useStore(props.folderId);
+const store = useStore(props.folderId, props.componentInstanceId);
 
 /**
  * to gradually add more marginLeft to indicate node level depth
@@ -91,6 +92,7 @@ function onRemoveSelected() {
                     :key="viewNode.id"
                     :node="viewNode"
                     :folder-id="props.folderId"
+                    :component-instance-id="props.componentInstanceId"
                     :depth="props.depth + 1"
                 />
             </transition-group>

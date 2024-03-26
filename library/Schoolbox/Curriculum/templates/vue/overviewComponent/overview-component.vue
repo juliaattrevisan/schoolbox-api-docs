@@ -19,6 +19,7 @@ import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
     folderId: number; // The folder id to display the nodes for
+    componentInstanceId: number; // The component instance id, to ensure the store is unique
     nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
     filter: Node; // The node filter to apply to the nodes, only displaying nodes that are children of this node
@@ -30,7 +31,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore(props.folderId);
+const store = useStore(props.folderId, props.componentInstanceId);
 const selectorStore = useSelectorStore(); // for the curriculum selector modal
 const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
 const modalStore = useModalStore(); // to open the modal
@@ -83,7 +84,7 @@ function onUpdateSelected() {
         :locale-unit="props.localeUnit"
         @map-selected="onUpdateSelected"
     />
-    <folder-nodes v-else :folder-id="props.folderId" />
+    <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />

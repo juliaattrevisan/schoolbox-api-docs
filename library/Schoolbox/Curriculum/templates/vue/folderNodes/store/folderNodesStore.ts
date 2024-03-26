@@ -11,8 +11,18 @@ import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolb
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 
-export const useStore = (folderId: number) =>
-    defineStore(`folderNodes/${folderId}`, () => {
+const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED";
+
+/**
+ * The details passed with a UPDATE event
+ */
+type UpdateEventDetail = {
+    updatedComponentInstanceId: number;
+    updatedNodes: Node[];
+};
+
+export const useStore = (folderId: number, componentInstanceId: number) =>
+    defineStore(`folderNodes/${folderId}-${componentInstanceId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
         const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
         const filter = window.Vue.ref<Node>({} as Node); // the node filter to apply to the nodes, only displaying nodes that are children of this node
@@ -47,6 +57,14 @@ export const useStore = (folderId: number) =>
                             detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
                         }),
                     );
+                    document.dispatchEvent(
+                        new CustomEvent(FOLDER_NODES_UPDATED, {
+                            detail: {
+                                updatedComponentInstanceId: componentInstanceId,
+                                updatedNodes: newNodes,
+                            } as UpdateEventDetail,
+                        }),
+                    );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
                     document.dispatchEvent(
@@ -67,6 +85,20 @@ export const useStore = (folderId: number) =>
         }
 
         /**
+         * Multiple instances of the component linked to this store could exist on the page in entirely different Vue apps.
+         * As such we need to ensure that when a change is made in one instance,
+         * that the other instances are updated to reflect the change
+         */
+        function initEventListener() {
+            document.addEventListener(FOLDER_NODES_UPDATED, (event) => {
+                const eventDetail = (event as CustomEvent).detail as UpdateEventDetail;
+                if (eventDetail.updatedComponentInstanceId !== componentInstanceId) {
+                    nodes.value = eventDetail.updatedNodes;
+                }
+            });
+        }
+
+        /**
          * Store a reference to the nodes to display
          * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
@@ -79,6 +111,7 @@ export const useStore = (folderId: number) =>
             filter.value = $filter;
             isReadOnly.value = $isReadOnly;
             void pushChanges();
+            initEventListener();
         }
 
         /**
