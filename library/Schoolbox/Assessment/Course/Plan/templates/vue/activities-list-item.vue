@@ -51,7 +51,7 @@ const activityLink = window.Vue.computed(() => {
         <ul :id="'dropdown-unitplanner-activity-' + props.activity.id" class="f-dropdown" data-dropdown-content>
             <li v-if="props.activity._links.export">
                 <a
-                    :href="returnUrl(props.activity._links.export)"
+                    :href="getReturnUrl(props.activity._links.export)"
                     class="icon-export"
                     title="Copy this task into classes"
                     >Export to Classes</a
