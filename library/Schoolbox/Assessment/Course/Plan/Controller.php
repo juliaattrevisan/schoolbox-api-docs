@@ -261,7 +261,15 @@ class Controller extends Base
                 // Fallback of the php default title for textbox components
                 $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
             }
-            $textboxes[strtolower($heading)] = null;
+
+            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+            // The frontend will use this to determine whether the textbox needs to be created or not.
+            // This saves needing to manipulate the initial data on the frontend on the first mount
+            $textboxes[strtolower($heading)] = [
+                'id' => -1,
+                'body' => ''
+            ];
+
             $textboxesKeys[strtolower($heading)] = $heading;
         }
 

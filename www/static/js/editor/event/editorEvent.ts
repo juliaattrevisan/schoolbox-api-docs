@@ -1,4 +1,5 @@
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 
 /**
  * The different events that can be dispatched by the editor
@@ -28,7 +29,7 @@ export enum EditorEvent {
  * When an EDITOR__CREATE event is dispatched, this is included
  */
 export type EditorCreatedEventInfo = {
-    editor: ClassicEditor;
+    editor: ClassicEditor | InlineEditor;
     sourceElement: HTMLElement;
 };
 
@@ -37,7 +38,7 @@ export type EditorCreatedEventInfo = {
  * This tells interested parties that the editor included in the info is about to be deleted.
  */
 export type EditorDeleteEventInfo = {
-    editor: ClassicEditor;
+    editor: ClassicEditor | InlineEditor;
     containingFormId: string;
     submitButtons: Array<HTMLInputElement | HTMLButtonElement>;
 };

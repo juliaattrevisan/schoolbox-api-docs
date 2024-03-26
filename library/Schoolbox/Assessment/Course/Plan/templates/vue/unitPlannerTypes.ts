@@ -27,7 +27,7 @@ export type Unit = {
     activities: Activity[];
     curriculumCodes: Node[];
     rubricCapabilities: RubricCapability[];
-    textboxes: Record<string, TextboxContent | null>;
+    textboxes: Record<string, TextboxContent>;
     extraTextboxes: number;
     sequence: number;
 };

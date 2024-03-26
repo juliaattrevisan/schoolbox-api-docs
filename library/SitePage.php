@@ -182,7 +182,7 @@ class SitePage
         return true;
     }
 
-        /**
+    /**
      * @param bool $state
      */
     public function setAjax($state = true)
@@ -214,6 +214,17 @@ class SitePage
         } else {
             return false;
         }
+    }
+
+    /**
+     * Detects if a request has requested JSON output by setting the "Accept"
+     * header to "application/json".
+     *
+     * @return bool
+     */
+    public static function detectJson()
+    {
+        return (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false);
     }
 
     /**
@@ -402,7 +413,7 @@ class SitePage
         $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
-        if (!( isset($_SESSION['history'][0]) && $_SESSION['history'][0] == $requestUri)) {
+        if (!(isset($_SESSION['history'][0]) && $_SESSION['history'][0] == $requestUri)) {
             array_unshift($_SESSION['history'], $requestUri);
 
             if (count($_SESSION['history']) > 3) {

@@ -19,7 +19,7 @@ export enum EditorToolbar {
  * The config object for the editor
  */
 export interface EditorConfig {
-    targetElements: string[]; // the elements to target for the editor
+    targetElements: (string | HTMLElement)[]; // the elements to target for the editor
     type?: EditorType.CLASSIC | EditorType.INLINE; // the type of editor to use
     toolbar?: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
