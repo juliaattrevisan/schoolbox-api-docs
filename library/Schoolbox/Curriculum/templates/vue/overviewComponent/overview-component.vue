@@ -6,6 +6,7 @@
 
 import { watchIgnorable } from "@vueuse/core";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
@@ -74,6 +75,13 @@ function onUpdateSelected() {
     });
     modalStore.open();
 }
+
+/**
+ * The modal has been closed, so reset the selected details node id
+ */
+function onModalClosed() {
+    store().selectedDetailsNodeId = UNSET_ID;
+}
 </script>
 
 <template>
@@ -87,6 +95,6 @@ function onUpdateSelected() {
     <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
     <cs-modal v-if="selectorStore.hasLoadedOk" />
-    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
+    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
     <toast ref="toastEl"></toast>
 </template>

@@ -11,10 +11,10 @@ import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolb
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 
-const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED";
+const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED"; // the event to trigger when the nodes have been updated
 
 /**
- * The details passed with a UPDATE event
+ * The details passed with an UPDATE event
  */
 type UpdateEventDetail = {
     updatedComponentInstanceId: number;

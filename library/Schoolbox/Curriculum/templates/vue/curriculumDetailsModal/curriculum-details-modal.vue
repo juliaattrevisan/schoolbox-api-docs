@@ -14,6 +14,10 @@ const props = withDefaults(defineProps<Props>(), {
     selectedNodeId: UNSET_ID,
 });
 
+const emit = defineEmits<{
+    closed: [];
+}>();
+
 /**
  * An alternative to findNodeLinks() is to pass the selectedNodeId prop
  * and changes will trigger the details modal to open
@@ -58,10 +62,17 @@ window.Vue.onMounted(() => {
         findNodeLinks();
     });
 });
+
+/**
+ * The modal has been closed, so emit the closed event
+ */
+function onModalClosed() {
+    emit("closed");
+}
 </script>
 
 <template>
-    <reveal-modal ref="modalEl">
+    <reveal-modal ref="modalEl" @closed="onModalClosed">
         <node-details :node="selectedNode" />
     </reveal-modal>
 </template>
