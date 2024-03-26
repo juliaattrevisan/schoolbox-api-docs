@@ -52,21 +52,7 @@ export function useEditor(
     async function loadCKEditor() {
         try {
             const ckeditorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
-            if (!isScriptAdded(ckeditorScript)) {
-                await injectScript(ckeditorScript);
-            }
-
-            // Wait for the script to load if it hasn't already
-            if (!window.sbProps.ckeditorReady) {
-                await new Promise<void>((resolve) => {
-                    const interval = setInterval(() => {
-                        if (window.sbProps.ckeditorReady) {
-                            clearInterval(interval);
-                            resolve();
-                        }
-                    }, 100);
-                });
-            }
+            await injectScript(ckeditorScript);
 
             const ckeditorElement =
                 typeof ckeditorSelector === "string"

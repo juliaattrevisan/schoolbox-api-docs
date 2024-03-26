@@ -152,7 +152,3 @@ document.addEventListener(EditorEvent.EDITOR__CREATE, (event) => {
 document.addEventListener(EditorEvent.EDITOR__DELETE, (event) => {
     onDelete(event as CustomEvent);
 });
-
-// Allow scripts to wait for us to be ready, so they don't try
-// to call the event listener before we're listening for it.
-window.sbProps.ckeditorReady = true;

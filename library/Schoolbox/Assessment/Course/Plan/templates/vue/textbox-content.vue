@@ -103,9 +103,6 @@ function initEditor() {
     );
 }
 
-window.Vue.onBeforeMount(() => {
-    document.addEventListener("DOMContentLoaded", initEditor);
-});
 window.Vue.onMounted(initEditor);
 </script>
 

@@ -115,7 +115,7 @@ export function getClosestElement(targetElement: HTMLElement, elements: HTMLElem
         const elementsTargetPoint = getElementsLeftAndMidHeightPoint(element);
         // ** is: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Exponentiation
         const distance = Math.sqrt(
-            (elementsTargetPoint.left - targetPoint.left) ** 2 + (elementsTargetPoint.top - targetPoint.top) ** 2
+            (elementsTargetPoint.left - targetPoint.left) ** 2 + (elementsTargetPoint.top - targetPoint.top) ** 2,
         );
         if (distance < minDistance) {
             minDistance = distance;
@@ -179,12 +179,86 @@ export function setAndGetAttribute(element: HTMLElement, attribute: string, valu
 }
 
 /**
+ * Returns the script element
+ * @param {string} src - the src of the script
+ * @returns { HTMLScriptElement | null } - the script element, or null if it doesn't exist
+ */
+export function getScriptElement(src: string): HTMLScriptElement | null {
+    return document.querySelector(`script[src="${src}"]`);
+}
+
+/**
  * Returns true if the script exists on the page
  * @param {string} src - the src of the script
  * @returns {boolean} - true if the script exists on the page
  */
-export function isScriptAdded(src: string) {
-    return Boolean(document.querySelector(`script[src="${src}"]`));
+export function isScriptAdded(src: string): boolean {
+    return Boolean(getScriptElement(src));
+}
+
+/**
+ * Returns true if the script has been loaded
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script has been loaded
+ */
+export function isScriptLoaded(src: string): boolean {
+    const scriptElement = getScriptElement(src);
+    return Boolean(scriptElement && scriptElement.getAttribute("data-is-loaded") === "true");
+}
+
+/**
+ * Returns true if the script was already injected
+ * @param {string} src - the src of the script
+ * @returns {boolean} - true if the script was already injected
+ */
+export function isScriptInjected(src: string): boolean {
+    // The script must have a data-is-loaded attribute to be considered injected
+    const scriptElement = getScriptElement(src);
+    return Boolean(scriptElement && scriptElement.getAttribute("data-is-loaded") !== null);
+}
+
+/**
+ * Async inject a <script> tag into the DOM
+ * https://stackoverflow.com/a/39008859
+ * @param {string} src - the src of the script to inject
+ */
+export function injectScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        // Have we already injected this script?
+        if (isScriptInjected(src)) {
+            // Has it already loaded?
+            if (isScriptLoaded(src)) {
+                resolve();
+            } else {
+                // If not, then wait for it to load.
+                //  Noting that other event listeners were already added,
+                //  so we don't need to do the same logic if we just created it.
+                const script = getScriptElement(src)!;
+                script.addEventListener("load", () => {
+                    resolve();
+                });
+                script.addEventListener("error", (e) => {
+                    reject(e.error);
+                });
+            }
+
+            return;
+        }
+
+        // Otherwise, inject the script
+        const script = document.createElement("script");
+        script.setAttribute("data-is-loaded", "false");
+        script.addEventListener("load", () => {
+            script.setAttribute("data-is-loaded", "true");
+            resolve();
+        });
+        script.addEventListener("error", (e) => {
+            console.error("injectScript failed for file ", src);
+            reject(e.error);
+        });
+        script.src = src;
+        document.head.appendChild(script);
+    });
 }
 
 /**
@@ -197,7 +271,7 @@ export async function getLoadedHTML(htmlString: string) {
     const documentFragment = document.createRange().createContextualFragment(htmlString); // createContextualFragment ensures any </script> tags within the element are run
     const scriptTags = documentFragment.querySelectorAll("script[src]:not([data-is-vue])"); // get each <script src></script> that isn't a vue component (which don't require preloading)
     const newScriptTags = Array.from(scriptTags).filter(
-        (scriptTag) => !isScriptAdded(scriptTag.getAttribute("src") as string)
+        (scriptTag) => !isScriptAdded(scriptTag.getAttribute("src") as string),
     ); // only add those <scripts> that aren't already on the page
     const injections: Promise<void>[] = [];
     newScriptTags.forEach((scriptTag) => {
@@ -213,47 +287,6 @@ export async function getLoadedHTML(htmlString: string) {
     const wrappedElement = document.createElement("div");
     wrappedElement.append(documentFragment);
     return wrappedElement;
-}
-
-/**
- * Returns the script element
- * @param {string} src - the src of the script
- * @returns { HTMLScriptElement } - the script element
- */
-export function getScriptElement(src: string) {
-    return document.querySelector(`script[src="${src}"]`);
-}
-
-/**
- * Returns true if the script has been loaded
- * @param {string} src - the src of the script
- * @returns {boolean} - true if the script has been loaded
- */
-export function isScriptLoaded(src: string) {
-    const scriptElement = document.querySelector(`script[src="${src}"]`);
-    return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
-}
-
-/**
- * Async inject a <script> tag into the DOM
- * https://stackoverflow.com/a/39008859
- * @param {string} src - the src of the script to inject
- */
-export function injectScript(src: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.setAttribute("data-is-loaded", "false");
-        script.addEventListener("load", () => {
-            script.setAttribute("data-is-loaded", "true");
-            resolve();
-        });
-        script.addEventListener("error", (e) => {
-            console.error("injectScript failed for file ", src);
-            reject(e.error);
-        });
-        script.src = src;
-        document.head.appendChild(script);
-    });
 }
 
 type InjectScriptsParams = {
