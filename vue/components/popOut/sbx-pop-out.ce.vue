@@ -176,7 +176,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         height: auto;
         text-transform: uppercase;
         width: auto;
-        padding: 0.5rem;
+        padding: var(--spacing-s);
 
         &:hover {
             background-color: var(--content-ui-hover);
