@@ -241,10 +241,17 @@ module.exports = {
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
 
+        // Firebase demo
+        firebaseDemo: "./www/static/js/firebase/firebaseDemo.ts",
+
         //Sass
         core: "./www/static/css/core/core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
         learnosity: "./www/static/css/learnosity/learnosity.scss",
+
+        // Firebase
+        firebaseInit: './www/static/js/firebase/firebase-init.ts',
+        firebaseMessaging: './www/static/js/firebase/firebase-messaging.ts',
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),

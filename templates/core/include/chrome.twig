@@ -116,6 +116,16 @@
         window.sbProps.hasEditorAI = true;
         {% endif %}
 
+        window.sbProps.firebaseApps = [];
+        {% for app in firebase.apps %}
+        {# Firebase public configuration will generally be provided as JS, so must be output raw #}
+        window.sbProps.firebaseApps.push({
+            appIdentifier: '{{ app.appIdentifier ?? '' }}',
+            publicConfiguration: {{ (app.publicConfiguration ?? 'null') | raw }},
+            webPushPublicKey: '{{ app.webPushPublicKey ?? '' }}',
+        });
+        {% endfor %}
+
     </script>
     {% endautoescape %}
 
@@ -414,6 +424,7 @@
     <sbx-toast />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
 </body>
 </html>

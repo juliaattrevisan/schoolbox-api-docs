@@ -25,7 +25,6 @@ use Schoolbox\Resource\Storage;
  */
 class ServiceMapper extends Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *
@@ -42,6 +41,8 @@ class ServiceMapper extends Mapper
         $this->uses('app_identifier', self::TYPE_STRING);
         $this->uses('provider', self::TYPE_STRING, null, 'providerName');
         $this->uses('key', self::TYPE_STRING);
+        $this->uses('public_configuration', self::TYPE_STRING);
+        $this->uses('web_push_public_key', self::TYPE_STRING);
         $this->joins('cert_hash', Storage\Mapper::class, 'hash', null, null, 'certificate', 'cert');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
     }

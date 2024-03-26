@@ -769,6 +769,10 @@ abstract class Kernel
                         );
                     }
 
+                    $dataGenerators['firebase'] = new \Schoolbox\Firebase\DataGenerator(
+                        $mapperFactory->get(\Schoolbox\MobileApp\ServiceMapper::class),
+                    );
+
                     /** @var Psr17Factory $httpFactory */
                     $httpFactory = $di->get('httpFactory');
                     return new ResponseFactory(

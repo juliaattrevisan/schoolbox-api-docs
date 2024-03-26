@@ -284,7 +284,6 @@ class ConfigMapper extends Mapper
     public const EXTERNAL_ISAMS_STUDENT_REGISTERS = 'external_isams_student_registers';
     public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
 
-
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *

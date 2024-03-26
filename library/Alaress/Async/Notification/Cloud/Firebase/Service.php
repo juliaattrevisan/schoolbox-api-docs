@@ -105,15 +105,6 @@ class Service extends AbstractService
             }
             $this->report($reportToken, $status, $severity);
         }
-        foreach ($report->validTokens() as $token) {
-            $this->report("$id@$token", 'OK', Logger::DEBUG);
-        }
-        foreach ($report->invalidTokens() as $token) {
-            $this->report("$id@$token", 'Error', Logger::INFO);
-        }
-        foreach ($report->unknownTokens() as $token) {
-            $this->report("$id@$token", 'Unknown', Logger::INFO);
-        }
 
         return !$report->hasFailures();
     }

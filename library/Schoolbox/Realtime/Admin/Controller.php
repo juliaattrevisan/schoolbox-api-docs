@@ -268,11 +268,13 @@ class Controller extends BaseController
      */
     public function postModifyApp()
     {
-        $post        = $this->requestPost;
-        $provider    = $post->get('provider');
-        $appId       = trim($post->get('app'));
-        $key         = trim($post->get('key'));
-        $certificate = null;
+        $post                = $this->requestPost;
+        $provider            = $post->get('provider');
+        $appId               = trim($post->get('app'));
+        $key                 = trim($post->get('key'));
+        $publicConfiguration = null;
+        $webPushPublicKey    = null;
+        $certificate         = null;
 
         switch ($provider) {
             case MobileApp\Registry::PROVIDER_APPLE:
@@ -302,11 +304,14 @@ class Controller extends BaseController
                 break;
 
             case MobileApp\Registry::PROVIDER_FIREBASE:
-                // require key for Firebase
-                if (empty($key)) {
-                    $this->sendError("Unable to setup Firebase service, please provide a key");
+                // require keys for Firebase
+                $publicConfiguration = trim($post->get('publicConfiguration', ''));
+                $webPushPublicKey    = trim($post->get('webPushPublicKey', ''));
+                if (empty($key) || empty($publicConfiguration) || empty($webPushPublicKey)) {
+                    $this->sendError("Unable to setup Firebase service, please provide a private key");
                     return;
                 }
+
                 break;
 
             default:
@@ -357,6 +362,8 @@ class Controller extends BaseController
                 ->setAppIdentifier($appId)
                 ->setProviderName($provider)
                 ->setKey($key)
+                ->setPublicConfiguration($publicConfiguration)
+                ->setWebPushPublicKey($webPushPublicKey)
                 ->setCertificate($certificate)
         );
 
