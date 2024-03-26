@@ -75,7 +75,7 @@ function onRemoveSelected() {
                     @click.prevent="onCodeSelected"
                     >[{{ props.node.code }}]
                 </a>
-                <h3 class="f-no-margins">{{ props.node.name }}</h3>
+                <h3 class="node__name f-no-margins">{{ props.node.name }}</h3>
             </div>
             <button
                 v-if="showRemove"
@@ -103,6 +103,10 @@ function onRemoveSelected() {
 <style scoped>
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
+}
+
+.node__name {
+    padding-inline-end: var(--spacing-s); /* to avoid the text sitting right on the component edge */
 }
 
 .remove-node {
