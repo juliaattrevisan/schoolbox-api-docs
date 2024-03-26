@@ -63,10 +63,7 @@ function onRemoveSelected() {
 
 <template>
     <div classs="">
-        <div
-            class="node l-flex-row l-flex--justify-space l-flex--no-wrap l-pad-xs--vert"
-            :style="{ marginLeft: marginLeft }"
-        >
+        <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-gap-xs">
                 <a
                     v-if="hasCode"
@@ -101,6 +98,10 @@ function onRemoveSelected() {
 </template>
 
 <style scoped>
+.node {
+    margin-left: v-bind(marginLeft);
+}
+
 .node:not(:last-child) {
     border-bottom: 1px solid var(--body-background);
 }
