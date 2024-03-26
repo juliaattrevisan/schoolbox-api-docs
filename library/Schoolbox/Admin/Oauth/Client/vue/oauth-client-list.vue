@@ -1,5 +1,8 @@
 <script>
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+
 export default {
+    components: {RevealModal},
     props: {
         getListEndpoint: {
             // The endpoint for fetching the list of items.
@@ -34,6 +37,7 @@ export default {
             isDataLoaded: false,
             hasDataLoadError: false,
             loadedData: [],
+            newItem: {},
         };
     },
 
@@ -45,6 +49,31 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
+            } finally {
+                this.isDataLoaded = true; //update the display to show the list
+            }
+        },
+        async postItem() {
+            try {
+                console.log(this.newItem);
+                const response = await fetch(
+                    this.postItemEndpoint,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(this.newItem),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                this.newItem = await response.json();
+                this.$refs.addItem.close();
+                this.$refs.itemAdded.open();
+                this.loadedData.push(this.newItem)
+
+                // Show toast
+            } catch (error) {
+                console.warn(error);
             } finally {
                 this.isDataLoaded = true; //update the display to show the list
             }
@@ -62,7 +91,7 @@ export default {
                         <i class="icon-list"></i>
                         <p>
                             No oAuth clients have been configured.
-                            <a href="#">Add an oAuth client</a>.
+                            <a href="#" @click.prevent="$refs.addItem.open">Add an oAuth client</a>.
                         </p>
                     </div>
                 </template>
@@ -71,19 +100,22 @@ export default {
                         <tr>
                             <th>Name</th>
                             <th>Client ID</th>
+                            <th>Client Secret</th>
                             <th>&nbsp;</th>
                         </tr>
                         <tr v-for="row in loadedData">
                             <td>{{ row.name }}</td>
                             <td>{{ row.clientId }}</td>
                             <td>
-                                <a href="#" class="icon-delete" title="Delete this client"></a>
+                                <template v-if="row.clientSecret">{{ row.clientSecret }}</template>
+                                <template v-else>&mdash;</template>
                             </td>
+                            <td><a href="#" class="icon-delete" title="Delete this client"></a></td>
                         </tr>
                     </table>
                     <div class="component-action">
                         <section>
-                            <a class="button" href="#">Add oAuth Client</a>
+                            <a class="button" href="#" @click.prevent="$refs.addItem.open">Add oAuth Client</a>
                         </section>
                     </div>
                 </template>
@@ -118,6 +150,41 @@ export default {
                 </tbody>
             </table>
         </div>
+
+        <reveal-modal ref="addItem">
+            <h2>Add oAuth Client</h2>
+            <label for="addItem-name">Name</label>
+            <input id="addItem-name" required v-model="newItem.name" />
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="postItem" href="#">Add</a>
+                    <a class="button" @click.prevent="$refs.addItem.close" href="#">Cancel</a>
+                </section>
+            </div>
+        </reveal-modal>
+
+        <reveal-modal ref="itemAdded">
+            <h2>oAuth Client Added</h2>
+            <label for="itemAdded-name">Name</label>
+            <input id="itemAdded-name" readonly v-model="newItem.name" />
+
+            <label for="itemAdded-name">Client ID</label>
+            <input id="itemAdded-name" readonly v-model="newItem.clientId" />
+
+            <label for="itemAdded-name">Client Secret</label>
+            <input id="itemAdded-name" readonly v-model="newItem.clientSecret" />
+
+            <div data-alert="" class="alert-box warning">
+                You must copy and store the client secret:
+                it will no longer be retrievable after reloading this page.
+            </div>
+
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="$refs.itemAdded.close" href="#">Close</a>
+                </section>
+            </div>
+        </reveal-modal>
     </div>
 </template>
 
