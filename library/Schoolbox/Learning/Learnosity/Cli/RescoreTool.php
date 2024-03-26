@@ -179,14 +179,21 @@ HELP;
         }
 
         if ($this->perform()) {
+            $this->getLogger()->info('');
+
             $this->getLogger()->info(sprintf(
-                'Sending %s attempt(s) to learnosity for rescoring.',
+                'Sending %s attempt(s) to learnosity for rescoring',
                 count($payload['statuses'])
             ));
 
             $response = $api->dataUpdateRequest('/jobs/sessions/statuses', $payload);
 
-            print_r($response);
+            $this->getLogger()->info('');
+
+            $this->getLogger()->info(sprintf(
+                'Rescoring request made to learnosity and returned job_reference %s',
+                $response['data']['job_reference']
+            ));
         } else {
             $this->getLogger()->info('Planning finished.');
         }
