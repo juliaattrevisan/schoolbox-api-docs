@@ -9,12 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Cli;
 
-use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Url\Factory;
@@ -41,12 +39,6 @@ class RescoreTool extends CliTool\App
      * @var \Schoolbox\Learning\Quiz\Mapper
      */
     private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
-
-
-    /**
-     * @var \Schoolbox\Learning\Quiz\Attempt\Mapper
-     */
-    private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper;
 
 
     /** @inheritdoc */
