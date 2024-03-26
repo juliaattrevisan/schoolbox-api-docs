@@ -50,7 +50,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             // First create a new component
             const formData = new FormData();
             formData.append("cid", storeUnit.folderId.toString());
-            formData.append("add", "44");
+            formData.append("add", "44"); // TODO: Grab this (textbox component definition ID) from the backend instead. See SA-17537
 
             const responseComponent = await fetch("/homepage/configForm.php", {
                 method: "POST",
