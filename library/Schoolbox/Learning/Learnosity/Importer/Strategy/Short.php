@@ -53,7 +53,7 @@ class Short extends Base implements IStrategy
             'stimulus' => $this->produceQuestionText($question['question']),
             'type' => $this->getLearnosityEquivalent(),
             'validation' => [
-                'automarkable' => false,
+                'automarkable' => true,
                 'scoring_type' => 'exactMatch',
                 'valid_response' => [
                     'value' =>  $answer,
