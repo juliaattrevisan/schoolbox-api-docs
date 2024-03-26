@@ -158,6 +158,6 @@ class QuestionBankCest
     public function tearDown(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-        $i->updateInDatabase('assess', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test Pastoral Record%"]);
+        $i->updateInDatabase('assess', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Test Pastoral Record%"]);
     }
 }

@@ -31,6 +31,7 @@ class LessonPlanTemplateList
      */
     public function clickAddLessonPlanTemplateButton(): void
     {
+        $this->tester->waitForElement(self::ICON_ADD);
         $this->tester->click(self::ICON_ADD);
     }
 

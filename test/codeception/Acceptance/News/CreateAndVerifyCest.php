@@ -416,7 +416,7 @@ class CreateAndVerifyCest
     public function tearDown(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['deleted_at' => null, 'name like' => "News Folder Test"]);
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "News Folder Test"]);
         $i->updateInDatabase('comms_news_article', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Acceptance Test News Article Testing%"]);
         $i->updateInDatabase('comms_news_article', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Acceptance Test News Composite Audience Article Testing%"]);
         $i->updateInDatabase('comms_news_article', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Acceptance Test News Audience Article via Class Page Testing%"]);

@@ -213,7 +213,7 @@ class FixtureCest
         $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Fourth Cest Match"]);
         $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Fifth Cest Match"]);
         $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Third Cest Modified Sixth"]);
-        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "aaa"]);
-        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "lalala"]);
+        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['description like' => "aaa"]);
+        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['description like' => "lalala"]);
     }
 }
