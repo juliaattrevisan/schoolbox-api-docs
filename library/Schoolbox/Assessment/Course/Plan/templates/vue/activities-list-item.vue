@@ -3,16 +3,20 @@ import { kebabCase, startCase } from "lodash";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
+import { useActivitiesDragStore } from "./store/activitiesDragStore";
 import type { Unit } from "./unitPlannerTypes";
 
-const deleteActivityStore = useDeleteActivityStore();
-
 interface Props {
+    activitiesDragStoreId: string; // The id of the activitiesDragStore this belongs to
     unit: Unit; // The id of the unit to which the activity belongs.
     activity: Activity;
 }
 
 const props = defineProps<Props>();
+const deleteActivityStore = useDeleteActivityStore();
+const activitiesDragStore = useActivitiesDragStore(props.activitiesDragStoreId);
+
+const activityListEl = window.Vue.ref<HTMLElement | null>(null);
 
 const activityLink = window.Vue.computed(() => {
     // If the activity is a project, use the status link
@@ -26,10 +30,24 @@ const activityLink = window.Vue.computed(() => {
     // Otherwise, use the summary link
     return props.activity._links.summary;
 });
+
+// When activityListEl is set, add the activity to the drag store (effectively after mount)
+window.Vue.watch(
+    activityListEl,
+    () => {
+        if (!activityListEl.value) return;
+        activitiesDragStore().setActivityEl(props.activity.id, activityListEl.value);
+    },
+    { immediate: true },
+);
+
+window.Vue.onUnmounted(() => {
+    activitiesDragStore().unsetActivityEl(props.activity.id);
+});
 </script>
 
 <template>
-    <li class="actions-small-1">
+    <li ref="activityListEl" class="actions-small-1">
         <div class="list-item">
             <div class="card small-12 compact wrap-down">
                 <a :href="getReturnUrl(activityLink)">
@@ -76,6 +94,7 @@ const activityLink = window.Vue.computed(() => {
 
 <style scoped>
 .card.compact {
+    padding-left: 0;
     padding-right: 0;
 }
 

@@ -10,7 +10,7 @@ import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
-import ActivitiesListItem from "./activities-list-item.vue";
+import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesAction from "./activities-action.vue";
 
 gsap.registerPlugin(Draggable);
@@ -189,15 +189,11 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
-                <ul class="information-list">
-                    <activities-list-item
-                        v-for="activity in props.unit.activities.items"
-                        ref="activityListItem"
-                        :key="activity.id"
-                        :unit="unit"
-                        :activity="activity"
-                    />
-                </ul>
+                <activities-list-content
+                    :unit="props.unit"
+                    :column="props.column"
+                    @update-content-height="updateContentHeight"
+                />
             </template>
 
             <template v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES">
