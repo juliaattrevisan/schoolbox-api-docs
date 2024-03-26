@@ -18,7 +18,6 @@ export const useStore = (folderId: number) =>
         const filter = window.Vue.ref<Node>({} as Node); // the node filter to apply to the nodes, only displaying nodes that are children of this node
         const isReadOnly = window.Vue.ref<boolean>(true); // whether the user can edit nodes or not
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
-        const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
 
@@ -98,6 +97,12 @@ export const useStore = (folderId: number) =>
         });
 
         /**
+         * To check if there are any nodes to display
+         * @returns {boolean} - whether there are any nodes to display
+         */
+        const hasNodes = window.Vue.computed(() => filteredNodes.value.length > 0);
+
+        /**
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
          * @param {Node} node - the node to remove
          */
@@ -116,7 +121,6 @@ export const useStore = (folderId: number) =>
         }
 
         return {
-            nodes,
             filter,
             selectedNodes,
             filteredNodes,
