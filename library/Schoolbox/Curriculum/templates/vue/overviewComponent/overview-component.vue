@@ -53,7 +53,7 @@ const { ignoreUpdates } = watchIgnorable(
 window.Vue.onMounted(() => {
     // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes
     ignoreUpdates(() => {
-        store().init(props.nodes, props.selectedNodes, props.isReadOnly);
+        store().init(props.nodes, props.selectedNodes, props.filter, props.isReadOnly);
         selectorStore.init({
             isReadOnly: props.isReadOnly,
             formValueName: "", // not required in this context

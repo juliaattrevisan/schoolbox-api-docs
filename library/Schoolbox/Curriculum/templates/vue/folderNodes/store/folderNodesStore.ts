@@ -9,7 +9,7 @@ import { defineStore } from "pinia";
 import { ToastEvent } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 
 export const useStore = (folderId: number) =>
     defineStore(`folderNodes/${folderId}`, () => {
@@ -83,6 +83,21 @@ export const useStore = (folderId: number) =>
         }
 
         /**
+         * We need to filter the nodes to only display the children of the filter node,
+         * first checking if the node is a child of the existing node trees
+         * and if so only returning the children of the filter node
+         * @returns {Node[]} - the nodes that are children of the filter node
+         */
+        const filteredNodes = window.Vue.computed(() => {
+            const filterNode = findById(nodes.value, filter.value.id);
+            if (filterNode === undefined) {
+                // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesnt currently contain any selected nodes
+                return [];
+            }
+            return [filterNode]; // otherwise we can use the filter node as the new list of nodes
+        });
+
+        /**
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
          * @param {Node} node - the node to remove
          */
@@ -102,7 +117,9 @@ export const useStore = (folderId: number) =>
 
         return {
             nodes,
+            filter,
             selectedNodes,
+            filteredNodes,
             isReadOnly,
             selectedNodeIds,
             hasNodes,
