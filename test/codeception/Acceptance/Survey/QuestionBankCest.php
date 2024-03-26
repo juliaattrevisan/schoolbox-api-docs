@@ -149,4 +149,15 @@ class QuestionBankCest
         $i->amGoingTo('save without any change');
         $questionFormInBank3->modify();
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('assess', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test Pastoral Record%"]);
+    }
 }

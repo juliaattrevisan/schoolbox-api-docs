@@ -248,4 +248,20 @@ class PastoralRecordsCest
         $i->canSee('Academic', '//div/dl/dd');
         $i->canSee('Award/Achievement', '//div/dl/dd');
     }
+
+
+    /**
+     * Soft deleting data to not impact the tests
+     * settinig up data to its original value in the database
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test Pastoral Record%"]);
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Automation Test View Pastoral Record%"]);
+        $i->updateInDatabase('pastoral', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "This is an automation pastoral record updated%"]);
+        $i->updateInDatabase('config', ['value' => 0], ['name' => 'pastoral_student_access']);
+    }
 }

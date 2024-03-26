@@ -344,4 +344,18 @@ class GroupPermissionCest
         $i->cantSee('Group 1');
         $i->canSee('You do not have permission to view this page.');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Group Free%"]);
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Group Moderated%"]);
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Group Restricted%"]);
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Group Root%"]);
+    }
 }

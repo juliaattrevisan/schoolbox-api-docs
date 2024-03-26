@@ -137,4 +137,15 @@ class CourseLocationPickerCest
         $i->amGoingTo('check the database is updated to reflect the new course location');
         $i->seeInDatabase('folder', ['id' => 65, 'parent' => 85]);
     }
+
+    /**
+     * updating data to its original value
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('folder', ['parent' => 2], ['id' => 65]);
+    }
 }

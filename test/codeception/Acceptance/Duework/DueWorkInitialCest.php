@@ -325,4 +325,16 @@ class DueWorkInitialCest
         $i->click('input[type=submit][value=Submit\ for\ assessment]');
         $i->canSee('Submission by Schoolbox Admin');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Test Class Homepage%"]);
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Test Due Wor%"]);
+    }
 }

@@ -213,4 +213,20 @@ class UpoloadFilesCest
         $resources->clickSubmitButton();
         $i->waitForText('testPhotoAutomation', 3);
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     * Putting files back to their original folders
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('file', ['category' => 242], ['name like' => "clip15"]);
+        $i->updateInDatabase('file', ['deleted_at' => "2022-01-15 11:22:34"], ['category' => 57,'name like' => "Abby"]);
+        $i->updateInDatabase('file', ['deleted_at' => "2022-01-15 11:22:34"], ['category' => 57,'name like' => "testAudioAutomation"]);
+        $i->updateInDatabase('file', ['deleted_at' => "2022-01-15 11:22:34"], ['category' => 57,'name like' => "testVideoAutomation"]);
+        $i->updateInDatabase('file', ['deleted_at' => "2022-01-15 11:22:34"], ['category' => 57,'name like' => "testPhotoAutomation"]);
+    }
 }

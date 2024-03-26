@@ -68,7 +68,7 @@ class LearningMomentPhotoCest
         $learningMoments->confirmDeletePhoto();
         sleep(2);
         $learningMoments->clickTakeAPhotoEvidence();
-        $i->fillCkEditorById('evidence-body', 'This is a learning moments test - take a photo');
+        $i->fillCkEditorById('evidence-body', '<p>This is a learning moments test - take a photo</p>');
         $learningMoments->clickSubmit();
         $i->amGoingTo('checking if the picture and text are presented in the student activity feed');
         $i->waitForText('This is a learning moments test - take a photo');
@@ -218,5 +218,20 @@ class LearningMomentPhotoCest
         $i->amGoingTo('checking the text is no longer presented ');
         $i->cantSee('This is a learning moment test to get deleted');
         $i->canSeeElement($learningMoments::SHARE_LEARNING_MOMENTS_LINK);
+    }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%This is a learning moments test - take a photo%"]);
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%This is a learning moments test to be commented%"]);
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%This is a learning moments test to be modified%"]);
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%This is a learning moments test to get comments deleted%"]);
+        $i->updateInDatabase('evidence', ['deleted_at' => "2022-01-15 11:22:34"], ['body like' => "%This is a learning moments test to get deleted%"]);
     }
 }

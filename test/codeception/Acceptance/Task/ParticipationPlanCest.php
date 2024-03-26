@@ -150,4 +150,16 @@ class ParticipationPlanCest
         $i->waitForText('Tasks');
         $i->canSee('Aug 3, 2030');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Participation and Learning Plan Homepage"]);
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Task Participation and Learning Plan"]);
+    }
 }
