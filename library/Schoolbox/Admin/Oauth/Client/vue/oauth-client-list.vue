@@ -66,20 +66,27 @@ export default {
                         </p>
                     </div>
                 </template>
-                <table v-else>
-                    <tr>
-                        <th>Name</th>
-                        <th>Client ID</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    <tr v-for="row in loadedData">
-                        <td>{{ row.name }}</td>
-                        <td>{{ row.clientId }}</td>
-                        <td>
-                            <a href="#" class="icon-delete" title="Delete this client"></a>
-                        </td>
-                    </tr>
-                </table>
+                <template v-else>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Client ID</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        <tr v-for="row in loadedData">
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.clientId }}</td>
+                            <td>
+                                <a href="#" class="icon-delete" title="Delete this client"></a>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="component-action">
+                        <section>
+                            <a class="button" href="#">Add oAuth Client</a>
+                        </section>
+                    </div>
+                </template>
             </div>
         </div>
 
