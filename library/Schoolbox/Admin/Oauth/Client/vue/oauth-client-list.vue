@@ -69,7 +69,7 @@ export default {
                 this.newItem = await response.json();
                 this.$refs.addItem.close();
                 this.$refs.itemAdded.open();
-                this.loadedData.push(this.newItem)
+                this.loadedData.push(this.newItem);
 
                 // Show toast
             } catch (error) {
@@ -96,7 +96,7 @@ export default {
                     </div>
                 </template>
                 <template v-else>
-                    <table>
+                    <table class="no-margin">
                         <tr>
                             <th>Name</th>
                             <th>Client ID</th>
@@ -107,7 +107,9 @@ export default {
                             <td>{{ row.name }}</td>
                             <td>{{ row.clientId }}</td>
                             <td>
-                                <template v-if="row.clientSecret">{{ row.clientSecret }}</template>
+                                <template v-if="row.clientSecret">{{ row.clientSecret }}
+                                    <span class="icon-alert" title="The client secret will no longer be retrievable after reloading this page." />
+                                </template>
                                 <template v-else>&mdash;</template>
                             </td>
                             <td><a href="#" class="icon-delete" title="Delete this client"></a></td>
