@@ -36,12 +36,7 @@ class Controller extends Base
     public function getList(): void
     {
         $this->response = $this->responseAsJson(
-            $this->mapper->findAll()
-                 ->map(fn (RelyingParty\Model $model) => [
-                     'id'       => $model->getId(),
-                     'name'     => $model->getName(),
-                     'clientId' => $model->getClientId(),
-                 ])
+            $this->mapper->findAll()->map($this->modelToArray(...))
         );
     }
 
@@ -55,11 +50,7 @@ class Controller extends Base
      */
     public function getItem(RelyingParty\Model $model): void
     {
-        $this->response = $this->responseAsJson([
-            'id'       => $model->getId(),
-            'name'     => $model->getName(),
-            'clientId' => $model->getClientId(),
-        ]);
+        $this->response = $this->responseAsJson($this->modelToArray($model));
     }
 
     /**
@@ -81,12 +72,10 @@ class Controller extends Base
             ->setClientId(RelyingParty\Generator\ClientId::generate())
             ->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
         $this->mapper->save($model);
-        $this->response = $this->responseAsJson([
-            'id'           => $model->getId(),
-            'name'         => $model->getName(),
-            'clientId'     => $model->getClientId(),
-            'clientSecret' => $clientSecret,
-        ]);
+        $this->response = $this->responseAsJson(
+            $this->modelToArray($model)
+            + ['clientSecret' => $clientSecret]
+        );
     }
 
     /**
@@ -139,5 +128,27 @@ class Controller extends Base
     {
         $this->mapper->delete($model);
         $this->response = $this->responseEmpty();
+    }
+
+    /**
+     * Quick implementation of model-to-array conversion.
+     *
+     * @param RelyingParty\Model $model
+     * @return array
+     */
+    private function modelToArray(RelyingParty\Model $model): array
+    {
+        $generator = $this->getRouteGenerator()->generate(...);
+        $params    = ['id' => $model->getId(),];
+        return [
+            'id'       => $model->getId(),
+            'name'     => $model->getName(),
+            'clientId' => $model->getClientId(),
+            '_links'   => [
+                'put'    => $generator('adminOauthClientApi.putItem', $params),
+                'patch'  => $generator('adminOauthClientApi.patchItem', $params),
+                'delete' => $generator('adminOauthClientApi.deleteItem', $params),
+            ]
+        ];
     }
 }

@@ -29,7 +29,7 @@ class Module extends BaseModule
         $permission = new IsSuperuser();
         $preload    = function (array $params) {
             return [
-                'client' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+                'model' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
             ];
         };
 

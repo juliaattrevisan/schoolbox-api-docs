@@ -14,18 +14,6 @@ export default {
             type: String,
             required: true,
         },
-        putItemEndpointBase: {
-            // The base endpoint for updating an item:
-            // assume each item's put endpoint is this with the ID appended.
-            type: String,
-            required: true,
-        },
-        deleteItemEndpointBase: {
-            // The endpoint for deleting an item:
-            // assume each item's delete endpoint is this with the ID appended.
-            type: String,
-            required: true,
-        },
     },
 
     mounted() {
@@ -38,6 +26,7 @@ export default {
             hasDataLoadError: false,
             loadedData: [],
             newItem: {},
+            deletingItem: {},
         };
     },
 
@@ -55,7 +44,6 @@ export default {
         },
         async postItem() {
             try {
-                console.log(this.newItem);
                 const response = await fetch(
                     this.postItemEndpoint,
                     {
@@ -67,15 +55,33 @@ export default {
                     }
                 );
                 this.newItem = await response.json();
-                this.$refs.addItem.close();
-                this.$refs.itemAdded.open();
+                this.$refs.addItemModal.close();
+                this.$refs.itemAddedModal.open();
                 this.loadedData.push(this.newItem);
 
                 // Show toast
             } catch (error) {
                 console.warn(error);
-            } finally {
-                this.isDataLoaded = true; //update the display to show the list
+            }
+        },
+        showDeleteModal(item) {
+            this.deletingItem = item;
+            this.$refs.deleteItemModal.open();
+        },
+        async deleteItem(item) {
+            try {
+                await fetch(
+                    item._links.delete,
+                    {
+                        method: 'DELETE'
+                    }
+                );
+                this.$refs.deleteItemModal.close();
+                this.loadedData = this.loadedData.filter(v => v.id !== item.id);
+
+                // Show toast
+            } catch (error) {
+                console.warn(error);
             }
         },
     }
@@ -91,7 +97,7 @@ export default {
                         <i class="icon-list"></i>
                         <p>
                             No oAuth clients have been configured.
-                            <a href="#" @click.prevent="$refs.addItem.open">Add an oAuth client</a>.
+                            <a href="#" @click.prevent="$refs.addItemModal.open">Add an oAuth client</a>.
                         </p>
                     </div>
                 </template>
@@ -112,12 +118,12 @@ export default {
                                 </template>
                                 <template v-else>&mdash;</template>
                             </td>
-                            <td><a href="#" class="icon-delete" title="Delete this client"></a></td>
+                            <td><a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a></td>
                         </tr>
                     </table>
                     <div class="component-action">
                         <section>
-                            <a class="button" href="#" @click.prevent="$refs.addItem.open">Add oAuth Client</a>
+                            <a class="button" href="#" @click.prevent="$refs.addItemModal.open">Add oAuth Client</a>
                         </section>
                     </div>
                 </template>
@@ -153,7 +159,7 @@ export default {
             </table>
         </div>
 
-        <reveal-modal ref="addItem">
+        <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
             <label for="addItem-name">Name</label>
             <input id="addItem-name" required v-model="newItem.name" />
@@ -165,7 +171,7 @@ export default {
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="itemAdded">
+        <reveal-modal ref="itemAddedModal">
             <h2>oAuth Client Added</h2>
             <label for="itemAdded-name">Name</label>
             <input id="itemAdded-name" readonly v-model="newItem.name" />
@@ -183,7 +189,17 @@ export default {
 
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="$refs.itemAdded.close" href="#">Close</a>
+                    <a class="button" @click.prevent="$refs.itemAddedModal.close" href="#">Close</a>
+                </section>
+            </div>
+        </reveal-modal>
+
+        <reveal-modal ref="deleteItemModal">
+            <h2>Delete oAuth Client {{ deletingItem.name }}?</h2>
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="deleteItem(deletingItem)" href="#">Delete</a>
+                    <a class="button" @click.prevent="$refs.deleteItemModal.close" href="#">Cancel</a>
                 </section>
             </div>
         </reveal-modal>

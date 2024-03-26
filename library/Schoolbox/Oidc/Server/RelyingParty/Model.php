@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server\RelyingParty;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -17,7 +18,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 /**
  * Model for OIDC relying parties.
  */
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
