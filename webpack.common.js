@@ -117,6 +117,9 @@ module.exports = {
         headerSearch: "./templates/core/include/vue/headerSearch.js",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
+        // Toast
+        sbxToast: "./vue/components/toast/sbxToast.ts",
+
         // Calendars
         sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.js",
         timetableCalendar: "./library/Schoolbox/Calendar/vue/timetableCalendar.js",
@@ -394,7 +397,7 @@ module.exports = {
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
             "@schoolboxLearningMomentEvidence": path.resolve(
                 __dirname,
-                "library/Schoolbox/Learning/Moment/Evidence/vue"
+                "library/Schoolbox/Learning/Moment/Evidence/vue",
             ),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),

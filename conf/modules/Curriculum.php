@@ -13,6 +13,7 @@ namespace Config\Modules;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Curriculum\Api\Module as ApiModule;
 use Schoolbox\Curriculum\Api\Usage\Module as ApiUsageModule;
+use Schoolbox\Curriculum\Api\Usage\Folder\Module as ApiUsageFolderModule;
 use Schoolbox\Curriculum\Module;
 
 class Curriculum implements ModuleConfigInterface
@@ -28,13 +29,10 @@ class Curriculum implements ModuleConfigInterface
         $apiModule = new ApiModule($di);
         $apiModule->registerModule('/api/curriculum');
 
-        $apiModule = new ApiUsageModule($di);
-        $apiModule->registerModule('/api/curriculum/usage');
+        $apiUsageModule = new ApiUsageModule($di);
+        $apiUsageModule->registerModule('/api/curriculum/usage');
 
-        // Submodules:
-        // * learning areas
-        // * learning levels
-        // * outcomes?
-        // * strands? (optional organisation of standards?)
+        $apiUsageFolderModule = new ApiUsageFolderModule($di);
+        $apiUsageFolderModule->registerModule('/api/curriculum/usage');
     }
 }

@@ -48,6 +48,15 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
         },
 
         /**
+         * to only add a single node, removing any previous selections
+         *
+         * @param { Object }
+         */
+        addSingle(nodeToAdd) {
+            this.nodes = [nodeToAdd];
+        },
+
+        /**
          * remove a node
          *
          * @param { Object }

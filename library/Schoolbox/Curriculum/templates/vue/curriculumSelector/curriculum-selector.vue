@@ -46,7 +46,9 @@ const props = defineProps({
         default: "curriculumCodes[]",
     },
     /**
-     * an 'original' selection, saved by the user
+     * an 'original' selection, saved by the user,
+     * currently used within the Badges filters, so when the `Reset to defaults`
+     * button is selected, the default node selection is reapplied.
      */
     selectedOriginal: {
         type: Array,
@@ -54,12 +56,22 @@ const props = defineProps({
         default: [],
     },
     /**
-     * the default selection relevant to the current user role
+     * the default selection relevant to the current user role,
+     * currently used within the Badges filters, so when the `Clear all`
+     * button is selected, the original node selection is reapplied.
      */
     selectedDefault: {
         type: Array,
         required: false,
         default: [],
+    },
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 
@@ -104,8 +116,8 @@ function onSelectedNodeModalClosed() {
     <div ref="curriculumSelectorEl">
         <cs-selected-nodes />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
-        <cs-search-results />
+        <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
-    <cs-modal v-if="store.hasLoadedOk" />
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

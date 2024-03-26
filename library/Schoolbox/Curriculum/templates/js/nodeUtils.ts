@@ -27,8 +27,7 @@ const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" })
 /**
  * return an empty node, usually used to indicate there's currently
  * nothing to display
- *
- * @returns { Node } the empty Node
+ * @returns {Node} the empty Node
  */
 export function getEmptyNode(): Node {
     return {
@@ -40,6 +39,19 @@ export function getEmptyNode(): Node {
         order: 0,
         parent: null,
         name: "",
+        _links: {
+            delete: "",
+            getUsage: "",
+            read: "",
+            update: "",
+        },
+        _usageCounts: {
+            course: 0,
+            unit: 0,
+            assessment: 0,
+            badge: 0,
+            folder: 0,
+        },
     };
 }
 
@@ -47,10 +59,9 @@ export function getEmptyNode(): Node {
  * To just return the node containing the specified id
  * We recursively loop through the object until we find the
  * matched object or undefined if not found
- *
- * @param { Node[] } array - an array of Node to loop through
- * @param { number } id - the id to find
- * @returns { Node | undefined } - the found Node
+ * @param {Node[]} array - an array of Node to loop through
+ * @param {number} id - the id to find
+ * @returns {Node | undefined} - the found Node
  */
 export function findById(array: Node[], id: number): Node | undefined {
     let node: Node | undefined;
@@ -70,10 +81,9 @@ export function findById(array: Node[], id: number): Node | undefined {
 
 /**
  * Node with a code take priority, then followed by those without, the name is used
- *
- * @param { Node } aNode - the first node to compare
- * @param { Node } bNode - the second node to compare
- * @returns { number } - the number to determine sorting
+ * @param {Node} aNode - the first node to compare
+ * @param {Node} bNode - the second node to compare
+ * @returns {number} - the number to determine sorting
  */
 function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
     const aHasCode = aNode.code !== "";
@@ -86,7 +96,7 @@ function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
         // if both have no code, just sort by name
         return collator.compare(aNode.name, bNode.name);
     }
-    // those with a code take precendence over those without
+    // those with a code take precedence over those without
     if (aHasCode) {
         return -1;
     }
@@ -98,9 +108,8 @@ function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
 
 /**
  * Return the nodes sorted first by order, then code, then name
- *
- * @param { Node[] } nodes - the nodes to sort
- * @returns { Node[] } - the sorted nodes
+ * @param {Node[]} nodes - the nodes to sort
+ * @returns {Node[]} - the sorted nodes
  */
 export function sortNodes(nodes: Node[]): Node[] {
     const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
@@ -119,10 +128,9 @@ export function sortNodes(nodes: Node[]): Node[] {
  * To return an array with any Nodes containing the specified id removed
  * we move through the object, looping recursively through .children and remove
  * any with the id that's being removed
- *
- * @param { Node[] } children - all the Node children
- * @param { number } id - id of the Node to remove
- * @returns { Node[] } - list of children with the Node linked to id removed
+ * @param {Node[]} children - all the Node children
+ * @param {number} id - id of the Node to remove
+ * @returns {Node[]} - list of children with the Node linked to id removed
  */
 export function removeId(children: Node[], id: number): Node[] {
     if (children !== null) {
@@ -139,10 +147,9 @@ export function removeId(children: Node[], id: number): Node[] {
 
 /**
  * Recursively loop through the parents adding in a breadcrumb for each
- *
- * @param { Node } node - the Node to traverse for breadcrumbs
- * @param { Breadcrumb[] } currentBreadcrumbs - the current breadcrumbs
- * @returns { Breadcrumb[] } - the new breadcrumbs
+ * @param {Node} node - the Node to traverse for breadcrumbs
+ * @param {Breadcrumb[]} currentBreadcrumbs - the current breadcrumbs
+ * @returns {Breadcrumb[]} - the new breadcrumbs
  */
 export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Breadcrumb[] {
     if (node.parent !== null) {
@@ -157,9 +164,8 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
 
 /**
  * To determine if there's any usage assigned on the node
- *
- * @param { Node } node - the node to check
- * @returns { boolean } - whether theres any usage assigned on the node
+ * @param {Node} node - the node to check
+ * @returns {boolean} - whether there's any usage assigned on the node
  */
 export function hasUsage(node: Node) {
     if (
@@ -175,9 +181,8 @@ export function hasUsage(node: Node) {
 
 /**
  * Get the total usage linked to all activities
- *
- * @param { Node } node - the node to check
- * @returns { number } - the total count
+ * @param {Node} node - the node to check
+ * @returns {number} - the total count
  */
 export function getTotalUsage(node: Node) {
     return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.assessment + node._usageCounts.badge;
@@ -185,9 +190,8 @@ export function getTotalUsage(node: Node) {
 
 /**
  * To distinguish the activity type
- *
- * @param { ActivityTypes } type - the activity type
- * @returns { string } - the icon to return
+ * @param {ActivityTypes} type - the activity type
+ * @returns {string} - the icon to return
  */
 export function getUsageIcon(type: ActivityTypes) {
     const icons = {
@@ -207,9 +211,8 @@ export function getUsageIcon(type: ActivityTypes) {
 
 /**
  * To return the href based on the activity type
- *
- * @param { Usage } usage - the usage
- * @returns { string } - the icon to return
+ * @param {Usage} usage - the usage
+ * @returns {string} - the icon to return
  */
 export function getUsageHref(usage: Usage) {
     const icons = {
@@ -223,19 +226,17 @@ export function getUsageHref(usage: Usage) {
 
 /**
  * To only return the usages of the specified type
- *
- * @param { Usage[] } usages - the usages
- * @param { type } type - the activity type
- * @returns { Usage[] } - the usages of the specified type
+ * @param {Usage[]} usages - the usages
+ * @param {ActivityTypes} type - the activity type
+ * @returns {Usage[]} - the usages of the specified type
  */
-export function getSpecificUsages(usages: Usage[], type: string) {
+export function getSpecificUsages(usages: Usage[], type: ActivityTypes) {
     return usages.filter((usage) => usage.discriminator === type);
 }
 
 /**
  * To return the hash of the current url as a node id
- *
- * @returns { number } - the node id
+ * @returns {number} - the node id
  */
 export function getIdHash() {
     const documentURL = document.URL;
@@ -246,8 +247,7 @@ export function getIdHash() {
  * a node id could be passed into the page via the hash,
  * if so we need to traverse to this node on load if the hash
  * is a valid node id
- *
- * @returns { boolean } - whether the hash is valid
+ * @returns {boolean} - whether the hash is valid
  */
 export function isValidHash() {
     const documentURL = document.URL;

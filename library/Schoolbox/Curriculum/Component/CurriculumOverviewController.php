@@ -53,30 +53,25 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
-            $nodeMapper            = Node\Mapper::getInstance();
-            $this->curriculumNodes = $nodeMapper->createCollection();
-
+            $nodeIds = [];
             foreach ($context->getCurriculumNodes() as $node) {
-                if (!$node->getEnabled() || '' === $node->getCode()) {
+                if (!$node->getEnabled()) {
                     continue;
                 }
-                if (empty($this->getConfig('curriculumCode')) || ($node->getCode() == $this->getConfig('curriculumCode'))) {
-                    $nodeMapper->loadDescendants($node);
-                    $this->curriculumNodes->add($node);
-                }
+
+                $nodeIds[] = $node->getId();
             }
 
-            // make sure that the node or node's ancestors do not already in the list
-            // to avoid same hierarchy appears twice in the component
-            $selectedNodeIds = $this->curriculumNodes->getPropertyValues('id');
-            foreach ($this->curriculumNodes as $offset => $node) {
-                $nodeMapper->loadAncestors($node);
-                $ancestorIds = $this->getAllAncestorIds($node);
-                $diff        = array_diff($ancestorIds, $selectedNodeIds);
-                if (count($diff) !== count($ancestorIds)) {
-                    $this->curriculumNodes->offsetUnset($offset);
-                }
-            }
+            // Fetch every node which is an ancestor or descendant of one of
+            // this folder's nodes, and is still enabled:
+            // only enabled nodes should be selectable.
+            $nodeMapper = Node\Mapper::getInstance();
+            $nodeIds    = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
+
+            // Then, sort the entire list of nodes into a tree structure.
+            $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
+                $nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+            );
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
@@ -103,23 +98,15 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             [
                 'context'           => $this->getContext(),
                 'nodes'             => $this->curriculumNodes,
+                // Placeholder value for selected nodes: just all selected nodes
+                'selectedNodes'     => $this->getContext()->getCurriculumNodes()->reindex(),
                 'curriculumTagging' => $this->curriculumTagging,
+                'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
+                    'curriculum.edit',
+                    [],
+                    $this->getUser()
+                ),
             ]
         );
-    }
-
-    /**
-     * Find all ancestor ids to remove duplicates
-     * @param Node\Model $node
-     * @return array
-     */
-    private function getAllAncestorIds(Node\Model $node): array
-    {
-        $parentIds = [];
-        if ($node->getParent() instanceof Node\Model) {
-            $parentIds   = $this->getAllAncestorIds($node->getParent());
-            $parentIds[] = $node->getParent()->getId();
-        }
-        return $parentIds;
     }
 }
