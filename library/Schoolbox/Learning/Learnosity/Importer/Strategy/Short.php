@@ -35,10 +35,10 @@ class Short extends Base implements IStrategy
      */
     public function convert(array $question): array
     {
-        /* FIXME This should always exist but what happens if it somehow doesn't?
-         *  Is that even a possibility in the fleet atm
+        /* the question can exist, but the answer can be deleted...
+         * as found on baqags (prod), so just cast to empty string and still import the question
          */
-        $answer = trim($question['_answers'][0]['answer']);
+        $answer = trim($question['_answers'][0]['answer'] ?? '');
 
         return [
             'case_sensitive' => false,
