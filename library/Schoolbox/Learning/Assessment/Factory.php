@@ -183,7 +183,7 @@ class Factory
         $this->setWorkType(
             $assessmentType === AssessmentType::TYPE_LESSON_PLAN
             ? null
-            : WorkTypeMapper::getInstance()->findById($post['workType'])
+            : WorkTypeMapper::getInstance()->findById($post['workType'])->getId()
         );
 
         /* Projects need this to instantiate
