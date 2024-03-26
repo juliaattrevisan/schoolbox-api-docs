@@ -98,11 +98,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             Node\Mapper::sortNodes($this->curriculumNodes, 0);
         }
 
-        // Load selected nodes
-        $this->selectedNodes = $nodeMapper->findByColumn(
-            'id',
-            explode(',', $this->getConfig('curriculumTreeFilter', '')),
-        );
+        $this->selectedNodes = $this->getContext()->getCurriculumNodes()->reindex();
 
         return true;
     }
