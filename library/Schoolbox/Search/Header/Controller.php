@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
-namespace Schoolbox\HeaderSearch;
+namespace Schoolbox\Search\Header;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
@@ -15,7 +15,7 @@ class Controller extends Base
     /**
      * Returns a JSON array of users based on keyword
      *
-     * @api /user/search
+     * @api GET /search/header
      */
     public function search(): void
     {

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\HeaderSearch\Search;
+namespace Schoolbox\Search\Header\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Image\Transformation\Storage;
@@ -19,6 +19,8 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\Search\Api\Database\ResultType\Page\Hydrator;
@@ -26,8 +28,6 @@ use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Query
 {

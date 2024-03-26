@@ -4,7 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  */
 
-namespace Schoolbox\HeaderSearch;
+namespace Schoolbox\Search\Header;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -25,7 +25,7 @@ class Module extends BaseModule
             );
         });
 
-        $this->register('GET', '/search', 'search', $loggedIn);
+        $this->register('GET', '', 'search', $loggedIn);
     }
 
     /**
