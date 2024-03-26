@@ -24,6 +24,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('oidc_relying_party');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('client_id', self::TYPE_STRING);
