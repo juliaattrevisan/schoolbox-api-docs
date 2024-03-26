@@ -16,11 +16,12 @@ use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 /**
- * Converts between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL
+ * The purpose of this file was previously to convert between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL.
+ * Assessment.work_type_id has since been changed to be non-nullable, so conversion is no longer necessary.
+ * However, all filter types must have a KeyConverter, so this class has been left in place.
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * All WorkType IDs known to the system (regardless of whether they are available)
      *
@@ -49,9 +50,6 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem(string $key, User $user, string $page): ?int
     {
-        if (Definition::KEY_NONE === $key) {
-            return null;
-        }
         $this->assertValidKey($key, $user, $page);
 
         return (int)$key;
@@ -63,8 +61,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        // +1 for KEY_NONE
-        return $this->workTypeIds->count() + 1;
+        return $this->workTypeIds->count();
     }
 
 
@@ -73,7 +70,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if ($key !== Definition::KEY_NONE && !$this->workTypeIds->offsetExists($key)) {
+        if (!$this->workTypeIds->offsetExists($key)) {
             throw new InvalidArgumentException("No WorkType found for key: $key");
         }
     }

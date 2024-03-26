@@ -25,6 +25,14 @@ class Model implements ISoftDeletable, Sequential
     use ModelTrait\HasSequence;
 
     /**
+     * The value of lu_work_type.name for the special 'None' row.
+     * The 'None' row exists because assessment.work_type_id used to be nullable, but now is not.
+     * Assessments that previously had a work_type_id of NULL were given the ID of the special 'None' lu_work_type row.
+     * Validation rules ensure that all new assessments are given a non-None work type.
+     */
+    public const NONE = 'None';
+
+    /**
      * @var int
      */
     private $id;
@@ -55,12 +63,22 @@ class Model implements ISoftDeletable, Sequential
         return $this->isShowOnGradesPage();
     }
 
+
     /**
      * @return bool
      */
     public function isShowOnGradesPage()
     {
         return $this->showOnGradesPage;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isNone()
+    {
+        return $this->name === self::NONE;
     }
 
 

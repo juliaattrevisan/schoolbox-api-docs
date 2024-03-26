@@ -66,13 +66,21 @@ class UnitAssessments
                 'delete' => $this->routeGenerator->generate('learningAssessment.postDeleteAssessment', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                ])
+                ]),
+                'export' => null,
             ];
             // if quiz we have special links
             if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
                 $links['modifyContent'] = $this->routeGenerator->generate('learnosity.getContent', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
+                ]);
+            }
+            // spec assessments can be exported
+            if ($assessment->isSpecification()) {
+                $links['export'] = $this->routeGenerator->generate('learningAssessmentExporter.getExportFormForAssessment', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
                 ]);
             }
         }

@@ -4,10 +4,8 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
 
-const unitPlannerStore = useUnitPlannerStore();
 const deleteActivityStore = useDeleteActivityStore();
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 
@@ -19,8 +17,10 @@ window.Vue.watch(
     (isOpen) => {
         if (modalEl.value !== null) {
             if (isOpen) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
                 modalEl.value.open();
             } else {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
                 modalEl.value.close();
             }
         }
@@ -28,25 +28,8 @@ window.Vue.watch(
 );
 
 /**
- * Use the deleteActivityStore to delete the activity, and display toast messages.
- */
-async function deleteActivityUsingStore() {
-    unitPlannerStore.toastEl.activate("Deleting...");
-    await deleteActivityStore
-        .deleteActivity()
-        .then((successMessage) => {
-            unitPlannerStore.toastEl.timeout(successMessage, true, 5000);
-        })
-        .catch((error) => {
-            console.warn(error);
-            unitPlannerStore.toastEl.timeout("Delete failed", false, 5000);
-        });
-}
-
-/**
  * To instantly notify the user that the node is being deleted
  * by updating the button text
- * @returns {string} The button text
  */
 const deleteButtonText = window.Vue.computed(() =>
     deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
@@ -54,7 +37,6 @@ const deleteButtonText = window.Vue.computed(() =>
 
 /**
  * To prevent the user from moving away from the modal while processing is taking place
- * @returns {boolean} whether the modal is disabled
  */
 const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessing);
 </script>
@@ -74,7 +56,7 @@ const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessi
                     class="button icon-approve submit"
                     data-test-confirm-delete-activity
                     :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="deleteActivityUsingStore"
+                    @click.prevent="deleteActivityStore.deleteActivity"
                 >
                     {{ deleteButtonText }}
                 </button>

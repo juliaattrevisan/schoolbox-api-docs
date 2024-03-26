@@ -6,6 +6,7 @@ use Exception;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Resource\HomepageTemplate;
 use Tests\Support\IntegrationTester;
+use Tests\Support\Page\Duework\AssessmentForm;
 use Tests\Support\Payload\Admin\LMS\LessonPlanTemplate\CreateLessonPlanTemplate;
 use Tests\Support\Payload;
 use Tests\Support\Payload\LessonPlan\Create;
@@ -84,6 +85,8 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
 
+        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_NONE); // Required form parameter.
+
         #THEN
         $i->amGoingTo('Check the lesson plan is created');
         $i->sendRequest($lessonPlanCreate);
@@ -155,6 +158,8 @@ class LessonPlanCest
             $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][template]', '' . ($lessonPlanTemplateFieldId + $j));
             $lessonPlanUpdate->setFormParam('field[' . ($lessonPlanFieldId + $j) . '][body]', 'Body field text updated' . ($lessonPlanFieldId  + $j));
         }
+
+        $lessonPlanUpdate->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
 
         $i->amGoingTo('Check the lesson plan is updated');
         $i->sendRequest($lessonPlanUpdate);
@@ -317,6 +322,8 @@ class LessonPlanCest
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][template]', '' . ($lessonPlanTemplateFieldId1 + $j));
             $lessonPlanCreate->setFormParam('field[new' . ($j + 1) . '][body]', 'Body field text' . ($j + 1));
         }
+
+        $lessonPlanCreate->setFormParam('workType', AssessmentForm::WORKTYPE_NONE); // Required form parameter.
 
         #THEN
         $i->amGoingTo('Check the lesson plan is created');

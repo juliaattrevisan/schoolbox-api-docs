@@ -33,9 +33,12 @@ use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -155,14 +158,14 @@ class Factory
      * @param array            $post (an array of post vars from the create/update forms)
      * @param string|null      $assessmentType
      * @param IAssessable|null $original
-     * @throws UnexpectedValueException
+     * @throws MapperException
+     * @throws Deleted
      */
     public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
     {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
-        $this->setWorkType(empty($post['workType']) ? null : (int)trim($post['workType']));
         $this->setDescription(trim($post['description'] ?? ''));
         $this->setCreator($creator);
         $this->setWeight((float)(trim($post['weight'] ?? '')));
@@ -174,6 +177,13 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
+
+        try {
+            $workType = WorkTypeMapper::getInstance()->findById($post['workType']);
+        } catch (MapperException) {
+            $workType = WorkTypeMapper::getInstance()->findOneByColumn('name', WorkType::NONE);
+        }
+        $this->setWorkType($workType->getId());
 
         /* Projects need this to instantiate
          */
@@ -481,7 +491,7 @@ class Factory
                 ->setUpdatedAt(Alaress_Date_Format::now());
 
             if ($this->workType) {
-                $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+                $assessment->setWorkType(WorkTypeMapper::getInstance()->createModel()->setId($this->workType));
             } else {
                 $assessment->setWorkType(null);
             }

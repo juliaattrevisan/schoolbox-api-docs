@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = props.isReadOnly
     ? window.Vue.ref("")
-    : useEditor(props.student.attemptComment.comment ?? "", editorId, {
+    : useEditor(props.student.attemptComment.comment ?? "", `#${editorId}`, {
           targetElements: [`#${editorId}`],
           hasTokens: true,
       }); // Use a ckeditor for the comments field
@@ -95,7 +95,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 }
+    { debounce: 1000 },
 );
 
 /**

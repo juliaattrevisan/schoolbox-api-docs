@@ -1,9 +1,7 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 <input type="hidden" name="type" value="{% if assessment.url|length %}url{% else %}attach{% endif %}"/>
-
 
 <fieldset>
     {# ----------------------------------------------------------- #}
@@ -12,21 +10,16 @@
     <label class="required" for="title">Title</label>
     <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
 
-
-
     {# ----------------------------------------------------------- #}
     {# Work Type #}
     {# ----------------------------------------------------------- #}
-    <label>
-        Work Type
-        <select name="workType">
-            <option value="" selected>None</option>
-            {% for workType in allWorkTypes %}
-                <option value="{{ workType.id }}" {% if (assessment.workType.id ?? '') == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-            {% endfor %}
-        </select>
-    </label>
-
+    {% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+        with {
+            allWorkTypes: allWorkTypes,
+            assessment: assessment,
+            courseManaged: courseManaged
+        } only
+    %}
 
     {# ----------------------------------------------------------- #}
     {# Description #}
@@ -42,9 +35,7 @@
     {% if canRelocate %}
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
-
 </fieldset>
-
 
 {# ----------------------------------------------------------- #}
 {# Dates #}
@@ -52,7 +43,6 @@
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
-
 
 {# ----------------------------------------------------------- #}
 {# Attachments #}
@@ -86,7 +76,6 @@
     </div>
 </div>
 
-
 {# ----------------------------------------------------------- #}
 {# Self assess #}
 {# ----------------------------------------------------------- #}
@@ -106,12 +95,10 @@
     </div>
 </div>
 
-
 {# ----------------------------------------------------------- #}
 {# Default Activity Duration #}
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
-
 
 {# ----------------------------------------------------------- #}
 {# Participation #}
@@ -132,7 +119,6 @@
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-
 
 {# ----------------------------------------------------------- #}
 {# Scripts #}

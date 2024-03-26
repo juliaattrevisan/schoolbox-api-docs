@@ -844,18 +844,24 @@ abstract class Mapper implements IMapper
         return new Collection(array($object));
     }
 
+
+
     /**
-     * Processes $collection into a hierarchical structure.
+     * Processes `$collection` into a hierarchical structure.
      *
-     * @param  Collection $collection  The flat structure
+     * @template T of Collection
+     * @param  T          $collection  The flat structure
      * @param  string     $parentField The name of the parent field. For most
-     *                                 hierarchical mappers, this is "parent'
+     *                                 hierarchical mappers, this is "parent"
      * @param  string     $childField  The name of the children field.
-     * @return Collection
+     * @return T
      */
-    public function getCollectionAsTree($collection, $parentField = 'parent', $childField = 'children')
-    {
-        $treeList = new Collection();
+    public function getCollectionAsTree(
+        Collection $collection,
+        string $parentField = 'parent',
+        string $childField = 'children',
+    ): Collection {
+        $treeList = $collection->emptyClone();
 
         // Process $collection into a tree list.
         // This can all be done in one pass, because objects are stored by
@@ -1009,6 +1015,79 @@ abstract class Mapper implements IMapper
             }
         }
         return $object;
+    }
+
+    /**
+     * Recursively finds all IDs of the family tree of `$ids`.
+     *
+     * This includes:
+     * * `$ids` themselves
+     * * all ancestors, up to `$maxAncestors` levels
+     * * all descendants, down to `$maxDescendants` levels
+     *
+     * @param array<int> $ids            IDs to find family tree for.
+     * @param string     $parentColumn   DB column which stores the parent ID.
+     * @param int        $maxAncestors   The max levels of ancestry to fetch:
+     *                                   defaults to 50.
+     * @param int        $maxDescendants The max levels of descent to fetch:
+     *                                   defaults to 50
+     * @return array<int>
+     */
+    public function findFamilyTreeIds(
+        array $ids,
+        string $parentColumn,
+        int $maxAncestors = 50,
+        int $maxDescendants = 50,
+    ): array {
+        return array_merge(
+            $ids,
+            $this->findAncestorIds($ids, $parentColumn, $maxAncestors),
+            $this->findDescendantIds($ids, $parentColumn, $maxDescendants),
+        );
+    }
+
+    /**
+     * Recursively finds all IDs of ancestors of the given IDs.
+     *
+     * This should only recurse n times, where n = max depth of tree above
+     * `$ids`.
+     *
+     * @param array  $ids          IDs to find ancestors for.
+     * @param string $parentColumn The DB column which stores the parent ID
+     * @param int    $maxDepth     The maximum depth to traverse: defaults to 50
+     * @param int    $currentDepth The current depth of this traversal:
+     *                             incremented after each recursion.
+     * @return array
+     */
+    public function findAncestorIds(
+        array $ids,
+        string $parentColumn,
+        int $maxDepth = 50,
+        int $currentDepth = 1,
+    ): array {
+        // Recursive relation protection
+        if ($currentDepth > $maxDepth) {
+            return [];
+        }
+
+        if ($ids === []) {
+            return [];
+        }
+        $ancestorIds = $this->findScalarByPredicates(
+            $parentColumn,
+            $this->getPredicateBuilder()->in($this->getIdentifierColumn(), $ids),
+        );
+        if ($ancestorIds === []) {
+            return [];
+        }
+
+        $grandAncestorIds = $this->findAncestorIds(
+            $ancestorIds,
+            $parentColumn,
+            $maxDepth,
+            $currentDepth + 1,
+        );
+        return array_merge($ancestorIds, $grandAncestorIds);
     }
 
     /**

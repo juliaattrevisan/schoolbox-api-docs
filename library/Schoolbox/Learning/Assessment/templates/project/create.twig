@@ -22,19 +22,16 @@
 {# ----------------------------------------------------------- #}
 {# Work Type #}
 {# ----------------------------------------------------------- #}
-<label>
-    Work Type
-    <select name="workType">
-        <option value="" selected>None</option>
-        {% for workType in allWorkTypes %}
-            <option value="{{ workType.id }}" {% if (assessment.workType.id ?? '') == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-        {% endfor %}
-    </select>
-</label>
+{% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+    with {
+        allWorkTypes: allWorkTypes,
+        assessment: assessment,
+        courseManaged: courseManaged
+    } only
+%}
 
 <label for="description">Description</label>
 <textarea id="description" name="description">{{ assessment.description }}</textarea>
-
 
 {# ----------------------------------------------------------- #}
 {# Assessment Location #}
@@ -146,6 +143,5 @@
 } %}
 
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.project.proper} %}
-
 
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

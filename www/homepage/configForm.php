@@ -108,13 +108,22 @@ if (is_numeric($_REQUEST['cid'])) {
         /** @var Component_Homepage_ControllerAbstract $component */
         $component = $factory->buildComponent($instance);
 
-        if (!($component instanceof Component_ControllerAbstract)) {
-            exit("<div class='alert alert-box'>Couldn't create component.</div>");
-        }
+        // If the request expects JSON, we don't need to render the component
+        if (SitePage::detectJson()) {
+            if (!($component instanceof Component_ControllerAbstract)) {
+                $page->outputJson("error: couldn't create component", false, 409);
+                exit;
+            }
 
-        $folder   = $folderMapper->findById($cid);
-        $renderer = new Component_Renderer();
-        $renderer->renderHomepageComponent($page, $folder, $component);
+            $page->outputJson(array('instanceID' => $instanceID), false, 200);
+        } else {
+            if (!($component instanceof Component_ControllerAbstract)) {
+                exit("<div class='alert alert-box'>Couldn't create component.</div>");
+            }
+            $folder   = $folderMapper->findById($cid);
+            $renderer = new Component_Renderer();
+            $renderer->renderHomepageComponent($page, $folder, $component);
+        }
     } elseif ($cid && is_array($_POST['colors'])) { // AJAX Save homepage colours
         $homepage = new Homepage($cid);
         // Also try to save width

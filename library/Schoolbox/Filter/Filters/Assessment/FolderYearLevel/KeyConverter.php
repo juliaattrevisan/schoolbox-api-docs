@@ -13,7 +13,6 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\Filter\Filters\Assessment\WorkType\Definition;
 use Schoolbox\User;
 
 /**

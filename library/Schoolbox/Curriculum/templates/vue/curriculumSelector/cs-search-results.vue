@@ -13,14 +13,25 @@ const searchStore = useSearchStore();
 const searchResultsContainerEl = window.Vue.ref(null);
 const searchResultsEl = window.Vue.ref(null);
 
+const props = defineProps({
+    /**
+     * so can only select a single node
+     */
+    isSingleSelect: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
+
 /**
  * show select all option for adding / removing codes only if there's
- * more than one search result
+ * single select is not active and more than one search result is available
  *
  * @returns { Boolean }
  */
 const showSelectAll = window.Vue.computed(() => {
-    return searchStore.filteredResults.length > 1;
+    return !props.isSingleSelect && searchStore.filteredResults.length > 1;
 });
 
 /**
@@ -36,7 +47,7 @@ window.Vue.watch(
                 height: targetHeight,
             });
         });
-    }
+    },
 );
 </script>
 
@@ -53,7 +64,7 @@ window.Vue.watch(
                         <cs-select-all-search-results />
                     </li>
                     <li v-for="result in searchStore.filteredResults" :key="result.id">
-                        <cs-search-result :result="result" />
+                        <cs-search-result :result="result" :is-single-select="props.isSingleSelect" />
                     </li>
                 </template>
             </ul>

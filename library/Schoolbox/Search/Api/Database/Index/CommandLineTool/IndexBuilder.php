@@ -14,6 +14,7 @@ use Alaress\Lock\LockRefreshException;
 use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 
@@ -100,16 +101,13 @@ class IndexBuilder extends App
             ),
         );
 
-        $dbi = $this->getDatabaseInternal();
-
-        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
-        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
-        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
-        // https://mariadb.com/kb/en/aborting-statements/
-        $dbi->execute('SET SESSION max_statement_time = 0;');
-        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $maxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
+        // Run all queries against the write database, rather than a possible
+        // read replica.
+        // This ensures that `SET max_statement_time = 0` happens on the same
+        // database as the `SELECT` statements.
+        /** @var DatabaseFactory $dbFactory */
+        $dbFactory = $this->getDi()->get('databaseFactory');
+        $dbi       = $dbFactory->getInternalWriteDatabase();
 
         /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
@@ -151,7 +149,16 @@ class IndexBuilder extends App
             );
         }
 
-        // Run for as long as you need to?
+        // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
+        // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
+        // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
+        // https://mariadb.com/kb/en/aborting-statements/
+        $dbi->execute('SET SESSION max_statement_time = 0;');
+        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $maxStatementTime = $rows[0]['Value'];
+        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
+
+        // Set this on the server as well: I'm not sure this makes a difference
         $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
 
         // Clear indices if required
@@ -159,7 +166,13 @@ class IndexBuilder extends App
             if (empty($types)) {
                 $logger->notice('Clearing ALL existing indices before rebuilding!');
                 if ($this->perform()) {
-                    $dbi->execute('TRUNCATE search_index');
+                    // This used to TRUNCATE instead of DELETE:
+                    // whilst TRUNCATE should be faster, it is susceptible to
+                    // crashing the database server for reasons I haven't
+                    // been able to determine.
+                    // Tt must acquire a lock, as it deletes and recreates the
+                    // table: this lock isn't always acquirable.
+                    $dbi->execute('DELETE FROM search_index');
                 }
             } else {
                 $logger->notice('Clearing indices for provided types before rebuilding!');
@@ -205,57 +218,63 @@ class IndexBuilder extends App
         ");
 
         $time = microtime(true);
-        foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
-            // Not in the list of types to build? Skip
-            if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
-                continue;
-            }
+        try {
+            foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
+                // Not in the list of types to build? Skip
+                if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
+                    continue;
+                }
 
-            try {
+                // Refresh lock before building list of updates
                 $logger->debug('Refreshing lock.');
                 $this->refreshLock($lock);
-            } catch (LockRefreshException) {
-                // Carry on.
-            }
 
-            foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
-                if (!$this->perform()) {
-                    continue;
+                foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
+                    if (!$this->perform()) {
+                        continue;
+                    }
+
+                    // Refresh lock between each update
+                    $this->refreshLock($lock);
+
+                    try {
+                        $updateStatement->execute([
+                            'type'                    => $updatedIndex->getType(),
+                            'identifier'              => $updatedIndex->getIdentifier(),
+                            'title'                   => $updatedIndex->getTitle(),
+                            'date'                    => $updatedIndex->getDate()?->getDatabase(),
+                            'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
+                            'createdBy'               => $updatedIndex->getCreatedBy(),
+                            'folderId'                => $updatedIndex->getFolderId(),
+                            'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
+                        ]);
+                    } catch (Exception $e) {
+                        $logger->warning(
+                            sprintf(
+                                'Unexpected database error when index for "%s:%s" (%s): ignoring',
+                                $updatedIndex->getType(),
+                                $updatedIndex->getIdentifier(),
+                                $e->getMessage(),
+                            )
+                        );
+                        continue;
+                    }
                 }
 
-                try {
-                    $updateStatement->execute([
-                        'type'                    => $updatedIndex->getType(),
-                        'identifier'              => $updatedIndex->getIdentifier(),
-                        'title'                   => $updatedIndex->getTitle(),
-                        'date'                    => $updatedIndex->getDate()?->getDatabase(),
-                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
-                        'createdBy'               => $updatedIndex->getCreatedBy(),
-                        'folderId'                => $updatedIndex->getFolderId(),
-                        'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
+                foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
+                    if (!$this->perform()) {
+                        continue;
+                    }
+                    $deleteStatement->execute([
+                        'identifier' => $deletedIndex->getIdentifier(),
+                        'type'       => $deletedIndex->getType(),
                     ]);
-                } catch (Exception $e) {
-                    $logger->warning(
-                        sprintf(
-                            'Unexpected database error when index for "%s:%s" (%s): ignoring',
-                            $updatedIndex->getType(),
-                            $updatedIndex->getIdentifier(),
-                            $e->getMessage(),
-                        )
-                    );
-                    continue;
                 }
             }
-
-            foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
-                if (!$this->perform()) {
-                    continue;
-                }
-                $deleteStatement->execute([
-                    'identifier' => $deletedIndex->getIdentifier(),
-                    'type'       => $deletedIndex->getType(),
-                ]);
-            }
+        } catch (LockRefreshException) {
+            // Do not carry on: instead, exit politely
+            $logger->warning('Exiting early as lock could not be re-acquired');
+            return;
         }
 
         $logger->notice(sprintf("Search indices rebuilt in %0.2fs", microtime(true) - $time));

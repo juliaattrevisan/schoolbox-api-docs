@@ -18,6 +18,8 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
         idList: [], //ids of the selected nodes
         currentDepth: 0, //track how far down the tree we are
         currentDirection: DIRECTION.FORWARDS, //which direction we are currently travelling in the tree
+        hasStartingNode: false, //whether we have a starting node to begin with
+        startingNodeId: null, //the id of the starting node
     }),
 
     getters: {
@@ -47,6 +49,13 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
                 const nodeAtDepth = findById(nodesStore.nodes.children, id);
                 breadcrumbs.push({ id: id, name: nodeAtDepth.name, depth: index + 1 });
             });
+            // remove any breadcrumbs that are before the starting node id, so the user can't go back further than the starting node
+            if (this.hasStartingNode) {
+                const indexOfStartingNode = breadcrumbs.findIndex(
+                    (breadcrumb) => breadcrumb.id === this.startingNodeId,
+                );
+                breadcrumbs = breadcrumbs.filter((_, index) => index >= indexOfStartingNode);
+            }
             //we return an empty array if there's no selections yet, otherwise return the breadcrumbs
             return breadcrumbs.length === 0 ? [] : breadcrumbs;
         },
@@ -154,6 +163,19 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
          */
         async toId(id) {
             await useNodesStore().loadId(id);
+        },
+
+        /**
+         * To traverse to a specified id, regardless of where it is
+         * in the current tree structure and prevent any further
+         * traversal back before the starting node
+         *
+         * @param { number } id - id of the Node to move to
+         */
+        async toStartingNodeId(id) {
+            this.hasStartingNode = true;
+            this.startingNodeId = id;
+            await useNodesStore().loadId(this.startingNodeId);
         },
     },
 });

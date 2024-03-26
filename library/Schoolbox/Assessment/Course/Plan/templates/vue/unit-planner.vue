@@ -2,6 +2,7 @@
 import type { Ref } from "vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
@@ -15,6 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
+const dragStore = useUnitPlannerDragStore();
 
 // Get a list of every textbox that could be shown in a unit
 // in case a unit doesn't have a textbox for a particular key
@@ -99,17 +101,17 @@ window.Vue.watch(
             updateScrollPosition();
         }
     },
-    { once: true }
+    { once: true },
 );
 
 window.Vue.onMounted(() => {
-    store.init(
-        props.units,
+    store.init(props.units, toastEl.value!);
+
+    dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
         headerRowHeight,
         unitPlannerContainerScrollTop,
-        toastEl
     );
 
     // Initialize the ResizeObserver
@@ -164,7 +166,7 @@ window.Vue.onUnmounted(() => {
             </div>
 
             <div
-                v-for="unit in store.isDragging ? store.dragOrderedUnits : store.orderedUnits"
+                v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
                 :key="unit.id"
                 ref="unitElements"
                 class="grid-row unit-row"
@@ -181,15 +183,15 @@ window.Vue.onUnmounted(() => {
             <div
                 class="unit-planner-sortable-placeholder grid-row"
                 :style="{
-                    display: store.isDragging ? 'grid' : 'none',
-                    top: `calc(${store.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                    display: dragStore.isDragging ? 'grid' : 'none',
+                    top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
                 }"
             >
-                <template v-if="store.dragCurrentUnit">
+                <template v-if="dragStore.dragCurrentUnit">
                     <unit-planner-unit-cell
                         v-for="column in selectedTab.columns"
                         :key="column.id"
-                        :unit="store.dragCurrentUnit"
+                        :unit="dragStore.dragCurrentUnit"
                         :column="column"
                         :is-sortable-placeholder="true"
                     ></unit-planner-unit-cell>

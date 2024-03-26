@@ -5,15 +5,16 @@
 import { defineStore } from "pinia";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Unit } from "../unitPlannerTypes";
 
 export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", () => {
+    const unitPlannerStore = useUnitPlannerStore();
+
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
-    const unit = window.Vue.ref<Unit | null>(null); // The unit to which the activity to be deleted belongs.
-    const activity = window.Vue.ref<Activity | null>(null); // The activity to be deleted.
-
-    const unitPlannerStore = useUnitPlannerStore();
+    const selectedUnit = window.Vue.ref<Unit | null>(null); // The unit to which the activity to be deleted belongs.
+    const selectedActivity = window.Vue.ref<Activity | null>(null); // The activity to be deleted.
 
     /**
      * Display a prompt to confirm a node removal.
@@ -22,47 +23,72 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
      */
     function prompt(unitToWhichActivityBelongs: Unit, activityToDelete: Activity) {
         isOpen.value = true;
-        activity.value = activityToDelete;
-        unit.value = unitToWhichActivityBelongs;
+        selectedUnit.value = unitToWhichActivityBelongs;
+        selectedActivity.value = activityToDelete;
     }
 
     /**
-     * to hide the confirmation prompt
+     * To hide the confirmation prompt
      */
     function cancel() {
         isOpen.value = false;
     }
 
     /**
-     * Activity removal has been confirmed so ask the server to delete the activity,
-     * and then remove it from the UI if the back end did its part.
-     * @returns {string} The toast message to display
+     * Remove the activity from the unit.
+     * @param { number } unitId - the unit ID to remove the activity from
+     * @param { number } activityId - the activity ID to remove
      */
-    async function deleteActivity(): string {
-        if (activity.value === null) {
-            throw new Error("Delete request not sent because activity not initialised.");
+    function removeActivityFromUnit(unitId: number, activityId: number) {
+        const storeUnit = unitPlannerStore.units.find((unit) => unit.id === unitId);
+        if (storeUnit === undefined) {
+            return;
+        }
+        const storeActivity = storeUnit.activities.find((activity) => activity.id === activityId);
+        if (storeActivity === undefined) {
+            return;
         }
 
+        // Remove the found activity.
+        storeUnit.activities = storeUnit.activities.filter((activity) => activity.id !== activityId);
+    }
+
+    /**
+     * Activity removal has been confirmed so ask the server to delete the activity,
+     * and then remove it from the UI if the back end did its part.
+     */
+    async function deleteActivity() {
+        if (selectedUnit.value === null || selectedActivity.value === null) {
+            return; // nothing to do
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+        unitPlannerStore.toastEl!.activate("Deleting...");
         isProcessing.value = true;
-        let response;
+
         try {
-            response = await window.fetch(activity.value._links.delete, {
+            const response = await window.fetch(selectedActivity.value._links.delete, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });
+
+            if (!response.ok) {
+                throw new Error(await extractErrorMessage(response));
+            }
         } catch (error) {
-            throw new Error("Error during fetch call.");
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            unitPlannerStore.toastEl!.timeout(error, false, 2000);
+            throw error;
         }
+
+        removeActivityFromUnit(selectedUnit.value.id, selectedActivity.value.id);
         isProcessing.value = false;
-
-        if (!response.ok) {
-            throw new Error("Delete response not ok.");
-        }
-
-        unitPlannerStore.removeActivityFromUnit(unit.value, activity.value);
         isOpen.value = false;
+        selectedUnit.value = null;
+        selectedActivity.value = null;
 
-        return "Activity deleted";
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+        unitPlannerStore.toastEl!.timeout("Activity Deleted", true, 5000);
     }
 
     return {

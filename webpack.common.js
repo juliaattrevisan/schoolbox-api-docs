@@ -117,6 +117,9 @@ module.exports = {
         headerSearch: "./templates/core/include/vue/headerSearch.js",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
+        // Toast
+        sbxToast: "./vue/components/toast/sbxToast.ts",
+
         // Calendars
         sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.js",
         timetableCalendar: "./library/Schoolbox/Calendar/vue/timetableCalendar.js",

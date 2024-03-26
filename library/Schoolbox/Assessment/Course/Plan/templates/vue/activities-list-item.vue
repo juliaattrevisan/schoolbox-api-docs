@@ -58,6 +58,14 @@ const activityLink = window.Vue.computed(() => {
         </nav>
         <!-- Move the dropdown content to the unit planner table so that it can get around the cell's overflow:hidden -->
         <ul :id="'dropdown-unitplanner-activity-' + props.activity.id" class="f-dropdown" data-dropdown-content>
+            <li v-if="props.activity._links.export">
+                <a
+                    :href="returnUrl(props.activity._links.export)"
+                    class="icon-export"
+                    title="Copy this task into classes"
+                    >Export to Classes</a
+                >
+            </li>
             <li>
                 <a :href="returnUrl(props.activity._links.modify)" class="icon-modify">{{
                     props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
