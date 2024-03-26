@@ -46,7 +46,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
      *
      * @var Node\Model|null
      */
-     protected ?Node\Model $curriculumTreeFilter = null;
+    protected ?Node\Model $curriculumTreeFilter = null;
 
     /**
      * Is curriculum tagging turned on
