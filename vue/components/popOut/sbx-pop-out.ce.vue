@@ -169,14 +169,14 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
 
     &--component-action {
         background-color: transparent;
-        margin: 0;
         font-weight: 600;
         font-size: rem-calc((var(--base-font-size) - 2));
-        line-height: 1.5rem;
         height: auto;
+        line-height: 1.5rem;
+        margin: 0;
+        padding: var(--spacing-s);
         text-transform: uppercase;
         width: auto;
-        padding: var(--spacing-s);
 
         &:hover {
             background-color: var(--content-ui-hover);

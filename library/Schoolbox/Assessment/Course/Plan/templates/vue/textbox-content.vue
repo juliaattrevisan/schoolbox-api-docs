@@ -116,9 +116,9 @@ window.Vue.onMounted(initEditor);
 
 <style scoped lang="scss">
 .editor-content {
-    z-index: auto !important;
-    padding: 8px !important;
     border: 0 !important;
+    padding: 8px !important;
+    z-index: auto !important;
 }
 
 // Specificity to override the CKEditor border, we handle it in the parent vue component instead

@@ -84,9 +84,9 @@ const activityLink = window.Vue.computed(() => {
 }
 
 .card.compact a p {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
