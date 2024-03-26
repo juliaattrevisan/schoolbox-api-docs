@@ -46,6 +46,13 @@ window.sbProps.firebaseApps.forEach((app) => {
             // Receipt of a message
             onMessage(messaging, (payload) => {
                 console.log('Message received. ', payload);
+                new Notification(payload.notification.title, {
+                    body: payload.notification.body,
+                    icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    renotify: false,
+                });
             });
         }
     }
