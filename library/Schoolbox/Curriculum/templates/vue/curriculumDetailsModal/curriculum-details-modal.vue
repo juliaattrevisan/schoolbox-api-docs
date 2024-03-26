@@ -7,7 +7,7 @@ const selectedNode = window.Vue.ref(getEmptyNode());
 const modalEl = window.Vue.ref(null);
 
 interface Props {
-    selectedNodeId: number; // the assigned node to display
+    selectedNodeId?: number; // the assigned node to display
 }
 
 const props = withDefaults(defineProps<Props>(), {
