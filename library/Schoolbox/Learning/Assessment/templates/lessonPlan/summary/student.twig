@@ -4,7 +4,6 @@
  # @param array             $lastView
  # @param array             $breadcrumbs            A set of nodes to render as breadcrumb elements
  # @param LessonPlan\Model  $assesment              A Lesson Plan assessment domain object instance
- # @param bool              $assesmentIsLessonPlan  True if $assessment is a lesson plan
  # @param \Schoolbox\User   $student                A \Schoolbox\User instance
  # @param array             $courseAssessments
  # @param array             $linkedAssessments
@@ -36,7 +35,6 @@
         <h1>{{ assessment.title }}</h1>
         {% include '@learningAssessment/meta.twig' with {
             assessment: assessment,
-            assessmentIsLessonPlan: assessmentIsLessonPlan,
             submissionsBlocked: '',
             student: student,
             icon: 'icon-lesson-plan',
