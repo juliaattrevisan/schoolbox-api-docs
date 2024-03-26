@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\Oauth\Client\Api;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 
 /**
@@ -36,11 +35,11 @@ class Module extends BaseModule
 
         // API routes
         $this->register(self::METHOD_GET, '', 'getList', $permission);
-        $this->register(self::METHOD_GET, '/{id:\\d+}', 'getClient', $permission, $preload);
-        $this->register(self::METHOD_POST, '{/id:\\d+}', 'postClient', $permission, $preload);
-        $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putClient', $permission, $preload);
-        $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchClient', $permission, $preload);
-        $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteClient', $permission, $preload);
+        $this->register(self::METHOD_GET, '/{id:\\d+}', 'getItem', $permission, $preload);
+        $this->register(self::METHOD_POST, '{/id:\\d+}', 'postItem', $permission, $preload);
+        $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putItem', $permission, $preload);
+        $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchItem', $permission, $preload);
+        $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteItem', $permission, $preload);
     }
 
     /**
@@ -48,6 +47,6 @@ class Module extends BaseModule
      */
     public function buildController(): Controller
     {
-        return new Controller();
+        return new Controller($this->getMapperFactory()->get(Mapper::class));
     }
 }

@@ -13,6 +13,8 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for OIDC relying party configurations.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
