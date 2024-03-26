@@ -76,7 +76,7 @@ export const useStore = (folderId: number) =>
             nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
             isReadOnly.value = $isReadOnly;
-            // void pushChanges(); // we don't want to push changes here, as we're just initializing the store
+            void pushChanges();
         }
 
         /**
