@@ -213,7 +213,6 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
     /**
      * While the user is dragging a unit
      * @param { Draggable } draggable - the draggable instance
-     * @returns { void }
      */
     function onDragMove(draggable: Draggable) {
         dragCurrentPointerY.value = draggable.pointerY;
@@ -223,7 +222,6 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
      * When the user starts dragging a unit
      * @param { Draggable } draggable - the draggable instance
      * @param { Unit } unit - the unit to start dragging
-     * @returns { void }
      */
     function onDragStart(draggable: Draggable, unit: Unit) {
         const pointerEvent = draggable.pointerEvent as PointerEvent;
@@ -247,7 +245,6 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
     /**
      * When the user stops dragging a unit
      * @param { Draggable } draggable - the draggable instance
-     * @returns { void }
      */
     function onDragEnd(draggable: Draggable) {
         if (dragInitial.value !== null) {

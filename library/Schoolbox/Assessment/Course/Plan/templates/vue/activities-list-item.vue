@@ -1,18 +1,26 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
+import { Draggable } from "gsap/Draggable";
 import { kebabCase, startCase } from "lodash";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
 import { useActivitiesDragStore } from "./store/activitiesDragStore";
 import type { Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
+
+gsap.registerPlugin(Draggable);
 
 interface Props {
     activitiesDragStoreId: string; // The id of the activitiesDragStore this belongs to
     unit: Unit; // The id of the unit to which the activity belongs.
+    column: Column;
     activity: Activity;
 }
 
 const props = defineProps<Props>();
+const store = useUnitPlannerStore();
 const deleteActivityStore = useDeleteActivityStore();
 const activitiesDragStore = useActivitiesDragStore(props.activitiesDragStoreId);
 
@@ -31,15 +39,38 @@ const activityLink = window.Vue.computed(() => {
     return props.activity._links.summary;
 });
 
-// When activityListEl is set, add the activity to the drag store (effectively after mount)
-window.Vue.watch(
-    activityListEl,
-    () => {
-        if (!activityListEl.value) return;
-        activitiesDragStore().setActivityEl(props.activity.id, activityListEl.value);
-    },
-    { immediate: true },
-);
+const draggableEl = window.Vue.ref<HTMLElement>();
+let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
+
+window.Vue.onMounted(() => {
+    activitiesDragStore().setActivityEl(props.activity.id, activityListEl.value!);
+
+    // Whether to allow the user to resequence the activities
+    if (activitiesDragStore().routeReorder) {
+        if (draggableEl.value) {
+            draggableInstance = Draggable.create(draggableEl.value, {
+                type: "y",
+                autoScroll: 1, // Scroll speed
+                inertia: true,
+                allowContextMenu: true,
+                onPress: () => {
+                    if (!draggableInstance) return;
+                    store.updateFocusedUnitCell(props.unit.id, props.column, true);
+                    activitiesDragStore().onDragStart(draggableInstance[0], props.activity);
+                },
+                onDrag: () => {
+                    if (!draggableInstance) return;
+                    activitiesDragStore().onDragMove(draggableInstance[0]);
+                },
+                onRelease: () => {
+                    if (!draggableInstance) return;
+                    store.updateFocusedUnitCell(props.unit.id, props.column, false);
+                    activitiesDragStore().onDragEnd(draggableInstance[0]);
+                },
+            });
+        }
+    }
+});
 
 window.Vue.onUnmounted(() => {
     activitiesDragStore().unsetActivityEl(props.activity.id);
@@ -47,8 +78,16 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <li ref="activityListEl" class="actions-small-1">
+    <li
+        ref="activityListEl"
+        class="actions-small-1"
+        :class="{
+            'is-dragging': activitiesDragStore().dragCurrentDraggable?.activity.id === props.activity.id,
+        }"
+    >
         <div class="list-item">
+            <div v-if="activitiesDragStore().routeReorder" ref="draggableEl" class="sortable-holder"></div>
+            <div class="grip compact ui-sortable-handle"></div>
             <div class="card small-12 compact wrap-down">
                 <a :href="getReturnUrl(activityLink)">
                     <span
@@ -92,7 +131,23 @@ window.Vue.onUnmounted(() => {
     </li>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+li.is-dragging {
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+
+    .sortable-holder {
+        transform: none !important;
+    }
+}
+.sortable-holder {
+    background-color: transparent;
+    height: 100%;
+    position: absolute;
+    width: 40px;
+    z-index: 100;
+}
+
 .card.compact {
     padding-left: 0;
     padding-right: 0;

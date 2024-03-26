@@ -148,7 +148,6 @@ window.Vue.onUnmounted(() => {
         :class="{
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
-            'sortable-placeholder': props.isSortablePlaceholder,
             'content-focused': contentIsFocused,
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
         }"
@@ -192,6 +191,7 @@ window.Vue.onUnmounted(() => {
                 <activities-list-content
                     :unit="props.unit"
                     :column="props.column"
+                    :is-sortable-placeholder="props.isSortablePlaceholder"
                     @update-content-height="updateContentHeight"
                 />
             </template>

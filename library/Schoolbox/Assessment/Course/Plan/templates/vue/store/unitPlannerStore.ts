@@ -42,7 +42,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         });
     });
 
-    // Units that are focused, e.g. when the user is editing a textbox (focused on the editor)
+    // Unit Cells that are focused, e.g. when the user is editing a textbox (focused on the editor), dragging an activity, etc
     const focusedUnitCells = window.Vue.ref<Record<number, string[]>>({});
     // Units that have been expanded by clicking "view more"
     const viewMoreUnitIDs = window.Vue.ref<Unit["id"][]>([]);
