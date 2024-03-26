@@ -26,7 +26,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
     defineStore(`folderNodes/${folderId}-${componentInstanceId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
         const selectedNodes = window.Vue.ref<Node[]>([]); // the specific nodes with codes that have been selected
-        const filter = window.Vue.ref<Node>({} as Node); // to only display nodes that are children of this node
+        const filter = window.Vue.ref<Node | null>({} as Node | null); // to only display nodes that are children of this node
         const isReadOnly = window.Vue.ref<boolean>(true); // whether the user can edit nodes or not
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
@@ -106,10 +106,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * Store a reference to the nodes to display
          * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
-         * @param {Node} $filter - to only display nodes that are children of this node
+         * @param {Node|null} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
-        function init($nodes: Node[], $selectedNodes: Node[], $filter: Node, $isReadOnly: boolean): void {
+        function init($nodes: Node[], $selectedNodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
             nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
             filter.value = $filter;
@@ -125,6 +125,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * @returns {Node[]} - the nodes that are children of the filter node
          */
         const filteredNodes = window.Vue.computed(() => {
+            // Nothing selected? Just show all nodes
+            if (filter.value === null) {
+                return nodes.value;
+            }
             const filterNode = findById(nodes.value, filter.value.id);
             if (filterNode === undefined) {
                 // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesnt currently contain any selected nodes

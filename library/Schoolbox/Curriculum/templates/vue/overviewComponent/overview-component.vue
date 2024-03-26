@@ -23,7 +23,7 @@ interface Props {
     componentInstanceId: number; // The component instance id, to ensure the store is unique
     nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
-    filter: Node; // to only display nodes that are children of this node
+    filter: Node | null; // to only display nodes that are children of this node
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
     isSuperUser: boolean; // Whether the user is a super user
@@ -95,7 +95,7 @@ function onModalClosed() {
     />
     <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
-    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter.id" />
+    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
     <toast ref="toastEl"></toast>
 </template>
