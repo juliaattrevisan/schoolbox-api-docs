@@ -27,6 +27,7 @@ export type Unit = {
     activities: {
         _links: {
             create: string | null;
+            reorder: string | null;
         };
         items: Activity[];
     };

@@ -191,7 +191,12 @@ class Controller extends Base
                     'contextType' => 'unitspecs',
                     'contextId' => $unit->getId(),
                     'context' => $unit,
-                ]]
+                ]],
+                'reorder' => ["route" => "learningAssessment.postReorderAssessments", "params" => [
+                    'contextType' => 'unitspecs',
+                    'contextId' => $unit->getId(),
+                    'context' => $unit,
+                ]],
             ];
 
             foreach ($activitiesLinks as $key => $link) {
