@@ -45,16 +45,4 @@ class Mapper extends Schoolbox\Mapper
     {
         return ['sequence' => 'ASC'];
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function delete($object): bool
-    {
-        if ($object->getName() === Model::NONE) {
-            throw new UnexpectedValueException('The ' . Model::NONE . ' option may not be deleted.');
-        }
-
-        return parent::delete($object);
-    }
 }

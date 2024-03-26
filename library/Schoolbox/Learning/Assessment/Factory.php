@@ -34,7 +34,6 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -178,12 +177,14 @@ class Factory
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
 
-        try {
-            $workType = WorkTypeMapper::getInstance()->findById($post['workType']);
-        } catch (MapperException) {
-            $workType = WorkTypeMapper::getInstance()->findOneByColumn('name', WorkType::NONE);
-        }
-        $this->setWorkType($workType->getId());
+        // Work type should always be null for lesson plans.
+        // For other assessment types, look up the work type to make sure it is valid before setting.
+        // If it is not valid (e.g. it does not exist or is soft-deleted) throw an exception.
+        $this->setWorkType(
+            $assessmentType === AssessmentType::TYPE_LESSON_PLAN
+            ? null
+            : WorkTypeMapper::getInstance()->findById($post['workType'])
+        );
 
         /* Projects need this to instantiate
          */

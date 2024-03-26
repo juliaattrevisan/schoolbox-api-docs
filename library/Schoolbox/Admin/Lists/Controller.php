@@ -17,7 +17,6 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Moment\Evidence\Tag\Mapper as LearningMomentEvidenceTag;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -640,7 +639,6 @@ class Controller extends Base
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'delete'            => true,
-                'deleteFailMsg'     => "You cannot delete the '" . WorkType::NONE . "' worktype.",
                 'showId'            => false,
                 'fields'            => [
                     'id' => [
