@@ -16,6 +16,7 @@ namespace Schoolbox\Curriculum\Component;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
@@ -43,9 +44,9 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
      * to filter the component to display only the nodes that are descendants of
      * this node.
      *
-     * @var GenericCollection<Node\Model>|null
+     * @var Node\Model|null
      */
-    // protected ?GenericCollection $curriculumTreeFilter = null;
+     protected ?Node\Model $curriculumTreeFilter = null;
 
     /**
      * Is curriculum tagging turned on
@@ -110,10 +111,15 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         $this->selectedNodes = $this->getContext()->getCurriculumNodes()->reindex();
 
         // Load curriculum tree filter node
-        // $this->curriculumTreeFilter = $nodeMapper->findByColumn(
-        //     'id',
-        //     explode(',', $this->getConfig('curriculumTreeFilter', '')),
-        // );
+        $curriculumTreeFilterConfig = $this->getConfig('curriculumTreeFilter');
+        if ($curriculumTreeFilterConfig) {
+            try {
+                $this->curriculumTreeFilter = $nodeMapper->findById($curriculumTreeFilterConfig);
+            } catch (Exception) {
+                // Node not found or deleted?
+                // Just act as if nothing were selected.
+            }
+        }
 
         return true;
     }
@@ -131,7 +137,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'nodes' => $this->curriculumNodes,
                 'selectedNodes' => $this->selectedNodes,
-                // 'curriculumTreeFilter' => $this->curriculumTreeFilter,
+                'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
                     'curriculum.edit',
