@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Cli;
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Url\Factory;
@@ -82,6 +84,11 @@ HELP;
             exit;
         }
 
+        /* Log the title first lol
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Learnosity Attempt Rescorer.');
+        $this->getLogger()->info('');
 
         /* Check mandatory args first
          */
@@ -158,6 +165,12 @@ HELP;
         ];
 
         foreach ($attempts as $attempt) {
+            $this->getLogger()->info(sprintf(
+                'Preparing attempt %s (%s) for rescoring',
+                $attempt->getId(),
+                $attempt->getLearnosityReference()
+            ));
+
             $payload['statuses'][] = [
                 'user_id' => (new UserIdentifier())->generate($schoolcode, $attempt->getUser()->getId()),
                 'session_id' => $attempt->getLearnosityReference(),
@@ -165,7 +178,18 @@ HELP;
             ];
         }
 
-//        $api->dataUpdateRequest('/jobs/sessions/statuses', )
+        if ($this->perform()) {
+            $this->getLogger()->info(sprintf(
+                'Sending %s attempt(s) to learnosity for rescoring.',
+                count($payload['statuses'])
+            ));
+
+            $response = $api->dataUpdateRequest('/jobs/sessions/statuses', $payload);
+
+            print_r($response);
+        } else {
+            $this->getLogger()->info('Planning finished.');
+        }
     }
 
 
