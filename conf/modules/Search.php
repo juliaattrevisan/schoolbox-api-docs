@@ -9,9 +9,10 @@ namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
 use Schoolbox\Search\Api;
+use Schoolbox\Search\Header\Module as HeaderSearchModule;
 use Schoolbox\Search\Mock;
-use Schoolbox\Search\User;
 use Schoolbox\Search\Module as SearchModule;
+use Schoolbox\Search\User;
 
 /**
  * Module configuration for search.
@@ -31,5 +32,8 @@ class Search implements ModuleConfigInterface
 
         $module = new SearchModule($di);
         $module->registerModule('/search');
+
+        $qsModule = new HeaderSearchModule($di);
+        $qsModule->registerModule('/search/header');
     }
 }

@@ -8,15 +8,24 @@ import debounce from "lodash/debounce";
 import { vOnClickOutside } from "@vueuse/components";
 import SearchInput from "@schoolboxVue/components/search/search-input.vue";
 
+interface MetaContext {
+    name: string;
+    url: string;
+}
+
 interface Result {
-    id: string;
-    formattedName: string;
-    metadata: string;
+    id: number;
+    title: string;
+    meta: string | MetaContext[];
+    type: string;
+    image: string;
+    icon: string;
+    url: string;
 }
 
 interface AllResults {
-    totalCount: number;
-    results: Result[];
+    metadata: { totalCountUsers: number, totalCountFolders: number };
+    data: Result[];
 }
 
 const isFocused = window.Vue.ref(false);
@@ -27,18 +36,43 @@ const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
 const isLoading = window.Vue.ref(true);
 const hasLoadError = window.Vue.ref(false);
-const totalCount = window.Vue.ref(0);
+const totalCountFolders = window.Vue.ref(0);
+const totalCountUsers = window.Vue.ref(0);
 const arrowCounter = window.Vue.ref(-1); // Want to automatically select the first result? set this to 0
 const formElement = window.Vue.ref<HTMLFormElement | null>(null);
 const minKeywordLength = 2;
 const paths = {
     portrait: "/portrait.php?id=",
-    searchEndpoint: "/user/search?keyword=",
+    searchEndpoint: "/search/header?keyword=",
     userPage: "/search/user/",
     searchPage: "/search",
     searchPageWithKeyword: "/search?keyword=",
     usersFilter: `filter=%7B"date"%3A%7B%7D%2C"creator"%3A%7B%7D%2C"types"%3A%5B"user"%2C"user.guest"%2C"user.parent"%2C"user.staff"%2C"user.student"%5D%7D`,
 };
+
+/**
+ * Only the user results
+ * @returns {Result[]} - the user results
+ */
+const userResults = window.Vue.computed(() => {
+    return results.value.filter((res) => res.type.includes("user"));
+});
+
+/**
+ * Only the page results
+ * @returns {Result[]} - the page results
+ */
+const pageResults = window.Vue.computed(() => {
+    return results.value.filter((res) => res.type.includes("page"));
+});
+
+/**
+ * The results combined, so we can still loop through key up / key down and assign relevant focus on item over
+ * @returns {Result[]} - all results
+ */
+const allResults = window.Vue.computed(() => {
+    return [...userResults.value, ...pageResults.value];
+});
 
 /**
  * Input added
@@ -52,7 +86,7 @@ function onInput(value: string) {
  * Arrow pressed down, moving to next result
  */
 function onArrowDown() {
-    if (arrowCounter.value < results.value.length - 1) {
+    if (arrowCounter.value < allResults.value.length - 1) {
         arrowCounter.value += 1;
     }
 }
@@ -74,8 +108,10 @@ const filterResults = debounce(() => {
     fetch(`${paths.searchEndpoint}${keyword.value}`)
         .then((response) => response.json())
         .then((data: AllResults) => {
-            totalCount.value = data.totalCount;
-            results.value = data.results;
+            totalCountUsers.value = data.metadata.totalCountUsers;
+            totalCountFolders.value = data.metadata.totalCountFolders;
+
+            results.value = data.data;
         })
         .finally(() => {
             isLoading.value = false;
@@ -101,8 +137,8 @@ window.Vue.watch(keyword, () => {
  * Navigate to the chosen result or submit the form to go to the search page
  */
 function onEnter() {
-    if (arrowCounter.value > 0) {
-        window.location.href = `${paths.userPage}${results.value[arrowCounter.value].id}`;
+    if (arrowCounter.value >= 0) {
+        window.location.href = allResults.value[arrowCounter.value].url;
     } else {
         (formElement.value as HTMLFormElement).submit();
     }
@@ -184,15 +220,6 @@ function onMouseOut() {
 }
 
 /**
- * To display the users portrait image
- * @param {string} id - The user id
- * @returns {string} - The path to the image
- */
-function formatPortrait(id: string) {
-    return `${paths.portrait}${id}&size=square64`;
-}
-
-/**
  * The search button href, if the keyword is empty, go to the search page
  * @returns {string} - The href
  */
@@ -228,8 +255,8 @@ const searchButtonText = window.Vue.computed(() => {
             :is-active-when-empty="false"
             :is-selected="isSelected"
             @input="onInput"
-            @key-down="onArrowDown"
-            @key-up="onArrowUp"
+            @keydown.arrow-down="onArrowDown"
+            @keydown.arrow-up="onArrowUp"
             @key-enter="onEnter"
             @focus-over="onFocusOver"
             @focus-out="onFocusOut"
@@ -239,41 +266,70 @@ const searchButtonText = window.Vue.computed(() => {
         />
         <div v-show="isSelected" class="c-header-search__results">
             <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
-                <div v-if="results.length && results.length !== totalCount" class="c-card c-card--border-end l-pad-s">
-                    <em>Showing {{ results.length }} of {{ totalCount }} matching users</em>
+                <div
+                    v-if="userResults.length && userResults.length !== totalCountUsers"
+                    class="c-card c-card--border-end l-pad-s"
+                >
+                    <em>Showing {{ userResults.length }} of {{ totalCountUsers }} matching users</em>
                 </div>
                 <a
-                    v-for="(result, i) in results"
+                    v-for="(result, i) in userResults"
                     :key="i"
                     :class="`c-card c-card--link c-card--border-end ${i === arrowCounter ? 'c-card--active' : ''}`"
-                    :href="paths.userPage + result.id"
-                    :data-test="`header-search-user-result-link-${result.formattedName}`"
+                    :href="result.url"
+                    :data-test="`header-search-user-result-link-${result.title}`"
                     @mouseover="arrowCounter = i"
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
                         <div class="c-img c-img--s c-img--round">
                             <div class="c-img__wrapper">
-                                <img
-                                    :src="formatPortrait(result.id)"
-                                    :alt="`Portrait photo of ${result.formattedName}`"
-                                />
+                                <img :src="result.image" :alt="`Portrait photo of ${result.title}`" />
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3>
-                                {{ result.formattedName }}
+                                {{ result.title }}
                             </h3>
-                            <span class="meta">{{ result.metadata }}</span>
+                            <span class="meta">{{ result.meta }}</span>
                         </div>
                     </div>
                 </a>
-                <a
-                    v-if="results.length && totalCount > results.length"
-                    class="c-card c-card--link c-card--active l-pad-s"
-                    :href="`${paths.searchPageWithKeyword}${keyword}&${paths.usersFilter}`"
+                <div
+                    v-if="pageResults.length && pageResults.length !== totalCountFolders"
+                    class="c-card c-card--border-end l-pad-s"
                 >
-                    View all {{ totalCount }} users
+                    <em>Showing {{ pageResults.length }} of {{ totalCountFolders }} matching pages</em>
+                </div>
+                <a
+                    v-for="(result, i) in pageResults"
+                    :key="i + pageResults.length"
+                    :class="`c-card c-card--link c-card--border-end ${
+                        i + pageResults.length === arrowCounter ? 'c-card--active' : ''
+                    }`"
+                    :href="result.url"
+                    :data-test="`header-search-page-result-link-${result.title}`"
+                    @mouseover="arrowCounter = i + userResults.length"
+                    @mouseleave="arrowCounter = -1"
+                >
+                    <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
+                        <div class="c-img c-img--s">
+                            <div class="c-img__wrapper">
+                                <div :class="`icon icon-${result.icon as string}`"></div>
+                            </div>
+                        </div>
+                        <div class="l-flex-col l-flex--justify-center f-no-margins">
+                            <h3>
+                                {{ result.title }}
+                            </h3>
+                            <span v-if="result.meta && result.meta.length > 0" class="meta"
+                                ><template v-for="(context, index) in result.meta as MetaContext[]" :key="context.id"
+                                    ><a :href="context.url">{{ context.name }}</a
+                                    ><template v-if="index < result.meta.length - 1"> > </template>
+                                </template></span
+                            >
+                        </div>
+                    </div>
                 </a>
                 <div v-if="isLoading" class="c-card c-card--loading">
                     <div class="l-flex-row l-gap-s l-pad-s">
@@ -288,7 +344,7 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </div>
-                <div v-if="!isLoading && !results.length" class="c-card l-pad-s">
+                <div v-if="!isLoading && !userResults.length" class="c-card l-pad-s">
                     <em>No users were found matching "{{ keyword }}"</em>
                 </div>
             </div>
