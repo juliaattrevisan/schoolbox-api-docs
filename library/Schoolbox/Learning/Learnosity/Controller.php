@@ -685,39 +685,46 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $payload = [
-            'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-            'reports' => [
-                [
-                    /* DOM element id, where this goes in
-                     *
-                     * It's configurable by us, unlike the other anchors for
-                     * Author and Items api
-                     */
-                    'id' => 'schoolbox-result-1',
-                    'type' => 'sessions-summary-by-question',
-                    'session_ids' => [
-                        $attempt->getLearnosityReference()
-                    ]
+        $hasMarkVisibility = $assessment->isFeedbackVisibleToUser($student);
+        $initOptions = null;
+
+        /* Only load a report if mark visibility is set to include students
+         */
+        if ($hasMarkVisibility) {
+            $payload = [
+                'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
+                'reports' => [
+                    [
+                        /* DOM element id, where this goes in
+                         *
+                         * It's configurable by us, unlike the other anchors for
+                         * Author and Items api
+                         */
+                        'id' => 'schoolbox-result-1',
+                        'type' => 'sessions-summary-by-question',
+                        'session_ids' => [
+                            $attempt->getLearnosityReference()
+                        ]
+                    ],
                 ],
-            ],
-        ];
+            ];
+
+            $initOptions = $this->api->initOptions('reports', $payload);
+        }
 
         /* Breadcrumbs
          */
         $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
-            ->add(
-                [
-                    $assessment->getTitle(),
-                    $this->routeGenerator->generate(
-                        'learningAssessment.getSummary',
-                        [
-                            'assessmentId' => $assessment->getId(),
-                            'studentId' => $this->getUser()->getId()
-                        ]
-                    )
-                ]
-            )
+            ->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId' => $this->getUser()->getId()
+                    ]
+                )
+            ])
             ->add(['Result Summary']);
 
         $returnUrlEncoded = $this->requestQuery->get(Redirect::RETURN_URL);
@@ -725,7 +732,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learnosity/outro.twig', [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'initOptions' => $this->api->initOptions('reports', $payload),
+            'initOptions' => $initOptions,
             'attempt' => $attempt,
             'returnUrl' => (
                 empty($returnUrlEncoded) ?
