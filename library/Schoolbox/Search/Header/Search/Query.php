@@ -327,11 +327,12 @@ class Query
             " . $this->getJoinsFromFolderForFolderTypeExpression() . "
             $where
             GROUP BY f.id
-            ORDER BY IF(fc.code IS NOT NULL, 1, 0) DESC, userIsInvolved DESC, f.name ASC"
+            ORDER BY userIsInvolved DESC, IF(fc.code IS NOT NULL, 1, 0) DESC, f.name ASC"
             // No LIMIT clause here because permission checks cannot be done in the SQL query,
             // and we don't know how many rows will remain after permission checks.
         );
 
+        print $statement->getSql();
         $statement->execute($params);
 
         // Drop rows to which the user does not have access, and index the remaining rows by 'id'.
