@@ -463,6 +463,7 @@ class Query
                         'page.unit'     => 'unit',
                         'page.class'    => 'teacher',
                         'page.homepage' => 'home',
+                        'page.group'    => 'home',
                         default         => 'folder',
                     }
                 ),
