@@ -452,10 +452,12 @@ class Query
         );
 
         $folderData = [];
-        foreach ($folderById as $folderId => $folder) {
-            /** @var FolderModel $folder */
+        // Loop over $folderInfoById (not $folderById) to preserve sort order.
+        foreach ($folderInfoById as $folderId => $folderInfo) {
+            $folderType = $folderInfo['folderType'];
 
-            $folderType = $folderInfoById[$folderId]['folderType'];
+            /** @var FolderModel $folder */
+            $folder = $folderById[$folderId];
 
             $folderData[] = [
                 // The keys of this array are a subset of the keys in the result
@@ -467,12 +469,11 @@ class Query
                 'meta'  => $this->formatMetadataForFolder($folder, $viewer),
                 'icon'  => (
                     match ($folderType) {
-                        'page.course'   => 'course',
-                        'page.unit'     => 'unit',
-                        'page.class'    => 'teacher',
-                        'page.homepage' => 'home',
-                        'page.group'    => 'home',
-                        default         => 'folder',
+                        'page.course' => 'course',
+                        'page.unit'   => 'unit',
+                        'page.class'  => 'teacher',
+                        'page.homepage', 'page.group' => 'home',
+                        default => 'folder',
                     }
                 ),
                 'image' => (
