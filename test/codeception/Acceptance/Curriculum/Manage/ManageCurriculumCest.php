@@ -283,6 +283,7 @@ class ManageCurriculumCest
         $i->updateInDatabase('curriculum_node', ['name' => "Year 9 History"], ['name like' => 'Year 9 Ancient History']);
         $i->updateInDatabase('curriculum_node', ['code' => ''], ['name like' => 'Year 9 History']);
         $i->updateInDatabase('curriculum_node', ['description' => ''], ['name like' => 'Year 9 History']);
+        $i->updateInDatabase('curriculum_node', ['deleted_at' => null], ['name like' => 'Year 12 French']);
         $i->updateInDatabase('curriculum_node', ['enabled' => 1], ['name like' => 'Year 4 History']);
         $i->updateInDatabase('curriculum_node', ['enabled' => 1], ['name like' => 'Year 9 History']);
     }

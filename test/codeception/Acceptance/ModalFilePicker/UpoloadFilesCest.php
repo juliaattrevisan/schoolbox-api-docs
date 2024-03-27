@@ -39,7 +39,9 @@ class UpoloadFilesCest
         $i->logout();
         $i->loginAsAdmin();
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amOnPage($resources::URL);
+        $resourcesPage->clickFolder(0);
     }
 
     /**

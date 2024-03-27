@@ -123,14 +123,15 @@ class PastoralRecordsCest
         $i->waitForElementVisible('a[id="panel-general"]', 10);
         $common->clickAddComment();
         $i->waitForElementVisible(['css' => '#comment-public + div.ck'], 5);
-        $i->fillRichTextField('comment-public', $pastoralComment);
-        $common->clickSubmitComment();
+        $i->fillCkEditorById('comment-public', $pastoralComment);
+        $pastoralProfile->clickPostComment();
         $i->amGoingTo('check the comment is presented');
         $i->wait(2);
         $i->canSee('This is an automation pastoral comment', '//article/p');
         $i->amGoingTo('delete the pastoral comment');
         $pastoralProfile->clickDeleteCommentIcon();
         $common->clickModalDeleteButton();
+        $i->wait(2);
         $i->cantSee($pastoralComment);
     }
     /**
@@ -190,6 +191,7 @@ class PastoralRecordsCest
         $pastoralProfile->clickDeleteIcon($recordId);
         $common->clickConfirmButton();
         $i->amGoingTo('ensure the record is no longer presented');
+        $i->wait(2);
         $i->cantSee($pastoralTitle);
     }
 

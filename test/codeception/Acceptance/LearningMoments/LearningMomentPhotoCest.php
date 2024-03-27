@@ -105,7 +105,7 @@ class LearningMomentPhotoCest
         $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
         $learningMoments->typeComment();
         sleep(2);
-        $common->clickSubmitComment();
+        $learningMoments->clickPostComment();
         $i->amGoingTo('checking the comment is presented');
         $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
     }

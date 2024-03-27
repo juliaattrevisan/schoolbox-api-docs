@@ -18,6 +18,7 @@ namespace Tests\Acceptance\Markbook;
  *
  */
 
+use Codeception\Util\Locator;
 use Tests\Support\AcceptanceTester;
 use Tests\Support\Page\Homepage;
 use Tests\Support\Page\Markbook\MarkbookPage;
@@ -39,10 +40,6 @@ class ParticipantCest
     {
         $i->logout();
         $i->loginAsAdmin();
-        $i->amGoingTo('add a due work component into the homepage');
-        $i->amOnPage('/homepage/106');
-        $addComponent = new Homepage($i);
-        $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Due Work');
     }
 
     /**
@@ -57,6 +54,10 @@ class ParticipantCest
         $teacher = Common::USER_JACKCOLES;
         $teacherId = Common::USER_ID_JACKCOLES;
 
+        $i->amGoingTo('add a due work component into the homepage');
+        $i->amOnPage('/homepage/106');
+        $addComponent = new Homepage($i);
+        $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Due Work');
         $i->amGoingTo('As Jack Coles, create a due work');
         $i->impersonate($teacher);
         $dueworkTitle1 = 'Cest One ' . Common::gentext(6);
@@ -124,6 +125,15 @@ class ParticipantCest
     public function tearDown(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-        $i->updateInDatabase('component_instance', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Cest One%"]);
+        $addComponent = new Homepage($i);
+        $i->amGoingTo('remove the due work component from the homepage if this is presented');
+        $i->amOnPage('/homepage/106');
+        if ($i->tryToSeeElement(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller'])) {
+            $i->amGoingTo('remove the component of the homepage');
+            $addComponent->clickLockToggle();
+            $addComponent->clickComponentRemoveIcon();
+            $addComponent->clickRemoveConfirmationMessage();
+        }
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Cest One%"]);
     }
 }
