@@ -28,7 +28,7 @@ class ArrayToModel extends Base
     {
         $model ??= new Model();
         $model = $this->setScalar($array, 'name', $model, 'setName');
-        $model = $this->setScalar($array, 'redirectUri', $model, 'redirectUri');
+        $model = $this->setScalar($array, 'redirectUri', $model, 'setRedirectUri');
         return $model;
     }
 }
