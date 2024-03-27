@@ -87,5 +87,4 @@ class PastoralProfile
     {
         $this->tester->click(self::PASTORAL_POST_COMMENT);
     }
-
 }
