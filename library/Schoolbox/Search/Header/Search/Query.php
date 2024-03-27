@@ -332,7 +332,6 @@ class Query
             // and we don't know how many rows will remain after permission checks.
         );
 
-        print $statement->getSql();
         $statement->execute($params);
 
         // Drop rows to which the user does not have access, and index the remaining rows by 'id'.
