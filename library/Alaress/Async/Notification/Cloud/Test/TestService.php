@@ -38,9 +38,9 @@ class TestService extends AbstractService
             [
                 'app_tokens'   => $tokens,
                 'message_id'   => $id,
-                'unread_count' => $unreadCount
+                'unread_count' => $unreadCount,
+                'data'         => $data
             ],
-            $data
         );
 
         return true;
