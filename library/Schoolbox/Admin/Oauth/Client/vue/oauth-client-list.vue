@@ -26,6 +26,7 @@ export default {
             hasDataLoadError: false,
             loadedData: [],
             newItem: {},
+            modifyingItem: {},
             deletingItem: {},
         };
     },
@@ -64,9 +65,38 @@ export default {
                 console.warn(error);
             }
         },
+        showModifyModal(item) {
+            this.modifyingItem = item;
+            this.$refs.modifyItemModal.open();
+        },
         showDeleteModal(item) {
             this.deletingItem = item;
             this.$refs.deleteItemModal.open();
+        },
+        async modifyItem(item) {
+            try {
+                await fetch(
+                    item._links.patch,
+                    {
+                        method: 'PATCH',
+                        body: JSON.stringify(item),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                this.$refs.modifyItemModal.close();
+
+                // Replace the existing modified item with the new version
+                let modifiedItem = await response.json();
+                this.loadedData  = this.loadedData.map(
+                    v => v.id === modifiedItem.id ? modifiedItem : v
+                );
+
+                // Show toast
+            } catch (error) {
+                console.warn(error);
+            }
         },
         async deleteItem(item) {
             try {
@@ -120,7 +150,10 @@ export default {
                                 </template>
                                 <template v-else>&mdash;</template>
                             </td>
-                            <td><a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a></td>
+                            <td>
+                                <a href="#" class="icon-modify" title="Modify this client" @click.prevent="showModifyModal(row)"></a>
+                                <a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a>
+                            </td>
                         </tr>
                     </table>
                     <div class="component-action">
@@ -186,8 +219,8 @@ export default {
             <label for="itemAdded-clientId">Client ID</label>
             <input id="itemAdded-clientId" readonly v-model="newItem.clientId" />
 
-            <label for="itemAdded-name">Client Secret</label>
-            <input id="itemAdded-name" readonly v-model="newItem.clientSecret" />
+            <label for="itemAdded-clientSecret">Client Secret</label>
+            <input id="itemAdded-clientSecret" readonly v-model="newItem.clientSecret" />
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret:
@@ -197,6 +230,24 @@ export default {
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="$refs.itemAddedModal.close" href="#">Close</a>
+                </section>
+            </div>
+        </reveal-modal>
+
+        <reveal-modal ref="modifyItemModal">
+            <h2>Modify oAuth Client</h2>
+            <label for="modifyItem-name">Name</label>
+            <input id="modifyItem-name" v-model="modifyingItem.name" />
+
+            <label for="modifyItem-redirectUri">Redirect URI</label>
+            <input id="modifyItem-redirectUri" v-model="modifyingItem.redirectUri" />
+
+            <label for="modifyItem-clientId">Client ID</label>
+            <input id="modifyItem-clientId" readonly v-model="modifyingItem.clientId" />
+
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="modifyItem(modifyingItem)" href="#">Modify</a>
                 </section>
             </div>
         </reveal-modal>
