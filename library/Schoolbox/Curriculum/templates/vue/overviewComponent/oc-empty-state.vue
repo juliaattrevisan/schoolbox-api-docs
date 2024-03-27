@@ -26,6 +26,23 @@ const store = useStore(props.folderId, props.componentInstanceId);
 function onMapSelected() {
     emit("mapSelected");
 }
+
+/**
+ * To prompt the user to udpate the currently selected Curriculum Tree Filter
+ */
+function onFilterSelected() {
+    const component = document.getElementById(`component${props.componentInstanceId}`) as HTMLDivElement;
+    const toggleButton = component.querySelector('[data-target="settings"]') as HTMLLinkElement;
+    if (toggleButton.getAttribute("data-state") === "opened") {
+        return;
+    }
+    const event = new MouseEvent("click", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+    });
+    toggleButton.dispatchEvent(event);
+}
 </script>
 
 <template>
@@ -46,7 +63,13 @@ function onMapSelected() {
             </template>
         </template>
         <template v-else>
-            <p>No selected curriculum nodes are children of the selected Curriculum Tree Filter</p>
+            <p v-if="props.isSuperUser">
+                No curriculum codes are children of the currently selected Curriculum Tree Filter. Consider
+                <a href="#map-curriculum-codes" @click.prevent="onMapSelected">mapping additional curriculum codes</a>
+                or updating the currently selected
+                <a href="#update-curriculum-tree-filter" @click.prevent="onFilterSelected">Curriculum Tree Filter</a>.
+            </p>
+            <p v-else>No curriculum codes are children of the currently selected Curriculum Tree Filter.</p>
         </template>
     </div>
 </template>
