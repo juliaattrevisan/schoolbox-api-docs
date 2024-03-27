@@ -311,8 +311,7 @@ class Query
         string $keyword,
         User $viewer,
         bool $stopAtAutoSuggestLimit = false
-    ): array
-    {
+    ): array {
         $uam = new UserAccessMapper();
         $allPermissions = $uam->findAllForUser($viewer);
         $permissionInfoByInvolvedFolderId = (
