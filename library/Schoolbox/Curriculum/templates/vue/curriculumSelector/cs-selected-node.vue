@@ -59,7 +59,7 @@ function onRemoveSelected() {
             @click.prevent="onTitleSelected"
             data-test-title-button
         >
-            {{ props.node.code }}
+            {{ props.node.code === "" ? props.node.name : props.node.code }}
         </button>
         <button
             type="button"

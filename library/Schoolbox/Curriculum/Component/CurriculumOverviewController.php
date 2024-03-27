@@ -16,15 +16,37 @@ namespace Schoolbox\Curriculum\Component;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
 class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * The curriculum to display.
+     * The curriculum to display in this component, compiled into a tree
+     * structure which contains the entire curriculum minus any nodes which are
+     * neither ancestors nor descendants of this folder's nodes.
+     *
+     * @var GenericCollection<Node\Model>|null
      */
     protected ?GenericCollection $curriculumNodes = null;
+
+    /**
+     * The nodes selected to display within this component: when rendered, any
+     * nodes outside of these will be excluded.
+     *
+     * @var GenericCollection<Node\Model>|null
+     */
+    protected ?GenericCollection $selectedNodes = null;
+
+    /**
+     * The selected curriculum tree filter node. The node that will be used to
+     * to filter the component to display only the nodes that are descendants of
+     * this node.
+     *
+     * @var Node\Model|null
+     */
+    protected ?Node\Model $curriculumTreeFilter = null;
 
     /**
      * Is curriculum tagging turned on
@@ -49,6 +71,8 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
          */
         $this->curriculumTagging = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
+        $nodeMapper = Node\Mapper::getInstance();
+
         // Show first curriculum for now
         /** @var Folder\Model $context */
         $context = $this->getContext();
@@ -65,8 +89,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             // Fetch every node which is an ancestor or descendant of one of
             // this folder's nodes, and is still enabled:
             // only enabled nodes should be selectable.
-            $nodeMapper = Node\Mapper::getInstance();
-            $nodeIds    = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
+            $nodeIds = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
 
             // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
@@ -84,6 +107,23 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         if ($this->curriculumNodes && $this->curriculumNodes->count()) {
             Node\Mapper::sortNodes($this->curriculumNodes, 0);
         }
+
+        // This should be unnecessary but PHPStan complains otherwise
+        /** @var GenericCollection<Node\Model> $selectedNodes */
+        $selectedNodes       = $this->getContext()->getCurriculumNodes()->reindex();
+        $this->selectedNodes = $selectedNodes;
+
+        // Load curriculum tree filter node
+        $curriculumTreeFilterConfig = $this->getConfig('curriculumTreeFilter');
+        if ($curriculumTreeFilterConfig) {
+            try {
+                $this->curriculumTreeFilter = $nodeMapper->findById($curriculumTreeFilterConfig);
+            } catch (Exception) {
+                // Node not found or deleted?
+                // Just act as if nothing were selected.
+            }
+        }
+
         return true;
     }
 
@@ -96,10 +136,11 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@curriculum/component/curriculumOverview.twig',
             [
-                'context'           => $this->getContext(),
-                'nodes'             => $this->curriculumNodes,
-                // Placeholder value for selected nodes: just all selected nodes
-                'selectedNodes'     => $this->getContext()->getCurriculumNodes()->reindex(),
+                'context' => $this->getContext(),
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'nodes' => $this->curriculumNodes,
+                'selectedNodes' => $this->selectedNodes,
+                'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
                     'curriculum.edit',

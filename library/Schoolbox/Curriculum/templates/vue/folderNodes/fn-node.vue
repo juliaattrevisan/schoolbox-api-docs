@@ -9,18 +9,12 @@ import { useStore } from "./store/folderNodesStore";
 interface Props {
     node: Node; // the assigned node to display
     folderId: number; // The folder id to display the nodes for, primarily used to reference the appropriate store
-    depth: number; // to gradually add more marginLeft to indicate node level depth
+    componentInstanceId: number; // The component instance id to display the nodes on
 }
 
 const props = defineProps<Props>();
 
-const store = useStore(props.folderId);
-
-/**
- * to gradually add more marginLeft to indicate node level depth
- * @returns {number} - the calculated marginLeft value
- */
-const marginLeft = window.Vue.computed(() => `calc(${props.depth * 1}rem + 1rem)`);
+const store = useStore(props.folderId, props.componentInstanceId);
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -61,41 +55,38 @@ function onRemoveSelected() {
 </script>
 
 <template>
-    <div classs="">
-        <div
-            class="node l-flex-row l-flex--justify-space l-flex--no-wrap l-pad-xs--vert"
-            :style="{ marginLeft: marginLeft }"
-        >
+    <li>
+        <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
             <div class="l-flex-row l-flex--no-wrap l-gap-xs">
                 <a
                     v-if="hasCode"
-                    class="f-no-margins l-flex__item--0-shrink"
+                    class="node__code f-no-margins l-flex__item--0-shrink"
                     :href="`#${props.node.id}`"
                     @click.prevent="onCodeSelected"
                     >[{{ props.node.code }}]
                 </a>
-                <h3 class="f-no-margins">{{ props.node.name }}</h3>
+                <h3 class="node__name f-no-margins">{{ props.node.name }}</h3>
             </div>
             <button
                 v-if="showRemove"
-                class="remove-node f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
+                class="node__remove f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
                 :title="`Remove [${props.node.code}] ${props.node.name} from selected nodes`"
                 @click.prevent="onRemoveSelected"
             ></button>
         </div>
         <template v-if="showChildren">
-            <transition-group name="list" tag="div">
+            <transition-group name="list" tag="ul">
                 <fn-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"
                     :folder-id="props.folderId"
-                    :depth="props.depth + 1"
+                    :component-instance-id="props.componentInstanceId"
                 />
             </transition-group>
         </template>
-    </div>
+    </li>
 </template>
 
 <style scoped>
@@ -103,8 +94,17 @@ function onRemoveSelected() {
     border-bottom: 1px solid var(--body-background);
 }
 
-.remove-node {
-    max-height: 2.5rem;
+.node__code,
+.node__name {
+    font-size: 1rem;
+}
+
+.node__name {
+    padding-inline-end: var(--spacing-s); /* to avoid the text sitting right on the component edge */
+}
+
+.node__remove {
+    max-height: 2.5rem; /* to ensure the button doesn't stretch too much */
     width: 2.5rem;
 }
 

@@ -48,7 +48,7 @@ window.Vue.watch(
             const event = new Event("change");
             selectEl.value.dispatchEvent(event);
         });
-    }
+    },
 );
 </script>
 
@@ -84,6 +84,7 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .selected-nodes-container {
+    background: #fff;
     border: 1px solid var(--form-border-color);
     display: flex;
     flex-wrap: wrap;

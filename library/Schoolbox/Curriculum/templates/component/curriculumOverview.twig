@@ -1,8 +1,10 @@
 <div data-overview-component>
     <overview-component
         :folder-id="{{ context.id }}"
+        :component-instance-id="{{ componentInstanceId }}"
         :nodes="{{ (nodes ?? []) | json_encode }}"
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
+        :filter="{{ curriculumTreeFilter | json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :is-read-only="{{ readonly ? 'true' : 'false' }}"
         :is-super-user="{{ USER.isSuperuser ? "true" : "false" }}"

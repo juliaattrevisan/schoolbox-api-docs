@@ -6,6 +6,7 @@
 
 import { watchIgnorable } from "@vueuse/core";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
@@ -19,8 +20,10 @@ import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
     folderId: number; // The folder id to display the nodes for
+    componentInstanceId: number; // The component instance id, to ensure the store is unique
     nodes: Node[]; // The curriculum nodes trees to display
     selectedNodes: Node[]; // The nodes already previously selected
+    filter: Node | null; // to only display nodes that are children of this node
     dataEndpoint: string; // The endpoint to retrieve all the curriculum data from
     isReadOnly: boolean; // Can only view the currently selected nodes, not edit them
     isSuperUser: boolean; // Whether the user is a super user
@@ -29,7 +32,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore(props.folderId);
+const store = useStore(props.folderId, props.componentInstanceId);
 const selectorStore = useSelectorStore(); // for the curriculum selector modal
 const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
 const modalStore = useModalStore(); // to open the modal
@@ -50,9 +53,9 @@ const { ignoreUpdates } = watchIgnorable(
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes
+    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes, otherwise we'll end up in a infinte loop!
     ignoreUpdates(() => {
-        store().init(props.nodes, props.selectedNodes, props.isReadOnly);
+        store().init(props.nodes, props.selectedNodes, props.filter, props.isReadOnly);
         selectorStore.init({
             isReadOnly: props.isReadOnly,
             formValueName: "", // not required in this context
@@ -72,19 +75,29 @@ function onUpdateSelected() {
     });
     modalStore.open();
 }
+
+/**
+ * The modal has been closed, so reset the selected details node id
+ * to allow it to be opened again on the same node if required
+ */
+function onModalClosed() {
+    store().selectedDetailsNodeId = UNSET_ID;
+}
 </script>
 
 <template>
     <oc-empty-state
-        v-if="!store().hasNodes"
+        v-if="!store().hasNodes || store().hasHiddenNodes"
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
+        :folder-id="props.folderId"
+        :component-instance-id="props.componentInstanceId"
         @map-selected="onUpdateSelected"
     />
-    <folder-nodes v-else :folder-id="props.folderId" />
+    <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
-    <cs-modal v-if="selectorStore.hasLoadedOk" />
-    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" />
+    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
+    <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
     <toast ref="toastEl"></toast>
 </template>

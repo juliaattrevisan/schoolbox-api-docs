@@ -14,19 +14,19 @@
 namespace Schoolbox\Curriculum\Node\Traits;
 
 use Schoolbox\Curriculum\Node\Model;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 trait HasCurriculumNodes
 {
     /**
      * A collection of CurriculumNode instances
      *
-     * @var Collection|Model[]|null
+     * @var GenericCollection|Model[]|null
      */
     protected $curriculumNodes;
 
     /**
-     * @return Collection|Model[]|null
+     * @return GenericCollection|Model[]|null
      */
     public function getCurriculumNodes()
     {
@@ -34,7 +34,7 @@ trait HasCurriculumNodes
     }
 
     /**
-     * @param  Collection|Model[] $curriculumNodes
+     * @param  GenericCollection|Model[] $curriculumNodes
      *
      * @return $this
      */
@@ -47,7 +47,7 @@ trait HasCurriculumNodes
     /**
      * Returns just the Curriculum nodes that do not have an empty code.
      * usually these are parent objects, or titles
-     * @return Collection|Model[]|null
+     * @return GenericCollection|Model[]|null
      */
     public function getViewableCurriculumNodes()
     {
