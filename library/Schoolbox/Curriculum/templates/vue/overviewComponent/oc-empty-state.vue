@@ -36,12 +36,13 @@ function onFilterSelected() {
     if (toggleButton.getAttribute("data-state") === "opened") {
         return;
     }
-    const event = new MouseEvent("click", {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-    });
-    toggleButton.dispatchEvent(event);
+    toggleButton.dispatchEvent(
+        new MouseEvent("click", {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+        }),
+    );
 }
 </script>
 
@@ -62,7 +63,7 @@ function onFilterSelected() {
                 <p v-else>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
             </template>
         </template>
-        <template v-else>
+        <template v-else-if="store().hasHiddenNodes">
             <p v-if="props.isSuperUser">
                 No curriculum codes are children of the currently selected Curriculum Tree Filter. Consider
                 <a href="#map-curriculum-codes" @click.prevent="onMapSelected">mapping additional curriculum codes</a>
