@@ -24,7 +24,7 @@ interface Result {
 }
 
 interface AllResults {
-    metadata: { totalCountUsers: number };
+    metadata: { totalCountUsers: number, totalCountFolders: number };
     data: Result[];
 }
 
@@ -36,7 +36,8 @@ const results = window.Vue.ref<Result[]>([]);
 const isOpen = window.Vue.ref(false);
 const isLoading = window.Vue.ref(true);
 const hasLoadError = window.Vue.ref(false);
-const totalCount = window.Vue.ref(0);
+const totalCountFolders = window.Vue.ref(0);
+const totalCountUsers = window.Vue.ref(0);
 const arrowCounter = window.Vue.ref(-1); // Want to automatically select the first result? set this to 0
 const formElement = window.Vue.ref<HTMLFormElement | null>(null);
 const minKeywordLength = 2;
@@ -107,7 +108,9 @@ const filterResults = debounce(() => {
     fetch(`${paths.searchEndpoint}${keyword.value}`)
         .then((response) => response.json())
         .then((data: AllResults) => {
-            totalCount.value = data.metadata.totalCountUsers;
+            totalCountUsers.value = data.metadata.totalCountUsers;
+            totalCountFolders.value = data.metadata.totalCountFolders;
+
             results.value = data.data;
         })
         .finally(() => {
@@ -264,10 +267,10 @@ const searchButtonText = window.Vue.computed(() => {
         <div v-show="isSelected" class="c-header-search__results">
             <div v-if="isOpen && keyword.length >= minKeywordLength" class="l-flex-col">
                 <div
-                    v-if="userResults.length && userResults.length !== totalCount"
+                    v-if="userResults.length && userResults.length !== totalCountUsers"
                     class="c-card c-card--border-end l-pad-s"
                 >
-                    <em>Showing {{ userResults.length }} of {{ totalCount }} matching users</em>
+                    <em>Showing {{ userResults.length }} of {{ totalCountUsers }} matching users</em>
                 </div>
                 <a
                     v-for="(result, i) in userResults"
@@ -293,19 +296,19 @@ const searchButtonText = window.Vue.computed(() => {
                     </div>
                 </a>
                 <div
-                    v-if="pageResults.length && pageResults.length !== totalCount"
+                    v-if="pageResults.length && pageResults.length !== totalCountFolders"
                     class="c-card c-card--border-end l-pad-s"
                 >
-                    <em>Showing {{ pageResults.length }} of {{ totalCount }} matching pages</em>
+                    <em>Showing {{ pageResults.length }} of {{ totalCountFolders }} matching pages</em>
                 </div>
                 <a
                     v-for="(result, i) in pageResults"
-                    :key="i + userResults.length"
+                    :key="i + pageResults.length"
                     :class="`c-card c-card--link c-card--border-end ${
-                        i + userResults.length === arrowCounter ? 'c-card--active' : ''
+                        i + pageResults.length === arrowCounter ? 'c-card--active' : ''
                     }`"
                     :href="result.url"
-                    :data-test="`header-search-user-result-link-${result.title}`"
+                    :data-test="`header-search-page-result-link-${result.title}`"
                     @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
                 >

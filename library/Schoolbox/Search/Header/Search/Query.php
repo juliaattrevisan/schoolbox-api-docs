@@ -348,6 +348,10 @@ class Query
             }
 
             $folderInfoById[$row['id']] = $row;
+
+/*           if (count($folderInfoById) >= self::AUTOSUGGEST_LIMIT) {
+                break;
+            }*/
         }
 
         return $folderInfoById;
