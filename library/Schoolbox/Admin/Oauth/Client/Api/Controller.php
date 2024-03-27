@@ -19,6 +19,11 @@ use Schoolbox\Oidc\Server\RelyingParty;
 class Controller extends Base
 {
     /**
+     * Model-to-array translator, only created when required.
+     */
+    private ?Translator\ModelToArray $modelToArray = null;
+
+    /**
      * Constructor
      *
      * @param RelyingParty\Mapper $mapper Mapper for saving relying parties.
@@ -36,7 +41,7 @@ class Controller extends Base
     public function getList(): void
     {
         $this->response = $this->responseAsJson(
-            $this->mapper->findAll()->map($this->modelToArray(...))
+            $this->mapper->findAll()->map($this->translateModelToArray(...))
         );
     }
 
@@ -50,7 +55,7 @@ class Controller extends Base
      */
     public function getItem(RelyingParty\Model $model): void
     {
-        $this->response = $this->responseAsJson($this->modelToArray($model));
+        $this->response = $this->responseAsJson($this->translateModelToArray($model));
     }
 
     /**
@@ -69,11 +74,12 @@ class Controller extends Base
         $clientSecret = RelyingParty\Generator\ClientSecret::generate();
         $model        = $this->mapper->createModel()
             ->setName($data['name'])
+            ->setRedirectUri($data['redirectUri'])
             ->setClientId(RelyingParty\Generator\ClientId::generate())
             ->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
         $this->mapper->save($model);
         $this->response = $this->responseAsJson(
-            $this->modelToArray($model)
+            $this->translateModelToArray($model)
             + ['clientSecret' => $clientSecret]
         );
     }
@@ -136,19 +142,9 @@ class Controller extends Base
      * @param RelyingParty\Model $model
      * @return array
      */
-    private function modelToArray(RelyingParty\Model $model): array
+    private function translateModelToArray(RelyingParty\Model $model): array
     {
-        $generator = $this->getRouteGenerator()->generate(...);
-        $params    = ['id' => $model->getId(),];
-        return [
-            'id'       => $model->getId(),
-            'name'     => $model->getName(),
-            'clientId' => $model->getClientId(),
-            '_links'   => [
-                'put'    => $generator('adminOauthClientApi.putItem', $params),
-                'patch'  => $generator('adminOauthClientApi.patchItem', $params),
-                'delete' => $generator('adminOauthClientApi.deleteItem', $params),
-            ]
-        ];
+        $this->modelToArray ??= new Translator\ModelToArray($this->routeGenerator, $this->authorizer, $this->getUser());
+        return call_user_func($this->modelToArray, $model);
     }
 }
