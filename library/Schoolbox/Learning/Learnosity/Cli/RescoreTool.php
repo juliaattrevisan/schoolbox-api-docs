@@ -211,8 +211,6 @@ HELP;
             if ($this->perform()) {
                 $response = $api->dataUpdateRequest('/sessions/item', $payload);
 
-                $this->getLogger()->info('');
-
                 $this->getLogger()->info(sprintf(
                     'Rescoring request made to learnosity and returned job_reference %s',
                     $response['data']['job_reference']
