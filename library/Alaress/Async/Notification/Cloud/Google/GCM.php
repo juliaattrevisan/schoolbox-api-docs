@@ -76,15 +76,15 @@ class GCM extends AbstractService
 
 
     /**
-     * @param array  $registrationIds
+     * @param array  $tokens
      * @param int    $id
      * @param string $title
      * @param int    $unreadCount
-     * @throws RuntimeException if your API key is bad
-     * @throws OverflowException if the max payload size (4KB) is exceeded
      * @return bool
+     *@throws OverflowException if the max payload size (4KB) is exceeded
+     * @throws RuntimeException if your API key is bad
      */
-    public function propagate(array $registrationIds, $id, $title, $unreadCount = 0)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
         $data = [
             'id'           => $id,
@@ -109,7 +109,7 @@ class GCM extends AbstractService
         $client   = new Client();
 
         // break into multiple requests if too many for a single pass
-        foreach (array_chunk($registrationIds, self::MAX_TOKENS, false) as $chunk) {
+        foreach (array_chunk($tokens, self::MAX_TOKENS, false) as $chunk) {
             $payload = json_encode(array(
                 'registration_ids' => $chunk,
                 'data'             => $data
@@ -132,7 +132,7 @@ class GCM extends AbstractService
                 $body = json_decode($rs->getBody()->getContents(), true);
 
                 foreach ($body['results'] as $i => $result) {
-                    $regId = $registrationIds[$i];
+                    $regId = $tokens[$i];
 
                     if (isset($result['error'])) {
                         $this->report("$regId", $result['error'], Logger::INFO, '?');

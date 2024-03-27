@@ -47,9 +47,14 @@ class Service extends AbstractService
 
 
     /**
+     * @param array      $tokens
+     * @param int        $id
+     * @param string     $title
+     * @param int        $unreadCount
+     * @param array|null $data
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null)
     {
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())
@@ -58,7 +63,12 @@ class Service extends AbstractService
 
         // Create message
         $message = Firebase\Messaging\CloudMessage::new()
-            ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title));
+            ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title))
+            ->withData(
+                [
+                    'data' => json_encode($data)
+                ]
+            );
 
         // Try to send it to all recipients
         $report = null;

@@ -99,7 +99,17 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title, $unreadCount);
+        $data = [
+            'id'        => $id,
+            'body'      => $n->getTitle(),
+            'icon'      => $n->getIcon(),
+            'href'      => $n->getHref(),
+            'params'    => $this->decorator->renderParametersAsArray($n),
+            'meta'      => $n->getMeta(),
+            'timestamp' => $n->getTimestamp(),
+        ];
+
+        return $this->propagate($tokens, $id, $title, $unreadCount, $data);
     }
 
 
@@ -135,11 +145,12 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @param array  $tokens
-     * @param int    $id
-     * @param string $title
-     * @param int    $unreadCount
+     * @param array      $tokens
+     * @param int        $id
+     * @param string     $title
+     * @param int        $unreadCount
+     * @param array|null $data
      * @return bool
      */
-    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0);
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null);
 }
