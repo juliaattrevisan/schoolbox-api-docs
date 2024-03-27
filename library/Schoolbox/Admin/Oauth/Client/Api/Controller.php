@@ -24,12 +24,18 @@ class Controller extends Base
     private ?Translator\ModelToArray $modelToArray = null;
 
     /**
+     * Array-to-model translator.
+     */
+    private Translator\ArrayToModel $arrayToModel;
+
+    /**
      * Constructor
      *
      * @param RelyingParty\Mapper $mapper Mapper for saving relying parties.
      */
     public function __construct(private RelyingParty\Mapper $mapper)
     {
+        $this->arrayToModel = new Translator\ArrayToModel();
     }
 
     /**
@@ -72,9 +78,10 @@ class Controller extends Base
         // Generate a new client ID+secret, return the new item with secret
         $data         = $this->request->getParsedBody();
         $clientSecret = RelyingParty\Generator\ClientSecret::generate();
-        $model        = $this->mapper->createModel()
-            ->setName($data['name'])
-            ->setRedirectUri($data['redirectUri'])
+
+        /** @var RelyingParty\Model $model */
+        $model = call_user_func($this->arrayToModel, $data);
+        $model
             ->setClientId(RelyingParty\Generator\ClientId::generate())
             ->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
         $this->mapper->save($model);
@@ -94,13 +101,13 @@ class Controller extends Base
      */
     public function putItem(RelyingParty\Model $model): void
     {
-        // Only the name can be updated
         $data = $this->request->getParsedBody();
-        if (isset($data['name'])) {
-            $model = $model->setName($data['name']);
-        }
-        $this->mapper->save($model);
-        $this->response = $this->responseEmpty();
+
+        /** @var RelyingParty\Model $newModel */
+        $newModel = call_user_func($this->arrayToModel, $data);
+        $newModel->setId($model->getId());
+        $this->mapper->save($newModel);
+        $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
     }
 
     /**
@@ -116,7 +123,12 @@ class Controller extends Base
      */
     public function patchItem(RelyingParty\Model $model): void
     {
-        $this->putItem($model);
+        $data = $this->request->getParsedBody();
+
+        /** @var RelyingParty\Model $newModel */
+        $newModel = call_user_func($this->arrayToModel, $data, $model);
+        $this->mapper->save($newModel);
+        $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
     }
 
     /**

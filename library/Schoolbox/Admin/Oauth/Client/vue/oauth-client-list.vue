@@ -105,12 +105,14 @@ export default {
                     <table class="no-margin">
                         <tr>
                             <th>Name</th>
+                            <th>Redirect URI</th>
                             <th>Client ID</th>
                             <th>Client Secret</th>
                             <th>&nbsp;</th>
                         </tr>
                         <tr v-for="row in loadedData">
                             <td>{{ row.name }}</td>
+                            <td>{{ row.redirectUri }}</td>
                             <td>{{ row.clientId }}</td>
                             <td>
                                 <template v-if="row.clientSecret">{{ row.clientSecret }}
@@ -163,6 +165,8 @@ export default {
             <h2>Add oAuth Client</h2>
             <label for="addItem-name">Name</label>
             <input id="addItem-name" required v-model="newItem.name" />
+            <label for="addItem-redirectUri">Redirect URI</label>
+            <input id="addItem-redirectUri" required v-model="newItem.redirectUri" />
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="postItem" href="#">Add</a>
@@ -176,8 +180,11 @@ export default {
             <label for="itemAdded-name">Name</label>
             <input id="itemAdded-name" readonly v-model="newItem.name" />
 
-            <label for="itemAdded-name">Client ID</label>
-            <input id="itemAdded-name" readonly v-model="newItem.clientId" />
+            <label for="itemAdded-redirectUri">Redirect URI</label>
+            <input id="itemAdded-redirectUri" readonly v-model="newItem.redirectUri" />
+
+            <label for="itemAdded-clientId">Client ID</label>
+            <input id="itemAdded-clientId" readonly v-model="newItem.clientId" />
 
             <label for="itemAdded-name">Client Secret</label>
             <input id="itemAdded-name" readonly v-model="newItem.clientSecret" />
