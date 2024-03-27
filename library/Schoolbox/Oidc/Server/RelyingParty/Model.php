@@ -50,6 +50,12 @@ class Model implements ISoftDeletable
     private string $clientSecretHash;
 
     /**
+     * The relying party's redirect URI: this is the location to where the
+     * user agent will be redirected upon authorization.
+     */
+    private string $redirectUri;
+
+    /**
      * @return string
      */
     public function getName(): string
@@ -93,9 +99,31 @@ class Model implements ISoftDeletable
         return $this->clientSecretHash;
     }
 
+    /**
+     * @param string $clientSecretHash
+     * @return $this
+     */
     public function setClientSecretHash(string $clientSecretHash): self
     {
         $this->clientSecretHash = $clientSecretHash;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRedirectUri(): string
+    {
+        return $this->redirectUri;
+    }
+
+    /**
+     * @param string $redirectUri
+     * @return $this
+     */
+    public function setRedirectUri(string $redirectUri): self
+    {
+        $this->redirectUri = $redirectUri;
         return $this;
     }
 }

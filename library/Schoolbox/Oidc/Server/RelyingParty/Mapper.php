@@ -29,6 +29,7 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('client_id', self::TYPE_STRING);
         $this->uses('client_secret_hash', self::TYPE_STRING);
+        $this->uses('redirect_uri', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

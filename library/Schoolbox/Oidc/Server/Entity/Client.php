@@ -17,23 +17,43 @@ use Schoolbox\Oidc\Server\RelyingParty\Model;
  */
 class Client implements ClientEntityInterface
 {
+    /**
+     * Constructor
+     *
+     * @param Model $model The model which stores oAuth client configuration.
+     */
     public function __construct(private Model $model)
     {
     }
 
+    /**
+     * Returns the identifier of the client.
+     *
+     * @return string
+     */
     public function getIdentifier()
     {
         return $this->model->getClientId();
     }
 
+    /**
+     * Returns the name of the client.
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->model->getName();
     }
 
+    /**
+     * Returns the client's redirect URI.
+     *
+     * @return string
+     */
     public function getRedirectUri()
     {
-        // Need to add a redirect URI to mapper/model/form
+        return $this->model->getRedirectUri();
     }
 
     /**
