@@ -21,14 +21,13 @@ const activitiesDragStore = useActivitiesDragStore(activitiesDragStoreId);
 const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 
 window.Vue.onMounted(() => {
-    if (!props.isSortablePlaceholder) {
-        activitiesDragStore().init(
-            props.unit.activities._links.reorder,
-            activitiesContainerEl as Ref<HTMLElement>,
-            props.unit.activities.items,
-            store.toastEl!,
-        );
-    }
+    activitiesDragStore().init(
+        props.unit.activities._links.reorder,
+        activitiesContainerEl as Ref<HTMLElement>,
+        props.unit.activities.items,
+        store.toastEl!,
+        props.isSortablePlaceholder,
+    );
 });
 </script>
 

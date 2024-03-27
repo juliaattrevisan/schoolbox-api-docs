@@ -75,7 +75,11 @@ const contentIsFocused = window.Vue.computed(() => {
 function updateContentHeight() {
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-    store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
+
+    // We don't want the placeholder to override the actual known content heights
+    if (!props.isSortablePlaceholder) {
+        store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
+    }
 }
 
 // Provide access to exposed focusEditor from the TextboxContent component

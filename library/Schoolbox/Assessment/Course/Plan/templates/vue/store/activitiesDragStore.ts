@@ -21,6 +21,7 @@ export const useActivitiesDragStore = (storeId: string) =>
         const routeReorder = window.Vue.ref<string | null>(null);
         const draggables = window.Vue.ref<Record<number, DraggableActivity>>({});
         const toastEl = window.Vue.ref<typeof Toast>();
+        const isUnitSortablePlaceholder = window.Vue.ref<boolean>(false);
 
         // Allow the refs to be passed in instead of creating and monitoring two
         let activitiesContainerEl: Ref<HTMLElement>;
@@ -39,12 +40,14 @@ export const useActivitiesDragStore = (storeId: string) =>
          * @param { Ref<HTMLElement> } $activitiesContainerEl - the ref to the activities container element
          * @param { Activity[] } $activities - the initial set of activities, in order
          * @param { typeof Toast } $toastEl - the toast element
+         * @param { boolean } $isUnitSortablePlaceholder - whether this has been created from a unit sortable placeholder
          */
         function init(
             $routeReorder: string | null,
             $activitiesContainerEl: Ref<HTMLElement>,
             $activities: Activity[],
             $toastEl: typeof Toast,
+            $isUnitSortablePlaceholder: boolean,
         ) {
             routeReorder.value = $routeReorder;
             activitiesContainerEl = $activitiesContainerEl;
@@ -58,6 +61,7 @@ export const useActivitiesDragStore = (storeId: string) =>
             });
 
             toastEl.value = $toastEl;
+            isUnitSortablePlaceholder.value = $isUnitSortablePlaceholder;
         }
 
         /**
@@ -125,7 +129,17 @@ export const useActivitiesDragStore = (storeId: string) =>
         });
 
         const orderedActivities = window.Vue.computed<Activity[]>(() => {
-            if (!isDragging.value || dragCurrentDraggable.value === null || dragInitial.value === null) {
+            // Show the current order if:
+            // - This was created from a unit sortable placeholder (which doesn't allow reordering)
+            // - or, the user is not dragging
+            // - or, no current draggable is set
+            // - or, the initial drag info is not set
+            if (
+                isUnitSortablePlaceholder.value ||
+                !isDragging.value ||
+                dragCurrentDraggable.value === null ||
+                dragInitial.value === null
+            ) {
                 return currentOrderedActivities.value;
             }
 
