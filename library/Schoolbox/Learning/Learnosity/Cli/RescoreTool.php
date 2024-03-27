@@ -65,10 +65,6 @@ tool, which lets you specify a particular quiz whose attempts you want to update
 
 It uses an assessment's learnosity_reference for a quiz whose attempts you want to rescore.
 
-Notes:
-* This always mutates data; it's always in Perform mode.
-* The verbose mode will log more diagnostic information but you shouldn't use it in prod.
-
 Usage: rescore.php --assessment=... [-vvv]
 
 
