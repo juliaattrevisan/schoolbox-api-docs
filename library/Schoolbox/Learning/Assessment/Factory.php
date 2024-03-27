@@ -152,7 +152,8 @@ class Factory
     /** @var IAssessable */
     private $original;
 
-    private $errorMapper;
+    /** @var Error\Mapper */
+    private Error\Mapper $errorMapper;
 
     /**
      * Factory constructor.
