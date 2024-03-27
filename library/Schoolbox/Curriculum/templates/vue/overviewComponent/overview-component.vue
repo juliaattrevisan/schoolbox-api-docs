@@ -87,10 +87,12 @@ function onModalClosed() {
 
 <template>
     <oc-empty-state
-        v-if="!store().hasNodes"
+        v-if="!store().hasNodes || store().hasHiddenNodes"
         :is-super-user="props.isSuperUser"
         :has-tagging="props.hasTagging"
         :locale-unit="props.localeUnit"
+        :folder-id="props.folderId"
+        :component-instance-id="props.componentInstanceId"
         @map-selected="onUpdateSelected"
     />
     <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />

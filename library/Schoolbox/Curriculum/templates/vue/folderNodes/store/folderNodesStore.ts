@@ -141,7 +141,14 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * To check if there are any nodes to display
          * @returns {boolean} - whether there are any nodes to display
          */
-        const hasNodes = window.Vue.computed(() => filteredNodes.value.length > 0);
+        const hasNodes = window.Vue.computed(() => selectedNodes.value.length > 0);
+
+        /**
+         * To check if there are any nodes to display after filtering, as we may have nodes linked to the folder,
+         * but the current filter node selection does not contain any of these selected nodes
+         * @returns {boolean} - whether there are any nodes to display after filtering
+         */
+        const hasHiddenNodes = window.Vue.computed(() => hasNodes.value && filteredNodes.value.length === 0);
 
         /**
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
@@ -167,6 +174,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             isReadOnly,
             selectedNodeIds,
             hasNodes,
+            hasHiddenNodes,
             selectedDetailsNodeId,
             isProcessing,
             init,
