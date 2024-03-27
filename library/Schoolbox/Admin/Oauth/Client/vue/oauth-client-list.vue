@@ -59,10 +59,11 @@ export default {
                         },
                     }
                 );
-                this.addingItem = await response.json();
+                const addedItem = await response.json();
+                this.addingItem = addedItem;
                 this.$refs.addItemModal.close();
                 this.$refs.itemAddedModal.open();
-                this.loadedData.push(this.addingItem);
+                this.loadedData.push({...addedItem});
 
                 // Show toast
             } catch (error) {
@@ -70,12 +71,12 @@ export default {
             }
         },
         showModifyModal(item) {
-            this.modifyingItem = item;
+            this.modifyingItem = {...item};
             this.$refs.modifyItemModal.open();
         },
         async modifyItem(item) {
             try {
-                await fetch(
+                const response = await fetch(
                     item._links.patch,
                     {
                         method: 'PATCH',
@@ -88,7 +89,7 @@ export default {
                 this.$refs.modifyItemModal.close();
 
                 // Replace the existing modified item with the new version
-                let modifiedItem = await response.json();
+                const modifiedItem = await response.json();
                 this.loadedData  = this.loadedData.map(
                     v => v.id === modifiedItem.id ? modifiedItem : v
                 );
@@ -99,7 +100,7 @@ export default {
             }
         },
         showDeleteModal(item) {
-            this.deletingItem = item;
+            this.deletingItem = {...item};
             this.$refs.deleteItemModal.open();
         },
         async deleteItem(item) {
