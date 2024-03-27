@@ -191,6 +191,7 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
+
         /* Set up default values
          */
         $event = (new Event())
@@ -416,6 +417,7 @@ class Controller extends Base
      */
     private function getFolders(Event $event)
     {
+
         /* Groups that were chosen for this even, from previous selections
          */
         $tempFolderIds = $event->getFolderCollection()->getPropertyValues('id');
@@ -555,6 +557,7 @@ class Controller extends Base
      */
     public function postModify(Event $event): void
     {
+
         /* Check owner still exists
          * If not - pass ownership to the author
          */
