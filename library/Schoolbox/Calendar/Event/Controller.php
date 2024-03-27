@@ -724,9 +724,38 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        /* Apply redirect - go back to the place from whence you came
-         */
-        $this->response = $this->redirectFound(Redirect::decode($returnUrl));
+        if ($this->isJsonRequest()) {
+            $this->response = $this->responseAsJson(
+                [
+                    // The returned keys match the keys expected by this function in $this->requestPost.
+                    'id' => $event->getId(),
+                    'userId' => $event->getOwner()->getId(),
+                    'authorId'=> $event->getAuthor()->getId(),
+                    'allDay'=> $event->getAllDay(),
+                    'efficacy'=> $efficacy,
+                    'title'=> $event->getTitle(),
+                    'startDate'=> $event->getStartDateTime()->getJson(),
+                    'endDate'=> $event->getEndDateTime()->getJson(),
+                    'repeat'=> $repeat,
+                    'repeat_until'=> $untilDate->getJson(),
+                    'type'=> $event->getType()->getId(),
+                    'location'=> $event->getLocation(),
+                    'detail'=> $event->getDetail(),
+                    'publishDate'=> $event->getPublishDateTime()->getJson(),
+                    'level'=> $accessLevel,
+                    'roles'=> $event->getRoleCollection(), // NOTE: This returns a collection of IDs, not objects.
+                    'campus'=> $event->getCampusCollection(), // NOTE: This returns a collection of IDs, not objects.
+                    'attendance'=> $event->getAttendance(),
+                    'guests'=> implode(',', $event->getGuests()->getAll()), // Return comma-separated string to match $this->requestPost.
+                    'maxAttendees'=> $event->getMaxAttendees(),
+                    'showAttendees'=> $event->getShowAttendees(),
+                ]
+            );
+        } else {
+            /* Apply redirect - go back to the place from whence you came
+             */
+            $this->response = $this->redirectFound(Redirect::decode($returnUrl));
+        }
     }
 
 
