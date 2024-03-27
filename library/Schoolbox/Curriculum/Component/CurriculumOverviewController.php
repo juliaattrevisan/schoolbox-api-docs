@@ -108,7 +108,10 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             Node\Mapper::sortNodes($this->curriculumNodes, 0);
         }
 
-        $this->selectedNodes = $this->getContext()->getCurriculumNodes()->reindex();
+        // This should be unnecessary but PHPStan complains otherwise
+        /** @var GenericCollection<Node\Model> $selectedNodes */
+        $selectedNodes       = $this->getContext()->getCurriculumNodes()->reindex();
+        $this->selectedNodes = $selectedNodes;
 
         // Load curriculum tree filter node
         $curriculumTreeFilterConfig = $this->getConfig('curriculumTreeFilter');
