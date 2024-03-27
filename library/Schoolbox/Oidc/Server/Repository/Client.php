@@ -20,6 +20,11 @@ use Schoolbox\Oidc\Server\RelyingParty;
  */
 class Client implements ClientRepositoryInterface
 {
+    /**
+     * Constructor
+     *
+     * @param RelyingParty\Mapper $mapper Mapper used to find relying parties.
+     */
     public function __construct(private RelyingParty\Mapper $mapper)
     {
     }
@@ -31,7 +36,7 @@ class Client implements ClientRepositoryInterface
      *
      * @return ClientEntityInterface|null
      */
-    public function getClientEntity($clientIdentifier)
+    public function getClientEntity($clientIdentifier): ?ClientEntityInterface
     {
         $relyingParty = $this->findRelyingParty($clientIdentifier);
         if (!$relyingParty) {
@@ -43,12 +48,13 @@ class Client implements ClientRepositoryInterface
     /**
      * Validate whether this client is valid for the given grant.
      *
-     * @param string $clientIdentifier
-     * @param string $clientSecret
-     * @param string $grantType
+     * @param string $clientIdentifier The client's identifier.
+     * @param string $clientSecret     The client's secret: will be hashed and
+     *                                 compared to the stored value.
+     * @param string $grantType        The requested grant type.
      * @return bool
      */
-    public function validateClient($clientIdentifier, $clientSecret, $grantType)
+    public function validateClient($clientIdentifier, $clientSecret, $grantType): bool
     {
         $relyingParty = $this->findRelyingParty($clientIdentifier);
         if (!$relyingParty) {

@@ -31,7 +31,7 @@ class Client implements ClientEntityInterface
      *
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->model->getClientId();
     }
@@ -41,7 +41,7 @@ class Client implements ClientEntityInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->model->getName();
     }
@@ -51,7 +51,7 @@ class Client implements ClientEntityInterface
      *
      * @return string
      */
-    public function getRedirectUri()
+    public function getRedirectUri(): string
     {
         return $this->model->getRedirectUri();
     }
@@ -64,7 +64,7 @@ class Client implements ClientEntityInterface
      *
      * @return true
      */
-    public function isConfidential()
+    public function isConfidential(): bool
     {
         return true;
     }
