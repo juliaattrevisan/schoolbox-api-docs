@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\WorkType;
 
 use Schoolbox;
-use UnexpectedValueException;
 
 /**
  * @method Model findById($identifierValue)
