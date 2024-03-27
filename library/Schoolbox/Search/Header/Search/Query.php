@@ -72,7 +72,7 @@ class Query
 
         if ($keyword !== '' && strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $matchingUserIds = $this->getUserIdsMatchingKeyword($keyword, $viewer);
-            $matchingFolderInfoById = $this->getFolderInfoByIdForFoldersMatchingKeyword($keyword, $viewer);
+            $matchingFolderInfoById = $this->getFolderInfoByIdForFoldersMatchingKeyword($keyword, $viewer, true);
 
             if (count($matchingUserIds) > 0) {
                 $result['data'] = array_merge($result['data'], $this->getUserData($matchingUserIds));
@@ -81,7 +81,9 @@ class Query
 
             if (count($matchingFolderInfoById) > 0) {
                 $result['data'] = array_merge($result['data'], $this->getFolderData($matchingFolderInfoById, $viewer));
-                $result['metadata']['totalCountFolders'] = count($matchingFolderInfoById);
+                $result['metadata']['totalCountFolders'] = null;
+                // Set totalCountFolders to null because $matchingFolderInfoById will contain a maximum of self::AUTOSUGGEST_LIMIT
+                // items due to $stopAtAutoSuggestLimit=true passed to getFolderInfoByIdForFoldersMatchingKeyword() above.
             }
         }
 
@@ -301,12 +303,15 @@ class Query
      * Find IDs for folders that match the given keyword, and are accessible by the logged-in user.
      *
      * @param string $keyword
-     * @param User $viewer
-     *
+     * @param User   $viewer
+     * @param bool   $stopAtAutoSuggestLimit If true, stop searching for folders once self::AUTOSUGGEST_LIMIT folders have been found.
      * @return array
      */
-    private function getFolderInfoByIdForFoldersMatchingKeyword(string $keyword, User $viewer): array
-    {
+    private function getFolderInfoByIdForFoldersMatchingKeyword(
+        string $keyword,
+        User $viewer,
+        bool $stopAtAutoSuggestLimit = false
+    ): array {
         $uam = new UserAccessMapper();
         $allPermissions = $uam->findAllForUser($viewer);
         $permissionInfoByInvolvedFolderId = (
@@ -349,9 +354,12 @@ class Query
 
             $folderInfoById[$row['id']] = $row;
 
-/*           if (count($folderInfoById) >= self::AUTOSUGGEST_LIMIT) {
+            if ($stopAtAutoSuggestLimit && count($folderInfoById) >= self::AUTOSUGGEST_LIMIT) {
+                // Exit the loop once we have found all the results we can display.
+                // The only benefit of staying in the loop longer would be to find out the total number of matching results.
+                // If $stopAtAutoSuggestLimit is true, the calling function has decided the juice is not worth the squeeze.
                 break;
-            }*/
+            }
         }
 
         return $folderInfoById;
@@ -444,10 +452,12 @@ class Query
         );
 
         $folderData = [];
-        foreach ($folderById as $folderId => $folder) {
-            /** @var FolderModel $folder */
+        // Loop over $folderInfoById (not $folderById) to preserve sort order.
+        foreach ($folderInfoById as $folderId => $folderInfo) {
+            $folderType = $folderInfo['folderType'];
 
-            $folderType = $folderInfoById[$folderId]['folderType'];
+            /** @var FolderModel $folder */
+            $folder = $folderById[$folderId];
 
             $folderData[] = [
                 // The keys of this array are a subset of the keys in the result
@@ -459,12 +469,11 @@ class Query
                 'meta'  => $this->formatMetadataForFolder($folder, $viewer),
                 'icon'  => (
                     match ($folderType) {
-                        'page.course'   => 'course',
-                        'page.unit'     => 'unit',
-                        'page.class'    => 'teacher',
-                        'page.homepage' => 'home',
-                        'page.group'    => 'home',
-                        default         => 'folder',
+                        'page.course' => 'course',
+                        'page.unit'   => 'unit',
+                        'page.class'  => 'teacher',
+                        'page.homepage', 'page.group' => 'home',
+                        default => 'folder',
                     }
                 ),
                 'image' => (

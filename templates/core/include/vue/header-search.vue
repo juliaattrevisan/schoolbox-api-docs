@@ -24,7 +24,7 @@ interface Result {
 }
 
 interface AllResults {
-    metadata: { totalCountUsers: number, totalCountFolders: number };
+    metadata: { totalCountUsers: number | null; totalCountFolders: number | null };
     data: Result[];
 }
 
@@ -110,7 +110,8 @@ const filterResults = debounce(() => {
         .then((data: AllResults) => {
             totalCountUsers.value = data.metadata.totalCountUsers;
             totalCountFolders.value = data.metadata.totalCountFolders;
-
+            console.info("totalCountUsers.value: ", totalCountUsers.value);
+            console.info("totalCountFolders.value: ", totalCountFolders.value);
             results.value = data.data;
         })
         .finally(() => {
@@ -272,6 +273,12 @@ const searchButtonText = window.Vue.computed(() => {
                 >
                     <em>Showing {{ userResults.length }} of {{ totalCountUsers }} matching users</em>
                 </div>
+                <div
+                    v-else-if="userResults.length && totalCountUsers === null"
+                    class="c-card c-card--border-end l-pad-s"
+                >
+                    <em>Showing top {{ userResults.length }} matching users</em>
+                </div>
                 <a
                     v-for="(result, i) in userResults"
                     :key="i"
@@ -296,10 +303,16 @@ const searchButtonText = window.Vue.computed(() => {
                     </div>
                 </a>
                 <div
-                    v-if="pageResults.length && pageResults.length !== totalCountFolders"
+                    v-if="pageResults.length && totalCountFolders !== null && pageResults.length !== totalCountFolders"
                     class="c-card c-card--border-end l-pad-s"
                 >
                     <em>Showing {{ pageResults.length }} of {{ totalCountFolders }} matching pages</em>
+                </div>
+                <div
+                    v-else-if="pageResults.length && totalCountFolders === null"
+                    class="c-card c-card--border-end l-pad-s"
+                >
+                    <em>Showing top {{ pageResults.length }} matching pages</em>
                 </div>
                 <a
                     v-for="(result, i) in pageResults"
