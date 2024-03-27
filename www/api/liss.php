@@ -41,7 +41,7 @@ $sourceName = $_GET['source'] ?? PayloadCache::DEFAULT_SOURCE_NAME;
 /* This is needed to process liss data from storage files
  */
 /** @var FilesystemProxy $filesystemProxy */
-$filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+$filesystemProxy = $kernel->get('filesystem.storageProxy');
 
 /* A random logger
  */
