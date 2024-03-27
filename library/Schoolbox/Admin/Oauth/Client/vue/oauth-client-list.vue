@@ -25,7 +25,7 @@ export default {
             isDataLoaded: false,
             hasDataLoadError: false,
             loadedData: [],
-            newItem: {},
+            addingItem: {},
             modifyingItem: {},
             deletingItem: {},
         };
@@ -43,22 +43,26 @@ export default {
                 this.isDataLoaded = true; //update the display to show the list
             }
         },
-        async postItem() {
+        showAddModal() {
+            this.addingItem = {};
+            this.$refs.addItemModal.open();
+        },
+        async addItem() {
             try {
                 const response = await fetch(
                     this.postItemEndpoint,
                     {
                         method: 'POST',
-                        body: JSON.stringify(this.newItem),
+                        body: JSON.stringify(this.addingItem),
                         headers: {
                             "Content-Type": "application/json",
                         },
                     }
                 );
-                this.newItem = await response.json();
+                this.addingItem = await response.json();
                 this.$refs.addItemModal.close();
                 this.$refs.itemAddedModal.open();
-                this.loadedData.push(this.newItem);
+                this.loadedData.push(this.addingItem);
 
                 // Show toast
             } catch (error) {
@@ -68,10 +72,6 @@ export default {
         showModifyModal(item) {
             this.modifyingItem = item;
             this.$refs.modifyItemModal.open();
-        },
-        showDeleteModal(item) {
-            this.deletingItem = item;
-            this.$refs.deleteItemModal.open();
         },
         async modifyItem(item) {
             try {
@@ -97,6 +97,10 @@ export default {
             } catch (error) {
                 console.warn(error);
             }
+        },
+        showDeleteModal(item) {
+            this.deletingItem = item;
+            this.$refs.deleteItemModal.open();
         },
         async deleteItem(item) {
             try {
@@ -158,7 +162,7 @@ export default {
                     </table>
                     <div class="component-action">
                         <section>
-                            <a class="button" href="#" @click.prevent="$refs.addItemModal.open">Add oAuth Client</a>
+                            <a class="button" href="#" @click.prevent="showAddModal">Add oAuth Client</a>
                         </section>
                     </div>
                 </template>
@@ -197,12 +201,12 @@ export default {
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
             <label for="addItem-name">Name</label>
-            <input id="addItem-name" required v-model="newItem.name" />
+            <input id="addItem-name" required v-model="addingItem.name" />
             <label for="addItem-redirectUri">Redirect URI</label>
-            <input id="addItem-redirectUri" required v-model="newItem.redirectUri" />
+            <input id="addItem-redirectUri" required v-model="addingItem.redirectUri" />
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="postItem" href="#">Add</a>
+                    <a class="button" @click.prevent="addItem" href="#">Add</a>
                     <a class="button" @click.prevent="$refs.addItem.close" href="#">Cancel</a>
                 </section>
             </div>
@@ -211,16 +215,16 @@ export default {
         <reveal-modal ref="itemAddedModal">
             <h2>oAuth Client Added</h2>
             <label for="itemAdded-name">Name</label>
-            <input id="itemAdded-name" readonly v-model="newItem.name" />
+            <input id="itemAdded-name" readonly v-model="addingItem.name" />
 
             <label for="itemAdded-redirectUri">Redirect URI</label>
-            <input id="itemAdded-redirectUri" readonly v-model="newItem.redirectUri" />
+            <input id="itemAdded-redirectUri" readonly v-model="addingItem.redirectUri" />
 
             <label for="itemAdded-clientId">Client ID</label>
-            <input id="itemAdded-clientId" readonly v-model="newItem.clientId" />
+            <input id="itemAdded-clientId" readonly v-model="addingItem.clientId" />
 
             <label for="itemAdded-clientSecret">Client Secret</label>
-            <input id="itemAdded-clientSecret" readonly v-model="newItem.clientSecret" />
+            <input id="itemAdded-clientSecret" readonly v-model="addingItem.clientSecret" />
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret:
