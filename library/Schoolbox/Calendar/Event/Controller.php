@@ -748,7 +748,7 @@ class Controller extends Base
                     'attendance'=> $event->getAttendance(),
                     'guests'=> implode(',', $event->getGuests()->getAll()), // Return comma-separated string to match $this->requestPost.
                     'maxAttendees'=> $event->getMaxAttendees(),
-                    'showAttendees'=> $event->getShowAttendees(),
+                    'showAttendees'=> $event->getShowAttendees() ? 1 : 0,
                 ]
             );
         } else {
