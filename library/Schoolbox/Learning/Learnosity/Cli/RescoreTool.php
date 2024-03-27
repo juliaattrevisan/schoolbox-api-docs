@@ -97,7 +97,7 @@ HELP;
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        /** @var QuizDomainModel $assessment */;
+        /** @var QuizDomainModel $assessment */
         $assessment = $assessmentMapperProxy->findById($assessmentId);
 
         /* We need these mappers
@@ -123,8 +123,6 @@ HELP;
 
         /* Build dependencies
          */
-        $schoolcode = $this->getConfig()->get('site_school_code');
-
         $api = new Api(
             (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
             $this->getConfig()->get('learnosity_version'),
