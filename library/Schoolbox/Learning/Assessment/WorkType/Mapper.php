@@ -19,7 +19,6 @@ use Schoolbox;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */

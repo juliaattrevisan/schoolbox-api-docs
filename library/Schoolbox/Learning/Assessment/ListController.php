@@ -649,7 +649,7 @@ class ListController extends Web\Controller\Base
                 $cacheValid = $projectResultCacheDetector->isSatisfiedByActivity($postData, $assessment);
             }
 
-            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
+            $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment, $this->errorMapper);
             $assessment        = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->transactor->transact($assessment, $this->getUser(), $before, $originalAssessment);

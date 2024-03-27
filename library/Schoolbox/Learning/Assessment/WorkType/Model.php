@@ -74,15 +74,6 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * @return bool
-     */
-    public function isNone()
-    {
-        return $this->name === self::NONE;
-    }
-
-
-    /**
      * @param bool $showOnGradesPage
      */
     public function setShowOnGradesPage(bool $showOnGradesPage): void

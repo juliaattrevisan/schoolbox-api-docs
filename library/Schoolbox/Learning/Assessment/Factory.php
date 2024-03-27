@@ -15,6 +15,7 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
@@ -34,7 +35,6 @@ use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -152,6 +152,9 @@ class Factory
     /** @var IAssessable */
     private $original;
 
+    /** @var Error\Mapper */
+    private Error\Mapper $errorMapper;
+
     /**
      * Factory constructor.
      * @param User             $creator
@@ -161,7 +164,7 @@ class Factory
      * @throws MapperException
      * @throws Deleted
      */
-    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
+    public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original, $errorMapper)
     {
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
@@ -177,13 +180,19 @@ class Factory
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
         $this->setCloseAt(trim($post['closeDate'] ?? ''));
+        $this->errorMapper = $errorMapper;
 
-        try {
-            $workType = WorkTypeMapper::getInstance()->findById($post['workType']);
-        } catch (MapperException) {
-            $workType = WorkTypeMapper::getInstance()->findOneByColumn('name', WorkType::NONE);
+        if ($assessmentType === AssessmentType::TYPE_LESSON_PLAN) {
+            // Work type should always be null for lesson plans.
+            $this->setWorkType(null);
+        } else {
+            try {
+                // If an invalid work type has been supplied by the client, treat as information missing.
+                $this->setWorkType(WorkTypeMapper::getInstance()->findById($post['workType'])->getId());
+            } catch (MapperException) {
+                throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
+            }
         }
-        $this->setWorkType($workType->getId());
 
         /* Projects need this to instantiate
          */
