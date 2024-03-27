@@ -114,7 +114,7 @@ HELP;
              * How this could be possible is a mystery except due to dev mistake
              */
             $this->getLogger()->warning(sprintf(
-                'Assessment %s was found to be a survey somehow; skipping',
+                'Assessment %s was found to be a survey somehow; exiting',
                 $assessment->getId()
             ));
 
@@ -132,6 +132,38 @@ HELP;
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger(),
         );
+
+        /* As per https://help.learnosity.com/hc/en-us/requests/24890
+         * We have to find all the Item References for the given quiz and collate them into
+         * a list, on behalf of learnosity - costing us a round trip api request
+         */
+        $itemReferences = $api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
+            ]
+        ])['data'][0]['data']['items'] ?? null;
+
+        /* No items? No trabajo
+         */
+        if (null === $itemReferences) {
+            $this->getLogger()->warning(sprintf(
+                'Assessment %s has no item references in learnosity; exiting',
+                $assessment->getId()
+            ));
+        }
+
+        /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+         * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+         */
+        if (is_array($itemReferences[0])) {
+            /* Forcibly mutate this, because learnosity insanity
+             */
+            $itemReferenceList = array_column($itemReferences, 'id');
+        } else {
+            /* Presume it was a list of reference strings already
+             */
+            $itemReferenceList = $itemReferences;
+        }
 
         /* Find all the attempts for this quiz
          */
@@ -153,7 +185,8 @@ HELP;
         /* Tell learnosity about the ones we need to rescore
          */
         $payload = [
-            'statuses' => []
+            'session_ids' => [],
+            'target_item' => []
         ];
 
         foreach ($attempts as $attempt) {
@@ -163,30 +196,37 @@ HELP;
                 $attempt->getLearnosityReference()
             ));
 
-            $payload['statuses'][] = [
-                'user_id' => (new UserIdentifier())->generate($schoolcode, $attempt->getUser()->getId()),
-                'session_id' => $attempt->getLearnosityReference(),
-                'status' => 'Completed'
-            ];
+            $payload['session_ids'][] = $attempt->getLearnosityReference();
         }
 
-        if ($this->perform()) {
-            $this->getLogger()->info('');
-
-            $this->getLogger()->info(sprintf(
-                'Sending %s attempt(s) to learnosity for rescoring',
-                count($payload['statuses'])
-            ));
-
-            $response = $api->dataUpdateRequest('/jobs/sessions/statuses', $payload);
+        /* Tell learnosity about the items among these session(s)
+         */
+        foreach ($itemReferenceList as $itemReference) {
+            $payload['target_item'] = [
+                'reference' => $itemReference
+            ];
 
             $this->getLogger()->info('');
 
             $this->getLogger()->info(sprintf(
-                'Rescoring request made to learnosity and returned job_reference %s',
-                $response['data']['job_reference']
+                'Sending %s attempt(s) to learnosity for rescoring item %s',
+                count($payload['session_ids']),
+                $itemReference
             ));
-        } else {
+
+            if ($this->perform()) {
+                $response = $api->dataUpdateRequest('/sessions/item', $payload);
+
+                $this->getLogger()->info('');
+
+                $this->getLogger()->info(sprintf(
+                    'Rescoring request made to learnosity and returned job_reference %s',
+                    $response['data']['job_reference']
+                ));
+            }
+        }
+
+        if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
     }
