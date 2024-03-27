@@ -15,104 +15,145 @@ use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 /**
- * Class AuthCode
+ * Auth code implementation.
  */
 class AuthCode implements AuthCodeEntityInterface
 {
+    /**
+     * This auth code's redirect URI, if present.
+     */
+    private ?string $redirectUri = null;
 
     /**
-     * @inheritDoc
+     * This auth code's expiry.
      */
-    public function getRedirectUri()
+    private DateTimeImmutable $expiryDateTime;
+
+    /**
+     * The user identifier for this auth code, if there is one.
+     */
+    private int|string|null $userIdentifier;
+
+    /**
+     * The oAuth client this auth code is associated with.
+     */
+    private ClientEntityInterface $client;
+
+    /**
+     * The available scopes for this auth code.
+     *
+     * @var ScopeEntityInterface[]
+     */
+    private array $scopes = [];
+
+    /**
+     * Constructor
+     *
+     * @param string $identifier The unique identifier for this auth code.
+     */
+    public function __construct(private string $identifier)
     {
-        // TODO: Implement getRedirectUri() method.
     }
 
     /**
-     * @inheritDoc
+     * @return string|null
      */
-    public function setRedirectUri($uri)
+    public function getRedirectUri(): ?string
     {
-        // TODO: Implement setRedirectUri() method.
+        return $this->redirectUri;
     }
 
     /**
-     * @inheritDoc
+     * @param string|null $uri
+     * @return void
      */
-    public function getIdentifier()
+    public function setRedirectUri($uri): void
     {
-        // TODO: Implement getIdentifier() method.
+        $this->redirectUri = $uri;
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
-    public function setIdentifier($identifier)
+    public function getIdentifier(): string
     {
-        // TODO: Implement setIdentifier() method.
+        return $this->identifier;
     }
 
     /**
-     * @inheritDoc
+     * @param string $identifier
+     * @return void
      */
-    public function getExpiryDateTime()
+    public function setIdentifier($identifier): void
     {
-        // TODO: Implement getExpiryDateTime() method.
+        $this->identifier = $identifier;
     }
 
     /**
-     * @inheritDoc
+     * @return DateTimeImmutable
      */
-    public function setExpiryDateTime(DateTimeImmutable $dateTime)
+    public function getExpiryDateTime(): DateTimeImmutable
     {
-        // TODO: Implement setExpiryDateTime() method.
+        return $this->expiryDateTime;
     }
 
     /**
-     * @inheritDoc
+     * @param DateTimeImmutable $dateTime
+     * @return void
      */
-    public function setUserIdentifier($identifier)
+    public function setExpiryDateTime(DateTimeImmutable $dateTime): void
     {
-        // TODO: Implement setUserIdentifier() method.
+        $this->expiryDateTime = $dateTime;
     }
 
     /**
-     * @inheritDoc
+     * @return int|string|null
      */
-    public function getUserIdentifier()
+    public function getUserIdentifier(): int|string|null
     {
-        // TODO: Implement getUserIdentifier() method.
+        return $this->userIdentifier;
     }
 
     /**
-     * @inheritDoc
+     * @param string $identifier
+     * @return void
      */
-    public function getClient()
+    public function setUserIdentifier($identifier): void
     {
-        // TODO: Implement getClient() method.
+        $this->userIdentifier = $identifier;
     }
 
     /**
-     * @inheritDoc
+     * @return ClientEntityInterface
      */
-    public function setClient(ClientEntityInterface $client)
+    public function getClient(): ClientEntityInterface
     {
-        // TODO: Implement setClient() method.
+        return $this->client;
     }
 
     /**
-     * @inheritDoc
+     * @param ClientEntityInterface $client
+     * @return void
      */
-    public function addScope(ScopeEntityInterface $scope)
+    public function setClient(ClientEntityInterface $client): void
     {
-        // TODO: Implement addScope() method.
+        $this->client = $client;
     }
 
     /**
-     * @inheritDoc
+     * @param ScopeEntityInterface $scope
+     * @return void
      */
-    public function getScopes()
+    public function addScope(ScopeEntityInterface $scope): void
     {
-        // TODO: Implement getScopes() method.
+        $this->scopes[] = $scope;
+    }
+
+    /**
+     * @return ScopeEntityInterface[]
+     */
+    public function getScopes(): array
+    {
+        return $this->scopes;
     }
 }
