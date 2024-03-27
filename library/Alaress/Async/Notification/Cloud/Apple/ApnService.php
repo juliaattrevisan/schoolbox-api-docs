@@ -99,13 +99,14 @@ class ApnService extends AbstractService
     }
 
     /**
-     * @param array  $tokens
-     * @param int    $id
-     * @param string $title
-     * @param int    $unreadCount
+     * @param array      $tokens
+     * @param int        $id
+     * @param string     $title
+     * @param int        $unreadCount
+     * @param array|null $data
      * @return bool
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0): bool
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null): bool
     {
         // Try to set up the protocol
         try {

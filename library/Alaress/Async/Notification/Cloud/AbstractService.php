@@ -18,7 +18,6 @@ use Schoolbox\Realtime\Notification\Decorator;
 
 abstract class AbstractService implements ServiceInterface
 {
-
     /**
      * Yes, this is private on purpose. See the protected accessor for the why.
      *
