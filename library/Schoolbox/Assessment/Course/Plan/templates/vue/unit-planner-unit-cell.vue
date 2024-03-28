@@ -218,7 +218,7 @@ window.Vue.onUnmounted(() => {
                         :tabindex="showViewMoreInner ? 0 : -1"
                         @click.prevent="store.toggleViewMore(props.unit.id)"
                     >
-                        Show More
+                        View More
                     </button>
                 </div>
             </div>
