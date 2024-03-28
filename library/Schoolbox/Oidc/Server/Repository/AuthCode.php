@@ -54,7 +54,8 @@ class AuthCode implements AuthCodeRepositoryInterface
     {
         $identifier = $authCodeEntity->getIdentifier();
 
-        // TODO figure out how to serialize an auth code gets serialized
+        // TODO figure out how to serialize an auth code gets serialized:
+        //      may need to put this in DB after all.
         $this->cache->set(
             $this->keyGenerator->generateKey($identifier),
             $authCodeEntity->__toString(),
