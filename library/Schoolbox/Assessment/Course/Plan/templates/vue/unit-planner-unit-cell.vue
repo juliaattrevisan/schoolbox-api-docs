@@ -35,30 +35,12 @@ const contentHeight = window.Vue.ref(0);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
-const contentMaxHeight = window.Vue.computed(() => {
-    // unitContentHeights is a map of unit IDs to column IDs to heights
-    if (!store.unitContentHeights[props.unit.id]) return 0;
-    return Math.max(...Object.values(store.unitContentHeights[props.unit.id]).map((height) => height || 0));
-});
-
-const cellMaxHeight = window.Vue.computed(() => {
-    // Ensure the height of the component initially renders as if it wasn't being dragged to ensure
-    // the height transition is able to occur.
-    if (dragStore.dragCurrentUnitNextTick === props.unit) return dragStore.dragUnitHeight;
-
-    // If the unit is expanded, allow it to grow to fit its content
-    if (store.expandedUnits.includes(props.unit.id)) return contentMaxHeight.value;
-
-    // Otherwise, limit the height to the unexpanded height
-    return store.unexpandedUnitHeight;
-});
-
 const showViewMoreGradient = window.Vue.computed(() => {
-    return contentHeight.value + componentActionHeight.value > cellMaxHeight.value;
+    if (!store.unitRowDisplayHeights[props.unit.id]) return false;
+    return contentHeight.value + componentActionHeight.value > store.unitRowDisplayHeights[props.unit.id];
 });
 const showViewMoreInner = window.Vue.computed(() => {
-    if (dragStore.dragCurrentUnitNextTick === props.unit) return false;
-    if (store.expandedUnits.includes(props.unit.id)) return false;
+    if (store.dragCurrentUnitNextTick === props.unit) return false;
     return showViewMoreGradient.value;
 });
 
@@ -151,11 +133,11 @@ window.Vue.onUnmounted(() => {
         class="unit-cell"
         :class="{
             'fixed-left': props.column.fixedLeft,
-            'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
+            'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'content-focused': contentIsFocused,
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
         }"
-        :style="{ height: `${cellMaxHeight}px` }"
+        :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
         @click="onContentClicked"
     >
         <div ref="contentEl">
@@ -164,7 +146,7 @@ window.Vue.onUnmounted(() => {
                     v-if="dragStore.routeFolderSequence"
                     ref="draggableEl"
                     class="sortable-holder"
-                    :class="{ isDragging: dragStore.dragCurrentUnit === props.unit }"
+                    :class="{ isDragging: store.dragCurrentUnit === props.unit }"
                 ></div>
 
                 <div>

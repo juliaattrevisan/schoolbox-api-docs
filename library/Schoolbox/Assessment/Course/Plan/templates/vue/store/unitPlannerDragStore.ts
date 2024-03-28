@@ -12,7 +12,6 @@ gsap.registerPlugin(ScrollToPlugin);
 
 export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () => {
     const unitPlannerStore = useUnitPlannerStore();
-    const dragUnitHeight = 80; // The height of a unit when it is being dragged, in px
 
     // Allow the refs to be passed in instead of creating and monitoring two
     let unitPlannerContainerEl: Ref<HTMLElement>;
@@ -40,22 +39,11 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
     }
 
     const isDragging = window.Vue.ref(false);
-    const dragCurrentUnit = window.Vue.ref<Unit | null>(null);
     const dragCurrentPointerY = window.Vue.ref<number | null>(null);
     const dragInitial = window.Vue.ref<{
         y: number;
         offsetY: number;
     } | null>(null);
-
-    // Allow components to react to changes to the drag unit the tick after it actually changes
-    // This is useful for example with the height transition of the drag placeholder where we need to initialise it with
-    // the unexpanded height, and then set it to the drag height, otherwise it'll skip the transition.
-    const dragCurrentUnitNextTick = window.Vue.ref<Unit | null>(null);
-    window.Vue.watch(dragCurrentUnit, (value) => {
-        setTimeout(() => {
-            dragCurrentUnitNextTick.value = value;
-        }, 0);
-    });
 
     const dragPlaceholderY = window.Vue.computed(() => {
         if (
@@ -89,10 +77,10 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
         //     Does not include the height of the dragged unit height, as we are based on the top of the placeholder
         const minDragHeight = 0;
         const maxDragHeight = Math.max(
-            unitPlannerContainerEl.value.clientHeight - dragUnitHeight - headerRowHeight.value,
+            unitPlannerContainerEl.value.clientHeight - unitPlannerStore.dragUnitHeight - headerRowHeight.value,
             unitPlannerStore.orderedUnits.reduce((acc, unit) => {
-                if (unit.id === dragCurrentUnit.value?.id) {
-                    return acc + dragUnitHeight;
+                if (unit.id === unitPlannerStore.dragCurrentUnit?.id) {
+                    return acc + unitPlannerStore.dragUnitHeight;
                 }
 
                 if (unitPlannerStore.expandedUnits.includes(unit.id)) {
@@ -108,7 +96,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     // Reorder the selected unit in the list based on the drag position
     const dragOrderedUnits = window.Vue.computed(() => {
-        if (dragCurrentUnit.value === null || dragInitial.value === null) {
+        if (unitPlannerStore.dragCurrentUnit === null || dragInitial.value === null) {
             return unitPlannerStore.orderedUnits;
         }
 
@@ -123,8 +111,8 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             // - the maximum of the content heights if it's expanded and not being dragged
 
             let currentUnitHeight = unitPlannerStore.unexpandedUnitHeight;
-            if (unit.id === dragCurrentUnit.value?.id) {
-                currentUnitHeight = dragUnitHeight;
+            if (unit.id === unitPlannerStore.dragCurrentUnit?.id) {
+                currentUnitHeight = unitPlannerStore.dragUnitHeight;
             } else if (unitPlannerStore.expandedUnits.includes(unit.id)) {
                 const unitHeights = unitPlannerStore.unitContentHeights[unit.id] || {};
                 currentUnitHeight = Math.max(...Object.values(unitHeights), unitPlannerStore.unexpandedUnitHeight);
@@ -145,7 +133,9 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
         // Reorder the units based on the new index
         const newOrderedUnits = [...unitPlannerStore.orderedUnits];
-        const dragUnitIndex = unitPlannerStore.orderedUnits.findIndex((u) => u.id === dragCurrentUnit.value?.id);
+        const dragUnitIndex = unitPlannerStore.orderedUnits.findIndex(
+            (u) => u.id === unitPlannerStore.dragCurrentUnit?.id,
+        );
         const [draggedUnit] = newOrderedUnits.splice(dragUnitIndex, 1);
         newOrderedUnits.splice(adjustedDragIndex, 0, draggedUnit);
 
@@ -228,7 +218,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
         const pointerTarget = pointerEvent.target as HTMLElement;
 
         dragCurrentPointerY.value = draggable.pointerY;
-        dragCurrentUnit.value = unit;
+        unitPlannerStore.dragCurrentUnit = unit;
         dragInitial.value = {
             // The initial position of the drag handle
             y: draggable.y,
@@ -258,18 +248,15 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
         resequenceUnits(dragOrderedUnits.value.map((u) => u.id));
 
         isDragging.value = false;
-        dragCurrentUnit.value = null;
+        unitPlannerStore.dragCurrentUnit = null;
         dragCurrentPointerY.value = null;
         dragInitial.value = null;
     }
 
     return {
         init,
-        dragUnitHeight,
         routeFolderSequence,
         isDragging,
-        dragCurrentUnit,
-        dragCurrentUnitNextTick,
         dragPlaceholderY,
         dragOrderedUnits,
         onDragStart,

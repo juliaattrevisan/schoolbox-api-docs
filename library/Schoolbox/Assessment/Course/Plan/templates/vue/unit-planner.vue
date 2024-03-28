@@ -189,11 +189,11 @@ window.Vue.onUnmounted(() => {
                     top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
                 }"
             >
-                <template v-if="dragStore.dragCurrentUnit">
+                <template v-if="store.dragCurrentUnit">
                     <unit-planner-unit-cell
                         v-for="column in selectedTab.columns"
                         :key="column.id"
-                        :unit="dragStore.dragCurrentUnit"
+                        :unit="store.dragCurrentUnit"
                         :column="column"
                         :is-sortable-placeholder="true"
                     ></unit-planner-unit-cell>
