@@ -186,7 +186,7 @@ class Controller extends Base
              */
             $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
 
-            $activitiesLinks = [
+            $activitiesListRoutes = [
                 'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
                     'contextType' => 'unitspecs',
                     'contextId' => $unit->getId(),
@@ -199,7 +199,7 @@ class Controller extends Base
                 ]],
             ];
 
-            foreach ($activitiesLinks as $key => $link) {
+            foreach ($activitiesListRoutes as $key => $link) {
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
                     $activitiesLinks[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
                 } else {
@@ -225,7 +225,7 @@ class Controller extends Base
                 /* All the assessment specs in this unit
                  */
                 'activities' => [
-                    '_links' => $activitiesLinks,
+                    '_routes' => $activitiesListRoutes,
                     'items' => $assessments->map(new UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
@@ -248,7 +248,8 @@ class Controller extends Base
             $units[] = $unitOut;
         }
 
-        $locale = [
+        // Locales required to translate the activity types
+        $activityTypeLocale = [
             'project' => [
                 'proper' => $this->rosettaStone->translate('project', false, true),
             ],
@@ -260,7 +261,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'locale' => $locale
+            'locale' => $activityTypeLocale
         ], "Unit Planner - {$course->getTitle()}");
     }
 

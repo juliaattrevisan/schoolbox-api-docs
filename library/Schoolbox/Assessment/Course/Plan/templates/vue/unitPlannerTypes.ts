@@ -1,4 +1,4 @@
-import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export type Assessment = {
@@ -25,10 +25,7 @@ export type Unit = {
     homepage: string;
     folderId: number;
     activities: {
-        _links: {
-            create: string | null;
-            reorder: string | null;
-        };
+        _routes: ActivitiesListRoutes;
         items: Activity[];
     };
     curriculumCodes: Node[];
@@ -36,13 +33,4 @@ export type Unit = {
     textboxes: Record<string, TextboxContent>;
     extraTextboxes: number;
     sequence: number;
-};
-
-export type UnitPlannerLocale = {
-    project: {
-        proper: string;
-    };
-    dueWork: {
-        proper: string;
-    };
 };

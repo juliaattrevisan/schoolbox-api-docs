@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
+import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
@@ -18,6 +19,8 @@ gsap.registerPlugin(Draggable);
 interface Props {
     unit: Unit;
     column: Column;
+    activityTypeLocale: ActivityTypeLocale;
+    ltiAssessmentsEnabled: boolean;
     isSortablePlaceholder: boolean;
 }
 
@@ -175,10 +178,13 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <activities-list-content
-                    :unit="props.unit"
-                    :column="props.column"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-placeholder' : ''}`"
                     :is-sortable-placeholder="props.isSortablePlaceholder"
-                    @update-content-height="updateContentHeight"
+                    :activities="props.unit.activities.items"
+                    :activity-type-locale="props.activityTypeLocale"
+                    :activities-list-routes="props.unit.activities._routes"
+                    :lti-assessments-enabled="props.ltiAssessmentsEnabled"
+                    :toast-el="store.toastEl!"
                 />
             </template>
 

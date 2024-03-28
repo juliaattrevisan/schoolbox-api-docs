@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
+import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit, UnitPlannerLocale } from "./unitPlannerTypes";
+import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
 import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
 
 interface Props {
     units: Unit[];
-    locale: UnitPlannerLocale;
+    activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
 }
@@ -107,7 +108,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.ltiAssessmentsEnabled, props.units, props.locale, toastEl.value!);
+    store.init(props.units, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,
@@ -178,6 +179,8 @@ window.Vue.onUnmounted(() => {
                     :key="column.id"
                     :unit="unit"
                     :column="column"
+                    :activity-type-locale="props.activityTypeLocale"
+                    :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                     :is-sortable-placeholder="false"
                 ></unit-planner-unit-cell>
             </div>
@@ -195,6 +198,8 @@ window.Vue.onUnmounted(() => {
                         :key="column.id"
                         :unit="store.dragCurrentUnit"
                         :column="column"
+                        :activity-type-locale="props.activityTypeLocale"
+                        :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                         :is-sortable-placeholder="true"
                     ></unit-planner-unit-cell>
                 </template>

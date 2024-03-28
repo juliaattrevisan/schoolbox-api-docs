@@ -1,31 +1,39 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
-import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import { useActivitiesDragStore } from "./store/activitiesDragStore";
-import { Unit } from "./unitPlannerTypes";
-import { Column } from "./unitPlannerConfig";
+import type { Activity, ActivityTypeLocale, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
+import Toast from "@schoolboxVue/components/toast.vue";
+import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
+import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListItem from "./activities-list-item.vue";
 
 interface Props {
-    unit: Unit;
-    column: Column;
-    isSortablePlaceholder: boolean; // Whether this has been created from a unit sortable placeholder
+    activitiesListStoreId: string; // A unique identifier for this activities list
+    activities: Activity[];
+    activityTypeLocale: ActivityTypeLocale;
+    activitiesListRoutes: ActivitiesListRoutes;
+    ltiAssessmentsEnabled: boolean;
+    toastEl: typeof Toast;
 }
 
 const props = defineProps<Props>();
-const store = useUnitPlannerStore();
-// We need the drag store to be unique per unit+column to isolate the activities
-const activitiesDragStoreId = `${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? "-placeholder" : ""}`;
-const activitiesDragStore = useActivitiesDragStore(activitiesDragStoreId);
+const activitiesListGlobalStore = useActivitiesListGlobalStore();
 
+// To allow for multiple activity lists on the same page, the store is created with a unique id
+const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 
 window.Vue.onMounted(() => {
-    activitiesDragStore().init(
+    activitiesListGlobalStore.init(
+        props.activityTypeLocale,
+        props.activitiesListRoutes,
+        props.ltiAssessmentsEnabled,
+        props.toastEl,
+    );
+
+    activitiesListStore().init(
         props.unit.activities._links.reorder,
         activitiesContainerEl as Ref<HTMLElement>,
         props.unit.activities.items,
-        store.toastEl!,
         props.isSortablePlaceholder,
     );
 });
@@ -34,12 +42,10 @@ window.Vue.onMounted(() => {
 <template>
     <ul ref="activitiesContainerEl" class="information-list sortable-card ui-sortable">
         <activities-list-item
-            v-for="activity in activitiesDragStore().orderedActivities"
+            v-for="activity in activitiesListStore().orderedActivities"
             :key="activity.id"
-            :activities-drag-store-id="activitiesDragStoreId"
-            :unit="props.unit"
-            :column="props.column"
             :activity="activity"
+            :activities-list-store-id="activitiesListStoreId"
         />
     </ul>
 </template>

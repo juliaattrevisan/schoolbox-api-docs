@@ -16,8 +16,8 @@ interface DraggableActivity {
     sequence: number;
 }
 
-export const useActivitiesDragStore = (storeId: string) =>
-    defineStore(`activitiesDragStore/${storeId}`, () => {
+export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
+    defineStore(`activitiesListDragStore/${activitiesListStoreId}`, () => {
         const routeReorder = window.Vue.ref<string | null>(null);
         const draggables = window.Vue.ref<Record<number, DraggableActivity>>({});
         const toastEl = window.Vue.ref<typeof Toast>();
