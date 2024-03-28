@@ -91,7 +91,7 @@ class Classes implements IStrategy
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
-                $className = trim((string)($struct['CourseName']->me['string'] ?? null));
+                $className = trim((string)($struct['ClassName']->me['string'] ?? null));
                 $classCode = trim((string)($struct['ClassCode']->me['string'] ?? null));
 
                 /* Constraints in the schema are case insensitive, unlike
