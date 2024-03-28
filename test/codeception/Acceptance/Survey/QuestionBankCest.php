@@ -49,11 +49,11 @@ class QuestionBankCest
         $classId = Common::CLASS_ID_9AENG;
         $surveyTitle = 'Cest Survey One ' . Common::gentext(6);
         $sectionTitle = 'Cest Section One ' . Common::gentext(6);
-        $question1 = Common::gentext(100);
+        $question1 = 'Question ' . Common::gentext(100);
         $question1Type = QuestionForm::TYPE_SHORT_ANSWER;
-        $question2 = Common::gentext(50);
+        $question2 = 'Question ' . Common::gentext(50);
         $question2Type = QuestionForm::TYPE_SHORT_SIGNATURE;
-        $question3 = Common::gentext(80);
+        $question3 = 'Question ' . Common::gentext(80);
         $question3Type = QuestionForm::TYPE_YESNO;
 
         $categoryId = QuestionBankPage::CATEGORY_ELECTIVE_SELECTION;
@@ -159,5 +159,7 @@ class QuestionBankCest
     {
         $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
         $i->updateInDatabase('assess', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Test Pastoral Record%"]);
+        $i->updateInDatabase('assess_question_bank', ['deleted_at' => "2022-01-15 11:22:34"], ['question like' => "%Question%"]);
+        $i->updateInDatabase('assess_question', ['deleted_at' => "2022-01-15 11:22:34"], ['question like' => "%Question%"]);
     }
 }
