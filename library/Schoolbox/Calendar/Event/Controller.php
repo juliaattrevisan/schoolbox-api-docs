@@ -25,6 +25,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -817,14 +818,17 @@ class Controller extends Base
      * Delete an event, or a set of events from a series
      *
      * @param Event $event
-     * @throws Exception
+     * @throws \Exception
      */
     public function postDelete(Event $event): void
     {
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
-            if ($this->requestPost->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES) {
+            if ($this->requestPost->get('efficacy') === null) {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
+            if ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
                 $allEvents = $this->eventMapper->getAllInSeries($event);
 
                 foreach ($allEvents as $currentEvent) {
@@ -860,7 +864,11 @@ class Controller extends Base
                 'callbackUrl' => $redirect
             ]);
         } else {
-            $this->response = $this->redirectFound($redirect);
+            if ($this->isJsonRequest()) {
+                $this->response = $this->responseAsJson('')->withStatus(204); // HTTP status 204 means 'No Content'.
+            } else {
+                $this->response = $this->redirectFound($redirect);
+            }
         }
     }
 }
