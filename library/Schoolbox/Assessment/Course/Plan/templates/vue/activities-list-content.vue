@@ -2,9 +2,9 @@
 import type { Ref } from "vue";
 import type { Activity, ActivityTypeLocale, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
-import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListItem from "./activities-list-item.vue";
+import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 
 interface Props {
     activitiesListStoreId: string; // A unique identifier for this activities list
@@ -16,25 +16,19 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const activitiesListGlobalStore = useActivitiesListGlobalStore();
+const emit = defineEmits(["dragStart", "dragStop"]);
 
-// To allow for multiple activity lists on the same page, the store is created with a unique id
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
+const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListStoreId);
+
 const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 
 window.Vue.onMounted(() => {
-    activitiesListGlobalStore.init(
-        props.activityTypeLocale,
-        props.activitiesListRoutes,
-        props.ltiAssessmentsEnabled,
-        props.toastEl,
-    );
-
-    activitiesListStore().init(
-        props.unit.activities._links.reorder,
+    activitiesListStore().init(props.activities, props.activitiesListRoutes);
+    activitiesListDragStore().init(
         activitiesContainerEl as Ref<HTMLElement>,
-        props.unit.activities.items,
-        props.isSortablePlaceholder,
+        () => emit("dragStart"),
+        () => emit("dragStop"),
     );
 });
 </script>
@@ -42,7 +36,7 @@ window.Vue.onMounted(() => {
 <template>
     <ul ref="activitiesContainerEl" class="information-list sortable-card ui-sortable">
         <activities-list-item
-            v-for="activity in activitiesListStore().orderedActivities"
+            v-for="activity in activitiesListDragStore().orderedActivities"
             :key="activity.id"
             :activity="activity"
             :activities-list-store-id="activitiesListStoreId"

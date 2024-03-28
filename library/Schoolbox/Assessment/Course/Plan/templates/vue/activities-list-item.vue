@@ -4,25 +4,19 @@ import { Draggable } from "gsap/Draggable";
 import { kebabCase, startCase } from "lodash";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
-import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
-import { useActivitiesDragStore } from "./store/activitiesDragStore";
-import type { Unit } from "./unitPlannerTypes";
-import type { Column } from "./unitPlannerConfig";
+import { useActivitiesListStore } from "./store/activitiesListStore";
+import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 
 gsap.registerPlugin(Draggable);
 
 interface Props {
-    activitiesDragStoreId: string; // The id of the activitiesDragStore this belongs to
-    unit: Unit; // The id of the unit to which the activity belongs.
-    column: Column;
+    activitiesListStoreId: string; // The id of the activitiesListStoreId this belongs to
     activity: Activity;
 }
 
 const props = defineProps<Props>();
-const store = useUnitPlannerStore();
-const deleteActivityStore = useDeleteActivityStore();
-const activitiesDragStore = useActivitiesDragStore(props.activitiesDragStoreId);
+const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
+const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListStoreId);
 
 const activityListEl = window.Vue.ref<HTMLElement | null>(null);
 
@@ -43,10 +37,10 @@ const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 window.Vue.onMounted(() => {
-    activitiesDragStore().setActivityEl(props.activity.id, activityListEl.value!);
+    activitiesListDragStore().setActivityEl(props.activity.id, activityListEl.value!);
 
     // Whether to allow the user to resequence the activities
-    if (activitiesDragStore().routeReorder) {
+    if (activitiesListStore().routes.reorder) {
         if (draggableEl.value) {
             draggableInstance = Draggable.create(draggableEl.value, {
                 type: "y",
@@ -55,17 +49,15 @@ window.Vue.onMounted(() => {
                 allowContextMenu: true,
                 onPress: () => {
                     if (!draggableInstance) return;
-                    store.updateFocusedUnitCell(props.unit.id, props.column, true);
-                    activitiesDragStore().onDragStart(draggableInstance[0], props.activity);
+                    activitiesListDragStore().onDragStart(draggableInstance[0], props.activity);
                 },
                 onDrag: () => {
                     if (!draggableInstance) return;
-                    activitiesDragStore().onDragMove(draggableInstance[0]);
+                    activitiesListDragStore().onDragMove(draggableInstance[0]);
                 },
                 onRelease: () => {
                     if (!draggableInstance) return;
-                    store.updateFocusedUnitCell(props.unit.id, props.column, false);
-                    activitiesDragStore().onDragEnd(draggableInstance[0]);
+                    activitiesListDragStore().onDragEnd(draggableInstance[0]);
                 },
             });
         }
@@ -73,7 +65,7 @@ window.Vue.onMounted(() => {
 });
 
 window.Vue.onUnmounted(() => {
-    activitiesDragStore().unsetActivityEl(props.activity.id);
+    activitiesListDragStore().unsetActivityEl(props.activity.id);
 });
 </script>
 
@@ -82,11 +74,11 @@ window.Vue.onUnmounted(() => {
         ref="activityListEl"
         class="actions-small-1"
         :class="{
-            'is-dragging': activitiesDragStore().dragCurrentDraggable?.activity.id === props.activity.id,
+            'is-dragging': activitiesListDragStore().dragCurrentActivityID === props.activity.id,
         }"
     >
         <div class="list-item">
-            <div v-if="activitiesDragStore().routeReorder" ref="draggableEl" class="sortable-holder"></div>
+            <div v-if="activitiesListStore().routes.reorder" ref="draggableEl" class="sortable-holder"></div>
             <div class="grip compact ui-sortable-handle"></div>
             <div class="card small-12 compact wrap-down">
                 <a :href="getReturnUrl(activityLink)">

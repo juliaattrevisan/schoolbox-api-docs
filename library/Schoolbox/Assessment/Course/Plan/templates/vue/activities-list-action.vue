@@ -1,29 +1,32 @@
 <script setup lang="ts">
-import { Column } from "./unitPlannerConfig";
-import { Unit } from "./unitPlannerTypes";
-import ActivitiesCreateInner from "./activities-create-inner.vue";
+import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
+import { useActivitiesListStore } from "./store/activitiesListStore";
+import ActivitiesListActionCreateInner from "./activities-list-action-create-inner.vue";
 
 interface Props {
-    unit: Unit;
-    column: Column;
+    activitiesListStoreId: string;
 }
 
 const props = defineProps<Props>();
+const activitiesListGlobalStore = useActivitiesListGlobalStore();
+const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 </script>
 
 <template>
-    <div v-if="props.unit.activities._links.create !== null" class="component-action">
+    <div v-if="activitiesListStore().routes.create !== null" class="component-action">
         <section>
             <sbx-pop-out
-                :content-id="`dropdown-unitplanner-activity-${props.column.id}-${props.unit.id}`"
+                :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
                 button-text="Create Activity"
                 move-to="#unitplanner-dropdown-container"
                 is-component-action
             ></sbx-pop-out>
-            <activities-create-inner
-                :content-id="`dropdown-unitplanner-activity-${props.column.id}-${props.unit.id}`"
-                :create-url="props.unit.activities._links.create"
-            ></activities-create-inner>
+            <activities-list-action-create-inner
+                :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
+                :create-route="activitiesListStore().routes.create!"
+                :lti-assessments-enabled="activitiesListGlobalStore.ltiAssessmentsEnabled"
+                :activity-type-locale="activitiesListGlobalStore.locale"
+            ></activities-list-action-create-inner>
         </section>
     </div>
 </template>

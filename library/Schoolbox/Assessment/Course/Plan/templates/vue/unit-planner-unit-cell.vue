@@ -12,7 +12,7 @@ import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
-import ActivitiesAction from "./activities-action.vue";
+import ActivitiesListAction from "./activities-list-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -178,13 +178,15 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <activities-list-content
-                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-placeholder' : ''}`"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-p' : ''}`"
                     :is-sortable-placeholder="props.isSortablePlaceholder"
                     :activities="props.unit.activities.items"
                     :activity-type-locale="props.activityTypeLocale"
                     :activities-list-routes="props.unit.activities._routes"
                     :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                     :toast-el="store.toastEl!"
+                    @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
+                    @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
                 />
             </template>
 
@@ -219,10 +221,9 @@ window.Vue.onUnmounted(() => {
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
 
-                <activities-action
+                <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
-                    :unit="props.unit"
-                    :column="props.column"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-placeholder' : ''}`"
                 />
             </div>
         </div>

@@ -2,6 +2,7 @@
 import type { Ref } from "vue";
 import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Unit } from "./unitPlannerTypes";
@@ -19,6 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
+const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
 // Get a list of every textbox that could be shown in a unit
@@ -109,6 +111,7 @@ window.Vue.watch(
 
 window.Vue.onMounted(() => {
     store.init(props.units, toastEl.value!);
+    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,

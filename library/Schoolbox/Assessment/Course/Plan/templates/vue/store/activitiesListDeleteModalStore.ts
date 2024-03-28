@@ -3,14 +3,10 @@
  */
 
 import { defineStore } from "pinia";
-import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
-import { useUnitPlannerStore } from "@schoolboxAssessment/Course/Plan/templates/vue/store/unitPlannerStore";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import type { Unit } from "../unitPlannerTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
-export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", () => {
-    const unitPlannerStore = useUnitPlannerStore();
-
+export const useActivitiesListDeleteModalStore = defineStore("activitiesListDeleteModalStore", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const selectedUnit = window.Vue.ref<Unit | null>(null); // The unit to which the activity to be deleted belongs.

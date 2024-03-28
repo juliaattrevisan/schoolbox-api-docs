@@ -201,9 +201,9 @@ class Controller extends Base
 
             foreach ($activitiesListRoutes as $key => $link) {
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
-                    $activitiesLinks[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+                    $activitiesListRoutes[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
                 } else {
-                    $activitiesLinks[$key] = null;
+                    $activitiesListRoutes[$key] = null;
                 }
             }
 
@@ -261,7 +261,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'locale' => $activityTypeLocale
+            'activityTypeLocale' => $activityTypeLocale
         ], "Unit Planner - {$course->getTitle()}");
     }
 
