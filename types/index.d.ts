@@ -21,7 +21,6 @@ declare global {
             colourDefaults: { [key: string]: any };
             editors: { [key: string]: Editor };
             hasEditorAI: true | undefined; // to display the AI features within the editor
-            ltiAssessmentsEnabled: true | undefined;
             lightGallery: Function;
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
@@ -29,7 +28,11 @@ declare global {
             imageSlideshows: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
-            firebaseApps: Array<{ appIdentifier: string, publicConfiguration: { [key: string]: any }, webPushPublicKey: string }>;
+            firebaseApps: Array<{
+                appIdentifier: string;
+                publicConfiguration: { [key: string]: any };
+                webPushPublicKey: string;
+            }>;
         };
         schoolboxUser: {
             id: number;

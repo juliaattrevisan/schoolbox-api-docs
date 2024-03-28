@@ -10,6 +10,7 @@
                 :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
                 :units="{{ units |json_encode }}"
                 :locale="{{ locale |json_encode }}"
+                :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
             ></unit-planner>
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>

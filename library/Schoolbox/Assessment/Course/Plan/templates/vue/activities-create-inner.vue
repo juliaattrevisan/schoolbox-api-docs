@@ -12,8 +12,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
-
-const { ltiAssessmentsEnabled } = window.sbProps;
 </script>
 
 <template>
@@ -34,7 +32,7 @@ const { ltiAssessmentsEnabled } = window.sbProps;
         <li>
             <a :href="getReturnUrl(`${props.createUrl}?type=task`)" class="icon-task">Task</a>
         </li>
-        <li v-if="ltiAssessmentsEnabled">
+        <li v-if="store.ltiAssessmentsEnabled">
             <a :href="getReturnUrl(`${props.createUrl}?type=lti`)" class="icon-lti">3rd Party Assessment</a>
         </li>
         <li>

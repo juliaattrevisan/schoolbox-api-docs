@@ -12,6 +12,7 @@ interface Props {
     units: Unit[];
     locale: UnitPlannerLocale;
     routeFolderSequence: string | null;
+    ltiAssessmentsEnabled: boolean;
 }
 
 const props = defineProps<Props>();
@@ -106,7 +107,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.units, props.locale, toastEl.value!);
+    store.init(props.ltiAssessmentsEnabled, props.units, props.locale, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,
