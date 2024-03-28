@@ -810,7 +810,10 @@ class Controller extends Base
             $eventRelations
         );
 
-        // No real need to return anything
+        if ($this->isJsonRequest()) {
+            $this->response = $this->responseAsJson('')->withStatus(200); // HTTP success code.
+        }
+        // Else no real need to return anything.
     }
 
 
