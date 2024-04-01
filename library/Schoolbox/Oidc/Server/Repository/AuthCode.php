@@ -41,7 +41,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      */
     public function getNewAuthCode(): AuthCodeEntityInterface
     {
-        return new AuthCodeEntity(base64_encode(random_bytes(80)));
+        return new AuthCodeEntity();
     }
 
     /**
