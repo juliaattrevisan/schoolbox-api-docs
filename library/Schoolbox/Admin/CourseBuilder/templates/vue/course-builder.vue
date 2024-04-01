@@ -62,12 +62,12 @@ window.Vue.onMounted(() => {
 <template>
     <form action="/adminv2/course-builder/save" method="post" novalidate @submit.prevent="saveChanges">
         <div class="small-12 island">
-            <h2 class="subheader">Course Templates</h2>
+            <h2 class="subheader">Course Framework</h2>
             <section>
                 <div class="list-container">
                     <header class="list-header actions-small-1">
                         <div class="list-item">
-                            <label class="small-12 medium-6 column required">Template Name</label>
+                            <label class="small-12 medium-6 column required">Framework Name</label>
                             <label class="small-12 medium-3 column required">Course Page Template</label>
                             <label class="small-12 medium-3 column required">Unit Page Template</label>
                         </div>
@@ -75,7 +75,7 @@ window.Vue.onMounted(() => {
                     <course-builder-rows :available-templates="props.availableTemplates" />
                     <div class="component-action">
                         <section>
-                            <a class="button" @click.prevent="onAddNewRow">Add New Template</a>
+                            <a class="button" @click.prevent="onAddNewRow">Add New Framework</a>
                         </section>
                     </div>
                 </div>
