@@ -22,9 +22,13 @@ firebaseApps.forEach((app) => {
     messaging.onBackgroundMessage(function (payload) {
         console.warn("[firebase-messaging-sw.js] Received background message ", payload);
         // Customize notification here
+        const data = JSON.parse(payload.data);
         const notificationOptions = {
             body: payload.notification.body,
-            icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+            icon: data.icon,
+            image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+            badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+            timestamp: data.timestamp
         };
         self.registration.showNotification(payload.notification.title, notificationOptions);
     });
