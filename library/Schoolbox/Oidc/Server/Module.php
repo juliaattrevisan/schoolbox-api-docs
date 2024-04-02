@@ -22,6 +22,7 @@ use OpenIDConnectServer\Entities\ClaimSetEntity;
 use OpenIDConnectServer\IdTokenResponse;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
+use Schoolbox\Oidc\Server\Repository\Scope;
 use Schoolbox\UserMapper;
 
 /**
@@ -51,7 +52,8 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/oidc/token', 'getAccessTokenRequest');
         $this->register(self::METHOD_POST, '/oidc/token', 'postAccessTokenRequest');
 
-        // well-known URLs: JWKS?
+        // well-known URLs: JWKS, configuration
+        $this->register(self::METHOD_GET, '/.well-known/openid-configuration', 'getOpenIdConfiguration');
         $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
     }
 
@@ -91,11 +93,11 @@ class Module extends BaseModule
         // Claim extractor: include Schoolbox's custom claims
         $claimExtractor = new ClaimExtractor(
             new ClaimSetEntity(
-                'https://schoolbox.education/',
+                Scope::SCOPE_SCHOOLBOX,
                 [
-                    'https://schoolbox.education/instance_id',
-                    'https://schoolbox.education/external_id',
-                    'https://schoolbox.education/role_type',
+                    Scope::SCOPE_SCHOOLBOX . '/instance_id',
+                    Scope::SCOPE_SCHOOLBOX . '/external_id',
+                    Scope::SCOPE_SCHOOLBOX . '/role_type',
                 ]
             )
         );

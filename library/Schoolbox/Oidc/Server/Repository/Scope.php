@@ -22,25 +22,31 @@ class Scope implements ScopeRepositoryInterface
     /**
      * Scope for OpenID Connect support.
      */
-    private const SCOPE_OPENID = 'openid';
+    public const SCOPE_OPENID = 'openid';
 
     /**
-     * Scope for basic details about the identity.
+     * Scope for profile details about the identity.
      */
-    private const SCOPE_BASIC = 'basic';
+    public const SCOPE_PROFILE = 'basic';
 
     /**
      * Scope for the identity's email address.
      */
-    private const SCOPE_EMAIL = 'email';
+    public const SCOPE_EMAIL = 'email';
+
+    /**
+     * Scope for Schoolbox details: instance ID, role type and external ID.
+     */
+    public const SCOPE_SCHOOLBOX = 'https://schoolbox.education';
 
     /**
      * Scopes available to this repository.
      */
-    private const AVAILABLE_SCOPES = [
+    public const AVAILABLE_SCOPES = [
         self::SCOPE_OPENID,
-        self::SCOPE_BASIC,
+        self::SCOPE_PROFILE,
         self::SCOPE_EMAIL,
+        self::SCOPE_SCHOOLBOX,
     ];
 
     /**

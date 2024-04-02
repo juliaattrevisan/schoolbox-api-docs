@@ -14,6 +14,7 @@ use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
+use Schoolbox\Url\Factory;
 
 /**
  * Controller for OpenID Connect identity provision.
@@ -95,6 +96,34 @@ class Controller extends Base
     public function postAccessToken(): void
     {
         $this->getAccessToken();
+    }
+
+    /**
+     * OpenID configuration.
+     *
+     * @see https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+     *
+     * @api   GET /.well-known/openid-configuration
+     * @since 24.0
+     */
+    public function getOpenIdConfiguration(): void
+    {
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // Minimum set of required content for OpenID configuration.
+        $this->response = $this->responseAsJson([
+            'issuer'                                => $baseUrl,
+            'authorization_endpoint'                => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAuthorization')),
+            'token_endpoint'                        => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAccessToken')),
+            'jwks_uri'                              => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getJsonWebKeySet')),
+            'scopes_supported'                      => Repository\Scope::AVAILABLE_SCOPES,
+            'response_types_supported'              => ['code', 'id_token', 'id_token token'],
+            'subject_types_supported'               => ['public'],
+            'id_token_signing_alg_values_supported' => ['RS256'],
+
+            // Allegedly OIDC must support the implicit grant type, but it is deprecated?
+            'grant_types_supported' => ['authorization_code', 'refresh_token', 'implicit', 'client_credentials'],
+        ]);
     }
 
     /**
