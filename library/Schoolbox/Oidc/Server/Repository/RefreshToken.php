@@ -53,12 +53,12 @@ class RefreshToken implements RefreshTokenRepositoryInterface
 
         // TODO figure out how to serialize a refresh token:
         //      may need to put this in DB after all.
+        //      As with auth code, I'm not sure it even matters?
+        //      It's never unserialized AFAICT
         $this->cache->set(
             $this->keyGenerator->generateKey($identifier),
-            $refreshTokenEntity->__toString(),
-            $refreshTokenEntity->getExpiryDateTime()->diff(
-                Alaress_Date_Format::now()->getDateTimeObject()
-            ),
+            $identifier,
+            Alaress_Date_Format::now()->getDateTimeObject()->diff($refreshTokenEntity->getExpiryDateTime()),
         );
     }
 

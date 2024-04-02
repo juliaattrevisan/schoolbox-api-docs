@@ -60,9 +60,7 @@ class AuthCode implements AuthCodeRepositoryInterface
         $this->cache->set(
             $this->keyGenerator->generateKey($identifier),
             $identifier,
-            $authCodeEntity->getExpiryDateTime()->diff(
-                Alaress_Date_Format::now()->getDateTimeObject()
-            ),
+            Alaress_Date_Format::now()->getDateTimeObject()->diff($authCodeEntity->getExpiryDateTime()),
         );
     }
 
