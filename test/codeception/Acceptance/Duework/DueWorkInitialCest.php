@@ -10,6 +10,7 @@ namespace Tests\Acceptance\Duework;
 use Exception;
 use Tests\Support\AcceptanceTester;
 use Codeception\Util\Locator;
+use Tests\Support\Page\Duework\AssessmentForm;
 
 /**
  * This test creates due work activities, deletes a due work activity, the student views the activity, submits it in person,
@@ -45,6 +46,7 @@ class DueWorkInitialCest
      */
     public function create2Assessments(AcceptanceTester $i): void
     {
+        $dueworkForm = new AssessmentForm($i);
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
         $i->amGoingTo('Create a homepage');
@@ -102,6 +104,7 @@ class DueWorkInitialCest
         $i->click('Create due work');
         $i->waitForText("Create Due Work", 5);
         $i->fillField("title", "Test Due Work");
+        $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
         $i->fillCkEditorById('assessment-description', 'We need more fish.');
         $i->selectOption('acceptOnline', '1');
         $i->fillField('weight', '5');
@@ -115,6 +118,7 @@ class DueWorkInitialCest
         $i->click($createButton);
         $i->waitForText("Create Due Work", 5);
         $i->fillField("title", "Test Due Work2");
+        $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
         $i->fillCkEditorById('assessment-description', 'We need more fish.');
         $i->selectOption('acceptOnline', '1');
         $i->fillField('weight', '5');
@@ -324,5 +328,17 @@ class DueWorkInitialCest
         sleep(2);
         $i->click('input[type=submit][value=Submit\ for\ assessment]');
         $i->canSee('Submission by Schoolbox Admin');
+    }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test Class Homepage%"]);
+        $i->updateInDatabase('assessment', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Test Due Wor%"]);
     }
 }

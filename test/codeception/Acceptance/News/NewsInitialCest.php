@@ -223,4 +223,15 @@ class NewsInitialCest
         $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
         $i->click('#confirm-dialog-confirm-button');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Test News Title%"]);
+    }
 }

@@ -15,6 +15,8 @@ class PastoralProfile
 
     public const DELETE_COMMENT_ICON = 'a[href="#delete-comment"]';
 
+    public const PASTORAL_POST_COMMENT = '#submit-for-comment-public';
+
 
     /**
      * Constructor
@@ -76,5 +78,13 @@ class PastoralProfile
     public function clickDeleteCommentIcon(): void
     {
         $this->tester->click(self::DELETE_COMMENT_ICON);
+    }
+
+    /**
+     * click post comment button
+     */
+    public function clickPostComment(): void
+    {
+        $this->tester->click(self::PASTORAL_POST_COMMENT);
     }
 }

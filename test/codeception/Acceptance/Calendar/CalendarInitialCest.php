@@ -192,4 +192,22 @@ class CalendarInitialCest
         $i->amGoingTo('delete the event so it does not impact in the next test');
         $i->updateInDatabase('event', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => $evenTitleSchool]);
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $evenTitleGroup = 'My Group Test Event';
+        $evenTitlePersonal = 'My Personal Test Event';
+        $evenTitleSchool = 'My School Test Event';
+        $evenTitle = 'My Test Event';
+        $i->updateInDatabase('event', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => $evenTitleGroup]);
+        $i->updateInDatabase('event', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => $evenTitlePersonal]);
+        $i->updateInDatabase('event', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => $evenTitleSchool]);
+        $i->updateInDatabase('event', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => $evenTitle]);
+    }
 }

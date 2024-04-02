@@ -162,4 +162,16 @@ class LessonPlanTemplatesCest
         $templates->clickConfirmDeleteButton();
         $i->cantSee('Automation Template 1');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('lesson_plan_template_field', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Field%"]);
+        $i->updateInDatabase('lesson_plan_template', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Automation Template%"]);
+    }
 }

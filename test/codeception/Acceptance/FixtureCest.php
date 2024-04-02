@@ -199,4 +199,21 @@ class FixtureCest
         $fixturePage->assertNotifExists('You have an upcoming Basketball match ' . $matchName2);
         $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName2 . ' has been updated');
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "First Cest Match"]);
+        $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Third Cest Match"]);
+        $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Fourth Cest Match"]);
+        $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Fifth Cest Match"]);
+        $i->updateInDatabase('sportsfixtures_match', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Third Cest Modified Sixth"]);
+        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['description like' => "aaa"]);
+        $i->updateInDatabase('sportsfixtures_match_itineraryitem', ['deleted_at' => "2022-01-15 11:22:34"], ['description like' => "lalala"]);
+    }
 }

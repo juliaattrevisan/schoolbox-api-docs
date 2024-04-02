@@ -24,6 +24,7 @@ class LearningMoments
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
     public const COMMENT_CONFIRM_DELETE_BUTTON = 'ID to be added and replaced here';
     public const LEARNING_MOMENT_DELETE_BUTTON = 'a[title="Delete"]';
+    public const LEARNING_POST_COMMENT = '#submit-for-comment-0';
 
     /**
      * This test's acceptance tester actor.
@@ -172,5 +173,13 @@ class LearningMoments
     public function clickLearningMomentDeleteButton(): void
     {
         $this->tester->click(self::LEARNING_MOMENT_DELETE_BUTTON);
+    }
+
+    /**
+     * click post comment button
+     */
+    public function clickPostComment(): void
+    {
+        $this->tester->click(self::LEARNING_POST_COMMENT);
     }
 }

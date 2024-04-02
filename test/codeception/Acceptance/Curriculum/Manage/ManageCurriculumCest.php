@@ -267,4 +267,24 @@ class ManageCurriculumCest
         $navigate->moveForwards();
         $i->canSee('ELBE1202');
     }
+
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('curriculum_node', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => 'Party Town']);
+        $i->updateInDatabase('curriculum_node', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => 'Grammar']);
+        $i->updateInDatabase('curriculum_node', array('order' => '0'), array('name' => 'Year 4 History'));
+        $i->updateInDatabase('curriculum_node', ['name' => "Year 9 History"], ['name like' => 'Year 9 Ancient History']);
+        $i->updateInDatabase('curriculum_node', ['code' => ''], ['name like' => 'Year 9 History']);
+        $i->updateInDatabase('curriculum_node', ['description' => ''], ['name like' => 'Year 9 History']);
+        $i->updateInDatabase('curriculum_node', ['deleted_at' => null], ['name like' => 'Year 12 French']);
+        $i->updateInDatabase('curriculum_node', ['enabled' => 1], ['name like' => 'Year 4 History']);
+        $i->updateInDatabase('curriculum_node', ['enabled' => 1], ['name like' => 'Year 9 History']);
+    }
 }

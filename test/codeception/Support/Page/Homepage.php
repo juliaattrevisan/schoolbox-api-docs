@@ -7,6 +7,7 @@
 
 namespace Tests\Support\Page;
 
+use Codeception\Util\Locator;
 use Tests\Support\AcceptanceTester;
 
 /**
@@ -50,7 +51,11 @@ class Homepage
 
     public const ELEMENT_COMPONENT_SETTINGS = 'a.icon-settings.settings.edit';
 
+    public const ELEMENT_REMOVE_ICON = 'a.icon-close';
+
     public const ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
+
+    public const REMOVE_BUTTON_CONFIRMATION_MESSAGE = 'Remove';
 
     /**
      * @var AcceptanceTester
@@ -231,6 +236,14 @@ class Homepage
     }
 
     /**
+     * Click the component remove icon X
+     */
+    public function clickComponentRemoveIcon(): void
+    {
+        $this->tester->click((Locator::firstElement(self::ELEMENT_REMOVE_ICON)));
+    }
+
+    /**
      * type a heading text
      * @param string $headingText
      * @return $this
@@ -257,5 +270,13 @@ class Homepage
     public function checkComponentCheckbox(int $id, string $componentElement): void
     {
         $this->tester->checkOption('#component' . $id . '-' . $componentElement);
+    }
+
+    /**
+     * Click the remove button when confirming to remove a component
+     */
+    public function clickRemoveConfirmationMessage(): void
+    {
+        $this->tester->click(self::REMOVE_BUTTON_CONFIRMATION_MESSAGE);
     }
 }

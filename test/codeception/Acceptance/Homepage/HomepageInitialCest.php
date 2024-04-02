@@ -300,4 +300,18 @@ class HomepageInitialCest
         $i->amOnUrl($this->resourcesPageUrl);
         $i->cantSee("Test Homepage");
     }
+
+    /**
+     * Soft deleting data to not impact the tests
+     *
+     * @param AcceptanceTester $i
+     */
+    public function tearDown(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test Homepage%"]);
+        $i->updateInDatabase('blog', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Test Blog Title"]);
+        $i->updateInDatabase('textBox', ['deleted_at' => "2022-01-15 11:22:34"], ['heading like' => "Test Text Box Title"]);
+        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2022-01-15 11:22:34"], ['title like' => "Test News Title"]);
+    }
 }
