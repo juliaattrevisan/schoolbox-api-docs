@@ -21,8 +21,9 @@ if ($argc !== 2) {
 
 function displayRow($row): void
 {
-    echo implode(',', $row);
-    echo "\n";
+    echo '"';
+    echo implode('","', $row);
+    echo "\"\n";
 }
 
 if (($handle = fopen($argv[1], "r")) !== false) {
