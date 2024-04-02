@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use InvalidArgumentException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
@@ -38,7 +37,6 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
@@ -47,6 +45,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        $this->register('POST', '/schoolDataImport/liss/delete', 'postDeleteLissPayload', $perms);
         $this->register('GET', '/schoolDataImport', 'getSchoolDataIndex', $perms);
         $this->register('POST', '/schoolDataImport', 'postSchoolDataOptions', $perms);
         $this->register('GET', '/schoolDataImport/status/indicator', 'getStatusIndicator', $perms);
@@ -56,6 +55,7 @@ class Module extends BaseModule
         $this->register('GET', '/schoolDataImport/timetable/export', 'getTimetableExport', $perms);
         $this->register('GET', '/schoolDataImport/classes/export', 'getClassesExport', $perms);
     }
+
 
     /**
      * @inheritdoc
@@ -72,6 +72,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\External\ClassEntryMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\File\Mapper::class),
         );
     }
 

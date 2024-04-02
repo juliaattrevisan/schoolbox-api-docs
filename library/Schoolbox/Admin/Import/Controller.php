@@ -51,6 +51,7 @@ use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Symfony\Component\Lock\LockInterface;
+use Twig\Error\Error;
 use UnexpectedValueException;
 
 /**
@@ -72,15 +73,16 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param ConfigMapper                       $configMapper
-     * @param FieldStrategyFactory               $fieldStrategyFactory
-     * @param Rebuilder                          $rebuilder
-     * @param CacheInterface                     $oidcCache
-     * @param Mapper                             $importLogMapper
-     * @param ClientInterface                    $redisStorage
-     * @param \Schoolbox\External\Event\Mapper   $eventMapper
-     * @param ClassEntryMapper                   $classEntryMapper
+     * @param ConfigMapper $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder $rebuilder
+     * @param CacheInterface $oidcCache
+     * @param Mapper $importLogMapper
+     * @param ClientInterface $redisStorage
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param \Schoolbox\Resource\File\Mapper $fileMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -91,7 +93,8 @@ class Controller extends ConfigController
         private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Resource\File\Mapper $fileMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -105,6 +108,7 @@ class Controller extends ConfigController
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws RouteNotFound
+     * @throws Error
      */
     public function getSchoolDataIndex(): void
     {
@@ -611,19 +615,21 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_event into a csv format
      *
-     * @api /adminv2/import/schoolDataImport/timetable/export
      * @return void
      * @throws PDOException
+     * @throws \InvalidArgumentException
+     * @api /adminv2/import/schoolDataImport/timetable/export
      */
     public function getTimetableExport(): void
     {
         $content = (new Timetable($this->eventMapper))->export();
+
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', \strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
         ;
     }
 
@@ -631,19 +637,56 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_class into a csv format
      *
-     * @api /adminv2/import/schoolDataImport/classes/export
      * @return void
      * @throws PDOException
+     * @throws \InvalidArgumentException
+     * @api /adminv2/import/schoolDataImport/classes/export
      */
     public function getClassesExport(): void
     {
         $content = (new Classes($this->classEntryMapper))->export();
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', \strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"")
-        ;
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
+    }
+
+
+    /**
+     * Explicitly hard-delete a storage file corresponding to a liss payload
+     *
+     * @return void
+     */
+    public function postDeleteLissPayload(): void
+    {
+        $hash = $this->requestPost->get('hash');
+
+        if (null === $hash) {
+            return;
+        }
+
+        /* Delete from the file table, if you dragged it into Resource Browser manually
+         */
+        try {
+            $file = $this->fileMapper->findOneByColumn('hash', $hash);
+
+            $this->fileMapper->hardDelete($file);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* noop
+             * This might have been uploaded by the system, not a human
+             */
+        }
+
+        try {
+            $payload = $this->storageMapper->findByHash($hash);
+
+            $this->storageMapper->actualDelete($payload);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* noop
+             * Hash not found, for some reason; maybe deleted via another tab
+             */
+        }
     }
 }
