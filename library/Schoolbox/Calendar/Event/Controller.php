@@ -807,10 +807,8 @@ class Controller extends Base
             $eventRelations
         );
 
-        if ($this->isJsonRequest()) {
-            $this->response = $this->responseAsJson('')->withStatus(200); // HTTP success code.
-        }
-        // Else no real need to return anything.
+        // Return empty '200 OK' regardless of whether JSON was requested.
+        $this->response = $this->responseEmpty()->withStatus(200);
     }
 
 
