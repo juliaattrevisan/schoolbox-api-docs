@@ -34,12 +34,12 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/oidc/authorize', 'getAuthorization');
         $this->register(self::METHOD_POST, '/oidc/authorize', 'postAuthorization');
 
-//        // Allow/deny authorization request
-//
-//        // access token: reply to RP with an access token
-//        $this->register(self::METHOD_GET, '/oidc/token', 'getAccessTokenRequest');
-//        $this->register(self::METHOD_POST, '/oidc/token', 'postAccessTokenRequest');
-//
+        // Allow/deny authorization request links:
+
+        // access token: reply to RP with an access token
+        $this->register(self::METHOD_GET, '/oidc/token', 'getAccessTokenRequest');
+        $this->register(self::METHOD_POST, '/oidc/token', 'postAccessTokenRequest');
+
 //        // well-known URLs: JWKS?
 //        $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
     }

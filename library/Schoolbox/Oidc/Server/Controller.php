@@ -27,12 +27,18 @@ use Schoolbox\Config\ConfigMapper;
 class Controller extends Base
 {
     /**
+     * The authorization server used to service OIDC auth requests.
+     */
+    private Server\AuthorizationServer $authorizationServer;
+
+    /**
      * Constructor
      *
      * @param RelyingParty\Mapper $mapper The mapper used for fetching the relying party which is authenticating.
      */
     public function __construct(private RelyingParty\Mapper $mapper)
     {
+        $this->authorizationServer = $this->setupAuthServer();
     }
 
     /**
@@ -47,6 +53,59 @@ class Controller extends Base
      * @return void
      */
     public function getAuthorization(): void
+    {
+        $authRequest = $this->authorizationServer->validateAuthorizationRequest($this->request);
+        $authRequest->setUser(new Entity\User($this->getUser()));
+
+//        // Display confirm auth page:
+//        // this should be bypassed if the user has already given permission
+//        // for this client.
+//        // (but in this case, the access token will probably just be used)
+//        $this->response = $this->responseFromTemplateUnthemed('@oidcServer/authorization.twig', []);
+
+        // For now, auto-accept
+        $authRequest->setAuthorizationApproved(true);
+        $this->response = $this->authorizationServer->completeAuthorizationRequest($authRequest, $this->response);
+    }
+
+    /**
+     * @see getAuthorization
+     */
+    public function postAuthorization(): void
+    {
+        $this->getAuthorization();
+    }
+
+    /**
+     * Exchange a received auth code for an access token.
+     *
+     * @api   GET /oidc/token
+     * @since 24.0
+     *
+     * @return void
+     */
+    public function getAccessToken(): void
+    {
+        $this->response = $this->authorizationServer->respondToAccessTokenRequest(
+            $this->request,
+            $this->response,
+        );
+    }
+
+    /**
+     * @see getAccessToken
+     */
+    public function postAccessToken(): void
+    {
+        $this->getAccessToken();
+    }
+
+    /**
+     * Set up the authorization server.
+     *
+     * @return Server\AuthorizationServer
+     */
+    private function setupAuthServer(): Server\AuthorizationServer
     {
         $cache = new SimpleCacheBridge(
             new ItemPool(
@@ -87,21 +146,6 @@ class Controller extends Base
             new Server\Grant\ClientCredentialsGrant(),
             new DateInterval('PT1H'),
         );
-
-        $authRequest = $authServer->validateAuthorizationRequest($this->request);
-        $authRequest->setUser(new Entity\User($this->getUser()));
-
-        // Display confirm auth page:
-        // this should be bypassed if the user has already given permission
-        // for this client.
-        $this->response = $this->responseFromTemplateUnthemed('@oidcServer/authorization.twig', []);
-    }
-
-    /**
-     * @see getAuthorization
-     */
-    public function postAuthorization(): void
-    {
-        $this->getAuthorization();
+        return $authServer;
     }
 }
