@@ -11,6 +11,7 @@ namespace Schoolbox\Oidc\Server;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 
 /**
  * Module for OpenID Connect identity provision.
@@ -57,6 +58,9 @@ class Module extends BaseModule
      */
     public function buildController(): Controller
     {
-        return new Controller();
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+
+        );
     }
 }
