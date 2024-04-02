@@ -188,6 +188,7 @@ function onFocusOut() {
  * The user has hovered over the search bar
  */
 function onMouseOver() {
+    console.info("onMouseOver() e");
     isActive.value = true;
     // If left nav is unpinned and currently open, close it
     const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
@@ -208,6 +209,7 @@ function onMouseOver() {
      * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
      */
     document.querySelector("#menu-toggle")?.classList.add("search-is-active");
+    console.info("onMouseOver() x");
 }
 
 /**
@@ -215,9 +217,12 @@ function onMouseOver() {
  * if focus is still on the search input
  */
 function onMouseOut() {
+    console.info("onMouseOut() e");
     if (!isFocused.value) {
+        console.info("onMouseOut() setting isActive to false");
         isActive.value = false;
     }
+    console.info("onMouseOut() x");
 }
 
 /**
@@ -322,7 +327,7 @@ const searchButtonText = window.Vue.computed(() => {
                     }`"
                     :href="result.url"
                     :data-test="`header-search-page-result-link-${result.title}`"
-                    @mouseover="arrowCounter = i + userResults.length"
+                    @mouseover="arrowCounter = i + pageResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
