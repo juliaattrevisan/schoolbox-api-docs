@@ -86,6 +86,7 @@
             <tr>
                 <th>Filename</th>
                 <th>Created</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -97,6 +98,14 @@
                 <td>
                     {{ file.createdAt.local }}
                 </td>
+                {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postDeleteLissPayload') %}
+                {% if deleteRoute %}
+                    <td class="actions-small-1">
+                        <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete="{{ file.hash }}"></a></nav>
+                    </td>
+                {% else %}
+                    <td></td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
