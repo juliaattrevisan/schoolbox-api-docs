@@ -27,7 +27,7 @@ class Scope implements ScopeRepositoryInterface
     /**
      * Scope for profile details about the identity.
      */
-    public const SCOPE_PROFILE = 'basic';
+    public const SCOPE_PROFILE = 'profile';
 
     /**
      * Scope for the identity's email address.
@@ -58,7 +58,7 @@ class Scope implements ScopeRepositoryInterface
      */
     public function getScopeEntityByIdentifier($identifier): ?ScopeEntityInterface
     {
-        if (array_key_exists($identifier, self::AVAILABLE_SCOPES) === false) {
+        if (!in_array($identifier, self::AVAILABLE_SCOPES)) {
             return null;
         }
 
