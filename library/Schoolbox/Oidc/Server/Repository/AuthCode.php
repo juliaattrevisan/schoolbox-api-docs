@@ -56,9 +56,10 @@ class AuthCode implements AuthCodeRepositoryInterface
 
         // TODO figure out how to serialize an auth code gets serialized:
         //      may need to put this in DB after all.
+        //      Actually, does it even matter? It's never unserialized AFAICT
         $this->cache->set(
             $this->keyGenerator->generateKey($identifier),
-            $authCodeEntity->__toString(),
+            $identifier,
             $authCodeEntity->getExpiryDateTime()->diff(
                 Alaress_Date_Format::now()->getDateTimeObject()
             ),

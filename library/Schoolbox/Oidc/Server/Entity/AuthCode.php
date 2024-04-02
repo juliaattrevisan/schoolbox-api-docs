@@ -9,10 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server\Entity;
 
-use DateTimeImmutable;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
-use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Entities\Traits\AuthCodeTrait;
 use League\OAuth2\Server\Entities\Traits\TokenEntityTrait;
 
