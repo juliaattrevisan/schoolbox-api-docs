@@ -95,7 +95,7 @@ class Controller extends Base
     {
         $this->response = $this->authServer->respondToAccessTokenRequest(
             $this->request,
-            $this->response,
+            $this->responseEmpty(),
         );
     }
 
