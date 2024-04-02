@@ -24,6 +24,9 @@ $app = new class extends CliTool\App {
         $log = $this->getLogger();
         $quoter = $dbc->getQuoter();
 
+        // Disable max_statement_time limit to prevent timeouts during creation of fulltext indexes below.
+        $dbc->execute('SET SESSION max_statement_time=0');
+
         // Create a custom stopwords list that is the same as the default list except for the inclusion of 'and'.
         $dbc->execute(
             'CREATE TABLE IF NOT EXISTS' . $quoter->quoteIdentifier(self::STOPWORDS_TABLE_NAME) . '
