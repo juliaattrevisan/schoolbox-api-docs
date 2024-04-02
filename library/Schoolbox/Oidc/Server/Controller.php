@@ -114,7 +114,7 @@ class Controller extends Base
         $this->response = $this->responseAsJson([
             'issuer'                                => $baseUrl,
             'authorization_endpoint'                => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAuthorization')),
-            'token_endpoint'                        => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAccessToken')),
+            'token_endpoint'                        => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAccessTokenRequest')),
             'jwks_uri'                              => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getJsonWebKeySet')),
             'scopes_supported'                      => Repository\Scope::AVAILABLE_SCOPES,
             'response_types_supported'              => ['code', 'id_token', 'id_token token'],
