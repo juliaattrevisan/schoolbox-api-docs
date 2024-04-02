@@ -91,7 +91,7 @@ class Controller extends Base
      *
      * @return void
      */
-    public function getAccessToken(): void
+    public function getAccessTokenRequest(): void
     {
         $this->response = $this->authServer->respondToAccessTokenRequest(
             $this->request,
@@ -102,9 +102,9 @@ class Controller extends Base
     /**
      * @see getAccessToken
      */
-    public function postAccessToken(): void
+    public function postAccessTokenRequest(): void
     {
-        $this->getAccessToken();
+        $this->getAccessTokenRequest();
     }
 
     /**
