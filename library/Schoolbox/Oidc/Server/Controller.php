@@ -72,7 +72,7 @@ class Controller extends Base
 
         // For now, auto-accept
         $authRequest->setAuthorizationApproved(true);
-        $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->response);
+        $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
     }
 
     /**
