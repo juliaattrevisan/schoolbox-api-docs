@@ -171,7 +171,7 @@ class JwtFactory
             '%s/%s:%s',
             $this->cohortDashboardBaseUrl,
             $cohortType,
-            urlencode($cohortIdentifier),
+            rawurlencode($cohortIdentifier),
         );
         return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
     }
