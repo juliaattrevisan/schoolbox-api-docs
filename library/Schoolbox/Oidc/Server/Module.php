@@ -9,8 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server;
 
+use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Twig\Loader\IChainLoader;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
+use DateInterval;
+use League\OAuth2\Server;
+use OpenIDConnectServer\ClaimExtractor;
+use OpenIDConnectServer\Entities\ClaimSetEntity;
+use OpenIDConnectServer\IdTokenResponse;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\UserMapper;
 
@@ -59,9 +69,70 @@ class Module extends BaseModule
      */
     public function buildController(): Controller
     {
+        // Set up auth server and all of its dependencies
+        $relyingPartyMapper = $this->getMapperFactory()->get(Mapper::class);
+        $userMapper         = $this->getMapperFactory()->get(UserMapper::class);
+        $cache              = new SimpleCacheBridge(
+            new ItemPool(
+                $this->injector->get('redis.cache'),
+                new Base64(),
+                new KeyGenerator('oauth', INSTANCE_ID),
+            )
+        );
+
+        // Set up various repositories
+        $clientRepository       = new Repository\Client($relyingPartyMapper);
+        $scopeRepository        = new Repository\Scope();
+        $accessTokenRepository  = new Repository\AccessToken($cache, new KeyGenerator('accessToken'));
+        $authCodeRepository     = new Repository\AuthCode($cache, new KeyGenerator('authCode'));
+        $refreshTokenRepository = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
+        $idTokenRepository      = new Repository\Identity($userMapper);
+
+        // Claim extractor: include Schoolbox's custom claims
+        $claimExtractor = new ClaimExtractor(
+            new ClaimSetEntity(
+                'https://schoolbox.education/',
+                [
+                    'https://schoolbox.education/instance_id',
+                    'https://schoolbox.education/external_id',
+                    'https://schoolbox.education/role_type',
+                ]
+            )
+        );
+
+        // The actual auth server
+        $authServer = new Server\AuthorizationServer(
+            $clientRepository,
+            $accessTokenRepository,
+            $scopeRepository,
+            $this->getConfig()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+            $this->getConfig()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            new IdTokenResponse($idTokenRepository, $claimExtractor),
+        );
+
+        // Auth code grant:
+        // auth codes expire after 10 minutes, refresh tokens after 1 month
+        $authCodeGrant = new Server\Grant\AuthCodeGrant(
+            $authCodeRepository,
+            $refreshTokenRepository,
+            new DateInterval('PT10M'),
+        );
+        $authCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
+        $authServer->enableGrantType($authCodeGrant);
+
+        // Refresh code grant: expires after 1 month
+        $refreshCodeGrant = new Server\Grant\RefreshTokenGrant($refreshTokenRepository);
+        $refreshCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
+        $authServer->enableGrantType($refreshCodeGrant);
+
+        // Client credentials grant: access tokens expire after 1 hour
+        $authServer->enableGrantType(
+            new Server\Grant\ClientCredentialsGrant(),
+            new DateInterval('PT1H'),
+        );
+
         return new Controller(
-            $this->getMapperFactory()->get(Mapper::class),
-            $this->getMapperFactory()->get(UserMapper::class),
+            $authServer,
             $this->injector->get('lti.keyChains'),
         );
     }

@@ -9,21 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server;
 
-use Alaress\Codec\Json\Base64;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
-use DateInterval;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
-use OpenIDConnectServer\ClaimExtractor;
-use OpenIDConnectServer\Entities\ClaimSetEntity;
-use OpenIDConnectServer\IdTokenResponse;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
-use Schoolbox\UserMapper;
 
 /**
  * Controller for OpenID Connect identity provision.
@@ -34,26 +24,16 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /**
-     * The authorization server used to service OIDC auth requests.
-     */
-    private Server\AuthorizationServer $authorizationServer;
-
-    /**
      * Constructor
      *
-     * @param RelyingParty\Mapper         $mapper     The mapper used for fetching the relying party which is currently
-     *                                                authenticating.
-     * @param UserMapper                  $userMapper Mapper for fetching users.
+     * @paramServer\AuthorizationServer   $authServer The authorization server used to service OIDC auth requests.
      * @param KeyChainRepositoryInterface $keyChains  Repository of keychains: set up for LTI, but usable outside of
      *                                                that context.
      */
     public function __construct(
-        private RelyingParty\Mapper $mapper,
-        private UserMapper $userMapper,
+        private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
-    )
-    {
-        $this->authorizationServer = $this->setupAuthServer();
+    ) {
     }
 
     /**
@@ -69,7 +49,7 @@ class Controller extends Base
      */
     public function getAuthorization(): void
     {
-        $authRequest = $this->authorizationServer->validateAuthorizationRequest($this->request);
+        $authRequest = $this->authServer->validateAuthorizationRequest($this->request);
         $authRequest->setUser(new Entity\User($this->getUser()));
 
 //        // Display confirm auth page:
@@ -82,7 +62,7 @@ class Controller extends Base
 
         // For now, auto-accept
         $authRequest->setAuthorizationApproved(true);
-        $this->response = $this->authorizationServer->completeAuthorizationRequest($authRequest, $this->response);
+        $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->response);
     }
 
     /**
@@ -103,7 +83,7 @@ class Controller extends Base
      */
     public function getAccessToken(): void
     {
-        $this->response = $this->authorizationServer->respondToAccessTokenRequest(
+        $this->response = $this->authServer->respondToAccessTokenRequest(
             $this->request,
             $this->response,
         );
@@ -115,76 +95,6 @@ class Controller extends Base
     public function postAccessToken(): void
     {
         $this->getAccessToken();
-    }
-
-    /**
-     * Set up the authorization server.
-     *
-     * @return Server\AuthorizationServer
-     */
-    private function setupAuthServer(): Server\AuthorizationServer
-    {
-        // Cache, for storing access tokens / auth codes / refresh tokens
-        // TODO consider replacing with database?
-        $cache = new SimpleCacheBridge(
-            new ItemPool(
-                $this->getDi()->get('redis.cache'),
-                new Base64(),
-                new KeyGenerator('oauth', INSTANCE_ID),
-            )
-        );
-
-        // Set up various repositories
-        $clientRepository       = new Repository\Client($this->mapper);
-        $scopeRepository        = new Repository\Scope();
-        $accessTokenRepository  = new Repository\AccessToken($cache, new KeyGenerator('accessToken'));
-        $authCodeRepository     = new Repository\AuthCode($cache, new KeyGenerator('authCode'));
-        $refreshTokenRepository = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
-        $idTokenRepository      = new Repository\Identity($this->userMapper);
-
-        // Claim extractor: include Schoolbox's custom claims
-        $claimExtractor = new ClaimExtractor(
-            new ClaimSetEntity(
-                'https://schoolbox.education/',
-                [
-                    'https://schoolbox.education/instance_id',
-                    'https://schoolbox.education/external_id',
-                    'https://schoolbox.education/role_type',
-                ]
-            )
-        );
-
-        // The actual auth server
-        $authServer = new Server\AuthorizationServer(
-            $clientRepository,
-            $accessTokenRepository,
-            $scopeRepository,
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            new IdTokenResponse($idTokenRepository, $claimExtractor),
-        );
-
-        // Auth code grant:
-        // auth codes expire after 10 minutes, refresh tokens after 1 month
-        $authCodeGrant = new Server\Grant\AuthCodeGrant(
-            $authCodeRepository,
-            $refreshTokenRepository,
-            new DateInterval('PT10M'),
-        );
-        $authCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
-        $authServer->enableGrantType($authCodeGrant);
-
-        // Refresh code grant: expires after 1 month
-        $refreshCodeGrant = new Server\Grant\RefreshTokenGrant($refreshTokenRepository);
-        $refreshCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
-        $authServer->enableGrantType($refreshCodeGrant);
-
-        // Client credentials grant: access tokens expire after 1 hour
-        $authServer->enableGrantType(
-            new Server\Grant\ClientCredentialsGrant(),
-            new DateInterval('PT1H'),
-        );
-        return $authServer;
     }
 
     /**
