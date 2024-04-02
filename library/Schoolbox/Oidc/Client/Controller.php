@@ -117,7 +117,7 @@ class Controller extends Base
             // Also: some providers may provide the identifying claim as part of
             // a non-standard scope?
             'scope'         => 'openid email profile',
-            'response_type' => 'code token',
+            'response_type' => 'code',
             'response_mode' => 'form_post',
             'state'         => $this->buildState($nonce),
             'nonce'         => $nonce,
