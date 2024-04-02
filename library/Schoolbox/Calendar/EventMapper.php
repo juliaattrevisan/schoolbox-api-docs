@@ -717,7 +717,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     public function populateGuests($event)
     {
         $guests = AttendanceMapper::getInstance()->findAttendances($event);
-        $event->setGuests(array_column($guests, 'id'));
+        $event->setGuests(new Collection(array_column($guests, 'id')));
         return $event;
     }
 
