@@ -75,7 +75,7 @@ window.Vue.onMounted(() => {
                     <course-builder-rows :available-templates="props.availableTemplates" />
                     <div class="component-action">
                         <section>
-                            <a class="button" @click.prevent="onAddNewRow">Add New Framework</a>
+                            <a class="button" @click.prevent="onAddNewRow">Add Framework</a>
                         </section>
                     </div>
                 </div>
