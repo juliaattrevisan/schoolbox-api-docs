@@ -141,6 +141,11 @@ class Controller extends Base
         $authCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
         $authServer->enableGrantType($authCodeGrant);
 
+        // Refresh code grant: expires after 1 month
+        $refreshCodeGrant = new Server\Grant\RefreshTokenGrant($refreshTokenRepository);
+        $refreshCodeGrant->setRefreshTokenTTL(new DateInterval('P1M'));
+        $authServer->enableGrantType($refreshCodeGrant);
+
         // Client credentials grant: access tokens expire after 1 hour
         $authServer->enableGrantType(
             new Server\Grant\ClientCredentialsGrant(),
