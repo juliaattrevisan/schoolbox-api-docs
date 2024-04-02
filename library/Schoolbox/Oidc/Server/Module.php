@@ -12,6 +12,7 @@ namespace Schoolbox\Oidc\Server;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
+use Schoolbox\UserMapper;
 
 /**
  * Module for OpenID Connect identity provision.
@@ -40,8 +41,8 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/oidc/token', 'getAccessTokenRequest');
         $this->register(self::METHOD_POST, '/oidc/token', 'postAccessTokenRequest');
 
-//        // well-known URLs: JWKS?
-//        $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
+        // well-known URLs: JWKS?
+        $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
     }
 
     /**
@@ -60,7 +61,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
-
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->injector->get('lti.keyChains'),
         );
     }
 }

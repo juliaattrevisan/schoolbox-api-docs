@@ -16,10 +16,13 @@ use Alaress\Web\Controller\Base;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use DateInterval;
 use League\OAuth2\Server;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OpenIDConnectServer\ClaimExtractor;
 use OpenIDConnectServer\Entities\ClaimSetEntity;
 use OpenIDConnectServer\IdTokenResponse;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\UserMapper;
 
 /**
@@ -38,9 +41,17 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param RelyingParty\Mapper $mapper The mapper used for fetching the relying party which is authenticating.
+     * @param RelyingParty\Mapper         $mapper     The mapper used for fetching the relying party which is currently
+     *                                                authenticating.
+     * @param UserMapper                  $userMapper Mapper for fetching users.
+     * @param KeyChainRepositoryInterface $keyChains  Repository of keychains: set up for LTI, but usable outside of
+     *                                                that context.
      */
-    public function __construct(private RelyingParty\Mapper $mapper)
+    public function __construct(
+        private RelyingParty\Mapper $mapper,
+        private UserMapper $userMapper,
+        private KeyChainRepositoryInterface $keyChains,
+    )
     {
         $this->authorizationServer = $this->setupAuthServer();
     }
@@ -66,6 +77,8 @@ class Controller extends Base
 //        // for this client.
 //        // (but in this case, the access token will probably just be used)
 //        $this->response = $this->responseFromTemplateUnthemed('@oidcServer/authorization.twig', []);
+
+        // Could set redirect URI based on what's in the request?
 
         // For now, auto-accept
         $authRequest->setAuthorizationApproved(true);
@@ -127,7 +140,7 @@ class Controller extends Base
         $accessTokenRepository  = new Repository\AccessToken($cache, new KeyGenerator('accessToken'));
         $authCodeRepository     = new Repository\AuthCode($cache, new KeyGenerator('authCode'));
         $refreshTokenRepository = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
-        $idTokenRepository      = new Repository\Identity(UserMapper::getInstance());
+        $idTokenRepository      = new Repository\Identity($this->userMapper);
 
         // Claim extractor: include Schoolbox's custom claims
         $claimExtractor = new ClaimExtractor(
@@ -172,5 +185,22 @@ class Controller extends Base
             new DateInterval('PT1H'),
         );
         return $authServer;
+    }
+
+    /**
+     * Generate a JSON Web Key Set (JWKS).
+     *
+     * Copied from `\Schoolbox\LTI\Platform\Controller::getJsonWebKeySet`:
+     * however, this is in a more generic location.
+     *
+     * @api   GET /.well-known/jwks.json
+     * @since 24.0
+     */
+    public function getJsonWebKeySet(): void
+    {
+        $jwksExporter   = new JwksExporter($this->keyChains);
+        $this->response = $this->responseAsJson(
+            $jwksExporter->export(RepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME),
+        );
     }
 }
