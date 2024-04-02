@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
 
@@ -51,7 +52,15 @@ class Controller extends Base
     public function getAuthorization(): void
     {
         $authRequest = $this->authServer->validateAuthorizationRequest($this->request);
-        $authRequest->setUser(new Entity\User($this->getUser()));
+
+        // There needs to be a currently authenticated user:
+        // If nobody's logged in, and logging in with client credentials:
+        // auth as whoever's configured, otherwise return 403.
+        $user = $this->getUser();
+        if (!$user->getId()) {
+            throw new NotAuthenticated();
+        }
+        $authRequest->setUser(new Entity\User($user));
 
 //        // Display confirm auth page:
 //        // this should be bypassed if the user has already given permission
