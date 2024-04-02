@@ -728,25 +728,25 @@ class Controller extends Base
                     // The returned keys and values match the keys and values expected by this function in $this->requestPost.
                     'id' => $event->getId(),
                     'userId' => $event->getOwner()->getId(),
-                    'authorId'=> $event->getAuthor()->getId(),
-                    'allDay'=> $event->getAllDay(),
-                    'efficacy'=> $efficacy,
-                    'title'=> $event->getTitle(),
-                    'startDate'=> $event->getStartDateTime()->getLocal(),
-                    'endDate'=> $event->getEndDateTime()->getLocal(),
-                    'repeat'=> $repeat,
-                    'repeat_until'=> $untilDate->getLocal(),
-                    'type'=> $event->getType()->getId(),
-                    'location'=> $event->getLocation(),
-                    'detail'=> $event->getDetail(),
-                    'publishDate'=> $event->getPublishDateTime()->getLocal(),
-                    'level'=> $accessLevel,
-                    'roles'=> $event->getRoleCollection(), // NOTE: This returns a collection of IDs, not objects.
-                    'campus'=> $event->getCampusCollection(), // NOTE: This returns a collection of IDs, not objects.
-                    'attendance'=> $event->getAttendance(),
-                    'guests'=> implode(',', $event->getGuests()->getAll()), // Return comma-separated string to match $this->requestPost.
-                    'maxAttendees'=> $event->getMaxAttendees(),
-                    'showAttendees'=> $event->getShowAttendees() ? 1 : 0,
+                    'authorId' => $event->getAuthor()->getId(),
+                    'allDay' => $event->getAllDay(),
+                    'efficacy' => $efficacy,
+                    'title' => $event->getTitle(),
+                    'startDate' => $event->getStartDateTime()->getLocal(),
+                    'endDate' => $event->getEndDateTime()->getLocal(),
+                    'repeat' => $repeat,
+                    'repeat_until' => $untilDate->getLocal(),
+                    'type' => $event->getType()->getId(),
+                    'location' => $event->getLocation(),
+                    'detail' => $event->getDetail(),
+                    'publishDate' => $event->getPublishDateTime()->getLocal(),
+                    'level' => $accessLevel,
+                    'roles' => $event->getRoleCollection(), // NOTE: This returns a collection of IDs, not objects.
+                    'campus' => $event->getCampusCollection(), // NOTE: This returns a collection of IDs, not objects.
+                    'attendance' => $event->getAttendance(),
+                    'guests' => implode(',', $event->getGuests()->getAll()), // Return comma-separated string to match $this->requestPost.
+                    'maxAttendees' => $event->getMaxAttendees(),
+                    'showAttendees' => $event->getShowAttendees() ? 1 : 0,
                 ]
             );
         } else {
