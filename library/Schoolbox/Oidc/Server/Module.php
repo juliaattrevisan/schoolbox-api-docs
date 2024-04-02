@@ -131,6 +131,12 @@ class Module extends BaseModule
             new DateInterval('PT1H'),
         );
 
+        // Implicit grant: apparently deprecated, but is required according to:
+        // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+        // Nonetheless, access tokens expire after 1 hour
+        $implicitGrant = new Server\Grant\ImplicitGrant(new DateInterval('PT1H'));
+        $authServer->enableGrantType($implicitGrant);
+
         return new Controller(
             $authServer,
             $this->injector->get('lti.keyChains'),
