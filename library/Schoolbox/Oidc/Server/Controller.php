@@ -16,7 +16,11 @@ use Alaress\Web\Controller\Base;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use DateInterval;
 use League\OAuth2\Server;
+use OpenIDConnectServer\ClaimExtractor;
+use OpenIDConnectServer\Entities\ClaimSetEntity;
+use OpenIDConnectServer\IdTokenResponse;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for OpenID Connect identity provision.
@@ -107,6 +111,8 @@ class Controller extends Base
      */
     private function setupAuthServer(): Server\AuthorizationServer
     {
+        // Cache, for storing access tokens / auth codes / refresh tokens
+        // TODO consider replacing with database?
         $cache = new SimpleCacheBridge(
             new ItemPool(
                 $this->getDi()->get('redis.cache'),
@@ -115,20 +121,34 @@ class Controller extends Base
             )
         );
 
+        // Set up various repositories
         $clientRepository       = new Repository\Client($this->mapper);
         $scopeRepository        = new Repository\Scope();
         $accessTokenRepository  = new Repository\AccessToken($cache, new KeyGenerator('accessToken'));
         $authCodeRepository     = new Repository\AuthCode($cache, new KeyGenerator('authCode'));
         $refreshTokenRepository = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
+        $idTokenRepository      = new Repository\Identity(UserMapper::getInstance());
 
-        // generate using base64_encode(random_bytes(32))
-        $encryptionKey = 'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen';
-        $authServer    = new Server\AuthorizationServer(
+        // Claim extractor: include Schoolbox's custom claims
+        $claimExtractor = new ClaimExtractor(
+            new ClaimSetEntity(
+                'https://schoolbox.education/',
+                [
+                    'https://schoolbox.education/instance_id',
+                    'https://schoolbox.education/external_id',
+                    'https://schoolbox.education/role_type',
+                ]
+            )
+        );
+
+        // The actual auth server
+        $authServer = new Server\AuthorizationServer(
             $clientRepository,
             $accessTokenRepository,
             $scopeRepository,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            $encryptionKey,
+            new IdTokenResponse($idTokenRepository, $claimExtractor),
         );
 
         // Auth code grant:
