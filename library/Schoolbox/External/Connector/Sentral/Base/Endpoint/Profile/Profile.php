@@ -86,6 +86,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Campuses are separated by semicolons here.
+     */
+    private const CAMPUS_SEPARATOR = ';';
+
+
+    /**
      * @var ValidStrats
      */
     private ValidStrats $validStrats;
@@ -289,7 +295,7 @@ class Profile implements IStrategy
 
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
-                $campusName = $this->findCampusName($student);
+                $campusName = $this->findCampusName($student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null);
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
@@ -663,12 +669,11 @@ class Profile implements IStrategy
      * Assign campuses if they exist in the mapping
      * Otherwise quietly disregard bad data
      *
-     * @param array $student
+     * @param string|null $campusId
      * @return string|null
      */
-    private function findCampusName(array $student): ?string
+    private function findCampusName(?string $campusId): ?string
     {
-        $campusId = $student['relationships']['primaryEnrolment']['data']['relationships']['campus']['data']['id'] ?? null;
         $campusName = null;
 
         if (null !== $campusId) {
@@ -1220,7 +1225,28 @@ class Profile implements IStrategy
                 ]);
 
                 $building = '';
-                $campusName = '';
+
+                /* Aggregate multiple staff campuses/campii from all their employments, I guess
+                 */
+                $campuses = [];
+
+                /* For some reason, sentral staff don't always have an Employments node lol
+                 * A staff member with no record of employment is strange, but ok
+                 */
+                if (isset($staff['relationships']['employments'])) {
+                    foreach ($staff['relationships']['employments']['data'] as $employment) {
+                        /* Apparently, campuses are optional too...
+                         */
+                        if (isset($employment['relationships']['campusLocations'])) {
+                            foreach ($employment['relationships']['campusLocations']['data'] as $campus) {
+                                $campuses[] = $this->findCampusName($campus['id']);
+                            }
+                        }
+                    }
+                }
+
+                $campusName = implode(self::CAMPUS_SEPARATOR . ' ', $campuses);
+
                 $category = trim((string)$staff['attributes']['employmentClassification']);
                 $department = '';
                 $email = trim((string)$staff['relationships']['person']['data']['attributes']['email']);
