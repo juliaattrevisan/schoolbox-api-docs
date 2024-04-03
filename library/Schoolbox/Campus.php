@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
  *
  * @package Schoolbox
  */
-class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
+class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable, \JsonSerializable
 {
     use ModelTrait\HasSequence;
     use ModelTrait\UpdatedBy;
@@ -151,6 +151,24 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
         return [
             'value' => $this->getId(),
             'label' => $this->getName(),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'extTimetableCode' => $this->extTimetableCode,
+            'timetableDay' => $this->timetableDay,
+            'sequence' => $this->sequence,
+            'updatedBy' => $this->getUpdatedBy(),
+            'createdAt' => $this->createdAt?->getJson(),
+            'updatedAt' => $this->updatedAt?->getJson(),
+            'deletedAt' => $this->deletedAt?->getJson(),
         ];
     }
 }
