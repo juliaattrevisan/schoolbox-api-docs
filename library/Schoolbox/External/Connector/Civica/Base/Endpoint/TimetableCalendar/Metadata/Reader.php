@@ -20,7 +20,19 @@ class Reader
      */
     public function getAttendanceLink(array|string $metadata): ?string
     {
-        return $this->deserialize($metadata)['links']['attendance'] ?? null;
+        $attendanceUrl = $this->deserialize($metadata)['links']['attendance'] ?? null;
+
+        if (null === $attendanceUrl) {
+            return null;
+        }
+
+        /* Slap it into a format that our iframer can use
+         * I don't have access to a $router here, so I guess we have to harcode it for now
+         */
+        return sprintf(
+            '/iframe/civica/attendance/%s',
+            base64_encode($attendanceUrl)
+        );
     }
 
 
