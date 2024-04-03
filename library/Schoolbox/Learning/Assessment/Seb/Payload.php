@@ -163,7 +163,10 @@ class Payload
             "{$quizStartUrl}*",
             "{$domain}/storage/fetch.php*",
             "{$domain}/storage/image.php*",
-            "{$domain}/cms/sendVideo.php*"
+            "{$domain}/cms/sendVideo.php*",
+            /* We married learnosity and need to allow all their stuff
+             */
+            "https://*.learnosity.com/*",
         ];
 
         if ($this->config->get('saml_enabled')) {
