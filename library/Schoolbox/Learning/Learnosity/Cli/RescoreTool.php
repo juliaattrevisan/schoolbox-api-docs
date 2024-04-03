@@ -144,6 +144,8 @@ HELP;
                 'Assessment %s has no item references in learnosity; exiting',
                 $assessment->getId()
             ));
+
+            exit(1);
         }
 
         /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
