@@ -676,7 +676,10 @@ class Controller extends Base
             } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
                 // Guests can also be supplied as a comma-separated string of userIds.
                 // This method is used by the form at route calendarEvent.getModify.
-                $guests = explode(',', $this->requestPost['guests']);
+                $guests = array_map(
+                    fn($guestId) => (int)$guestId,
+                    explode(',', $this->requestPost['guests'])
+                );
             }
         }
 
@@ -750,7 +753,7 @@ class Controller extends Base
                     'roles' => $event->getRoleCollection(), // NOTE: This returns a collection of IDs, not objects.
                     'campus' => $event->getCampusCollection(), // NOTE: This returns a collection of IDs, not objects.
                     'attendance' => $event->getAttendance(),
-                    'guests' => implode(',', $event->getGuests()->getAll()), // Return comma-separated string to match $this->requestPost.
+                    'guests' => $event->getGuests()->getAll(),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees() ? 1 : 0,
                 ]
