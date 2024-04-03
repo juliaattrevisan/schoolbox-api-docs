@@ -109,10 +109,7 @@ HELP;
             /* This somehow found to be a survey, not a quiz.
              * How this could be possible is a mystery except due to dev mistake
              */
-            $this->getLogger()->warning(sprintf(
-                'Assessment %s was found to be a survey somehow; exiting',
-                $assessment->getId()
-            ));
+            $this->getLogger()->warning($e->getMessage());
 
             exit(1);
         }
@@ -239,6 +236,15 @@ HELP;
     {
         /** @var Quiz $quiz */
         $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        /* Not a quiz
+         */
+        if (null === $quiz) {
+            throw new \RuntimeException(sprintf(
+                'Assessment id %s is not a quiz.',
+                $assessmentId
+            ));
+        }
 
         if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
             throw new \RuntimeException(sprintf(
