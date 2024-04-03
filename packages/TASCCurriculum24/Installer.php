@@ -13,4 +13,9 @@ class Installer extends Package\BaseCurriculum
      * @inheritdoc
      */
     protected string $sourceFile = __DIR__ . '/curriculum.csv';
+
+    /**
+     * @inheritdoc
+     */
+    protected array $requiredPackages = ['TASCCurriculum'];
 }
