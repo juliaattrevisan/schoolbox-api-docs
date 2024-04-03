@@ -753,10 +753,10 @@ class Controller extends Base
                     'detail' => $event->getDetail(),
                     'publishDate' => $event->getPublishDateTime()->getLocal(),
                     'level' => $accessLevel,
-                    'roles' => $event->getRoleCollection(), // NOTE: This returns a collection of IDs, not objects.
-                    'campus' => $event->getCampusCollection(), // NOTE: This returns a collection of IDs, not objects.
+                    'roles' => $this->roleMapper->findByColumn('id', $event->getRoleCollection()),
+                    'campus' => $this->campusMapper->findByColumn('id', $event->getCampusCollection()),
                     'attendance' => $event->getAttendance(),
-                    'guests' => $event->getGuests()->getAll(),
+                    'guests' => $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees() ? 1 : 0,
                 ]
@@ -881,7 +881,7 @@ class Controller extends Base
     }
 
     /**
-     * @param array $items of digit strings or (arrays an 'id' key (e.g. ["id" => 123])
+     * @param array $items of digit strings or (arrays containing an 'id' key (e.g. ["id" => 123])
      * @return array of integers
      */
     private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
