@@ -49,10 +49,11 @@ class User implements UserEntityInterface, ClaimSetInterface
     {
         return [
             // Profile claims
-            'name'        => $this->user->getFullName(),
-            'given_name'  => $this->user->getFirstname(),
-            'family_name' => $this->user->getLastname(),
-            'nickname'    => $this->user->getGivenName(),
+            'name'               => $this->user->getFullName(),
+            'given_name'         => $this->user->getFirstname(),
+            'family_name'        => $this->user->getLastname(),
+            'nickname'           => $this->user->getGivenName(),
+            'preferred_username' => $this->user->getUsername(),
 
             // Email claims: assume email is verified
             'email'          => $this->user->getEmail(),
