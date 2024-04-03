@@ -19,7 +19,6 @@ use DateInterval;
 use League\OAuth2\Server;
 use OpenIDConnectServer\ClaimExtractor;
 use OpenIDConnectServer\Entities\ClaimSetEntity;
-use OpenIDConnectServer\IdTokenResponse;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
@@ -109,7 +108,7 @@ class Module extends BaseModule
             $scopeRepository,
             $this->getConfig()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             $this->getConfig()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            new IdTokenResponse($idTokenRepository, $claimExtractor),
+            new Response\IdToken($idTokenRepository, $claimExtractor),
         );
 
         // Auth code grant:
