@@ -553,6 +553,7 @@ class Controller extends Base
      * @throws LogicException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Exception
      */
     public function postModify(Event $event): void
     {
@@ -576,15 +577,16 @@ class Controller extends Base
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders     = array_map('intval', $this->requestPost['folder'] ?? []);
-        $campuses    = array_map('intval', $this->requestPost['campus'] ?? []);
         $accessLevel = (int)($this->requestPost['level'] ?? null);
         $eventTypeId = (int)($this->requestPost['type'] ?? null);
         $title       = $this->requestPost['title'] ?? null;
         $location    = $this->requestPost['location'] ?? null;
         $detail      = $this->requestPost['detail'] ?? null;
         $allDay      = (int)($this->requestPost['allDay'] ?? null);
-        $roles       = $this->requestPost['roles'] ?? [];
+
+        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folder'] ?? []);
+        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campus'] ?? []);
+        $roles    = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['roles'] ?? []);
 
         /* Recurrence settings
          */
@@ -670,9 +672,10 @@ class Controller extends Base
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
             if (is_array($this->requestPost['guests'])) {
-                // Guests can also be supplied as an array of userIds.
-                // This method is documented at api.schoolbox.com.au.
-                $guests = $this->requestPost['guests'];
+                // Guests can be supplied as an array of userIds, or an array of JSON objects.
+                // The array of userIds method is for similarity with 'roles', 'campus', and 'folder'.
+                // The object stub method is documented at api.schoolbox.com.au.
+                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['guests'] ?? []);
             } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
                 // Guests can also be supplied as a comma-separated string of userIds.
                 // This method is used by the form at route calendarEvent.getModify.
@@ -875,5 +878,32 @@ class Controller extends Base
                 $this->response = $this->redirectFound($redirect);
             }
         }
+    }
+
+    /**
+     * @param array $items of digit strings or (arrays an 'id' key (e.g. ["id" => 123])
+     * @return array of integers
+     */
+    private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
+    {
+        $integers = [];
+
+        foreach ($items as $item) {
+            if (is_int($item)) {
+                $integers[] = $item;
+            } elseif (is_string($item) && ctype_digit($item)) {
+                $integers[] = (int)$item;
+            } elseif (is_array($item) && array_key_exists('id', $item)) {
+                if (is_int($item['id']) || ctype_digit($item['id'])) {
+                    $integers[] = (int)$item['id'];
+                } else {
+                    throw new InvalidArgumentException("Value for key 'id' must be integer or digit string.");
+                }
+            } else {
+                throw new InvalidArgumentException("Value must be integer or digit string or array with 'id' key.");
+            }
+        }
+
+        return $integers;
     }
 }
