@@ -123,7 +123,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_question question ON section.section_id = question.section_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             AND question.deleted_at IS NULL
@@ -136,7 +136,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_section section ON assess.assess_id = section.assess_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             GROUP BY assess.assess_id
@@ -144,7 +144,7 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND deleted_at IS NULL
-        AND learnosity_reference IS NULL
+        AND (learnosity_reference IS NULL OR learnosity_reference = '')
         AND external_id IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) <= :payloadSize
     ";
@@ -173,7 +173,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_question question ON section.section_id = question.section_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             AND question.deleted_at IS NULL
@@ -186,7 +186,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_section section ON assess.assess_id = section.assess_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             GROUP BY assess.assess_id
@@ -194,7 +194,7 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND deleted_at IS NULL
-        AND learnosity_reference IS NULL
+        AND (learnosity_reference IS NULL OR learnosity_reference = '')
         AND external_id IS NULL
         AND (COALESCE(a.numQuestions, 0) + COALESCE(b.numSections, 0)) > :payloadSize
     ";
@@ -242,7 +242,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_question question ON section.section_id = question.section_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             AND question.deleted_at IS NULL
@@ -255,7 +255,7 @@ class ImporterTool extends CliTool\App
             INNER JOIN assess_section section ON assess.assess_id = section.assess_id
             WHERE assess.deleted_at IS NULL
             AND assess.availability = 'assess'
-            AND assess.learnosity_reference IS NULL
+            AND (assess.learnosity_reference IS NULL OR assess.learnosity_reference = '')
             AND assess.external_id IS NULL
             AND section.deleted_at IS NULL
             GROUP BY assess.assess_id
@@ -263,7 +263,7 @@ class ImporterTool extends CliTool\App
         ) b ON assess.assess_id = b.assess_id
         WHERE availability = 'assess'
         AND assessment_id = :assessmentId
-        AND learnosity_reference IS NULL
+        AND (learnosity_reference IS NULL OR learnosity_reference = '')
         AND external_id IS NULL
     ";
 
@@ -356,7 +356,7 @@ Assessments
 You can specify a particular assessment to import; otherwise it imports everything
 that is:
  * alive (ie. everything that is not soft-deleted)
- * not already in learnosity (ie. assess.learnosity_reference is null)
+ * not already in learnosity (ie. assess.learnosity_reference is null or it's an empty string)
 
 * Note that when you specify an assessment id, we try to figure out whether it's a small quiz or
 a large quiz for you. Whatever we find, we override your size param, disregarding --small and
