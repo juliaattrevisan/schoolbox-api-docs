@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
@@ -128,7 +129,7 @@ class Controller extends Base
             'scopes_supported'                      => Repository\Scope::AVAILABLE_SCOPES,
             'response_types_supported'              => ['code', 'id_token', 'id_token token'],
             'subject_types_supported'               => ['public'],
-            'id_token_signing_alg_values_supported' => ['RS256'],
+            'id_token_signing_alg_values_supported' => [Jwt::SIGNING_ALGORITHM],
 
             // Allegedly OIDC must support the implicit grant type, but it is deprecated?
             'grant_types_supported' => ['authorization_code', 'refresh_token', 'implicit', 'client_credentials'],
