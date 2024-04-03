@@ -669,7 +669,13 @@ class Controller extends Base
         $guests = [];
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if ('' !== (string)($this->requestPost['guests'] ?? '')) {
+            if (is_array($this->requestPost['guests'])) {
+                // Guests can also be supplied as an array of userIds.
+                // This method is documented at api.schoolbox.com.au.
+                $guests = $this->requestPost['guests'];
+            } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
+                // Guests can also be supplied as a comma-separated string of userIds.
+                // This method is used by the form at route calendarEvent.getModify.
                 $guests = explode(',', $this->requestPost['guests']);
             }
         }
