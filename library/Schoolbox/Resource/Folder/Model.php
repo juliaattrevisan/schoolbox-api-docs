@@ -739,7 +739,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'parentFolderId' => $this?->getParent()->getId(),
+            'parentFolderId' => $this->getParent()?->getId(),
             'createdAt' => $this->createdAt?->getJson(),
             'createdByUserId' => $this->createdBy,
             'updatedAt' => $this->updatedAt?->getJson(),
