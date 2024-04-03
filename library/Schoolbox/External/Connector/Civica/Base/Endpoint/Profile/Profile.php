@@ -741,6 +741,19 @@ class Profile implements IStrategy
             $title = trim((string)$parent['caregiverTitle']);
             $username = '';
 
+            /* Decide if this parent record should have a relationship with this student record
+             * hasAccessRestriction true means they -shouldn't- and we can skip their processing
+             */
+            if ($parent['hasAccessRestriction']) {
+                $this->log->debug(sprintf(
+                    '%s %s has restricted access: skipping',
+                    $firstname,
+                    $lastname
+                ));
+
+                continue;
+            }
+
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
              *
