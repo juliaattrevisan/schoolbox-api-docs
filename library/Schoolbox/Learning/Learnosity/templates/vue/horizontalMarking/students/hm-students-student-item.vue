@@ -72,6 +72,7 @@ function onCommentUpdated(comment: string) {
                 :student="props.student"
                 :item="props.item"
                 :is-read-only="false"
+                :has-mark-visibility="true"
                 @updated-comment="onCommentUpdated"
             />
         </div>
