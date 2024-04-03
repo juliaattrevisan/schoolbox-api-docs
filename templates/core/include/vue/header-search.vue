@@ -110,8 +110,6 @@ const filterResults = debounce(() => {
         .then((data: AllResults) => {
             totalCountUsers.value = data.metadata.totalCountUsers;
             totalCountFolders.value = data.metadata.totalCountFolders;
-            console.info("totalCountUsers.value: ", totalCountUsers.value);
-            console.info("totalCountFolders.value: ", totalCountFolders.value);
             results.value = data.data;
         })
         .finally(() => {
@@ -322,7 +320,7 @@ const searchButtonText = window.Vue.computed(() => {
                     }`"
                     :href="result.url"
                     :data-test="`header-search-page-result-link-${result.title}`"
-                    @mouseover="arrowCounter = i + userResults.length"
+                    @mouseover="arrowCounter = i + pageResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--align-center l-gap-s l-pad-s">
