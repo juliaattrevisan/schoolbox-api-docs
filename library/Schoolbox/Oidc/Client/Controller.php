@@ -209,6 +209,10 @@ class Controller extends Base
     {
         $config                   = $this->getConfigLoader();
         $oauthIdentityProviderUri = new Uri($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER));
+        $oauthIssuerUri           = new Uri(
+            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
+            ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+        );
         $clientId                 = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         $clientSecret             = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
 
@@ -238,7 +242,7 @@ class Controller extends Base
                 'clientId'                => $clientId,
                 'clientSecret'            => $clientSecret,
                 'redirectUri'             => $redirectUri->__toString(),
-                'idTokenIssuer'           => $oauthIdentityProviderUri->__toString(),
+                'idTokenIssuer'           => $oauthIssuerUri->__toString(),
                 'urlAuthorize'            => $oidcConfig['authorization_endpoint'],
                 'urlAccessToken'          => $oidcConfig['token_endpoint'],
                 'urlResourceOwnerDetails' => $oidcConfig['userinfo_endpoint'],
