@@ -584,8 +584,8 @@ class Controller extends Base
         $detail      = $this->requestPost['detail'] ?? null;
         $allDay      = (int)($this->requestPost['allDay'] ?? null);
 
-        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folder'] ?? []);
-        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campus'] ?? []);
+        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folders'] ?? []);
+        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campuses'] ?? []);
         $roles    = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['roles'] ?? []);
 
         /* Recurrence settings
@@ -754,7 +754,7 @@ class Controller extends Base
                     'publishDate' => $event->getPublishDateTime()->getLocal(),
                     'level' => $accessLevel,
                     'roles' => $this->roleMapper->findByColumn('id', $event->getRoleCollection()),
-                    'campus' => $this->campusMapper->findByColumn('id', $event->getCampusCollection()),
+                    'campuses' => $this->campusMapper->findByColumn('id', $event->getCampusCollection()),
                     'folders' => $this->folderMapper->findByColumn('id', $event->getFolderCollection()),
                     'attendance' => $event->getAttendance(),
                     'guests' => $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
