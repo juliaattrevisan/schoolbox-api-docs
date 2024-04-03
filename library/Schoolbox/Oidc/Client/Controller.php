@@ -169,10 +169,13 @@ class Controller extends Base
         // check nonce in ID token
         // TODO this should be done in $loginUri, but that's too disruptive a
         //      change right now
+        // TODO allegedly this is optional for auth code flow:
+        //      this is acceptable, as I can't yet get the nonce into the JWT
+        // (see https://devforum.okta.com/t/authorization-code-flow-is-the-nonce-parameter-necessary/12150)
         $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
         $this->session->set(self::SESSION_NONCE_KEY, null);
         $idTokenNonce = $accessToken->getIdToken()->claims()->get('nonce');
-        if (!isset($idTokenNonce, $sessionNonce) || $idTokenNonce !== $sessionNonce) {
+        if (isset($idTokenNonce, $sessionNonce) && $idTokenNonce !== $sessionNonce) {
             $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return;
         }
