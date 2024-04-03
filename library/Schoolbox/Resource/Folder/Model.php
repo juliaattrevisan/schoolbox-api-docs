@@ -55,7 +55,7 @@ use function preg_match;
  * @package Schoolbox\Resource\Folder
  * @method null|Model getParent()
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel, Sequential
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel, Sequential, \JsonSerializable
 {
     use CreatedAtDate;
     use CreatedBy;
@@ -729,5 +729,26 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getLocationTitle(): string
     {
         return $this->getTitle();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'parentFolderId' => $this->parent?->getId(),
+            'createdAt' => $this->createdAt?->getJson(),
+            'createdByUserId' => $this->createdBy,
+            'updatedAt' => $this->updatedAt?->getJson(),
+            'updatedByUserId' => $this->updatedBy,
+            'deletedAt' => $this->deletedAt?->getJson(),
+            'deletedByUserId' => $this->deletedBy,
+            'inherit' => $this->inherit,
+            'colour' => $this->getColour(),
+            'sequence' => $this->sequence,
+        ];
     }
 }

@@ -755,6 +755,7 @@ class Controller extends Base
                     'level' => $accessLevel,
                     'roles' => $this->roleMapper->findByColumn('id', $event->getRoleCollection()),
                     'campus' => $this->campusMapper->findByColumn('id', $event->getCampusCollection()),
+                    'folders' => $this->folderMapper->findByColumn('id', $event->getFolderCollection()),
                     'attendance' => $event->getAttendance(),
                     'guests' => $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
                     'maxAttendees' => $event->getMaxAttendees(),
