@@ -10,7 +10,6 @@ namespace Schoolbox;
 
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\User\Translator\ModelToArray;
 
 /**
  * Class Campus
@@ -160,6 +159,16 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable,
      */
     public function jsonSerialize(): array
     {
-        return (new ModelToArray())->convertCampus($this);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'extTimetableCode' => $this->extTimetableCode,
+            'timetableDay' => $this->timetableDay,
+            'sequence' => $this->sequence,
+            'updatedByUserId' => $this->getUpdatedBy(),
+            'createdAt' => $this->createdAt?->getJson(),
+            'updatedAt' => $this->updatedAt?->getJson(),
+            'deletedAt' => $this->deletedAt?->getJson(),
+        ];
     }
 }
