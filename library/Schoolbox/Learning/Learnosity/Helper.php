@@ -464,22 +464,21 @@ class Helper
 //             *  There's no endpoint to update a Session's status...
 //             */
 //        }
-//
-//        // Do something depending on the result from Learnosity.
-//        $status = match ($result['data'][0]['status']) {
-//            Helper::LEARNOSITY_ATTEMPT_STATUS_COMPLETED       => Model::LEARNOSITY_SCORE_STATUS_COMPLETED,
-//            Helper::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING => Model::LEARNOSITY_SCORE_STATUS_PROCESSING,
-//            Helper::LEARNOSITY_ATTEMPT_STATUS_DISCARDED       => Model::LEARNOSITY_SCORE_STATUS_FAILED,
-//            Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE      => Model::LEARNOSITY_SCORE_STATUS_FAILED,
-//            default                                           => null,
-//        };
-//
-//
-//        // Pending scoring: set up a taskd callback to do this later
-//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING === $result['data'][0]['status']) {
-//            $this->initiatePollingForAttemptScore();
-//            return;
-//        }
+
+        // Set status depending on the result from Learnosity.
+        // If still pending scoring or incomplete:
+        // set it to processing, that will act as a signal to set up a poll.
+        $status = match ($result['data'][0]['status']) {
+            self::LEARNOSITY_ATTEMPT_STATUS_COMPLETED       => self::LEARNOSITY_PROCESS_STATUS_COMPLETED,
+            self::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING => self::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+            self::LEARNOSITY_ATTEMPT_STATUS_DISCARDED       => self::LEARNOSITY_PROCESS_STATUS_FAILED,
+            self::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE      => self::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+            default                                         => null,
+        };
+        $existingAttempt
+            ->setLearnosityStatus($status)
+            ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
+        ;
 
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data

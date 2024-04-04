@@ -665,6 +665,15 @@ class Controller extends Base
         ]);
 
         $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $existingAttempt);
+
+        if ($existingAttempt->getLearnosityStatus() === Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING) {
+            $attemptEvaluator = $this->buildAttemptEvaluator();
+            $attemptEvaluator->initiatePollingForAttemptScore(
+                $this->getUser(),
+                $assessment,
+                $existingAttempt,
+            );
+        }
     }
 
 
@@ -1925,6 +1934,21 @@ class Controller extends Base
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
         $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $attempt);
+
+        // Respond with code:
+        // * 200 if complete
+        // * 202 if still processing (this tells polling process to try again)
+        // * 400 if failed
+        $status       = $attempt->getLearnosityStatus();
+        $responseCode = match ($status) {
+            Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
+            Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
+            // including failure
+            default => 400,
+        };
+        $this->response = $this
+            ->responseAsJson(['status' => $status])
+            ->withStatus($responseCode);
     }
 
     /**
@@ -2169,6 +2193,23 @@ class Controller extends Base
             $this->messageFactory,
             $this->messageProducer,
             new TagFactory($this->getConfigLoader()->get('site_school_code')),
+        );
+    }
+
+    /**
+     * Build assessment attempt evaluator upon request, because it cannot be
+     * built in the constructor.
+     *
+     * @return Api\AttemptEvaluator
+     */
+    private function buildAttemptEvaluator(): Api\AttemptEvaluator
+    {
+        return new Api\AttemptEvaluator(
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
         );
     }
 }
