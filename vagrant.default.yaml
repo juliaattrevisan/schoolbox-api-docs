@@ -78,3 +78,9 @@ aws_role_name: 'Vagrant'
 
 # The sso start url
 aws_start_url: 'https://d-976758be37.awsapps.com/start#/'
+
+#the s3 bucket for testing cdn functionality
+aws_bucket: "sbx-dev-cdn"
+
+# The prefix used in the bucket should be firstname.lastname
+# aws_bucket_prefix: "eli.lowinger"
