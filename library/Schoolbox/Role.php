@@ -12,6 +12,7 @@ namespace Schoolbox;
 
 use JsonSerializable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User\Translator\ModelToArray;
 
 class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Sequential
 {
@@ -503,14 +504,6 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
      */
     public function jsonSerialize(): array
     {
-        return [
-            'id'      => $this->id,
-            'type'    => $this->type,
-            'name'    => $this->name,
-            'student' => $this->isStudent(),
-            'staff'   => $this->isStaff(),
-            'parent'  => $this->isParent(),
-            'guest'   => $this->isGuest(),
-        ];
+        return (new ModelToArray())->convertRole($this);
     }
 }
