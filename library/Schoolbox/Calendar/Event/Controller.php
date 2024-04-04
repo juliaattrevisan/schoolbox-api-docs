@@ -32,8 +32,10 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -752,9 +754,9 @@ class Controller extends Base
                     'detail' => $event->getDetail(),
                     'publishDate' => $event->getPublishDateTime()->getLocal(),
                     'level' => $accessLevel,
-                    'roles' => $this->roleMapper->findByColumn('id', $event->getRoleCollection()),
-                    'campuses' => $this->campusMapper->findByColumn('id', $event->getCampusCollection()),
-                    'folders' => $this->folderMapper->findByColumn('id', $event->getFolderCollection()),
+                    'roles' => $this->translateRoleModelsToArrays($this->roleMapper->findByColumn('id', $event->getRoleCollection())),
+                    'campuses' => $this->translateCampusModelsToArrays($this->campusMapper->findByColumn('id', $event->getCampusCollection())),
+                    'folders' => $this->translateFolderModelsToArrays($this->folderMapper->findByColumn('id', $event->getFolderCollection())),
                     'attendance' => $event->getAttendance(),
                     'guests' => $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
                     'maxAttendees' => $event->getMaxAttendees(),
@@ -905,5 +907,47 @@ class Controller extends Base
         }
 
         return $integers;
+    }
+
+    /**
+     * @param Collection $roles array of Role
+     * @return array
+     */
+    private function translateRoleModelsToArrays(Collection $roles): array
+    {
+        $translator = new UserTranslator();
+        $roleArrays = [];
+        foreach  ($roles as $role) {
+            $roleArrays[] = $translator->convertRole($role);
+        }
+        return $roleArrays;
+    }
+
+    /**
+     * @param Collection $campuses array of Campus
+     * @return array
+     */
+    private function translateCampusModelsToArrays(Collection $campuses): array
+    {
+        $translator = new UserTranslator();
+        $campusArrays = [];
+        foreach  ($campuses as $campus) {
+            $campusArrays[] = $translator->convertCampus($campus);
+        }
+        return $campusArrays;
+    }
+
+    /**
+     * @param Collection $folders array of Folder
+     * @return array
+     */
+    private function translateFolderModelsToArrays(Collection $folders): array
+    {
+        $translator = new FolderLinkOnlyTranslator(0);
+        $folderArrays = [];
+        foreach  ($folders as $folder) {
+            $folderArrays[] = $translator($folder);
+        }
+        return $folderArrays;
     }
 }
