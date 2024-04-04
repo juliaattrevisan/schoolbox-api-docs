@@ -80,6 +80,31 @@ class Helper
 
 
     /**
+     * Possible statuses for something in Schoolbox which is reliant upon
+     * Learnosity having run a process and returned a result.
+     * * PENDING: Learnosity hasn't started its process yet; it must be started,
+     *   and will then be set to PROCESSING
+     * * PROCESSING: Learnosity is currently running the process; its status
+     *   must be checked and set to either COMPLETED or FAILED
+     * * COMPLETED: the Learnosity process ran successfully
+     * * FAILED: the Learnosity process did not run successfully; its status may
+     *   be set back to PENDING to try again
+     * * UNPROCESSABLE: the Learnosity process either could not start, or it has
+     *   been determined it will never run successfully
+     *
+     * Possible Learnosity processes:
+     * * duplicating a quiz: this involves creating a Learnosity job
+     * * auto-marking: this involves sending marks to Learnosity and possibly
+     *   waiting for Learnosity to complete said job
+     */
+    public const LEARNOSITY_PROCESS_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_PROCESS_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_PROCESS_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_PROCESS_STATUS_FAILED = 'failed';
+    public const LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE = 'unprocessable';
+
+
+    /**
      * The configuration used for the regions to show in the Learnosity player
      *
      * Currently used for both Items API and Assess API initialisations but should be the same for both
