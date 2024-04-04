@@ -101,7 +101,7 @@ class ModelToArray
      * @param Campus $campus
      * @return array
      */
-    private function convertCampus(Campus $campus): array
+    public function convertCampus(Campus $campus): array
     {
         return [
             'id'   => $campus->getId(),
