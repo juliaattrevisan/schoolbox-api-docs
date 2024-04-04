@@ -737,6 +737,8 @@ class Controller extends Base
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         if ($this->isJsonRequest()) {
+            $folderLinkOnlyTranslator = new FolderLinkOnlyTranslator(0);
+
             $this->response = $this->responseAsJson(
                 [
                     'id' => $event->getId(),
@@ -754,11 +756,19 @@ class Controller extends Base
                     'detail' => $event->getDetail(),
                     'publishDate' => $event->getPublishDateTime()->getLocal(),
                     'level' => $accessLevel,
-                    'roles' => $this->translateRoleModelsToArrays($this->roleMapper->findByColumn('id', $event->getRoleCollection())),
-                    'campuses' => $this->translateCampusModelsToArrays($this->campusMapper->findByColumn('id', $event->getCampusCollection())),
-                    'folders' => $this->translateFolderModelsToArrays($this->folderMapper->findByColumn('id', $event->getFolderCollection())),
+                    'roles' => $this->translateRoleModelsToArrays(
+                        $this->roleMapper->findByColumn('id', $event->getRoleCollection())
+                    ),
+                    'campuses' => $this->translateCampusModelsToArrays(
+                        $this->campusMapper->findByColumn('id', $event->getCampusCollection())
+                    ),
+                    'folders' => $this->translateFolderModelsToArrays(
+                        $this->folderMapper->findByColumn('id', $event->getFolderCollection())
+                    ),
                     'attendance' => $event->getAttendance(),
-                    'guests' => $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
+                    'guests' => $this->translateUserModelsToArrays(
+                        $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
+                    ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees() ? 1 : 0,
                 ]
@@ -949,5 +959,19 @@ class Controller extends Base
             $folderArrays[] = $translator($folder);
         }
         return $folderArrays;
+    }
+
+    /**
+     * @param Collection $users (each element is a User)
+     * @return array
+     */
+    private function translateUserModelsToArrays(Collection $users): array
+    {
+        $translator = new UserTranslator();
+        $userArrays = [];
+        foreach ($users as $user) {
+            $userArrays[] = $translator->convertLinkedUser($user);
+        }
+        return $userArrays;
     }
 }

@@ -166,7 +166,7 @@ class ModelToArray
      * @param User $linkedUser
      * @return array
      */
-    private function convertLinkedUser(User $linkedUser): array
+    public function convertLinkedUser(User $linkedUser): array
     {
         $role = $linkedUser->getRole();
         $year = $linkedUser->getYear();
