@@ -480,6 +480,11 @@ class Helper
             ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
         ;
 
+        // If the process hasn't completed yet: return without setting mark
+        if ($status !== self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
+            return;
+        }
+
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
          * ($mark must never exceed $maxMark) and/or otherwise sanitise data
          */
