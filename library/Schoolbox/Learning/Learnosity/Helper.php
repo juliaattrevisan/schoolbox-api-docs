@@ -480,34 +480,32 @@ class Helper
             ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
         ;
 
-        // If the process hasn't completed yet: return without setting mark
-        if ($status !== self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
-            return;
+        // If the process hasn't completed yet: don't set mark
+        if ($status === self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
+            /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+             * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+             */
+            $resultData = $result['data'][0];
+            $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
+
+            $mark = $sanitisedScore['score'];
+            $maxMark = $sanitisedScore['max_score'];
+
+            /* Fabricate an IResponse instance for existing mark scheme
+             *
+             * Note that $existingResponse might well be null for broken data somehow,
+             * but we have no means to recover from that...and it shouldn't really
+             * occur naturally
+             */
+            $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+
+            // TODO What kind of error should we present to users? It's asynchronous
+            if (null === $existingResponse) {
+                return;
+            }
+
+            $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
         }
-
-        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $resultData = $result['data'][0];
-        $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
-
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
-
-        /* Fabricate an IResponse instance for existing mark scheme
-         *
-         * Note that $existingResponse might well be null for broken data somehow,
-         * but we have no means to recover from that...and it shouldn't really
-         * occur naturally
-         */
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
-
-        // TODO What kind of error should we present to users? It's asynchronous
-        if (null === $existingResponse) {
-            return;
-        }
-
-        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording
