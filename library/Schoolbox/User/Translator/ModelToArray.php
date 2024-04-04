@@ -117,7 +117,7 @@ class ModelToArray
      * @param Role $role
      * @return array|null
      */
-    public function convertRole(Role $role): ?array
+    private function convertRole(Role $role): ?array
     {
         return $role->getId()
             ? [
