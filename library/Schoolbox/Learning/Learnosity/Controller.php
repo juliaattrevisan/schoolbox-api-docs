@@ -1924,7 +1924,7 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        //
+        $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $attempt);
     }
 
     /**
