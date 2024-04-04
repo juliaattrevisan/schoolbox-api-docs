@@ -737,7 +737,6 @@ class Controller extends Base
         if ($this->isJsonRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    // The returned keys and values match the keys and values expected by this function in $this->requestPost.
                     'id' => $event->getId(),
                     'userId' => $event->getOwner()->getId(),
                     'authorId' => $event->getAuthor()->getId(),
