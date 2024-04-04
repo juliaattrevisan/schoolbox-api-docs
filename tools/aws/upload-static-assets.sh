@@ -99,7 +99,8 @@ function upload_assets() {
   aws_bucket=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET")
   bucket_prefix=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX")
   if [[ -z $bucket_prefix ]]; then
-    error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX"
+    error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX with your firstname.lastname"
+    exit 1
   fi
   aws s3 sync "$site_root"/www/static/ s3://"$aws_bucket"/"$bucket_prefix"/"$site_package"
 
@@ -117,7 +118,6 @@ function main() {
   check_run_as_root
   derive_site_root "$@"
   parse_args "$@"
-  load_access_and_secret_keys
   upload_assets
 }
 
