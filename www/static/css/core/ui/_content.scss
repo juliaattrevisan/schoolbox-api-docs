@@ -458,7 +458,7 @@ span.loader {
     right: 0;
     top: 0;
     position: fixed;
-    z-index: 10000;
+    z-index: var(--depth-ui-overlay);
 
     .loader {
         position: absolute;
@@ -708,7 +708,7 @@ $train-line-unvisited-color: $content-ui-background;
                 position: absolute;
                 top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
                 width: 0.5 * $train-line-stop-size;
-                z-index: 1;
+                z-index: var(--depth-default);
                 transition: all 200ms ease-out;
 
                 // You specified an icon for this stop (Knurl)
