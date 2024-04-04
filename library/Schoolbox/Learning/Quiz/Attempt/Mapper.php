@@ -80,6 +80,21 @@ class Mapper extends BaseMapper
         ));
 
         $this->uses('learnosity_reference', self::TYPE_STRING);
+        $this->uses(
+            'learnosity_status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                null,
+                Model::LEARNOSITY_SCORE_STATUS_PENDING,
+                Model::LEARNOSITY_SCORE_STATUS_PROCESSING,
+                Model::LEARNOSITY_SCORE_STATUS_COMPLETED,
+                Model::LEARNOSITY_SCORE_STATUS_FAILED,
+                Model::LEARNOSITY_SCORE_STATUS_UNPROCESSABLE,
+            ],
+        );
+        $this->uses('learnosity_poll_count', self::TYPE_INTEGER);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
 

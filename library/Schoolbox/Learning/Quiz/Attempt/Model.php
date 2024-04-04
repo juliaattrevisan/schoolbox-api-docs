@@ -20,6 +20,28 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 
 class Model implements ISoftDeletable
 {
+    /**
+     * Possible statuses for Learnosity calculation of this attempt's score.
+     * * PENDING: the Learnosity score hasn't been queried yet; it must be
+     *   queried and set to PROCESSING.
+     *   In practice, this is unlikely to ever be used: Learnosity will be
+     *   queried immediately on attempt completion, and set to PROCESSING or
+     *   COMPLETED.
+     * * PROCESSING: the Learnosity score is currently being calculated; it
+     *   must be checked and set to either COMPLETED or FAILED.
+     * * COMPLETED: the Learnosity score has been calculated successfully, and
+     *   the mark has been set.
+     * * FAILED: the Learnosity score could not be calculated; its status may be
+     *   set back to PROCESSING to try again.
+     * * UNPROCESSABLE: the Learnosity score could not be calculated, and it is
+     *   determined it will never be calculated successfully.
+     */
+    public const LEARNOSITY_SCORE_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_SCORE_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_SCORE_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_SCORE_STATUS_FAILED = 'failed';
+    public const LEARNOSITY_SCORE_STATUS_UNPROCESSABLE = 'unprocessable';
+
     use Id;
 
     // TODO 17.0 update calls to getDelete() to getDeletedAt() and uncomment next line
@@ -93,6 +115,18 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     private ?string $learnosityReference = null;
+
+    /**
+     * The status of the Learnosity score calculation.
+     *
+     * @var self::LEARNOSITY_SCORE_STATUS_*|null
+     */
+    private ?string $learnosityStatus = null;
+
+    /**
+     * The number of times the Learnosity score calculation has been polled.
+     */
+    private ?int $learnosityPollCount = null;
 
     /**
      * Is this deleted?
@@ -421,6 +455,42 @@ class Model implements ISoftDeletable
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityStatus(): ?string
+    {
+        return $this->learnosityStatus;
+    }
+
+    /**
+     * @param string|null $learnosityStatus
+     * @return $this
+     */
+    public function setLearnosityStatus(?string $learnosityStatus): self
+    {
+        $this->learnosityStatus = $learnosityStatus;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLearnosityPollCount(): ?int
+    {
+        return $this->learnosityPollCount;
+    }
+
+    /**
+     * @param int|null $learnosityPollCount
+     * @return $this
+     */
+    public function setLearnosityPollCount(?int $learnosityPollCount): self
+    {
+        $this->learnosityPollCount = $learnosityPollCount;
         return $this;
     }
 }
