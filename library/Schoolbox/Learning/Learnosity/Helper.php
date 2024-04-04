@@ -49,10 +49,34 @@ class Helper
 
 
     /**
+     * Possible attempt statuses.
+     *
+     * @see https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#scores
+     */
+
+    /**
      * Attempt Status is sometimes Incomplete when students don't conclude
-     * their own attempts officially
+     * their own attempts officially.
      */
     public const LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE = 'Incomplete';
+
+    /**
+     * The attempt has been scored.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_COMPLETED = 'Completed';
+
+    /**
+     * The attempt has been discarded: not sure how this happens, but it is
+     * documented within Learnosity's API.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_DISCARDED = 'Discarded';
+
+    /**
+     * Attempt Status is sometimes Pending Scoring when Learnosity hasn't
+     * marked the attempt yet: in this case, set up a callback to mark this item
+     * later.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING = 'Pending Scoring';
 
 
     /**
@@ -414,6 +438,22 @@ class Helper
 //             *  then reload their $result like we originally tried...but how?
 //             *  There's no endpoint to update a Session's status...
 //             */
+//        }
+//
+//        // Do something depending on the result from Learnosity.
+//        $status = match ($result['data'][0]['status']) {
+//            Helper::LEARNOSITY_ATTEMPT_STATUS_COMPLETED       => Model::LEARNOSITY_SCORE_STATUS_COMPLETED,
+//            Helper::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING => Model::LEARNOSITY_SCORE_STATUS_PROCESSING,
+//            Helper::LEARNOSITY_ATTEMPT_STATUS_DISCARDED       => Model::LEARNOSITY_SCORE_STATUS_FAILED,
+//            Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE      => Model::LEARNOSITY_SCORE_STATUS_FAILED,
+//            default                                           => null,
+//        };
+//
+//
+//        // Pending scoring: set up a taskd callback to do this later
+//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING === $result['data'][0]['status']) {
+//            $this->initiatePollingForAttemptScore();
+//            return;
 //        }
 
         /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
