@@ -737,8 +737,6 @@ class Controller extends Base
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         if ($this->isJsonRequest()) {
-            $folderLinkOnlyTranslator = new FolderLinkOnlyTranslator(0);
-
             $this->response = $this->responseAsJson(
                 [
                     'id' => $event->getId(),
