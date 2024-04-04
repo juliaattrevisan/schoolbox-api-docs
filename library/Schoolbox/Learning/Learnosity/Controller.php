@@ -1909,6 +1909,25 @@ class Controller extends Base
     }
 
     /**
+     * Callback for polling the status of a Learnosity attempt.
+     *
+     * @api   POST /learning/learnosity/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/poll
+     * @since 23.1
+     *
+     * @param QuizDomainObject $assessment
+     * @param User             $student
+     * @param Model            $attempt
+     * @return void
+     */
+    public function postPollQuizAttemptStatus(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        //
+    }
+
+    /**
      * TODO Literally copypasta'd
      *
      * Converts an assessment_id to a Quiz
