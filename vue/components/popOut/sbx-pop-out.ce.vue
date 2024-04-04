@@ -28,6 +28,10 @@ interface Props {
      */
     isArrowIcon?: boolean;
     /**
+     * Whether the dropdown is in a component action and requires specific styling
+     */
+    isComponentAction?: boolean;
+    /**
      * Close the dropdown when the content is clicked
      */
     isCloseOnContentClick?: boolean;
@@ -57,9 +61,12 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     <button
         ref="button"
         type="button"
-        :class="`sbx-button ${
-            props.buttonText ? `` : `sbx-button--icon-only`
-        } ${props.isFullWidth ? `sbx-button--block` : ``}`"
+        class="sbx-button"
+        :class="{
+            'sbx-button--icon-only': !props.buttonText,
+            'sbx-button--block': props.isFullWidth,
+            'sbx-button--component-action': props.isComponentAction,
+        }"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
@@ -158,6 +165,29 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     }
     &__icon--dropdown {
         transform: rotate(180deg);
+    }
+
+    &--component-action {
+        background-color: transparent;
+        font-weight: 600;
+        font-size: rem-calc((var(--base-font-size) - 2));
+        height: auto;
+        line-height: 1.5rem;
+        margin: 0;
+        padding: var(--spacing-s);
+        text-transform: uppercase;
+        width: auto;
+
+        &:hover {
+            background-color: var(--content-ui-hover);
+        }
+        &:disabled,
+        &.disabled {
+            &:hover {
+                // don't show a hover if it's disabled
+                background-color: transparent;
+            }
+        }
     }
 }
 

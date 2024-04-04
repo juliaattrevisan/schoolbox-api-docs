@@ -3,14 +3,16 @@ import type { Ref } from "vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit } from "./unitPlannerTypes";
+import { Unit, UnitPlannerLocale } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
 import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
 
 interface Props {
     units: Unit[];
+    locale: UnitPlannerLocale;
     routeFolderSequence: string | null;
+    ltiAssessmentsEnabled: boolean;
 }
 
 const props = defineProps<Props>();
@@ -105,7 +107,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.units, toastEl.value!);
+    store.init(props.ltiAssessmentsEnabled, props.units, props.locale, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,
@@ -210,9 +212,9 @@ window.Vue.onUnmounted(() => {
 }
 
 .unit-planner {
-    position: relative;
     display: grid;
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
+    position: relative;
 }
 
 .grid-row {
@@ -222,13 +224,10 @@ window.Vue.onUnmounted(() => {
         background-color: #fff;
         border-color: var(--body-background);
         border-style: solid;
-        border-width: 0; // Unless overridden below
+        border-width: 1px 0 1px 0; // Unless overridden below
         font-size: 0.8125rem;
         overflow-wrap: anywhere;
         text-wrap: wrap;
-
-        border-bottom-width: 1px;
-        border-top-width: 1px;
 
         &:not(:last-child) {
             border-right-width: 1px;
@@ -240,11 +239,11 @@ window.Vue.onUnmounted(() => {
     }
 
     &.header-row > div {
+        border-top-width: 0px;
         color: #000;
         font-weight: 600;
         padding: 0.625rem;
         white-space: nowrap;
-        border-top-width: 0px;
     }
 }
 
@@ -253,8 +252,8 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-left {
-    position: sticky;
     left: 0;
+    position: sticky;
     z-index: 2; // Behind the dropdowns and table header, but on top of the content
 }
 .fixed-top {
@@ -270,19 +269,19 @@ window.Vue.onUnmounted(() => {
 }
 
 #unit-planner-sortable-container {
+    height: calc(100% - var(--UnitPlannerTableHeaderHeight));
+    left: 0;
     position: absolute;
     top: var(--UnitPlannerTableHeaderHeight);
-    left: 0;
     width: 100%;
-    height: calc(100% - var(--UnitPlannerTableHeaderHeight));
     z-index: -1;
 }
 
 .unit-planner-sortable-placeholder {
     background: white;
-    position: absolute;
-    z-index: 8;
-    width: 100%;
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
+    position: absolute;
+    width: 100%;
+    z-index: 8;
 }
 </style>

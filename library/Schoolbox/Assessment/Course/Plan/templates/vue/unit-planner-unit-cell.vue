@@ -11,6 +11,7 @@ import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListItem from "./activities-list-item.vue";
+import ActivitiesAction from "./activities-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -190,7 +191,7 @@ window.Vue.onUnmounted(() => {
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <ul class="information-list">
                     <activities-list-item
-                        v-for="activity in props.unit.activities"
+                        v-for="activity in props.unit.activities.items"
                         ref="activityListItem"
                         :key="activity.id"
                         :unit="unit"
@@ -223,13 +224,18 @@ window.Vue.onUnmounted(() => {
             </div>
 
             <div ref="componentActionEl">
-                <template v-if="props.column.type === ColumnType.OVERVIEW">
-                    <textbox-action
-                        :unit="props.unit"
-                        :column="props.column"
-                        @modify-clicked="textboxContentComponent?.focusEditor"
-                    />
-                </template>
+                <textbox-action
+                    v-if="props.column.type === ColumnType.OVERVIEW"
+                    :unit="props.unit"
+                    :column="props.column"
+                    @modify-clicked="textboxContentComponent?.focusEditor"
+                />
+
+                <activities-action
+                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                    :unit="props.unit"
+                    :column="props.column"
+                />
             </div>
         </div>
     </div>
@@ -239,11 +245,10 @@ window.Vue.onUnmounted(() => {
 @import "www/static/css/core/base/_variables.scss";
 
 .unit-cell {
-    transition: height 0.5s ease;
-
-    position: relative;
     overflow: clip; // Use clip to avoid focus scrolling the cell content
+    position: relative;
     text-overflow: ellipsis;
+    transition: height 0.5s ease;
 
     &.sortable-dropzone {
         background-color: #f8f8f8;
@@ -256,8 +261,8 @@ window.Vue.onUnmounted(() => {
 .sortable-holder {
     background-color: transparent;
     height: 25px;
-    width: 25px;
     position: absolute;
+    width: 25px;
     z-index: 100;
 
     &:not(.isDragging) {
@@ -267,29 +272,29 @@ window.Vue.onUnmounted(() => {
 
 .content-container-fixed {
     bottom: 0;
-    left: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
     justify-content: end;
+    left: 0;
     pointer-events: none;
+    position: absolute;
+    width: 100%;
 
     .content-overlay {
         display: flex;
-        width: 100%;
-        flex-grow: 1;
         flex-direction: column;
+        flex-grow: 1;
         justify-content: end;
+        width: 100%;
     }
 
     .show-more-container {
+        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
         display: flex;
         justify-content: end;
-        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
-        transition: opacity 0.3s;
         opacity: 0;
+        transition: opacity 0.3s;
 
         &[data-visible="true"] {
             opacity: 1;
@@ -297,9 +302,9 @@ window.Vue.onUnmounted(() => {
 
         button {
             margin: 5px;
+            opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            opacity: 0;
 
             &[data-visible="true"] {
                 opacity: 1;
@@ -315,12 +320,10 @@ window.Vue.onUnmounted(() => {
 
     > div > div:not(.sortable-holder) {
         display: flex;
-        text-wrap: wrap;
-
-        // Avoid the content being pushed around by the draggable holder
-        position: absolute;
-        top: 5px;
         left: 5px;
+        position: absolute; // Avoid the content being pushed around by the draggable holder
+        text-wrap: wrap;
+        top: 5px;
     }
 }
 

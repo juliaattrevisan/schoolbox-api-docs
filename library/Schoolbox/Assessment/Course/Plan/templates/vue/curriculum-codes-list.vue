@@ -11,20 +11,22 @@ const props = defineProps<Props>();
 <template>
     <ul v-if="props.curriculumCodes.length > 0" class="information-list">
         <template v-for="node in props.curriculumCodes" :key="node.id">
-          <li v-if="node.enabled">
-            <div class="content">
-                <template v-if="node.code">
-                    [<a :href="'#' + node.id" title="View curriculum node details" data-display-node>{{ node.code }}</a
-                    >]
-                </template>
-                {{ node.name }}
+            <li v-if="node.enabled">
+                <div class="content">
+                    <template v-if="node.code">
+                        [<a :href="'#' + node.id" title="View curriculum node details" data-display-node>{{
+                            node.code
+                        }}</a
+                        >]
+                    </template>
+                    {{ node.name }}
 
-                <curriculum-codes-list
-                    v-if="node.children !== null"
-                    :curriculum-codes="node.children"
-                ></curriculum-codes-list>
-            </div>
-          </li>
+                    <curriculum-codes-list
+                        v-if="node.children !== null"
+                        :curriculum-codes="node.children"
+                    ></curriculum-codes-list>
+                </div>
+            </li>
         </template>
     </ul>
 </template>
@@ -32,9 +34,9 @@ const props = defineProps<Props>();
 <style scoped>
 .content {
     overflow: hidden;
-    padding-top: 5px;
     padding-bottom: 5px;
-    text-wrap: nowrap;
+    padding-top: 5px;
     text-overflow: ellipsis;
+    text-wrap: nowrap;
 }
 </style>

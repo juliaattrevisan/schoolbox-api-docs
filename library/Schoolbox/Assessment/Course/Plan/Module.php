@@ -67,7 +67,8 @@ class Module extends BaseModule
             $this->getAssessmentMapperProxy(),
             $this->getRubricIndicatorMapper(),
             $this->getNodeMapper(),
-            $this->getComponentInstanceMapper()
+            $this->getComponentInstanceMapper(),
+            $this->injector->get('l10n'),
         );
     }
 

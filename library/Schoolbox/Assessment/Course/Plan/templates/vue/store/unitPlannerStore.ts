@@ -4,7 +4,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
-import { Unit } from "../unitPlannerTypes";
+import { Unit, UnitPlannerLocale } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -13,15 +13,21 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unexpandedUnitHeight = 300; // The default unexpanded height of a unit, in px
 
     const units = window.Vue.ref<Unit[]>([]);
+    const locale = window.Vue.ref<UnitPlannerLocale>();
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
+    const ltiAssessmentsEnabled = window.Vue.ref<boolean>(false);
 
     /**
      * store any passed through properties
+     * @param { boolean } $ltiAssessmentsEnabled - whether LTI assessments are enabled
      * @param { Unit[] } $units - the units to store
+     * @param { UnitPlannerLocale } $locale - the locales relating to the unit planner
      * @param { typeof Toast } $toastEl - the toast element
      */
-    function init($units: Unit[], $toastEl: typeof Toast) {
+    function init($ltiAssessmentsEnabled: boolean, $units: Unit[], $locale: UnitPlannerLocale, $toastEl: typeof Toast) {
+        ltiAssessmentsEnabled.value = $ltiAssessmentsEnabled;
         units.value = $units;
+        locale.value = $locale;
         toastEl.value = $toastEl;
     }
 
@@ -103,7 +109,9 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     return {
         init,
         unexpandedUnitHeight,
+        ltiAssessmentsEnabled,
         units,
+        locale,
         toastEl,
         orderedUnits,
         focusedUnitCells,

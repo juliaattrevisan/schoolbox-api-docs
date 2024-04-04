@@ -44,13 +44,13 @@ export const useDeleteActivityStore = defineStore("unitPlannerDeleteActivity", (
         if (storeUnit === undefined) {
             return;
         }
-        const storeActivity = storeUnit.activities.find((activity) => activity.id === activityId);
+        const storeActivity = storeUnit.activities.items.find((activity) => activity.id === activityId);
         if (storeActivity === undefined) {
             return;
         }
 
         // Remove the found activity.
-        storeUnit.activities = storeUnit.activities.filter((activity) => activity.id !== activityId);
+        storeUnit.activities.items = storeUnit.activities.items.filter((activity) => activity.id !== activityId);
     }
 
     /**

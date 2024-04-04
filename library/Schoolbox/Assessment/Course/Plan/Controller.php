@@ -27,6 +27,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig\Error\Error;
 
@@ -40,6 +41,10 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $textboxStatement;
     private \Alaress\Database\Statement\Query\Base|IQuery $rubricStatement;
 
+    /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
 
     /**
      * Controller constructor.
@@ -48,9 +53,15 @@ class Controller extends Base
      * @param RubricIndicatorMapper $rubricIndicatorMapper
      * @param Mapper $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param RosettaStone $rosettaStone
      */
-    public function __construct(private AssessmentMapperProxy $assessmentMapper, private RubricIndicatorMapper $rubricIndicatorMapper, private Node\Mapper $nodeMapper, private \Component_InstanceMapper $componentInstanceMapper)
-    {
+    public function __construct(
+        private AssessmentMapperProxy $assessmentMapper,
+        private RubricIndicatorMapper $rubricIndicatorMapper,
+        private Node\Mapper $nodeMapper,
+        private \Component_InstanceMapper $componentInstanceMapper,
+        RosettaStone $rosettaStone
+    ) {
         /* Only prepare the textbox statement once
          */
         $this->textboxStatement = $this->rubricIndicatorMapper->getDatabase()->prepareQuery(
@@ -118,6 +129,8 @@ class Controller extends Base
             AND sb.use_rubric = 1
             ORDER BY rc.id, riu.sequence, ri.name
         ");
+
+        $this->rosettaStone = $rosettaStone;
     }
 
 
@@ -173,6 +186,22 @@ class Controller extends Base
              */
             $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
 
+            $activitiesLinks = [
+                'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
+                    'contextType' => 'unitspecs',
+                    'contextId' => $unit->getId(),
+                    'context' => $unit,
+                ]]
+            ];
+
+            foreach ($activitiesLinks as $key => $link) {
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
+                    $activitiesLinks[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+                } else {
+                    $activitiesLinks[$key] = null;
+                }
+            }
+
             /* Aggregated data for each unit appears as a row in the Unit Planner
              * on the front end - this is basically the contract between back- and
              * front-end implementations and the basis of an api-first philosophy
@@ -190,12 +219,15 @@ class Controller extends Base
                 'extraTextboxes' => $textboxData['extraTextboxes'],
                 /* All the assessment specs in this unit
                  */
-                'activities' => $assessments->map(new UnitAssessments(
-                    $this->routeGenerator,
-                    $this->getAuthorizer(),
-                    $this->getUser(),
-                    $this->getUser()
-                )),
+                'activities' => [
+                    '_links' => $activitiesLinks,
+                    'items' => $assessments->map(new UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser()
+                    )),
+                ],
                 /* All the rubric capabilities and indicators that are in use among all
                  * the assessment specs in this unit
                  */
@@ -204,16 +236,26 @@ class Controller extends Base
                  * in this unit
                  */
                 'curriculumCodes' => $curriculumNodes,
-                'sequence' => $unit->getFolder()->getSequence()
+                'sequence' => $unit->getFolder()->getSequence(),
             ];
 
             // add this units data to the whole course units collection.
             $units[] = $unitOut;
         }
 
+        $locale = [
+            'project' => [
+                'proper' => $this->rosettaStone->translate('project', false, true),
+            ],
+            'dueWork' => [
+                'proper' => $this->rosettaStone->translate('dueWork', false, true),
+            ],
+        ];
+
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
-            'units' => $units
+            'units' => $units,
+            'locale' => $locale
         ], "Unit Planner - {$course->getTitle()}");
     }
 
@@ -477,8 +519,8 @@ class Controller extends Base
                 /* Did we really need these right now?
                  * Temporarily disabled for speed; re-enable when you actually need it
                  */
-//                $this->nodeMapper->loadAncestors($node);
-//                $this->nodeMapper->loadDescendants($node);
+                //                $this->nodeMapper->loadAncestors($node);
+                //                $this->nodeMapper->loadDescendants($node);
 
                 $ancestorIds = $this->getAllAncestorIds($node);
                 $diff = array_diff($ancestorIds, $curriculumNodes->keys());
