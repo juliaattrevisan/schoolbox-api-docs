@@ -13,6 +13,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Url\Factory;
@@ -124,40 +125,6 @@ HELP;
             $this->getLogger(),
         );
 
-        /* As per https://help.learnosity.com/hc/en-us/requests/24890
-         * We have to find all the Item References for the given quiz and collate them into
-         * a list, on behalf of learnosity - costing us a round trip api request
-         */
-        $itemReferences = $api->dataGetRequest('/itembank/activities', [
-            'references' => [
-                $quiz->getLearnosityReference()
-            ]
-        ])['data'][0]['data']['items'] ?? null;
-
-        /* No items? No trabajo
-         */
-        if (null === $itemReferences) {
-            $this->getLogger()->warning(sprintf(
-                'Assessment %s has no item references in learnosity; exiting',
-                $assessment->getId()
-            ));
-
-            exit(1);
-        }
-
-        /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-         * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-         */
-        if (is_array($itemReferences[0])) {
-            /* Forcibly mutate this, because learnosity insanity
-             */
-            $itemReferenceList = array_column($itemReferences, 'id');
-        } else {
-            /* Presume it was a list of reference strings already
-             */
-            $itemReferenceList = $itemReferences;
-        }
-
         /* Find all the attempts for this quiz
          */
         $attempts = $attemptMapper->findByColumn('assess_id', $quiz->getId());
@@ -175,45 +142,80 @@ HELP;
             exit(1);
         }
 
-        /* Tell learnosity about the ones we need to rescore
-         */
-        $payload = [
-            'session_ids' => [],
-            'target_item' => []
-        ];
-
         foreach ($attempts as $attempt) {
+            $this->getLogger()->info('');
+
             $this->getLogger()->info(sprintf(
                 'Preparing attempt %s (%s) for rescoring',
                 $attempt->getId(),
                 $attempt->getLearnosityReference()
             ));
 
-            $payload['session_ids'][] = $attempt->getLearnosityReference();
-        }
+            /* Find the learnosity Responses for this $attempt as each attempt's
+             * contents might actually vary between users
+             *
+             * This can happen when your item list isn't the same across Sessions
+             * such as when you add or remove questions, and students' attempt
+             * consequently vary in their content
+             *
+             * Such a circumstance gives you http 400 "Check session_ids - target_item not used: b985ec0c....."
+             * but there's nothing we can do about that
+             */
+            $itemResponses = $api->dataGetRequest('/sessions/responses', [
+                'session_id' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ])['data'][0]['items'] ?? null;
 
-        /* Tell learnosity about the items among these session(s)
-         */
-        foreach ($itemReferenceList as $itemReference) {
-            $payload['target_item'] = [
-                'reference' => $itemReference
-            ];
+            /* No items? No trabajo
+             */
+            if (null === $itemResponses) {
+                $this->getLogger()->info(sprintf(
+                    'No items found for attempt %s; skipping',
+                    $attempt->getLearnosityReference(),
+                ));
 
-            $this->getLogger()->info('');
+                continue;
+            }
 
+            /* Collate a set of item references for this attempt
+             * Tell learnosity about the ones we need to rescore
+             */
             $this->getLogger()->info(sprintf(
-                'Sending %s attempt(s) to learnosity for rescoring item %s',
-                count($payload['session_ids']),
-                $itemReference
+                'Sending %s item(s) to learnosity for rescoring',
+                count($itemResponses)
             ));
 
-            if ($this->perform()) {
-                $response = $api->dataUpdateRequest('/sessions/item', $payload);
+            foreach ($itemResponses as $itemResponse) {
+                $payload = [
+                    'session_ids' => [
+                        $attempt->getLearnosityReference()
+                    ],
+                    'target_item' => [
+                        'reference' => $itemResponse['reference']
+                    ]
+                ];
 
-                $this->getLogger()->info(sprintf(
-                    'Rescoring request made to learnosity and returned job_reference %s',
-                    $response['data']['job_reference']
+                $this->getLogger()->debug(sprintf(
+                    'Sending item %s to learnosity for rescoring',
+                    $itemResponse['reference']
                 ));
+
+                /* Send it to learnosity
+                 */
+                if ($this->perform()) {
+                    try {
+                        $job = $api->dataUpdateRequest('/sessions/item', $payload);
+
+                        $this->getLogger()->info(sprintf(
+                            'Rescoring request made to learnosity and returned job_reference %s for item %s',
+                            $job['data']['job_reference'],
+                            $itemResponse['reference']
+                        ));
+                    } catch (ApiException $e) {
+                        $this->getLogger()->warning($e->getMessage());
+                    }
+                }
             }
         }
 
