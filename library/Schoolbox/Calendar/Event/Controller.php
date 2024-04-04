@@ -910,7 +910,7 @@ class Controller extends Base
     }
 
     /**
-     * @param Collection $roles array of Role
+     * @param Collection $roles (each element is a \Schoolbox\Role)
      * @return array
      */
     private function translateRoleModelsToArrays(Collection $roles): array
@@ -924,7 +924,7 @@ class Controller extends Base
     }
 
     /**
-     * @param Collection $campuses array of Campus
+     * @param Collection $campuses (each element is a \Schoolbox\Campus)
      * @return array
      */
     private function translateCampusModelsToArrays(Collection $campuses): array
@@ -938,7 +938,7 @@ class Controller extends Base
     }
 
     /**
-     * @param Collection $folders array of Folder
+     * @param Collection $folders (each element is a Folder)
      * @return array
      */
     private function translateFolderModelsToArrays(Collection $folders): array
