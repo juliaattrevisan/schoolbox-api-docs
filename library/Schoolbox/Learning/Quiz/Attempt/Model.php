@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -20,28 +21,6 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 
 class Model implements ISoftDeletable
 {
-    /**
-     * Possible statuses for Learnosity calculation of this attempt's score.
-     * * PENDING: the Learnosity score hasn't been queried yet; it must be
-     *   queried and set to PROCESSING.
-     *   In practice, this is unlikely to ever be used: Learnosity will be
-     *   queried immediately on attempt completion, and set to PROCESSING or
-     *   COMPLETED.
-     * * PROCESSING: the Learnosity score is currently being calculated; it
-     *   must be checked and set to either COMPLETED or FAILED.
-     * * COMPLETED: the Learnosity score has been calculated successfully, and
-     *   the mark has been set.
-     * * FAILED: the Learnosity score could not be calculated; its status may be
-     *   set back to PROCESSING to try again.
-     * * UNPROCESSABLE: the Learnosity score could not be calculated, and it is
-     *   determined it will never be calculated successfully.
-     */
-    public const LEARNOSITY_SCORE_STATUS_PENDING = 'pending';
-    public const LEARNOSITY_SCORE_STATUS_PROCESSING = 'processing';
-    public const LEARNOSITY_SCORE_STATUS_COMPLETED = 'completed';
-    public const LEARNOSITY_SCORE_STATUS_FAILED = 'failed';
-    public const LEARNOSITY_SCORE_STATUS_UNPROCESSABLE = 'unprocessable';
-
     use Id;
 
     // TODO 17.0 update calls to getDelete() to getDeletedAt() and uncomment next line
@@ -119,7 +98,7 @@ class Model implements ISoftDeletable
     /**
      * The status of the Learnosity score calculation.
      *
-     * @var self::LEARNOSITY_SCORE_STATUS_*|null
+     * @var Helper::LEARNOSITY_PROCESS_STATUS_*|null
      */
     private ?string $learnosityStatus = null;
 

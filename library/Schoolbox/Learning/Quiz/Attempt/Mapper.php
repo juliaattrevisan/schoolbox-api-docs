@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -87,11 +88,11 @@ class Mapper extends BaseMapper
             null,
             [
                 null,
-                Model::LEARNOSITY_SCORE_STATUS_PENDING,
-                Model::LEARNOSITY_SCORE_STATUS_PROCESSING,
-                Model::LEARNOSITY_SCORE_STATUS_COMPLETED,
-                Model::LEARNOSITY_SCORE_STATUS_FAILED,
-                Model::LEARNOSITY_SCORE_STATUS_UNPROCESSABLE,
+                Helper::LEARNOSITY_PROCESS_STATUS_PENDING,
+                Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+                Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED,
+                Helper::LEARNOSITY_PROCESS_STATUS_FAILED,
+                Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE,
             ],
         );
         $this->uses('learnosity_poll_count', self::TYPE_INTEGER);
