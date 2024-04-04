@@ -30,7 +30,6 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
-use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\Storage\IStorage;
@@ -737,6 +736,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function jsonSerialize(): array
     {
-        return (new LinkOnly(0))($this);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'parentFolderId' => $this->getParent()?->getId(),
+            'createdAt' => $this->createdAt?->getJson(),
+            'createdByUserId' => $this->createdBy,
+            'updatedAt' => $this->updatedAt?->getJson(),
+            'updatedByUserId' => $this->updatedBy,
+            'deletedAt' => $this->deletedAt?->getJson(),
+            'deletedByUserId' => $this->deletedBy,
+            'inherit' => $this->inherit,
+            'colour' => $this->getColour(),
+            'sequence' => $this->sequence,
+        ];
     }
 }
