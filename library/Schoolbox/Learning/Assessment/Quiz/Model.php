@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
@@ -60,12 +60,14 @@ class Model extends AbstractAssessment
      *   set back to PENDING to try again
      * * UNPROCESSABLE: the Learnosity job either could not start, or it has
      *   been determined it will never run successfully
+     *
+     * TODO remove these consts, use helper consts directly
      */
-    public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
-    public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
-    public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
-    public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
-    public const LEARNOSITY_JOB_STATUS_UNPROCESSABLE = 'unprocessable';
+    public const LEARNOSITY_JOB_STATUS_PENDING       = Helper::LEARNOSITY_PROCESS_STATUS_PENDING;
+    public const LEARNOSITY_JOB_STATUS_PROCESSING    = Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING;
+    public const LEARNOSITY_JOB_STATUS_COMPLETED     = Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED;
+    public const LEARNOSITY_JOB_STATUS_FAILED        = Helper::LEARNOSITY_PROCESS_STATUS_FAILED;
+    public const LEARNOSITY_JOB_STATUS_UNPROCESSABLE = Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE;
 
 
     /**
