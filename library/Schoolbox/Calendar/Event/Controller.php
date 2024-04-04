@@ -917,7 +917,7 @@ class Controller extends Base
     {
         $translator = new UserTranslator();
         $roleArrays = [];
-        foreach  ($roles as $role) {
+        foreach ($roles as $role) {
             $roleArrays[] = $translator->convertRole($role);
         }
         return $roleArrays;
@@ -931,7 +931,7 @@ class Controller extends Base
     {
         $translator = new UserTranslator();
         $campusArrays = [];
-        foreach  ($campuses as $campus) {
+        foreach ($campuses as $campus) {
             $campusArrays[] = $translator->convertCampus($campus);
         }
         return $campusArrays;
@@ -945,7 +945,7 @@ class Controller extends Base
     {
         $translator = new FolderLinkOnlyTranslator(0);
         $folderArrays = [];
-        foreach  ($folders as $folder) {
+        foreach ($folders as $folder) {
             $folderArrays[] = $translator($folder);
         }
         return $folderArrays;
