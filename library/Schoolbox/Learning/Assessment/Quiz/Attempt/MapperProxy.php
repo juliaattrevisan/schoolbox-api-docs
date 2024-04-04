@@ -118,6 +118,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedBy($attempt->getUser())
                 ->setSubmittedOnBehalfOf($attempt->getUser())
                 ->setLearnosityReference($attempt->getLearnosityReference())
+                ->setLearnosityStatus($attempt->getLearnosityStatus())
+                ->setLearnosityPollCount($attempt->getLearnosityPollCount())
                 ->setCreatedAt($attempt->getStart())
                 ->setSubmittedAt($attempt->getFinish())
                 ->setDeletedAt($attempt->getDeleted())
@@ -163,6 +165,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setStart($domainObject->getCreatedAt())
                 ->setFinish($domainObject->getUpdatedAt())
                 ->setLearnosityReference($domainObject->getLearnosityReference())
+                ->setLearnosityStatus($domainObject->getLearnosityStatus())
+                ->setLearnosityPollCount($domainObject->getLearnosityPollCount())
                 ->setDeleted($domainObject->getDeletedAt());
                 // TODO reviewed field probably needs to be set somehow
 //                ->setReviewed($domainObject->getPublishedAt());
