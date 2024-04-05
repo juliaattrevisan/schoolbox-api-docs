@@ -697,9 +697,11 @@ class Controller extends Base
         $hasMarkVisibility = $assessment->isFeedbackVisibleToUser($student);
         $initOptions = null;
 
-        /* Only load a report if mark visibility is set to include students
+        /* Only load a report if:
+         * * mark visibility is set to include students
+         * * the attempt actually has a mark
          */
-        if ($hasMarkVisibility) {
+        if ($hasMarkVisibility && $attempt->getMark() !== null) {
             $payload = [
                 'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
