@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -134,7 +135,7 @@ class Overwriter
         $destination
             ->setLearnosityReference(null)
             ->setLearnosityJobReference(null)
-            ->setLearnosityJobStatus(Quiz::LEARNOSITY_JOB_STATUS_PENDING)
+            ->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_PENDING)
             ->setLearnositySourceAssessmentId($source->getId())
         ;
     }

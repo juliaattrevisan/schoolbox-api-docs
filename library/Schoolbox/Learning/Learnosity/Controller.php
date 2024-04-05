@@ -1867,7 +1867,7 @@ class Controller extends Base
         } catch (SourceAssociationException $e) {
             // Not able to be associated?
             // Set destination as unprocessable, save and rethrow exception
-            $destination->setLearnosityJobStatus(QuizDomainObject::LEARNOSITY_JOB_STATUS_UNPROCESSABLE);
+            $destination->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE);
             $this->assessmentDataSource->save($destination, $this->getUser());
             throw $e;
         }
