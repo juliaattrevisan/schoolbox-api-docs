@@ -623,14 +623,19 @@ class Controller extends Base
             $publishDate = new Alaress_Date_Format(
                 $this->requestPost['publishDate'], [
                     $locale->localFormat(),
-                    DateTimeInterface::RFC3339
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    DateTimeInterface::RFC3339,
+                    DateTimeInterface::RFC3339_EXTENDED
                 ]
             );
         }
 
         $acceptedDateFormats = [
+            // The localShortFormat does not include time, so is only appropriate for all day events.
             ($allDay === Event::ALL_DAY) ? $locale->localShortFormat() : $locale->localFormat(),
-            DateTimeInterface::RFC3339
+            // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+            DateTimeInterface::RFC3339,
+            DateTimeInterface::RFC3339_EXTENDED
         ];
         $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
         $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
