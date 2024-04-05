@@ -763,14 +763,14 @@ class Controller extends Base
                     'allDay' => $event->getAllDay(),
                     'efficacy' => $efficacy,
                     'title' => $event->getTitle(),
-                    'startDate' => $event->getStartDateTime()->getLocal(),
-                    'endDate' => $event->getEndDateTime()->getLocal(),
+                    'startDate' => $event->getStartDateTime()->getJson(),
+                    'endDate' => $event->getEndDateTime()->getJson(),
                     'repeat' => $repeat,
-                    'repeat_until' => $untilDate->getLocal(),
+                    'repeat_until' => $untilDate->getJson(),
                     'type' => $event->getType()->getId(),
                     'location' => $event->getLocation(),
                     'detail' => $event->getDetail(),
-                    'publishDate' => $event->getPublishDateTime()->getLocal(),
+                    'publishDate' => $event->getPublishDateTime()->getJson(),
                     'level' => $accessLevel,
                     'roles' => $this->translateRoleModelsToArrays(
                         $this->roleMapper->findByColumn('id', $event->getRoleCollection())
