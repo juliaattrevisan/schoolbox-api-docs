@@ -107,7 +107,7 @@ class AutoscoreAttemptsTool extends CliTool\App
     /**
      * Search for quiz attempts which:
      * * are in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
-     * * optionally are in `null` status, and have not yet been reviewed
+     * * optionally are in `null` status
      *
      * Then, query Learnosity for whether they have been scored yet: if so, add
      * the mark from Learnosity.
@@ -135,14 +135,36 @@ class AutoscoreAttemptsTool extends CliTool\App
         $pb = $attemptMapper->getPredicateBuilder();
         $pb = $pb->notNull('aa.finish');
 
+        // Build status predicates:
+        // If specially requested: process null Learnosity status as well
         $statusPb = $attemptMapper->getPredicateBuilder();
         $statusPb = $statusPb->equals('aa.learnosity_status', Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING);
-
-        // If specially requested: process null Learnosity status as well
-        $statusPb = $statusPb->isNull('aa.learnosity_status');
-
-        // Now build and run query
+        if ($this->getOpt(self::OPT_LONG_PROCESS_NULL_STATUS)) {
+            $statusPb = $statusPb->isNull('aa.learnosity_status');
+        }
         $pb = $pb->any($statusPb);
+
+        // Build assessment and attempt predicates
+        $assessmentId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
+        if ($assessmentId) {
+            $pb = $pb->equals('a2.id', $assessmentId);
+        }
+        $attemptId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
+        if ($attemptId) {
+            $pb = $pb->equals('aa.attempt_id', $attemptId);
+        }
+
+        // Build from/to
+        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+        if ($fromDate) {
+            $pb = $pb->greaterThanOrEqualTo('aa.finish', $fromDate->getDatabase());
+        }
+        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        if ($toDate) {
+            $pb = $pb->lessThanOrEqualTo('aa.finish', $toDate->getDatabase());
+        }
+
+        // Build and run query
         $query = $this->getDatabaseInternal()->prepareQuery(
             $baseQuery . ' WHERE ' . $pb->getWhereIntersect(),
         );
@@ -281,7 +303,7 @@ OPTIONS
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
 
     $yellow--process-null-status$white
-        If provided, auto-score attempts whose `learnosity_status` field is NULL.
+        If provided, auto-score attempts whose `learnosity_status` field is `NULL` in addition to those `completed`.
 
 
 HELP;
