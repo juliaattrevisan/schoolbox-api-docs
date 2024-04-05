@@ -621,7 +621,8 @@ class Controller extends Base
 
         if ('' !== ($this->requestPost['publishDate'] ?? '')) {
             $publishDate = new Alaress_Date_Format(
-                $this->requestPost['publishDate'], [
+                $this->requestPost['publishDate'],
+                [
                     $locale->localFormat(),
                     // API docs state we accept RFC3339 without qualification, so we must accept both variants.
                     DateTimeInterface::RFC3339,
