@@ -56,17 +56,19 @@ class SideMenu implements IDataGenerator
 
         $subjectGroups = [];
 
-        foreach ($this->currentUser->getSubjectCollection() as $subject) {
-            if ($subject['perm'] >= UserAccess::ACCESS_READ) {
-                if (!isset($subjectGroups[$subject['classType']])) {
-                    $subjectGroups[$subject['classType']] = [];
+        if (!$this->currentUser->getHideTimetable()) {
+            foreach ($this->currentUser->getSubjectCollection() as $subject) {
+                if ($subject['perm'] >= UserAccess::ACCESS_READ) {
+                    if (!isset($subjectGroups[$subject['classType']])) {
+                        $subjectGroups[$subject['classType']] = [];
+                    }
+                    $subjectGroups[$subject['classType']][] = $subject;
                 }
-                $subjectGroups[$subject['classType']][] = $subject;
             }
+            uksort($subjectGroups, function ($a, $b) {
+                return strnatcmp($a, $b);
+            });
         }
-        uksort($subjectGroups, function ($a, $b) {
-            return strnatcmp($a, $b);
-        });
 
         // Get the menu sections in their correct order
 
