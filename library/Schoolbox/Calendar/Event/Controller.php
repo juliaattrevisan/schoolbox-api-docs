@@ -12,6 +12,7 @@ namespace Schoolbox\Calendar\Event;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
+use DateTimeInterface;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
@@ -622,14 +623,14 @@ class Controller extends Base
             $publishDate = new Alaress_Date_Format(
                 $this->requestPost['publishDate'], [
                     $locale->localFormat(),
-                    'Y-m-d\TH:i:sP' // RFC3339 format.
+                    DateTimeInterface::RFC3339
                 ]
             );
         }
 
         $acceptedDateFormats = [
             ($allDay === Event::ALL_DAY) ? $locale->localShortFormat() : $locale->localFormat(),
-            'Y-m-d\TH:i:sP' // RFC3339 format.
+            DateTimeInterface::RFC3339
         ];
         $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
         $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
