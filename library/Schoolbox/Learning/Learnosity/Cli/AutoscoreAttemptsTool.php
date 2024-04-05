@@ -18,6 +18,7 @@ use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory as UrlFactory;
+use Throwable;
 
 class AutoscoreAttemptsTool extends CliTool\App
 {
@@ -203,7 +204,7 @@ class AutoscoreAttemptsTool extends CliTool\App
             $quizId = $attempt->getQuiz()->getAssessmentModel()->getId();
             $this->getLogger()->notice(sprintf('Processing attempt #%d for quiz #%d', $attempt->getId(), $quizId));
             try {
-                $quizCache[$quizId] ??= $assessmentDataSource->findById($quizId);
+                $quizCache[$quizId] ??= $assessmentDataSource->findByIdForReview($quizId);
             } catch (MapperException $e) {
                 $this->getLogger()->warning(
                     sprintf('Quiz #%d not found (error: %s): skipping', $quizId, $e->getMessage()),
@@ -217,11 +218,18 @@ class AutoscoreAttemptsTool extends CliTool\App
                 continue;
             }
             if ($this->perform()) {
-                $helper->processAttemptCompletion(
-                    $attemptMapper,
-                    $quizCache[$quizId],
-                    $attempt,
-                );
+                try {
+                    $helper->processAttemptCompletion($attemptMapper, $quizCache[$quizId], $attempt);
+                } catch (Throwable $e) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Attempt #%d could not be processed (error: %s): skipping',
+                            $attempt->getId(),
+                            $e->getMessage(),
+                        ),
+                    );
+                    continue;
+                }
                 match ($attempt->getLearnosityStatus()) {
                     Helper::LEARNOSITY_PROCESS_STATUS_PENDING => $this->getLogger()->warning(
                         sprintf('Attempt #%d is somehow pending: should be impossible', $attempt->getId()),
