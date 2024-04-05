@@ -1909,8 +1909,8 @@ class Controller extends Base
         // possibly an API problem?
         $jobStatus    = $assessment->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
-            Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
-            Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
+            Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
+            Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
                 // including failure
             default => 400,
         };
