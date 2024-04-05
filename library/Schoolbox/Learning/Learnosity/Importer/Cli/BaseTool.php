@@ -230,7 +230,7 @@ abstract class BaseTool extends CliTool\App
     /**
      * Which quiz status does this tool target?
      *
-     * @return QuizDomainModel::LEARNOSITY_JOB_STATUS_*
+     * @return Helper::LEARNOSITY_PROCESS_STATUS_*
      */
     abstract protected function getTargetedQuizStatus(): string;
 
