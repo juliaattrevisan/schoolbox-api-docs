@@ -276,10 +276,9 @@ class Base
              */
             $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
 
-            if($allDay) {
+            if ($allDay) {
                 $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end'])->endOfDay();
-            }
-            else {
+            } else {
                 $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
             }
 
