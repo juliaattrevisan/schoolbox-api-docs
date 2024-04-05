@@ -46,13 +46,29 @@ window.sbProps.firebaseApps.forEach((app) => {
             // Receipt of a message
             onMessage(messaging, (payload) => {
                 console.log('Message received. ', payload);
-                new Notification(payload.notification.title, {
+                // parse notification data, including extra info
+                const data = JSON.parse(payload.data.data);
+                let notif = new Notification(payload.notification.title, {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    image: data.icon,
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
+                    timestamp: data.timestamp,
                 });
+                notif.onclick = (event) => {
+                    // debug log?
+                    console.log("On notification click: .ts");
+                    event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                    // some notifications have a href, some don't just load the dashboard for those missing hrefs.
+                    const notifHref = data.href ?? "/";
+
+                    // debug log?
+                    console.log("opening: ", notifHref);
+
+                    // open the notification destination
+                    window.open(notifHref, "_blank");
+                };
             });
         }
     }
