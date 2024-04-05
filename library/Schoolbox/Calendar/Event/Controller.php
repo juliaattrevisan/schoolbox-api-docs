@@ -11,6 +11,7 @@ namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Alaress_Date_Locale_Config;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
@@ -613,20 +614,31 @@ class Controller extends Base
 
         /* Check the dates
          */
+        $locale = new Alaress_Date_Locale_Config();
+
         $publishDate = null;
 
         if ('' !== ($this->requestPost['publishDate'] ?? '')) {
-            $publishDate = Alaress_Date_Format::newLocal($this->requestPost['publishDate']);
+            $publishDate = new Alaress_Date_Format(
+                $this->requestPost['publishDate'], [
+                    $locale->localFormat(),
+                    'Y-m-d\TH:i:sP' // RFC3339 format.
+                ]
+            );
         }
+
+        $acceptedDateFormats = [
+            ($allDay === Event::ALL_DAY) ? $locale->localShortFormat() : $locale->localFormat(),
+            'Y-m-d\TH:i:sP' // RFC3339 format.
+        ];
+        $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
+        $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
 
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
-            $startDate = Alaress_Date_Format::newLocalShort($this->requestPost['startDate'] ?? '')->startOfDay();
-            $endDate   = Alaress_Date_Format::newLocalShort($this->requestPost['endDate'] ?? '')->endOfDay();
-        } else {
-            $startDate = Alaress_Date_Format::newLocal($this->requestPost['startDate'] ?? '');
-            $endDate   = Alaress_Date_Format::newLocal($this->requestPost['endDate'] ?? '');
+            $startDate = $startDate->startOfDay();
+            $endDate   = $endDate->endOfDay();
         }
 
         /* All events recur, due to the dropdown "Repeat" always being set.
