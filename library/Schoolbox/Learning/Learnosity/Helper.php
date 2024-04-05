@@ -427,6 +427,15 @@ class Helper
         QuizDomainModel $assessment,
         Model $existingAttempt
     ): void {
+        // Has this already been reviewed or marked?
+        // If so, mark this as complete and don't query Learnosity:
+        // the quiz attempt can already be considered as marked.
+        if ($existingAttempt->getReviewed() || $existingAttempt->getMark() !== null) {
+            $existingAttempt->setLearnosityStatus(self::LEARNOSITY_PROCESS_STATUS_COMPLETED);
+            $attemptMapper->save($existingAttempt);
+            return;
+        }
+
         $student = $existingAttempt->getUser();
 
         $payload = [
