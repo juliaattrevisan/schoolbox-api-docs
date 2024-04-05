@@ -132,8 +132,10 @@ class AutoscoreAttemptsTool extends CliTool\App
             INNER JOIN assess a ON aa.assess_id = a.assess_id
             INNER JOIN assessment a2 on a.assessment_id = a2.id
         ";
-        $pb = $attemptMapper->getPredicateBuilder();
-        $pb = $pb->notNull('aa.finish');
+        $pb = $attemptMapper->getPredicateBuilder()
+            ->isNull('aa.deleted_at')
+            ->notNull('aa.finish')
+            ->notNull('aa.learnosity_reference');
 
         // Build status predicates:
         // If specially requested: process null Learnosity status as well
