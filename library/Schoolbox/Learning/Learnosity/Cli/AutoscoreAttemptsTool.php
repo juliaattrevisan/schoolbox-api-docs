@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\Quiz\Model;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -106,12 +106,18 @@ class AutoscoreAttemptsTool extends CliTool\App
     }
 
     /**
-     * Search for quiz attempts which:
+     * Search for quiz attempts which are awaiting an auto-score. This includes
+     * quiz attempts which:
+     * * have been finished
+     * * have not yet been reviewed
+     *   (the instructor's review renders an auto-score redundant)
+     * * have a Learnosity reference (otherwise, no auto-score can exist)
      * * are in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
      * * optionally are in `null` status
+     * * are neither deleted, nor for a quiz which has been deleted
      *
      * Then, query Learnosity for whether they have been scored yet: if so, add
-     * the mark from Learnosity.
+     * the mark and normalised mark from Learnosity.
      *
      * @return void
      */
@@ -126,7 +132,7 @@ class AutoscoreAttemptsTool extends CliTool\App
         $lock          = $this->acquireLock(self::LOCK_NAME, self::LOCK_TIMEOUT);
         $attemptMapper = Mapper::getInstance();
 
-        // Find quiz attempts which are still processing
+        // Find quiz attempts which meet the criteria for auto-scoring
         $baseQuery = "
             SELECT aa.attempt_id
             FROM assess_attempt aa
@@ -134,9 +140,12 @@ class AutoscoreAttemptsTool extends CliTool\App
             INNER JOIN assessment a2 on a.assessment_id = a2.id
         ";
         $pb = $attemptMapper->getPredicateBuilder()
-            ->isNull('aa.deleted_at')
             ->notNull('aa.finish')
-            ->notNull('aa.learnosity_reference');
+            ->isNull('aa.reviewed_at')
+            ->notNull('aa.learnosity_reference')
+            ->isNull('aa.deleted_at')
+            ->isNull('a.deleted_at')
+            ->isNull('a2.deleted_at');
 
         // Build status predicates:
         // If specially requested: process null Learnosity status as well
@@ -211,9 +220,9 @@ class AutoscoreAttemptsTool extends CliTool\App
                 );
                 continue;
             }
-            if (!$quizCache[$quizId] instanceof Model) {
+            if (!$quizCache[$quizId] instanceof QuizObject) {
                 $this->getLogger()->warning(
-                    sprintf('Quiz with assessment ID #%d is somehow not a quiz: skipping', $quizId),
+                    sprintf('Assessment with ID #%d is somehow not a quiz: skipping', $quizId),
                 );
                 continue;
             }
@@ -298,7 +307,7 @@ OPTIONS
         If provided: only score this attempt ID.
 
     $yellow--from=FROM_DATE$white
-        If provided, only score attempts finished from {$yellow}FROM_DATE{$white} onward.
+        If provided: only score attempts finished from {$yellow}FROM_DATE{$white} onward.
 
         {$yellow}FROM_DATE{$white} will be parsed according to the following rules:
         * as a database date (YYYY-MM-DD HH:MM:SS)
@@ -308,12 +317,14 @@ OPTIONS
         This script will fail if {$yellow}FROM_DATE{$white} is not parseable.
 
     $yellow--to=TO_DATE$white
-        If provided, only score attempts finished on {$yellow}TO_DATE{$white} and before.
+        If provided: only score attempts finished on {$yellow}TO_DATE{$white} and before.
 
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
 
     $yellow--process-null-status$white
         If provided, auto-score attempts whose `learnosity_status` field is `NULL` in addition to those `completed`.
+
+        This should only be required for if historic attempts need to be auto-scored.
 
 
 HELP;
