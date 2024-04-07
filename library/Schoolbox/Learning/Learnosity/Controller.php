@@ -699,9 +699,10 @@ class Controller extends Base
 
         /* Only load a report if:
          * * mark visibility is set to include students
-         * * the attempt actually has a mark
+         * * the attempt has been auto-scored
          */
-        if ($hasMarkVisibility && $attempt->getMark() !== null) {
+        $isAttemptAutoscored = $attempt->getLearnosityStatus() === Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED;
+        if ($hasMarkVisibility && $isAttemptAutoscored) {
             $payload = [
                 'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
@@ -745,6 +746,8 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $initOptions,
             'attempt' => $attempt,
+            'isAttemptAutoscored' => $isAttemptAutoscored,
+            'isMarkVisible' => $hasMarkVisibility,
             'returnUrl' => (
                 empty($returnUrlEncoded) ?
                 "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}" :
