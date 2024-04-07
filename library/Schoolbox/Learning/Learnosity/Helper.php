@@ -103,6 +103,11 @@ class Helper
     public const LEARNOSITY_PROCESS_STATUS_FAILED = 'failed';
     public const LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE = 'unprocessable';
 
+    /**
+     * The default number of times the quiz attempt may be polled for completion
+     * before being marked as failed.
+     */
+    public const LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS = 10;
 
     /**
      * The configuration used for the regions to show in the Learnosity player
@@ -436,6 +441,14 @@ class Helper
             return;
         }
 
+        // Has the attempt already failed to mark too many times?
+        // Mark it as failed and don't query Learnosity.
+        if ($existingAttempt->getLearnosityPollCount() >= self::LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS) {
+            $existingAttempt->setLearnosityStatus(self::LEARNOSITY_PROCESS_STATUS_FAILED);
+            $attemptMapper->save($existingAttempt);
+            return;
+        }
+
         $student = $existingAttempt->getUser();
 
         $payload = [
@@ -488,6 +501,7 @@ class Helper
             ->setLearnosityStatus($status)
             ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
         ;
+
 
         // If the process hasn't completed yet: don't set mark
         if ($status === self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {

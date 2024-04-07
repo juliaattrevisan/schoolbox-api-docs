@@ -13,6 +13,7 @@ use Aura\Router\Generator;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
@@ -78,6 +79,11 @@ class AttemptEvaluator
                     ->withHeader('accept', 'application/json')
             )
             ->build();
-        $this->messageProducer->send($message, delay: 5, maxRequeues: 10);
+
+        $this->messageProducer->send(
+            $message,
+            delay: 5,
+            maxRequeues: Helper::LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS,
+        );
     }
 }
