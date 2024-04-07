@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
