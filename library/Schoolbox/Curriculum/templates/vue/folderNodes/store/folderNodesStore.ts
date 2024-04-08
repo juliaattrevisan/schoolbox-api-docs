@@ -145,7 +145,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * To check if there are any nodes to display
          * @returns {boolean} - whether there are any nodes to display
          */
-        const hasNodes = window.Vue.computed(() => selectedNodes.value.length > 0);
+        const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
 
         /**
          * To check if there are any nodes to display after filtering, as we may have nodes linked to the folder,
