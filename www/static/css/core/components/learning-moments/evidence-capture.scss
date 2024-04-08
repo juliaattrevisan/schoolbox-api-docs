@@ -142,6 +142,7 @@
 
         // prevent images in posts displaying too large
         img {
+            width: auto;
             max-height: rem-calc(500);
         }
     }
