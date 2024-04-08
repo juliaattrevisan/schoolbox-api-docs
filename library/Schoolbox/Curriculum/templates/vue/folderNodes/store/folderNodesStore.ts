@@ -134,7 +134,11 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesnt currently contain any selected nodes
                 return [];
             }
-            return [filterNode]; // otherwise we can use the filter node as the new list of nodes
+            if (filterNode.children === null) {
+                // if the filter node has no children, we'll just return the filter node, as it's the only node to display
+                return [filterNode];
+            }
+            return [...filterNode.children]; // when the filter is set and has children, it's assumed the component heading will be the name of the filter node, so there's no need to display the filter node itself, as we'd just be doubling up on the name
         });
 
         /**
