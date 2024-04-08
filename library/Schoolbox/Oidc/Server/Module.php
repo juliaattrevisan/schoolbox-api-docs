@@ -113,7 +113,7 @@ class Module extends BaseModule
 
         // Auth code grant:
         // auth codes expire after 10 minutes, refresh tokens after 1 month
-        $authCodeGrant = new Server\Grant\AuthCodeGrant(
+        $authCodeGrant = new Grant\AuthCode(
             $authCodeRepository,
             $refreshTokenRepository,
             new DateInterval('PT10M'),
@@ -135,7 +135,7 @@ class Module extends BaseModule
         // Implicit grant: apparently deprecated, but is required according to:
         // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
         // Nonetheless, access tokens expire after 1 hour
-        $implicitGrant = new Server\Grant\ImplicitGrant(new DateInterval('PT1H'));
+        $implicitGrant = new Grant\Implicit(new DateInterval('PT1H'));
         $authServer->enableGrantType($implicitGrant);
 
         return new Controller(
