@@ -32,7 +32,7 @@ function onSelected() {
  *
  * @returns { String }
  */
-const saveText = window.Vue.computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Update"));
+const saveText = window.Vue.computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Modify"));
 
 /**
  * If there's no nodes currently selected and we haven't selected any
