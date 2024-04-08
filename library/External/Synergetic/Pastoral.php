@@ -688,6 +688,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     }
 
                     try {
+                        // Note pastoral.updated_at should not be updated here, because pastoral.external_id is a special
+                        // field that is not used in the Schoolbox UI.  The pastoral.updated_at field stores the time at
+                        // which the Schoolbox record was last updated, as observable via the UI.  So an update that is
+                        // not reflected anywhere in the Schoolbox UI is not a real update in this sense.
                         $this->pastoralMapper->setExternalIdWithoutChangingUpdatedAt($pastoralCareSeq, $pastoral->getId());
                     } catch (UnexpectedValueException) {
                         if (!$inOuterTransaction) {
