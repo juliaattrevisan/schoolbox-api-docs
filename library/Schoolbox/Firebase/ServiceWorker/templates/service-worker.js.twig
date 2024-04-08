@@ -25,11 +25,31 @@ firebaseApps.forEach((app) => {
         const data = JSON.parse(payload.data);
         const notificationOptions = {
             body: payload.notification.body,
-            icon: data.icon,
-            image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+            icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+            image: data.icon,
             badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-            timestamp: data.timestamp
+            renotify: false,
+            timestamp: data.timestamp,
+            data: data
         };
         self.registration.showNotification(payload.notification.title, notificationOptions);
+    });
+
+    self.registration.getNotifications().then((notifications) => {
+        notifications.forEach((notif) => {
+            notif.onclick = (event) => {
+                // debug log?
+                console.log("On notification click: .sw");
+                event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                // some notifications have a href, some don't just load the dashboard for those missing hrefs.
+                const notifHref = notif.data.href ?? "/";
+
+                // debug log?
+                console.log("opening: ", notifHref);
+
+                // open the notification destination
+                window.open(notifHref, "_blank");
+            };
+        });
     });
 });

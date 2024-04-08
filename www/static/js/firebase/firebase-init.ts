@@ -55,6 +55,7 @@ window.sbProps.firebaseApps.forEach((app) => {
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
                     timestamp: data.timestamp,
+                    data: data
                 });
                 notif.onclick = (event) => {
                     // debug log?
