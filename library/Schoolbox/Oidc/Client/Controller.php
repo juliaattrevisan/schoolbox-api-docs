@@ -110,16 +110,8 @@ class Controller extends Base
     {
         $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
-            // TODO scopes and response_type may need to be made configurable?
-            // https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes
-            // states that the below are standard, but not all client ID/secret
-            // pairs may allow access to them.
-            // Also: some providers may provide the identifying claim as part of
-            // a non-standard scope?
-            // Also: if scope `open_id` is requested, response_type should
-            // include `id_token`.
-            'scope'         => 'openid email profile',
-            'response_type' => 'code token',
+            'scope'         => $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_SCOPES),
+            'response_type' => $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_RESPONSE_TYPE),
             'response_mode' => 'form_post',
             'state'         => $this->buildState($nonce),
             'nonce'         => $nonce,
