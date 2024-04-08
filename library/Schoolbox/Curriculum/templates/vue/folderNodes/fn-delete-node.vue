@@ -37,7 +37,7 @@ window.Vue.watch(
  * delete the node when confirmed
  */
 function onDeleteSelected() {
-    store().confirmRemoveNode();
+    void store().confirmRemoveNode();
 }
 
 /**

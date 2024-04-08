@@ -31,7 +31,6 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
-        // const isModalOpen = window.Vue.ref<boolean>(false); // to show the delete modal
         const nodeToRemove = window.Vue.ref<Node | null>(null); // the node to remove
 
         /**
@@ -140,7 +139,8 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 // if the filter node has no children, we'll just return the filter node, as it's the only node to display
                 return [filterNode];
             }
-            return [...filterNode.children]; // when the filter is set and has children, it's assumed the component heading will be the name of the filter node, so there's no need to display the filter node itself, as we'd just be doubling up on the name
+            // when the filter is set and has children, it's assumed the component heading will be the name of the filter node, so there's no need to display the filter node itself, as we'd just be doubling up on the name
+            return [...filterNode.children];
         });
 
         /**
@@ -167,14 +167,14 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         /**
          * Confirm the removal of the node
          */
-        function confirmRemoveNode(): void {
+        async function confirmRemoveNode(): Promise<void> {
             if (nodeToRemove.value === null) {
                 return;
             }
             selectedNodes.value = selectedNodes.value.filter(
-                (selectedNode) => selectedNode.id !== nodeToRemove.value.id,
+                (selectedNode) => selectedNode.id !== nodeToRemove.value?.id,
             );
-            void pushChanges();
+            await pushChanges();
             nodeToRemove.value = null;
         }
 
