@@ -31,6 +31,8 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         const selectedNodeIds = window.Vue.computed(() => selectedNodes.value.map((node) => node.id));
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
+        // const isModalOpen = window.Vue.ref<boolean>(false); // to show the delete modal
+        const nodeToRemove = window.Vue.ref<Node | null>(null); // the node to remove
 
         /**
          * To notify the backend of a change in the selected nodes
@@ -158,9 +160,29 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
          * @param {Node} node - the node to remove
          */
-        async function removeNode(node: Node): Promise<void> {
-            selectedNodes.value = selectedNodes.value.filter((selectedNode) => selectedNode.id !== node.id);
-            await pushChanges();
+        function removeNode(node: Node): void {
+            nodeToRemove.value = node;
+        }
+
+        /**
+         * Confirm the removal of the node
+         */
+        function confirmRemoveNode(): void {
+            if (nodeToRemove.value === null) {
+                return;
+            }
+            selectedNodes.value = selectedNodes.value.filter(
+                (selectedNode) => selectedNode.id !== nodeToRemove.value.id,
+            );
+            void pushChanges();
+            nodeToRemove.value = null;
+        }
+
+        /**
+         * Cancel the removal of the node
+         */
+        function cancelRemoveNode(): void {
+            nodeToRemove.value = null;
         }
 
         /**
@@ -181,8 +203,11 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             hasHiddenNodes,
             selectedDetailsNodeId,
             isProcessing,
+            nodeToRemove,
             init,
             removeNode,
+            confirmRemoveNode,
+            cancelRemoveNode,
             updateNodes,
         };
     });

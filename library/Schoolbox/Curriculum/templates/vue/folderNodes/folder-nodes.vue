@@ -6,6 +6,7 @@
 
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnNode from "./fn-node.vue";
+import FnDeleteNode from "./fn-delete-node.vue";
 
 interface Props {
     folderId: number; // The folder id to display the nodes for
@@ -26,6 +27,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
             :component-instance-id="props.componentInstanceId"
         />
     </transition-group>
+    <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
 </template>
 
 <style scoped>
