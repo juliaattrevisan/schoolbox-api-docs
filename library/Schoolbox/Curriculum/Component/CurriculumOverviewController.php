@@ -143,9 +143,12 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
                 'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
-                    'curriculum.edit',
-                    [],
-                    $this->getUser()
+                    'folder.getFolderModify',
+                    [
+                        'id'     => $this->getContext()->getId(),
+                        'folder' => $this->getContext(),
+                    ],
+                    $this->getUser(),
                 ),
             ]
         );
