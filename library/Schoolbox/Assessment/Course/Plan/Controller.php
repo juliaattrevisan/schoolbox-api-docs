@@ -237,8 +237,8 @@ class Controller extends Base
             // Learning Activities
             $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
                 'order' => [
-                    'sequence' => 'ASC'
-                ]
+                    'sequence' => 'ASC',
+                ],
             ]);
 
             /* Get a set of rubrics that were used among all the assessment specs
@@ -377,6 +377,182 @@ class Controller extends Base
         ], "Unit Planner - {$course->getTitle()}");
     }
 
+    /**
+     * Get csv of all textboxes from all unit pages, to confirm they have the correct textbox title, component heading, and actually contain data
+     *
+     * @return void
+     */
+    public function getAudit()
+    {
+        $units = [];
+
+//build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Course Homepage ID',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Textbox Component Name',
+            'Textbox Title',
+            'Textbox ID',
+            'Textbox Content (empty string, empty state)'
+        ];
+
+//this should have succeeded, so open / build the csv file
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+
+// fetch all units/courses
+        $courseUnitQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("select
+    courseFolder.name as 'course.name',
+    courseFolder.id as 'course.id',
+    unitFolder.name as 'unit.name',
+    unitFolder.id as 'unit.id'
+FROM course_specification
+join folder courseFolder on course_specification.folder_id = courseFolder.id
+join course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
+join folder unitFolder on course_unit_specification.folder_id = unitFolder.id");
+
+        $courseUnitQuery->execute();
+        while ($row = $courseUnitQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $units[$row['unit.id']] = $row;
+        }
+// help the user by grabbing all unit IDs from the above query
+        $unitIDs = array_keys($units);
+
+
+        $unitPlaceHolder = Builder::getArrayPlaceholders($unitIDs, 'units');
+// fetch all textboxes with components from these units
+        $compTextQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
+    CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
+    f.id AS folder_id,
+    cci_componentname.value as 'componentName',
+    tb.heading as 'textboxHeading',
+    tb.updated_at AS date,
+    tb.updated_by AS updated_by,
+    tb.body AS textboxBody
+FROM component_definition cd
+         JOIN component_instance ci ON ci.component_definition_id = cd.id
+         JOIN folder f ON f.id = ci.identifier
+         JOIN component_config_definition ccd_textbox ON (
+    ccd_textbox.component_definition_id = cd.id AND
+    ccd_textbox.key = :homepageComponentKey
+    )
+         LEFT JOIN component_config_instance cci_textbox ON (
+    cci_textbox.component_config_definition_id = ccd_textbox.id AND
+    cci_textbox.component_instance_id = ci.id
+    )
+         LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+         JOIN component_config_definition ccd_componentname ON (
+    ccd_componentname.component_definition_id = cd.id AND
+    ccd_componentname.key = :componentConfigComponentNameKey
+    )
+         LEFT JOIN component_config_instance cci_componentname ON (
+    cci_componentname.component_config_definition_id = ccd_componentname.id AND
+    cci_componentname.component_instance_id = ci.id
+    )
+WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+  AND f.deleted_at IS NULL
+  AND tb.deleted_at IS NULL
+AND f.id in {$unitPlaceHolder};
+
+");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings);
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Textbox Component Name',
+         * 'Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $compTextQuery->execute(array_merge(
+            [
+                                        'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                                        'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+                                    ],
+            Builder::getArrayParameters($unitIDs, 'units')
+        ));
+        while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+            $units[$row['folder_id']]['course.name'],
+            $units[$row['folder_id']]['course.id'],
+            $units[$row['folder_id']]['unit.name'],
+            $units[$row['folder_id']]['unit.id'],
+            $row['componentName'] ?? 'NULL',
+            $row['textboxHeading'] ?? 'NULL',
+            $row['id'] ?? 'NULL',
+            $row['textboxBody'] ?? 'NULL',
+            ]);
+        }
+
+// fetch all textboxes with no component from these units
+
+        $textQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
+    CONCAT(tb2.textBoxID, '--') AS id,
+    tb2.heading as 'textboxHeading',
+    tb2.updated_at AS date,
+    tb2.updated_by AS updated_by,
+    tb2.body AS textboxBody,
+    tb2.categoryID as folderId
+FROM textBox tb2
+         LEFT JOIN component_config_instance cci2 ON (
+    cci2.component_config_definition_id = (
+        SELECT id
+        FROM component_config_definition ccd2
+        WHERE ccd2.key = :homepageComponentKey
+    ) AND
+    cci2.value = CAST(tb2.textBoxID AS NCHAR)
+    )
+WHERE tb2.deleted_at IS NULL
+  AND cci2.id IS NULL
+  AND tb2.categoryID in {$unitPlaceHolder}
+");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Textbox Component Name',
+         * 'Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $textQuery->execute(array_merge(
+            [
+                                    'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY],
+            Builder::getArrayParameters($unitIDs, 'units')
+        ));
+        while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+            $units[$row['folderId']]['course.name'],
+            $units[$row['folderId']]['course.id'],
+            $units[$row['folderId']]['unit.name'],
+            $units[$row['folderId']]['unit.id'],
+            $row['componentName']  ?? 'NULL',
+            $row['textboxHeading'] ?? 'NULL',
+            $row['id'] ?? 'NULL',
+            $row['textboxBody'] ?? 'NULL',
+            ]);
+        }
+        exit(1);
+    }
+
 
     /**
      * Find all the textboxes currently in use by $unitFolderId
@@ -397,7 +573,7 @@ class Controller extends Base
         if (null === $unitTemplateId) {
             return [
                 'textboxes' => [],
-                'extraTextboxes' => 0
+                'extraTextboxes' => 0,
             ];
         }
 
@@ -427,7 +603,7 @@ class Controller extends Base
             // This saves needing to manipulate the initial data on the frontend on the first mount
             $textboxes[strtolower($heading)] = [
                 'id' => -1,
-                'body' => ''
+                'body' => '',
             ];
 
             $textboxesKeys[strtolower($heading)] = $heading;
@@ -446,7 +622,7 @@ class Controller extends Base
                 'folderId' => $unitFolderId,
                 'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                'homepageDefaultComponentHeading' => TextboxComponentController::DEFAULT_COMPONENT_HEADING
+                'homepageDefaultComponentHeading' => TextboxComponentController::DEFAULT_COMPONENT_HEADING,
             ]
         );
 
@@ -471,7 +647,7 @@ class Controller extends Base
 
         return [
             'textboxes' => array_combine($textboxesKeys, $textboxes),
-            'extraTextboxes' => $extraTextboxes
+            'extraTextboxes' => $extraTextboxes,
         ];
     }
 
@@ -499,19 +675,19 @@ class Controller extends Base
                 /* Cross-referencing for fetching curriculum nodes separately
                  */
                 'capabilityIds' => [],
-                'indicatorIds' => []
+                'indicatorIds' => [],
             ],
             'used' => [
                 'capabilities' => [],
                 /* Cross-referencing for fetching curriculum nodes separately
                  */
                 'capabilityIds' => [],
-                'indicatorIds' => []
+                'indicatorIds' => [],
             ],
         ];
 
         $this->rubricStatement->execute([
-            'unitFolderId' => $unitFolderId
+            'unitFolderId' => $unitFolderId,
         ]);
 
         /* Accumulate a unique set of capabilities and indicators
@@ -533,12 +709,12 @@ class Controller extends Base
                 $rubrics['used']['capabilities'][$capabilityId] = [
                     'id' => $capabilityId,
                     'name' => Scrub::markdown($row['capability_name']),
-                    'indicators' => []
+                    'indicators' => [],
                 ];
             }
 
             $rubrics['used']['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
-                'name' => Scrub::markdown($row['indicator_name'])
+                'name' => Scrub::markdown($row['indicator_name']),
             ];
         }
 

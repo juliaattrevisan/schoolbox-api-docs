@@ -56,6 +56,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '/{id:\d+}', 'getPlan', $getPerms, $preloadCourse);
+        $this->register('GET', '/audit', 'getAudit', $getPerms);
     }
 
     /**
