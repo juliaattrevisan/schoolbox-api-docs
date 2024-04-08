@@ -119,7 +119,7 @@ class Controller extends Base
             // Also: if scope `open_id` is requested, response_type should
             // include `id_token`.
             'scope'         => 'openid email profile',
-            'response_type' => 'code id_token',
+            'response_type' => 'code token',
             'response_mode' => 'form_post',
             'state'         => $this->buildState($nonce),
             'nonce'         => $nonce,
