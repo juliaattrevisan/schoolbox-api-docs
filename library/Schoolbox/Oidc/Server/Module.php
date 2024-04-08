@@ -19,6 +19,7 @@ use DateInterval;
 use League\OAuth2\Server;
 use OpenIDConnectServer\ClaimExtractor;
 use OpenIDConnectServer\Entities\ClaimSetEntity;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
@@ -81,13 +82,21 @@ class Module extends BaseModule
             )
         );
 
+        // Get stuff out of the request
+        /** @var ServerRequestInterface $request */
+        $request = $this->injector->get('httpRequest');
+
         // Set up various repositories
-        $clientRepository       = new Repository\Client($relyingPartyMapper);
-        $scopeRepository        = new Repository\Scope();
-        $accessTokenRepository  = new Repository\AccessToken($cache, new KeyGenerator('accessToken'));
-        $authCodeRepository     = new Repository\AuthCode($cache, new KeyGenerator('authCode'));
-        $refreshTokenRepository = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
-        $idTokenRepository      = new Repository\Identity($userMapper);
+        $clientRepository        = new Repository\Client($relyingPartyMapper);
+        $scopeRepository         = new Repository\Scope();
+
+        $authTokenKeyGenerator   = new KeyGenerator('authCode');
+        $nonceKeyGenerator       = new KeyGenerator('nonce');
+        $authCodeRepository      = new Repository\AuthCode($cache, $authTokenKeyGenerator, $nonceKeyGenerator, $request);
+        $accessTokenKeyGenerator = new KeyGenerator('accessToken');
+        $accessTokenRepository   = new Repository\AccessToken($cache, $accessTokenKeyGenerator);
+        $refreshTokenRepository  = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
+        $idTokenRepository       = new Repository\Identity($userMapper);
 
         // Claim extractor: include Schoolbox's custom claims
         $claimExtractor = new ClaimExtractor(
