@@ -57,13 +57,6 @@ const isModalDisabled = window.Vue.computed(() => store().isProcessing);
 /**
  * to close the modal
  */
-function onCancelSelected() {
-    store().cancelRemoveNode();
-}
-
-/**
- * to close the modal
- */
 function onModalClosed() {
     store().cancelRemoveNode();
 }
@@ -94,7 +87,7 @@ function onModalClosed() {
                     class="button icon-close"
                     data-test-cancel-delete-node
                     :disabled="store().isProcessing"
-                    @click.prevent="onCancelSelected"
+                    @click.prevent="onModalClosed"
                 >
                     Cancel
                 </button>
