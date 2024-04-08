@@ -687,22 +687,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         throw new ExternalException('Failed to get pastoralCareSeq for pastoral: ' . $pastoral->getId());
                     }
 
-                    $pastoral->setExternalId($pastoralCareSeq);
-
-                    // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
-                    // notification every time someone creates a pastoral record
-                    $this->pastoralMapper->suppressNotification();
                     try {
-                        $this->pastoralMapper->save($pastoral);
-                    } catch (MapperException $e) {
+                        $this->pastoralMapper->setExternalIdWithoutChangingUpdatedAt($pastoralCareSeq, $pastoral->getId());
+                    } catch (UnexpectedValueException) {
                         if (!$inOuterTransaction) {
                             $this->connector->rollBack();
                         }
                         return false;
                     }
-
-                    // Restore the proper propagator
-                    $this->pastoralMapper->restoreNotification();
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic

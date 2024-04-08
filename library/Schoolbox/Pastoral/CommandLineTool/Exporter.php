@@ -89,7 +89,7 @@ HELP;
                 try {
                     $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
-                    $log->debug("Could not syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                    $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
                     $skippedRecordIds[] = $pastoralRecord->getId();
                 }
                 $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");

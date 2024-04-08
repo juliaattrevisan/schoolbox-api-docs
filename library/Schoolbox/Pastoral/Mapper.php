@@ -33,6 +33,7 @@ use Schoolbox\Pastoral\RecordAction\Mapper as PastoralRecordActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Please don't use this mapper directly in web requests!
@@ -1198,6 +1199,32 @@ class Mapper extends BaseMapper
             return;
         }
         $this->filters[] = $filter;
+    }
+
+    /**
+     * @param int $externalId
+     * @param int $pastoralId
+     * @return void
+     */
+    public function setExternalIdWithoutChangingUpdatedAt(int $externalId, int $pastoralId): void
+    {
+        $statement = $this->database->executeQuery(
+            'UPDATE ' . $this->database->getQuoter()->quoteIdentifier($this->getTable()) . '
+            SET external_id=:externalId
+            WHERE id=:pastoralId',
+            [
+                'externalId' => $externalId,
+                'pastoralId' => $pastoralId
+            ]
+        );
+
+        $nRowsAffected = $statement->rowCount();
+
+        if ($nRowsAffected !== 1) {
+            throw new UnexpectedValueException(
+                "Expected 1 row to be affected by UPDATE, but $nRowsAffected were affected."
+            );
+        }
     }
 
     /**
