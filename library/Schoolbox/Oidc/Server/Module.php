@@ -157,6 +157,7 @@ class Module extends BaseModule
         $authServer->enableGrantType($implicitGrant);
 
         return new Controller(
+            $relyingPartyMapper,
             $authServer,
             $this->injector->get('lti.keyChains'),
         );

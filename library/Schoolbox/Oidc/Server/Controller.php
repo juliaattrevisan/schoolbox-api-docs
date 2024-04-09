@@ -16,6 +16,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Url\Factory;
 
 /**
@@ -29,11 +30,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @paramServer\AuthorizationServer   $authServer The authorization server used to service OIDC auth requests.
+     * @param Mapper                      $mapper     The mapper which contains OIDC relying parties.
+     * @param Server\AuthorizationServer  $authServer The authorization server used to service OIDC auth requests.
      * @param KeyChainRepositoryInterface $keyChains  Repository of keychains: set up for LTI, but usable outside of
      *                                                that context.
      */
     public function __construct(
+        private Mapper $mapper,
         private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
     ) {
@@ -74,6 +77,7 @@ class Controller extends Base
                 '@oidcServer/authorization.twig',
                 [
                     'authorizationUrl' => $this->request->getUri(),
+                    'relyingParty'     => $this->mapper->findByClientId($this->requestQuery->get('client_id')),
                 ],
             );
         } else {

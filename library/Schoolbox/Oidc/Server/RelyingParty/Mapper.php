@@ -34,4 +34,15 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
+
+    /**
+     * Find a single relying party by its client ID.
+     *
+     * @param string $clientId
+     * @return Model|null The relying party model, or null if it doesn't exist.
+     */
+    public function findByClientId(string $clientId): ?Model
+    {
+        return $this->findByColumn('client_id', $clientId)->first();
+    }
 }

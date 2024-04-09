@@ -38,7 +38,7 @@ class Client implements ClientRepositoryInterface
      */
     public function getClientEntity($clientIdentifier): ?ClientEntityInterface
     {
-        $relyingParty = $this->findRelyingParty($clientIdentifier);
+        $relyingParty = $this->mapper->findByClientId($clientIdentifier);
         if (!$relyingParty) {
             return null;
         }
@@ -56,7 +56,7 @@ class Client implements ClientRepositoryInterface
      */
     public function validateClient($clientIdentifier, $clientSecret, $grantType): bool
     {
-        $relyingParty = $this->findRelyingParty($clientIdentifier);
+        $relyingParty = $this->mapper->findByClientId($clientIdentifier);
         if (!$relyingParty) {
             return false;
         }
@@ -67,16 +67,5 @@ class Client implements ClientRepositoryInterface
 
         // Currently assume any grant type is acceptable
         return true;
-    }
-
-    /**
-     * Helper method for finding the relying party model from the client ID.
-     *
-     * @param string $clientIdentifier
-     * @return RelyingParty\Model|null
-     */
-    private function findRelyingParty(string $clientIdentifier): ?RelyingParty\Model
-    {
-        return $this->mapper->findByColumn('client_id', $clientIdentifier)->first();
     }
 }
