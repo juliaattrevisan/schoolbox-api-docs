@@ -78,7 +78,11 @@ class Controller extends Base
             );
         } else {
             $authRequest->setAuthorizationApproved($permission);
-            $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
+            try {
+                $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
+            } catch (Server\Exception\OAuthServerException $e) {
+                $this->response = $e->generateHttpResponse($this->responseEmpty());
+            }
         }
     }
 
