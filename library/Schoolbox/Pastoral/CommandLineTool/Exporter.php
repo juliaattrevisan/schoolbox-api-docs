@@ -71,10 +71,7 @@ HELP;
         $log->info("Using external database connector '" . $externalPastoral->getDatabaseClassName() . "'");
 
         if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
-            $log->info(
-                "Note '" . External_Offline_Pastoral::class . "' is just a mock class that won't actually export anything." .
-                "  Configure an external database to actually export records."
-            );
+            $log->info('The current external db does not support pastoral exports; nothing will persist.');
         }
 
         $externalPastoralUpload    = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
