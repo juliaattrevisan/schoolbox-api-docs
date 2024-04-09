@@ -82,7 +82,7 @@ class AttendanceLink implements IAttendanceLink
             return false;
         }
 
-        /* Empty classcode results in no attendance in civica
+        /* Empty classcode results in no attendance link
          */
         if ('' === $classCode) {
             return false;
