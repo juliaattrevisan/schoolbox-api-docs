@@ -14,6 +14,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\User;
 
 /**
  * Model for OIDC relying parties.
@@ -54,6 +55,12 @@ class Model implements ISoftDeletable
      * user agent will be redirected upon authorization.
      */
     private string $redirectUri;
+
+    /**
+     * The user to impersonate when authorizing with the `client_credentials`
+     * grant: if not set, then this relying party doesn't support the grant.
+     */
+    private ?User $clientCredentialsUser = null;
 
     /**
      * @return string
@@ -124,6 +131,24 @@ class Model implements ISoftDeletable
     public function setRedirectUri(string $redirectUri): self
     {
         $this->redirectUri = $redirectUri;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getClientCredentialsUser(): ?User
+    {
+        return $this->clientCredentialsUser;
+    }
+
+    /**
+     * @param User|null $clientCredentialsUser
+     * @return $this
+     */
+    public function setClientCredentialsUser(?User $clientCredentialsUser): self
+    {
+        $this->clientCredentialsUser = $clientCredentialsUser;
         return $this;
     }
 }

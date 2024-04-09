@@ -143,6 +143,7 @@ export default {
                             <th>Redirect URI</th>
                             <th>Client ID</th>
                             <th>Client Secret</th>
+                            <th>Client Credentials User</th>
                             <th>&nbsp;</th>
                         </tr>
                         <tr v-for="row in loadedData">
@@ -155,6 +156,7 @@ export default {
                                 </template>
                                 <template v-else>&mdash;</template>
                             </td>
+                            <td>{{ row.clientCredentialsUser.fullName }}</td>
                             <td>
                                 <a href="#" class="icon-modify" title="Modify this client" @click.prevent="showModifyModal(row)"></a>
                                 <a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a>

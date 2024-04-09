@@ -47,7 +47,7 @@ class Controller extends Base
     public function getList(): void
     {
         $this->response = $this->responseAsJson(
-            $this->mapper->findAll()->map($this->translateModelToArray(...))
+            $this->mapper->findAll()->map($this->translateModelToArray(...))->reindex()
         );
     }
 
