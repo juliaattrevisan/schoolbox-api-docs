@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Oauth\Client\Api\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Oidc\Server\RelyingParty\Model;
+use Schoolbox\User;
 
 /**
  * Convert a oAuth client model to an array.
@@ -29,6 +30,15 @@ class ArrayToModel extends Base
         $model ??= new Model();
         $model = $this->setScalar($array, 'name', $model, 'setName');
         $model = $this->setScalar($array, 'redirectUri', $model, 'setRedirectUri');
+        $model = $this->setModel(
+            $array,
+            'clientCredentialsUser',
+            'id',
+            $model,
+            'setClientCredentialsUser',
+            new User(),
+            'setId',
+        );
         return $model;
     }
 }

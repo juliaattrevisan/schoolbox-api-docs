@@ -25,15 +25,18 @@ class ModelToArray
     /**
      * Constructor
      *
-     * @param Generator  $routeGenerator Route generator: this, `$authorizer` and `$currentUser` are used to generate
-     *                                   links to oAuth clients.
-     * @param Authorizer $authorizer     Authorizer
-     * @param User       $currentUser    Current user
+     * @param Generator                    $routeGenerator Route generator: this, `$authorizer` and `$currentUser` are
+     *                                                     used to generate links to oAuth clients.
+     * @param Authorizer                   $authorizer     Authorizer
+     * @param User                         $currentUser    Current user
+     * @param User\Translator\ModelToArray $userTranslator User translator: required for translating the client's
+     *                                                     client credentials user.
      */
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        protected User\Translator\ModelToArray $userTranslator,
     ) {
     }
 
@@ -47,11 +50,14 @@ class ModelToArray
     {
         $params = ['id' => $model->getId(),];
         return [
-            'id'          => $model->getId(),
-            'name'        => $model->getName(),
-            'clientId'    => $model->getClientId(),
-            'redirectUri' => $model->getRedirectUri(),
-            '_links'      => [
+            'id'                    => $model->getId(),
+            'name'                  => $model->getName(),
+            'clientId'              => $model->getClientId(),
+            'redirectUri'           => $model->getRedirectUri(),
+            'clientCredentialsUser' => $model->getClientCredentialsUser()
+                ? call_user_func($this->userTranslator, $model->getClientCredentialsUser())
+                : null,
+            '_links'                => [
                 'put'    => $this->getRouteIfAuthorized('adminOauthClientApi.putItem', $params),
                 'patch'  => $this->getRouteIfAuthorized('adminOauthClientApi.patchItem', $params),
                 'delete' => $this->getRouteIfAuthorized('adminOauthClientApi.deleteItem', $params),

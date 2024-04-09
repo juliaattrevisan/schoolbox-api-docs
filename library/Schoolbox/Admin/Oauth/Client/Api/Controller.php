@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Oauth\Client\Api;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Oidc\Server\RelyingParty;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 
 /**
  * Controller actions for setting up oAuth clients (a.k.a. OpenID Connect
@@ -156,7 +157,12 @@ class Controller extends Base
      */
     private function translateModelToArray(RelyingParty\Model $model): array
     {
-        $this->modelToArray ??= new Translator\ModelToArray($this->routeGenerator, $this->authorizer, $this->getUser());
+        $this->modelToArray ??= new Translator\ModelToArray(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            new UserTranslator(),
+        );
         return call_user_func($this->modelToArray, $model);
     }
 }
