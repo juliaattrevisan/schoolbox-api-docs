@@ -18,9 +18,13 @@
     <ul>
         <li>Name</li>
         <li>Email address</li>
+        <li>URL: {{ authorizationUrl }}</li>
     </ul>
-    <ul class="flex-list buttons">
-        <li><a href="#" class="submit">Allow</a></li>
-        <li><a href="#">Deny</a></li>
-    </ul>
+
+    <form method="post" action="{{ authorizationUrl }}">
+        <ul class="flex-list buttons">
+            <li><button type="submit" name="permission" value="1">Allow</button></li>
+            <li><button type="submit" name="permission" value="0">Deny</button></li>
+        </ul>
+    </form>
 {% endblock content %}

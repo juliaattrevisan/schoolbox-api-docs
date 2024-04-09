@@ -57,26 +57,40 @@ class Controller extends Base
         // There needs to be a currently authenticated user:
         // If nobody's logged in, and logging in with client credentials:
         // auth as whoever's configured, otherwise return 403.
+        // TODO move to permissions?
         $user = $this->getUser();
         if (!$user->getId()) {
             throw new NotAuthenticated();
         }
         $authRequest->setUser(new Entity\User($user));
 
-//        // Display confirm auth page:
-//        // this should be bypassed if the user has already given permission
-//        // for this client.
-//        // (but in this case, the access token will probably just be used)
-//        $this->response = $this->responseFromTemplateUnthemed('@oidcServer/authorization.twig', []);
-
-        // Could set redirect URI based on what's in the request?
-
-        // For now, auto-accept
-        $authRequest->setAuthorizationApproved(true);
-        $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
+        // Display confirm auth page:
+        // this should be bypassed if the user has already given permission
+        // for this client.
+        // (but in this case, the access token will probably just be used)
+        $permission = $this->requestPost->getBool('permission');
+        if (!isset($permission)) {
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@oidcServer/authorization.twig',
+                [
+                    'authorizationUrl' => $this->request->getUri(),
+                ],
+            );
+        } else {
+            $authRequest->setAuthorizationApproved($permission);
+            $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
+        }
     }
 
     /**
+     * POST request for receiving an authorization code.
+     *
+     * This is the only way in which the auth request may be confirmed or
+     * rejected.
+     *
+     * @api   POST /oidc/authorize
+     * @since 24.0
+     *
      * @see getAuthorization
      */
     public function postAuthorization(): void
