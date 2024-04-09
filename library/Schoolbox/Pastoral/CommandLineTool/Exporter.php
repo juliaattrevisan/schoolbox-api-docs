@@ -31,6 +31,8 @@ class Exporter extends CliTool\App
      */
     private const BATCH_SIZE = 100;
 
+    private const UNSPECIFIED_REASON = 'Unspecified reason';
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -89,7 +91,7 @@ HELP;
 
         $builder = $pastoralMapper->getPredicateBuilder();
 
-        $skippedRecordIds = [];
+        $failedPastoralIdsByReason = [];
         $nRecordsExported = 0;
 
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
@@ -100,11 +102,14 @@ HELP;
                     $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
                     $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
-                    $skippedRecordIds[] = $pastoralRecord->getId();
+                    $shortExceptionMessage = substr($e->getMessage(), 0, 50);
+                    $failedPastoralIdsByReason[$shortExceptionMessage][] = $pastoralRecord->getId();
+                    continue;
                 }
 
                 if (!$syncSucceeded) {
                     $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                    $failedPastoralIdsByReason[self::UNSPECIFIED_REASON][] = $pastoralRecord->getId();
                     continue;
                 }
 
@@ -148,10 +153,14 @@ HELP;
             }
         }
 
-        $log->info("$nRecordsExported pastoral records exported.");
-        $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
-        if (count($skippedRecordIds) > 0) {
-            $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
+        $log->info("$nRecordsExported pastoral records exported successfully.");
+
+        if (count($failedPastoralIdsByReason) > 0) {
+            $log->info("PastoralIds that failed to export, by reason for failure:");
+            foreach ($failedPastoralIdsByReason as $reason => $pastoralIds) {
+                $log->info(' * ' . count($pastoralIds) . " pastoral record(s) were not exported due to error '$reason'");
+                $log->info('   pastoralIds: ' . implode(', ', $pastoralIds));
+            }
         }
     }
 }
