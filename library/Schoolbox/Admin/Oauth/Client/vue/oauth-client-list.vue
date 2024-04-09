@@ -1,8 +1,15 @@
 <script>
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
+// Vue-select for selecting a user
+import vSelect from "vue-select";
+import debounce from "lodash/debounce";
+import "vue-select/dist/vue-select.css";
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
+vSelect.props.components.default = () => ({ Deselect });
+
 export default {
-    components: {RevealModal},
+    components: {RevealModal, vSelect},
     props: {
         getListEndpoint: {
             // The endpoint for fetching the list of items.
@@ -13,6 +20,17 @@ export default {
             // The endpoint for posting a new item to.
             type: String,
             required: true,
+        },
+        userSearchEndpoint: {
+            // The endpoint to which user search requests are submitted.
+            type: String,
+            required: true,
+        },
+        userSearchQueryParam: {
+            // The query string parameter to submit the user search parameter
+            // within, when performing a user search.
+            type: String,
+            default: "query",
         },
     },
 
@@ -119,6 +137,32 @@ export default {
                 console.warn(error);
             }
         },
+
+        /**
+         * Search callback for the user selectize.
+         *
+         * This method is debounced so that the search doesn't trigger until
+         * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
+         * milliseconds.
+         *
+         * @param {String}   query   The search string
+         * @param {Function} loading A function to call when the loading state
+         *                           changes (accepts a Boolean)
+         */
+        onUserSearch: debounce(async (query, loading) => {
+            debugger;
+            if (query.length < 3) {
+                return;
+            }
+            loading(true);
+
+            let searchUrl = new URL(this.userSearchEndpoint, window.location);
+            searchUrl.search = new URLSearchParams([
+                [this.userSearchQueryParam, query]
+            ])
+            const response = await fetch(searchUrl);
+            loading(false);
+        }),
     }
 }
 </script>
@@ -210,6 +254,31 @@ export default {
             <input id="addItem-name" required v-model="addingItem.name" />
             <label for="addItem-redirectUri">Redirect URI</label>
             <input id="addItem-redirectUri" required v-model="addingItem.redirectUri" />
+
+            <label for="addItem-clientCredentialsUser">Client Credentials User</label>
+            <v-select
+                input-id="addItem-clientCredentialsUser"
+                class="schoolbox-vue-selectize"
+                :clear-search-on-blur="true"
+                :clear-search-on-select="true"
+                :close-on-select="false"
+                @search="onUserSearch"
+                label="fullName"
+                placeholder="Search for user"
+                v-model="addingItem.clientCredentialsUser"
+            >
+                <template #option="option">
+                <span class="d-center">
+                    {{ option.name }}
+                </span>
+                </template>
+                <template #selected-option="option">
+                <span class="selected d-center">
+                    {{ option.name }}
+                </span>
+                </template>
+            </v-select>
+
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="addItem" href="#">Add</a>

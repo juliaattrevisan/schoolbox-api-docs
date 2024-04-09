@@ -16,6 +16,7 @@ configContext:  array     - Data required to render a config settings form
             <oauth-client-list
                 get-list-endpoint="{{ routeLookup('adminOauthClientApi.getList') }}"
                 post-item-endpoint="{{ routeLookup('adminOauthClientApi.postItem') }}"
+                user-search-endpoint="/ajax/user.php"
             >
             </oauth-client-list>
         </div>
