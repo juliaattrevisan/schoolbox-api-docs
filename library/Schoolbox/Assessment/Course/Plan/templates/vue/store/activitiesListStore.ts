@@ -85,11 +85,20 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
             }
         }
 
+        /**
+         * Remove an activity from the store
+         * @param { number } activityId - the activity ID to remove
+         */
+        function removeActivity(activityId: number) {
+            activities.value = activities.value.filter((activity) => activity.id !== activityId);
+        }
+
         return {
             init,
             activities,
             routes,
             saveActivitySequence,
             resequenceActivities,
+            removeActivity,
         };
     });

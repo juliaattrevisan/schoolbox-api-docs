@@ -6,6 +6,7 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
+import { useActivitiesListDeleteModalStore } from "./store/activitiesListDeleteModalStore";
 
 gsap.registerPlugin(Draggable);
 
@@ -15,8 +16,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(["deleted"]);
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListStoreId);
+const activitiesListDeleteModalStore = useActivitiesListDeleteModalStore();
 
 const activityListEl = window.Vue.ref<HTMLElement | null>(null);
 
@@ -115,7 +118,9 @@ window.Vue.onUnmounted(() => {
                 <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
             </li>
             <li>
-                <a class="icon-delete" @click.prevent="deleteActivityStore.prompt(props.unit, props.activity)"
+                <a
+                    class="icon-delete"
+                    @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
                     >Delete</a
                 >
             </li>

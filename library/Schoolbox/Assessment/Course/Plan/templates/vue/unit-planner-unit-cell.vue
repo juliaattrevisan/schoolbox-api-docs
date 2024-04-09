@@ -187,6 +187,7 @@ window.Vue.onUnmounted(() => {
                     :toast-el="store.toastEl!"
                     @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
                     @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
+                    @activity-deleted="store.removeActivity(props.unit.id, $event)"
                 />
             </template>
 

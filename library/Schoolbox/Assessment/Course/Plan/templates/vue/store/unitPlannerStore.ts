@@ -158,6 +158,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         );
     });
 
+    /**
+     * Remove an activity from the store
+     * @param { number } unitId - the unit ID to remove the activity from
+     * @param { number } activityId - the activity ID to remove
+     */
+    function removeActivity(unitId: number, activityId: number) {
+        const storeUnit = units.value.find((unit) => unit.id === unitId);
+        if (storeUnit === undefined) {
+            return;
+        }
+        storeUnit.activities.items = storeUnit.activities.items.filter((activity) => activity.id !== activityId);
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -174,5 +187,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitContentHeights,
         setUnitContentHeight,
         unitRowDisplayHeights,
+        removeActivity,
     };
 });

@@ -16,12 +16,25 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["dragStart", "dragStop"]);
+const emit = defineEmits<{
+    (e: "activityDeleted", activityId: number): void;
+    (e: "dragStart"): void;
+    (e: "dragStop"): void;
+}>();
 
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListStoreId);
 
 const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
+
+/**
+ * When an activity is deleted, remove it from the store and let the parent component know
+ * @param {number} activityId The id of the activity that was deleted
+ */
+function onActivityDeleted(activityId: number) {
+    activitiesListStore().removeActivity(activityId);
+    emit("activityDeleted", activityId);
+}
 
 window.Vue.onMounted(() => {
     activitiesListStore().init(props.activities, props.activitiesListRoutes);
@@ -40,6 +53,7 @@ window.Vue.onMounted(() => {
             :key="activity.id"
             :activity="activity"
             :activities-list-store-id="activitiesListStoreId"
+            @deleted="onActivityDeleted(activity.id)"
         />
     </ul>
 </template>

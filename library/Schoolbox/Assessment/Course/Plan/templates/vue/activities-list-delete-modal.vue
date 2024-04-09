@@ -3,76 +3,60 @@
  * To be able to delete an activity on confirmation
  */
 
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import { useDeleteActivityStore } from "./store/unitPlannerDeleteActivityStore";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
+import { useActivitiesListDeleteModalStore } from "./store/activitiesListDeleteModalStore";
 
-const deleteActivityStore = useDeleteActivityStore();
-const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
-
-/**
- * to open the modal when requested
- */
-window.Vue.watch(
-    () => deleteActivityStore.isOpen,
-    (isOpen) => {
-        if (modalEl.value !== null) {
-            if (isOpen) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
-                modalEl.value.open();
-            } else {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
-                modalEl.value.close();
-            }
-        }
-    },
-);
+const activitiesListDeleteModalStore = useActivitiesListDeleteModalStore();
 
 /**
  * To instantly notify the user that the node is being deleted
  * by updating the button text
  */
 const deleteButtonText = window.Vue.computed(() =>
-    deleteActivityStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
+    activitiesListDeleteModalStore.isProcessing ? "Deleting..." : "Yes, permanently delete",
 );
 
 /**
  * To prevent the user from moving away from the modal while processing is taking place
  */
-const isModalDisabled = window.Vue.computed(() => deleteActivityStore.isProcessing);
+const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore.isProcessing);
 </script>
 
 <template>
-    <reveal-modal
-        ref="modalEl"
+    <sequential-reveal-modal
+        :is-open="activitiesListDeleteModalStore.isOpen"
         :is-close-disabled="isModalDisabled"
-        :close-on-background-click="false"
-        @closed="deleteActivityStore.cancel"
+        @closed="activitiesListDeleteModalStore.close()"
     >
-        <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this activity? You will be unable to import this activity into classes.</p>
-        <ul class="flex-list">
-            <li>
-                <button
-                    class="button icon-approve submit"
-                    data-test-confirm-delete-activity
-                    :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="deleteActivityStore.deleteActivity"
-                >
-                    {{ deleteButtonText }}
-                </button>
-            </li>
-            <li>
-                <button
-                    class="button icon-close"
-                    data-test-cancel-delete-activity
-                    :disabled="deleteActivityStore.isProcessing"
-                    @click.prevent="deleteActivityStore.cancel"
-                >
-                    No, keep it
-                </button>
-            </li>
-        </ul>
-    </reveal-modal>
+        <template #sequence-1>
+            <h2>Please Confirm</h2>
+            <p>
+                Are you sure you wish to delete this activity? You will be unable to import this activity into classes.
+            </p>
+            <ul class="flex-list">
+                <li>
+                    <button
+                        class="button icon-approve submit"
+                        data-test-confirm-delete-activity
+                        :disabled="activitiesListDeleteModalStore.isProcessing"
+                        @click.prevent="activitiesListDeleteModalStore.confirm()"
+                    >
+                        {{ deleteButtonText }}
+                    </button>
+                </li>
+                <li>
+                    <button
+                        class="button icon-close"
+                        data-test-cancel-delete-activity
+                        :disabled="activitiesListDeleteModalStore.isProcessing"
+                        @click.prevent="activitiesListDeleteModalStore.close()"
+                    >
+                        No, keep it
+                    </button>
+                </li>
+            </ul>
+        </template>
+    </sequential-reveal-modal>
 </template>
 
 <style scoped></style>

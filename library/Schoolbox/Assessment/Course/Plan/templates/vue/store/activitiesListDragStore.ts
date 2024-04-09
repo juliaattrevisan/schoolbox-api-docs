@@ -15,6 +15,16 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         const activityEls = window.Vue.ref<Record<Activity["id"], HTMLElement>>({});
 
+        // If an activity is deleted from the store, remove it from the activityEls
+        window.Vue.watch(activitiesListStore().activities, (newActivities, oldActivities) => {
+            const newActivityIDs = newActivities.map((activity) => activity.id);
+            const oldActivityIDs = oldActivities.map((activity) => activity.id);
+            const removedActivityIDs = oldActivityIDs.filter((id) => !newActivityIDs.includes(id));
+            removedActivityIDs.forEach((id) => {
+                delete activityEls.value[id];
+            });
+        });
+
         // Allow the refs to be passed in instead of creating and monitoring two
         let activitiesContainerEl: Ref<HTMLElement>;
 

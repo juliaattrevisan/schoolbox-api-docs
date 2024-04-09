@@ -8,7 +8,7 @@ import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
-import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
+import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
     units: Unit[];
@@ -210,7 +210,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
 
-    <activities-list-delete-item />
+    <activities-list-delete-modal />
     <toast ref="toastEl"></toast>
 </template>
 
