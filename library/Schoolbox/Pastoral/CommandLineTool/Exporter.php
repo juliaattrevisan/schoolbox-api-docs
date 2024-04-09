@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\CommandLineTool;
 
+use External_Offline_Pastoral;
 use External_Pastoral;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -136,6 +137,11 @@ HELP;
         $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
         if (count($skippedRecordIds) > 0) {
             $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
+        }
+
+        if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
+            $log->info('Note nothing was actually exported because the mock connector External_Offline_Pastoral was used.');
+            $log->info('Configure an external database to actually export records.');
         }
     }
 }
