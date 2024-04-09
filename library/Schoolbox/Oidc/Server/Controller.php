@@ -77,7 +77,9 @@ class Controller extends Base
                 '@oidcServer/authorization.twig',
                 [
                     'authorizationUrl' => $this->request->getUri(),
-                    'relyingParty'     => $this->mapper->findByClientId($this->requestQuery->get('client_id')),
+                    'authRequest'      => $authRequest,
+                    // Separate variable, as this isn't a standard scope name.
+                    'schoolboxScope'   => Repository\Scope::SCOPE_SCHOOLBOX,
                 ],
             );
         } else {
