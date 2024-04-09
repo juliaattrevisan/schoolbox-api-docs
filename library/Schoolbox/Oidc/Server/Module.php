@@ -24,6 +24,7 @@ use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
+use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
 
 /**
@@ -97,7 +98,7 @@ class Module extends BaseModule
         $accessTokenKeyGenerator = new KeyGenerator('accessToken');
         $accessTokenRepository   = new Repository\AccessToken($cache, $accessTokenKeyGenerator);
         $refreshTokenRepository  = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
-        $idTokenRepository       = new Repository\Identity($userMapper);
+        $idTokenRepository       = new Repository\Identity($userMapper, (new Factory($this->getConfig()))->buildFullyQualified());
 
         // Claim extractor: include Schoolbox's custom claims
         $claimExtractor = new ClaimExtractor(

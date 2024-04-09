@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server\Entity;
 
+use Alaress\Image\Transformation\Storage;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use OpenIDConnectServer\Entities\ClaimSetInterface;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\User as UserModel;
 
 /**
@@ -21,9 +23,10 @@ class User implements UserEntityInterface, ClaimSetInterface
     /**
      * Constructor
      *
-     * @param UserModel $user The user who is being identified.
+     * @param UserModel    $user    The user who is being identified.
+     * @param UriInterface $baseUri This Schoolbox instance's base URI: used to determine links to profile and picture.
      */
-    public function __construct(private UserModel $user)
+    public function __construct(private UserModel $user, private UriInterface $baseUri)
     {
     }
 
@@ -54,6 +57,13 @@ class User implements UserEntityInterface, ClaimSetInterface
             'family_name'        => $this->user->getLastname(),
             'nickname'           => $this->user->getGivenName(),
             'preferred_username' => $this->user->getUsername(),
+            'profile'            => $this->baseUri
+                ->withPath('/search/user/' . $this->user->getId())
+                ->__toString(),
+            'picture'            => $this->baseUri
+                ->withPath('/portrait.php')
+                ->withQuery(http_build_query(['id' => $this->user->getId(), 'size' => Storage::TRANSFORM_SQUARE64]))
+                ->__toString(),
 
             // Email claims: assume email is verified
             'email'          => $this->user->getEmail(),

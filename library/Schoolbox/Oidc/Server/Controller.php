@@ -65,7 +65,7 @@ class Controller extends Base
         if (!$user->getId()) {
             throw new NotAuthenticated();
         }
-        $authRequest->setUser(new Entity\User($user));
+        $authRequest->setUser(new Entity\User($user, (new Factory($this->getConfigLoader()))->buildFullyQualified()));
 
         // Display confirm auth page:
         // this should be bypassed if the user has already given permission
