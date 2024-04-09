@@ -97,7 +97,6 @@ HELP;
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
-                $syncSucceeded = false;
                 try {
                     $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
