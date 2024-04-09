@@ -156,7 +156,10 @@ export default {
                                 </template>
                                 <template v-else>&mdash;</template>
                             </td>
-                            <td>{{ row.clientCredentialsUser.fullName }}</td>
+                            <td>
+                                <a v-if="row.clientCredentialsUser" :href="row.clientCredentialsUser._links.profile">{{ row.clientCredentialsUser.fullName }}</a>
+                                <em v-else>No user</em>
+                            </td>
                             <td>
                                 <a href="#" class="icon-modify" title="Modify this client" @click.prevent="showModifyModal(row)"></a>
                                 <a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a>
