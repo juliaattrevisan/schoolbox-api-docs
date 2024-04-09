@@ -102,14 +102,16 @@ class Module extends BaseModule
 
         // Claim extractor: include Schoolbox's custom claims
         $claimExtractor = new ClaimExtractor(
-            new ClaimSetEntity(
-                Scope::SCOPE_SCHOOLBOX,
-                [
-                    Scope::SCOPE_SCHOOLBOX . '/instance_id',
-                    Scope::SCOPE_SCHOOLBOX . '/external_id',
-                    Scope::SCOPE_SCHOOLBOX . '/role_type',
-                ]
-            )
+            [
+                new ClaimSetEntity(
+                    Scope::SCOPE_SCHOOLBOX,
+                    [
+                        Scope::SCOPE_SCHOOLBOX . '/instance_id',
+                        Scope::SCOPE_SCHOOLBOX . '/external_id',
+                        Scope::SCOPE_SCHOOLBOX . '/role_type',
+                    ]
+                ),
+            ]
         );
 
         // The actual auth server
