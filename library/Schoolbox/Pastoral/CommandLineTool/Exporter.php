@@ -66,6 +66,17 @@ HELP;
         $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
         $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
         $externalPastoral          = new External_Pastoral();
+
+
+        $log->info("Using external database connector '" . $externalPastoral->getDatabaseClassName() . "'");
+
+        if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
+            $log->info(
+                "Note '" . External_Offline_Pastoral::class . "' is just a mock class that won't actually export anything." .
+                "  Configure an external database to actually export records."
+            );
+        }
+
         $externalPastoralUpload    = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
         if ($externalPastoralUpload) {
             $log->info('Pastoral external attachment upload is enabled');
@@ -87,13 +98,20 @@ HELP;
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
+                $syncSucceeded = false;
                 try {
-                    $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
+                    $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
                     $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
                     $skippedRecordIds[] = $pastoralRecord->getId();
                 }
-                $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
+
+                if (!$syncSucceeded) {
+                    $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                    continue;
+                }
+
+                $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
 
                 $nRecordsExported++;
 
@@ -137,11 +155,6 @@ HELP;
         $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
         if (count($skippedRecordIds) > 0) {
             $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
-        }
-
-        if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
-            $log->info('Note nothing was actually exported because the mock connector External_Offline_Pastoral was used.');
-            $log->info('Configure an external database to actually export records.');
         }
     }
 }
