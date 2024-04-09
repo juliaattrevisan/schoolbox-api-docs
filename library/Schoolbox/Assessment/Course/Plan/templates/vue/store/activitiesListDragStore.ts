@@ -29,7 +29,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
         let activitiesContainerEl: Ref<HTMLElement>;
 
         const isDragging = window.Vue.ref(false);
-        const dragCurrentActivityID = window.Vue.ref<Activity["id"] | null>(null);
+        const dragCurrentActivity = window.Vue.ref<Activity | null>(null);
         const dragCurrentPointerY = window.Vue.ref<number | null>(null);
         const dragInitial = window.Vue.ref<{
             y: number;
@@ -93,14 +93,15 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
             // Clamp the target height to between:
             // - Min of 0 (Top of the container)
-            // - Max of the height of every row combined
+            // - Max of the height of every row combined excluding the dragged row
             const minDragHeight = 0;
-            const maxDragHeight = Math.max(
-                activitiesContainerEl.value.clientHeight,
-                Object.values(activityEls.value).reduce((acc, draggableEl) => {
-                    return acc + draggableEl.clientHeight;
-                }, 0),
-            );
+            const maxDragHeight =
+                Math.max(
+                    activitiesContainerEl.value.clientHeight,
+                    Object.values(activityEls.value).reduce((acc, draggableEl) => {
+                        return acc + draggableEl.clientHeight;
+                    }, 0),
+                ) - activityEls.value[dragCurrentActivity.value!.id].clientHeight;
             return Math.max(minDragHeight, Math.min(targetHeight, maxDragHeight));
         });
 
@@ -113,7 +114,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             if (
                 // isUnitSortablePlaceholder.value ||
                 !isDragging.value ||
-                dragCurrentActivityID.value === null ||
+                dragCurrentActivity.value === null ||
                 dragInitial.value === null
             ) {
                 return activitiesListStore().activities;
@@ -149,7 +150,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             // Reorder the units based on the new index
             const newOrderedActivities = [...activitiesListStore().activities];
             const dragActivityIndex = activitiesListStore().activities.findIndex(
-                (u) => u.id === dragCurrentActivityID.value,
+                (u) => u.id === dragCurrentActivity.value!.id,
             );
             const [draggedActivity] = newOrderedActivities.splice(dragActivityIndex, 1);
             newOrderedActivities.splice(adjustedDragIndex, 0, draggedActivity);
@@ -176,7 +177,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             const pointerTarget = pointerEvent.target as HTMLElement;
 
             dragCurrentPointerY.value = draggable.pointerY;
-            dragCurrentActivityID.value = activity.id;
+            dragCurrentActivity.value = activity;
             dragInitial.value = {
                 // The initial position of the drag handle
                 y: draggable.y,
@@ -207,7 +208,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             activitiesListStore().resequenceActivities(orderedActivities.value.map((activity) => activity.id));
 
             isDragging.value = false;
-            dragCurrentActivityID.value = null;
+            dragCurrentActivity.value = null;
             dragCurrentPointerY.value = null;
             dragInitial.value = null;
             callbackOnDragEnd();
@@ -220,7 +221,7 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             unsetActivityEl,
             orderedActivities,
             isDragging,
-            dragCurrentActivityID,
+            dragCurrentActivity,
             dragPlaceholderY,
             onDragStart,
             onDragMove,

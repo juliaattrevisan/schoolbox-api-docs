@@ -53,7 +53,15 @@ window.Vue.onMounted(() => {
             :key="activity.id"
             :activity="activity"
             :activities-list-store-id="activitiesListStoreId"
+            :is-drag-placeholder="false"
             @deleted="onActivityDeleted(activity.id)"
+        />
+        <activities-list-item
+            v-if="activitiesListDragStore().isDragging"
+            :key="`${activitiesListDragStore().dragCurrentActivity!.id}-placeholder`"
+            :activity="activitiesListDragStore().dragCurrentActivity!"
+            :activities-list-store-id="activitiesListStoreId"
+            :is-drag-placeholder="true"
         />
     </ul>
 </template>

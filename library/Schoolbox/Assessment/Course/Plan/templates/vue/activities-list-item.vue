@@ -13,6 +13,7 @@ gsap.registerPlugin(Draggable);
 interface Props {
     activitiesListStoreId: string; // The id of the activitiesListStoreId this belongs to
     activity: Activity;
+    isDragPlaceholder: boolean;
 }
 
 const props = defineProps<Props>();
@@ -40,13 +41,14 @@ const draggableEl = window.Vue.ref<HTMLElement>();
 let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 window.Vue.onMounted(() => {
-    activitiesListDragStore().setActivityEl(props.activity.id, activityListEl.value!);
-
     // Whether to allow the user to resequence the activities
-    if (activitiesListStore().routes.reorder) {
+    if (activitiesListStore().routes.reorder && !props.isDragPlaceholder) {
+        activitiesListDragStore().setActivityEl(props.activity.id, activityListEl.value!);
+
         if (draggableEl.value) {
             draggableInstance = Draggable.create(draggableEl.value, {
                 type: "y",
+                cursor: "move",
                 autoScroll: 1, // Scroll speed
                 inertia: true,
                 allowContextMenu: true,
@@ -68,7 +70,9 @@ window.Vue.onMounted(() => {
 });
 
 window.Vue.onUnmounted(() => {
-    activitiesListDragStore().unsetActivityEl(props.activity.id);
+    if (activitiesListStore().routes.reorder && !props.isDragPlaceholder) {
+        activitiesListDragStore().unsetActivityEl(props.activity.id);
+    }
 });
 </script>
 
@@ -76,9 +80,13 @@ window.Vue.onUnmounted(() => {
     <li
         ref="activityListEl"
         class="actions-small-1"
-        :class="{
-            'is-dragging': activitiesListDragStore().dragCurrentActivityID === props.activity.id,
+        :class="{ 'ui-sortable-helper': props.isDragPlaceholder }"
+        :style="{
+            top: props.isDragPlaceholder ? `${activitiesListDragStore().dragPlaceholderY}px` : undefined,
         }"
+        :data-sortable-active="
+            (activitiesListDragStore().dragCurrentActivity === props.activity && !props.isDragPlaceholder) || undefined
+        "
     >
         <div class="list-item">
             <div v-if="activitiesListStore().routes.reorder" ref="draggableEl" class="sortable-holder"></div>
@@ -129,13 +137,12 @@ window.Vue.onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-li.is-dragging {
-    background-color: #f8f8f8;
-    border: 1px solid #e0e0e0;
-
-    .sortable-holder {
-        transform: none !important;
-    }
+li[data-sortable-active="true"] .sortable-holder {
+    transform: none !important;
+}
+.ui-sortable-helper {
+    position: absolute;
+    width: 100%;
 }
 .sortable-holder {
     background-color: transparent;

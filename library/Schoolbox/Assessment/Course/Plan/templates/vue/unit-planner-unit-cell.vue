@@ -103,6 +103,7 @@ window.Vue.onMounted(() => {
         if (draggableEl.value) {
             draggableInstance = Draggable.create(draggableEl.value, {
                 type: "y",
+                cursor: "move",
                 autoScroll: 1, // Scroll speed
                 inertia: true,
                 allowContextMenu: true,
