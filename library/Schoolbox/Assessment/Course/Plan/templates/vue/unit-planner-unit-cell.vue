@@ -179,16 +179,16 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <activities-list-content
-                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-p' : ''}`"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                     :is-sortable-placeholder="props.isSortablePlaceholder"
                     :activities="props.unit.activities.items"
                     :activity-type-locale="props.activityTypeLocale"
                     :activities-list-routes="props.unit.activities._routes"
                     :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                     :toast-el="store.toastEl!"
+                    :prevent-store-init="props.isSortablePlaceholder"
                     @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
                     @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
-                    @activity-deleted="store.removeActivity(props.unit.id, $event)"
                 />
             </template>
 
@@ -225,7 +225,7 @@ window.Vue.onUnmounted(() => {
 
                 <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
-                    :activities-list-store-id="`${props.unit.id}-${props.column.id}${props.isSortablePlaceholder ? '-placeholder' : ''}`"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
             </div>
         </div>

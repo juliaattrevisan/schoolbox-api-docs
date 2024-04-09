@@ -14,6 +14,7 @@ interface Props {
     activitiesListStoreId: string; // The id of the activitiesListStoreId this belongs to
     activity: Activity;
     isDragPlaceholder: boolean;
+    preventDraggableInit: boolean; // Whether to skip draggable initialization, e.g. if this is a placeholder
 }
 
 const props = defineProps<Props>();
@@ -42,7 +43,7 @@ let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 window.Vue.onMounted(() => {
     // Whether to allow the user to resequence the activities
-    if (activitiesListStore().routes.reorder && !props.isDragPlaceholder) {
+    if (activitiesListStore().routes.reorder && !props.preventDraggableInit) {
         activitiesListDragStore().setActivityEl(props.activity.id, activityListEl.value!);
 
         if (draggableEl.value) {
@@ -70,7 +71,7 @@ window.Vue.onMounted(() => {
 });
 
 window.Vue.onUnmounted(() => {
-    if (activitiesListStore().routes.reorder && !props.isDragPlaceholder) {
+    if (activitiesListStore().routes.reorder && !props.preventDraggableInit) {
         activitiesListDragStore().unsetActivityEl(props.activity.id);
     }
 });
@@ -85,7 +86,8 @@ window.Vue.onUnmounted(() => {
             top: props.isDragPlaceholder ? `${activitiesListDragStore().dragPlaceholderY}px` : undefined,
         }"
         :data-sortable-active="
-            (activitiesListDragStore().dragCurrentActivity === props.activity && !props.isDragPlaceholder) || undefined
+            (activitiesListDragStore().dragCurrentActivity === props.activity && !props.preventDraggableInit) ||
+            undefined
         "
     >
         <div class="list-item">

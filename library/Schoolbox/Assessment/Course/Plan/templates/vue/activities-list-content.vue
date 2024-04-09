@@ -13,11 +13,11 @@ interface Props {
     activitiesListRoutes: ActivitiesListRoutes;
     ltiAssessmentsEnabled: boolean;
     toastEl: typeof Toast;
+    preventStoreInit: boolean; // Whether to skip store initialization, e.g. if we're using an existing store
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "activityDeleted", activityId: number): void;
     (e: "dragStart"): void;
     (e: "dragStop"): void;
 }>();
@@ -27,22 +27,15 @@ const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListS
 
 const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 
-/**
- * When an activity is deleted, remove it from the store and let the parent component know
- * @param {number} activityId The id of the activity that was deleted
- */
-function onActivityDeleted(activityId: number) {
-    activitiesListStore().removeActivity(activityId);
-    emit("activityDeleted", activityId);
-}
-
 window.Vue.onMounted(() => {
-    activitiesListStore().init(props.activities, props.activitiesListRoutes);
-    activitiesListDragStore().init(
-        activitiesContainerEl as Ref<HTMLElement>,
-        () => emit("dragStart"),
-        () => emit("dragStop"),
-    );
+    if (!props.preventStoreInit) {
+        activitiesListStore().init(props.activities, props.activitiesListRoutes);
+        activitiesListDragStore().init(
+            activitiesContainerEl as Ref<HTMLElement>,
+            () => emit("dragStart"),
+            () => emit("dragStop"),
+        );
+    }
 });
 </script>
 
@@ -54,7 +47,8 @@ window.Vue.onMounted(() => {
             :activity="activity"
             :activities-list-store-id="activitiesListStoreId"
             :is-drag-placeholder="false"
-            @deleted="onActivityDeleted(activity.id)"
+            :prevent-draggable-init="preventStoreInit"
+            @deleted="activitiesListStore().removeActivity($event)"
         />
         <activities-list-item
             v-if="activitiesListDragStore().isDragging"
@@ -62,6 +56,7 @@ window.Vue.onMounted(() => {
             :activity="activitiesListDragStore().dragCurrentActivity!"
             :activities-list-store-id="activitiesListStoreId"
             :is-drag-placeholder="true"
+            :prevent-draggable-init="true"
         />
     </ul>
 </template>
