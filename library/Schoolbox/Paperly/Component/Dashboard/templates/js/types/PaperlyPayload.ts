@@ -5,7 +5,7 @@
 import type { FeatureItem } from "./FeatureItem";
 import type { UpcomingItem } from "./UpcomingItem";
 
-export type Item = {
+export type PaperlyPayload = {
     features: FeatureItem[];
     upcoming: UpcomingItem[];
 };
