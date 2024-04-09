@@ -20,6 +20,7 @@ use League\OAuth2\Server;
 use OpenIDConnectServer\ClaimExtractor;
 use OpenIDConnectServer\Entities\ClaimSetEntity;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
@@ -117,7 +118,15 @@ class Module extends BaseModule
             $scopeRepository,
             $this->getConfig()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             $this->getConfig()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            new Response\IdToken($idTokenRepository, $claimExtractor),
+            new Response\IdToken(
+                $idTokenRepository,
+                $claimExtractor,
+                $request,
+                $this->getConfig()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+                Jwt::KEY_ID,
+                $cache,
+                $nonceKeyGenerator,
+            ),
         );
 
         // Auth code grant:
