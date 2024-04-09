@@ -67,7 +67,6 @@ HELP;
         $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
         $externalPastoral          = new External_Pastoral();
 
-
         $log->info("Using external database connector '" . $externalPastoral->getDatabaseClassName() . "'");
 
         if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
