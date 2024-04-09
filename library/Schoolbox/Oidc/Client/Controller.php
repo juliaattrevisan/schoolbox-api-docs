@@ -108,6 +108,16 @@ class Controller extends Base
      */
     private function sendAuthorizationRequest(): void
     {
+        // Was there an error? If so output something
+        $error = $this->requestPost->get('error') ?? $this->requestQuery->get('error');
+        if (isset($error)) {
+            $this->response = $this->responseFromTemplateUnthemed(
+                '@loginOidc/error.twig',
+                ['error' => $error],
+            );
+            return;
+        }
+
         $nonce        = Uuid::uuid4()->toString();
         $oauthOptions = [
             'scope'         => $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_SCOPES),

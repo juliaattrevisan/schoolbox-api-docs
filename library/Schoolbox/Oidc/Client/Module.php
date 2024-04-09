@@ -11,6 +11,7 @@ namespace Schoolbox\Oidc\Client;
 
 use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 
 /**
@@ -31,6 +32,14 @@ class Module extends BaseModule
         // These routes should only exist if provider is set up and enabled.
         $this->register(self::METHOD_GET, '', 'getAuthorization');
         $this->register(self::METHOD_POST, '', 'postAuthorization');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

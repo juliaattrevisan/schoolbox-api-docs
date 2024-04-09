@@ -1,0 +1,51 @@
+{##
+ # Error message: for whatever reason, the oAuth identity provider rejected
+ # the request.
+ #
+ # @param string error The error type from the identity provider:
+ #                     see https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+ #}
+
+{% extends 'include/styledIframe.twig' %}
+
+{% block title %}Login request rejected{% endblock title %}
+
+{% block content %}
+    <h1>Login request rejected</h1>
+
+    {# TODO write better words here: these are copied verbatim from the RFC mentioned above #}
+    <p>
+        {% if error == 'invalid_request' %}
+            The request is missing a required parameter, includes an
+            invalid parameter value, includes a parameter more than
+            once, or is otherwise malformed.
+        {% elseif error == 'unauthorized_client' %}
+            The client is not authorized to request an authorization
+            code using this method.
+        {% elseif error == 'access_denied' %}
+            The resource owner or authorization server denied the
+            request.
+        {% elseif error == 'unsupported_response_type' %}
+            The authorization server does not support obtaining an
+            authorization code using this method.
+        {% elseif error == 'invalid_scope' %}
+            The requested scope is invalid, unknown, or malformed.
+        {% elseif error == 'server_error' %}
+            The authorization server encountered an unexpected
+            condition that prevented it from fulfilling the request.
+            (This error code is needed because a 500 Internal Server
+            Error HTTP status code cannot be returned to the client
+            via an HTTP redirect.)
+        {% elseif error == 'temporarily_unavailable' %}
+            The authorization server is currently unable to handle
+            the request due to a temporary overloading or maintenance
+            of the server.  (This error code is needed because a 503
+            Service Unavailable HTTP status code cannot be returned
+            to the client via an HTTP redirect.)
+        {% endif %}
+    </p>
+
+    <ul class="flex-list buttons">
+        <li><a href="{{ routeLookup('loginOidc.getAuthorization') }}">Try again</a></li>
+    </ul>
+{% endblock content %}
