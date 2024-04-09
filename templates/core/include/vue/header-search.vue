@@ -287,7 +287,7 @@ const searchButtonText = window.Vue.computed(() => {
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-s l-pad-s">
-                        <div class="c-img c-img--s c-img--round">
+                        <div class="c-img c-img--s c-img--round l-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img :src="result.image" :alt="`Portrait photo of ${result.title}`" />
                             </div>
@@ -326,12 +326,8 @@ const searchButtonText = window.Vue.computed(() => {
                     <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-s l-pad-s">
                         <div class="c-img c-img--s l-flex__item--0-shrink">
                             <div class="c-img__wrapper">
-                                <template v-if="result.image">
-                                    <img :src="result.image" :alt="`photo of ${result.title}`" />
-                                </template>
-                                <template v-else>
-                                    <div :class="`icon icon-${result.icon as string}`"></div>
-                                </template>
+                                <img v-if="result.image" :src="result.image" :alt="`photo of ${result.title}`" />
+                                <div v-else :class="`icon icon-${result.icon as string}`"></div>
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
