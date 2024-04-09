@@ -231,6 +231,10 @@ module.exports = {
         // Slideshow
         slideshow: "./www/static/js/slideshow/slideshow.ts",
 
+        // Paperly Dashboard Component
+        paperlyDashboardComponent:
+            "./library/Schoolbox/Paperly/Component/Dashboard/templates/vue/paperlyDashboardComponent.ts",
+
         // Image Lightbox
         imageLightbox: "./www/static/js/image-lightbox/imageLightbox.ts",
         imageLightboxInit: "./www/static/js/image-lightbox/imageLightboxInit.ts",
@@ -250,8 +254,8 @@ module.exports = {
         learnosity: "./www/static/css/learnosity/learnosity.scss",
 
         // Firebase
-        firebaseInit: './www/static/js/firebase/firebase-init.ts',
-        firebaseMessaging: './www/static/js/firebase/firebase-messaging.ts',
+        firebaseInit: "./www/static/js/firebase/firebase-init.ts",
+        firebaseMessaging: "./www/static/js/firebase/firebase-messaging.ts",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),

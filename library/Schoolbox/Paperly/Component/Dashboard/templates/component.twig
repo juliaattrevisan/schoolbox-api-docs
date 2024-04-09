@@ -1,7 +1,7 @@
 <div id='component-{{ componentInstanceId }}' class='component-container' data-component>
-    <div class="row">
-        <div class="small-12 island">
-            <p>Paperly</p>
-        </div>
+    <div id="paperly-dashboard-component-container">
+        <paperly-dashboard-component
+        />
     </div>
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/paperlyDashboardComponent.js?v={{ config.site_version }}"></script>
