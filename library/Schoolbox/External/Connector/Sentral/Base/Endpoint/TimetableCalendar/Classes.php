@@ -261,8 +261,8 @@ class Classes implements IStrategy
 
         /* Consume everything inside this payload
          */
-        foreach ($payload['data'] as $class) {
-            $this->processClass($class, $data);
+        foreach ($payload['data'] as $classInstance) {
+            $this->processClass($classInstance, $data);
         }
     }
 
@@ -271,21 +271,21 @@ class Classes implements IStrategy
      * For each class, process the lessons and apply student/staff involvements
      * Ignore lessons that occur outside the [$from, $to] window
      *
-     * @param array $class
+     * @param array $classInstance
      * @param array $data
      * @return void
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $class, array $data): void
+    private function processClass(array $classInstance, array $data): void
     {
         /* Save main event info - see if one already exists
          * if it has the same name, place, day, period and time
          * If you have five columns the same, you're probably
          * looking at an event that we've already loaded before
          */
-        $guid = trim((string)$class['id']);
+        $guid = trim((string)$classInstance['id']);
 
         /* Try to recycle a previous instance
          */
@@ -303,34 +303,34 @@ class Classes implements IStrategy
         } else {
             /* Save new sis_event record
              */
-            $event = $this->createEvent($class);
+            $event = $this->createEvent($classInstance);
         }
 
         /* Save sis_class record
          */
-        $classEntry = $this->createClassEntry($class, $event);
+        $classEntry = $this->createClassEntry($classInstance, $event);
 
         /* Save the involvements
          */
-        $this->createInvolvements($class, $data, $event, $classEntry);
+        $this->createInvolvements($classInstance, $data, $event, $classEntry);
     }
 
 
     /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
-     * @param array $class
+     * @param array $classInstance
      * @return Model
      * @throws \PDOException
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function createEvent(array $class): \Schoolbox\External\Event\Model
+    private function createEvent(array $classInstance): \Schoolbox\External\Event\Model
     {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$class['attributes']['className']);
-        $day = trim((string)$class['attributes']['dayName']);
+        $classCode = trim((string)$classInstance['attributes']['className']);
+        $day = trim((string)$classInstance['attributes']['dayName']);
         $detail = null;
 
         /* Arbitrarily concoct a superkey to represent this activity instance
@@ -340,32 +340,32 @@ class Classes implements IStrategy
          * If you have five columns the same, you're probably
          * looking at an event that we've already loaded before
          */
-        $guid = trim((string)$class['id']);
+        $guid = trim((string)$classInstance['id']);
 
-        $period = trim((string)$class['attributes']['periodName']);
-        $room = trim((string)$class['attributes']['roomName']);
-        $title = trim((string)$class['attributes']['subject']);
+        $period = trim((string)$classInstance['attributes']['periodName']);
+        $room = trim((string)$classInstance['attributes']['roomName']);
+        $title = trim((string)$classInstance['attributes']['subject']);
 
         /* Datetimes for when this class occurs
          */
-        $allday = !$class['attributes']['startTime'] && !$class['attributes']['endTime'];
+        $allday = !$classInstance['attributes']['startTime'] && !$classInstance['attributes']['endTime'];
         $startAt = \Alaress_Date_Format::newDatabaseDate(sprintf(
             '%s %s',
-            $class['attributes']['date'],
-            $class['attributes']['startTime'] ?? '00:00:00'
+            $classInstance['attributes']['date'],
+            $classInstance['attributes']['startTime'] ?? '00:00:00'
         ));
 
         $finishAt = \Alaress_Date_Format::newDatabaseDate(sprintf(
             '%s %s',
-            $class['attributes']['date'],
-            $class['attributes']['endTime'] ?? '00:00:00'
+            $classInstance['attributes']['date'],
+            $classInstance['attributes']['endTime'] ?? '00:00:00'
         ));
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
          * possible. If you can't get it, dw about it
          */
-        $type = trim((string)$class['attributes']['classType']);
+        $type = trim((string)$classInstance['attributes']['classType']);
 
         /* Try to recycle based on guid
          */
@@ -386,6 +386,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
+            ->setMetadata((new Metadata\Builder())->build($classInstance))
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(\Schoolbox\External\Connector\Sentral\Base\Endpoint\Factory::SOURCE_NAME);
