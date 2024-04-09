@@ -8,6 +8,10 @@ import "vue-select/dist/vue-select.css";
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
 vSelect.props.components.default = () => ({ Deselect });
 
+// The number of milliseconds to wait between the user's input and a search for
+// users.
+const SEARCH_RESULT_RETRIEVE_DELAY = 350;
+
 export default {
     components: {RevealModal, vSelect},
     props: {
@@ -30,7 +34,17 @@ export default {
             // The query string parameter to submit the user search parameter
             // within, when performing a user search.
             type: String,
-            default: "query",
+            default: "search",
+        },
+        userSearchAdditionalParams: {
+            // Any additional query string parameters to submit to the user
+            // search endpoint.
+            //
+            // By default, this user search show staff users only.
+            type: Object,
+            default: () => {
+                return { filter: JSON.stringify({roleType: 'staff'}) };
+            },
         },
     },
 
@@ -149,20 +163,24 @@ export default {
          * @param {Function} loading A function to call when the loading state
          *                           changes (accepts a Boolean)
          */
-        onUserSearch: debounce(async (query, loading) => {
-            debugger;
-            if (query.length < 3) {
-                return;
-            }
-            loading(true);
+        onUserSearch: debounce(
+            async function (query, loading) {
+                if (query.length < 3) {
+                    return;
+                }
+                loading(true);
 
-            let searchUrl = new URL(this.userSearchEndpoint, window.location);
-            searchUrl.search = new URLSearchParams([
-                [this.userSearchQueryParam, query]
-            ])
-            const response = await fetch(searchUrl);
-            loading(false);
-        }),
+                let searchUrl = new URL(this.userSearchEndpoint, window.location),
+                    searchParams = this.userSearchAdditionalParams;
+                searchParams[this.userSearchQueryParam] = query;
+                searchUrl.search = new URLSearchParams(searchParams);
+                console.log(searchUrl);
+                const response = await fetch(searchUrl);
+
+                loading(false);
+            },
+            SEARCH_RESULT_RETRIEVE_DELAY,
+        ),
     }
 }
 </script>
@@ -259,7 +277,7 @@ export default {
             <v-select
                 input-id="addItem-clientCredentialsUser"
                 class="schoolbox-vue-selectize"
-                :clear-search-on-blur="true"
+                :clear-search-on-blur="() => true"
                 :clear-search-on-select="true"
                 :close-on-select="false"
                 @search="onUserSearch"
