@@ -581,11 +581,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
-        $rand = rand(0, 5);
-        if ($rand < 2) {
-            throw new Exception("Random error number $rand");
-        }
-
         // Get insert/update query based on the absence/presence of an external ID on the pastoral record
 
         $isCreate = empty($pastoral->getExternalId());
