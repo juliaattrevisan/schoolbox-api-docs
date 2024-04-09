@@ -2,7 +2,7 @@
  * An upcoming activity that requires input
  */
 
-export type Upcoming = {
+export type UpcomingItem = {
     title: string;
     due: string;
     url: string;

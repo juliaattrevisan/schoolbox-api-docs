@@ -3,9 +3,9 @@
  */
 
 import type { FeatureItem } from "./FeatureItem";
-import type { Upcoming } from "./Upcoming";
+import type { UpcomingItem } from "./UpcomingItem";
 
 export type Item = {
     features: FeatureItem[];
-    upcoming: Upcoming[];
+    upcoming: UpcomingItem[];
 };
