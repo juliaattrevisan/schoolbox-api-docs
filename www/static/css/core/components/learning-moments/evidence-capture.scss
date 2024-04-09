@@ -142,7 +142,8 @@
 
         // prevent images in posts displaying too large
         img {
-            max-height: rem-calc(500);
+            width: auto;
+            max-height: 2000px;
         }
     }
     .tags {
