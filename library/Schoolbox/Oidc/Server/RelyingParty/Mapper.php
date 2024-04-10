@@ -18,6 +18,7 @@ use Schoolbox\UserMapper;
  * Mapper for OIDC relying party configurations.
  *
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  * @method GenericCollection<Model> createCollection($contents = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */

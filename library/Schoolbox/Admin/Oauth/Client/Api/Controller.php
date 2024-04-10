@@ -86,6 +86,9 @@ class Controller extends Base
             ->setClientId(RelyingParty\Generator\ClientId::generate())
             ->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
         $this->mapper->save($model);
+
+        // Refetch model so that client credentials are rehydrated
+        $model = $this->mapper->findById($model->getId());
         $this->response = $this->responseAsJson(
             $this->translateModelToArray($model)
             + ['clientSecret' => $clientSecret]
@@ -108,6 +111,7 @@ class Controller extends Base
         $newModel = call_user_func($this->arrayToModel, $data);
         $newModel->setId($model->getId());
         $this->mapper->save($newModel);
+        $newModel = $this->mapper->findById($newModel->getId());
         $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
     }
 
@@ -129,6 +133,7 @@ class Controller extends Base
         /** @var RelyingParty\Model $newModel */
         $newModel = call_user_func($this->arrayToModel, $data, $model);
         $this->mapper->save($newModel);
+        $newModel = $this->mapper->findById($newModel->getId());
         $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
     }
 
