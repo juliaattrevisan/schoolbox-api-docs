@@ -11,7 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
- * To dispaly the formatted due date
+ * To display the formatted due date
  * @returns {string} - the formatted due date eg: Mon 01 Jan at 12:00pm
  */
 function getDate() {

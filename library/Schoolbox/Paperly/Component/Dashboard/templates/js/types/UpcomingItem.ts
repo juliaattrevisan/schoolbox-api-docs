@@ -4,7 +4,7 @@
 
 export type UpcomingItem = {
     title: string;
-    due: string;
     url: string;
+    due?: string;
     status?: string;
 };
