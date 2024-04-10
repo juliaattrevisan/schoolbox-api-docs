@@ -106,15 +106,7 @@ class AutoscoreAttemptsTool extends CliTool\App
     }
 
     /**
-     * Search for quiz attempts which are awaiting an auto-score. This includes
-     * quiz attempts which:
-     * * have been finished
-     * * have not yet been reviewed
-     *   (the instructor's review renders an auto-score redundant)
-     * * have a Learnosity reference (otherwise, no auto-score can exist)
-     * * are in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
-     * * optionally are in `null` status
-     * * are neither deleted, nor for a quiz which has been deleted
+     * Search for quiz attempts which are awaiting an auto-score.
      *
      * Then, query Learnosity for whether they have been scored yet: if so, add
      * the mark and normalised mark from Learnosity.
@@ -128,69 +120,10 @@ class AutoscoreAttemptsTool extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        // Lock
+        $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TIMEOUT);
 
-        $lock          = $this->acquireLock(self::LOCK_NAME, self::LOCK_TIMEOUT);
-        $attemptMapper = Mapper::getInstance();
-
-        // Find quiz attempts which meet the criteria for auto-scoring
-        $baseQuery = "
-            SELECT aa.attempt_id
-            FROM assess_attempt aa
-            INNER JOIN assess a ON aa.assess_id = a.assess_id
-            INNER JOIN assessment a2 on a.assessment_id = a2.id
-        ";
-        $pb = $attemptMapper->getPredicateBuilder()
-            ->notNull('aa.finish')
-            ->isNull('aa.reviewed_at')
-            ->notNull('aa.learnosity_reference')
-            ->isNull('aa.deleted_at')
-            ->isNull('a.deleted_at')
-            ->isNull('a2.deleted_at');
-
-        // Build status predicates:
-        // If specially requested: process null Learnosity status as well
-        $statusPb = $attemptMapper->getPredicateBuilder();
-        $statusPb = $statusPb->equals('aa.learnosity_status', Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING);
-        if ($this->getOpt(self::OPT_LONG_PROCESS_NULL_STATUS)) {
-            $statusPb = $statusPb->isNull('aa.learnosity_status');
-        }
-        $pb = $pb->any($statusPb);
-
-        // Build assessment and attempt predicates
-        $assessmentId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
-        if ($assessmentId) {
-            $pb = $pb->equals('a2.id', $assessmentId);
-        }
-        $attemptId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
-        if ($attemptId) {
-            $pb = $pb->equals('aa.attempt_id', $attemptId);
-        }
-
-        // Build from/to
-        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
-        if ($fromDate) {
-            $pb = $pb->greaterThanOrEqualTo('aa.finish', $fromDate->getDatabase());
-        }
-        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
-        if ($toDate) {
-            $pb = $pb->lessThanOrEqualTo('aa.finish', $toDate->getDatabase());
-        }
-
-        // Build and run query
-        $query = $this->getDatabaseInternal()->prepareQuery(
-            $baseQuery . ' WHERE ' . $pb->getWhereIntersect(),
-        );
-        $query->execute($pb->getParams());
-
-        $ids = $query->fetchColumnArray('attempt_id');
-        if (empty($ids)) {
-            $this->getLogger()->notice(sprintf('No quiz attempts require auto-scoring: nothing to do'));
-            $lock->release();
-            return;
-        }
-
-        // Otherwise, start processing
-        $this->getLogger()->notice(sprintf('%d quiz attempts require auto-scoring', count($ids)));
+        // Set up the necessary helpers and mappers
         $api = new Api(
             (new UrlFactory($this->getConfig()))->buildFullyQualified()->getHost(),
             $this->getConfig()->get('learnosity_version'),
@@ -202,9 +135,22 @@ class AutoscoreAttemptsTool extends CliTool\App
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $attemptMapper        = Mapper::getInstance();
 
-        // Now find attempts
-        $attempts  = $attemptMapper->findByColumn('attempt_id', $ids);
+        // Find attempts
+        $attempts      = $attemptMapper->findAwaitingAutoscore(
+            (bool)($this->getOpt(self::OPT_LONG_PROCESS_NULL_STATUS)),
+            $this->getOptAsInt(self::OPT_LONG_ATTEMPT_ID),
+            $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID),
+            $this->buildDate($this->getOpt(self::OPT_LONG_FROM)),
+            $this->buildDate($this->getOpt(self::OPT_LONG_TO)),
+        );
+        if (count($attempts) === 0) {
+            $this->getLogger()->notice(sprintf('No quiz attempts require auto-scoring: nothing to do'));
+            $lock->release();
+            return;
+        }
+        $this->getLogger()->notice(sprintf('%d quiz attempts require auto-scoring', count($attempts)));
         $quizCache = [];
 
         // And process them
@@ -322,7 +268,7 @@ OPTIONS
         {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
 
     $yellow--process-null-status$white
-        If provided, auto-score attempts whose `learnosity_status` field is `NULL` in addition to those `completed`.
+        If provided, auto-score attempts whose `learnosity_status` field is `NULL` in addition to those `processing`.
 
         This should only be required for if historic attempts need to be auto-scored.
 

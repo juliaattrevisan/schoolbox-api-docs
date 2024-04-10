@@ -276,6 +276,66 @@ class Mapper extends BaseMapper
         return null;
     }
 
+    /**
+     * Find all attempts which are awaiting an auto-score.
+     *
+     * An attempt is awaiting an auto-score if it:
+     * * has been finished
+     * * has not yet been reviewed
+     *   (the instructor's review renders an auto-score redundant)
+     * * has a Learnosity reference (otherwise, no auto-score can exist)
+     * * is neither deleted, nor for a quiz which has been deleted
+     * * is in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
+     * * optionally is in `null` status
+     *
+     * @param bool                     $includeNullStatus if true: find attempts with a `null` Learnosity status, as
+     *                                                    well as `processing`: otherwise, find only attempts in
+     *                                                    `processing`.
+     *                                                    Attempts created before the Learnosity status field was
+     *                                                    added will always have a `null` status.
+     * @param int|null                 $attemptId         if provided: find only this one attempt ID.
+     * @param int|null                 $assessmentId      if provided: find only attempts for this assessment.
+     * @param Alaress_Date_Format|null $fromDate          if provided: find only attempts finished after this date.
+     * @param Alaress_Date_Format|null $toDate            if provided: find only attempts finished before this date.
+     * @return GenericCollection
+     */
+    public function findAwaitingAutoscore(
+        bool $includeNullStatus,
+        ?int $attemptId = null,
+        ?int $assessmentId = null,
+        ?Alaress_Date_Format $fromDate = null,
+        ?Alaress_Date_Format $toDate = null,
+    ): GenericCollection {
+        $pb = $this->getPredicateBuilder()
+            ->notNull('finish')
+            ->isNull('reviewed_at')
+            ->notNull('learnosity_reference')
+            ->isNull('deleted_at')
+            ->isNull('a.deleted_at');
+
+        $statusPb = $this->getPredicateBuilder()
+            ->equals('learnosity_status', Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING);
+        if ($includeNullStatus) {
+            $statusPb = $statusPb->isNull('learnosity_status');
+        }
+        $pb = $pb->any($statusPb);
+
+        if ($assessmentId) {
+            $pb = $pb->equals('a.assessment_id', $assessmentId);
+        }
+        if ($attemptId) {
+            $pb = $pb->equals('attempt_id', $attemptId);
+        }
+        if ($fromDate) {
+            $pb = $pb->greaterThanOrEqualTo('finish', $fromDate->getDatabase());
+        }
+        if ($toDate) {
+            $pb = $pb->lessThanOrEqualTo('finish', $toDate->getDatabase());
+        }
+
+        return $this->findByPredicates($pb);
+    }
+
 
     /**
      * Post-Save callback.
