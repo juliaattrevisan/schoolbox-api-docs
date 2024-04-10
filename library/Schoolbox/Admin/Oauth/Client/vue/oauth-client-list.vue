@@ -285,7 +285,7 @@ export default {
                 :close-on-select="false"
                 @search="onUserSearch"
                 label="fullName"
-                placeholder="Search for user"
+                placeholder="Search for user, or leave empty for no user"
                 v-model="addingItem.clientCredentialsUser"
             >
                 <template #option="option">
@@ -321,6 +321,12 @@ export default {
 
             <label for="itemAdded-clientSecret">Client Secret</label>
             <input id="itemAdded-clientSecret" readonly v-model="addingItem.clientSecret" />
+
+            <label for="itemAdded-clientCredentialsUser">Client Credentials User</label>
+            <select id="itemAdded-clientCredentialsUser" readonly>
+                <option v-if="addingItem.clientCredentialsUser">{{ addingItem.clientCredentialsUser.fullName }}</option>
+                <option v-else>No user</option>
+            </select>
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret:
