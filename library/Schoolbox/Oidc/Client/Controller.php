@@ -249,7 +249,7 @@ class Controller extends Base
                 'idTokenIssuer'           => $oauthIssuerUri->__toString(),
                 'urlAuthorize'            => $oidcConfig['authorization_endpoint'],
                 'urlAccessToken'          => $oidcConfig['token_endpoint'],
-                'urlResourceOwnerDetails' => $oidcConfig['userinfo_endpoint'],
+                'urlResourceOwnerDetails' => $oidcConfig['userinfo_endpoint'] ?? null,
                 'publicKey'               => $publicKey,
             ],
             [
