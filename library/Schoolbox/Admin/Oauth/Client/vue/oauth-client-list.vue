@@ -60,6 +60,7 @@ export default {
             addingItem: {},
             modifyingItem: {},
             deletingItem: {},
+            searchUsers: [],
         };
     },
 
@@ -176,7 +177,8 @@ export default {
                 searchUrl.search = new URLSearchParams(searchParams);
                 console.log(searchUrl);
                 const response = await fetch(searchUrl);
-
+                const responseJson = await response.json();
+                this.searchUsers = responseJson.data;
                 loading(false);
             },
             SEARCH_RESULT_RETRIEVE_DELAY,
@@ -276,6 +278,7 @@ export default {
             <label for="addItem-clientCredentialsUser">Client Credentials User</label>
             <v-select
                 input-id="addItem-clientCredentialsUser"
+                :options="searchUsers"
                 class="schoolbox-vue-selectize"
                 :clear-search-on-blur="() => true"
                 :clear-search-on-select="true"
@@ -287,12 +290,12 @@ export default {
             >
                 <template #option="option">
                 <span class="d-center">
-                    {{ option.name }}
+                    {{ option.fullName }}
                 </span>
                 </template>
                 <template #selected-option="option">
                 <span class="selected d-center">
-                    {{ option.name }}
+                    {{ option.fullName }}
                 </span>
                 </template>
             </v-select>
