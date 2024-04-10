@@ -98,6 +98,25 @@ function onRefreshSelected() {
         </div>
     </div>
     <template v-else>
+        <ul class="flex-list flex-wrap buttons">
+            <li v-if="tempPayload?.features.find((item) => 'Forms' in item)">
+                <a class="icon-paperly-forms" :href="tempPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''">
+                    Forms</a
+                >
+            </li>
+            <li v-if="tempPayload?.features.find((item) => 'Excursions' in item)">
+                <a
+                    class="icon-paperly-excursions"
+                    :href="tempPayload.features.find((item) => 'Excursions' in item)?.Excursions ?? ''"
+                    >Excursions</a
+                >
+            </li>
+            <li v-if="tempPayload?.features.find((item) => 'PTI' in item)">
+                <a class="icon-paperly-pti" :href="tempPayload.features.find((item) => 'PTI' in item)?.PTI ?? ''"
+                    >Parent/Teacher Interview</a
+                >
+            </li>
+        </ul>
         <div class="c-island l-flex-col">
             <pdc-upcoming-item v-for="item in upcoming" :key="item.url" :item="item" />
         </div>

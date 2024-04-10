@@ -20,7 +20,7 @@ function getDate() {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-xs l-pad-s">
+    <div class="item l-flex-col l-gap-xs l-pad-s">
         <a :href="props.item.url" :title="`View ${props.item.title}`">{{ props.item.title }}</a>
         <p class="meta f-no-margins">
             <template v-if="props.item.status">{{ props.item.status }} - Due date: {{ getDate() }}</template>
@@ -29,4 +29,8 @@ function getDate() {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.item:not(:last-child) {
+    border-bottom: 1px solid var(--body-background);
+}
+</style>

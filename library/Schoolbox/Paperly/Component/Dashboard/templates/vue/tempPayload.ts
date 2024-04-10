@@ -2,7 +2,7 @@ import { PaperlyPayload } from "../js/types/PaperlyPayload";
 
 export const payload: PaperlyPayload = {
     features: [
-        { Forms: "https:/url/to/iframe/create_forms" },
+        { Forms: "https://url/to/iframe/create_forms" },
         { Excursions: "https://url/to/iframe/create_excursions" },
         { PTI: "https://url/to/iframe/view_pti" },
     ],
