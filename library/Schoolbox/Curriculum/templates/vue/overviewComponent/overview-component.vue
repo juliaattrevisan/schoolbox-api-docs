@@ -15,6 +15,7 @@ import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.
 import FolderNodes from "@schoolboxCurriculum/vue/folderNodes/folder-nodes.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
+import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import OcEmptyState from "./oc-empty-state.vue";
 
@@ -97,6 +98,7 @@ function onModalClosed() {
     />
     <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
+    <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
     <toast ref="toastEl"></toast>
