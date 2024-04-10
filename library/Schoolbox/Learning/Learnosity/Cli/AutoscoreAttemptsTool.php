@@ -138,26 +138,51 @@ class AutoscoreAttemptsTool extends CliTool\App
         $attemptMapper        = Mapper::getInstance();
 
         // Find attempts
-        $attempts      = $attemptMapper->findAwaitingAutoscore(
-            (bool)($this->getOpt(self::OPT_LONG_PROCESS_NULL_STATUS)),
-            $this->getOptAsInt(self::OPT_LONG_ATTEMPT_ID),
-            $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID),
-            $this->buildDate($this->getOpt(self::OPT_LONG_FROM)),
-            $this->buildDate($this->getOpt(self::OPT_LONG_TO)),
+        $this->getLogger()->info('Finding quiz attempts which require auto-scoring:');
+        $processNullStatus = (bool)($this->getOpt(self::OPT_LONG_PROCESS_NULL_STATUS));
+        if ($processNullStatus) {
+            $this->getLogger()->info('* including attempts with null learnosity_status');
+        }
+        $attemptId = $this->getOptAsInt(self::OPT_LONG_ATTEMPT_ID);
+        if ($attemptId) {
+            $this->getLogger()->info(sprintf('* filtered to attempt ID: #%d', $attemptId));
+        }
+        $assessmentId = $this->getOptAsInt(self::OPT_LONG_ASSESSMENT_ID);
+        if ($assessmentId) {
+            $this->getLogger()->info(sprintf('* filtered to attempts for quiz ID: #%d', $assessmentId));
+        }
+        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+        if ($fromDate) {
+            $this->getLogger()->info(
+                sprintf('* filtered to attempts finished on or after: "%s"', $fromDate->toRfc3339String()),
+            );
+        }
+        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        if ($toDate) {
+            $this->getLogger()->info(
+                sprintf('* filtered to attempts finished on or before: "%s"', $toDate->toRfc3339String()),
+            );
+        }
+        $attempts = $attemptMapper->findAwaitingAutoscore(
+            $processNullStatus,
+            $attemptId,
+            $assessmentId,
+            $fromDate,
+            $toDate,
         );
         if (count($attempts) === 0) {
-            $this->getLogger()->notice(sprintf('No quiz attempts require auto-scoring: nothing to do'));
+            $this->getLogger()->info(sprintf('No quiz attempts require auto-scoring: nothing to do'));
             $lock->release();
             return;
         }
-        $this->getLogger()->notice(sprintf('%d quiz attempts require auto-scoring', count($attempts)));
+        $this->getLogger()->info(sprintf('%d quiz attempts require auto-scoring', count($attempts)));
         $quizCache = [];
 
         // And process them
         foreach ($attempts as $attempt) {
             $lock->refresh(self::LOCK_TIMEOUT);
             $quizId = $attempt->getQuiz()->getAssessmentModel()->getId();
-            $this->getLogger()->notice(sprintf('Processing attempt #%d for quiz #%d', $attempt->getId(), $quizId));
+            $this->getLogger()->info(sprintf('Processing attempt #%d for quiz #%d', $attempt->getId(), $quizId));
             try {
                 $quizCache[$quizId] ??= $assessmentDataSource->findByIdForReview($quizId);
             } catch (MapperException $e) {
@@ -192,7 +217,7 @@ class AutoscoreAttemptsTool extends CliTool\App
                     Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => $this->getLogger()->debug(
                         sprintf('Attempt #%d is still processing', $attempt->getId()),
                     ),
-                    Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => $this->getLogger()->notice(
+                    Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => $this->getLogger()->info(
                         sprintf('Attempt #%d has been processed: scores have been loaded', $attempt->getId()),
                     ),
                     Helper::LEARNOSITY_PROCESS_STATUS_FAILED => $this->getLogger()->warning(
@@ -212,7 +237,7 @@ class AutoscoreAttemptsTool extends CliTool\App
             }
         }
 
-        $this->getLogger()->notice('Auto-scoring finished.');
+        $this->getLogger()->info('Auto-scoring finished.');
         $lock->release();
     }
 
