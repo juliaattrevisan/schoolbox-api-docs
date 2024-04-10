@@ -12,7 +12,7 @@ import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelect
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
-import FolderNodes from "@schoolboxCurriculum/vue/folderNodes/folder-nodes.vue";
+import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
@@ -96,7 +96,7 @@ function onModalClosed() {
         :component-instance-id="props.componentInstanceId"
         @map-selected="onUpdateSelected"
     />
-    <folder-nodes v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
+    <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />

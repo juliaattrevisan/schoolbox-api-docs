@@ -77,7 +77,7 @@ function onRemoveSelected() {
         </div>
         <template v-if="showChildren">
             <transition-group name="list" tag="ul">
-                <fn-node
+                <fn-list-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"

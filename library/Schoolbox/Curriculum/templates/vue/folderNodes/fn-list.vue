@@ -5,7 +5,7 @@
  */
 
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
-import FnNode from "./fn-node.vue";
+import FnListNode from "./fn-list-node.vue";
 
 interface Props {
     folderId: number; // The folder id to display the nodes for
@@ -18,7 +18,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
 
 <template>
     <transition-group name="list" tag="ul" class="nodes l-flex-col">
-        <fn-node
+        <fn-list-node
             v-for="node in store().filteredNodes"
             :key="node.id"
             :node="node"
