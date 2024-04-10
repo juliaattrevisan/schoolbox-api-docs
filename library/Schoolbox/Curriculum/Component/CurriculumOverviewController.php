@@ -110,7 +110,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
         // This should be unnecessary but PHPStan complains otherwise
         /** @var GenericCollection<Node\Model> $selectedNodes */
-        $selectedNodes       = $this->getContext()->getCurriculumNodes()->reindex();
+        $selectedNodes       = $this->getContext()->getCurriculumNodes()->filterBy('enabled', true)->reindex();
         $this->selectedNodes = $selectedNodes;
 
         // Load curriculum tree filter node
@@ -142,11 +142,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                 'selectedNodes' => $this->selectedNodes,
                 'curriculumTreeFilter' => $this->curriculumTreeFilter,
                 'curriculumTagging' => $this->curriculumTagging,
-                'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
-                    'curriculum.edit',
-                    [],
-                    $this->getUser()
-                ),
+                'readonly' => !$this->hasContextWriteAccess(),
             ]
         );
     }
