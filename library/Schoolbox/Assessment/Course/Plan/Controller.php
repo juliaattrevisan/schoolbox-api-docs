@@ -17,6 +17,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -184,7 +185,38 @@ class Controller extends Base
              * A unique set of curriculum nodes collated from various places:
              * folders, assessments, capabilities and indicators
              */
-            $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
+            // now unused, as we are only now caring about curriculum nodes on the folder, not all children items also.
+            //$curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
+
+            //new curriculum array structure
+            $curriculum = [
+                'nodes' => $this->getCurriculumNodes($unit),
+                'selectedNodes' => $unit->getFolder()->getCurriculumNodes()->reindex(),
+                'components' => [],
+            ];
+
+            // grab list collection of curriculum overview components on the unit page
+            $components = $this->componentInstanceMapper->findByContextAndClass(
+                'homepage',
+                $unit->getFolder()->getId(),
+                CurriculumOverviewController::class
+            );
+            foreach ($components as $component) {
+                // extract the configs.
+                $instanceConfig = $component->getConfigArray();
+                if ('' === trim($instanceConfig['componentname']['value'])) {
+                    $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
+                }
+                // default value it '0' so set to null for vue to work
+                if ('0' === $instanceConfig['curriculumTreeFilter']['value']) {
+                    $instanceConfig['curriculumTreeFilter']['value'] = null;
+                }
+                $curriculum['components'][] = [
+                    'componentId' => $component->getId(),
+                    'heading' => $instanceConfig['componentname']['value'],
+                    'filter' => $instanceConfig['curriculumTreeFilter']['value'],
+                ];
+            }
 
             $activitiesListRoutes = [
                 'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
@@ -237,10 +269,9 @@ class Controller extends Base
                  * the assessment specs in this unit
                  */
                 'rubricCapabilities' => $rubricCapabilities,
-                /* All the unique curriculum nodes that are in use by all the assessment specs
-                 * in this unit
+                /* Curriculum data object, containing selected, and filtered curriculum nodes
                  */
-                'curriculumCodes' => $curriculumNodes,
+                'curriculum' => $curriculum,
                 'sequence' => $unit->getFolder()->getSequence(),
             ];
 
@@ -432,6 +463,45 @@ class Controller extends Base
         return $rubrics;
     }
 
+
+    /**
+     * Build the tree of curriculum nodes for the specified unit
+     * if there are no nodes, will just return null
+     * direct clone from \Schoolbox\Curriculum\Component\CurriculumOverviewController::execute
+     *
+     * @param Model $unit
+     * @return Collection|null
+     */
+    private function getCurriculumNodes(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit): ?Collection
+    {
+        /** @var ?Collection $curriculumNodes */
+        $curriculumNodes = null;
+        if ($unit->getFolder()->getCurriculumNodes()->count()) {
+            $nodeIds = [];
+            foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
+                if (!$node->getEnabled()) {
+                    continue;
+                }
+
+                $nodeIds[] = $node->getId();
+            }
+
+            // Fetch every node which is an ancestor or descendant of one of
+            // this folder's nodes, and is still enabled:
+            // only enabled nodes should be selectable.
+            $nodeIds = $this->nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
+
+            // Then, sort the entire list of nodes into a tree structure.
+            $curriculumNodes = $this->nodeMapper->getCollectionAsTree(
+                $this->nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+            );
+        }
+
+        if ($curriculumNodes && $curriculumNodes->count()) {
+            Node\Mapper::sortNodes($curriculumNodes, 0);
+        }
+        return $curriculumNodes;
+    }
 
     /**
      * Find all the unique curriculum nodes used in:
