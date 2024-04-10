@@ -30,26 +30,11 @@ async function loadPayload() {
         if (response.ok) {
             // const payload = (await response.json()) as PaperlyPayload;
             tempPayload.value = payload;
-            // document.dispatchEvent(
-            //     new CustomEvent(ToastEvent.TIMEOUT, {
-            //         detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
-            //     }),
-            // );
         } else {
             hasLoadError.value = true;
-            // const responseText = (await response.json()) as { title: string; type: string; status: number };
-            // document.dispatchEvent(
-            //     new CustomEvent(ToastEvent.TIMEOUT, {
-            //         detail: { text: responseText.title, isSuccess: false } as ToastTimeoutEventDetail,
-            //     }),
-            // );
         }
     } catch (error) {
-        // document.dispatchEvent(
-        //     new CustomEvent(ToastEvent.TIMEOUT, {
-        //         detail: { text: "There was an unexpected error", isSuccess: false } as ToastTimeoutEventDetail,
-        //     }),
-        // );
+        hasLoadError.value = true;
     } finally {
         await timeout(2000);
         isProcessing.value = false;
@@ -84,12 +69,32 @@ const upcoming = window.Vue.computed(() => {
 function onViewMoreSelected() {
     viewMore.value = true;
 }
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected() {
+    window.location.reload();
+}
 </script>
 
 <template>
     <div v-if="isProcessing" class="row">
         <div class="small-12 island">
             <loading-table />
+        </div>
+    </div>
+    <div v-else-if="hasLoadError" class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <div tableData-alert class="alert-box alert">
+                    Sorry, we are currently unable to load the Paperly data. Please
+                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
+                        >refresh the page</a
+                    >
+                    to try again and contact your support if the problem persists.
+                </div>
+            </section>
         </div>
     </div>
     <template v-else>
