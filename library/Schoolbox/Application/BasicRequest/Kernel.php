@@ -39,6 +39,7 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
@@ -307,11 +308,13 @@ class Kernel extends WebKernelAbstract
                     $oidcCache              = $di->get('oidc.cache');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config)
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
                     );
                 }
             )
