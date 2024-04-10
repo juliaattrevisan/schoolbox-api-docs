@@ -423,7 +423,7 @@ class Controller extends Base
         // fetch all textboxes with components from these units
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $compTextQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
-            CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
+            tb.textBoxID AS id,
             f.id AS folder_id,
             cci_componentname.value as 'componentName',
             ci.id as 'componentId',
@@ -506,7 +506,7 @@ class Controller extends Base
         // fetch all textboxes with no component from these units
         // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
         $textQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("SELECT
-            CONCAT(tb2.textBoxID, '--') AS id,
+            tb2.textBoxID AS id,
             tb2.heading as 'textboxHeading',
             tb2.updated_at AS date,
             tb2.updated_by AS updated_by,
