@@ -1,13 +1,14 @@
 {##
  # Complete an attempt
  #
- # @param IAssessable $assessment      Our schoolbgox quiz instance
- # @param array $breadcrumbs           A context trail at the top of the screeen
- # @param string|array $initOptions    Learnosity API initialisation object
+ # @param IAssessable   $assessment    Our schoolbgox quiz instance
+ # @param array         $breadcrumbs   A context trail at the top of the screeen
+ # @param string|array  $initOptions   Learnosity API initialisation object:
+ #                                     will not be set if the assessment is not yet scored by either Learnosity or a
+ #                                     teacher, or the user cannot view the mark.
  # @param Attempt/Model $attempt       An attempt instance
- # @param string $returnUrl            A redirect back to a place from whence you came.
- # @param bool $isMarkVisible          Can the user which attemped the quiz view its mark?
- # @param bool $isAttemptAutoscored    Has the quiz attempt been auto-scored yet?
+ # @param string        $returnUrl     A redirect back to a place from whence you came.
+ # @param bool          $isMarkVisible Can the user which attemped the quiz view its mark?
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -41,7 +42,7 @@
                 <section id="schoolbox-result-container" class="content">
                     <div id="schoolbox-result-1"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
                 </section>
-            {% elseif not isAttemptAutoscored %}
+            {% else %}
                 <h2 class="subheader">Result Summary</h2>
                 <section class="content">
                     <p>
