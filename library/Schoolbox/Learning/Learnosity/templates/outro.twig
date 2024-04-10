@@ -31,9 +31,9 @@
             {% if initOptions %}
                 <h2 class="subheader">Result Summary</h2>
                 <section class="content">
-                    <p>
-                        <em>This mark is unconfirmed and may change following teacher review.</em>
-                    </p>
+                    {% if not attempt.reviewed %}
+                    <p><em>This mark is unconfirmed and may change following teacher review.</em></p>
+                    {% endif %}
                     <p class="grade no-pad">
                         <span>{{ attempt.mark }} ({{ attempt.normalisedMark|number_format(2) }}%)</span>
                     </p>
