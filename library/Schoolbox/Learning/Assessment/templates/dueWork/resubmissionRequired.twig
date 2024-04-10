@@ -11,10 +11,10 @@
 <input type="checkbox"
        value="1"
        tabindex="{{ tabIndex }}"
-       id="resubmissionRequired-{{ participant.user.id }}"
+       id="resubmissionRequired-{{ feedback.owner }}"
        name="resubmissionRequired"
        {% if readonly %}readonly{% endif %}
-       {% if participant.resubmissionRequired ?? false %}checked{% endif %}
+       {% if feedback.resubmissionRequired ?? false %}checked{% endif %}
 />
 <label for="resubmissionRequired-{{ participant.user.id }}"
        class="checkbox-label">Resubmission required</label>

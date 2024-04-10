@@ -272,6 +272,10 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * * the most recent interaction is an instructor-given feedback
      * * that feedback is marked as requiring resubmission
      *
+     * Note that this function is for whether feedback is required from the student's perspective.  There may be a
+     * more recent unpublished feedback in which resubmitRequired is false.  To get whether resubmission is required
+     * according to the most recently saved draft feedback, get the value directly from the feedback item.
+     *
      * @inheritdoc
      */
     public function isResubmissionRequired(Participant $participant): bool

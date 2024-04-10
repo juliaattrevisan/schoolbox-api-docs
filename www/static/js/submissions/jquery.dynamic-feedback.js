@@ -199,9 +199,10 @@
 
                 publishFeedback(this);
             });
-            $(config.assessmentList).on('change', ':input[name="resubmissionRequired"]', function (e) {
-              e.preventDefault();
-              publishFeedback(this);
+            $(config.assessmentList).on("change", ':input[name="resubmissionRequired"]', function (e) {
+                var $input = $(this);
+                e.preventDefault();
+                onFeedbackChanged.apply($input);
             });
         }
 
