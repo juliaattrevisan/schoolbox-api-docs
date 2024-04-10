@@ -393,6 +393,7 @@ class Controller extends Base
             'Unit Title',
             'Unit Homepage ID',
             'Textbox Component Name',
+            'Textbox Component ID',
             'Textbox Title',
             'Textbox ID',
             'Textbox Content (empty string, empty state)'
@@ -425,6 +426,7 @@ class Controller extends Base
             CONCAT(tb.textBoxID, '-', ci.id, '-', f.id) AS id,
             f.id AS folder_id,
             cci_componentname.value as 'componentName',
+            ci.id as 'componentId',
             tb.heading as 'textboxHeading',
             tb.updated_at AS date,
             tb.updated_by AS updated_by,
@@ -482,13 +484,19 @@ class Controller extends Base
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = TextboxComponentController::DEFAULT_COMPONENT_HEADING;
+            }
             //build the row and send
             fputcsv($fp, [
             $units[$row['folder_id']]['course.name'],
             $units[$row['folder_id']]['course.id'],
             $units[$row['folder_id']]['unit.name'],
             $units[$row['folder_id']]['unit.id'],
-            $row['componentName'] ?? 'NULL',
+            $componentName,
+            $row['componentId'] ?? 'NULL',
             $row['textboxHeading'] ?? 'NULL',
             $row['id'] ?? 'NULL',
             str_replace('"', '\'', $row['textboxBody'] ?? 'NULL'),
@@ -542,7 +550,8 @@ class Controller extends Base
             $units[$row['folderId']]['course.id'],
             $units[$row['folderId']]['unit.name'],
             $units[$row['folderId']]['unit.id'],
-            $row['componentName']  ?? 'NULL',
+            'No Component',
+            'No Component',
             $row['textboxHeading'] ?? 'NULL',
             $row['id'] ?? 'NULL',
             str_replace('"', '\'', $row['textboxBody'] ?? 'NULL'),
