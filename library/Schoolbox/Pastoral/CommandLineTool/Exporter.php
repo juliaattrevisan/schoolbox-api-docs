@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\CommandLineTool;
 
+use External_Offline_Pastoral;
 use External_Pastoral;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -65,6 +66,13 @@ HELP;
         $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
         $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
         $externalPastoral          = new External_Pastoral();
+
+        $log->info("Using external database connector '" . $externalPastoral->getDatabaseClassName() . "'");
+
+        if ($externalPastoral->getDatabaseClassName() === External_Offline_Pastoral::class) {
+            $log->info('The current external db does not support pastoral exports; nothing will persist.');
+        }
+
         $externalPastoralUpload    = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
         if ($externalPastoralUpload) {
             $log->info('Pastoral external attachment upload is enabled');
@@ -80,19 +88,27 @@ HELP;
 
         $builder = $pastoralMapper->getPredicateBuilder();
 
-        $skippedRecordIds = [];
+        $failedPastoralIds = [];
         $nRecordsExported = 0;
 
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 try {
-                    $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
+                    $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                 } catch (\Exception $e) {
-                    $log->debug("Could not syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
-                    $skippedRecordIds[] = $pastoralRecord->getId();
+                    $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                    $failedPastoralIds[] = $pastoralRecord->getId();
+                    continue;
                 }
-                $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
+
+                if (!$syncSucceeded) {
+                    $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                    $failedPastoralIds[] = $pastoralRecord->getId();
+                    continue;
+                }
+
+                $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
 
                 $nRecordsExported++;
 
@@ -132,10 +148,10 @@ HELP;
             }
         }
 
-        $log->info("$nRecordsExported pastoral records exported.");
-        $log->info(count($skippedRecordIds) . " pastoral records skipped (records are skipped if errors are encountered).");
-        if (count($skippedRecordIds) > 0) {
-            $log->info('Skipped pastoral record ids: ' . implode(',', $skippedRecordIds));
+        $log->info("$nRecordsExported pastoral records exported successfully.");
+
+        if (count($failedPastoralIds) > 0) {
+            $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
         }
     }
 }

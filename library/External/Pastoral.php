@@ -126,4 +126,12 @@ class External_Pastoral implements External_PastoralInterface
     {
         return $this->database->getActionList();
     }
+
+    /**
+     * @return string
+     */
+    public function getDatabaseClassName(): string
+    {
+        return $this->database::class;
+    }
 }
