@@ -351,6 +351,31 @@ export default {
             <label for="modifyItem-clientId">Client ID</label>
             <input id="modifyItem-clientId" readonly v-model="modifyingItem.clientId" />
 
+            <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
+            <v-select
+                input-id="modifyItem-clientCredentialsUser"
+                :options="searchUsers"
+                class="schoolbox-vue-selectize"
+                :clear-search-on-blur="() => true"
+                :clear-search-on-select="true"
+                :close-on-select="false"
+                @search="onUserSearch"
+                label="fullName"
+                placeholder="Search for user, or leave empty for no user"
+                v-model="modifyingItem.clientCredentialsUser"
+            >
+                <template #option="option">
+                <span class="d-center">
+                    {{ option.fullName }}
+                </span>
+                </template>
+                <template #selected-option="option">
+                <span class="selected d-center">
+                    {{ option.fullName }}
+                </span>
+                </template>
+            </v-select>
+
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="modifyItem(modifyingItem)" href="#">Modify</a>
