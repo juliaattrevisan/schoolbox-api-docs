@@ -168,11 +168,27 @@ class Mapper extends AbstractCourseMapper
             JOIN course_implementation AS cimp ON cimp.id = cci_importedCourse.value
             WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
             AND ci.module="homepage"
-            AND cimp.course_specification_id=:courseSpecId',
+            AND cimp.course_specification_id=:courseSpecId
+            AND cimp.deleted_at IS NULL',
             ['courseSpecId' => $courseSpecId]
         )->fetchAll(PDO::FETCH_COLUMN);
 
-        return $this->findByPredicates($this->getPredicateBuilder()->in('id', $courseImplIds));
+        $courseImpls = $this->findByPredicates($this->getPredicateBuilder()->in('id', $courseImplIds));
+        $folderIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getFolder()->getId());
+
+        $folders = $this->getJoinMapper('folder')->findByColumn('id', $folderIds);
+
+        $foldersByFolderId = [];
+        foreach ($folders as $folder) {
+            $foldersByFolderId[$folder->getId()] = $folder;
+        }
+
+        // Add folder codes to $courseImpls.
+        foreach ($courseImpls as $courseImpl) {
+            $courseImpl->setFolder($foldersByFolderId[$courseImpl->getFolder()->getId()]);
+        }
+
+        return $courseImpls;
     }
 
     /**
