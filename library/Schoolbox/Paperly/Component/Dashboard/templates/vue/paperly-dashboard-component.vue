@@ -6,7 +6,8 @@
  */
 
 import { timeout } from "@js/util/jsUtils";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { payload } from "./tempPayload";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
@@ -62,13 +63,6 @@ const upcoming = window.Vue.computed(() => {
     }
     return tempPayload.value.upcoming;
 });
-
-/**
- * Reload the page to try loading again
- */
-function onRefreshSelected() {
-    window.location.reload();
-}
 </script>
 
 <template>
@@ -77,19 +71,7 @@ function onRefreshSelected() {
             <loading-table />
         </div>
     </div>
-    <div v-else-if="hasLoadError" class="row">
-        <div class="small-12 island">
-            <section class="content">
-                <div tableData-alert class="alert-box alert">
-                    Sorry, we are currently unable to load the Paperly data. Please
-                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
-                        >refresh the page</a
-                    >
-                    to try again and contact your support if the problem persists.
-                </div>
-            </section>
-        </div>
-    </div>
+    <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
             <li v-if="tempPayload?.features.find((item) => 'Forms' in item)">
