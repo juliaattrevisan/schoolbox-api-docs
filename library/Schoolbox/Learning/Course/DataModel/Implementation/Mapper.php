@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation;
 
+use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -140,7 +141,38 @@ class Mapper extends AbstractCourseMapper
         if ($loadUnits) {
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
         }
+
         return $courseImpls;
+    }
+
+    /**
+     * Finds all course impls for this course spec that are used in Course Outline components on homepages.
+     *
+     * @param int $courseSpecId
+     * @return Collection of CourseImplementation
+     */
+    public function findAllByCourseSpecificationIdInCourseOutlineComponentsOnly(int $courseSpecId): Collection
+    {
+        $courseImplIds = $this->getDatabase()->executeQuery(
+            'SELECT cimp.id AS courseImplId
+            FROM component_definition cd
+            JOIN component_instance ci ON ci.component_definition_id=cd.id
+            JOIN component_config_definition ccd_importedCourse ON (
+                ccd_importedCourse.component_definition_id = cd.id AND
+                ccd_importedCourse.key = "importedCourse"
+            )
+            LEFT JOIN component_config_instance cci_importedCourse ON (
+                cci_importedCourse.component_config_definition_id = ccd_importedCourse.id AND
+                cci_importedCourse.component_instance_id = ci.id
+            )
+            JOIN course_implementation AS cimp ON cimp.id = cci_importedCourse.value
+            WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
+            AND ci.module="homepage"
+            AND cimp.course_specification_id=:courseSpecId',
+            ['courseSpecId' => $courseSpecId]
+        )->fetchAll(PDO::FETCH_COLUMN);
+
+        return $this->findByPredicates($this->getPredicateBuilder()->in('id', $courseImplIds));
     }
 
     /**
