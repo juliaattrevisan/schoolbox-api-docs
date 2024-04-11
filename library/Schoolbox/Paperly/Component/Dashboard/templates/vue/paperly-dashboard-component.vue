@@ -115,5 +115,6 @@ const upcoming = window.Vue.computed(() => {
 <style scoped>
 h3 {
     background-color: #f5f5f5; /* to help distinguish the title */
+    border-bottom: 1px solid #efefef;
 }
 </style>
