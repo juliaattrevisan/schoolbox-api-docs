@@ -2,7 +2,6 @@
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
-import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
@@ -19,8 +18,6 @@ gsap.registerPlugin(Draggable);
 interface Props {
     unit: Unit;
     column: Column;
-    activityTypeLocale: ActivityTypeLocale;
-    ltiAssessmentsEnabled: boolean;
     isSortablePlaceholder: boolean;
 }
 
@@ -180,12 +177,8 @@ window.Vue.onUnmounted(() => {
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
                 <activities-list-content
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
-                    :is-sortable-placeholder="props.isSortablePlaceholder"
                     :activities="props.unit.activities.items"
-                    :activity-type-locale="props.activityTypeLocale"
                     :activities-list-routes="props.unit.activities._routes"
-                    :lti-assessments-enabled="props.ltiAssessmentsEnabled"
-                    :toast-el="store.toastEl!"
                     :prevent-store-init="props.isSortablePlaceholder"
                     @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
                     @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
-import type { Activity, ActivityTypeLocale, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
-import Toast from "@schoolboxVue/components/toast.vue";
+import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListContentItem from "./activities-list-content-item.vue";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
@@ -9,10 +8,7 @@ import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 interface Props {
     activitiesListStoreId: string; // A unique identifier for this activities list
     activities: Activity[];
-    activityTypeLocale: ActivityTypeLocale;
     activitiesListRoutes: ActivitiesListRoutes;
-    ltiAssessmentsEnabled: boolean;
-    toastEl: typeof Toast;
     preventStoreInit: boolean; // Whether to skip store initialization, e.g. if we're using an existing store
 }
 

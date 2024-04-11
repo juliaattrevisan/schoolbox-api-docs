@@ -182,8 +182,6 @@ window.Vue.onUnmounted(() => {
                     :key="column.id"
                     :unit="unit"
                     :column="column"
-                    :activity-type-locale="props.activityTypeLocale"
-                    :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                     :is-sortable-placeholder="false"
                 ></unit-planner-unit-cell>
             </div>
