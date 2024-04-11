@@ -39,7 +39,7 @@ const allTextboxKeys: string[] = (() => {
     return Array.from(keysSet);
 })();
 
-const tabs = createTabs(allTextboxKeys);
+const tabs = createTabs(allTextboxKeys, props.units);
 
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 

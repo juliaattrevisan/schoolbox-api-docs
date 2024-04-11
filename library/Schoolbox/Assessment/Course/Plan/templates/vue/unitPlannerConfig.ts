@@ -1,3 +1,5 @@
+import { Unit } from "./unitPlannerTypes";
+
 // All types of content that can be shown in a column
 export enum ColumnType {
     UNIT = "unit",
@@ -50,7 +52,7 @@ const tabConfig: TabConfig[] = [
     {
         id: "curriculum-overview",
         label: "Curriculum Overview",
-        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
+        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW, ColumnType.CURRICULUM_OVERVIEW],
     },
 ];
 
@@ -66,11 +68,33 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
 };
 
 /**
+ * Get the columns for the curriculum overview tab
+ * @param {Unit[]} units - The units to display in the unit planner
+ */
+export function getCurriculumOveriewColumns(units: Unit[]) {
+    // run through each unit, getting the curriculum overview components of each unit
+    // we group each by the componentds heading, so if two units have the same heading, they will be grouped together
+    // we then create a column for each group
+
+    const curriculumOverviewColumns = [];
+    units.forEach((unit) => {
+        unit.curriculum.components.forEach((component) => {
+            if (curriculumOverviewColumns.find((column) => column.heading === component.heading) === undefined) {
+                curriculumOverviewColumns.push({ heading: component.heading });
+            }
+        });
+    });
+    console.warn(curriculumOverviewColumns);
+}
+
+/**
  * Create the tabs for the unit planner
  * @param {string[]} allTextboxKeys - The keys (labels) of all the textboxes
+ * @param {Unit[]} units - The units to display in the unit planner
  * @returns {Tab[]} - The tabs for the unit planner
  */
-export function createTabs(allTextboxKeys: string[]) {
+export function createTabs(allTextboxKeys: string[], units: Unit[]) {
+    getCurriculumOveriewColumns(units);
     return tabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
 
