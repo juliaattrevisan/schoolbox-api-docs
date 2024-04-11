@@ -1,4 +1,14 @@
 <script setup lang="ts">
+/**
+ * The main container for an activities list
+ * Activities can be dragged and dropped to reorder the activities list
+ * This does not handle the component-action for creating new activities, which should be created separately
+ * If initialising this component with an existing store after, set preventStoreInit to true.
+ * Note, only supports 1 instance per activitiesListStoreId where the activities will be draggable,
+ * components initialised with preventStoreInit=true are only for display purposes, e.g. in the unit planner if resequencing a unit
+ *
+ * Must have an initialised activitiesListGlobalStore in the parent component
+ */
 import type { Ref } from "vue";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListStore } from "./store/activitiesListStore";

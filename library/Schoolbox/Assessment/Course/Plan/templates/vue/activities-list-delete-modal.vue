@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
- * To be able to delete an activity on confirmation
+ * The modal that appears when the user attempts to delete an activity
+ * To be used alongside the activities list, all activities lists on the page will share this modal
+ * One instance of <activities-list-delete-modal /> should be available on the page if an activities list is present
  */
-
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import { useActivitiesListDeleteModalStore } from "./store/activitiesListDeleteModalStore";
 

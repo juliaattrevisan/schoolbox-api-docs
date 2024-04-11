@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * A component-action that can be used alongside the activities list
+ * Currently has the ability to create a new activity via a dropdown of activity types
+ */
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListActionCreateInner from "./activities-list-action-create-inner.vue";

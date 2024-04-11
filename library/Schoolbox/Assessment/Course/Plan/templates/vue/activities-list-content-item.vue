@@ -1,4 +1,11 @@
 <script setup lang="ts">
+/**
+ * To display a single activity linked to a particular folder.
+ * The activity can be dragged and dropped to reorder the activities list,
+ * and further actions can be taken on the activity via the three dot menu
+ * As the activity can be dragged and dropped, the activity can also become a placeholder
+ * for when the actual activity is being dragged to help the user visualize where the activity will be placed
+ */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { kebabCase, startCase } from "lodash";

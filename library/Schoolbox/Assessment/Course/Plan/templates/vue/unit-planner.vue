@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * The main component for the unit planner
+ */
 import type { Ref } from "vue";
 import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";

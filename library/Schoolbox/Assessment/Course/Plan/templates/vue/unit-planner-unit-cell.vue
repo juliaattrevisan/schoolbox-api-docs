@@ -1,4 +1,11 @@
 <script setup lang="ts">
+/**
+ * A cell in the unit planner grid
+ * Contains the content for a specific unit and column based on the column type
+ * If draggableEl is present (e.g. if the column type is UNIT), the draggable instance is initialised
+ * to allow for resequencing units in the unit planner
+ * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
+ */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";

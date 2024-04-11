@@ -1,6 +1,9 @@
 <script setup lang="ts">
-// The inner contents for a create activity dropdown, should be wrapped in a ul
-// sbx-pop-out is not created here, as it may need to be customised by the parent component
+/**
+ * The inner contents for a create activity dropdown
+ * Should be wrapped in a ul
+ * sbx-pop-out is not created here, as it may need to be customised by the parent component
+ */
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 

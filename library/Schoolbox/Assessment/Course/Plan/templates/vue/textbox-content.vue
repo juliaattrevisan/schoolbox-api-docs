@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * The main component for showing the content of a textbox on the unit planner
+ */
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
