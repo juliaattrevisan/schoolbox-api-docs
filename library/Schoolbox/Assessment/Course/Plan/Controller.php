@@ -211,6 +211,11 @@ class Controller extends Base
                 if ('0' === $instanceConfig['curriculumTreeFilter']['value']) {
                     $instanceConfig['curriculumTreeFilter']['value'] = null;
                 }
+                // if we are filtering we should return the curric node
+                if ($instanceConfig['curriculumTreeFilter']['value']) {
+                    $instanceConfig['curriculumTreeFilter']['value'] =
+                        $this->nodeMapper->findOneByColumnList(['id' => $instanceConfig['curriculumTreeFilter']['value'], 'enabled' => true,]);
+                }
                 $curriculum['components'][] = [
                     'componentId' => $component->getId(),
                     'heading' => $instanceConfig['componentname']['value'],
