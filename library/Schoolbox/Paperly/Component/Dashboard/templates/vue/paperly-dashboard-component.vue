@@ -64,13 +64,6 @@ const upcoming = window.Vue.computed(() => {
 });
 
 /**
- * To show all upcoming tasks
- */
-function onViewMoreSelected() {
-    viewMore.value = true;
-}
-
-/**
  * Reload the page to try loading again
  */
 function onRefreshSelected() {
@@ -126,7 +119,7 @@ function onRefreshSelected() {
         </div>
         <div v-if="tempPayload && tempPayload.upcoming.length > 3" class="component-action">
             <section>
-                <button @click.prevent="onViewMoreSelected">View more</button>
+                <button @click.prevent="viewMore = true">View more</button>
             </section>
         </div>
     </template>
