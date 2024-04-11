@@ -14,7 +14,6 @@ import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
-import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
@@ -202,7 +201,6 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <curriculum-codes-list :curriculum-codes="props.unit.curriculumCodes"></curriculum-codes-list>
                 <curriculum-details-modal />
             </template>
         </div>
