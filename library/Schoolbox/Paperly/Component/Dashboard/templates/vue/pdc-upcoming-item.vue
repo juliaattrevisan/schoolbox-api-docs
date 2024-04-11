@@ -20,7 +20,7 @@ function getDate() {
 </script>
 
 <template>
-    <div class="item l-flex-col l-gap-xs l-pad-s">
+    <div class="item l-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
         <a :href="props.item.url" :title="`View ${props.item.title}`">{{ props.item.title }}</a>
         <p class="meta f-no-margins">
             <template v-if="props.item.status">{{ props.item.status }} - Due date: {{ getDate() }}</template>
