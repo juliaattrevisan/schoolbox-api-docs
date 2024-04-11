@@ -19,6 +19,15 @@ export type TextboxContent = {
     body: string;
 };
 
+/**
+ * A single Curriculum Overview component that's been added to a Unit's home page
+ */
+export type CurriculumOverviewComponent = {
+    componentId: number;
+    heading: string;
+    filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
+};
+
 export type Unit = {
     id: number;
     title: string;
@@ -28,7 +37,11 @@ export type Unit = {
         _routes: ActivitiesListRoutes;
         items: Activity[];
     };
-    curriculumCodes: Node[];
+    curriculum: {
+        selectedNodes: Node[]; // the individual nodes assigned to the folder
+        nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
+        components: CurriculumOverviewComponent[];
+    };
     rubricCapabilities: RubricCapability[];
     textboxes: Record<string, TextboxContent>;
     extraTextboxes: number;
