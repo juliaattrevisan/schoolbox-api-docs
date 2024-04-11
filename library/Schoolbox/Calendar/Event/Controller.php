@@ -787,7 +787,7 @@ class Controller extends Base
                         $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
-                    'showAttendees' => $event->getShowAttendees() ? 1 : 0,
+                    'showAttendees' => $event->getShowAttendees(),
                 ]
             );
         } else {
