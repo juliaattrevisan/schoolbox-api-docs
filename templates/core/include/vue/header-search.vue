@@ -356,8 +356,8 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </div>
-                <div v-if="!isLoading && !userResults.length" class="c-card l-pad-s">
-                    <em>No users were found matching "{{ keyword }}"</em>
+                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="c-card l-pad-s">
+                    <em>No users or pages were found matching "{{ keyword }}"</em>
                 </div>
             </div>
             <div class="l-flex-col">
