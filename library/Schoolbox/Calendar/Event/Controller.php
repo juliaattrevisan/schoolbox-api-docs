@@ -915,25 +915,31 @@ class Controller extends Base
      */
     private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
     {
-        $integers = [];
+        $ids = [];
 
         foreach ($items as $item) {
-            if (is_int($item)) {
-                $integers[] = $item;
-            } elseif (is_string($item) && ctype_digit($item)) {
-                $integers[] = (int)$item;
-            } elseif (is_array($item) && array_key_exists('id', $item)) {
-                if (is_int($item['id']) || ctype_digit($item['id'])) {
-                    $integers[] = (int)$item['id'];
-                } else {
-                    throw new InvalidArgumentException("Value for key 'id' must be integer or digit string.");
+            if (is_array($item)) {
+                if (!array_key_exists('id', $item)) {
+                    throw new InvalidArgumentException("No 'id' key supplied in object.");
                 }
+
+                $value = $item['id'];
             } else {
-                throw new InvalidArgumentException("Value must be integer or digit string or array with 'id' key.");
+                $value = $item;
             }
+
+            if (is_int($value)) {
+                $id = $value;
+            } elseif (is_string($value) && ctype_digit($value)) {
+                $id = (int)$value;
+            } else {
+                throw new InvalidArgumentException("Invalid 'id' value.  Expected integer or digit string.");
+            }
+
+            $ids[] = $id;
         }
 
-        return $integers;
+        return $ids;
     }
 
     /**
