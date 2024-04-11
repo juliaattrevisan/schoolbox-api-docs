@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Cloud\Test;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Notification;
 use Psr\Log\LoggerInterface;
 use Schoolbox\MobileApp\RegistryMapper;
 
@@ -23,14 +24,14 @@ use Schoolbox\MobileApp\RegistryMapper;
 class TestService extends AbstractService
 {
     /**
-     * @param array      $tokens
-     * @param int        $id
-     * @param string     $title
-     * @param int        $unreadCount
-     * @param array|null $data
+     * @param array             $tokens
+     * @param int               $id
+     * @param string            $title
+     * @param int               $unreadCount
+     * @param Notification|null $notification
      * @return bool
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
         $this->getLog()->debug('This is a test message: it is not sent anywhere');
         $this->getLog()->debug(
@@ -39,7 +40,7 @@ class TestService extends AbstractService
                 'app_tokens'   => $tokens,
                 'message_id'   => $id,
                 'unread_count' => $unreadCount,
-                'data'         => $data
+                'notification' => $notification
             ],
         );
 

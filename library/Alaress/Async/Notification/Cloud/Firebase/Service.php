@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Notification;
 use Kreait\Firebase;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
@@ -51,10 +52,10 @@ class Service extends AbstractService
      * @param int        $id
      * @param string     $title
      * @param int        $unreadCount
-     * @param array|null $data
+     * @param null|Notification $notification
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())
@@ -66,7 +67,15 @@ class Service extends AbstractService
             ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title))
             ->withData(
                 [
-                    'data' => json_encode($data)
+                    'data' => json_encode([
+                                              'id'        => $id,
+                                              'body'      => $notification->getTitle(),
+                                              'icon'      => $notification->getIcon(),
+                                              'href'      => $notification->getHref(),
+                                              'params'    => $this->decorator->renderParametersAsArray($notification),
+                                              'meta'      => $notification->getMeta(),
+                                              'timestamp' => $notification->getTimestamp(),
+                                          ])
                 ]
             );
 

@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Cloud\Google;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Notification;
 use GuzzleHttp\Client;
 use Monolog\Logger;
 use OverflowException;
@@ -76,16 +77,11 @@ class GCM extends AbstractService
 
 
     /**
-     * @param array      $tokens
-     * @param int        $id
-     * @param string     $title
-     * @param int        $unreadCount
-     * @param array|null $data
-     * @return bool
+     * @inheritdoc
      *@throws OverflowException if the max payload size (4KB) is exceeded
      * @throws RuntimeException if your API key is bad
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, array $data = null)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
         $data = [
             'id'           => $id,
