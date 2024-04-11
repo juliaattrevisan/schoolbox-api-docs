@@ -9,6 +9,9 @@
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
+import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
+import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
+import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
@@ -30,6 +33,8 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
+const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
+folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -201,7 +206,8 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <p>Yep</p>
+                <fn-list :folder-id="props.unit.folderId" :component-instance-id="0" />
+                <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="0" />
                 <curriculum-details-modal />
             </template>
         </div>
