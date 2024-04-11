@@ -118,6 +118,9 @@ window.Vue.onMounted(initEditor);
 </template>
 
 <style scoped lang="scss">
+.editor-wrapper {
+    z-index: 1;
+}
 .editor-content {
     border: 0 !important;
     padding: 8px !important;

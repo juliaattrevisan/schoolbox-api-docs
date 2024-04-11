@@ -257,24 +257,24 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-top.fixed-left {
-    z-index: 5; // On top of both the left column, the header, and the dropdowns
+    z-index: 6; // On top of both the left column, the header, and the dropdowns
 }
 
 .fixed-left {
     left: 0;
     position: sticky;
-    z-index: 2; // Behind the dropdowns and table header, but on top of the content
+    z-index: 3; // Behind the dropdowns and table header, but on top of the content
 }
 .fixed-top {
     position: sticky;
     top: 0;
-    z-index: 4; // On top of both the left column and the dropdowns
+    z-index: 5; // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
     height: 0;
     position: sticky;
-    z-index: 3; // On top of left column, but behind the header
+    z-index: 4; // On top of left column, but behind the header
 }
 
 #unit-planner-sortable-container {
@@ -291,6 +291,6 @@ window.Vue.onUnmounted(() => {
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
     position: absolute;
     width: 100%;
-    z-index: 8;
+    z-index: 10; // Appear on top of everything else
 }
 </style>
