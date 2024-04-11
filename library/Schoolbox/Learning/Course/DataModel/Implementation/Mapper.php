@@ -174,16 +174,14 @@ class Mapper extends AbstractCourseMapper
         )->fetchAll(PDO::FETCH_COLUMN);
 
         $courseImpls = $this->findByPredicates($this->getPredicateBuilder()->in('id', $courseImplIds));
+
+        // Hydrate course implementation folders so that class codes will be available.
         $folderIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getFolder()->getId());
-
         $folders = $this->getJoinMapper('folder')->findByColumn('id', $folderIds);
-
         $foldersByFolderId = [];
         foreach ($folders as $folder) {
             $foldersByFolderId[$folder->getId()] = $folder;
         }
-
-        // Add folder codes to $courseImpls.
         foreach ($courseImpls as $courseImpl) {
             $courseImpl->setFolder($foldersByFolderId[$courseImpl->getFolder()->getId()]);
         }
