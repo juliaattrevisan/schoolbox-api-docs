@@ -3,7 +3,7 @@ import type { Ref } from "vue";
 import type { Activity, ActivityTypeLocale, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { useActivitiesListStore } from "./store/activitiesListStore";
-import ActivitiesListItem from "./activities-list-item.vue";
+import ActivitiesListContentItem from "./activities-list-content-item.vue";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 
 interface Props {
@@ -41,7 +41,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <ul ref="activitiesContainerEl" class="information-list sortable-card ui-sortable">
-        <activities-list-item
+        <activities-list-content-item
             v-for="activity in activitiesListDragStore().orderedActivities"
             :key="activity.id"
             :activity="activity"
@@ -50,7 +50,7 @@ window.Vue.onMounted(() => {
             :prevent-draggable-init="preventStoreInit"
             @deleted="activitiesListStore().removeActivity($event)"
         />
-        <activities-list-item
+        <aactivities-list-content-item
             v-if="activitiesListDragStore().isDragging"
             :key="`${activitiesListDragStore().dragCurrentActivity!.id}-placeholder`"
             :activity="activitiesListDragStore().dragCurrentActivity!"
