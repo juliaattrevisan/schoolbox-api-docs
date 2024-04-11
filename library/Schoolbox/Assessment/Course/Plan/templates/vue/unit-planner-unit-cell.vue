@@ -12,6 +12,7 @@ import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsMo
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
+import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
@@ -105,6 +106,18 @@ function onContentClicked(event: MouseEvent) {
     if (textboxContentComponent.value) {
         textboxContentComponent.value.focusEditor();
     }
+}
+
+/**
+ * To open the curriculum code mapping modal,
+ * ensuring the latest selected nodes are displayed
+ */
+function onUpdateCurriculumSelected() {
+    // dispatch to the top parent to open up the curriculum modal
+    // ignoreUpdates(() => {
+    //     selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
+    // });
+    // modalStore.open();
 }
 
 window.Vue.onMounted(() => {
@@ -232,10 +245,13 @@ window.Vue.onUnmounted(() => {
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
-
                 <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
+                />
+                <fn-actions
+                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                    @update-selected="onUpdateCurriculumSelected"
                 />
             </div>
         </div>
