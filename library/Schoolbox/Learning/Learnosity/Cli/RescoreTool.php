@@ -125,9 +125,14 @@ HELP;
             $this->getLogger(),
         );
 
-        /* Find all the attempts for this quiz
+        /* Find all the finished attempts for this quiz
+         * (Don't try to rescore attempts currently in progress)
          */
-        $attempts = $attemptMapper->findByColumn('assess_id', $quiz->getId());
+        $pb = $attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->notNull('finish');
+
+        $attempts = $attemptMapper->findByPredicates($pb);
 
         /* No attempts? No trabajo
          */
