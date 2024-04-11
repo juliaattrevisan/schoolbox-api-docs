@@ -46,44 +46,60 @@ class UnitAssessments
      */
     public function __invoke(IAssessable $assessment): array
     {
-        $links = null;
+        $links = [];
         if ($this->routeGenerator) {
-            $links = [
-                'summary' => $this->routeGenerator->generate('learningAssessment.getSummary', [
+            $availableLinks = [
+                'summary' => ["route" => "learningAssessment.getSummary", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'studentId' => $this->student->getId(),
                     'student' => $this->student,
-                ]),
-                'status' => $this->routeGenerator->generate('learningAssessment.getStatus', [
+                ]],
+                'status' => ["route" => "learningAssessment.getStatus", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                ]),
-                'modify' => $this->routeGenerator->generate('learningAssessment.getUpdateAssessmentForm', [
+                ]],
+                'modify' => ["route" => "learningAssessment.getUpdateAssessmentForm", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                ]),
-                'delete' => $this->routeGenerator->generate('learningAssessment.postDeleteAssessment', [
+                ]],
+                'delete' => ["route" => "learningAssessment.postDeleteAssessment", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                ]),
+                ]],
+                'modifyContent' => null,
                 'export' => null,
             ];
             // if quiz we have special links
             if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-                $links['modifyContent'] = $this->routeGenerator->generate('learnosity.getContent', [
+                $availableLinks['modifyContent'] = ["route" => "learnosity.getContent", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
-                ]);
+                ]];
             }
             // spec assessments can be exported
             if ($assessment->isSpecification()) {
-                $links['export'] = $this->routeGenerator->generate('learningAssessmentExporter.getExportFormForAssessment', [
+                $availableLinks['export'] = ["route" => "learningAssessmentExporter.getExportFormForAssessment", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment'   => $assessment,
-                ]);
+                ]];
+            }
+
+            // Filter out links that the user is not authorized to access (null if not authorized or not applicable)
+            foreach ($availableLinks as $key => $link) {
+                if ($link === null || !$this->authorizer->isPathAuthorizedForUser($link['route'], $link['params'], $this->loggedInUser)) {
+                    $links[$key] = null;
+                } else {
+                    $links[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+                }
             }
         }
+
+        // If the user does not have access to any links, set $links to null
+        if (empty(array_filter($links))) {
+            $links = null;
+        }
+
         $assessments = null;
         if ($assessment instanceof Project) {
             $assessments = $assessment->getAssessables();

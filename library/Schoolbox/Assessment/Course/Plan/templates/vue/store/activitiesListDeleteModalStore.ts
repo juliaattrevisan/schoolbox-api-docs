@@ -45,6 +45,10 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
             return; // nothing to do
         }
 
+        if (activityToDelete.value._links === null || activityToDelete.value._links.delete === null) {
+            return; // user does not have access to delete
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
         globalStore.toastEl!.activate("Deleting...");
         isProcessing.value = true;

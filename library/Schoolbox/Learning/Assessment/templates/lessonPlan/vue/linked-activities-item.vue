@@ -104,23 +104,31 @@ function getDataProgressTickStatus(activity: Activity) {
 function getDataProgressTickForm(activity: Activity) {
     return activity.isSelfAssessableTask ? "selfAssessed" : "teacherAssessed";
 }
+
+const activityLink = window.Vue.computed(() => {
+    if (props.activity._links === null) {
+        return undefined;
+    }
+
+    if (props.canModify && !store.isStudentView && props.activity._links.status !== null) {
+        return `${props.activity._links.status}?returnUrl=${props.returnUrl}`;
+    }
+
+    if (props.activity._links?.summary !== null) {
+        return `${props.activity._links.summary}?returnUrl=${props.returnUrl}`;
+    }
+
+    return undefined;
+});
 </script>
 
 <template>
     <div class="card small-12">
         <h3>
             <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>
-            <a
-                v-if="activity._links !== null"
-                class="title"
-                :href="
-                    props.canModify && !store.isStudentView
-                        ? activity._links.status + '?returnUrl=' + returnUrl
-                        : activity._links.summary + '?returnUrl=' + returnUrl
-                "
-                >{{ activity.title }}</a
-            >
-            <span v-else class="title">{{ activity.title }}</span>
+            <component :is="activity._links !== null ? 'a' : 'span'" class="title" :href="activityLink">
+                {{ activity.title }}
+            </component>
         </h3>
         <p class="meta">
             {{ getActivityMeta(activity) }}
