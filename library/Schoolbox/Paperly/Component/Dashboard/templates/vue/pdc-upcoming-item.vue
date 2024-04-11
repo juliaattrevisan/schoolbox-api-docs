@@ -6,7 +6,7 @@
 import type { UpcomingItem } from "../js/types/UpcomingItem";
 
 interface Props {
-    item: UpcomingItem; // The folder id to display the nodes for
+    item: UpcomingItem; // The upcoming item to display
 }
 const props = defineProps<Props>();
 

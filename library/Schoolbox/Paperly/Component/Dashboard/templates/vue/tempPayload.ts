@@ -1,3 +1,7 @@
+/**
+ * Dummy payload while we await the actualy Paperly API
+ */
+
 import { PaperlyPayload } from "../js/types/PaperlyPayload";
 
 export const payload: PaperlyPayload = {

@@ -14,7 +14,7 @@ import PdcUpcomingItem from "./pdc-upcoming-item.vue";
 
 const tempPayload = window.Vue.ref<PaperlyPayload | undefined>();
 const viewMore = window.Vue.ref(false); // to show all upcoming tasks, only show the first three by default
-const isProcessing = window.Vue.ref(false); // to disable further backend actions while we're already processing
+const isProcessing = window.Vue.ref(false); // to display loading while the payload is being loaded
 const hasLoadError = window.Vue.ref(false); // to show an error message if the payload fails to load
 
 /**
@@ -54,6 +54,7 @@ window.Vue.onMounted(() => {
  * @returns {UpcomingItem[]} - the upcoming tasks
  */
 const upcoming = window.Vue.computed(() => {
+    // if the payload is not loaded, return an empty array
     if (tempPayload.value === undefined) {
         return [];
     }
@@ -61,6 +62,7 @@ const upcoming = window.Vue.computed(() => {
     if (!viewMore.value) {
         return tempPayload.value.upcoming.slice(0, 3);
     }
+    // otherwise show all upcoming tasks
     return tempPayload.value.upcoming;
 });
 </script>
