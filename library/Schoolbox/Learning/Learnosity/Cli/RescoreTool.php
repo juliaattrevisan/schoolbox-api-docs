@@ -241,7 +241,7 @@ HELP;
      */
     protected function getQuizForAssessmentId(int $assessmentId): Quiz
     {
-        /** @var Quiz $quiz */
+        /** @var null|Quiz $quiz */
         $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
 
         /* Not a quiz
