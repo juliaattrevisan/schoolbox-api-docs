@@ -95,10 +95,13 @@ const upcoming = window.Vue.computed(() => {
             </li>
         </ul>
         <div class="c-island l-flex-col">
-            <h3 class="l-pad-m--horiz l-pad-s--vert f-no-margins">Upcoming Tasks (Action required)</h3>
-            <p v-if="upcoming.length === 0" class="meta l-pad-m--horiz l-pad-s--vert f-no-margins">
-                There are currently no upcoming tasks that require action
-            </p>
+            <h3 v-if="upcoming.length > 0" class="l-pad-m--horiz l-pad-s--vert f-no-margins">
+                Upcoming Tasks (Action required)
+            </h3>
+            <div v-if="upcoming.length === 0" class="empty-state">
+                <i class="icon-paperly-forms"></i>
+                <p>There are currently no upcoming tasks that require action.</p>
+            </div>
             <pdc-upcoming-item v-for="item in upcoming" v-else :key="item.url" :item="item" />
         </div>
         <div v-if="tempPayload && tempPayload.upcoming.length > 3" class="component-action">
@@ -109,4 +112,8 @@ const upcoming = window.Vue.computed(() => {
     </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+h3 {
+    background-color: #f5f5f5; /* to help distinguish the title */
+}
+</style>
