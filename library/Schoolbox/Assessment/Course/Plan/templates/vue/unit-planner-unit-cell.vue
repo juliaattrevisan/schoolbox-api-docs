@@ -92,6 +92,11 @@ function onContentClicked(event: MouseEvent) {
         return;
     }
 
+    // if the cell is already focused, there's no need to re-focus it
+    if (contentIsFocused.value) {
+        return;
+    }
+
     // If there's a textbox content component, focus the editor
     if (textboxContentComponent.value) {
         textboxContentComponent.value.focusEditor();
