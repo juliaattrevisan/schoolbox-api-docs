@@ -150,7 +150,7 @@ class Controller extends BaseController
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationIdInCourseOutlineComponentsOnly($courseSpec->getId());
 
         // Filter out historical classes (no class code, no group).
-        $courseImpls->filter(
+        $courseImpls = $courseImpls->filter(
             function (CourseImplementation\Model $courseImpl) {
                 return !($courseImpl->getFolder()->getCodeString() === '' && $courseImpl->getFolder()->getGroup() === null);
             }
