@@ -1036,50 +1036,6 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        /* Updated marks given by our teacher,
-         * including attempt-based commentary
-         */
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* $postData is a structured array containing all the feedback info
-         * Some of it goes back into learnosity; some is saved locally
-         *
-         * $postData = [
-         *     'scores' => [
-                   '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 2
-         *     ],
-         *     'comments' => [
-         *         '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 'my comment'
-         *     ],
-         *     'attempt-comment' => 'you did a good job, now back to sleep'
-         * ]
-         */
-
-        /* Instead of asking learnosity how it tallied everything, we can
-         * just...do it ourselves, I guess, and sort-of delete this problem
-         * We knew the max_mark from the attempt table, so it could potentially
-         * desync from what Learnosity knows.
-         *
-         * FIXME Add Polling Mechanism
-         *  This would otherwise have been processed by the polling thing
-         *
-         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $sanitisedScore = (new SanitiseScores())->sanitise(array_sum(array_values($postData['scores'])), $attempt->getMaxMark());
-
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
-
-        /* Log data that seems suspiciously broken
-         */
-        (new Feedback\SuspiciousLogger())->logSanitisedScore(
-            'postFeedback() score calc',
-            $attempt->getLearnosityReference(),
-            $sanitisedScore,
-            $postData
-        );
-
         // As with posting a feedback:
         // need the existing response to determine a human-readable mark.
         $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
@@ -1090,19 +1046,10 @@ class Controller extends Base
             return;
         }
 
-        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
-
-        /* Replace tokens in Overall Attempt Comment
+        /* Updated marks given by our teacher,
+         * including attempt-based commentary
          */
-        $comment = $this->replaceTokens($postData['attempt-comment'], $student);
-
-        /* Save the comment and new normalised mark
-         */
-        $attempt->setComment($comment)
-            ->setReviewer($this->getUser())
-            ->setReviewed(\Alaress_Date_Format::now());
-
-        $this->attemptMapper->save($attempt);
+        $postData = $this->requestPost->getArrayCopy();
 
         /* For every learnosity question, see if we have a db record for its feedback
          * If we do, recycle it and update its contents
@@ -1152,6 +1099,7 @@ class Controller extends Base
         /* Re-collate updated response data
          */
         $responseData = [];
+        $updatedMaxMarks = 0;
 
         foreach ($responses as $response) {
             $updatedResponse = $response;
@@ -1194,7 +1142,65 @@ class Controller extends Base
             $updatedResponse['attempted'] = true;
 
             $responseData[] = $updatedResponse;
+
+            /* Also collate the new max_mark total here, in case someone changed
+             * this in learnosity and we didn't already know
+             */
+            $updatedMaxMarks += (float)$maxMark;
         }
+
+        /* Instead of asking learnosity how it tallied everything, we can
+         * just...do it ourselves, I guess, and sort-of delete this problem
+         * We knew the max_mark from the attempt table, so it could potentially
+         * desync from what Learnosity knows.
+         *
+         * FIXME Add Polling Mechanism
+         *  This would otherwise have been processed by the polling thing
+         *
+         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
+        $sanitisedScore = (new SanitiseScores())->sanitise(array_sum(array_values($postData['scores'])), $updatedMaxMarks);
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
+
+        /* Log data that seems suspiciously broken
+         */
+        (new Feedback\SuspiciousLogger())->logSanitisedScore(
+            'postFeedback() score calc',
+            $attempt->getLearnosityReference(),
+            $sanitisedScore,
+            $postData
+        );
+
+        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
+
+        /* $postData is a structured array containing all the feedback info
+         * Some of it goes back into learnosity; some is saved locally
+         *
+         * $postData = [
+         *     'scores' => [
+                   '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 2
+         *     ],
+         *     'comments' => [
+         *         '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 'my comment'
+         *     ],
+         *     'attempt-comment' => 'you did a good job, now back to sleep'
+         * ]
+         */
+
+        /* Replace tokens in Overall Attempt Comment
+         */
+        $comment = $this->replaceTokens($postData['attempt-comment'], $student);
+
+        /* Save the comment and new normalised mark
+         */
+        $attempt->setComment($comment)
+            ->setReviewer($this->getUser())
+            ->setReviewed(\Alaress_Date_Format::now());
+
+        $this->attemptMapper->save($attempt);
 
         /* Post back to learnosity
          * When the learnosity ui reloads again, it'll still be remembering

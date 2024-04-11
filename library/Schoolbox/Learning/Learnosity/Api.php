@@ -318,7 +318,7 @@ class Api
                             $response->getStatusCode(),
                             $response->getBody(),
                             json_encode($payload, JSON_THROW_ON_ERROR)
-                        ));
+                        ), $response->getStatusCode());
                     }
 
                     /* Try to decode what learnosity told us
@@ -343,7 +343,7 @@ class Api
                         $response->getStatusCode(),
                         $response->getBody(),
                         json_encode($payload, JSON_THROW_ON_ERROR)
-                    ));
+                    ), $response->getStatusCode());
                 }
 
                 /* No exceptions/rate limits encountered:
