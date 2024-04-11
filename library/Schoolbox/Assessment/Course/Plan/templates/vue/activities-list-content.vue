@@ -56,7 +56,7 @@ window.Vue.onMounted(() => {
             :prevent-draggable-init="preventStoreInit"
             @deleted="activitiesListStore().removeActivity($event)"
         />
-        <aactivities-list-content-item
+        <activities-list-content-item
             v-if="activitiesListDragStore().isDragging"
             :key="`${activitiesListDragStore().dragCurrentActivity!.id}-placeholder`"
             :activity="activitiesListDragStore().dragCurrentActivity!"
