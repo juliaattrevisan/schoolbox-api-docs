@@ -314,13 +314,13 @@ const searchButtonText = window.Vue.computed(() => {
                 </div>
                 <a
                     v-for="(result, i) in pageResults"
-                    :key="i + pageResults.length"
+                    :key="i + userResults.length"
                     :class="`c-card c-card--link c-card--border-end ${
-                        i + pageResults.length === arrowCounter ? 'c-card--active' : ''
+                        i + userResults.length === arrowCounter ? 'c-card--active' : ''
                     }`"
                     :href="result.url"
                     :data-test="`header-search-page-result-link-${result.title}`"
-                    @mouseover="arrowCounter = i + pageResults.length"
+                    @mouseover="arrowCounter = i + userResults.length"
                     @mouseleave="arrowCounter = -1"
                 >
                     <div class="l-flex-row l-flex--align-center l-flex--no-wrap l-gap-s l-pad-s">
@@ -356,8 +356,8 @@ const searchButtonText = window.Vue.computed(() => {
                         </div>
                     </div>
                 </div>
-                <div v-if="!isLoading && !userResults.length" class="c-card l-pad-s">
-                    <em>No users were found matching "{{ keyword }}"</em>
+                <div v-if="!isLoading && !userResults.length && !pageResults.length" class="c-card l-pad-s">
+                    <em>No users or pages were found matching "{{ keyword }}"</em>
                 </div>
             </div>
             <div class="l-flex-col">
