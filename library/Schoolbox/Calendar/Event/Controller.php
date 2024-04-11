@@ -23,6 +23,7 @@ use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -756,11 +757,18 @@ class Controller extends Base
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         if ($this->isJsonRequest()) {
+            /**
+             * @var eventType $eventType EventType
+             */
+            $eventType = $this->eventTypeMapper->findById($event->getType()->getId());
+            $event->setType($eventType);
+
+            $userTranslator = new UserTranslator();
             $this->response = $this->responseAsJson(
                 [
                     'id' => $event->getId(),
-                    'userId' => $event->getOwner()->getId(),
-                    'authorId' => $event->getAuthor()->getId(),
+                    'user' => $userTranslator->convertLinkedUser($event->getOwner()),
+                    'author' => $userTranslator->convertLinkedUser($event->getAuthor()),
                     'allDay' => $event->getAllDay(),
                     'efficacy' => $efficacy,
                     'title' => $event->getTitle(),
@@ -768,7 +776,7 @@ class Controller extends Base
                     'endDate' => $event->getEndDateTime()->getJson(),
                     'repeat' => $repeat,
                     'repeat_until' => $untilDate->getJson(),
-                    'type' => $event->getType()->getId(),
+                    'type' => $event->getType(),
                     'location' => $event->getLocation(),
                     'detail' => $event->getDetail(),
                     'publishDate' => $event->getPublishDateTime()->getJson(),
