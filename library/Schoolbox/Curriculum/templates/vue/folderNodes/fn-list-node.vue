@@ -10,6 +10,7 @@ interface Props {
     node: Node; // the assigned node to display
     folderId: number; // The folder id to display the nodes for, primarily used to reference the appropriate store
     componentInstanceId: number; // The component instance id to display the nodes on
+    isSmall?: boolean; // Whether the list should be displayed in a small format
 }
 
 const props = defineProps<Props>();
@@ -28,6 +29,15 @@ const showChildren = window.Vue.computed(() => props.node.children && props.node
  * @returns {boolean}
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
+
+/**
+ * Shrink the font size if props.isSmall is true
+ * @returns {string}
+ */
+const fontSize = window.Vue.computed(() => {
+    if (props.isSmall) return "0.8125rem";
+    return "1rem";
+});
 
 /**
  * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
@@ -83,6 +93,7 @@ function onRemoveSelected() {
                     :node="viewNode"
                     :folder-id="props.folderId"
                     :component-instance-id="props.componentInstanceId"
+                    :is-small="props.isSmall"
                 />
             </transition-group>
         </template>
@@ -96,7 +107,7 @@ function onRemoveSelected() {
 
 .node__code,
 .node__name {
-    font-size: 1rem;
+    font-size: v-bind(fontSize);
 }
 
 .node__name {

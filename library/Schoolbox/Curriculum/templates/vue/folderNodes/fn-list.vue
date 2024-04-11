@@ -10,6 +10,7 @@ import FnListNode from "./fn-list-node.vue";
 interface Props {
     folderId: number; // The folder id to display the nodes for
     componentInstanceId: number; // The component instance id to display the nodes on
+    isSmall?: boolean; // Whether the list should be displayed in a small format
 }
 const props = defineProps<Props>();
 
@@ -24,6 +25,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
             :node="node"
             :folder-id="props.folderId"
             :component-instance-id="props.componentInstanceId"
+            :is-small="props.isSmall"
         />
     </transition-group>
 </template>

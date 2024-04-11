@@ -206,7 +206,7 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <fn-list :folder-id="props.unit.folderId" :component-instance-id="0" />
+                <fn-list :folder-id="props.unit.folderId" :component-instance-id="0" :is-small="true" />
                 <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="0" />
                 <curriculum-details-modal />
             </template>
