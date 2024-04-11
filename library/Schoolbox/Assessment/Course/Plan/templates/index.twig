@@ -9,7 +9,7 @@
                 {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
                 :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
                 :units="{{ units |json_encode }}"
-                :locale="{{ locale |json_encode }}"
+                :activity-type-locale="{{ activityTypeLocale |json_encode }}"
                 :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
             ></unit-planner>
         </div>

@@ -1,16 +1,21 @@
 <script setup lang="ts">
+/**
+ * The main component for the unit planner
+ */
 import type { Ref } from "vue";
+import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit, UnitPlannerLocale } from "./unitPlannerTypes";
+import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
-import ActivitiesListDeleteItem from "./activities-list-delete-item.vue";
+import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
     units: Unit[];
-    locale: UnitPlannerLocale;
+    activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
 }
@@ -18,6 +23,7 @@ interface Props {
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
+const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
 // Get a list of every textbox that could be shown in a unit
@@ -107,7 +113,8 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.ltiAssessmentsEnabled, props.units, props.locale, toastEl.value!);
+    store.init(props.units, toastEl.value!);
+    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
 
     dragStore.init(
         props.routeFolderSequence,
@@ -189,12 +196,14 @@ window.Vue.onUnmounted(() => {
                     top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
                 }"
             >
-                <template v-if="dragStore.dragCurrentUnit">
+                <template v-if="store.dragCurrentUnit">
                     <unit-planner-unit-cell
                         v-for="column in selectedTab.columns"
                         :key="column.id"
-                        :unit="dragStore.dragCurrentUnit"
+                        :unit="store.dragCurrentUnit"
                         :column="column"
+                        :activity-type-locale="props.activityTypeLocale"
+                        :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                         :is-sortable-placeholder="true"
                     ></unit-planner-unit-cell>
                 </template>
@@ -202,7 +211,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
 
-    <activities-list-delete-item />
+    <activities-list-delete-modal />
     <toast ref="toastEl"></toast>
 </template>
 

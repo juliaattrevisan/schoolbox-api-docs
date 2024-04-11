@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * A component that displays a list of rubric capabilities and their indicators
+ */
 import { RubricCapability } from "./unitPlannerTypes";
 
 interface Props {

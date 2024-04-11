@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * The component-action for a textbox cell on the unit planner
+ * Handles the creation, modification, and saving of the textbox content
+ */
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column, ColumnType } from "./unitPlannerConfig";

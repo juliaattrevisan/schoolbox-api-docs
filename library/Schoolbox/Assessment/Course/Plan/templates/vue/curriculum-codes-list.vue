@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * A component that displays a list of curriculum codes
+ */
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {

@@ -1,4 +1,11 @@
 <script setup lang="ts">
+/**
+ * A cell in the unit planner grid
+ * Contains the content for a specific unit and column based on the column type
+ * If draggableEl is present (e.g. if the column type is UNIT), the draggable instance is initialised
+ * to allow for resequencing units in the unit planner
+ * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
+ */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
@@ -10,8 +17,8 @@ import RubricCapabilities from "./rubric-capabilities.vue";
 import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
-import ActivitiesListItem from "./activities-list-item.vue";
-import ActivitiesAction from "./activities-action.vue";
+import ActivitiesListContent from "./activities-list-content.vue";
+import ActivitiesListAction from "./activities-list-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -35,30 +42,12 @@ const contentHeight = window.Vue.ref(0);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
-const contentMaxHeight = window.Vue.computed(() => {
-    // unitContentHeights is a map of unit IDs to column IDs to heights
-    if (!store.unitContentHeights[props.unit.id]) return 0;
-    return Math.max(...Object.values(store.unitContentHeights[props.unit.id]).map((height) => height || 0));
-});
-
-const cellMaxHeight = window.Vue.computed(() => {
-    // Ensure the height of the component initially renders as if it wasn't being dragged to ensure
-    // the height transition is able to occur.
-    if (dragStore.dragCurrentUnitNextTick === props.unit) return dragStore.dragUnitHeight;
-
-    // If the unit is expanded, allow it to grow to fit its content
-    if (store.expandedUnits.includes(props.unit.id)) return contentMaxHeight.value;
-
-    // Otherwise, limit the height to the unexpanded height
-    return store.unexpandedUnitHeight;
-});
-
 const showViewMoreGradient = window.Vue.computed(() => {
-    return contentHeight.value + componentActionHeight.value > cellMaxHeight.value;
+    if (!store.unitRowDisplayHeights[props.unit.id]) return false;
+    return contentHeight.value + componentActionHeight.value > store.unitRowDisplayHeights[props.unit.id];
 });
 const showViewMoreInner = window.Vue.computed(() => {
-    if (dragStore.dragCurrentUnitNextTick === props.unit) return false;
-    if (store.expandedUnits.includes(props.unit.id)) return false;
+    if (store.dragCurrentUnitNextTick === props.unit) return false;
     return showViewMoreGradient.value;
 });
 
@@ -75,7 +64,11 @@ const contentIsFocused = window.Vue.computed(() => {
 function updateContentHeight() {
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-    store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
+
+    // We don't want the placeholder to override the actual known content heights
+    if (!props.isSortablePlaceholder) {
+        store.setUnitContentHeight(props.unit, props.column, contentHeight.value + componentActionHeight.value);
+    }
 }
 
 // Provide access to exposed focusEditor from the TextboxContent component
@@ -114,6 +107,7 @@ window.Vue.onMounted(() => {
         if (draggableEl.value) {
             draggableInstance = Draggable.create(draggableEl.value, {
                 type: "y",
+                cursor: "move",
                 autoScroll: 1, // Scroll speed
                 inertia: true,
                 allowContextMenu: true,
@@ -147,12 +141,11 @@ window.Vue.onUnmounted(() => {
         class="unit-cell"
         :class="{
             'fixed-left': props.column.fixedLeft,
-            'sortable-dropzone': !props.isSortablePlaceholder && dragStore.dragCurrentUnit === props.unit,
-            'sortable-placeholder': props.isSortablePlaceholder,
+            'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'content-focused': contentIsFocused,
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
         }"
-        :style="{ height: `${cellMaxHeight}px` }"
+        :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
         @click="onContentClicked"
     >
         <div ref="contentEl">
@@ -161,7 +154,7 @@ window.Vue.onUnmounted(() => {
                     v-if="dragStore.routeFolderSequence"
                     ref="draggableEl"
                     class="sortable-holder"
-                    :class="{ isDragging: dragStore.dragCurrentUnit === props.unit }"
+                    :class="{ isDragging: store.dragCurrentUnit === props.unit }"
                 ></div>
 
                 <div>
@@ -189,15 +182,14 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
-                <ul class="information-list">
-                    <activities-list-item
-                        v-for="activity in props.unit.activities.items"
-                        ref="activityListItem"
-                        :key="activity.id"
-                        :unit="unit"
-                        :activity="activity"
-                    />
-                </ul>
+                <activities-list-content
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
+                    :activities="props.unit.activities.items"
+                    :activities-list-routes="props.unit.activities._routes"
+                    :prevent-store-init="props.isSortablePlaceholder"
+                    @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
+                    @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
+                />
             </template>
 
             <template v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES">
@@ -218,7 +210,7 @@ window.Vue.onUnmounted(() => {
                         :tabindex="showViewMoreInner ? 0 : -1"
                         @click.prevent="store.toggleViewMore(props.unit.id)"
                     >
-                        Show More
+                        View More
                     </button>
                 </div>
             </div>
@@ -231,10 +223,9 @@ window.Vue.onUnmounted(() => {
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
 
-                <activities-action
+                <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
-                    :unit="props.unit"
-                    :column="props.column"
+                    :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
             </div>
         </div>
