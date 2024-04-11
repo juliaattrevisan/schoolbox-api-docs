@@ -104,7 +104,7 @@ const upcoming = window.Vue.computed(() => {
             </div>
             <pdc-upcoming-item v-for="item in upcoming" v-else :key="item.url" :item="item" />
         </div>
-        <div v-if="tempPayload && tempPayload.upcoming.length > 3" class="component-action">
+        <div v-if="tempPayload && tempPayload.upcoming.length > 3 && !viewMore" class="component-action">
             <section>
                 <button @click.prevent="viewMore = true">View more</button>
             </section>
