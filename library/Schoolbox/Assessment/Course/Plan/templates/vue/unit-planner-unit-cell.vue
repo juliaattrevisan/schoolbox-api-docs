@@ -201,6 +201,7 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
+                <p>Yep</p>
                 <curriculum-details-modal />
             </template>
         </div>
