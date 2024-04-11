@@ -114,9 +114,14 @@ window.Vue.onUnmounted(() => {
         "
     >
         <div class="list-item">
-            <div v-if="activitiesListStore().routes.reorder" ref="draggableEl" class="sortable-holder"></div>
-            <div class="grip compact ui-sortable-handle"></div>
-            <div class="card small-12 compact wrap-down">
+            <template v-if="activitiesListStore().routes.reorder">
+                <div ref="draggableEl" class="sortable-holder"></div>
+                <div class="grip compact ui-sortable-handle"></div>
+            </template>
+            <div
+                class="card small-12 compact wrap-down"
+                :class="{ 'activity-sortable': activitiesListStore().routes.reorder }"
+            >
                 <component
                     :is="activityLink !== null ? 'a' : 'span'"
                     :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
@@ -183,7 +188,9 @@ li[data-sortable-active="true"] .sortable-holder {
 }
 
 .card.compact {
-    padding-left: 0;
+    &.activity-sortable {
+        padding-left: 0;
+    }
     padding-right: 0;
 }
 
