@@ -39,6 +39,16 @@ const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
 folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
 
+/**
+ * To open the curriculum details modal
+ */
+window.Vue.watch(
+    () => folderNodesStore().selectedDetailsNodeId,
+    () => {
+        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
+    },
+);
+
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
 });
@@ -112,11 +122,11 @@ function onContentClicked(event: MouseEvent) {
 
 /**
  * To open the curriculum code mapping modal,
- * ensuring the relevant selected nodes are displayed
+ * ensuring the relevant selected nodes are displayed by
+ * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
 function onModifyCurriculumSelected() {
     curriculumStore.openCurriculumSelectorModal(props.unit.folderId, 0);
-    // pass the folderId and componentId to the curriculum store
 }
 
 window.Vue.onMounted(() => {
@@ -220,7 +230,6 @@ window.Vue.onUnmounted(() => {
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
                 <fn-list :folder-id="props.unit.folderId" :component-instance-id="0" :is-small="true" />
                 <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="0" />
-                <curriculum-details-modal />
             </template>
         </div>
 

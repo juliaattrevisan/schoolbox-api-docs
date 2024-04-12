@@ -5,6 +5,7 @@
 
 import { defineStore } from "pinia";
 import { watchIgnorable } from "@vueuse/core";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
@@ -14,7 +15,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
     const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
     const modalStore = useModalStore(); // to open the modal
-    const startingNodeId = window.Vue.ref<number | undefined>(undefined);
+    const startingNodeId = window.Vue.ref<number | undefined>(undefined); // to open the modal at a specific node
+    const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
     let currentFolderId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
     let currentComponentId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
 
@@ -63,6 +65,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         init,
         selectorStore,
         startingNodeId,
+        selectedDetailsNodeId,
         openCurriculumSelectorModal,
     };
 });
