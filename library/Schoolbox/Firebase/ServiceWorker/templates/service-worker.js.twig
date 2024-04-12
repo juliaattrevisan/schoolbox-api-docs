@@ -29,9 +29,11 @@ firebaseApps.forEach((app) => {
             image: data.icon,
             badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
             renotify: false,
-            timestamp: data.timestamp,
             data: data
         };
+        if (data.timestamp !== '0') {
+            notificationOptions.timestamp = data.timestamp;
+        }
         self.registration.showNotification(payload.notification.title, notificationOptions);
     });
 

@@ -48,15 +48,18 @@ window.sbProps.firebaseApps.forEach((app) => {
                 console.log('Message received. ', payload);
                 // parse notification data, including extra info
                 const data = JSON.parse(payload.data.data);
-                let notif = new Notification(payload.notification.title, {
+                const notificationOptions = {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     image: data.icon,
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
-                    timestamp: data.timestamp,
                     data: data
-                });
+                };
+                if (data.timestamp !== '0') {
+                    notificationOptions.timestamp = data.timestamp;
+                }
+                let notif = new Notification(payload.notification.title, notificationOptions);
                 notif.onclick = (event) => {
                     // debug log?
                     console.log("On notification click: .ts");
