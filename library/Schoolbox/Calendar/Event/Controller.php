@@ -540,8 +540,10 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
+        $userId = $this->requestPost['user']['id'] ?? $this->requestPost['userId'];
+
         $event = new Event();
-        $event->setOwner($this->userMapper->createModel()->setId($this->requestPost['userId']));
+        $event->setOwner($this->userMapper->createModel()->setId($userId));
 
         $this->postModify($event);
     }
@@ -571,11 +573,13 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
+        $authorId = $this->requestPost['author']['id'] ?? $this->requestPost['authorId'];
+
         /* Check if author still exists
          * If not - pass author to the author
          */
         try {
-            $author = $this->userMapper->findById($this->requestPost['authorId']);
+            $author = $this->userMapper->findById($authorId);
         } catch (Exception $e) {
             $author = $this->getUser();
         }
