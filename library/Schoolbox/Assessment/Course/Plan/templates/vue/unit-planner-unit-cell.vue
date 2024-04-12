@@ -8,13 +8,14 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
+// import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
-import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
+import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
@@ -34,8 +35,8 @@ const props = defineProps<Props>();
 
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
-const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
-folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
+const curriculumStore = useUnitPlannerCurriculumStore();
+// const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -110,10 +111,10 @@ function onContentClicked(event: MouseEvent) {
 
 /**
  * To open the curriculum code mapping modal,
- * ensuring the latest selected nodes are displayed
+ * ensuring the relevant selected nodes are displayed
  */
 function onModifyCurriculumSelected() {
-    // emit("modifyCurriculumSelected", props.unit.folderId, 0, folderNodesStore().selectedNodes);
+    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, 0);
     // pass the folderId and componentId to the curriculum store
 }
 

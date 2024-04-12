@@ -11,6 +11,7 @@ import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Unit } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
+import UnitPlannerCurriculum from "./unit-planner-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
@@ -185,7 +186,6 @@ window.Vue.onUnmounted(() => {
                     :unit="unit"
                     :column="column"
                     :is-sortable-placeholder="false"
-                    @modify-curriculum-selected="onModifyCurriculumSelected"
                 />
             </div>
 
@@ -210,7 +210,7 @@ window.Vue.onUnmounted(() => {
     </div>
 
     <activities-list-delete-modal />
-    <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="startingNodeId" />
+    <unit-planner-curriculum />
     <toast ref="toastEl"></toast>
 </template>
 
