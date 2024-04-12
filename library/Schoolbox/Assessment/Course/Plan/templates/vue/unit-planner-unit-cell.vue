@@ -30,8 +30,12 @@ interface Props {
     column: Column;
     isSortablePlaceholder: boolean;
 }
-
 const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    modifyCurriculumSelected: [];
+}>();
+
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
@@ -112,7 +116,8 @@ function onContentClicked(event: MouseEvent) {
  * To open the curriculum code mapping modal,
  * ensuring the latest selected nodes are displayed
  */
-function onUpdateCurriculumSelected() {
+function onModifyCurriculumSelected() {
+    emit("modifyCurriculumSelected");
     // dispatch to the top parent to open up the curriculum modal
     // ignoreUpdates(() => {
     //     selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
@@ -251,7 +256,7 @@ window.Vue.onUnmounted(() => {
                 />
                 <fn-actions
                     v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
-                    @update-selected="onUpdateCurriculumSelected"
+                    @modify-selected="onModifyCurriculumSelected"
                 />
             </div>
         </div>

@@ -4,14 +4,14 @@
  */
 
 const emit = defineEmits<{
-    updateSelected: [];
+    modifySelected: [];
 }>();
 
 /**
  * To open the curriculum code mapping modal
  */
 function onModifySelected() {
-    emit("updateSelected");
+    emit("modifySelected");
 }
 </script>
 

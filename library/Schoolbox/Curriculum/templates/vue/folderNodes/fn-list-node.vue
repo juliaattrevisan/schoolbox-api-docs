@@ -40,7 +40,7 @@ const fontSize = window.Vue.computed(() => {
 });
 
 /**
- * Tighten up the margins down the nested list when props.isSmall is true
+ * Tighten up the margins down the node tree when props.isSmall is true
  * @returns {string}
  */
 const marginStart = window.Vue.computed(() => {

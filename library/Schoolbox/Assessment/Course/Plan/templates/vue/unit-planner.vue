@@ -112,6 +112,19 @@ window.Vue.watch(
     { once: true },
 );
 
+/**
+ * To open the curriculum code mapping modal,
+ * ensuring the latest selected nodes are displayed
+ */
+function onModifyCurriculumSelected() {
+    console.warn("yep");
+    // dispatch to the top parent to open up the curriculum modal
+    // ignoreUpdates(() => {
+    //     selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
+    // });
+    // modalStore.open();
+}
+
 window.Vue.onMounted(() => {
     store.init(props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
@@ -186,7 +199,8 @@ window.Vue.onUnmounted(() => {
                     :unit="unit"
                     :column="column"
                     :is-sortable-placeholder="false"
-                ></unit-planner-unit-cell>
+                    @modify-curriculum-selected="onModifyCurriculumSelected"
+                />
             </div>
 
             <div
@@ -203,7 +217,7 @@ window.Vue.onUnmounted(() => {
                         :unit="store.dragCurrentUnit"
                         :column="column"
                         :is-sortable-placeholder="true"
-                    ></unit-planner-unit-cell>
+                    />
                 </template>
             </div>
         </div>

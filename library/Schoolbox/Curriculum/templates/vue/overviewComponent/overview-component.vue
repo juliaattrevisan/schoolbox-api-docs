@@ -70,7 +70,7 @@ window.Vue.onMounted(() => {
  * To open the curriculum code mapping modal,
  * ensuring the latest selected nodes are displayed
  */
-function onUpdateSelected() {
+function onModifySelected() {
     ignoreUpdates(() => {
         selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
     });
@@ -94,10 +94,10 @@ function onModalClosed() {
         :locale-unit="props.localeUnit"
         :folder-id="props.folderId"
         :component-instance-id="props.componentInstanceId"
-        @map-selected="onUpdateSelected"
+        @map-selected="onModifySelected"
     />
     <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
-    <fn-actions v-if="!props.isReadOnly && store().hasNodes" @update-selected="onUpdateSelected" />
+    <fn-actions v-if="!props.isReadOnly && store().hasNodes" @modify-selected="onModifySelected" />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
