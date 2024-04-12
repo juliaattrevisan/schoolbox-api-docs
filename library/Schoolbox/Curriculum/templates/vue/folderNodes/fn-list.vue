@@ -37,6 +37,9 @@ const store = useStore(props.folderId, props.componentInstanceId);
     margin-block-end: 0;
     padding-inline-start: var(--spacing-m);
 }
+.nodes li ul {
+    margin-inline-start: var(--spacing-xs);
+}
 .list-enter-active,
 .list-leave-active {
     transition: opacity 0.5s ease;

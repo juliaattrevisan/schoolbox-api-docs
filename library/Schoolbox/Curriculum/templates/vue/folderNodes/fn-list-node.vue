@@ -40,6 +40,15 @@ const fontSize = window.Vue.computed(() => {
 });
 
 /**
+ * Tighten up the margins down the nested list when props.isSmall is true
+ * @returns {string}
+ */
+const marginStart = window.Vue.computed(() => {
+    if (props.isSmall) return "var(--spacing-s)";
+    return "var(--spacing-m)";
+});
+
+/**
  * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
  * or we are at the root level node, or if the search is active
  * @returns { boolean }
@@ -117,6 +126,10 @@ function onRemoveSelected() {
 .node__remove {
     max-height: 2.5rem; /* to ensure the button doesn't stretch too much */
     width: 2.5rem;
+}
+
+ul li ul {
+    margin-inline-start: v-bind(marginStart);
 }
 
 .list-enter-active,
