@@ -769,7 +769,7 @@ class Controller extends Base
                     'id' => $event->getId(),
                     'user' => $userTranslator->convertLinkedUser($event->getOwner()),
                     'author' => $userTranslator->convertLinkedUser($event->getAuthor()),
-                    'allDay' => $event->getAllDay(),
+                    'allDay' => ($event->getAllDay() === 1), // Convert from int to boolean.
                     'efficacy' => $efficacy,
                     'title' => $event->getTitle(),
                     'startDate' => $event->getStartDateTime()->getJson(),
