@@ -390,6 +390,7 @@ class Controller extends Base
         $rowHeadings = [
             'Course Title',
             'Course Homepage ID',
+            'Course Framework',
             'Unit Title',
             'Unit Homepage ID',
             'Textbox Component Name',
@@ -407,8 +408,10 @@ class Controller extends Base
             courseFolder.name as 'course.name',
             courseFolder.id as 'course.id',
             unitFolder.name as 'unit.name',
-            unitFolder.id as 'unit.id'
+            unitFolder.id as 'unit.id',
+            courseTemplates.name as 'framework'
         FROM course_specification
+        join courseTemplates on course_specification.template_id = courseTemplates.id
         join folder courseFolder on course_specification.folder_id = courseFolder.id
         join course_unit_specification on course_specification.id = course_unit_specification.course_specification_id
         join folder unitFolder on course_unit_specification.folder_id = unitFolder.id");
@@ -493,6 +496,7 @@ class Controller extends Base
             fputcsv($fp, [
             $units[$row['folder_id']]['course.name'],
             $units[$row['folder_id']]['course.id'],
+            $units[$row['folder_id']]['framework'],
             $units[$row['folder_id']]['unit.name'],
             $units[$row['folder_id']]['unit.id'],
             $componentName,
@@ -548,6 +552,7 @@ class Controller extends Base
             fputcsv($fp, [
             $units[$row['folderId']]['course.name'],
             $units[$row['folderId']]['course.id'],
+            $units[$row['folderId']]['framework'],
             $units[$row['folderId']]['unit.name'],
             $units[$row['folderId']]['unit.id'],
             'No Component',
