@@ -540,7 +540,7 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
-        $userId = $this->requestPost['user']['id'] ?? $this->requestPost['userId'];
+        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId']);
 
         $event = new Event();
         $event->setOwner($this->userMapper->createModel()->setId($userId));
@@ -573,7 +573,7 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
-        $authorId = $this->requestPost['author']['id'] ?? $this->requestPost['authorId'];
+        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId']);
 
         /* Check if author still exists
          * If not - pass author to the author
@@ -587,7 +587,7 @@ class Controller extends Base
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
         $accessLevel = (int)($this->requestPost['level'] ?? null);
-        $eventTypeId = (int)($this->requestPost['type'] ?? null);
+        $eventTypeId = (int)($this->requestPost['type']['id'] ?? $this->requestPost['type'] ?? null);
         $title       = $this->requestPost['title'] ?? null;
         $location    = $this->requestPost['location'] ?? null;
         $detail      = $this->requestPost['detail'] ?? null;
