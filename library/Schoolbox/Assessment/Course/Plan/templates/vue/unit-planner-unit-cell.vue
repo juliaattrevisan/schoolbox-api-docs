@@ -7,9 +7,10 @@
  * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
  */
 import { gsap } from "gsap";
+import { watchIgnorable } from "@vueuse/core";
 import { Draggable } from "gsap/Draggable";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
-import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
+// import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
@@ -23,6 +24,7 @@ import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 gsap.registerPlugin(Draggable);
 
@@ -46,6 +48,21 @@ window.Vue.watch(
     () => folderNodesStore().selectedDetailsNodeId,
     () => {
         curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
+    },
+);
+
+/**
+ * So we can unset the selected details node id
+ * so the same node can be opened again if desired
+ */
+const { ignoreUpdates } = watchIgnorable(
+    () => curriculumStore.selectedDetailsNodeId,
+    () => {
+        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
+            ignoreUpdates(() => {
+                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
+            });
+        }
     },
 );
 
