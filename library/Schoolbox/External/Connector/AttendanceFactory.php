@@ -43,6 +43,10 @@ class AttendanceFactory
                 (bool)$this->configLoader->get('external_attendance'),
                 (int)$this->configLoader->get('external_attendance_days')
             ),
+            \Schoolbox\External\Importer\Endpoint\Factory::SENTRAL => new \Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\AttendanceLink(
+                (bool)$this->configLoader->get('external_attendance'),
+                (int)$this->configLoader->get('external_attendance_days')
+            ),
             default => null,
         };
     }
