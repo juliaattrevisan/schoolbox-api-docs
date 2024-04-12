@@ -14,9 +14,9 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
     const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
     const modalStore = useModalStore(); // to open the modal
-    const currentFolderId = window.Vue.ref<number | null>(null); // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
-    const currentComponentId = window.Vue.ref<number | null>(null); // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
     const startingNodeId = window.Vue.ref<number | undefined>(undefined);
+    let currentFolderId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
+    let currentComponentId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
 
     /**
      * Initialises the selector store, which loads the initial curriculum data
@@ -38,7 +38,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         () => selectedNodesStore.nodes,
         () => {
             // target the correct store to update the nodes
-            const folderNodesStore = useFolderNodesStore(currentFolderId.value!, currentComponentId.value!);
+            const folderNodesStore = useFolderNodesStore(currentFolderId!, currentComponentId!);
             void folderNodesStore().updateNodes(selectedNodesStore.nodes);
         },
     );
@@ -49,8 +49,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {number} componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
-        currentFolderId.value = folderId;
-        currentComponentId.value = componentId;
+        currentFolderId = folderId;
+        currentComponentId = componentId;
         const folderNodesStore = useFolderNodesStore(folderId, componentId);
         ignoreUpdates(() => {
             selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal

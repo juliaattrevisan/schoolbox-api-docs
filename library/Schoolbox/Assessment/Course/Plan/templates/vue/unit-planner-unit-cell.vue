@@ -8,7 +8,7 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-// import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
+import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
@@ -36,7 +36,8 @@ const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 const curriculumStore = useUnitPlannerCurriculumStore();
-// const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
+const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
+folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
