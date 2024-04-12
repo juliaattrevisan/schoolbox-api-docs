@@ -393,6 +393,7 @@ class Controller extends Base
             'Course Framework',
             'Unit Title',
             'Unit Homepage ID',
+            'Edit Link',
             'Textbox Component Name',
             'Textbox Component ID',
             'Textbox Title',
@@ -402,6 +403,7 @@ class Controller extends Base
 
         // base filename with school code and date
         $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // fetch all units/courses
         $courseUnitQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("select
@@ -499,6 +501,7 @@ class Controller extends Base
             $units[$row['folder_id']]['framework'],
             $units[$row['folder_id']]['unit.name'],
             $units[$row['folder_id']]['unit.id'],
+            $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder_id']]['unit.id']))->withFragment(sprintf("component%s", $row['componentId'])),
             $componentName,
             $row['componentId'] ?? 'NULL',
             $row['textboxHeading'] ?? 'NULL',
@@ -555,6 +558,7 @@ class Controller extends Base
             $units[$row['folderId']]['framework'],
             $units[$row['folderId']]['unit.name'],
             $units[$row['folderId']]['unit.id'],
+            $urlBase->withPath(sprintf("/textbox/folder/%s", $units[$row['folderId']]['unit.id'])),
             'No Component',
             'No Component',
             $row['textboxHeading'] ?? 'NULL',
