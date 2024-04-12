@@ -54,7 +54,7 @@ const { ignoreUpdates } = watchIgnorable(
  * that's displayed within the curriculum selector modal
  */
 window.Vue.onMounted(() => {
-    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes, otherwise we'll end up in a infinte loop!
+    // don't fire off the selectedNodesStore.nodes watch when we are setting the initial nodes, otherwise we'll end up in a infinite loop!
     ignoreUpdates(() => {
         store().init(props.nodes, props.selectedNodes, props.filter, props.isReadOnly);
         selectorStore.init({

@@ -196,6 +196,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         return {
             selectedNodes,
+            filter,
             filteredNodes,
             isReadOnly,
             selectedNodeIds,

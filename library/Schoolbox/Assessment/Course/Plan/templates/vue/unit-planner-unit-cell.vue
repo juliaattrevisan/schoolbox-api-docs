@@ -33,7 +33,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    modifyCurriculumSelected: [];
+    modifyCurriculumSelected: [folderId: number, componentId: number, selectedNodes: Node[]];
 }>();
 
 const store = useUnitPlannerStore();
@@ -117,12 +117,7 @@ function onContentClicked(event: MouseEvent) {
  * ensuring the latest selected nodes are displayed
  */
 function onModifyCurriculumSelected() {
-    emit("modifyCurriculumSelected");
-    // dispatch to the top parent to open up the curriculum modal
-    // ignoreUpdates(() => {
-    //     selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
-    // });
-    // modalStore.open();
+    emit("modifyCurriculumSelected", props.unit.folderId, 0, folderNodesStore().selectedNodes);
 }
 
 window.Vue.onMounted(() => {
