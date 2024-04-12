@@ -32,10 +32,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    modifyCurriculumSelected: [folderId: number, componentId: number, selectedNodes: Node[]];
-}>();
-
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
@@ -117,7 +113,8 @@ function onContentClicked(event: MouseEvent) {
  * ensuring the latest selected nodes are displayed
  */
 function onModifyCurriculumSelected() {
-    emit("modifyCurriculumSelected", props.unit.folderId, 0, folderNodesStore().selectedNodes);
+    // emit("modifyCurriculumSelected", props.unit.folderId, 0, folderNodesStore().selectedNodes);
+    // pass the folderId and componentId to the curriculum store
 }
 
 window.Vue.onMounted(() => {

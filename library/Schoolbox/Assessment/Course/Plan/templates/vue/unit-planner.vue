@@ -3,15 +3,8 @@
  * The main component for the unit planner
  */
 import type { Ref } from "vue";
-import { watchIgnorable } from "@vueuse/core";
 import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import Toast from "@schoolboxVue/components/toast.vue";
-import type { Node } from "@schoolboxCurriculum/types/Node";
-import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
-import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
-import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
-import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
-import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
@@ -30,9 +23,6 @@ interface Props {
 const props = defineProps<Props>();
 const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
-const selectorStore = useSelectorStore(); // for the curriculum selector modal
-const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
-const modalStore = useModalStore(); // to open the modal
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
@@ -122,46 +112,7 @@ window.Vue.watch(
     { once: true },
 );
 
-const currentFolderId = window.Vue.ref<number | null>(null); // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
-const currentComponentId = window.Vue.ref<number | null>(null); // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
-const startingNodeId = window.Vue.ref<number | undefined>(undefined);
-
-/**
- * Changes have been made to the selected nodes via the modal,
- * so update the folder store
- */
-const { ignoreUpdates } = watchIgnorable(
-    () => selectedNodesStore.nodes,
-    () => {
-        // target the correct store to update the nodes
-        const folderNodesStore = useFolderNodesStore(currentFolderId.value!, currentComponentId.value!);
-        void folderNodesStore().updateNodes(selectedNodesStore.nodes);
-    },
-);
-
-/**
- * To open the curriculum code mapping modal,
- * ensuring the latest selected nodes are displayed
- * @param {number} folderId - the folder id to open the modal on
- * @param {number} componentId - the component id to open the modal on
- * @param {Node[]} selectedNodes - The selected nodes
- */
-function onModifyCurriculumSelected(folderId: number, componentId: number, selectedNodes: Node[]) {
-    // dispatch to the top parent to open up the curriculum modal
-    currentFolderId.value = folderId;
-    currentComponentId.value = componentId;
-    ignoreUpdates(() => {
-        selectedNodesStore.update(selectedNodes); // update to latest selected nodes prior to opening the modal
-    });
-    const folderNodesStore = useFolderNodesStore(folderId, componentId);
-    startingNodeId.value = folderNodesStore().filter ? folderNodesStore().filter?.id : undefined;
-    modalStore.open();
-}
-
-/**
- * Set up any stores that are required for the unit planner
- */
-function initStores() {
+window.Vue.onMounted(() => {
     store.init(props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
     dragStore.init(
@@ -170,16 +121,6 @@ function initStores() {
         headerRowHeight,
         unitPlannerContainerScrollTop,
     );
-    selectorStore.init({
-        isReadOnly: false,
-        formValueName: "", // not required in this context
-        dataEndpoint: "/api/curriculum",
-        selectedNodes: [], // so the modal displays the latest selected nodes
-    });
-}
-
-window.Vue.onMounted(() => {
-    initStores();
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
@@ -270,7 +211,6 @@ window.Vue.onUnmounted(() => {
 
     <activities-list-delete-modal />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="startingNodeId" />
-    <!-- <cs-modal v-if="selectorStore.hasLoadedOk" /> -->
     <toast ref="toastEl"></toast>
 </template>
 
