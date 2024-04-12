@@ -435,7 +435,7 @@ class Controller extends Base
             tb.updated_by AS updated_by,
             tb.body AS textboxBody
         FROM component_definition cd
-                 JOIN component_instance ci ON ci.component_definition_id = cd.id
+                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
                  JOIN folder f ON f.id = ci.identifier
                  JOIN component_config_definition ccd_textbox ON (
             ccd_textbox.component_definition_id = cd.id AND
