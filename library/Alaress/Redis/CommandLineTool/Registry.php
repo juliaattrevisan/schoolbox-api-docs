@@ -48,7 +48,7 @@ class Registry
             'routeCache:' . INSTANCE_ID,
             'moduleCache:' . INSTANCE_ID,
 
-            // OIDC cache, used for caching:
+            // OIDC client cache, used for caching:
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
             CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
@@ -117,5 +117,13 @@ class Registry
         //            'scheduled.' . INSTANCE_ID . '.*',
         //            'routed.' . INSTANCE_ID . '.*',
         //        ],
+
+        // OIDC server cache, used for caching:
+        // * auth codes
+        // * access tokens
+        // * nonces
+        // * refresh tokens
+        CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+        CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':',
     ];
 }

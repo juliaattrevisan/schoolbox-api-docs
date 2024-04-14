@@ -40,6 +40,11 @@ class CacheHelper
     public const BASE_CLIENT_KEY = 'oidcClient';
 
     /**
+     * Base key for OIDC server related caches.
+     */
+    public const BASE_SERVER_KEY = 'oidcServer';
+
+    /**
      * Where to cache OIDC config for the provider for this client?
      */
     public const OIDC_CONFIG_CACHE_KEY = 'oidcConfig';

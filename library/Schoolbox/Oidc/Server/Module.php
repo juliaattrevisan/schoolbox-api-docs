@@ -77,11 +77,14 @@ class Module extends BaseModule
         // Set up auth server and all of its dependencies
         $relyingPartyMapper = $this->getMapperFactory()->get(Mapper::class);
         $userMapper         = $this->getMapperFactory()->get(UserMapper::class);
-        $cache              = new SimpleCacheBridge(
+
+        // Cache server-related data in storage:
+        // auth codes, access tokens, etc. should be somewhat persistent
+        $cache = new SimpleCacheBridge(
             new ItemPool(
-                $this->injector->get('redis.cache'),
+                $this->injector->get('redis.storage'),
                 new Base64(),
-                new KeyGenerator('oauth', INSTANCE_ID),
+                new KeyGenerator(CacheHelper::BASE_SERVER_KEY, INSTANCE_ID),
             )
         );
 
