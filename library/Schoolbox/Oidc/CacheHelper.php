@@ -35,9 +35,9 @@ class CacheHelper
     private const JWKS_CACHE_DEFAULT_TTL = 3600;
 
     /**
-     * Base key for the OIDC cache.
+     * Base key for OIDC client related caches.
      */
-    public const BASE_KEY = 'oidc';
+    public const BASE_CLIENT_KEY = 'oidcClient';
 
     /**
      * Where to cache OIDC config for the provider for this client?

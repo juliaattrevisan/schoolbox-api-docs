@@ -2021,7 +2021,7 @@ abstract class Kernel
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_KEY, INSTANCE_ID),
+                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
                         )
                     );
                 }

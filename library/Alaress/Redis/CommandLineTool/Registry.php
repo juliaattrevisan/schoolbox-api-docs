@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use Schoolbox\Oidc\CacheHelper;
 
 class Registry
 {
@@ -50,8 +51,8 @@ class Registry
             // OIDC cache, used for caching:
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
-            'oidc:' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
-            'oidc:' . INSTANCE_ID . ':',
+            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
