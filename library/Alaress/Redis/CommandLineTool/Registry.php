@@ -47,7 +47,9 @@ class Registry
             'routeCache:' . INSTANCE_ID,
             'moduleCache:' . INSTANCE_ID,
 
-            // OIDC cache
+            // OIDC cache, used for caching:
+            // * OpenID configuration and JWKS responses from the configured
+            //   oAuth/OIDC provider
             'oidc:' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
             'oidc:' . INSTANCE_ID . ':',
         ],

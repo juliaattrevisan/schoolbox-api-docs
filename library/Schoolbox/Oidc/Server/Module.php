@@ -22,6 +22,7 @@ use OpenIDConnectServer\Entities\ClaimSetEntity;
 use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Oidc\Server\Repository\Scope;
 use Schoolbox\Url\Factory;

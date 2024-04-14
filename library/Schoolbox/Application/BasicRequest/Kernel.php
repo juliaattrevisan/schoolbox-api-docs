@@ -39,6 +39,7 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -482,7 +483,7 @@ class Kernel extends WebKernelAbstract
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
-                            new KeyGenerator('oidc', INSTANCE_ID),
+                            new KeyGenerator(CacheHelper::BASE_KEY, INSTANCE_ID),
                         )
                     );
                 }

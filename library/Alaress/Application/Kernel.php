@@ -140,6 +140,7 @@ use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
+use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -2020,7 +2021,7 @@ abstract class Kernel
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
-                            new KeyGenerator('oidc', INSTANCE_ID),
+                            new KeyGenerator(CacheHelper::BASE_KEY, INSTANCE_ID),
                         )
                     );
                 }
