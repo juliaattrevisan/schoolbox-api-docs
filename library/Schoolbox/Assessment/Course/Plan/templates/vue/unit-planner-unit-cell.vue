@@ -14,6 +14,7 @@ import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folder
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
@@ -24,7 +25,6 @@ import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 gsap.registerPlugin(Draggable);
 
@@ -37,34 +37,6 @@ const props = defineProps<Props>();
 
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
-const curriculumStore = useUnitPlannerCurriculumStore();
-const folderNodesStore = useFolderNodesStore(props.unit.folderId, 0);
-folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
-
-/**
- * To open the curriculum details modal
- */
-window.Vue.watch(
-    () => folderNodesStore().selectedDetailsNodeId,
-    () => {
-        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
-    },
-);
-
-/**
- * So we can unset the selected details node id
- * so the same node can be opened again if desired
- */
-const { ignoreUpdates } = watchIgnorable(
-    () => curriculumStore.selectedDetailsNodeId,
-    () => {
-        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
-            ignoreUpdates(() => {
-                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
-            });
-        }
-    },
-);
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -136,6 +108,53 @@ function onContentClicked(event: MouseEvent) {
         textboxContentComponent.value.focusEditor();
     }
 }
+
+/**
+ * To retrieve the curriculum component id for the column,
+ * to be able to retrieve the correct folderNodesStore
+ * and load in the appropriate node tree
+ * @returns {number} - the component id for the curriculum component
+ */
+function getCurriculumComponentId() {
+    // loop through the curriculum components, matching the component heading to the column label
+    const matchedComponent = props.unit.curriculum.components.find(
+        (component) => component.heading === props.column.label,
+    );
+    if (matchedComponent) {
+        return matchedComponent.componentId;
+    }
+    return UNSET_ID;
+}
+
+const curriculumComponentId = getCurriculumComponentId();
+const curriculumStore = useUnitPlannerCurriculumStore();
+const folderNodesStore = useFolderNodesStore(props.unit.folderId, curriculumComponentId);
+folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
+
+/**
+ * To open the curriculum details modal
+ */
+window.Vue.watch(
+    () => folderNodesStore().selectedDetailsNodeId,
+    () => {
+        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
+    },
+);
+
+/**
+ * So we can unset the selected details node id
+ * so the same node can be opened again if desired
+ */
+const { ignoreUpdates } = watchIgnorable(
+    () => curriculumStore.selectedDetailsNodeId,
+    () => {
+        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
+            ignoreUpdates(() => {
+                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
+            });
+        }
+    },
+);
 
 /**
  * To open the curriculum code mapping modal,
@@ -244,9 +263,15 @@ window.Vue.onUnmounted(() => {
                 <rubric-capabilities :rubric-capabilities="props.unit.rubricCapabilities"></rubric-capabilities>
             </template>
 
-            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <fn-list :folder-id="props.unit.folderId" :component-instance-id="0" :is-small="true" />
-                <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="0" />
+            <template
+                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponentId !== UNSET_ID"
+            >
+                <fn-list
+                    :folder-id="props.unit.folderId"
+                    :component-instance-id="curriculumComponentId"
+                    :is-small="true"
+                />
+                <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="curriculumComponentId" />
             </template>
         </div>
 
