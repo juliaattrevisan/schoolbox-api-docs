@@ -93,12 +93,12 @@ class Module extends BaseModule
         $clientRepository        = new Repository\Client($relyingPartyMapper);
         $scopeRepository         = new Repository\Scope();
 
-        $authTokenKeyGenerator   = new KeyGenerator('authCode');
-        $nonceKeyGenerator       = new KeyGenerator('nonce');
+        $authTokenKeyGenerator   = new KeyGenerator(CacheHelper::AUTH_CODE_KEY);
+        $nonceKeyGenerator       = new KeyGenerator(CacheHelper::NONCE_KEY);
         $authCodeRepository      = new Repository\AuthCode($cache, $authTokenKeyGenerator, $nonceKeyGenerator, $request);
-        $accessTokenKeyGenerator = new KeyGenerator('accessToken');
+        $accessTokenKeyGenerator = new KeyGenerator(CacheHelper::ACCESS_TOKEN_KEY);
         $accessTokenRepository   = new Repository\AccessToken($cache, $accessTokenKeyGenerator);
-        $refreshTokenRepository  = new Repository\RefreshToken($cache, new KeyGenerator('refreshToken'));
+        $refreshTokenRepository  = new Repository\RefreshToken($cache, new KeyGenerator(CacheHelper::REFRESH_TOKEN_KEY));
         $idTokenRepository       = new Repository\Identity($userMapper, (new Factory($this->getConfig()))->buildFullyQualified());
 
         // Claim extractor: include Schoolbox's custom claims
