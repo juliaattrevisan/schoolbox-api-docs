@@ -109,7 +109,9 @@ class CacheHelper
     {
         $oidcConfig = $this->baseCache->get(self::OIDC_CONFIG_CACHE_KEY);
         if (!isset($oidcConfig)) {
-            $oidcDiscoveryUri  = $issuerUri->withPath('/.well-known/openid-configuration');
+            $oidcDiscoveryUri  = $issuerUri->withPath(
+                $issuerUri->getPath() . '/.well-known/openid-configuration',
+            );
             $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
             $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
             $this->baseCache->set(self::OIDC_CONFIG_CACHE_KEY, $oidcConfig, $this->oidcConfigCacheTtl);
