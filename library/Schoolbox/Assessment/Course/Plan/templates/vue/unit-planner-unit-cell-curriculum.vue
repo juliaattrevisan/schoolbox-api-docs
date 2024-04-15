@@ -1,0 +1,59 @@
+<script setup lang="ts">
+/**
+ * To display a curriculum overview component within the unit planner
+ */
+
+import { watchIgnorable } from "@vueuse/core";
+import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
+import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
+import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
+
+interface Props {
+    nodes: Node[]; // The nodes to display
+    selectedNodes: Node[]; // The selected nodes
+    folderId: number; // The folder id to display the nodes for
+    component: CurriculumOverviewComponent; // The component instance id to display the nodes on
+}
+const props = defineProps<Props>();
+
+const curriculumStore = useUnitPlannerCurriculumStore();
+
+const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
+folderNodesStore().init(props.nodes, props.selectedNodes, props.component?.filter ?? null, false);
+
+/**
+ * To open the curriculum details modal
+ */
+window.Vue.watch(
+    () => folderNodesStore().selectedDetailsNodeId,
+    () => {
+        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
+    },
+);
+
+/**
+ * So we can unset the selected details node id
+ * so the same node can be opened again if desired
+ */
+const { ignoreUpdates } = watchIgnorable(
+    () => curriculumStore.selectedDetailsNodeId,
+    () => {
+        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
+            ignoreUpdates(() => {
+                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
+            });
+        }
+    },
+);
+</script>
+
+<template>
+    <fn-list :folder-id="props.folderId" :component-instance-id="props.component.componentId" :is-small="true" />
+    <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.component.componentId" />
+</template>
+
+<style scoped></style>

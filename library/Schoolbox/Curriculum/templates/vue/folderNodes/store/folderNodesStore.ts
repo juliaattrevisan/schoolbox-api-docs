@@ -60,7 +60,6 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                             detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
                         }),
                     );
-                    console.warn(nodes.value);
                     // document.dispatchEvent(
                     //     new CustomEvent(FOLDER_NODES_UPDATED, {
                     //         detail: {

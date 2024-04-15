@@ -7,24 +7,19 @@
  * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
  */
 import { gsap } from "gsap";
-import { watchIgnorable } from "@vueuse/core";
 import { Draggable } from "gsap/Draggable";
-import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
-// import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
-import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
-import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
-import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
+import type { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
+import unitPlannerUnitCellCurriculum from "./unit-planner-unit-cell-curriculum.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -128,41 +123,6 @@ function getCurriculumComponent() {
 
 const curriculumComponent = getCurriculumComponent();
 const curriculumStore = useUnitPlannerCurriculumStore();
-const folderNodesStore = useFolderNodesStore(
-    props.unit.folderId,
-    curriculumComponent !== null ? curriculumComponent?.componentId : 0,
-);
-folderNodesStore().init(
-    props.unit.curriculum.nodes,
-    props.unit.curriculum.selectedNodes,
-    curriculumComponent?.filter ?? null,
-    false,
-);
-
-/**
- * To open the curriculum details modal
- */
-window.Vue.watch(
-    () => folderNodesStore().selectedDetailsNodeId,
-    () => {
-        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
-    },
-);
-
-/**
- * So we can unset the selected details node id
- * so the same node can be opened again if desired
- */
-const { ignoreUpdates } = watchIgnorable(
-    () => curriculumStore.selectedDetailsNodeId,
-    () => {
-        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
-            ignoreUpdates(() => {
-                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
-            });
-        }
-    },
-);
 
 /**
  * To open the curriculum code mapping modal,
@@ -170,7 +130,7 @@ const { ignoreUpdates } = watchIgnorable(
  * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
 function onModifyCurriculumSelected() {
-    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, 0);
+    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, curriculumComponent?.filter?.id as number);
 }
 
 window.Vue.onMounted(() => {
@@ -272,14 +232,11 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
-                <fn-list
+                <unit-planner-unit-cell-curriculum
+                    :nodes="props.unit.curriculum.nodes"
+                    :selected-nodes="props.unit.curriculum.selectedNodes"
                     :folder-id="props.unit.folderId"
-                    :component-instance-id="curriculumComponent.componentId"
-                    :is-small="true"
-                />
-                <fn-delete-node
-                    :folder-id="props.unit.folderId"
-                    :component-instance-id="curriculumComponent.componentId"
+                    :component="curriculumComponent"
                 />
             </template>
         </div>
