@@ -18,7 +18,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
 </script>
 
 <template>
-    <transition-group v-if="store().hasLoaded" name="list" tag="ul" class="nodes l-flex-col">
+    <ul v-if="store().hasLoaded" class="nodes l-flex-col">
         <fn-list-node
             v-for="node in store().filteredNodes"
             :key="node.id"
@@ -27,7 +27,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
             :component-instance-id="props.componentInstanceId"
             :is-small="props.isSmall"
         />
-    </transition-group>
+    </ul>
 </template>
 
 <style scoped>
@@ -39,13 +39,5 @@ const store = useStore(props.folderId, props.componentInstanceId);
 }
 .nodes li ul {
     margin-inline-start: var(--spacing-xs);
-}
-.list-enter-active,
-.list-leave-active {
-    transition: opacity 0.5s ease;
-}
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
 }
 </style>

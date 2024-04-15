@@ -26,7 +26,7 @@ const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
 
 /**
- * To open the curriculum details modal
+ * To open the curriculum details modal when a node code is selected
  */
 window.Vue.watch(
     () => folderNodesStore().selectedDetailsNodeId,
@@ -58,6 +58,17 @@ window.Vue.onMounted(async () => {
     await window.Vue.nextTick();
     emit("updateContentHeight"); // to update the height of the unit planner cell
 });
+
+/**
+ * To update the content height when the nodes have changed
+ */
+window.Vue.watch(
+    () => folderNodesStore().filteredNodes,
+    async () => {
+        await window.Vue.nextTick();
+        emit("updateContentHeight");
+    },
+);
 </script>
 
 <template>

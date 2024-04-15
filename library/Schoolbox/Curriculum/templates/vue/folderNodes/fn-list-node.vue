@@ -95,7 +95,7 @@ function onRemoveSelected() {
             ></button>
         </div>
         <template v-if="showChildren">
-            <transition-group name="list" tag="ul">
+            <ul>
                 <fn-list-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
@@ -104,7 +104,7 @@ function onRemoveSelected() {
                     :component-instance-id="props.componentInstanceId"
                     :is-small="props.isSmall"
                 />
-            </transition-group>
+            </ul>
         </template>
     </li>
 </template>
@@ -130,14 +130,5 @@ function onRemoveSelected() {
 
 ul li ul {
     margin-inline-start: v-bind(marginStart);
-}
-
-.list-enter-active,
-.list-leave-active {
-    transition: opacity 0.5s ease;
-}
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
 }
 </style>
