@@ -68,11 +68,12 @@ class Controller extends AbstractController
      * @param QuizAnswerMapper $quizAnswerMapper
      * @param MapperProxy $assessmentMapperProxy
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param Transactor  $transactor
      */
     public function __construct(
-        Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         ErrorMapper $errorMapper,
         QuizSectionMapper $quizSectionMapper,
         QuizQuestionMapper $quizQuestionMapper,
@@ -284,6 +285,7 @@ class Controller extends AbstractController
                     $context,
                     $this->getUser(),
                     $assessmentMapperProxy,
+                    $this->quizMapper,
                     $this->workTypeMapper
                 ))->build($data);
 

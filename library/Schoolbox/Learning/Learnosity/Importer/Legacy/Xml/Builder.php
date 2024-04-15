@@ -18,15 +18,17 @@ class Builder
     /**
      * Constructor.
      *
-     * @param AssessmentContext     $context
-     * @param User                  $user
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param Mapper                $workTypeMapper
+     * @param AssessmentContext               $context
+     * @param User                            $user
+     * @param AssessmentMapperProxy           $assessmentMapperProxy
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param Mapper                          $workTypeMapper
      */
     public function __construct(
         private AssessmentContext $context,
         private \Schoolbox\User $user,
         private AssessmentMapperProxy $assessmentMapperProxy,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private WorkType\Mapper $workTypeMapper
     ) {
     }
@@ -65,7 +67,7 @@ class Builder
         }
 
         // Create the IAssessable
-        $quizAssessable = (new \Schoolbox\Learning\Assessment\Quiz\Model())
+        $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
 //            ->setCompletionMessage($parser->getCompletionMessage())
 //            ->setDuration($parser->getDuration())
@@ -85,18 +87,26 @@ class Builder
         if ($this->context instanceof \Schoolbox\Learning\Assessment\Project) {
             // Attach context
             // @see Schoolbox\Learning\Assessment\Factory produceNew()
-            $this->context->getAssessables()->add($quizAssessable);
+            $this->context->getAssessables()->add($assessment);
         }
 
-        $quizAssessable->setContext($this->context);
+        $assessment->setContext($this->context);
 
+        // FIXME Temporarily disabled
 //        $this->assessmentMapperProxy->save($quizAssessable, $this->user);
 
         // Notify about what was just made
-        $this->assessmentMapperProxy->getNotifier()->notify($quizAssessable, $this->user, []);
+        $this->assessmentMapperProxy->getNotifier()->notify($assessment, $this->user, []);
+
+        /* We might need this quiz instance for saving a learnosity_reference later
+         */
+        new \Alaress_Probe('test');
+        die();
+        $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
 
         return [
-            'quiz' => $quizAssessable,
+            'assessment' => $assessment,
+            'quiz' => $quiz,
             'parser' => $parser
         ];
     }
