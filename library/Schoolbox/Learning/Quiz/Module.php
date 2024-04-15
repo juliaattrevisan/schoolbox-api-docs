@@ -172,6 +172,7 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(QuizAnswerMapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $transactor
         );
     }

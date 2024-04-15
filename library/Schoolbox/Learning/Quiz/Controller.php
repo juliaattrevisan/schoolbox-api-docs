@@ -20,6 +20,8 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
@@ -27,6 +29,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception;
 
 /**
@@ -65,6 +68,7 @@ class Controller extends AbstractController
      * @param QuizAnswerMapper $quizAnswerMapper
      * @param MapperProxy $assessmentMapperProxy
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param Transactor  $transactor
      */
     public function __construct(
@@ -77,6 +81,7 @@ class Controller extends AbstractController
         QuizAnswerMapper $quizAnswerMapper,
         private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private Transactor $transactor,
     ) {
         parent::__construct($quizMapper);
@@ -250,23 +255,43 @@ class Controller extends AbstractController
      */
     public function postLegacyQuizImport(AssessmentContext $context): void
     {
-        // TODO: load assessment info from xml as best we can
-        $postData = $this->requestPost->getArrayCopy();
-
         /* Intentionally prefill with an instance of AssessmentContext
          * and other POST vars the Factory assumes exist
          */
-        $postData['assessmentType'] = AssessmentType::TYPE_QUIZ;
-        $postData['context'] = $context;
+        $postData = array_merge($this->requestPost->getArrayCopy(), [
+            'assessmentType' => AssessmentType::TYPE_QUIZ,
+            'context' => $context,
+            /* Legacy xml only ever supported Total Mark marktype
+             */
+            'markType' => (string)MarkType::TYPE_TOTAL
+        ]);
 
-        /* Legacy xml only ever supported Total Mark marktype
+        /* Milk out some of the assessment settings from the xml itself
          */
-        $postData['markType'] = (string)MarkType::TYPE_TOTAL;
+        try {
+            if (\is_array($postData['attachment'] ?? null)) {
+                /** @var \Schoolbox\Resource\Storage\Model $xml */
+                $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
 
-        $assessmentFactory = new Factory($this->getUser(), $postData, $postData['assessmentType'], null);
-        $assessment        = $assessmentFactory->produce();
+                /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+                $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+                $data = $filesystemProxy->read($file);
 
-        $transactionSummary = $this->transactor->transact($assessment, $this->getUser());
+                /** @var AssessmentMapperProxy $assessmentMapperProxy */
+                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+                $parts = (new Builder(
+                    $context,
+                    $this->getUser(),
+                    $assessmentMapperProxy,
+                    $this->workTypeMapper
+                ))->build($data);
+
+                new \Alaress_Probe($parts);die();
+            }
+        } catch (\Schoolbox\Resource\Exception $e) {
+//            error(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
 
         var_dump($this->requestPost->getArrayCopy());die();
     }
