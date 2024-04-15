@@ -17,6 +17,7 @@ use CoderCat\JWKToPEM;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use OpenIDConnectClient\OpenIDConnectProvider;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -38,10 +39,11 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
-     * Session keys in which the OIDC state and nonce are stored.
+     * Session keys in which the OIDC state, PKCE and nonce are stored.
      */
-    private const SESSION_STATE_KEY = 'oidcState';
-    private const SESSION_NONCE_KEY = 'oidcNonce';
+    private const SESSION_STATE_KEY     = 'oidcState';
+    private const SESSION_PKCE_CODE_KEY = 'oidcPkceCode';
+    private const SESSION_NONCE_KEY     = 'oidcNonce';
 
     /**
      * Constructor
@@ -135,6 +137,7 @@ class Controller extends Base
 
         // Get the state and nonce generated for you and store it to the session
         $this->session->set(self::SESSION_STATE_KEY, $oidcProvider->getState());
+        $this->session->set(self::SESSION_PKCE_CODE_KEY, $oidcProvider->getPkceCode());
         $this->session->set(self::SESSION_NONCE_KEY, $nonce);
 
         // Redirect the user to the authorization URL
@@ -164,11 +167,13 @@ class Controller extends Base
             return;
         }
 
-        // convert auth code to access token
-        $accessToken = $this->buildOidcProvider()->getAccessToken(
-            'authorization_code',
-            ['code' => $code]
-        );
+        // convert auth code to access token, checking PKCE code along the way
+        $accessToken = $this->buildOidcProvider()
+            ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
+            ->getAccessToken(
+                'authorization_code',
+                ['code' => $code]
+            );
 
         // check nonce in ID token
         // TODO this should be done in $loginUri, but that's too disruptive a
@@ -250,6 +255,7 @@ class Controller extends Base
                 'urlAccessToken'          => $oidcConfig['token_endpoint'],
                 'urlResourceOwnerDetails' => $oidcConfig['userinfo_endpoint'] ?? null,
                 'publicKey'               => $publicKey,
+                'pkceMethod'              => AbstractProvider::PKCE_METHOD_S256,
             ],
             [
                 'signer' => new Sha256(),
