@@ -48,6 +48,7 @@ class Builder
         $xml = $this->prepareXml($data);
         $version = $this->detectVersion($xml);
         $parser = $this->produceParser($xml, $version);
+        $inUnitSpec = $this->context->getBaseContext() instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 
         /* Find a matchign work type if one was specified
          */
@@ -74,10 +75,10 @@ class Builder
             ->setTitle($parser->getTitle())
             ->setWorkType($workType)
             ->setDescription($parser->getDescription())
-//            ->setPublishAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
-//            ->setOpenAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
-//            ->setDueAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
-//            ->setCloseAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
+            ->setPublishAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setOpenAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setDueAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+            ->setCloseAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($parser->getWeight())
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
             ->setMaxAttempts($parser->getMaxAttempts())
