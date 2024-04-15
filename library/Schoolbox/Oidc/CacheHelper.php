@@ -91,10 +91,13 @@ class CacheHelper
     }
 
     /**
-     * Retrieve OIDC config from the oAuth identity provider's OIDC discovery
-     * URI.
+     * Retrieve OIDC config from the oAuth issuer URI.
      *
-     * @param UriInterface $identityProviderUri
+     * According to https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig:
+     * the discovery URI must be `/.well-known/openid-configuration` relative to
+     * the issuer URI.
+     *
+     * @param UriInterface $issuerUri
      * @return array
      * @throws ClientExceptionInterface if something went wrong fetching
      *                                  OIDC discovery URI
@@ -102,11 +105,11 @@ class CacheHelper
      *                                  or read from cache
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function retrieveOidcConfig(UriInterface $identityProviderUri): array
+    public function retrieveOidcConfig(UriInterface $issuerUri): array
     {
         $oidcConfig = $this->baseCache->get(self::OIDC_CONFIG_CACHE_KEY);
         if (!isset($oidcConfig)) {
-            $oidcDiscoveryUri  = $identityProviderUri->withPath('/.well-known/openid-configuration');
+            $oidcDiscoveryUri  = $issuerUri->withPath('/.well-known/openid-configuration');
             $oidcConfigRequest = $this->httpClient->get($oidcDiscoveryUri->__toString());
             $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
             $this->baseCache->set(self::OIDC_CONFIG_CACHE_KEY, $oidcConfig, $this->oidcConfigCacheTtl);
@@ -118,7 +121,7 @@ class CacheHelper
      * Retrieve JSON web key set (JWKS) from the oAuth identity provider's OIDC
      * discovery URI's response.
      *
-     * @param UriInterface $identityProviderUri
+     * @param UriInterface $issuerUri
      * @return array
      * @throws ClientExceptionInterface if something went wrong fetching
      *                                  OIDC discovery or JWKS URIs
@@ -126,9 +129,9 @@ class CacheHelper
      *                                  written to or read from cache
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function retrieveJsonWebKeySet(UriInterface $identityProviderUri): array
+    public function retrieveJsonWebKeySet(UriInterface $issuerUri): array
     {
-        $oidcConfig = $this->retrieveOidcConfig($identityProviderUri);
+        $oidcConfig = $this->retrieveOidcConfig($issuerUri);
         $jwks       = $this->baseCache->get(self::JWKS_CACHE_KEY);
         if (!isset($jwks)) {
             $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);

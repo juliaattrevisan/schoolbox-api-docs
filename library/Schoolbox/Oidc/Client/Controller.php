@@ -211,14 +211,13 @@ class Controller extends Base
      */
     private function buildOidcProvider(): OpenIDConnectProvider
     {
-        $config                   = $this->getConfigLoader();
-        $oauthIdentityProviderUri = new Uri($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER));
-        $oauthIssuerUri           = new Uri(
+        $config         = $this->getConfigLoader();
+        $oauthIssuerUri = new Uri(
             $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
             ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
         );
-        $clientId                 = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
-        $clientSecret             = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
+        $clientId       = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        $clientSecret   = $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_SECRET);
 
         // Redirect URI: here, I suppose?
         $redirectUri = (new Factory($config))
@@ -233,8 +232,8 @@ class Controller extends Base
         // if possible.
         $oidcCache = new CacheHelper($this->httpClient, $this->cache);
         try {
-            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIdentityProviderUri);
-            $jwks       = $oidcCache->retrieveJsonWebKeySet($oauthIdentityProviderUri);
+            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIssuerUri);
+            $jwks       = $oidcCache->retrieveJsonWebKeySet($oauthIssuerUri);
         } catch (InvalidArgumentException $e) {
             throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
         }
