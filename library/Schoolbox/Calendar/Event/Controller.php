@@ -573,7 +573,7 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
-        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId']);
+        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId'] ?? null);
 
         /* Check if author still exists
          * If not - pass author to the author
