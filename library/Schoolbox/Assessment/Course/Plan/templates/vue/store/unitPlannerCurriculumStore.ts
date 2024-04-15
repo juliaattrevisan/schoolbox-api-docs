@@ -1,6 +1,6 @@
 /**
  * To manage curriculum related state within the unit planner,
- * handling the curriculum modal and its interactions with the current folderNodesStore
+ * handling the curriculum selector modal and its interactions with the current folderNodesStore
  */
 
 import { defineStore } from "pinia";
@@ -21,7 +21,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     let currentComponentId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
 
     /**
-     * Initialises the selector store, which loads the initial curriculum data
+     * Initialises the curriculum selector modal store, which loads the initial curriculum data
      */
     function init(): void {
         selectorStore.init({
@@ -33,8 +33,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     }
 
     /**
-     * Changes have been made to the selected nodes via the modal,
-     * so update the folder store
+     * Changes have been made to the selected nodes via the selector modal,
+     * so update the current folder nodes store
      */
     const { ignoreUpdates } = watchIgnorable(
         () => selectedNodesStore.nodes,
@@ -55,6 +55,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         currentComponentId = componentId;
         const folderNodesStore = useFolderNodesStore(folderId, componentId);
         ignoreUpdates(() => {
+            // so the watch above doesn't trigger, setting off an infinite loop
             selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal
         });
         startingNodeId.value = folderNodesStore().filter ? folderNodesStore().filter?.id : undefined;

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 /**
- * To initiate both the curriculum selector and details modals,
- * ensuring the nodes within the individual unit-cells are kept up to date
- * with any changes made via the modals
+ * To initiate both the curriculum selector and details modal
  */
 
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";

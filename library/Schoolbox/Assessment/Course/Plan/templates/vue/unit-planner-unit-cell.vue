@@ -105,13 +105,12 @@ function onContentClicked(event: MouseEvent) {
 }
 
 /**
- * To retrieve the curriculum component id for the column,
- * to be able to retrieve the correct folderNodesStore
- * and load in the appropriate node tree
+ * To retrieve the curriculum component id for the column if it's available,
+ * so we can retrieve the correct folderNodesStore and load in the appropriate node tree
  * @returns {CurriculumOverviewComponent|null} - the component found or null
  */
 function getCurriculumComponent() {
-    // loop through the curriculum components, matching the component heading to the column label
+    // loop through the curriculum components on the unit, matching the component heading to the column label
     const matchedComponent = props.unit.curriculum.components.find(
         (component) => component.heading === props.column.label,
     );
@@ -233,8 +232,8 @@ window.Vue.onUnmounted(() => {
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
                 <unit-planner-unit-cell-curriculum
-                    :nodes="props.unit.curriculum.nodes"
                     :selected-nodes="props.unit.curriculum.selectedNodes"
+                    :nodes="props.unit.curriculum.nodes"
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
                     @update-content-height="updateContentHeight"
