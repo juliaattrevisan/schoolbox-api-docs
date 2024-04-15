@@ -111,7 +111,12 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * @param {Node|null} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
-        async function init($nodes: Node[], $selectedNodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
+        async function init(
+            $nodes: Node[],
+            $selectedNodes: Node[],
+            $filter: Node | null,
+            $isReadOnly: boolean,
+        ): Promise<void> {
             nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
             filter.value = $filter;

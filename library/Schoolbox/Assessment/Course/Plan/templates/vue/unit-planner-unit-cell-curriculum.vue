@@ -19,11 +19,11 @@ interface Props {
     component: CurriculumOverviewComponent; // The component instance id to display the nodes on
 }
 const props = defineProps<Props>();
+const emit = defineEmits(["updateContentHeight"]);
 
 const curriculumStore = useUnitPlannerCurriculumStore();
 
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
-folderNodesStore().init(props.nodes, props.selectedNodes, props.component?.filter ?? null, false);
 
 /**
  * To open the curriculum details modal
@@ -49,6 +49,15 @@ const { ignoreUpdates } = watchIgnorable(
         }
     },
 );
+
+/**
+ * To ensure the entire node tree can be displayed within the unit cell
+ */
+window.Vue.onMounted(async () => {
+    await folderNodesStore().init(props.nodes, props.selectedNodes, props.component?.filter ?? null, false);
+    await window.Vue.nextTick();
+    emit("updateContentHeight"); // to update the height of the unit planner cell
+});
 </script>
 
 <template>

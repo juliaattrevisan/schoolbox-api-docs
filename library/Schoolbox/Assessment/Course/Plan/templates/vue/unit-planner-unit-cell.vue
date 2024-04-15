@@ -237,6 +237,7 @@ window.Vue.onUnmounted(() => {
                     :selected-nodes="props.unit.curriculum.selectedNodes"
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
+                    @update-content-height="updateContentHeight"
                 />
             </template>
         </div>
