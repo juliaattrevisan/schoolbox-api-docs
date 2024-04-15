@@ -108,19 +108,19 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         /**
          * Store a reference to the nodes to display
-         * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
+         * @param {Node[]} $nodes - the node trees to display
          * @param {Node|null} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
         async function init(
-            $nodes: Node[],
             $selectedNodes: Node[],
+            $nodes: Node[],
             $filter: Node | null,
             $isReadOnly: boolean,
         ): Promise<void> {
-            nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
+            nodes.value = $nodes;
             filter.value = $filter;
             isReadOnly.value = $isReadOnly;
             await pushChanges();

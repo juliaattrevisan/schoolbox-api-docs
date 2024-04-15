@@ -54,7 +54,7 @@ const { ignoreUpdates } = watchIgnorable(
  * To ensure the entire node tree can be displayed within the unit cell
  */
 window.Vue.onMounted(async () => {
-    await folderNodesStore().init(props.nodes, props.selectedNodes, props.component?.filter ?? null, false);
+    await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     await window.Vue.nextTick();
     emit("updateContentHeight"); // to update the height of the unit planner cell
 });
