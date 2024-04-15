@@ -14,6 +14,7 @@ use Assess_Main;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Mapper\Exception;
 
 class Decorator implements DecoratorInterface
 {
@@ -33,12 +34,13 @@ class Decorator implements DecoratorInterface
         protected int $maxAttempts,
         protected string $completionMessage,
         protected int $markType,
-        protected int $gradingScheme,
+        protected ?int $gradingScheme,
     ) {
     }
 
     /**
      * @param Quiz $assessment
+     * @throws Exception
      */
     public function decorate($assessment): void
     {
@@ -117,19 +119,19 @@ class Decorator implements DecoratorInterface
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    protected function getGradingScheme()
+    protected function getGradingScheme(): ?int
     {
         return $this->gradingScheme;
     }
 
 
     /**
-     * @param int $gradingScheme
+     * @param int|null $gradingScheme
      * @return $this
      */
-    protected function setGradingScheme($gradingScheme)
+    protected function setGradingScheme(?int $gradingScheme): self
     {
         $this->gradingScheme = $gradingScheme;
         return $this;

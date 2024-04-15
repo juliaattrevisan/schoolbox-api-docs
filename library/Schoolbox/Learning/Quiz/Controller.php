@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Quiz;
 
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -257,6 +258,10 @@ class Controller extends AbstractController
          */
         $postData['assessmentType'] = AssessmentType::TYPE_QUIZ;
         $postData['context'] = $context;
+
+        /* Legacy xml only ever supported Total Mark marktype
+         */
+        $postData['markType'] = (string)MarkType::TYPE_TOTAL;
 
         $assessmentFactory = new Factory($this->getUser(), $postData, $postData['assessmentType'], null);
         $assessment        = $assessmentFactory->produce();
