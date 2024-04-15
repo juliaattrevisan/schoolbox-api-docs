@@ -19,11 +19,12 @@ interface Props {
     component: CurriculumOverviewComponent; // The component instance id to display the nodes on
 }
 const props = defineProps<Props>();
+
 const emit = defineEmits(["updateContentHeight", "loaded"]);
 
 const curriculumStore = useUnitPlannerCurriculumStore();
-
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
+const hasLoaded = window.Vue.ref(false);
 
 /**
  * To open the curriculum details modal when a node code is selected
@@ -58,6 +59,7 @@ window.Vue.onMounted(async () => {
     await window.Vue.nextTick();
     emit("updateContentHeight"); // to update the height of the unit planner cell
     emit("loaded"); // to update the height of the unit planner cell
+    hasLoaded.value = true;
 });
 
 /**
@@ -73,7 +75,8 @@ window.Vue.watch(
 </script>
 
 <template>
-    <fn-list :folder-id="props.folderId" :component-instance-id="props.component.componentId" :is-small="true" />
+    <div v-if="!hasLoaded" class="loader"></div>
+    <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.component.componentId" :is-small="true" />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.component.componentId" />
 </template>
 
