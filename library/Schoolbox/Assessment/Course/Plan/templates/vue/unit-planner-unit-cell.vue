@@ -309,7 +309,7 @@ window.Vue.onUnmounted(() => {
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
                 <fn-actions
-                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
                     @modify-selected="onModifyCurriculumSelected"
                 />
             </div>
