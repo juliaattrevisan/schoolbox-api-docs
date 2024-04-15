@@ -247,6 +247,7 @@ class Controller extends AbstractController
      */
     public function postLegacyXmlImport(): void
     {
+        // TODO: load assessment info from xml as best we can
         $postData = $this->requestPost->getArrayCopy();
 
         $assessmentFactory = new Factory($this->getUser(), $postData, AssessmentType::TYPE_QUIZ, null);
