@@ -17,7 +17,8 @@ const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED"; // the event to trigge
  * The details passed with an UPDATE event
  */
 type UpdateEventDetail = {
-    updatedComponentInstanceId: number;
+    folderId: number;
+    componentInstanceId: number;
     updatedNodes: Node[];
     updatedSelectedNodes: Node[];
 };
@@ -60,15 +61,16 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                             detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
                         }),
                     );
-                    // document.dispatchEvent(
-                    //     new CustomEvent(FOLDER_NODES_UPDATED, {
-                    //         detail: {
-                    //             updatedComponentInstanceId: componentInstanceId,
-                    //             updatedNodes: newNodes,
-                    //             updatedSelectedNodes: selectedNodes.value,
-                    //         } as UpdateEventDetail,
-                    //     }),
-                    // );
+                    document.dispatchEvent(
+                        new CustomEvent(FOLDER_NODES_UPDATED, {
+                            detail: {
+                                folderId,
+                                componentInstanceId,
+                                updatedNodes: newNodes,
+                                updatedSelectedNodes: selectedNodes.value,
+                            } as UpdateEventDetail,
+                        }),
+                    );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
                     document.dispatchEvent(
@@ -97,7 +99,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         function initEventListener() {
             document.addEventListener(FOLDER_NODES_UPDATED, (event) => {
                 const eventDetail = (event as CustomEvent).detail as UpdateEventDetail;
-                if (eventDetail.updatedComponentInstanceId !== componentInstanceId) {
+                if (eventDetail.folderId === folderId && eventDetail.componentInstanceId !== componentInstanceId) {
                     nodes.value = eventDetail.updatedNodes;
                     selectedNodes.value = eventDetail.updatedSelectedNodes;
                 }
