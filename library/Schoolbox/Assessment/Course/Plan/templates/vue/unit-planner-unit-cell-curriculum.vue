@@ -56,10 +56,10 @@ const { ignoreUpdates } = watchIgnorable(
  */
 window.Vue.onMounted(async () => {
     await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
-    await window.Vue.nextTick();
-    emit("updateContentHeight"); // to update the height of the unit planner cell
     emit("loaded"); // to update the height of the unit planner cell
     hasLoaded.value = true;
+    await window.Vue.nextTick();
+    emit("updateContentHeight"); // to update the height of the unit planner cell
 });
 
 /**
