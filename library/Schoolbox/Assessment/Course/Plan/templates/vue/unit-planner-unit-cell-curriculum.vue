@@ -19,7 +19,7 @@ interface Props {
     component: CurriculumOverviewComponent; // The component instance id to display the nodes on
 }
 const props = defineProps<Props>();
-const emit = defineEmits(["updateContentHeight"]);
+const emit = defineEmits(["updateContentHeight", "loaded"]);
 
 const curriculumStore = useUnitPlannerCurriculumStore();
 
@@ -57,6 +57,7 @@ window.Vue.onMounted(async () => {
     await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     await window.Vue.nextTick();
     emit("updateContentHeight"); // to update the height of the unit planner cell
+    emit("loaded"); // to update the height of the unit planner cell
 });
 
 /**

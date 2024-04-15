@@ -122,6 +122,7 @@ function getCurriculumComponent() {
 
 const curriculumComponent = getCurriculumComponent();
 const curriculumStore = useUnitPlannerCurriculumStore();
+const isCurriculumLoaded = window.Vue.ref(false);
 
 /**
  * To open the curriculum code mapping modal,
@@ -237,6 +238,7 @@ window.Vue.onUnmounted(() => {
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
                     @update-content-height="updateContentHeight"
+                    @loaded="isCurriculumLoaded = true"
                 />
             </template>
         </div>
@@ -266,7 +268,11 @@ window.Vue.onUnmounted(() => {
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
                 <fn-actions
-                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
+                    v-else-if="
+                        props.column.type === ColumnType.CURRICULUM_OVERVIEW &&
+                        curriculumComponent !== null &&
+                        isCurriculumLoaded
+                    "
                     @modify-selected="onModifyCurriculumSelected"
                 />
             </div>
