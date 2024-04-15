@@ -166,28 +166,4 @@ class Builder
             default => throw new \DomainException('No parser found for version: ' . $fileFormatVersion),
         };
     }
-
-    /**
-     * Gets the data-model context
-     *
-     * @param string $contextType
-     * @return AssessmentContext
-     */
-    protected function getAssessmentContext(string $contextType): AssessmentContext
-    {
-        switch ($contextType) {
-            case AssessmentContextType::TYPE_FOLDER:
-                return FolderMapper::getInstance()->findById($this->contextId);
-            case AssessmentContextType::TYPE_UNIT_SPECIFICATION:
-                return UnitSpecMapper::getInstance()->findById($this->contextId);
-            case AssessmentContextType::TYPE_UNIT_IMPLEMENTATION:
-                return UnitImplMapper::getInstance()->findById($this->contextId);
-            case AssessmentContextType::TYPE_PROJECT:
-                /** @var Project $project */
-                $project = $this->assessmentMapperProxy->findById($this->contextId);
-                return $project;
-            default:
-                throw new \DomainException('Unknown context type: ' . $this->contextType);
-        }
-    }
 }
