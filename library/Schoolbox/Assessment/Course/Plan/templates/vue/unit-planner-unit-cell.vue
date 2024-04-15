@@ -13,7 +13,7 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
-import type { Unit } from "./unitPlannerTypes";
+import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
@@ -130,7 +130,7 @@ const curriculumStore = useUnitPlannerCurriculumStore();
  * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
 function onModifyCurriculumSelected() {
-    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, curriculumComponent?.filter?.id as number);
+    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, curriculumComponent?.componentId as number);
 }
 
 window.Vue.onMounted(() => {
