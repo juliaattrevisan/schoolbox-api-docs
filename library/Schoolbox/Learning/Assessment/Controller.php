@@ -38,6 +38,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
@@ -348,6 +349,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 }
             }
         } else {
+            /* Legacy Quiz XML Import
+             */
+            if (AssessmentType::TYPE_QUIZ === $type) {
+                $data['attachzone'] = (new Zone('xmlImport'))
+                    ->setMulti(false)
+                    ->setAttachPrompt('Attach a legacy xml')
+                    ->setAttachmentsLabel('')
+                    ->setMimeFilter('text/xml')
+                    ->setFilesystemContext('xml')
+                    ->getTwigContext();
+            }
+
             // either output the fragment to the mage, or use the synchronous form
             if ($this->isXhrRequest()) {
                 $content = $this->responseFromTemplateUnthemed("@learningAssessment/$type/create.twig", $data);
