@@ -272,7 +272,10 @@ class Controller extends Base
     private function decodeAccessToken(string $token): AccessToken
     {
         $jwks         = $this->retrieveJsonWebKeySet();
-        $decodedToken = Jwt::decode($token, JWK::parseKeySet($jwks, \Schoolbox\API\Token\Jwt::SIGNING_ALGORITHM)['keys'][0]);
+        $keySet       = JWK::parseKeySet($jwks, \Schoolbox\API\Token\Jwt::SIGNING_ALGORITHM);
+
+        Jwt::$leeway  = $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_LEEWAY);
+        $decodedToken = Jwt::decode($token, $keySet[\Schoolbox\API\Token\Jwt::KEY_ID]);
         return new AccessToken((array)$decodedToken);
     }
 
