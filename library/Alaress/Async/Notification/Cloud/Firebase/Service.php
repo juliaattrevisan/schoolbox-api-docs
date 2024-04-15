@@ -63,21 +63,19 @@ class Service extends AbstractService
             ->createMessaging();
 
         // Create message
-        $message = Firebase\Messaging\CloudMessage::new()
-            ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title))
-            ->withData(
-                [
-                    'data' => json_encode([
-                                              'id'        => $id,
-                                              'body'      => $notification->getTitle(),
-                                              'icon'      => $notification->getIcon(),
-                                              'href'      => $notification->getHref(),
-                                              'params'    => $this->decorator->renderParametersAsArray($notification),
-                                              'meta'      => $notification->getMeta(),
-                                              'timestamp' => $notification->getTimestamp(),
-                                          ])
-                ]
-            );
+        $config = Firebase\Messaging\WebPushConfig::fromArray([
+                                               'notification' => [
+                                                   'title' => $this->appTitle,
+                                                   'body' => $title,
+                                                   'icon' => $notification->getIcon(),
+                                                   'timestamp' => $notification->getTimestamp(),
+                                                   'href'      => $notification->getHref(),
+                                               ],
+                                               'fcm_options' => [
+                                                   'link' => $notification->getHref(),
+                                               ],
+                                           ]);
+        $message = Firebase\Messaging\CloudMessage::new()->withWebPushConfig($config);
 
         // Try to send it to all recipients
         $report = null;
