@@ -3,11 +3,14 @@
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Evaluation\Import\Parser\IParser;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
@@ -71,19 +74,34 @@ class Builder
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
             ->setCompletionMessage($parser->getCompletionMessage())
-            ->setDuration($parser->getDuration())
             ->setTitle($parser->getTitle())
             ->setWorkType($workType)
             ->setDescription($parser->getDescription())
-            ->setPublishAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
-            ->setOpenAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
-            ->setDueAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
-            ->setCloseAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
+            ->setPublishAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setOpenAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setDueAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+            ->setCloseAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($parser->getWeight())
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
             ->setMaxAttempts($parser->getMaxAttempts())
-            ->setMarkVisibility($parser->getMarkVisibility());
+            ->setMarkVisibility($parser->getMarkVisibility())
+            /* Learnosity-era unlimited durations are represented by zero, not -1
+             */
+            ->setDuration(max($parser->getDuration(), Model::DURATION_UNLIMITED))
+            /* Learnosity doesn't support randomised items
+             */
+            ->setShuffleItems(false)
+            /* Legacy XML never knew about Prompts Mode
+             */
+            ->setPromptsMode(false)
+            /* Legacy XML only ever supported Total Mark
+             */
+            ->setMarkType(MarkTypeMapper::getInstance()->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL))
+        ;
 
+        /* Update context if it's a Project
+         * (for whatever reason, Project contexts need a list of their constituent assessments)
+         */
         if ($this->context instanceof \Schoolbox\Learning\Assessment\Project) {
             // Attach context
             // @see Schoolbox\Learning\Assessment\Factory produceNew()
@@ -92,16 +110,13 @@ class Builder
 
         $assessment->setContext($this->context);
 
-        // FIXME Temporarily disabled
-//        $this->assessmentMapperProxy->save($quizAssessable, $this->user);
+        $this->assessmentMapperProxy->save($assessment, $this->user);
 
         // Notify about what was just made
         $this->assessmentMapperProxy->getNotifier()->notify($assessment, $this->user, []);
 
         /* We might need this quiz instance for saving a learnosity_reference later
          */
-        new \Alaress_Probe('test');
-        die();
         $quiz = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
 
         return [

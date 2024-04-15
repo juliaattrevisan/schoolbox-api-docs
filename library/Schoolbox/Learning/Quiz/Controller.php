@@ -288,14 +288,10 @@ class Controller extends AbstractController
                     $this->quizMapper,
                     $this->workTypeMapper
                 ))->build($data);
-
-                new \Alaress_Probe($parts);die();
             }
         } catch (\Schoolbox\Resource\Exception $e) {
 //            error(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
-
-        var_dump($this->requestPost->getArrayCopy());die();
     }
 
 
