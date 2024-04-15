@@ -8,19 +8,26 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Exception;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -47,15 +54,16 @@ class Controller extends AbstractController
 
 
     /**
-     * @param Mapper                                                    $quizMapper
-     * @param ErrorMapper                                               $errorMapper
-     * @param QuizSectionMapper                                         $quizSectionMapper
-     * @param QuizQuestionMapper                                        $quizQuestionMapper
-     * @param QuizSolutionMapper                                        $quizSolutionMapper
-     * @param QuizAttemptMapper                                         $quizAttemptMapper
-     * @param QuizAnswerMapper                                          $quizAnswerMapper
-     * @param MapperProxy                                               $assessmentMapperProxy
-     * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Mapper             $quizMapper
+     * @param ErrorMapper        $errorMapper
+     * @param QuizSectionMapper  $quizSectionMapper
+     * @param QuizQuestionMapper $quizQuestionMapper
+     * @param QuizSolutionMapper $quizSolutionMapper
+     * @param QuizAttemptMapper  $quizAttemptMapper
+     * @param QuizAnswerMapper   $quizAnswerMapper
+     * @param MapperProxy        $assessmentMapperProxy
+     * @param Mapper             $projectResultCacheMapper
+     * @param Transactor         $transactor
      */
     public function __construct(
         Mapper $quizMapper,
@@ -66,7 +74,8 @@ class Controller extends AbstractController
         QuizAttemptMapper $quizAttemptMapper,
         QuizAnswerMapper $quizAnswerMapper,
         private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Transactor $transactor,
     ) {
         parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
@@ -231,13 +240,20 @@ class Controller extends AbstractController
      *
      * @api POST /learning/quiz/legacyXmlImport
      * @return void
+     * @throws MapperException
+     * @throws Deleted
+     * @throws RouteNotFound
+     * @throws Exception
      */
     public function postLegacyXmlImport(): void
     {
-//        $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
-//        $assessment        = $assessmentFactory->produce($assessment);
-//
-//        $transactionSummary = $this->transactor->transact($assessment, $this->getUser(), $before, $originalAssessment);\
+        $postData = $this->requestPost->getArrayCopy();
+
+        $assessmentFactory = new Factory($this->getUser(), $postData, AssessmentType::TYPE_QUIZ, null);
+        $assessment        = $assessmentFactory->produce();
+
+        $transactionSummary = $this->transactor->transact($assessment, $this->getUser());
+
         var_dump($this->requestPost->getArrayCopy());die();
     }
 

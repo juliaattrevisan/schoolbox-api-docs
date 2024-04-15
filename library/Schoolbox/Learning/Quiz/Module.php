@@ -14,6 +14,7 @@ use Alaress\Web\Router\PathMatcher;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -158,6 +159,9 @@ class Module extends RestfulModule
      */
     public function buildController(): Base
     {
+        /** @var Transactor $transactor */
+        $transactor = $this->injector->get('transactor');
+
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
@@ -168,6 +172,7 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(QuizAnswerMapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
+            $transactor
         );
     }
 }
