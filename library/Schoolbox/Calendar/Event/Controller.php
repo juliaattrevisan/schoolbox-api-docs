@@ -874,16 +874,14 @@ class Controller extends Base
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
-            if ($this->requestPost->get('efficacy') === null) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-            }
-            if ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
+            $efficacy = $this->requestPost->get('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
+            if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
                 $allEvents = $this->eventMapper->getAllInSeries($event);
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
                 }
-            } elseif ($this->requestPost->get('efficacy') === EventRecurrenceMapper::EFFICACY_SELF) {
+            } elseif ($efficacy === EventRecurrenceMapper::EFFICACY_SELF) {
                 $this->eventMapper->delete($event);
             }
         } else {
