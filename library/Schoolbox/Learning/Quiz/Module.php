@@ -82,6 +82,7 @@ class Module extends RestfulModule
             'POST' => [
 //                '/quiz/submit'                                              => 'postQuizSubmit',
                 '/quiz/attempts/delete'                                     => 'postAttemptDelete',
+                '/quiz/legacyXmlImport' => 'postLegacyXmlImport'
             ]
         ];
 
@@ -127,6 +128,7 @@ class Module extends RestfulModule
 
         $this->addRoutePermission($authorizer, 'postAttemptDelete', $canWrite);
         $this->addRoutePermission($authorizer, 'getQuizSummary', $canModify);
+        $this->addRoutePermission($authorizer, 'postLegacyQuizImport', $canWrite);
     }
 
     /**

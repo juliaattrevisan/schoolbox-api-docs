@@ -225,6 +225,23 @@ class Controller extends AbstractController
         return $quiz;
     }
 
+
+    /**
+     * Imports a quiz into the given context via its legacy xml representation.
+     *
+     * @api POST /learning/quiz/legacyXmlImport
+     * @return void
+     */
+    public function postLegacyXmlImport(): void
+    {
+//        $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
+//        $assessment        = $assessmentFactory->produce($assessment);
+//
+//        $transactionSummary = $this->transactor->transact($assessment, $this->getUser(), $before, $originalAssessment);\
+        var_dump($this->requestPost->getArrayCopy());die();
+    }
+
+
 //    /**
 //     * Marks an attempt as completed
 //     *
