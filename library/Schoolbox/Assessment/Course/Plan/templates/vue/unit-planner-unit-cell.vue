@@ -19,7 +19,7 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
-import { Unit } from "./unitPlannerTypes";
+import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
@@ -113,23 +113,31 @@ function onContentClicked(event: MouseEvent) {
  * To retrieve the curriculum component id for the column,
  * to be able to retrieve the correct folderNodesStore
  * and load in the appropriate node tree
- * @returns {number} - the component id for the curriculum component
+ * @returns {CurriculumOverviewComponent|null} - the component found or null
  */
-function getCurriculumComponentId() {
+function getCurriculumComponent() {
     // loop through the curriculum components, matching the component heading to the column label
     const matchedComponent = props.unit.curriculum.components.find(
         (component) => component.heading === props.column.label,
     );
     if (matchedComponent) {
-        return matchedComponent.componentId;
+        return matchedComponent;
     }
-    return UNSET_ID;
+    return null;
 }
 
-const curriculumComponentId = getCurriculumComponentId();
+const curriculumComponent = getCurriculumComponent();
 const curriculumStore = useUnitPlannerCurriculumStore();
-const folderNodesStore = useFolderNodesStore(props.unit.folderId, curriculumComponentId);
-folderNodesStore().init(props.unit.curriculum.nodes, props.unit.curriculum.selectedNodes, null, false);
+const folderNodesStore = useFolderNodesStore(
+    props.unit.folderId,
+    curriculumComponent !== null ? curriculumComponent?.componentId : 0,
+);
+folderNodesStore().init(
+    props.unit.curriculum.nodes,
+    props.unit.curriculum.selectedNodes,
+    curriculumComponent?.filter ?? null,
+    false,
+);
 
 /**
  * To open the curriculum details modal
@@ -263,15 +271,16 @@ window.Vue.onUnmounted(() => {
                 <rubric-capabilities :rubric-capabilities="props.unit.rubricCapabilities"></rubric-capabilities>
             </template>
 
-            <template
-                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponentId !== UNSET_ID"
-            >
+            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
                 <fn-list
                     :folder-id="props.unit.folderId"
-                    :component-instance-id="curriculumComponentId"
+                    :component-instance-id="curriculumComponent.componentId"
                     :is-small="true"
                 />
-                <fn-delete-node :folder-id="props.unit.folderId" :component-instance-id="curriculumComponentId" />
+                <fn-delete-node
+                    :folder-id="props.unit.folderId"
+                    :component-instance-id="curriculumComponent.componentId"
+                />
             </template>
         </div>
 

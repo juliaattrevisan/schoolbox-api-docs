@@ -59,15 +59,15 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                             detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
                         }),
                     );
-                    document.dispatchEvent(
-                        new CustomEvent(FOLDER_NODES_UPDATED, {
-                            detail: {
-                                updatedComponentInstanceId: componentInstanceId,
-                                updatedNodes: newNodes,
-                                updatedSelectedNodes: selectedNodes.value,
-                            } as UpdateEventDetail,
-                        }),
-                    );
+                    // document.dispatchEvent(
+                    //     new CustomEvent(FOLDER_NODES_UPDATED, {
+                    //         detail: {
+                    //             updatedComponentInstanceId: componentInstanceId,
+                    //             updatedNodes: newNodes,
+                    //             updatedSelectedNodes: selectedNodes.value,
+                    //         } as UpdateEventDetail,
+                    //     }),
+                    // );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
                     document.dispatchEvent(
@@ -132,7 +132,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             }
             const filterNode = findById(nodes.value, filter.value.id);
             if (filterNode === undefined) {
-                // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesnt currently contain any selected nodes
+                // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesn't currently contain any selected nodes
                 return [];
             }
             if (filterNode.children === null) {
