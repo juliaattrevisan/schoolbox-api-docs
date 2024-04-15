@@ -69,20 +69,19 @@ class Builder
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
             ->setCreator($this->user)
-//            ->setCompletionMessage($parser->getCompletionMessage())
-//            ->setDuration($parser->getDuration())
-//            ->setTitle($parser->getTitle())
+            ->setCompletionMessage($parser->getCompletionMessage())
+            ->setDuration($parser->getDuration())
+            ->setTitle($parser->getTitle())
             ->setWorkType($workType)
-//            ->setDescription($parser->getDescription())
+            ->setDescription($parser->getDescription())
 //            ->setPublishAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
 //            ->setOpenAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 hour')))
 //            ->setDueAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
 //            ->setCloseAt($inUnitSpec ? $nullDate : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
-//            ->setWeight($parser->getWeight())
-//            ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
-//            ->setMaxAttempts($parser->getMaxAttempts())
-//            ->setMarkVisibility($parser->getMarkVisibility())
-            ;
+            ->setWeight($parser->getWeight())
+            ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
+            ->setMaxAttempts($parser->getMaxAttempts())
+            ->setMarkVisibility($parser->getMarkVisibility());
 
         if ($this->context instanceof \Schoolbox\Learning\Assessment\Project) {
             // Attach context
