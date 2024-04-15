@@ -11,14 +11,16 @@ export type Activity = {
         relative: string;
     } | null;
     isSelfAssessableTask: boolean;
+    // _links is itself null if the user does not have access to any actions
+    // Individual links are null if the user does not have access to the action, or if the action is not available
     _links: {
-        status: string;
-        summary: string;
-        modify: string;
+        status: string | null;
+        summary: string | null;
+        modify: string | null;
         modifyContent: string | null; // learnosity modify contents
-        delete: string;
+        delete: string | null;
         export: string | null; // Spec assessments can be exported
-    };
+    } | null;
     completionCount: number | null;
     studentCount: number | null;
     progressTick: {

@@ -33,6 +33,10 @@ const activitiesListDeleteModalStore = useActivitiesListDeleteModalStore();
 const activityListEl = window.Vue.ref<HTMLElement | null>(null);
 
 const activityLink = window.Vue.computed(() => {
+    if (props.activity._links === null) {
+        return null;
+    }
+
     // If the activity is a project, use the status link
     if (props.activity.assessmentType === "project") {
         return props.activity._links.status;
@@ -43,6 +47,19 @@ const activityLink = window.Vue.computed(() => {
     }
     // Otherwise, use the summary link
     return props.activity._links.summary;
+});
+
+const hasNavLinks = window.Vue.computed(() => {
+    if (props.activity._links === null) return false;
+
+    const validNavLinks = [
+        props.activity._links.export,
+        props.activity._links.modify,
+        props.activity._links.modifyContent,
+        props.activity._links.delete,
+    ];
+
+    return !validNavLinks.every((link) => link === null);
 });
 
 const draggableEl = window.Vue.ref<HTMLElement>();
@@ -87,8 +104,7 @@ window.Vue.onUnmounted(() => {
 <template>
     <li
         ref="activityListEl"
-        class="actions-small-1"
-        :class="{ 'ui-sortable-helper': props.isDragPlaceholder }"
+        :class="{ 'ui-sortable-helper': props.isDragPlaceholder, 'actions-small-1': hasNavLinks }"
         :style="{
             top: props.isDragPlaceholder ? `${activitiesListDragStore().dragPlaceholderY}px` : undefined,
         }"
@@ -98,50 +114,60 @@ window.Vue.onUnmounted(() => {
         "
     >
         <div class="list-item">
-            <div v-if="activitiesListStore().routes.reorder" ref="draggableEl" class="sortable-holder"></div>
-            <div class="grip compact ui-sortable-handle"></div>
-            <div class="card small-12 compact wrap-down">
-                <a :href="getReturnUrl(activityLink)">
+            <template v-if="activitiesListStore().routes.reorder">
+                <div ref="draggableEl" class="sortable-holder"></div>
+                <div class="grip compact ui-sortable-handle"></div>
+            </template>
+            <div
+                class="card small-12 compact wrap-down"
+                :class="{ 'activity-sortable': activitiesListStore().routes.reorder }"
+            >
+                <component
+                    :is="activityLink !== null ? 'a' : 'span'"
+                    :href="activityLink !== null ? getReturnUrl(activityLink) : undefined"
+                >
                     <span
                         :class="'icon-' + kebabCase(props.activity.assessmentType)"
                         :title="startCase(props.activity.assessmentType)"
                     ></span>
                     <p>{{ props.activity.title }}</p>
-                </a>
+                </component>
             </div>
         </div>
-        <nav>
-            <sbx-pop-out
-                :content-id="'dropdown-unitplanner-activity-' + props.activity.id"
-                move-to="#unitplanner-dropdown-container"
-            ></sbx-pop-out>
-        </nav>
-        <!-- Move the dropdown content to the unit planner table so that it can get around the cell's overflow:hidden -->
-        <ul :id="'dropdown-unitplanner-activity-' + props.activity.id" class="f-dropdown" data-dropdown-content>
-            <li v-if="props.activity._links.export">
-                <a
-                    :href="getReturnUrl(props.activity._links.export)"
-                    class="icon-export"
-                    title="Copy this task into classes"
-                    >Export to Classes</a
-                >
-            </li>
-            <li>
-                <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
-                    props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
-                }}</a>
-            </li>
-            <li v-if="props.activity.assessmentType === 'quiz' && props.activity._links.modifyContent">
-                <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
-            </li>
-            <li>
-                <a
-                    class="icon-delete"
-                    @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
-                    >Delete</a
-                >
-            </li>
-        </ul>
+        <template v-if="hasNavLinks && props.activity._links !== null">
+            <nav>
+                <sbx-pop-out
+                    :content-id="'dropdown-unitplanner-activity-' + props.activity.id"
+                    move-to="#unitplanner-dropdown-container"
+                ></sbx-pop-out>
+            </nav>
+            <!-- Move the dropdown content to the unit planner table so that it can get around the cell's overflow:hidden -->
+            <ul :id="'dropdown-unitplanner-activity-' + props.activity.id" class="f-dropdown" data-dropdown-content>
+                <li v-if="props.activity._links.export">
+                    <a
+                        :href="getReturnUrl(props.activity._links.export)"
+                        class="icon-export"
+                        title="Copy this task into classes"
+                        >Export to Classes</a
+                    >
+                </li>
+                <li v-if="props.activity._links.modify">
+                    <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
+                        props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify"
+                    }}</a>
+                </li>
+                <li v-if="props.activity._links.modifyContent">
+                    <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+                </li>
+                <li v-if="props.activity._links.delete">
+                    <a
+                        class="icon-delete"
+                        @click.prevent="activitiesListDeleteModalStore.prompt(props.activity, () => emit('deleted'))"
+                        >Delete</a
+                    >
+                </li>
+            </ul>
+        </template>
     </li>
 </template>
 
@@ -162,7 +188,9 @@ li[data-sortable-active="true"] .sortable-holder {
 }
 
 .card.compact {
-    padding-left: 0;
+    &.activity-sortable {
+        padding-left: 0;
+    }
     padding-right: 0;
 }
 
