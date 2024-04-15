@@ -40,8 +40,8 @@ const allTextboxKeys: string[] = (() => {
     return Array.from(keysSet);
 })();
 
-// Get a list of every textbox that could be shown in a unit
-// in case a unit doesn't have a textbox for a particular key
+// Get a list of every curriculum component that could be shown in a unit
+// in case a unit doesn't have a component for a particular key
 // Ensures that the table will always show all possible textboxes
 const allCurriculumKeys: string[] = (() => {
     const keysSet: Set<string> = new Set();

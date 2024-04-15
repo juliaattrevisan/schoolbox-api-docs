@@ -1,5 +1,3 @@
-import { Unit } from "./unitPlannerTypes";
-
 // All types of content that can be shown in a column
 export enum ColumnType {
     UNIT = "unit",
@@ -52,7 +50,7 @@ const tabConfig: TabConfig[] = [
     {
         id: "curriculum-overview",
         label: "Curriculum Overview",
-        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW, ColumnType.CURRICULUM_OVERVIEW],
+        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
     },
 ];
 
@@ -68,24 +66,30 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
 };
 
 /**
- * Get the columns for the curriculum overview tab
- * @param {Unit[]} units - The units to display in the unit planner
+ * Get any extra columns for a particular Column Type
+ * For example a unit template could have multiple textboxes, so we need to add a column for each
+ * @param {Tab["columns"]} tabColumns - The columns for the tab
+ * @param {ColumnConfig} newColumnBase - The base configuration for the new columns
+ * @param {ColumnType} columnTypeID - The type of column
+ * @param {string[]} keys - The keys (labels) of the textboxes
  */
-// export function getCurriculumOveriewColumns(units: Unit[]) {
-//     // run through each unit, getting the curriculum overview components of each unit
-//     // we group each by the componentds heading, so if two units have the same heading, they will be grouped together
-//     // we then create a column for each group
-
-//     const curriculumOverviewColumns = [];
-//     units.forEach((unit) => {
-//         unit.curriculum.components.forEach((component) => {
-//             if (curriculumOverviewColumns.find((column) => column.heading === component.heading) === undefined) {
-//                 curriculumOverviewColumns.push({ heading: component.heading });
-//             }
-//         });
-//     });
-//     // console.warn(curriculumOverviewColumns);
-// }
+function getExtraColumns(
+    tabColumns: Tab["columns"],
+    newColumnBase: ColumnConfig,
+    columnTypeID: ColumnType,
+    keys: string[],
+) {
+    let columnId = 0;
+    keys.forEach((key) => {
+        columnId += 1;
+        tabColumns.push({
+            ...newColumnBase,
+            id: `${columnTypeID}-${columnId}`,
+            type: columnTypeID, // Add the missing 'type' property
+            label: key,
+        });
+    });
+}
 
 /**
  * Create the tabs for the unit planner
@@ -94,9 +98,6 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
  * @returns {Tab[]} - The tabs for the unit planner
  */
 export function createTabs(allTextboxKeys: string[], allCurriculumKeys: string[]) {
-    // console.warn(allTextboxKeys);
-    // console.warn(allCurriculumKeys);
-    // getCurriculumOveriewColumns(units);
     return tabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
 
@@ -109,29 +110,11 @@ export function createTabs(allTextboxKeys: string[], allCurriculumKeys: string[]
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
-                let columnId = 0;
-                allTextboxKeys.forEach((textboxKey) => {
-                    columnId += 1;
-                    tabColumns.push({
-                        ...newColumnBase,
-                        id: `${columnTypeID}-${columnId}`,
-                        label: textboxKey,
-                    });
-                });
-                console.warn(tabColumns);
+                getExtraColumns(tabColumns, newColumnBase, columnTypeID, allTextboxKeys);
                 return;
             }
             if (columnTypeID === ColumnType.CURRICULUM_OVERVIEW) {
-                let columnId = 0;
-                allCurriculumKeys.forEach((curriculumKey) => {
-                    columnId += 1;
-                    tabColumns.push({
-                        ...newColumnBase,
-                        id: `${columnTypeID}-${columnId}`,
-                        label: curriculumKey,
-                    });
-                });
-                console.warn(tabColumns);
+                getExtraColumns(tabColumns, newColumnBase, columnTypeID, allCurriculumKeys);
                 return;
             }
             tabColumns.push(newColumnBase);
