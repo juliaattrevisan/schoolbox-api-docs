@@ -108,6 +108,14 @@ class Registry
             '^group:g\.',
             '^session:s\.',
             "^groups$",
+
+            // OIDC server cache, used for caching:
+            // * auth codes
+            // * access tokens
+            // * nonces
+            // * refresh tokens
+            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
@@ -117,13 +125,5 @@ class Registry
         //            'scheduled.' . INSTANCE_ID . '.*',
         //            'routed.' . INSTANCE_ID . '.*',
         //        ],
-
-        // OIDC server cache, used for caching:
-        // * auth codes
-        // * access tokens
-        // * nonces
-        // * refresh tokens
-        CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
-        CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':',
     ];
 }
