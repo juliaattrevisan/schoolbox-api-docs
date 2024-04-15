@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
@@ -17,9 +16,9 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
@@ -54,16 +53,18 @@ class Controller extends AbstractController
 
 
     /**
-     * @param Mapper             $quizMapper
-     * @param ErrorMapper        $errorMapper
-     * @param QuizSectionMapper  $quizSectionMapper
+     * Constructor.
+     *
+     * @param Mapper $quizMapper
+     * @param ErrorMapper $errorMapper
+     * @param QuizSectionMapper $quizSectionMapper
      * @param QuizQuestionMapper $quizQuestionMapper
      * @param QuizSolutionMapper $quizSolutionMapper
-     * @param QuizAttemptMapper  $quizAttemptMapper
-     * @param QuizAnswerMapper   $quizAnswerMapper
-     * @param MapperProxy        $assessmentMapperProxy
-     * @param Mapper             $projectResultCacheMapper
-     * @param Transactor         $transactor
+     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param QuizAnswerMapper $quizAnswerMapper
+     * @param MapperProxy $assessmentMapperProxy
+     * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Transactor  $transactor
      */
     public function __construct(
         Mapper $quizMapper,
@@ -238,19 +239,26 @@ class Controller extends AbstractController
     /**
      * Imports a quiz into the given context via its legacy xml representation.
      *
-     * @api POST /learning/quiz/legacyXmlImport
+     * @api POST /learning/quiz/legacyQuizImport/contextType/contextId
+     * @param AssessmentContext $context
      * @return void
-     * @throws MapperException
      * @throws Deleted
-     * @throws RouteNotFound
      * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
      */
-    public function postLegacyXmlImport(): void
+    public function postLegacyQuizImport(AssessmentContext $context): void
     {
         // TODO: load assessment info from xml as best we can
         $postData = $this->requestPost->getArrayCopy();
 
-        $assessmentFactory = new Factory($this->getUser(), $postData, AssessmentType::TYPE_QUIZ, null);
+        /* Intentionally prefill with an instance of AssessmentContext
+         * and other POST vars the Factory assumes exist
+         */
+        $postData['assessmentType'] = AssessmentType::TYPE_QUIZ;
+        $postData['context'] = $context;
+
+        $assessmentFactory = new Factory($this->getUser(), $postData, $postData['assessmentType'], null);
         $assessment        = $assessmentFactory->produce();
 
         $transactionSummary = $this->transactor->transact($assessment, $this->getUser());

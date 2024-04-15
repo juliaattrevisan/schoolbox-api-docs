@@ -11,16 +11,23 @@ namespace Schoolbox\Learning\Quiz;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
@@ -28,6 +35,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\Assessment\Term;
 
@@ -56,51 +64,14 @@ class Module extends RestfulModule
         parent::__construct($injector, QuizMapper::class, 'quiz', $context);
     }
 
-    /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param string $basePath The base route for this module
-     */
-    public function initRoutes(string $basePath)
-    {
-        parent::initRoutes($basePath);
-
-        $routes = [
-            'GET' => [
-//                '/quiz/review/{assessmentId}/horizontal'                    => 'getQuizReviewHorizontal',
-//                '/quiz/review/{assessmentId}/{firstSectionId}/{responseId}' => 'getQuizResponseFirstSection',
-//                '/quiz/{assessmentId}/{userId}/attempts'                    => 'getQuizAttemptsByUser',
-                '/quiz/summary/{assessmentId}'                              => 'getQuizSummary',
-//                '/quiz/intro/{assessmentId}'                                => 'getQuizIntro',
-                '/quiz/{assessmentId}/attempts/export'                      => 'getExportAttempts',
-//                '/quiz/section/create/{assessmentId}'                       => 'getQuizSectionCreate',
-            ],
-            'POST' => [
-//                '/quiz/submit'                                              => 'postQuizSubmit',
-                '/quiz/attempts/delete'                                     => 'postAttemptDelete',
-                '/quiz/legacyXmlImport' => 'postLegacyXmlImport'
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($alias, $basePath, $path);
-        }
-    }
 
     /**
-     * {@inheritdoc}
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
+    protected function registerRoutes() {
         $canWrite = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -127,23 +98,11 @@ class Module extends RestfulModule
             )
         );
 
-        $this->addRoutePermission($authorizer, 'postAttemptDelete', $canWrite);
-        $this->addRoutePermission($authorizer, 'getQuizSummary', $canModify);
-        $this->addRoutePermission($authorizer, 'postLegacyQuizImport', $canWrite);
-    }
+        $preloadContext = function ($params) {
+            return $this->preloadContext($params);
+        };
 
-    /**
-     * @return Term\Mapper
-     * @throws \InvalidArgumentException If unable to find mapper class
-     */
-    private function getTermMapper()
-    {
-        return $this->getMapperFactory()->get(Term\Mapper::class);
-    }
-
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $matcher->add('#getQuizSummary#', function ($params) {
+        $preloadAssessment = function($params) {
             /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
             $dataSource = $this->injector->get('assessmentDataSource');
 
@@ -151,8 +110,49 @@ class Module extends RestfulModule
                 "assessmentId"   => $params["assessmentId"],
                 "assessment"     => $dataSource->findById($params["assessmentId"])
             ];
+        };
+
+        // pluralise for REST
+        $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
+            return $name . 's';
         });
+
+        $this->register('POST', "/quiz/attempts/delete", 'postAttemptDelete', $canWrite);
+        $this->register('GET', "/quiz/summary/{assessmentId}", 'getQuizSummary', $canModify, $preloadAssessment);
+        $this->register('GET', "/quiz/{assessmentId}/attempts/export", 'getExportAttempts', $canModify);
+        $this->register('POST', "/quiz/legacyQuizImport/{contextType:$contextTypes}/{contextId:\\d+}", 'postLegacyQuizImport', $canWrite, $preloadContext);
     }
+
+
+    /**
+     * Convert route params into a context object
+     *
+     * @param array $params
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadContext(array $params): array
+    {
+        try {
+            $contextFactory = new \Schoolbox\Learning\Assessment\DataModel\Context\Factory(
+                $this->getMapperFactory()->get(FolderMapper::class),
+                $this->getMapperFactory()->get(UnitImplementationMapper::class),
+                $this->injector->get('assessmentDataSource'),
+                $this->getMapperFactory()->get(UnitSpecificationMapper::class)
+            );
+            $c = $contextFactory->produce($params['contextType'], $params['contextId']);
+        } catch (MapperException\Deleted $e) {
+            $c = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'context' => $c
+        ];
+    }
+
 
     /**
      * @inheritdoc
@@ -174,5 +174,15 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $transactor
         );
+    }
+
+
+    /**
+     * @return Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 }
