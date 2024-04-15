@@ -32,6 +32,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
         const nodeToRemove = window.Vue.ref<Node | null>(null); // the node to remove
+        const hasLoaded = window.Vue.ref<boolean>(false); // whether the store has been initialised, so nodes aren't displayed until the filter has been considered
 
         /**
          * To notify the backend of a change in the selected nodes
@@ -59,6 +60,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                             detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
                         }),
                     );
+                    console.warn(nodes.value);
                     // document.dispatchEvent(
                     //     new CustomEvent(FOLDER_NODES_UPDATED, {
                     //         detail: {
@@ -88,7 +90,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         }
 
         /**
-         * Multiple instances of the component linked to this store could exist on the page,
+         * Multiple instances of the curriculum overview component could exist on the page,
          * even in entirely different Vue apps.
          * As such we need to ensure that when a change is made in one instance,
          * the other instances are updated to reflect the latest changes
@@ -110,12 +112,13 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * @param {Node|null} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
-        function init($nodes: Node[], $selectedNodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
+        async function init($nodes: Node[], $selectedNodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
             nodes.value = $nodes;
             selectedNodes.value = $selectedNodes;
             filter.value = $filter;
             isReadOnly.value = $isReadOnly;
-            void pushChanges();
+            await pushChanges();
+            hasLoaded.value = true;
             initEventListener();
         }
 
@@ -205,6 +208,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             selectedDetailsNodeId,
             isProcessing,
             nodeToRemove,
+            hasLoaded,
             init,
             removeNode,
             confirmRemoveNode,

@@ -18,7 +18,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
 </script>
 
 <template>
-    <transition-group name="list" tag="ul" class="nodes l-flex-col">
+    <transition-group v-if="store().hasLoaded" name="list" tag="ul" class="nodes l-flex-col">
         <fn-list-node
             v-for="node in store().filteredNodes"
             :key="node.id"
