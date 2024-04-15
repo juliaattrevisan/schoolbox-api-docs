@@ -233,7 +233,7 @@ window.Vue.onUnmounted(() => {
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
                 <unit-planner-unit-cell-curriculum
                     :selected-nodes="props.unit.curriculum.selectedNodes"
-                    :nodes="props.unit.curriculum.nodes"
+                    :nodes="props.unit.curriculum.nodes ?? []"
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
                     @update-content-height="updateContentHeight"
