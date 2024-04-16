@@ -541,12 +541,11 @@ class Controller extends Base
      * direct clone from \Schoolbox\Curriculum\Component\CurriculumOverviewController::execute
      *
      * @param Model $unit
-     * @return Collection|null
+     * @return Collection
      */
-    private function getCurriculumNodes(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit): ?Collection
+    private function getCurriculumNodes(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit): Collection
     {
-        /** @var ?Collection $curriculumNodes */
-        $curriculumNodes = null;
+        $curriculumNodes = $this->nodeMapper->createCollection();
         if ($unit->getFolder()->getCurriculumNodes()->count()) {
             $nodeIds = [];
             foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
