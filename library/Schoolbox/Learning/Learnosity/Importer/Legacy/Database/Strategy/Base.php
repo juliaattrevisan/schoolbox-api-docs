@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy;
 
-class Base
+abstract class Base
 {
     /**
      * Constructor.

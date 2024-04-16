@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy;
 
 /**
  * Converts a Schoolbox "Matching Pairs" question into its Learnosity equivalent
