@@ -18,6 +18,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Client\Provider\AbstractProvider;
+use OpenIDConnectClient\AccessToken;
 use OpenIDConnectClient\OpenIDConnectProvider;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -167,7 +168,10 @@ class Controller extends Base
             return;
         }
 
-        // convert auth code to access token, checking PKCE code along the way
+        // Convert auth code to access token, checking PKCE code along the way.
+        // Note the var-check is required as `setPkceCode` returns the base
+        // access token class
+        /** @var AccessToken $accessToken */
         $accessToken = $this->buildOidcProvider()
             ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
             ->getAccessToken(
