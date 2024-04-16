@@ -2,6 +2,9 @@
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
+use Schoolbox\User;
+
 /**
  * Construct a simplified flat array of sections/questions/answers/etc.
  * that represents a legacy quiz, where the data came from an xml file
@@ -20,9 +23,13 @@ class Builder
     /**
      * Constructor.
      *
-     * @param Strategy\Factory $strategyFactory
+     * @param User    $user
+     * @param Factory $strategyFactory
      */
-    public function __construct(private Strategy\Factory $strategyFactory) {
+    public function __construct(
+        private \Schoolbox\User $user,
+        private Strategy\Factory $strategyFactory
+    ) {
     }
 
 
@@ -39,6 +46,9 @@ class Builder
         /* Augment final stack some facts about assessment instances
          */
         $quiz = [
+            /* This user is assumed to be the author
+             */
+            'user_id' => $this->user->getId(),
             'assess_id' => $instances['quiz']->getId(),
             'assessment_id' => $instances['assessment']->getId(),
             'title' => $instances['assessment']->getTitle(),

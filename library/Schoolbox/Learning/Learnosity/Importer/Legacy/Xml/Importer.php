@@ -123,7 +123,7 @@ class Importer
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $quizBuilder = new Builder($strategyFactory);
+        $quizBuilder = new Builder($this->user, $strategyFactory);
 
         /* Generates sets of tags for Activities' and Items' assignations
          */
