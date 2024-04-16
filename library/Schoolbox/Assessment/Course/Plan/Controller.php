@@ -223,7 +223,7 @@ class Controller extends Base
         foreach ($course->getUnits() as $unit) {
             /* Gather up the textboxes and extraTextboxes meta
              */
-            $textboxData = $this->findTextboxes($course->getTemplate()?->getUnitTemplate()->getId(), $unit->getFolder()->getId());
+            $textboxData = $this->findTextboxes($textboxKey, $unit->getFolder()->getId());
 
             // Learning Activities
             $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
@@ -374,55 +374,14 @@ class Controller extends Base
      * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
      * is thrown into extraTextboxes)
      *
-     * @param int|null $unitTemplateId|null
+     * @param array $textboxKey
      * @param int $unitFolderId
      * @return array
      * @throws Exception
      * @throws \DomainException
      */
-    private function findTextboxes(?int $unitTemplateId, int $unitFolderId): array
+    private function findTextboxes(array $textboxKey, int $unitFolderId): array
     {
-        /* In case the course wasn't hydrated with all the parts
-         */
-        if (null === $unitTemplateId) {
-            return [
-                'textboxes' => [],
-                'extraTextboxes' => 0
-            ];
-        }
-
-        /**
-         * Grab the list of textboxes from the Unit Template
-         */
-        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = TextboxComponentController::class;
-        $textboxes = [];
-        $textboxesKeys = [];
-        $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $unitTemplateId, $class);
-
-        foreach ($unitTextboxes as $textboxComponent) {
-            if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
-                // if there is a value set for the component use that
-                $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
-            } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
-                // is there a system default value for the component
-                $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
-            } else {
-                // Fallback of the php default title for textbox components
-                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
-            }
-
-            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
-            // The frontend will use this to determine whether the textbox needs to be created or not.
-            // This saves needing to manipulate the initial data on the frontend on the first mount
-            $textboxes[strtolower($heading)] = [
-                'id' => -1,
-                'body' => ''
-            ];
-
-            $textboxesKeys[strtolower($heading)] = $heading;
-        }
-
         // fetch all for the folder
         /* Find all the textboxes in this Unit Spec that happens to match
          * the ones in the template; circumstantially matching textboxes
@@ -430,6 +389,7 @@ class Controller extends Base
          * template are called "extraTextboxes"
          */
         $extraTextboxes = 0;
+        $textboxes = [];
 
         $this->textboxStatement->execute(
             [
@@ -443,15 +403,17 @@ class Controller extends Base
         while ($row = $this->textboxStatement->fetch()) {
             // match only on the Component Heading
             $normalisedTitle = strtolower(trim((string)$row['componentHeading']));
+
+            // NOTE: This is all based on component titles (which don't need to be unique),
+            // so you could have 2 components on a page that share the same title, and this will just display the last entry.
+            $textboxes[$normalisedTitle] = [
+                'id' => $row['textboxID'],
+                'body' => Scrub::html($row['textboxBody']),
+                'heading' => trim((string)$row['componentHeading']),
+                'inTemplate' => in_array($normalisedTitle, $textboxKey)
+            ];
             // Check if the textbox should exist in the plan?
-            if (array_key_exists($normalisedTitle, $textboxes)) {
-                // NOTE: This is all based on component titles (which don't need to be unique),
-                // so you could have 2 components on a page that share the same title, and this will just display the last entry.
-                $textboxes[$normalisedTitle] = [
-                    'id' => $row['textboxID'],
-                    'body' => Scrub::html($row['textboxBody'])
-                ];
-            } else {
+            if (!in_array($normalisedTitle, $textboxKey)) {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
                 $extraTextboxes++;
@@ -459,7 +421,7 @@ class Controller extends Base
         }
 
         return [
-            'textboxes' => array_combine($textboxesKeys, $textboxes),
+            'textboxes' => $textboxes,
             'extraTextboxes' => $extraTextboxes
         ];
     }
