@@ -12,9 +12,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
-use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -23,10 +21,34 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use SimpleXMLElement;
-use Symfony\Component\Lock\LockInterface;
 
 class Importer
 {
+    /**
+     * Number of times to retry association queries
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
+     * Associate a newly-imported learnosity quiz with the legacy one
+     */
+    private const QUERY_ASSOCIATE_LEARNOSITY = '
+        UPDATE assess
+        SET learnosity_reference = :learnosityReference
+        WHERE assess_id = :assessId
+        LIMIT 1
+    ';
+
+
+    /**
+     * A set of prepared statements we can recycle
+     *
+     * @var \PDOStatement
+     */
+    private \PDOStatement $associateStatement;
+
+
     /**
      * Constructor.
      *
@@ -55,6 +77,7 @@ class Importer
         private WorkType\Mapper $workTypeMapper,
         private MarkTypeMapper $markTypeMapper
     ) {
+        $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
     }
 
 
@@ -63,11 +86,11 @@ class Importer
      * so you can continue making data with it elsewhere
      *
      * @param string $data
-     * @return array
+     * @return void
      * @throws Deleted
      * @throws MapperException
      */
-    public function import(string $data): array
+    public function import(string $data): void
     {
         /* We need to use this later
          */
@@ -117,32 +140,16 @@ class Importer
 
         /* Traverse the xml, loading each question
          */
-        $legacyQuiz = $quizBuilder->build($xml);
+        $legacyQuiz = $quizBuilder->build($instances, $xml);
 
         /* Figure out how to consolidate payloads
          */
-        if ($legacyQuiz['numQuestions'] <= ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-            $this->importSmall(
-                $legacyQuiz,
-                $blueprintBuilder,
-                $this->api
-            );
-        } else {
-            $this->importLarge(
-                $legacyQuiz,
-                $blueprintBuilder,
-                $this->api
-            );
-        }
-
-        // TODO Continue stealing from ImporterTool
-
-        /* TODO probably display a list of questions and their status, maybe
-         */
-        return [
-            'assessment' => $instances['assessment'],
-            'quiz'       => $instances['quiz']
-        ];
+        $this->importLarge(
+            $instances,
+            $legacyQuiz,
+            $blueprintBuilder,
+            $this->api
+        );
     }
 
 
@@ -288,127 +295,85 @@ class Importer
 
 
     /**
-     * Import a small quiz
-     *
-     * @param array            $legacyQuiz
-     * @param BlueprintBuilder $blueprintBuilder
-     * @param Api              $api
-     * @return void
-     * @throws \JsonException
-     * @throws \LearnositySdk\Exceptions\ValidationException
-     */
-    private function importSmall(
-        array $legacyQuiz,
-        BlueprintBuilder $blueprintBuilder,
-        Api $api
-    ): void {
-        /* Make the overall Learnosity payloads which we then send later with
-         * a little postprocessing to put things into the exactly correct format.
-         * Learnosity is really particular about such things.
-         */
-        try {
-            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-        } catch (\DomainException $e) {
-            return;
-        }
-
-        /* We can perhaps minimise more Learnosity requests by batching $blueprints
-         * which typically represent a single quiz. There's a limit on the number of
-         * quizzes, but there's also a limit on number of features/questions/items
-         * which isn't particularly obvious
-         */
-        $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
-
-        /* Send it
-         */
-        $this->transmitConsolidated($api, $consolidatedBlueprint);
-    }
-
-
-    /**
-     * Sends data to Learnosity and returns updated metrics
-     *
-     * @param Api   $api
-     * @param array $consolidatedBlueprint
-     * @return void
-     * @throws \JsonException
-     * @throws \LearnositySdk\Exceptions\ValidationException
-     */
-    private function transmitConsolidated(Api $api, array $consolidatedBlueprint): void
-    {
-        $this->logger->info(sprintf(
-            'Importing %s consolidated quizzes into Learnosity.',
-            $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
-        ));
-
-        foreach ($consolidatedBlueprint as $endpoint => $data) {
-            /* Associate the learnosity reference back to our legacy quiz
-             */
-            if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
-                foreach ($data['payload']['associations'] as $association) {
-                    $this->logger->info(sprintf(
-                        'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
-                        $association['assessmentId'],
-                        $association['quizId'],
-                        substr($association['activityLearnosityReference'], 0, 13)
-                    ));
-
-                    /* Associate with a retry mechanism
-                     */
-                    try {
-                        $this->associate($association);
-                    } catch (\RuntimeException $e) {
-                        $this->logger->warning($e->getMessage());
-                        continue;
-                    }
-                }
-            } else {
-                $this->logger->debug(sprintf(
-                    '%s: transmitting payload (size: %s) to Learnosity...',
-                    $data['endpoint'],
-                    $data['count']
-                ));
-
-                /* Skip zero-sized payloads; Learnosity hates that
-                 *
-                 * (alternatively capture exception but probably not helpful most of the time)
-                 *
-                 * The main way this has happened to me is when you create a quiz
-                 * using Learnosity, then artificially reset its learnosity_reference
-                 * to null, then try to reimport that back into Learnosity - this is
-                 * an exceedingly particular scenario that shouldn't happen organically.
-                 *
-                 * Or, there's just an empty section somehow.
-                 */
-                if ($data['count'] > 0) {
-                    try {
-                        $api->dataSetRequestHub($data['endpoint'], $data['payload']);
-                    } catch (ApiException $e) {
-                        /* Warn us, then keep going
-                         */
-                        $this->logger->warning($e->getMessage());
-                        $this->logger->warning('Consolidated payload abandoned.');
-
-                        continue;
-                    }
-                }
-            }
-        }
-    }
-
-
-    /**
      * Import a large quiz by spreading its contents over multiple payloads
      *
+     * @param array            $instances A set of (IAssessable, corresponding quiz subobject)
      * @param array            $legacyQuiz
      * @param BlueprintBuilder $blueprintBuilder
      * @param Api              $api
      * @return void
      */
     private function importLarge(
+        array $instances,
         array $legacyQuiz,
         BlueprintBuilder $blueprintBuilder,
         Api $api
-    ) {
+    ):void {
+        /* Make the overall Learnosity payloads which we then send later with
+         * a little postprocessing to put things into the exactly correct format.
+         * Learnosity is really particular about such things.
+         */
+        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+
+        foreach ($blueprint['payloadSequence'] as $payloadSequence) {
+            $endpoint = $payloadSequence['endpoint'];
+
+            if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
+                $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence, $lock);
+            } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
+                $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence, $lock);
+            } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
+                $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence, $lock);
+            } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
+                $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence, $lock);
+            }
+        }
+
+        /* Associations are always done last, once per quiz,
+         * and after their guts have been sent to Learnosity
+         */
+        $association = [
+            'quizId' => $blueprint['quizId'],
+            'assessmentId' => $blueprint['assessmentId'],
+            'activityLearnosityReference' => $blueprint['activityLearnosityReference']
+        ];
+
+        /* Associate with a retry mechanism
+         */
+        $this->associate($association);
+    }
+
+
+    /**
+     * Associate legacy quiz with learnosity quiz, using a retry system
+     * in case our db went away for some reason
+     *
+     * @param array $association
+     * @return void
+     */
+    private function associate(array $association): void
+    {
+        $numFails = 0;
+
+        while ($numFails < self::NUM_RETRY) {
+            try {
+                $this->associateStatement->execute([
+                    'learnosityReference' => $association['activityLearnosityReference'],
+                    'assessId' => $association['quizId']
+                ]);
+
+                return;
+            } catch (\PDOException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                $numFails++;
+            }
+        }
+
+        throw new \RuntimeException(sprintf(
+            'Could not associate learnosity quiz %s with legacy quiz %s after %s tries',
+            $association['activityLearnosityReference'],
+            $association['quizId'],
+            $numFails
+        ));
     }
 }
