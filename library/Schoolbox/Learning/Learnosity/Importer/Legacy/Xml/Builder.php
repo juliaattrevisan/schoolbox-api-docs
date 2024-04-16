@@ -43,14 +43,39 @@ class Builder
      *
      * @param string $data
      * @return array
-     * @throws MapperException
      * @throws Deleted
+     * @throws MapperException
      */
     public function build(string $data): array
     {
-        $xml = $this->prepareXml($data);
-        $version = $this->detectVersion($xml);
-        $parser = $this->produceParser($xml, $version);
+        /* Set up a parser to traverse the xml
+         */
+        $parser = $this->produceParser($data);
+
+        /* Produce IAssessable and quiz subobject instances into an array for convenience
+         * (these are already persisted in the db)
+         */
+        $instances = $this->buildAssessment($parser);
+
+        /* TODO Traverse the xml, loading each question
+         */
+
+        /* TODO probably display a list of questions and their status, maybe
+         */
+        return [];
+    }
+
+
+    /**
+     * Persist IAssessable and quiz subobject instances
+     *
+     * @param IParser $parser
+     * @return array
+     * @throws Deleted
+     * @throws MapperException
+     */
+    private function buildAssessment(IParser $parser): array
+    {
         $inUnitSpec = $this->context->getBaseContext() instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 
         /* Find a matchign work type if one was specified
@@ -77,10 +102,10 @@ class Builder
             ->setTitle($parser->getTitle())
             ->setWorkType($workType)
             ->setDescription($parser->getDescription())
-            ->setPublishAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 hour')))
-            ->setOpenAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 hour')))
-            ->setDueAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
-            ->setCloseAt($inUnitSpec ? null : new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
+            ->setPublishAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setOpenAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 hour')))
+            ->setDueAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+            ->setCloseAt($inUnitSpec ? null : new \Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
             ->setWeight($parser->getWeight())
             ->setDefaultOpenSpan($parser->getDefaultOpenSpan())
             ->setMaxAttempts($parser->getMaxAttempts())
@@ -122,7 +147,6 @@ class Builder
         return [
             'assessment' => $assessment,
             'quiz' => $quiz,
-            'parser' => $parser
         ];
     }
 
@@ -168,17 +192,19 @@ class Builder
      * Gets a version-dependent parser that knows how to interpret a specific version format, but
      * respect a consistent API of representing the file's data.
      *
-     * @param SimpleXMLElement $xml
-     * @param string $fileFormatVersion
+     * @param string $data
      * @return IParser
      */
-    private function produceParser(SimpleXMLElement $xml, string $fileFormatVersion): IParser
+    private function produceParser(string $data): IParser
     {
-        return match ($fileFormatVersion) {
+        $xml = $this->prepareXml($data);
+        $version = $this->detectVersion($xml);
+
+        return match ($version) {
             IParser::FORMAT_VERSION_160 => new \Assess\Import\Parser\V160($xml),
             IParser::FORMAT_VERSION_165 => new \Assess\Import\Parser\V165($xml),
             IParser::FORMAT_VERSION_170 => new \Assess\Import\Parser\V170($xml),
-            default => throw new \DomainException('No parser found for version: ' . $fileFormatVersion),
+            default => throw new \DomainException('No parser found for version: ' . $version),
         };
     }
 }

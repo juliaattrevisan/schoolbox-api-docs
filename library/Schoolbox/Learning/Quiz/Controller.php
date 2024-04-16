@@ -281,7 +281,7 @@ class Controller extends AbstractController
                 /** @var AssessmentMapperProxy $assessmentMapperProxy */
                 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-                $parts = (new Builder(
+                $result = (new Builder(
                     $context,
                     $this->getUser(),
                     $assessmentMapperProxy,
