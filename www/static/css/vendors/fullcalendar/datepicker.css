@@ -337,7 +337,7 @@ temporary rendered events).
 .fc-event.fc-selected:after {
   content: "";
   position: absolute;
-  z-index: calc(var(--depth-default) - 2 );
+  z-index: var(--depth-default);
   /* same z-index as fc-bg, behind text */
   /* overcome the borders */
   top: -1px;
@@ -365,7 +365,7 @@ temporary rendered events).
 .fc-h-event.fc-selected:before {
   content: "";
   position: absolute;
-  z-index: var(--depth-default);
+  z-index: calc(var(--depth-default) + 1);
   /* below resizers */
   top: -10px;
   bottom: -10px;
@@ -512,12 +512,12 @@ a.fc-more {
 
 /* popover that appears when "more" link is clicked */
 .fc-day-grid .fc-row {
-  z-index: calc(var(--depth-default) - 2 );
+  z-index: calc(var(--depth-pop-over) - 1 );
   /* make the "more" popover one higher than this */
 }
 
 .fc-more-popover {
-  z-index: calc(var(--depth-default) - 1 );
+  z-index: var(--depth-pop-over);
 }
 
 .fc-more-popover .fc-event-container {
@@ -767,13 +767,13 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 }
 
 .fc-button-group > .fc-button:hover {
-  z-index: calc(var(--depth-default) - 2 );
+  z-index: var(--depth-default);
 }
 
 .fc-button-group > .fc-button:focus,
 .fc-button-group > .fc-button:active,
 .fc-button-group > .fc-button.fc-button-active {
-  z-index: calc(var(--depth-default) - 2 );
+  z-index: var(--depth-default);
 }
 
 .fc-button-group > .fc-button:not(:first-child) {
@@ -849,7 +849,7 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 .fc-view > table {
   /* so dragged elements can be above the view's main element */
   position: relative;
-  z-index: calc(var(--depth-default) - 2 );
+  z-index: var(--depth-default);
 }
 
 @media print {
