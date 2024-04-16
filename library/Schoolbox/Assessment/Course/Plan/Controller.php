@@ -390,6 +390,7 @@ class Controller extends Base
          */
         $extraTextboxes = 0;
         $textboxes = [];
+        $textboxesKeys = [];
 
         $this->textboxStatement->execute(
             [
@@ -412,6 +413,7 @@ class Controller extends Base
                 'heading' => trim((string)$row['componentHeading']),
                 'inTemplate' => in_array($normalisedTitle, $textboxKey)
             ];
+            $textboxesKeys[$normalisedTitle] = trim((string)$row['componentHeading']);
             // Check if the textbox should exist in the plan?
             if (!in_array($normalisedTitle, $textboxKey)) {
                 // increase the extra textboxes by 1
@@ -421,7 +423,7 @@ class Controller extends Base
         }
 
         return [
-            'textboxes' => $textboxes,
+            'textboxes' => array_combine($textboxesKeys, $textboxes),
             'extraTextboxes' => $extraTextboxes
         ];
     }
