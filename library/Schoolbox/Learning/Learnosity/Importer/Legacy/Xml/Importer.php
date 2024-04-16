@@ -3,7 +3,6 @@
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Alaress\Database\Connector\IConnector;
-use DebugBar\DebugBarException;
 use Evaluation\Import\Parser\IParser;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -13,9 +12,10 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
+use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
-use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use SimpleXMLElement;
+use Symfony\Component\Lock\LockInterface;
 
 class Importer
 {
@@ -65,7 +66,6 @@ class Importer
      * @return array
      * @throws Deleted
      * @throws MapperException
-     * @throws DebugBarException
      */
     public function import(string $data): array
     {
@@ -100,6 +100,10 @@ class Importer
 
         /* A context lookup builder thing for conveniently deriving tags
         */
+        /* FIXME Replace with usage of AssessmentContext since we have no
+         *  idea where this assessment's context details are (it comes from
+         *  an xml where there's no record of it in the db)
+         */
         $contextLookup = new ContextLookup($this->databaseInternal, $tagFactory, $this->logger);
 
         /* Generates payload array structs
@@ -113,15 +117,31 @@ class Importer
 
         /* Traverse the xml, loading each question
          */
-        $quiz = $quizBuilder->build($xml);
-new \Alaress_Probe($quiz);
+        $legacyQuiz = $quizBuilder->build($xml);
+
+        /* Figure out how to consolidate payloads
+         */
+        if ($legacyQuiz['numQuestions'] <= ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+            $this->importSmall(
+                $legacyQuiz,
+                $blueprintBuilder,
+                $this->api
+            );
+        } else {
+            $this->importLarge(
+                $legacyQuiz,
+                $blueprintBuilder,
+                $this->api
+            );
+        }
+
         // TODO Continue stealing from ImporterTool
 
         /* TODO probably display a list of questions and their status, maybe
          */
         return [
             'assessment' => $instances['assessment'],
-            'quiz' => $instances['quiz']
+            'quiz'       => $instances['quiz']
         ];
     }
 
@@ -135,7 +155,7 @@ new \Alaress_Probe($quiz);
     private function prepareXml(string $xml): SimpleXMLElement
     {
         $use_errors = libxml_use_internal_errors(true);
-        $result = simplexml_load_string($xml);
+        $result     = simplexml_load_string($xml);
 
         if (!($result instanceof SimpleXMLElement)) {
             $result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
@@ -238,8 +258,7 @@ new \Alaress_Probe($quiz);
             ->setPromptsMode(false)
             /* Legacy XML only ever supported Total Mark
              */
-            ->setMarkType($this->markTypeMapper->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL))
-        ;
+            ->setMarkType($this->markTypeMapper->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL));
 
         /* Update context if it's a Project
          * (for whatever reason, Project contexts need a list of their constituent assessments)
@@ -263,7 +282,133 @@ new \Alaress_Probe($quiz);
 
         return [
             'assessment' => $assessment,
-            'quiz' => $quiz,
+            'quiz'       => $quiz,
         ];
+    }
+
+
+    /**
+     * Import a small quiz
+     *
+     * @param array            $legacyQuiz
+     * @param BlueprintBuilder $blueprintBuilder
+     * @param Api              $api
+     * @return void
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function importSmall(
+        array $legacyQuiz,
+        BlueprintBuilder $blueprintBuilder,
+        Api $api
+    ): void {
+        /* Make the overall Learnosity payloads which we then send later with
+         * a little postprocessing to put things into the exactly correct format.
+         * Learnosity is really particular about such things.
+         */
+        try {
+            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+        } catch (\DomainException $e) {
+            return;
+        }
+
+        /* We can perhaps minimise more Learnosity requests by batching $blueprints
+         * which typically represent a single quiz. There's a limit on the number of
+         * quizzes, but there's also a limit on number of features/questions/items
+         * which isn't particularly obvious
+         */
+        $consolidatedBlueprint = $blueprintBuilder->consolidateNew($blueprint);
+
+        /* Send it
+         */
+        $this->transmitConsolidated($api, $consolidatedBlueprint);
+    }
+
+
+    /**
+     * Sends data to Learnosity and returns updated metrics
+     *
+     * @param Api   $api
+     * @param array $consolidatedBlueprint
+     * @return void
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function transmitConsolidated(Api $api, array $consolidatedBlueprint): void
+    {
+        $this->logger->info(sprintf(
+            'Importing %s consolidated quizzes into Learnosity.',
+            $consolidatedBlueprint[BlueprintBuilder::ENDPOINT_ASSOCIATIONS]['count']
+        ));
+
+        foreach ($consolidatedBlueprint as $endpoint => $data) {
+            /* Associate the learnosity reference back to our legacy quiz
+             */
+            if (BlueprintBuilder::ENDPOINT_ASSOCIATIONS === $endpoint) {
+                foreach ($data['payload']['associations'] as $association) {
+                    $this->logger->info(sprintf(
+                        'Associating quiz (assessment_id: %s, assess_id: %s) with %s...',
+                        $association['assessmentId'],
+                        $association['quizId'],
+                        substr($association['activityLearnosityReference'], 0, 13)
+                    ));
+
+                    /* Associate with a retry mechanism
+                     */
+                    try {
+                        $this->associate($association);
+                    } catch (\RuntimeException $e) {
+                        $this->logger->warning($e->getMessage());
+                        continue;
+                    }
+                }
+            } else {
+                $this->logger->debug(sprintf(
+                    '%s: transmitting payload (size: %s) to Learnosity...',
+                    $data['endpoint'],
+                    $data['count']
+                ));
+
+                /* Skip zero-sized payloads; Learnosity hates that
+                 *
+                 * (alternatively capture exception but probably not helpful most of the time)
+                 *
+                 * The main way this has happened to me is when you create a quiz
+                 * using Learnosity, then artificially reset its learnosity_reference
+                 * to null, then try to reimport that back into Learnosity - this is
+                 * an exceedingly particular scenario that shouldn't happen organically.
+                 *
+                 * Or, there's just an empty section somehow.
+                 */
+                if ($data['count'] > 0) {
+                    try {
+                        $api->dataSetRequestHub($data['endpoint'], $data['payload']);
+                    } catch (ApiException $e) {
+                        /* Warn us, then keep going
+                         */
+                        $this->logger->warning($e->getMessage());
+                        $this->logger->warning('Consolidated payload abandoned.');
+
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Import a large quiz by spreading its contents over multiple payloads
+     *
+     * @param array            $legacyQuiz
+     * @param BlueprintBuilder $blueprintBuilder
+     * @param Api              $api
+     * @return void
+     */
+    private function importLarge(
+        array $legacyQuiz,
+        BlueprintBuilder $blueprintBuilder,
+        Api $api
+    ) {
     }
 }
