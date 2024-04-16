@@ -38,7 +38,7 @@ class Short extends Base implements IStrategy
         /* the question can exist, but the answer can be deleted...
          * as found on baqags (prod), so just cast to empty string and still import the question
          */
-        $answer = trim($question['_answers'][0]['answer'] ?? '');
+        $answer = trim($question['_answers'] ?? '');
 
         return [
             'case_sensitive' => false,
@@ -73,6 +73,9 @@ class Short extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }
