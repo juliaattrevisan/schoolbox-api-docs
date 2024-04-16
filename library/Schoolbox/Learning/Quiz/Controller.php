@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -32,7 +31,6 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Exception;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -52,6 +50,7 @@ class Controller extends AbstractController
      * @param MapperProxy $assessmentMapperProxy
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper
      * @param Transactor  $transactor
      */
     public function __construct(
@@ -65,6 +64,7 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
         private Transactor $transactor,
     ) {
         parent::__construct($quizMapper);
