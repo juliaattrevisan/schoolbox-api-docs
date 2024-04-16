@@ -359,7 +359,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'locale' => $locale,
+            'activityTypeLocale' => $activityTypeLocale,
             'template'  => [
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumnTemplate,
