@@ -38,7 +38,7 @@ class Radio extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $possibleAnswers = $question['_answers'][0]['answer'] ?? [];
+        $possibleAnswers = $question['_answers'] ?? [];
 
         $options = [];
         $correct = [];
@@ -46,8 +46,8 @@ class Radio extends Base implements IStrategy
         /* Note that $possibleAnswers deserialized into stdClass instances
          */
         foreach ($possibleAnswers as $possibleAnswer) {
-            $description = trim($possibleAnswer->description ?? '');
-            $value = trim($possibleAnswer->value ?? '');
+            $description = $possibleAnswer['label'];
+            $value = $possibleAnswer['value'];
 
             /* Skip descriptions/values that are meaningless
              * These weren't intended, but somehow exist in prod data
@@ -66,7 +66,7 @@ class Radio extends Base implements IStrategy
 
             /* Remember the correct answer(s)
              */
-            if ($possibleAnswer->correct ?? false) {
+            if ($possibleAnswer['correct'] ?? false) {
                 $correct[] = $value;
             }
         }
@@ -108,6 +108,31 @@ class Radio extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
+        $options = [];
 
+        foreach ($answers[0]->xpath('answer') as $answer) {
+            $description = trim((string)$answer->xpath('text')[0]);
+            $value = trim((string)$answer->xpath('value')[0]);
+
+            $options[] = [
+                'label' => $description,
+                'value' => $value,
+                /* 100 denotes a correct answer; it'll be 0 for wrong answers
+                 */
+                'correct' => 100 === (int)trim((string)$answer->xpath('@fraction')[0])
+            ];
+        }
+
+        /* Randomise option order
+         * This was a configuration setting in legacy quiz
+         */
+        return [
+            'answers' => $options,
+            /* Sometimes config options are found here, and need to be move dup
+             */
+            'config' => [
+                'randomiseOptionOrder' => (int)($answers->xpath('shuffleanswers')[0])
+            ]
+        ];
     }
 }
