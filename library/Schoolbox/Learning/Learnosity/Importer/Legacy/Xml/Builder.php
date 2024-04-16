@@ -59,14 +59,29 @@ class Builder
                     'penalty' => trim((string)$question->xpath('typeid')[0]),
                 ];
 
-                    $answerRow = $this->decompileAnswer($questionRow, $question->xpath('answers'));
+                /* xpath->answers is a one-node set, so you should read this really as $answers[0]
+                 */
+                $struct = $this->decompileAnswer($questionRow, $question->xpath('answers')[0]);
 
-//                    new \Alaress_Probe($question, $questionRow, $answerRow);
+                /* Ensure each question knows about its potential answwrs
+                 */
+                $questionRow['_answers'] = $struct['answers'];
 
+                /* Merge any answer-specific configurations found deeper in the xml
+                 */
+                $questionRow['config'] = array_merge($questionRow['config'], $struct['config']);
 
+                /* Add it to the section stack
+                 */
+                $sectionRow['_questions'][] = $questionRow;
             }
 
+            /* Add it to the quiz stack
+             */
+            $quiz['_sections'][] = $sectionRow;
         }
+
+        new \Alaress_Probe($quiz);
     }
 
 
@@ -97,11 +112,11 @@ class Builder
      * are intertwined with phplibs, which is annoying
      *
      * @param array $question
-     * @param array $answers
+     * @param \SimpleXMLElement $answers
      * @return mixed
      * @throws \RuntimeException
      */
-    private function decompileAnswer(array $question, array $answers): array
+    private function decompileAnswer(array $question, \SimpleXMLElement $answers): array
     {
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)

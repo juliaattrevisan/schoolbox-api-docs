@@ -41,12 +41,9 @@ abstract class Base
     /**
      * Decompiles $answer's xml value
      *
-     * @param array $answers
+     * @param \SimpleXMLElement $answers
      * @return array
      * @throws \RuntimeException
      */
-    public function decompileAnswer(array $answers): array
-    {
-
-    }
+    abstract public function decompileAnswer(\SimpleXMLElement $answers): array;
 }
