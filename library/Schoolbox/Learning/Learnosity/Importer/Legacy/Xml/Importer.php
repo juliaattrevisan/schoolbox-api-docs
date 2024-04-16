@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
+use DebugBar\DebugBarException;
 use Evaluation\Import\Parser\IParser;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
@@ -9,6 +10,7 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -20,6 +22,7 @@ class Importer
     /**
      * Constructor.
      *
+     * @param Factory                         $strategyFactory
      * @param AssessmentContext               $context
      * @param User                            $user
      * @param AssessmentMapperProxy           $assessmentMapperProxy
@@ -28,6 +31,7 @@ class Importer
      * @param MarkTypeMapper                  $markTypeMapper
      */
     public function __construct(
+        private Strategy\Factory $strategyFactory,
         private AssessmentContext $context,
         private \Schoolbox\User $user,
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -46,6 +50,7 @@ class Importer
      * @return array
      * @throws Deleted
      * @throws MapperException
+     * @throws DebugBarException
      */
     public function import(string $data): array
     {
@@ -64,8 +69,7 @@ class Importer
 
         /* TODO Traverse the xml, loading each question
          */
-        $builder = (new Builder())->build($xml);
-
+        $builder = (new Builder($this->strategyFactory))->build($xml);
 
         /* TODO probably display a list of questions and their status, maybe
          */

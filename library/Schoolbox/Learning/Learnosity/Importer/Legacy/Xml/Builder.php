@@ -2,6 +2,8 @@
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
+use DebugBar\DebugBarException;
+
 /**
  * Construct a simplified flat array of sections/questions/answers/etc.
  * that represents a legacy quiz, where the data came from an xml file
@@ -9,11 +11,21 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 class Builder
 {
     /**
+     * Constructor.
+     *
+     * @param Strategy\Factory $strategyFactory
+     */
+    public function __construct(private Strategy\Factory $strategyFactory) {
+    }
+
+
+    /**
      * Construct a simplified flat array of sections/questions/answers/etc.
      * that represents a legacy quiz, where the data came from an xml file
      *
      * @param \SimpleXMLElement $xml
      * @return array
+     * @throws DebugBarException
      */
     public function build(\SimpleXMLElement $xml): array
     {
@@ -39,7 +51,7 @@ class Builder
             foreach ($section->xpath('question') as $question) {
                 $questionRow = [
                     '_answers' => [],
-                    'typeid' => trim((string)$question->xpath('typeid')[0]),
+                    'type_id' => trim((string)$question->xpath('typeid')[0]),
                     'marks' => trim((string)$question->xpath('marks')[0]),
                     'config' => $this->decompileQuestionConfig($question),
                     'name' => trim((string)$question->xpath('name')[0]->xpath('text')[0]),
@@ -48,8 +60,9 @@ class Builder
                 ];
 
                 foreach ($question->xpath('answers')[0]->xpath('answer') as $answer) {
-                    $answerRow = [];
+                    $answerRow = $this->decompileAnswer($questionRow, $answer);
                 }
+
                 new \Alaress_Probe($question, $questionRow);
             }
 
@@ -75,5 +88,24 @@ class Builder
         }
 
         return $configRow;
+    }
+
+
+    /**
+     * Certain question types were supposed to have serialized answers
+     * These were never really treated like a codec and the handlers
+     * are intertwined with phplibs, which is annoying
+     *
+     * @param array $question
+     * @param \SimpleXMLElement $answer
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    private function decompileAnswer(array $question, \SimpleXMLElement $answer): mixed
+    {
+        /* Quiz only uses types 2, 4 and 5
+         * (6,8,9,10,17 are all Survey)
+         */
+        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answer);
     }
 }

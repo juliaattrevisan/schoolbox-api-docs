@@ -307,7 +307,15 @@ class Controller extends AbstractController
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
+        /* For converting urls
+         */
+        $server = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $domain = (string)$server;
+
+        $strategyFactory = new \Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory($domain);
+
         $result = (new Legacy\Xml\Importer(
+            $strategyFactory,
             $context,
             $this->getUser(),
             $assessmentMapperProxy,
