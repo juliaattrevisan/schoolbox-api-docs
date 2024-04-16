@@ -24,7 +24,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
-use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
+use Schoolbox\Learning\Learnosity\Importer\Legacy;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
@@ -307,14 +307,14 @@ class Controller extends AbstractController
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        $result = (new Builder(
+        $result = (new Legacy\Xml\Importer(
             $context,
             $this->getUser(),
             $assessmentMapperProxy,
             $this->quizMapper,
             $this->workTypeMapper,
             $this->markTypeMapper
-        ))->build($data);
+        ))->import($data);
     }
 
 

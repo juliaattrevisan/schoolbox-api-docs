@@ -15,7 +15,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use SimpleXMLElement;
 
-class Builder
+class Importer
 {
     /**
      * Constructor.
@@ -47,7 +47,7 @@ class Builder
      * @throws Deleted
      * @throws MapperException
      */
-    public function build(string $data): array
+    public function import(string $data): array
     {
         /* Set up a parser to traverse the xml
          */
@@ -63,7 +63,68 @@ class Builder
 
         /* TODO probably display a list of questions and their status, maybe
          */
-        return [];
+        return [
+            'assessment' => $instances['assessment'],
+            'quiz' => $instances['quiz']
+        ];
+    }
+
+
+    /**
+     * Convert raw string of xml $xml into a SimpleXmlElement instance
+     *
+     * @param string $xml
+     * @return SimpleXMLElement
+     */
+    private function prepareXml(string $xml): SimpleXMLElement
+    {
+        $use_errors = libxml_use_internal_errors(true);
+        $result = simplexml_load_string($xml);
+
+        if (!($result instanceof SimpleXMLElement)) {
+            $result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
+        }
+
+        libxml_use_internal_errors($use_errors);
+
+        return $result;
+    }
+
+
+    /**
+     * Returns what version file the user is trying to import.
+     *
+     * Prior to 16.5, no version numbering existed, so assume 16.0
+     *
+     * @param SimpleXMLElement $xml
+     * @return string
+     */
+    protected function detectVersion(SimpleXMLElement $xml): string
+    {
+        $fileVersion = (string)$xml->version;
+
+        return $fileVersion ?: \Evaluation\Import\Parser\Base::FORMAT_VERSION_160;
+    }
+
+
+    /**
+     * Gets a version-dependent parser that knows how to interpret a specific version format, but
+     * respect a consistent API of representing the file's data.
+     *
+     * @param string $data
+     * @return IParser
+     */
+    private function produceParser(string $data): IParser
+    {
+        $xml = $this->prepareXml($data);
+        $version = $this->detectVersion($xml);
+
+        return match ($version) {
+            IParser::FORMAT_VERSION_160 => new \Assess\Import\Parser\V160($xml),
+            IParser::FORMAT_VERSION_165 => new \Assess\Import\Parser\V165($xml),
+            IParser::FORMAT_VERSION_170 => new \Assess\Import\Parser\V170($xml),
+            default => throw new \DomainException('No parser found for version: ' . $version),
+        };
     }
 
 
@@ -149,63 +210,5 @@ class Builder
             'assessment' => $assessment,
             'quiz' => $quiz,
         ];
-    }
-
-
-    /**
-     * Convert raw string of xml $xml into a SimpleXmlElement instance
-     *
-     * @param string $xml
-     * @return SimpleXMLElement
-     */
-    private function prepareXml(string $xml): SimpleXMLElement
-    {
-        $use_errors = libxml_use_internal_errors(true);
-        $result = simplexml_load_string($xml);
-
-        if (!($result instanceof SimpleXMLElement)) {
-            $result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
-        }
-
-        libxml_use_internal_errors($use_errors);
-
-        return $result;
-    }
-
-
-    /**
-     * Returns what version file the user is trying to import.
-     *
-     * Prior to 16.5, no version numbering existed, so assume 16.0
-     *
-     * @param SimpleXMLElement $xml
-     * @return string
-     */
-    protected function detectVersion(SimpleXMLElement $xml): string
-    {
-        $fileVersion = (string)$xml->version;
-
-        return $fileVersion ?: \Evaluation\Import\Parser\Base::FORMAT_VERSION_160;
-    }
-
-
-    /**
-     * Gets a version-dependent parser that knows how to interpret a specific version format, but
-     * respect a consistent API of representing the file's data.
-     *
-     * @param string $data
-     * @return IParser
-     */
-    private function produceParser(string $data): IParser
-    {
-        $xml = $this->prepareXml($data);
-        $version = $this->detectVersion($xml);
-
-        return match ($version) {
-            IParser::FORMAT_VERSION_160 => new \Assess\Import\Parser\V160($xml),
-            IParser::FORMAT_VERSION_165 => new \Assess\Import\Parser\V165($xml),
-            IParser::FORMAT_VERSION_170 => new \Assess\Import\Parser\V170($xml),
-            default => throw new \DomainException('No parser found for version: ' . $version),
-        };
     }
 }
