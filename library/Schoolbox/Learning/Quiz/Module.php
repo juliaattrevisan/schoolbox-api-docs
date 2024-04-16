@@ -92,7 +92,7 @@ class Module extends RestfulModule
             new Rule\IsSuperuser(),
             new Rule\All(
                 $canWrite,
-                new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
+                new IsModifyUnLocked(new LockedChecker($this->getMapperFactory()->get(Term\Mapper::class)))
             )
         );
 
@@ -172,17 +172,6 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
-            $transactor
         );
-    }
-
-
-    /**
-     * @return Term\Mapper
-     * @throws \InvalidArgumentException If unable to find mapper class
-     */
-    private function getTermMapper()
-    {
-        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 }

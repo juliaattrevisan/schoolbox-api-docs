@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
@@ -51,7 +50,6 @@ class Controller extends AbstractController
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper
-     * @param Transactor  $transactor
      */
     public function __construct(
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
@@ -65,7 +63,6 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
-        private Transactor $transactor,
     ) {
         parent::__construct($quizMapper);
     }
