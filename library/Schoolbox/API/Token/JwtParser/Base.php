@@ -11,7 +11,6 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use DomainException;
 use Firebase\JWT as JwtLibrary;
-use Firebase\JWT\Key;
 use InvalidArgumentException;
 use SensitiveParameter;
 use UnexpectedValueException;
@@ -40,22 +39,9 @@ abstract class Base implements IParser
     public bool $bypassIpTracking = false;
 
     /**
-     * Decodes a JWT, and verifies that the JWT has been signed appropriately
-     * and not tampered with.
-     *
-     * @param string               $jwt         The JWT to parse.
-     * @param Key|array<Key>|mixed $keyOrKeySet A key object (or set thereof) to verify the JWT against.
-     * @param int                  $leeway      The amount of clock skew allowance when checking the JWT's time claims.
-     *                                          Allows leeway for:
-     *                                          * nbf (not before)
-     *                                          * iat (issued at)
-     *                                          * exp (expiry)
-     * @return array The claims within the JWT.
-     * @throws Exception\Rejected JWT cannot be decoded for some reason
-     *                            (e.g. the key is not valid for the given JWT,
-     *                            or the signature is invalid)
+     * @inheritdoc
      */
-    protected function decode(#[SensitiveParameter] string $jwt, mixed $keyOrKeySet, int $leeway): array
+    public function decode(#[SensitiveParameter] string $jwt, mixed $keyOrKeySet, int $leeway): array
     {
         // Set leeway for this decode only, set it back once done
         $previousLeeway         = JwtLibrary\JWT::$leeway;
