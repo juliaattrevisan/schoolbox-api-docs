@@ -55,7 +55,7 @@ $joyride-screenfill: rgba(0, 0, 0, 0.5) !default;
             position: absolute;
             top: 0;
             width: 95%;
-            z-index: calc(var(--depth-pop-over) + 2);
+            z-index: calc(var(--depth-intro) + 2);
             #{$default-float}: 2.5%;
         }
 
@@ -171,7 +171,7 @@ $joyride-screenfill: rgba(0, 0, 0, 0.5) !default;
             position: fixed;
             top: 0;
             width: 100%;
-            z-index: calc(var(--depth-pop-over) + 1);
+            z-index: calc(var(--depth-intro) + 1);
             #{$default-float}: 0;
         }
 
@@ -180,7 +180,7 @@ $joyride-screenfill: rgba(0, 0, 0, 0.5) !default;
             border-radius: 3px;
             box-shadow: 0 0 15px $white;
             position: absolute;
-            z-index: var(--depth-pop-over);
+            z-index: var(--depth-intro);
         }
 
         .joyride-expose-cover {
@@ -189,7 +189,7 @@ $joyride-screenfill: rgba(0, 0, 0, 0.5) !default;
             left: 0;
             position: absolute;
             top: 0;
-            z-index: calc(var(--depth-pop-over) + 2);
+            z-index: calc(var(--depth-intro) + 2);
         }
 
         /* Styles for screens that are at least 768px; */

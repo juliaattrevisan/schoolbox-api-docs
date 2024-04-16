@@ -458,7 +458,7 @@ span.loader {
     right: 0;
     top: 0;
     position: fixed;
-    z-index: var(--depth-ui-overlay);
+    z-index: var(--depth-fullscreen);
 
     .loader {
         position: absolute;
