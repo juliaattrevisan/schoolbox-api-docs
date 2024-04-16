@@ -317,8 +317,8 @@ class Controller extends AbstractController
         $result = (new Legacy\Xml\Importer(
             $logger,
             $api,
-            $domain,
             $schoolCode,
+            $domain,
             $this->getDi()->get('databaseInternal'),
             $context,
             $this->getUser(),
