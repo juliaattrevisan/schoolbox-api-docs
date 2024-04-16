@@ -168,6 +168,10 @@ class Module extends RestfulModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
+            new \Schoolbox\Url\Factory($this->getConfig()),
+            (string)$this->getConfig()->get('learnosity_version'),
+            (string)$this->getConfig()->get('learnosity_consumer_key'),
+            (string)$this->getConfig()->get('learnosity_consumer_secret'),
         );
     }
 }

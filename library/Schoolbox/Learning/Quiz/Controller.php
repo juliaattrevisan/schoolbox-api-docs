@@ -8,20 +8,24 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Alaress\Lumberjack\Logger;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -31,6 +35,7 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Url\Factory;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -38,19 +43,31 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 class Controller extends AbstractController
 {
     /**
+     * Our lifeline to learnosity
+     *
+     * @var Api
+     */
+    private \Schoolbox\Learning\Learnosity\Api $api;
+
+
+    /**
      * Constructor.
      *
-     * @param Mapper $quizMapper
-     * @param ErrorMapper $errorMapper
-     * @param QuizSectionMapper $quizSectionMapper
-     * @param QuizQuestionMapper $quizQuestionMapper
-     * @param QuizSolutionMapper $quizSolutionMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
-     * @param QuizAnswerMapper $quizAnswerMapper
-     * @param MapperProxy $assessmentMapperProxy
-     * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param Mapper                                         $quizMapper
+     * @param ErrorMapper                                    $errorMapper
+     * @param QuizSectionMapper                              $quizSectionMapper
+     * @param QuizQuestionMapper                             $quizQuestionMapper
+     * @param QuizSolutionMapper                             $quizSolutionMapper
+     * @param QuizAttemptMapper                              $quizAttemptMapper
+     * @param QuizAnswerMapper                               $quizAnswerMapper
+     * @param MapperProxy                                    $assessmentMapperProxy
+     * @param Mapper                                         $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper
+     * @param MarkTypeMapper                                 $markTypeMapper
+     * @param Factory                                        $urlFactory
+     * @param string                                         $learnosityVersion
+     * @param string                                         $learnosityConsumerKey
+     * @param string                                         $learnosityConsumerSecret
      */
     public function __construct(
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
@@ -64,8 +81,26 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Url\Factory $urlFactory,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         parent::__construct($quizMapper);
+
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+        $this->api = new Api(
+            $urlFactory->buildFullyQualified()->getHost(),
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            $logger
+        );
     }
 
 //    /**
