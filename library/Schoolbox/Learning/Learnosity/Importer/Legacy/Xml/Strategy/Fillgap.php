@@ -38,7 +38,7 @@ class Fillgap extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $answer = $question['_answers'][0]['answer'];
+        $answer = $question['_answers'];
 
         /* We used <span class=selected-word></span> elements to denote our correct
          * answers, whereas Learnosity used {{response}}. Our implementation was almost
@@ -86,6 +86,9 @@ class Fillgap extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }
