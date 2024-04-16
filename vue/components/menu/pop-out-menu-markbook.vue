@@ -59,13 +59,13 @@ const isExpanded = window.Vue.ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
 const hasSubmissions = window.Vue.computed(() =>
-    activityItems.value.some((item) => item.type === "response" && item.submitted)
+    activityItems.value.some((item) => item.type === "response" && item.submitted),
 );
 // has an event of type 'feedback'
 const hasFeedback = window.Vue.computed(() => activityItems.value.some((item) => item.type === "feedback"));
 // has an event of type 'feedback' and feedback.published === false
 const hasDraftFeedback = window.Vue.computed(() =>
-    activityItems.value.some((item) => item.type === "feedback" && item.published === false)
+    activityItems.value.some((item) => item.type === "feedback" && item.published === false),
 );
 // is the user excluded from the assessment
 const isExcluded = window.Vue.ref(false);
@@ -593,12 +593,5 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
             display: flex;
         }
     }
-}
-// Additions to fix the exclude additional reveal-model
-.reveal-modal-bg {
-    z-index: 100002;
-}
-.reveal-modal {
-    z-index: 100003;
 }
 </style>

@@ -302,7 +302,7 @@ export default {
         checkErrorMessage(errorResponseData) {
             if (errorResponseData.hash?.includes("This file exceeds the file size restriction")) {
                 this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
-                    this.recordedData.size
+                    this.recordedData.size,
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
             if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
@@ -513,7 +513,7 @@ export default {
     background: black;
     overflow: hidden;
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
-    z-index: 1;
+    z-index: var(--depth-default);
     h2,
     h3 {
         max-width: none;
@@ -528,7 +528,7 @@ export default {
 }
 
 .component-action {
-    z-index: 2;
+    z-index: calc(var(--depth-default) + 1);
 }
 
 .fade-enter-active,

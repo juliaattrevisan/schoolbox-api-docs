@@ -116,7 +116,7 @@ export default {
         this.$emit("on-pop-out-mounted", this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
         this.isActive = false;
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-        $(document).foundation('tooltip', 'reflow');
+        $(document).foundation("tooltip", "reflow");
     },
 
     beforeUnmount() {
@@ -144,7 +144,9 @@ export default {
          */
         adjustPosition() {
             this.$nextTick(() => {
-                const currentRow = this.$el.parentNode.querySelector('.list-item-container[data-row-id="' + this.selectedRow.id + '"]');
+                const currentRow = this.$el.parentNode.querySelector(
+                    '.list-item-container[data-row-id="' + this.selectedRow.id + '"]',
+                );
                 if (currentRow) {
                     const tableRect = this.$el.parentNode.getBoundingClientRect();
                     const rowRect = currentRow.getBoundingClientRect();
@@ -218,11 +220,7 @@ export default {
                 return;
             }
             const container = this.$refs.innerContainer;
-            if (
-                container &&
-                !container.contains(event.target) &&
-                !event.target.classList.contains("update-button")
-            ) {
+            if (container && !container.contains(event.target) && !event.target.classList.contains("update-button")) {
                 // Clicked outside the "outer-container", discard changes and close the pop out
                 this.onDiscardChangesSelected();
             }
@@ -253,7 +251,12 @@ export default {
                     <label for="select-all">Select All</label>
                 </li>
                 <li v-for="(field, index) in changePopOutFields" :key="index">
-                    <input :id="field.caption" type="checkbox" v-model="selectedRow[field.id]" :disabled="saveRows_isProcessing" />
+                    <input
+                        :id="field.caption"
+                        type="checkbox"
+                        v-model="selectedRow[field.id]"
+                        :disabled="saveRows_isProcessing"
+                    />
                     <label :for="field.caption"
                         >{{ field.caption
                         }}<span
@@ -271,7 +274,7 @@ export default {
                 type="submit"
                 @click.prevent="saveRows_onSaveSelected"
                 :disabled="saveRows_isProcessing"
-                >
+            >
                 {{ saveRows_saveStatus }} {{ headerField.caption }}
             </button>
         </div>
@@ -284,7 +287,7 @@ export default {
 
 .outer-container {
     position: absolute;
-    z-index: 1;
+    z-index: var(--depth-default);
     right: 0px;
     top: 0px;
     width: 320px;
