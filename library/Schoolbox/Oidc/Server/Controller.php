@@ -14,6 +14,7 @@ use Firebase\JWT\Key;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OpenIDConnectServer\ClaimExtractor;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Application\Exception\NotAuthenticated;
@@ -32,16 +33,16 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Server\AuthorizationServer  $authServer The authorization server used to service OIDC auth requests.
-     * @param KeyChainRepositoryInterface $keyChains  Repository of keychains: set up for LTI, but usable outside of
-     *                                                that context.
-     * @param IParser                     $jwtParser  The JWT parser: required for parsing an access token in the
-     *                                                userinfo endpoint.
+     * @param Server\AuthorizationServer  $authServer     The authorization server used to service OIDC auth requests.
+     * @param KeyChainRepositoryInterface $keyChains      Repository of keychains: set up for LTI, but usable outside of
+     *                                                    that context.
+     * @param ClaimExtractor              $claimExtractor Claim extractor: used to filter claims shown in userinfo.
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
         private IParser $jwtParser,
+        private ClaimExtractor $claimExtractor,
     ) {
     }
 
@@ -196,14 +197,21 @@ class Controller extends Base
         }
         [, $accessToken] = $matches;
 
-        // Parse the bearer token, and extract the user out of it
+        // Extract the user out of the access token
+        $user       = $this->jwtParser->determineUser($accessToken);
+        $userEntity = new Entity\User($user, (new Factory($this->getConfigLoader()))->buildFullyQualified());
+
+        // Actually decode the access token,
+        // to determine which scopes the access token allows
         $decodedJwt = $this->jwtParser->decode(
             $accessToken,
             new Key($this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
             (int)$this->getConfigLoader()->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
 
-        // Say something about the user's identity here
-        $this->response = $this->responseAsJson($decodedJwt);
+        // Create a response for the user identified by the access token,
+        // with the claim set allowed in the access token's scopes.
+        $idTokenClaims  = $this->claimExtractor->extract($decodedJwt['scopes'] ?? [], $userEntity->getClaims());
+        $this->response = $this->responseAsJson($idTokenClaims);
     }
 }

@@ -168,6 +168,7 @@ class Module extends BaseModule
             $authServer,
             $this->injector->get('lti.keyChains'),
             $this->injector->get('user.jwtParser'),
+            $claimExtractor,
         );
     }
 }
