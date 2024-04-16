@@ -21,19 +21,19 @@ class Builder
      * Construct a simplified flat array of sections/questions/answers/etc.
      * that represents a legacy quiz, where the data came from an xml file
      *
+     * @param array $instances
      * @param \SimpleXMLElement $xml
      * @return array
      */
-    public function build(\SimpleXMLElement $xml): array
+    public function build(array $instances, \SimpleXMLElement $xml): array
     {
-        /* Final stack
+        /* Augment final stack some facts about assessment instances
          */
         $quiz = [
-            /* A convenience summation to detect quiz size, since
-             * Learnosity has a payload limit this lets us choose
-             * the mose appropriate import strategy to use
-             */
-            'numQuestions' => 0,
+            'quiz_id' => $instances['quiz']->getId(),
+            'assessment_id' => $instances['assessment']->getId(),
+            'title' => $instances['assessment']->getTitle(),
+            'duration' => $instances['assessment']->getDuration(),
             '_sections' => [],
         ];
 
@@ -53,12 +53,12 @@ class Builder
             foreach ($section->xpath('question') as $question) {
                 $questionRow = [
                     '_answers' => [],
-                    'type_id' => trim((string)$question->xpath('typeid')[0]),
+                    'type_id' => (int)trim((string)$question->xpath('typeid')[0]),
                     'marks' => trim((string)$question->xpath('marks')[0]),
                     'config' => $this->decompileQuestionConfig($question),
                     'name' => trim((string)$question->xpath('name')[0]->xpath('text')[0]),
-                    'questiontext' => trim((string)$question->xpath('penalty')[0]),
-                    'penalty' => trim((string)$question->xpath('typeid')[0]),
+                    'question' => trim((string)$question->xpath('questiontext')[0]->xpath('text')[0]),
+                    'penalty' => trim((string)$question->xpath('penalty')[0]),
                 ];
 
                 /* xpath->answers is a one-node set, so you should read this really as $answers[0]
@@ -76,10 +76,6 @@ class Builder
                 /* Add it to the section stack
                  */
                 $sectionRow['_questions'][] = $questionRow;
-
-                /* Remember how many questions we saw here
-                 */
-                $quiz['numQuestions']++;
             }
 
             /* Add it to the quiz stack
