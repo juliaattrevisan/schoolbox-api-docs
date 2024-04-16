@@ -314,35 +314,11 @@ class Controller extends AbstractController
             $logger
         );
 
-        /* Used to make representations of questions and answers
-         */
-        $strategyFactory = new \Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory($domain);
-
-        /* Used to manufacture an array containing all the legacy quiz's contents
-         */
-        $quizBuilder = new Builder($strategyFactory);
-
-        /* Generates sets of tags for Activities' and Items' assignations
-         */
-        $tagFactory = new TagFactory($schoolCode);
-
-        /* A context lookup builder thing for conveniently deriving tags
-        */
-        $contextLookup = new ContextLookup($this->getDi()->get('databaseInternal'), $tagFactory, $logger);
-
-        /* Generates payload array structs
-         */
-        $payloadFactory = new PayloadFactory($strategyFactory);
-
-        /* Generates payload "blueprints" so you can inspect them before committing to
-         * sending them to Learnosity
-         */
-        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $contextLookup, $logger);
-
         $result = (new Legacy\Xml\Importer(
+            $logger,
             $api,
+            $domain,
             $schoolCode,
-            $quizBuilder,
             $this->getDi()->get('databaseInternal'),
             $context,
             $this->getUser(),

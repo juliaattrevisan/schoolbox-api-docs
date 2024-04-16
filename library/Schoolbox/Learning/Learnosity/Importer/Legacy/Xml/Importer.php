@@ -5,6 +5,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 use Alaress\Database\Connector\IConnector;
 use DebugBar\DebugBarException;
 use Evaluation\Import\Parser\IParser;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -28,9 +29,11 @@ class Importer
     /**
      * Constructor.
      *
+     * @param LoggerInterface                 $logger
      * @param Api                             $api
      * @param string                          $schoolCode
-     * @param Factory                         $strategyFactory
+     * @param string                          $domain
+     * @param IConnector                      $databaseInternal
      * @param AssessmentContext               $context
      * @param User                            $user
      * @param AssessmentMapperProxy           $assessmentMapperProxy
@@ -39,9 +42,10 @@ class Importer
      * @param MarkTypeMapper                  $markTypeMapper
      */
     public function __construct(
+        private LoggerInterface $logger,
         private Api $api,
         private string $schoolCode,
-        private Builder $legacyXmlQuizBuilder,
+        private string $domain,
         private IConnector $databaseInternal,
         private AssessmentContext $context,
         private \Schoolbox\User $user,
@@ -81,6 +85,32 @@ class Importer
         /* Traverse the xml, loading each question
          */
         $quiz = $this->legacyXmlQuizBuilder->build($xml);
+
+
+        /* Used to make representations of questions and answers
+         */
+        $strategyFactory = new Strategy\Factory($this->domain);
+
+        /* Used to manufacture an array containing all the legacy quiz's contents
+         */
+        $quizBuilder = new Builder($strategyFactory);
+
+        /* Generates sets of tags for Activities' and Items' assignations
+         */
+        $tagFactory = new TagFactory($this->schoolCode);
+
+        /* A context lookup builder thing for conveniently deriving tags
+        */
+        $contextLookup = new ContextLookup($this->databaseInternal, $tagFactory, $this->logger);
+
+        /* Generates payload array structs
+         */
+        $payloadFactory = new PayloadFactory($strategyFactory);
+
+        /* Generates payload "blueprints" so you can inspect them before committing to
+         * sending them to Learnosity
+         */
+        $blueprintBuilder = new BlueprintBuilder($this->schoolCode, $payloadFactory, $contextLookup, $this->logger);
 
 
         // TODO Continue stealing from ImporterTool
