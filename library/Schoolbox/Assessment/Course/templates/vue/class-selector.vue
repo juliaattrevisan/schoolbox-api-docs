@@ -518,7 +518,7 @@ function onClearAllSelected() {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 10;
+    z-index: var(--depth-pop-over);
     ul {
         list-style: none;
         margin: 0;

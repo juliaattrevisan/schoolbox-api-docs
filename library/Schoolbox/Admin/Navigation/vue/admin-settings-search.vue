@@ -453,7 +453,7 @@ export default {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         position: absolute;
         top: 40px;
-        z-index: 10;
+        z-index: var(--depth-pop-over);
     }
 }
 

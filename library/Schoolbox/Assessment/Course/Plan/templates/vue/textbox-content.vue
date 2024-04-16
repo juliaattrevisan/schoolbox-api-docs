@@ -121,7 +121,7 @@ window.Vue.onMounted(initEditor);
 .editor-content {
     border: 0 !important;
     padding: 8px !important;
-    z-index: auto !important;
+    z-index: auto !important; /* so any content inside the editor sits within the cell and doesn't sit above the View more button */
 }
 
 // Specificity to override the CKEditor border, we handle it in the parent vue component instead

@@ -53,7 +53,7 @@ export default {
                 this.$emit(
                     recordMediaEvents.OVER_MEDIA_MODAL_OPENED,
                     this.$refs.modal.parentElement.offsetWidth,
-                    this.$refs.modal.offsetHeight + 40
+                    this.$refs.modal.offsetHeight + 40,
                 ); //just ensure that the entire message is visible
                 this.hasEmitOpened = true;
             }
@@ -92,7 +92,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 99;
+    z-index: var(--depth-modal);
     width: 100%;
     height: 100%;
     display: flex;

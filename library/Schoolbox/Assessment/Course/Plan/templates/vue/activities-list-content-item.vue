@@ -184,7 +184,7 @@ li[data-sortable-active="true"] .sortable-holder {
     height: 100%;
     position: absolute;
     width: 40px;
-    z-index: 100;
+    z-index: var(--depth-default);
 }
 
 .card.compact {
