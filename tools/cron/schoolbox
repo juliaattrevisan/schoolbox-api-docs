@@ -141,6 +141,33 @@ MAILTO="support@schoolbox.com.au"
 # deploy new credentials: sometime overnight?
 15 0 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/learnosity/deploy-credentials.php -vv >> /var/log/schoolbox/learnosity-deploy-credentials.log 2>&1
 
+# 3:30: Full rebuild (this will also analyze)
+30 3 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --clear >> /var/log/schoolbox/search-build-index.log 2>&1
+
+# 5:30: First incremental build after optimize
+# Build data which wouldn't have been built in the window
+30 5 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-130 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
+
+# 5:35: Restart regular build cadence
+35,40,45,50,55 5 * * * www-data /usr/local/bin/jitter 150 php /usr/share/schoolbox/tools/search/buildIndex.php -p --from="-10 minute" >> /var/log/schoolbox/search-build-index.log 2>&1
+
+# Intellischool
+# sync data every 5min
+*/5 * * * *     www-data    php /usr/share/schoolbox/tools/intellischool/intellischoolSync.php >> /var/log/schoolbox/intellischool.log 2>&1
+
+# Learnosity:
+# restart pending quiz imports every 15 minutes?
+*/15 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/restart-pending.php -p >> /var/log/schoolbox/learnosity-restart-pending.log 2>&1
+
+# poll processing quiz imports every 5 minutes?
+*/5 * * * *     www-data    /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/poll-processing.php -p >> /var/log/schoolbox/learnosity-poll-processing.log 2>&1
+
+# reset failed quiz imports: every 15 minutes?
+*/15 * * * *    www-data    php /usr/share/schoolbox/tools/learnosity/reset-failed.php -p >> /var/log/schoolbox/learnosity-reset-failed.log 2>&1
+
+# deploy new credentials: sometime overnight?
+15 0 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/learnosity/deploy-credentials.php -vv >> /var/log/schoolbox/learnosity-deploy-credentials.log 2>&1
+
 # upload backup to S3 at 01:00
 0 1 * * * root /usr/local/bin/jitter 3600 && /usr/share/schoolbox/tools/upload-backup-to-S3.php >> /var/log/schoolbox/S3-backup.log 2>&1
 

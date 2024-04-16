@@ -17,7 +17,7 @@ use Schoolbox\Mapper;
  *
  * @package Schoolbox\Config
  * @method Config findOneByColumn($columnName, $columnValue, array $options = [])
- * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = [])
  */
 class ConfigMapper extends Mapper
 {
@@ -38,25 +38,25 @@ class ConfigMapper extends Mapper
     public const COL_MODULE      = 'module';
 
     // Module column enum
-    public const MODULE_SETTINGS   = 'settings';
-    public const MODULE_COMMS      = 'comms';
-    public const MODULE_CUSTOM     = 'custom';
-    public const MODULE_OAUTH      = 'oauth';
-    public const MODULE_SCHOOLDATA = 'schoolData';
-    public const MODULE_LTI        = 'lti';
+    public const MODULE_SETTINGS      = 'settings';
+    public const MODULE_COMMS         = 'comms';
+    public const MODULE_CUSTOM        = 'custom';
+    public const MODULE_OAUTH         = 'oauth';
+    public const MODULE_SCHOOLDATA    = 'schoolData';
+    public const MODULE_LTI           = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
-    public const MODULE_EPORTFOLIO = 'eportfolio';
+    public const MODULE_EPORTFOLIO    = 'eportfolio';
 
     // Field enum (kinda)
-    public const FIELD_INPUT         =  1;
-    public const FIELD_TEXT_AREA     =  2;
-    public const FIELD_BOOLEAN       =  3;
-    public const FIELD_SELECT        =  4;
-    public const FIELD_CHECKBOX      =  5;
-    public const FIELD_BYTES         =  6;
-    public const FIELD_SELECT_KEY    =  7;
-    public const FIELD_HTML          =  8;
-    public const FIELD_RESOURCE      =  9;
+    public const FIELD_INPUT         = 1;
+    public const FIELD_TEXT_AREA     = 2;
+    public const FIELD_BOOLEAN       = 3;
+    public const FIELD_SELECT        = 4;
+    public const FIELD_CHECKBOX      = 5;
+    public const FIELD_BYTES         = 6;
+    public const FIELD_SELECT_KEY    = 7;
+    public const FIELD_HTML          = 8;
+    public const FIELD_RESOURCE      = 9;
     public const FIELD_SELECT_LOOKUP = 10;
     public const FIELD_COLOUR        = 11;
     public const FIELD_FILE          = 12;
@@ -69,15 +69,15 @@ class ConfigMapper extends Mapper
     public const FIELD_URI           = 19;
 
     // Type enum
-    public const TYPE_SITE          =  1;
-    public const TYPE_SECURITY      =  2;
-    public const TYPE_PATHS         =  3;
-    public const TYPE_RESOURCES     =  4;
-    public const TYPE_POLICY        =  5;
-    public const TYPE_LOCALISATION  =  6;
-    public const TYPE_EXTERNAL      =  7;
-    public const TYPE_EMAIL         =  8;
-    public const TYPE_COLOURS       =  9;
+    public const TYPE_SITE          = 1;
+    public const TYPE_SECURITY      = 2;
+    public const TYPE_PATHS         = 3;
+    public const TYPE_RESOURCES     = 4;
+    public const TYPE_POLICY        = 5;
+    public const TYPE_LOCALISATION  = 6;
+    public const TYPE_EXTERNAL      = 7;
+    public const TYPE_EMAIL         = 8;
+    public const TYPE_COLOURS       = 9;
     public const TYPE_3RD           = 10;
     public const TYPE_MODULES       = 11;
     public const TYPE_WELCOME       = 13;
@@ -91,13 +91,13 @@ class ConfigMapper extends Mapper
     public const TYPE_SAML          = 21;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
-    public const _GLOBAL_MODERATION              = 'global_moderation';
-    public const _PUBLISH_DATE_OFFSET            = 'publish_date_offset';
-    public const _EXPIRY_DATE_OFFSET             = 'news_default_expiry';
-    public const _READ_MORE                      = 'read_more';
-    public const _SAVE_FOR_LATER                 = 'save_for_later';
-    public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
-    public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
+    public const _GLOBAL_MODERATION           = 'global_moderation';
+    public const _PUBLISH_DATE_OFFSET         = 'publish_date_offset';
+    public const _EXPIRY_DATE_OFFSET          = 'news_default_expiry';
+    public const _READ_MORE                   = 'read_more';
+    public const _SAVE_FOR_LATER              = 'save_for_later';
+    public const _STAFF_CAN_POST_NEWS         = 'news_staff_post_enabled';
+    public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
 //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const COMMS_STATISTICS_ENABLED        = 'comms_statistics_enabled';
@@ -128,16 +128,21 @@ class ConfigMapper extends Mapper
     public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';
     public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
     public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
+    public const NAME_OTFS_S3_CRED_KEY               = 'otfs_s3_cred_key';
+    public const NAME_OTFS_S3_CRED_SECRET            = 'otfs_s3_cred_secret';
+    public const NAME_OTFS_S3_REGION                 = 'otfs_s3_region';
+    public const NAME_OTFS_S3_VERSION                = 'otfs_s3_version';
 
-    public const NAME_MAIL_ENABLED           = 'mail_enable';
-    public const NAME_MAIL_ADDRESS           = 'mail_address';
-    public const NAME_EMAIL_SIGNATURE        = 'email_signature';
-    public const NAME_MAIL_FORCE_FROM_SYSTEM = 'mail_force_from_system';
+
+    public const NAME_MAIL_ENABLED                 = 'mail_enable';
+    public const NAME_MAIL_ADDRESS                 = 'mail_address';
+    public const NAME_EMAIL_SIGNATURE              = 'email_signature';
+    public const NAME_MAIL_FORCE_FROM_SYSTEM       = 'mail_force_from_system';
     public const NAME_MAIL_PASSWORD_CHANGE_FROM    = 'password_change_email_from';
     public const NAME_MAIL_PASSWORD_CHANGE_SUBJECT = 'password_change_email_subject';
-    public const NAME_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
-    public const NAME_MAIL_FROM_ADDRESS      = 'mail_from_address';
-    public const NAME_MAIL_FROM_NAME         = 'mail_from_name';
+    public const NAME_MAIL_SUPPORT_ADDRESS         = 'mail_support_address';
+    public const NAME_MAIL_FROM_ADDRESS            = 'mail_from_address';
+    public const NAME_MAIL_FROM_NAME               = 'mail_from_name';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
@@ -149,43 +154,45 @@ class ConfigMapper extends Mapper
     public const NAME_BADGES_ENABLED                 = 'badges_enabled';
     public const NAME_ACTIVITY_FEED_FEEDBACK_ENABLED = 'activity_feed_feedback_enabled';
 
-    public const NAME_JWT_PUBLIC_KEY  = 'jwt_public_key';
-    public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';
-    public const NAME_JWT_LEEWAY      = 'jwt_leeway';
+    public const NAME_JWT_PUBLIC_KEY   = 'jwt_public_key';
+    public const NAME_JWT_PRIVATE_KEY  = 'jwt_private_key';
+    public const NAME_JWT_LEEWAY       = 'jwt_leeway';
     public const NAME_QR_LOGIN_ENABLED = 'qr_login_enabled';
-    public const NAME_ETHERPAD_HOST   = 'etherpad_host';
+    public const NAME_ETHERPAD_HOST    = 'etherpad_host';
 
-    public const NAME_SITE_PLAN = 'site_plan';
-    public const NAME_SITE_VERSION = 'site_version';
-    public const NAME_SITE_PACKAGE = 'site_package';
-    public const NAME_SITE_DOMAIN = 'site_domain';
-    public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
+    public const NAME_SITE_PLAN                        = 'site_plan';
+    public const NAME_SITE_VERSION                     = 'site_version';
+    public const NAME_SITE_PACKAGE                     = 'site_package';
+    public const NAME_SITE_DOMAIN                      = 'site_domain';
+    public const NAME_SITE_SCHOOL_CODE                 = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
-    public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
+    public const NAME_SITE_STATIC_ASSET_PREFIX         = 'site_static_asset_prefix';
+    public const NAME_SITE_TYPE                        = 'site_type';
+    public const NAME_SITE_ENVIRONMENT                 = 'site_environment';
 
-    public const NAME_GOTENBERG_HOST = 'gotenberg_host';
-    public const NAME_GOTENBERG_API_KEY = 'gotenberg_api_key';
-    public const NAME_GOTENBERG_API_VERSION = 'gotenberg_api_version';
+    public const NAME_GOTENBERG_HOST           = 'gotenberg_host';
+    public const NAME_GOTENBERG_API_KEY        = 'gotenberg_api_key';
+    public const NAME_GOTENBERG_API_VERSION    = 'gotenberg_api_version';
     public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 
-    public const NAME_EPORTFOLIO_ENABLED = 'eportfolio_enabled';
-    public const NAME_EXTERNAL_MARKBOOK = 'external_markbook';
-    public const NAME_CLASS_MARKBOOK_ENABLED = 'class_markbook_enable';
-    public const NAME_COURSE_MARKBOOK_ENABLED = 'course_markbook_enable';
-    public const NAME_RUBRIC_MARKBOOK_ENABLED = 'rubric_markbook_enable';
-    public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
-    public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
-    public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
-    public const NAME_LMS_ENABLED = 'lms_enabled';
+    public const NAME_EPORTFOLIO_ENABLED           = 'eportfolio_enabled';
+    public const NAME_EXTERNAL_MARKBOOK            = 'external_markbook';
+    public const NAME_CLASS_MARKBOOK_ENABLED       = 'class_markbook_enable';
+    public const NAME_COURSE_MARKBOOK_ENABLED      = 'course_markbook_enable';
+    public const NAME_RUBRIC_MARKBOOK_ENABLED      = 'rubric_markbook_enable';
+    public const NAME_PASTORAL_ENABLED             = 'pastoral_enabled';
+    public const NAME_NOTIFICATIONS_ENABLED        = 'messaging_enabled';
+    public const NAME_MOBILE_PUSH_NOTIF_ENABLED    = 'push_notifications_enabled';
+    public const NAME_LMS_ENABLED                  = 'lms_enabled';
     public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
-    public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
+    public const NAME_LTI_ASSESSMENTS_ENABLE       = 'lti_assessments_enable';
 
-    public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
-    public const NAME_RESOURCE_BOOKING_ENABLED = 'resource_booking_enabled';
-    public const NAME_FIXTURES_ENABLED = 'fixtures_enabled';
-    public const NAME_TOURS_ENABLED = 'tours_enabled';
+    public const NAME_ASSESSMENT_CALENDAR_ENABLED      = 'assessment_calendar_enabled';
+    public const NAME_RESOURCE_BOOKING_ENABLED         = 'resource_booking_enabled';
+    public const NAME_FIXTURES_ENABLED                 = 'fixtures_enabled';
+    public const NAME_TOURS_ENABLED                    = 'tours_enabled';
     public const NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED = 'external_document_report_enabled';
 
     public const NAME_WEBDAV_ENABLED         = 'webdav_enable';
@@ -193,7 +200,7 @@ class ConfigMapper extends Mapper
     public const NAME_GOOGLEDRIVE_EXPORT_PDF = 'googledrive_export_pdf';
     public const NAME_GOOGLEAPPS_API_KEY     = 'googleapps_api_key';
     public const NAME_GOOGLEAPPS_CLIENT_ID   = 'googleapps_client_id';
-    public const NAME_MAX_FILE_SIZE = 'max_file_size';
+    public const NAME_MAX_FILE_SIZE          = 'max_file_size';
 
     public const NAME_LMS_SEB_ENABLED = 'lms_seb_enable';
 
@@ -204,14 +211,14 @@ class ConfigMapper extends Mapper
     public const NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL         = 'intellischool_cohort_dashboard_base_url';
 
     public const NAME_PASTORAL_FLAG_COUNT_PERIOD = 'pastoral_flag_count_period';
-    public const NAME_PASTORAL_SEVERITY_ENABLED = 'pastoral_severity';
-    public const NAME_PASTORAL_ACTION_ENABLED = 'pastoral_action_enable';
-    public const NAME_EXTERNAL_PASTORAL = 'external_pastoral';
-    public const NAME_PASTORAL_EXTERNAL_DELETE = 'pastoral_external_delete';
-    public const NAME_SHOW_ATTENDANCE_FLAGS = 'show_attendance_flags';
-    public const NAME_PASTORAL_EXTERNAL_UPLOAD = 'external_pastoral_upload';
+    public const NAME_PASTORAL_SEVERITY_ENABLED  = 'pastoral_severity';
+    public const NAME_PASTORAL_ACTION_ENABLED    = 'pastoral_action_enable';
+    public const NAME_EXTERNAL_PASTORAL          = 'external_pastoral';
+    public const NAME_PASTORAL_EXTERNAL_DELETE   = 'pastoral_external_delete';
+    public const NAME_SHOW_ATTENDANCE_FLAGS      = 'show_attendance_flags';
+    public const NAME_PASTORAL_EXTERNAL_UPLOAD   = 'external_pastoral_upload';
 
-    public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
+    public const NAME_PASTORAL_PARENT_ACCESS_ENABLED  = 'pastoral_parent_access';
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
 
     public const NAME_REPORT_TITLE = 'report_title';
@@ -219,8 +226,8 @@ class ConfigMapper extends Mapper
     public const NAME_REDIS_URL = 'redis_url';
 
     public const NAME_REDIS_EPHEMERAL_URL = 'redis_ephemeral_url';
-    public const NAME_TASKD_REDIS_URL = 'taskd_redis_url';
-    public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
+    public const NAME_TASKD_REDIS_URL     = 'taskd_redis_url';
+    public const NAME_TASKD_REDIS_QUEUE   = 'taskd_redis_queue';
 
     public const NAME_SCHOOLDATA_IMPORT_DATA_SOURCE = 'schooldata_import_data_source';
 
@@ -228,61 +235,62 @@ class ConfigMapper extends Mapper
 
     public const NAME_GROUP_STAFF_ONLY = 'group_staff_only';
 
-    public const NAME_NAME_FORMAT = 'name_format';
+    public const NAME_NAME_FORMAT           = 'name_format';
     public const NAME_INSTANCE_REGISTRY_URL = 'instance_registry_url';
     public const NAME_START_OF_SCHOOL_YEAR  = 'start_of_school_year';
 
     /**
      * Skin Config Fields
      */
-    public const NAME_HOMEPAGE_COLOUR_HEAD_FONT = 'homepage_colour_head_font';
-    public const NAME_HOMEPAGE_COLOUR_HEAD_BG = 'homepage_colour_head_bg';
-    public const NAME_HOMEPAGE_COLOUR_FONT = 'homepage_colour_font';
-    public const NAME_HOMEPAGE_COLOUR_BG_PRIMARY = 'homepage_colour_bg_primary';
-    public const NAME_SKIN_COLOUR_NAVIGATION_FOREGROUND = 'skin_colour_navigation_foreground';
-    public const NAME_SKIN_COLOUR_NAVIGATION_BACKGROUND = 'skin_colour_navigation_background';
-    public const NAME_SKIN_COLOUR_NAVIGATION_HOVER = 'skin_colour_navigation_hover';
-    public const NAME_SKIN_COLOUR_OFFCANVAS_FOREGROUND = 'skin_colour_offcanvas_foreground';
-    public const NAME_SKIN_COLOUR_OFFCANVAS_BACKGROUND = 'skin_colour_offcanvas_background';
-    public const NAME_SKIN_COLOUR_OFFCANVAS_HOVER = 'skin_colour_offcanvas_hover';
-    public const NAME_ACCOUNTS_MENU_BG_COLOUR = 'accounts_menu_bg_colour';
-    public const NAME_SKIN_COLOUR_CONTENT_UI_FOREGROUND = 'skin_colour_content_ui_foreground';
-    public const NAME_SKIN_COLOUR_CONTENT_UI_BACKGROUND = 'skin_colour_content_ui_background';
-    public const NAME_SKIN_COLOUR_CONTENT_UI_HOVER = 'skin_colour_content_ui_hover';
-    public const NAME_SKIN_COLOUR_CONTENT_UI_SELECTED = 'skin_colour_content_ui_selected';
+    public const NAME_HOMEPAGE_COLOUR_HEAD_FONT                = 'homepage_colour_head_font';
+    public const NAME_HOMEPAGE_COLOUR_HEAD_BG                  = 'homepage_colour_head_bg';
+    public const NAME_HOMEPAGE_COLOUR_FONT                     = 'homepage_colour_font';
+    public const NAME_HOMEPAGE_COLOUR_BG_PRIMARY               = 'homepage_colour_bg_primary';
+    public const NAME_SKIN_COLOUR_NAVIGATION_FOREGROUND        = 'skin_colour_navigation_foreground';
+    public const NAME_SKIN_COLOUR_NAVIGATION_BACKGROUND        = 'skin_colour_navigation_background';
+    public const NAME_SKIN_COLOUR_NAVIGATION_HOVER             = 'skin_colour_navigation_hover';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_FOREGROUND         = 'skin_colour_offcanvas_foreground';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_BACKGROUND         = 'skin_colour_offcanvas_background';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_HOVER              = 'skin_colour_offcanvas_hover';
+    public const NAME_ACCOUNTS_MENU_BG_COLOUR                  = 'accounts_menu_bg_colour';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_FOREGROUND        = 'skin_colour_content_ui_foreground';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_BACKGROUND        = 'skin_colour_content_ui_background';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_HOVER             = 'skin_colour_content_ui_hover';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_SELECTED          = 'skin_colour_content_ui_selected';
     public const NAME_SKIN_COLOUR_CONTENT_UI_SUBMIT_FOREGROUND = 'skin_colour_content_ui_submit_foreground';
     public const NAME_SKIN_COLOUR_CONTENT_UI_SUBMIT_BACKGROUND = 'skin_colour_content_ui_submit_background';
-    public const NAME_SKIN_COLOUR_ACCENT_FOREGROUND = 'skin_colour_accent_foreground';
-    public const NAME_SKIN_COLOUR_ACCENT_BACKGROUND = 'skin_colour_accent_background';
-    public const NAME_SKIN_COLOUR_ACCENT_HOVER = 'skin_colour_accent_hover';
-    public const NAME_SKIN_COLOUR_LOGO_BACKGROUND = 'skin_colour_logo_background';
-    public const NAME_SKIN_COLOUR_BODY_BG = 'skin_colour_body_bg';
-    public const NAME_SKIN_LOGO_SQUARE = 'skin_logo_square';
-    public const NAME_SKIN_LOGO_LARGE = 'skin_logo_large';
-    public const NAME_SKIN_LOGO_LOGIN = 'skin_logo_login';
-    public const NAME_SKIN_LOGIN_BG = 'skin_login_bg';
-    public const NAME_SKIN_CUSTOM_CSS = 'skin_custom_css';
-    public const NAME_SKIN_COLOUR_LOGIN_BACKGROUND = 'skin_colour_login_background';
-    public const NAME_SKIN_COLOUR_FORM_INPUT_BORDER_COLOR = 'skin_colour_form_input_border_color';
-    public const NAME_SKIN_COLOUR_FORM_BACKGROUND_HOVER_COLOR = 'skin_colour_form_background_hover_color';
-    public const NAME_ACCOUNTS_MENU_TEXT_COLOUR = 'accounts_menu_text_colour';
-    public const NAME_ACCOUNTS_MENU_HOVER_COLOUR = 'accounts_menu_hover_colour';
-    public const NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
-    public const NAME_SKIN_FAVICON = 'skin_favicon';
+    public const NAME_SKIN_COLOUR_ACCENT_FOREGROUND            = 'skin_colour_accent_foreground';
+    public const NAME_SKIN_COLOUR_ACCENT_BACKGROUND            = 'skin_colour_accent_background';
+    public const NAME_SKIN_COLOUR_ACCENT_HOVER                 = 'skin_colour_accent_hover';
+    public const NAME_SKIN_COLOUR_LOGO_BACKGROUND              = 'skin_colour_logo_background';
+    public const NAME_SKIN_COLOUR_BODY_BG                      = 'skin_colour_body_bg';
+    public const NAME_SKIN_LOGO_SQUARE                         = 'skin_logo_square';
+    public const NAME_SKIN_LOGO_LARGE                          = 'skin_logo_large';
+    public const NAME_SKIN_LOGO_LOGIN                          = 'skin_logo_login';
+    public const NAME_SKIN_LOGIN_BG                            = 'skin_login_bg';
+    public const NAME_SKIN_CUSTOM_CSS                          = 'skin_custom_css';
+    public const NAME_SKIN_COLOUR_LOGIN_BACKGROUND             = 'skin_colour_login_background';
+    public const NAME_SKIN_COLOUR_FORM_INPUT_BORDER_COLOR      = 'skin_colour_form_input_border_color';
+    public const NAME_SKIN_COLOUR_FORM_BACKGROUND_HOVER_COLOR  = 'skin_colour_form_background_hover_color';
+    public const NAME_ACCOUNTS_MENU_TEXT_COLOUR                = 'accounts_menu_text_colour';
+    public const NAME_ACCOUNTS_MENU_HOVER_COLOUR               = 'accounts_menu_hover_colour';
+    public const NAME_EMAIL_BANNER_IMAGE                       = 'email_banner_image';
+    public const NAME_SKIN_FAVICON                             = 'skin_favicon';
 
     /* Directories
      */
-    public const NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
+    public const NAME_REPORT_STAFF_ACCESS            = 'report_staff_access';
     public const NAME_REPORT_STAFF_DIRECTORY_ENABLED = 'staff_directory_enabled';
+    public const NAME_BACKUP_DIR                     = 'backup_dir';
 
     /**
      * Isams specific
      */
-    public const EXTERNAL_ISAMS_REST_API_HOST = 'external_isams_rest_api_host';
-    public const EXTERNAL_ISAMS_REST_API_CLIENT_ID = 'external_isams_rest_api_client_id';
+    public const EXTERNAL_ISAMS_REST_API_HOST          = 'external_isams_rest_api_host';
+    public const EXTERNAL_ISAMS_REST_API_CLIENT_ID     = 'external_isams_rest_api_client_id';
     public const EXTERNAL_ISAMS_REST_API_CLIENT_SECRET = 'external_isams_rest_api_client_secret';
-    public const EXTERNAL_ISAMS_STUDENT_REGISTERS = 'external_isams_student_registers';
-    public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
+    public const EXTERNAL_ISAMS_STUDENT_REGISTERS      = 'external_isams_student_registers';
+    public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS    = 'external_isams_financial_registers';
 
     /**
      * Config settings which may affect the behaviour of the router daemon.
@@ -296,7 +304,7 @@ class ConfigMapper extends Mapper
         'feedback_url',
         'feedback_text',
         self::NAME_MAIL_FORCE_FROM_SYSTEM,
-        self::NAME_MAIL_ENABLED
+        self::NAME_MAIL_ENABLED,
     ];
 
     /**
@@ -317,7 +325,7 @@ class ConfigMapper extends Mapper
      *
      * If any of these settings change: rebuild the route and module tables.
      */
-    public const SETTINGS_AFFECTING_MODULES    = [
+    public const SETTINGS_AFFECTING_MODULES = [
         self::NAME_LMS_ENABLED,
         self::NAME_PASTORAL_ENABLED,
         self::NAME_LEARNING_MOMENTS_ENABLED,
@@ -347,8 +355,8 @@ class ConfigMapper extends Mapper
         self::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS,
         self::NAME_OAUTH_ISSUER,
         self::NAME_OAUTH_ENABLE_SSO,
-//        self::NAME_OAUTH_SSO_IP_BLACKLIST,
-//        self::NAME_OAUTH_SSO_IP_WHITELIST,
+        //        self::NAME_OAUTH_SSO_IP_BLACKLIST,
+        //        self::NAME_OAUTH_SSO_IP_WHITELIST,
     ];
 
     /**
@@ -375,7 +383,15 @@ class ConfigMapper extends Mapper
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             null,
-            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA, self::MODULE_LTI, self::MODULE_REPORT_EXPORT]
+            [
+                self::MODULE_SETTINGS,
+                self::MODULE_COMMS,
+                self::MODULE_CUSTOM,
+                self::MODULE_OAUTH,
+                self::MODULE_SCHOOLDATA,
+                self::MODULE_LTI,
+                self::MODULE_REPORT_EXPORT,
+            ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
@@ -400,7 +416,7 @@ class ConfigMapper extends Mapper
      */
     public function findTypeList(): array
     {
-        $query = "
+        $query     = "
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}
             INNER JOIN lu_config_type ON config.type_id  = lu_config_type.id
@@ -445,7 +461,7 @@ class ConfigMapper extends Mapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $config = $this->hydrate($row);
-            $type = $this->hydrateJoin($row, 'type', 'lct');
+            $type   = $this->hydrateJoin($row, 'type', 'lct');
             if ($type instanceof Type\Model) {
                 $config->setType($type);
             }
@@ -464,7 +480,7 @@ class ConfigMapper extends Mapper
      *
      * @param object $object
      * @param string $verb
-     * @param null $previous
+     * @param null   $previous
      * @return void
      */
     protected function raiseNotification($object, $verb, $previous = null)
