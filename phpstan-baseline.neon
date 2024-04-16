@@ -3681,11 +3681,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:getAssessmentContext\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessmentContextDataModel but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:getWeight\\(\\) should return int but returns float\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php

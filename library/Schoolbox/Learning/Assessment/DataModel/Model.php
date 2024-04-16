@@ -285,9 +285,9 @@ class Model implements ISoftDeletable
     /**
      * Helper method for getting this assessment data model's context.
      *
-     * @return IAssessmentContextDataModel
+     * @return null|IAssessmentContextDataModel
      */
-    public function getAssessmentContext()
+    public function getAssessmentContext(): ?IAssessmentContextDataModel
     {
         $folder   = $this->getContextFolder();
         $unitSpec = $this->getContextUnitSpecification();
