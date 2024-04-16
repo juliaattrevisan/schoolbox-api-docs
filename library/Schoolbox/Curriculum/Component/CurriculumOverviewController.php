@@ -23,6 +23,10 @@ use Schoolbox\Resource\Folder;
 class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Default component name as specified in component_config_definition
+     */
+    const DEFAULT_COMPONENT_HEADING = 'Curriculum Overview';
+    /**
      * The curriculum to display in this component, compiled into a tree
      * structure which contains the entire curriculum minus any nodes which are
      * neither ancestors nor descendants of this folder's nodes.

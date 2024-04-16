@@ -153,6 +153,67 @@ class Controller extends Base
         $units = [];
 
         /**
+         * Grab the list of curriculum components from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = CurriculumOverviewController::class;
+        $curriculumnTemplate = [];
+        $curriculumnKey = [];
+        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+
+        foreach ($unitCurricComp as $curricComponent) {
+            if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $curricComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CurriculumOverviewController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+            // The frontend will use this to determine whether the textbox needs to be created or not.
+            // This saves needing to manipulate the initial data on the frontend on the first mount
+            $curriculumnTemplate[] = [
+                'heading' => $heading,
+                'filter' => $this->nodeMapper->findOneByColumnList(['id' => $curricComponent->getConfigByKey('curriculumTreeFilter'), 'enabled' => true,])
+            ];
+            $curriculumnKey[] = strtolower($heading);
+        }
+
+        /**
+         * Grab the list of textbox components from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = TextboxComponentController::class;
+        $textboxTemplate = [];
+        $textboxKey = [];
+        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+
+        foreach ($unitTextboxComp as $textboxComponent) {
+            if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+            // The frontend will use this to determine whether the textbox needs to be created or not.
+            // This saves needing to manipulate the initial data on the frontend on the first mount
+            $textboxTemplate[] = [
+                'heading' => $heading,
+            ];
+            $textboxKey[] = strtolower($heading);
+        }
+
+        /**
          * for each unit, generate the data...
          *
          * Maybe one day we can separate textboxData, assessments, rubricData, etc.
@@ -220,6 +281,7 @@ class Controller extends Base
                     'componentId' => $component->getId(),
                     'heading' => $instanceConfig['componentname']['value'],
                     'filter' => $instanceConfig['curriculumTreeFilter']['value'],
+                    'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
                 ];
             }
 
@@ -297,7 +359,11 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'activityTypeLocale' => $activityTypeLocale
+            'locale' => $locale,
+            'template'  => [
+                'textboxes' => $textboxTemplate,
+                'curriculum' => $curriculumnTemplate,
+            ]
         ], "Unit Planner - {$course->getTitle()}");
     }
 
