@@ -9,13 +9,15 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Aura\Router\Exception\RouteNotFound;
+use League\Flysystem\FilesystemException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -37,25 +39,6 @@ use Schoolbox\Resource\Exception;
  */
 class Controller extends AbstractController
 {
-    /** @var ErrorMapper */
-    private $errorMapper;
-
-    /** @var QuizSectionMapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestionMapper */
-    private $quizQuestionMapper;
-
-    /** @var QuizSolutionMapper */
-    private $quizSolutionMapper;
-
-    /** @var QuizAttemptMapper */
-    private $quizAttemptMapper;
-
-    /** @var QuizAnswerMapper */
-    private $quizAnswerMapper;
-
-
     /**
      * Constructor.
      *
@@ -73,24 +56,18 @@ class Controller extends AbstractController
      */
     public function __construct(
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        ErrorMapper $errorMapper,
-        QuizSectionMapper $quizSectionMapper,
-        QuizQuestionMapper $quizQuestionMapper,
-        QuizSolutionMapper $quizSolutionMapper,
-        QuizAttemptMapper $quizAttemptMapper,
-        QuizAnswerMapper $quizAnswerMapper,
+        private ErrorMapper $errorMapper,
+        private QuizSectionMapper $quizSectionMapper,
+        private QuizQuestionMapper $quizQuestionMapper,
+        private QuizSolutionMapper $quizSolutionMapper,
+        private QuizAttemptMapper $quizAttemptMapper,
+        private QuizAnswerMapper $quizAnswerMapper,
         private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private Transactor $transactor,
     ) {
         parent::__construct($quizMapper);
-        $this->errorMapper = $errorMapper;
-        $this->quizSectionMapper = $quizSectionMapper;
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        $this->quizSolutionMapper = $quizSolutionMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
-        $this->quizAnswerMapper = $quizAnswerMapper;
     }
 
 //    /**
@@ -249,9 +226,11 @@ class Controller extends AbstractController
      * @param AssessmentContext $context
      * @return void
      * @throws Deleted
-     * @throws Exception
      * @throws MapperException
-     * @throws RouteNotFound
+     * @throws FilesystemException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function postLegacyQuizImport(AssessmentContext $context): void
     {
@@ -290,7 +269,7 @@ class Controller extends AbstractController
                 ))->build($data);
             }
         } catch (\Schoolbox\Resource\Exception $e) {
-//            error(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
     }
 
