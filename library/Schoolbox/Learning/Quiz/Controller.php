@@ -24,7 +24,12 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
+use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\Legacy;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
+use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
@@ -41,31 +46,23 @@ use Schoolbox\Url\Factory;
 class Controller extends AbstractController
 {
     /**
-     * Our lifeline to learnosity
-     *
-     * @var Api
-     */
-    private \Schoolbox\Learning\Learnosity\Api $api;
-
-
-    /**
      * Constructor.
      *
-     * @param Mapper                                         $quizMapper
-     * @param ErrorMapper                                    $errorMapper
-     * @param QuizSectionMapper                              $quizSectionMapper
-     * @param QuizQuestionMapper                             $quizQuestionMapper
-     * @param QuizSolutionMapper                             $quizSolutionMapper
-     * @param QuizAttemptMapper                              $quizAttemptMapper
-     * @param QuizAnswerMapper                               $quizAnswerMapper
-     * @param AssessmentMapperProxy                          $assessmentMapperProxy
-     * @param Mapper                                         $projectResultCacheMapper
-     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
-     * @param MarkTypeMapper                                 $markTypeMapper
-     * @param Factory                                        $urlFactory
-     * @param string                                         $learnosityVersion
-     * @param string                                         $learnosityConsumerKey
-     * @param string                                         $learnosityConsumerSecret
+     * @param \Schoolbox\Learning\Quiz\Mapper                           $quizMapper
+     * @param ErrorMapper                                               $errorMapper
+     * @param QuizSectionMapper                                         $quizSectionMapper
+     * @param QuizQuestionMapper                                        $quizQuestionMapper
+     * @param QuizSolutionMapper                                        $quizSolutionMapper
+     * @param QuizAttemptMapper                                         $quizAttemptMapper
+     * @param QuizAnswerMapper                                          $quizAnswerMapper
+     * @param AssessmentMapperProxy                                     $assessmentMapperProxy
+     * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
+     * @param MarkTypeMapper                                            $markTypeMapper
+     * @param Factory                                                   $urlFactory
+     * @param string                                                    $learnosityVersion
+     * @param string                                                    $learnosityConsumerKey
+     * @param string                                                    $learnosityConsumerSecret
      */
     public function __construct(
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
@@ -85,20 +82,6 @@ class Controller extends AbstractController
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         parent::__construct($quizMapper);
-
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
-         */
-        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
-
-        $this->api = new Api(
-            $urlFactory->buildFullyQualified()->getHost(),
-            $this->learnosityVersion,
-            $this->learnosityConsumerKey,
-            $this->learnosityConsumerSecret,
-            $logger
-        );
     }
 
 //    /**
@@ -307,15 +290,60 @@ class Controller extends AbstractController
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+        /* Used to segregate each school's data; used in tags and author identifiers
+         */
+        $schoolCode = $this->getConfigLoader()->get('site_school_code');
+
         /* For converting urls
          */
         $server = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $serverName = $server->getHost();
         $domain = (string)$server;
 
+        $api = new Api(
+            $serverName,
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            $logger
+        );
+
+        /* Used to make representations of questions and answers
+         */
         $strategyFactory = new \Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory($domain);
 
+        /* Used to manufacture an array containing all the legacy quiz's contents
+         */
+        $quizBuilder = new Builder($strategyFactory);
+
+        /* Generates sets of tags for Activities' and Items' assignations
+         */
+        $tagFactory = new TagFactory($schoolCode);
+
+        /* A context lookup builder thing for conveniently deriving tags
+        */
+        $contextLookup = new ContextLookup($this->getDi()->get('databaseInternal'), $tagFactory, $logger);
+
+        /* Generates payload array structs
+         */
+        $payloadFactory = new PayloadFactory($strategyFactory);
+
+        /* Generates payload "blueprints" so you can inspect them before committing to
+         * sending them to Learnosity
+         */
+        $blueprintBuilder = new BlueprintBuilder($schoolCode, $payloadFactory, $contextLookup, $logger);
+
         $result = (new Legacy\Xml\Importer(
-            $strategyFactory,
+            $api,
+            $schoolCode,
+            $quizBuilder,
+            $this->getDi()->get('databaseInternal'),
             $context,
             $this->getUser(),
             $assessmentMapperProxy,

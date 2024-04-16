@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
+use Alaress\Database\Connector\IConnector;
 use DebugBar\DebugBarException;
 use Evaluation\Import\Parser\IParser;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -10,7 +11,12 @@ use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
+use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
+use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -22,6 +28,8 @@ class Importer
     /**
      * Constructor.
      *
+     * @param Api                             $api
+     * @param string                          $schoolCode
      * @param Factory                         $strategyFactory
      * @param AssessmentContext               $context
      * @param User                            $user
@@ -31,7 +39,10 @@ class Importer
      * @param MarkTypeMapper                  $markTypeMapper
      */
     public function __construct(
-        private Strategy\Factory $strategyFactory,
+        private Api $api,
+        private string $schoolCode,
+        private Builder $legacyXmlQuizBuilder,
+        private IConnector $databaseInternal,
         private AssessmentContext $context,
         private \Schoolbox\User $user,
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -67,9 +78,12 @@ class Importer
          */
         $instances = $this->buildAssessment($parser);
 
-        /* TODO Traverse the xml, loading each question
+        /* Traverse the xml, loading each question
          */
-        $builder = (new Builder($this->strategyFactory))->build($xml);
+        $quiz = $this->legacyXmlQuizBuilder->build($xml);
+
+
+        // TODO Continue stealing from ImporterTool
 
         /* TODO probably display a list of questions and their status, maybe
          */
