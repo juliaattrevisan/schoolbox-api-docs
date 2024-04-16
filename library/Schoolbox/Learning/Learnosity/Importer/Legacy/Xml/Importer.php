@@ -49,9 +49,13 @@ class Importer
      */
     public function import(string $data): array
     {
+        /* We need to use this later
+         */
+        $xml = $this->prepareXml($data);
+
         /* Set up a parser to traverse the xml
          */
-        $parser = $this->produceParser($data);
+        $parser = $this->produceParser($xml);
 
         /* Produce IAssessable and quiz subobject instances into an array for convenience
          * (these are already persisted in the db)
@@ -60,6 +64,8 @@ class Importer
 
         /* TODO Traverse the xml, loading each question
          */
+        $builder = (new Builder())->build($xml);
+
 
         /* TODO probably display a list of questions and their status, maybe
          */
@@ -111,12 +117,11 @@ class Importer
      * Gets a version-dependent parser that knows how to interpret a specific version format, but
      * respect a consistent API of representing the file's data.
      *
-     * @param string $data
+     * @param \SimpleXmlElement $xml
      * @return IParser
      */
-    private function produceParser(string $data): IParser
+    private function produceParser(\SimpleXmlElement $xml): IParser
     {
-        $xml = $this->prepareXml($data);
         $version = $this->detectVersion($xml);
 
         return match ($version) {
