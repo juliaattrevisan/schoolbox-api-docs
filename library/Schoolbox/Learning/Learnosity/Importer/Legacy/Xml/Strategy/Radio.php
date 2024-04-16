@@ -123,9 +123,6 @@ class Radio extends Base implements IStrategy
             ];
         }
 
-        /* Randomise option order
-         * This was a configuration setting in legacy quiz
-         */
         return [
             'answers' => $options,
             /* Sometimes config options are found here, and need to be move dup
