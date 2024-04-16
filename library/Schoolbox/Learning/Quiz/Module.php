@@ -16,7 +16,6 @@ use Schoolbox\Application\Exception\NotFound;;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
@@ -157,9 +156,6 @@ class Module extends RestfulModule
      */
     public function buildController(): Base
     {
-        /** @var Transactor $transactor */
-        $transactor = $this->injector->get('transactor');
-
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
