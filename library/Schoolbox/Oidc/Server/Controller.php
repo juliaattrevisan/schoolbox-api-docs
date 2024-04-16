@@ -14,9 +14,9 @@ use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
-use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 use Schoolbox\Url\Factory;
 
 /**
@@ -33,10 +33,13 @@ class Controller extends Base
      * @param Server\AuthorizationServer  $authServer The authorization server used to service OIDC auth requests.
      * @param KeyChainRepositoryInterface $keyChains  Repository of keychains: set up for LTI, but usable outside of
      *                                                that context.
+     * @param IParser                     $jwtParser  The JWT parser: required for parsing an access token in the
+     *                                                userinfo endpoint.
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
+        private IParser $jwtParser,
     ) {
     }
 
@@ -147,6 +150,7 @@ class Controller extends Base
             'issuer'                                => $baseUrl,
             'authorization_endpoint'                => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAuthorization')),
             'token_endpoint'                        => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getAccessTokenRequest')),
+            'userinfo_endpoint'                     => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getUserinfo')),
             'jwks_uri'                              => $baseUrl->withPath($this->routeGenerator->generate('oidcServer.getJsonWebKeySet')),
             'scopes_supported'                      => Repository\Scope::AVAILABLE_SCOPES,
             'response_types_supported'              => ['code', 'id_token', 'id_token token'],
@@ -173,5 +177,27 @@ class Controller extends Base
         $this->response = $this->responseAsJson(
             $jwksExporter->export(RepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME),
         );
+    }
+
+    /**
+     * Userinfo endpoint: get an identity for the user from the access token.
+     *
+     * @api   GET /oidc/userinfo
+     * @since 24.0
+     */
+    public function getUserinfo(): void
+    {
+        $authHeader = $this->request->getHeaderLine('authorization');
+        preg_match('/^Bearer\\s+(.*)/i', $authHeader, $matches);
+        if (!$matches) {
+            $this->sendJsonError('Access token must be provided as a Bearer token', 400);
+        }
+        [, $accessToken] = $matches;
+
+        // Parse the bearer token, and extract the user out of it
+        $user = $this->jwtParser->determineUser($accessToken);
+
+        // Say something about the user's identity here
+        $this->response = $this->responseAsJson($user);
     }
 }

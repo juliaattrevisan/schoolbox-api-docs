@@ -58,6 +58,7 @@ class Module extends BaseModule
         // well-known URLs: JWKS, configuration
         $this->register(self::METHOD_GET, '/.well-known/openid-configuration', 'getOpenIdConfiguration');
         $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
+        $this->register(self::METHOD_GET, '/oidc/userinfo', 'getUserinfo');
     }
 
     /**
@@ -166,6 +167,7 @@ class Module extends BaseModule
         return new Controller(
             $authServer,
             $this->injector->get('lti.keyChains'),
+            $this->injector->get('user.jwtParser'),
         );
     }
 }
