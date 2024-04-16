@@ -9,6 +9,15 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 class Builder
 {
     /**
+     * Our BlueprintBuilder uses section_id and question_id fields for its
+     * logging; we don't have any such ids when we're manufacturing from
+     * an xml file, so use this to maintain compatibility (it doesn't mean
+     * anything in the xml context, anyways)
+     */
+    private const ID_PLACEHOLDER = 'derived from xml';
+
+
+    /**
      * Constructor.
      *
      * @param Strategy\Factory $strategyFactory
@@ -30,7 +39,7 @@ class Builder
         /* Augment final stack some facts about assessment instances
          */
         $quiz = [
-            'quiz_id' => $instances['quiz']->getId(),
+            'assess_id' => $instances['quiz']->getId(),
             'assessment_id' => $instances['assessment']->getId(),
             'title' => $instances['assessment']->getTitle(),
             'duration' => $instances['assessment']->getDuration(),
@@ -41,24 +50,26 @@ class Builder
          */
         foreach ($xml->xpath('section') as $section) {
             $sectionRow = [
-                '_questions' => [],
+                'section_id' => self::ID_PLACEHOLDER,
                 'title' => trim((string)$section->xpath('title')[0]),
                 'description' => trim((string)$section->xpath('description')[0]),
                 'random' => trim((string)$section->xpath('random')[0]),
-                'pool' => trim((string)$section->xpath('pool')[0])
+                'pool' => trim((string)$section->xpath('pool')[0]),
+                '_questions' => [],
             ];
 
             /* Get each section's questions
              */
             foreach ($section->xpath('question') as $question) {
                 $questionRow = [
-                    '_answers' => [],
+                    'question_id' => self::ID_PLACEHOLDER,
                     'type_id' => (int)trim((string)$question->xpath('typeid')[0]),
                     'marks' => trim((string)$question->xpath('marks')[0]),
                     'config' => $this->decompileQuestionConfig($question),
                     'name' => trim((string)$question->xpath('name')[0]->xpath('text')[0]),
                     'question' => trim((string)$question->xpath('questiontext')[0]->xpath('text')[0]),
                     'penalty' => trim((string)$question->xpath('penalty')[0]),
+                    '_answers' => [],
                 ];
 
                 /* xpath->answers is a one-node set, so you should read this really as $answers[0]

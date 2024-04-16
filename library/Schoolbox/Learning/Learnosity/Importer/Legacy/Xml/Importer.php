@@ -4,6 +4,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Alaress\Database\Connector\IConnector;
 use Evaluation\Import\Parser\IParser;
+use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
@@ -24,6 +25,13 @@ use SimpleXMLElement;
 
 class Importer
 {
+    /**
+     * Maximum number of things per learnosity payload
+     * (50 questions, 50 features, 50 items, 50 activities)
+     */
+    public const LEARNOSITY_MAX_PAYLOAD_SIZE = 50;
+
+
     /**
      * Number of times to retry association queries
      */
@@ -145,7 +153,6 @@ class Importer
         /* Figure out how to consolidate payloads
          */
         $this->importLarge(
-            $instances,
             $legacyQuiz,
             $blueprintBuilder,
             $this->api
@@ -297,14 +304,14 @@ class Importer
     /**
      * Import a large quiz by spreading its contents over multiple payloads
      *
-     * @param array            $instances A set of (IAssessable, corresponding quiz subobject)
      * @param array            $legacyQuiz
      * @param BlueprintBuilder $blueprintBuilder
      * @param Api              $api
      * @return void
+     * @throws \JsonException
+     * @throws ValidationException
      */
     private function importLarge(
-        array $instances,
         array $legacyQuiz,
         BlueprintBuilder $blueprintBuilder,
         Api $api
@@ -319,13 +326,13 @@ class Importer
             $endpoint = $payloadSequence['endpoint'];
 
             if (BlueprintBuilder::ENDPOINT_FEATURES === $endpoint) {
-                $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence, $lock);
+                $this->transmitUnconsolidated($api, 'features', $endpoint, $payloadSequence);
             } elseif (BlueprintBuilder::ENDPOINT_QUESTIONS === $endpoint) {
-                $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence, $lock);
+                $this->transmitUnconsolidated($api, 'questions', $endpoint, $payloadSequence);
             } elseif (BlueprintBuilder::ENDPOINT_ITEMS === $endpoint) {
-                $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence, $lock);
+                $this->transmitUnconsolidated($api, 'items', $endpoint, $payloadSequence);
             } elseif (BlueprintBuilder::ENDPOINT_ACTIVITIES === $endpoint) {
-                $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence, $lock);
+                $this->transmitUnconsolidated($api, 'activities', $endpoint, $payloadSequence);
             }
         }
 
@@ -341,6 +348,70 @@ class Importer
         /* Associate with a retry mechanism
          */
         $this->associate($association);
+    }
+
+
+    /**
+     * Sends data to Learnosity and returns updated metrics
+     *
+     * @param Api    $api
+     * @param string $key
+     * @param string $endpoint
+     * @param array  $payloadSequence
+     * @return void
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function transmitUnconsolidated(
+        Api $api,
+        string $key,
+        string $endpoint,
+        array $payloadSequence,
+    ): void {
+        $payload = [
+            $key => []
+        ];
+
+        foreach ($payloadSequence['payload'][$key] as $object) {
+            $payload[$key][] = $object;
+
+            /* A special case for Questions endpoint which requires this random
+             * meta object outside of everything else -_-
+             */
+            if (isset($object['meta'])) {
+                $payload['meta'] = $object['meta'];
+            }
+
+            /* Check if we're full; if so, send it and make a new payload
+             * ready for the next iteration
+             */
+            $currentPayloadSize = \count($payload[$key]);
+
+            if ($currentPayloadSize === self::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                $api->dataSetRequestHub($endpoint, $payload);
+
+                $payload = [
+                    $key => []
+                ];
+            }
+        }
+
+        /* Send any remainders
+         *
+         * When perform mode is on, actually send it as batches of features, questions,
+         * items, activities and just...hope/presumed that everything worked out
+         *
+         * Note that $payload might be empty because the quiz contained an exact multiple
+         * of the maximum payload size; in this case, $payload will be an empty array and
+         * there are no remainders in any of its keys.
+         */
+        $payloadSize = \count($payload[$key]);
+
+        /* Skip zero-sized payloads; Learnosity hates that
+         */
+        if ($payloadSize) {
+            $api->dataSetRequestHub($endpoint, $payload);
+        }
     }
 
 
