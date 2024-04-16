@@ -280,6 +280,72 @@ Usage:
             var unitSpecId = window.location.hash.slice(1);
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
+
+        // If the units can be sorted, set up the drag/drop functionality
+        $('[data-unit-list][data-sortable]').sortable({
+            placeholder: 'sortable-placeholder',
+            items: '> [data-unit-spec]',
+            forcePlaceholderSize: true,
+            handle: '[data-grip-unit]',
+            axis: 'y',
+            start: function (event, ui) {
+                const unitId = ui.item.data('unit-spec');
+
+                // Collapse the unit when dragging
+                // (cannot use JQuery to read data attributes as it does not update the value...)
+                if (document.querySelector(`[data-collapsable="unit-${unitId}"]`).dataset.collapseState === 'uncollapsed') {
+                    ui.item.find(`[data-collapser="unit-${unitId}"]`).trigger('click');
+
+                    // Set the height of the placeholder to match the height of the now collapsed unit
+
+                    // We need to use the padding of the item and the inner item height as the new placeholder height
+                    // as the placeholder already has a fixed height set and we need to wait for the collapse animation
+                    // to finish before it will be correct.
+                    const itemPadding = parseInt(window.getComputedStyle(ui.item[0]).paddingTop, 10) * 2;
+                    const actionsItemHeight = ui.item.find('[data-unit-actions]').outerHeight();
+                    const actualItemHeight = actionsItemHeight + itemPadding;
+
+                    // Instead of immediately changing the height, animate it to the new height so that the height change
+                    // matches with the height change as a result of the collapse animation.
+                    ui.helper.animate({height: actualItemHeight}, 400, 'linear');
+                    ui.placeholder.animate({height: actualItemHeight}, 400, 'linear');
+
+                    // Ensure sortable is aware of the new height of the placeholder
+                    setTimeout(() => {
+                        $('[data-unit-list][data-sortable]').sortable('refreshPositions');
+                    }, 400);
+                }
+            },
+            update: async function (event, ui) {
+                const sequence = Array.from(document.querySelectorAll('[data-unit-spec]')).map((unit) => parseInt(unit.dataset.folderId, 10));
+
+                console.log(sequence);
+
+                var $toastFeedback = $('[data-relation="ajax-response"]');
+                $toastFeedback.toastActivate({ text: "Saving..." });
+                try {
+                    const currentSequence = sequence;
+                    const response = await fetch($(this).data('action'), {
+                        method: "POST",
+                        body: JSON.stringify({
+                            sequence: currentSequence,
+                        }),
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(response);
+                    }
+
+                    $toastFeedback.toastTimeout({ text: "Save successful", css: "success" });
+                } catch (error) {
+                    $toastFeedback.toastTimeout({ text: "Save failed!", css: "alert" });
+                }
+            }
+        });
     });
 </script>
 {% endautoescape %}
@@ -410,7 +476,17 @@ Usage:
                     <legend>{{ locale.unit.properPlural }}</legend>
                     {# Don't delete the inline style, it's needed -#}
                     <div class="small-12 column no-pad"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
-                        <ul class="information-list">
+
+                        <ul
+                            {% if courseSpec %}
+                                class="information-list sortable-card ui-sortable"
+                                data-sortable
+                                data-unit-list
+                                data-action="{{ routeLookup('folder.postFolderSequence', {id: courseSpec.folder.id, folder: courseSpec.folder}) }}"
+                            {% else %}
+                                class="information-list"
+                            {% endif %}
+                        >
                             {% if courseSpec %}
                             {% for unitSpec in courseSpec.units|sort((a,b) => b.folder.sequence <=> a.folder.sequence) %}
                                 {% if folderAccess[unitSpec.folder.id] > 0 %}
