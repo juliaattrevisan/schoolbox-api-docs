@@ -17,6 +17,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
@@ -242,32 +243,45 @@ class Controller extends AbstractController
             'markType' => (string)MarkType::TYPE_TOTAL
         ]);
 
+        /* No upload? No trabajo
+         */
+        if (!isset($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* An unusual outcome where the key might exist, but nothing else is in
+         * the way we thought - probably our mistake
+         */
+        if (!is_array($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
         /* Milk out some of the assessment settings from the xml itself
          */
         try {
-            if (\is_array($postData['attachment'] ?? null)) {
-                /** @var \Schoolbox\Resource\Storage\Model $xml */
-                $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+            /** @var \Schoolbox\Resource\Storage\Model $xml */
+            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
 
-                /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
-                $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-                $data = $filesystemProxy->read($file);
-
-                /** @var AssessmentMapperProxy $assessmentMapperProxy */
-                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-
-                $result = (new Builder(
-                    $context,
-                    $this->getUser(),
-                    $assessmentMapperProxy,
-                    $this->quizMapper,
-                    $this->workTypeMapper,
-                    $this->markTypeMapper
-                ))->build($data);
-            }
+            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+            $data = $filesystemProxy->read($file);
         } catch (\Schoolbox\Resource\Exception $e) {
+            /* Something went wrong reading the file's contents
+             */
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
         }
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        $result = (new Builder(
+            $context,
+            $this->getUser(),
+            $assessmentMapperProxy,
+            $this->quizMapper,
+            $this->workTypeMapper,
+            $this->markTypeMapper
+        ))->build($data);
     }
 
 
