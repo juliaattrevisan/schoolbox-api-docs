@@ -44,7 +44,7 @@ class Numeric extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $answer = trim($question['_answers'][0]['answer']);
+        $answer = trim($question['_answers']);
 
         return [
             'case_sensitive' => false,
@@ -73,6 +73,9 @@ class Numeric extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }
