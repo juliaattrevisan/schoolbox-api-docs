@@ -2,8 +2,6 @@
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
-use DebugBar\DebugBarException;
-
 /**
  * Construct a simplified flat array of sections/questions/answers/etc.
  * that represents a legacy quiz, where the data came from an xml file
@@ -25,7 +23,6 @@ class Builder
      *
      * @param \SimpleXMLElement $xml
      * @return array
-     * @throws DebugBarException
      */
     public function build(\SimpleXMLElement $xml): array
     {
@@ -48,6 +45,7 @@ class Builder
 
             /* Get each section's questions
              */
+            $n = 0;
             foreach ($section->xpath('question') as $question) {
                 $questionRow = [
                     '_answers' => [],
@@ -74,6 +72,8 @@ class Builder
                 /* Add it to the section stack
                  */
                 $sectionRow['_questions'][] = $questionRow;
+
+                $n++;
             }
 
             /* Add it to the quiz stack
@@ -81,7 +81,7 @@ class Builder
             $quiz['_sections'][] = $sectionRow;
         }
 
-        new \Alaress_Probe($quiz);
+        return $quiz;
     }
 
 
