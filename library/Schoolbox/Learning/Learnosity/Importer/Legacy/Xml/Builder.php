@@ -5,7 +5,6 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 use Evaluation\Import\Parser\IParser;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
-use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
@@ -26,13 +25,15 @@ class Builder
      * @param AssessmentMapperProxy           $assessmentMapperProxy
      * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
      * @param Mapper                          $workTypeMapper
+     * @param MarkTypeMapper                  $markTypeMapper
      */
     public function __construct(
         private AssessmentContext $context,
         private \Schoolbox\User $user,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private WorkType\Mapper $workTypeMapper
+        private WorkType\Mapper $workTypeMapper,
+        private MarkTypeMapper $markTypeMapper
     ) {
     }
 
@@ -121,7 +122,7 @@ class Builder
             ->setPromptsMode(false)
             /* Legacy XML only ever supported Total Mark
              */
-            ->setMarkType(MarkTypeMapper::getInstance()->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL))
+            ->setMarkType($this->markTypeMapper->findOneByColumn('mark_type_id', MarkType::TYPE_TOTAL))
         ;
 
         /* Update context if it's a Project

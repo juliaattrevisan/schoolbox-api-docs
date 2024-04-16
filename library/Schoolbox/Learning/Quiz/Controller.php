@@ -68,7 +68,6 @@ class Controller extends AbstractController
      * @param QuizAnswerMapper $quizAnswerMapper
      * @param MapperProxy $assessmentMapperProxy
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param Transactor  $transactor
      */
@@ -286,7 +285,8 @@ class Controller extends AbstractController
                     $this->getUser(),
                     $assessmentMapperProxy,
                     $this->quizMapper,
-                    $this->workTypeMapper
+                    $this->workTypeMapper,
+                    $this->markTypeMapper
                 ))->build($data);
             }
         } catch (\Schoolbox\Resource\Exception $e) {

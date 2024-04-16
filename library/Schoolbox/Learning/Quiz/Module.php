@@ -8,13 +8,11 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Router\PathMatcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\Exception\NotFound;;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -173,6 +171,7 @@ class Module extends RestfulModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\WorkType\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper::class),
             $transactor
         );
     }
