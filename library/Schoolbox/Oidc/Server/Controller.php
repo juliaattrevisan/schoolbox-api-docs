@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Oidc\Server;
 
 use Alaress\Web\Controller\Base;
+use Firebase\JWT\Key;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Application\Exception\NotAuthenticated;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
 
@@ -195,9 +197,13 @@ class Controller extends Base
         [, $accessToken] = $matches;
 
         // Parse the bearer token, and extract the user out of it
-        $user = $this->jwtParser->determineUser($accessToken);
+        $decodedJwt = $this->jwtParser->decode(
+            $accessToken,
+            new Key($this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_JWT_LEEWAY),
+        );
 
         // Say something about the user's identity here
-        $this->response = $this->responseAsJson($user);
+        $this->response = $this->responseAsJson($decodedJwt);
     }
 }
