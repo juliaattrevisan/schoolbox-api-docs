@@ -18,13 +18,11 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Builder;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
@@ -60,7 +58,7 @@ class Controller extends AbstractController
      * @param QuizSolutionMapper                             $quizSolutionMapper
      * @param QuizAttemptMapper                              $quizAttemptMapper
      * @param QuizAnswerMapper                               $quizAnswerMapper
-     * @param MapperProxy                                    $assessmentMapperProxy
+     * @param AssessmentMapperProxy                          $assessmentMapperProxy
      * @param Mapper                                         $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param MarkTypeMapper                                 $markTypeMapper
