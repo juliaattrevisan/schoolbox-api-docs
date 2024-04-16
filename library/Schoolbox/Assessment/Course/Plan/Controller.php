@@ -190,7 +190,7 @@ class Controller extends Base
         $class = TextboxComponentController::class;
         $textboxTemplate = [];
         $textboxKey = [];
-        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
         foreach ($unitTextboxComp as $textboxComponent) {
             if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
