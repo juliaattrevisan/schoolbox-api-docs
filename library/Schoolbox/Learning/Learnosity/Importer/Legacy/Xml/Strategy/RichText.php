@@ -61,6 +61,9 @@ class RichText extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }
