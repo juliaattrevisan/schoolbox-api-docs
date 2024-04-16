@@ -59,11 +59,11 @@ class Builder
                     'penalty' => trim((string)$question->xpath('typeid')[0]),
                 ];
 
-                foreach ($question->xpath('answers')[0]->xpath('answer') as $answer) {
-                    $answerRow = $this->decompileAnswer($questionRow, $answer);
-                }
+                    $answerRow = $this->decompileAnswer($questionRow, $question->xpath('answers'));
 
-                new \Alaress_Probe($question, $questionRow);
+//                    new \Alaress_Probe($question, $questionRow, $answerRow);
+
+
             }
 
         }
@@ -97,15 +97,15 @@ class Builder
      * are intertwined with phplibs, which is annoying
      *
      * @param array $question
-     * @param \SimpleXMLElement $answer
+     * @param array $answers
      * @return mixed
      * @throws \RuntimeException
      */
-    private function decompileAnswer(array $question, \SimpleXMLElement $answer): mixed
+    private function decompileAnswer(array $question, array $answers): array
     {
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)
          */
-        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answer);
+        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answers);
     }
 }

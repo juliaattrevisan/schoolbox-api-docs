@@ -36,8 +36,8 @@ interface IStrategy
      * Questions that don't have serialized data (short answer, richtext, etc)
      * return their inputs.
      *
-     * @param \SimpleXmlElement $answer
+     * @param array $answer
      * @throws \RuntimeException
      */
-    public function decompileAnswer(\SimpleXmlElement $answer): mixed;
+    public function decompileAnswer(array $answer): mixed;
 }

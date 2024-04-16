@@ -67,11 +67,11 @@ class Numeric extends Base implements IStrategy
     /**
      * Decompiles $answer's xml value
      *
-     * @param \SimpleXMLElement $answers
+     * @param array $answers
      * @return array
      * @throws \RuntimeException
      */
-    public function decompileAnswer(\SimpleXMLElement $answers): array
+    public function decompileAnswer(array $answers): array
     {
 
     }

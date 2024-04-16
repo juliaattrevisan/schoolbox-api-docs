@@ -104,16 +104,18 @@ class Multi extends Base implements IStrategy
     /**
      * Decompiles $answer's xml value
      *
-     * @param \SimpleXMLElement $answers
-     * @return mixed
+     * @param array $answers
+     * @return array
      * @throws \RuntimeException
      */
-    public function decompileAnswer(\SimpleXMLElement $answers): array
+    public function decompileAnswer(array $answers): array
     {
-        foreach ($answers->xpath('answer') as $answer) {
-            new \Alaress_Probe($answer);
-        }
+        new \Alaress_Probe($answers);
+        foreach ($answers as $answer) {
 
+//            new \Alaress_Probe($answer);
+        }
+die();
         return [];
     }
 }
