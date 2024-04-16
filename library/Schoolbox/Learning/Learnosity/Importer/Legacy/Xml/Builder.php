@@ -29,15 +29,13 @@ class Builder
         /* Final stack
          */
         $quiz = [
-            '_sections' => [],
             /* A convenience summation to detect quiz size, since
              * Learnosity has a payload limit this lets us choose
              * the mose appropriate import strategy to use
              */
-            'numQuestions' => 0
+            'numQuestions' => 0,
+            '_sections' => [],
         ];
-
-        $numQuestions = 0;
 
         /* Get its sections
          */
@@ -79,17 +77,15 @@ class Builder
                  */
                 $sectionRow['_questions'][] = $questionRow;
 
-                $numQuestions++;
+                /* Remember how many questions we saw here
+                 */
+                $quiz['numQuestions']++;
             }
 
             /* Add it to the quiz stack
              */
             $quiz['_sections'][] = $sectionRow;
         }
-
-        /* Remember how many questions we saw here
-         */
-        $quiz['numQuestions'] = $numQuestions;
 
         return $quiz;
     }

@@ -82,10 +82,9 @@ class Importer
          */
         $instances = $this->buildAssessment($parser);
 
-        /* Traverse the xml, loading each question
+        /* Start manufacturing quiz payloads for learnosity
+         * This is mostly stolen from the cli ImpoterTool
          */
-        $quiz = $this->legacyXmlQuizBuilder->build($xml);
-
 
         /* Used to make representations of questions and answers
          */
@@ -112,7 +111,10 @@ class Importer
          */
         $blueprintBuilder = new BlueprintBuilder($this->schoolCode, $payloadFactory, $contextLookup, $this->logger);
 
-
+        /* Traverse the xml, loading each question
+         */
+        $quiz = $quizBuilder->build($xml);
+new \Alaress_Probe($quiz);
         // TODO Continue stealing from ImporterTool
 
         /* TODO probably display a list of questions and their status, maybe
