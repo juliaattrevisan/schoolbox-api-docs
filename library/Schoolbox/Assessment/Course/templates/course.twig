@@ -281,6 +281,9 @@ Usage:
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
 
+        // To track if we need to re-expand the unit after dragging
+        let currentDraggedUnitWasExpanded = false;
+
         // If the units can be sorted, set up the drag/drop functionality
         $('[data-unit-list][data-sortable]').sortable({
             placeholder: 'sortable-placeholder',
@@ -291,9 +294,13 @@ Usage:
             start: function (event, ui) {
                 const unitId = ui.item.data('unit-spec');
 
+                // Set the height of the placeholder to match the INITIAL height of the item, so we can transition it if needed
+                ui.placeholder.height(ui.item.outerHeight());
+
                 // Collapse the unit when dragging
                 // (cannot use JQuery to read data attributes as it does not update the value...)
-                if (document.querySelector(`[data-collapsable="unit-${unitId}"]`).dataset.collapseState === 'uncollapsed') {
+                currentDraggedUnitWasExpanded = document.querySelector(`[data-collapsable="unit-${unitId}"]`).dataset.collapseState === 'uncollapsed';
+                if (currentDraggedUnitWasExpanded) {
                     ui.item.find(`[data-collapser="unit-${unitId}"]`).trigger('click');
 
                     // Set the height of the placeholder to match the height of the now collapsed unit
@@ -305,15 +312,18 @@ Usage:
                     const actionsItemHeight = ui.item.find('[data-unit-actions]').outerHeight();
                     const actualItemHeight = actionsItemHeight + itemPadding;
 
+                    // 400 is the default collapse animation time from $(...).slideUp()
+                    const collapseTime = 400;
+
                     // Instead of immediately changing the height, animate it to the new height so that the height change
                     // matches with the height change as a result of the collapse animation.
-                    ui.helper.animate({height: actualItemHeight}, 400, 'linear');
-                    ui.placeholder.animate({height: actualItemHeight}, 400, 'linear');
+                    ui.helper.animate({height: actualItemHeight}, collapseTime, 'linear');
+                    ui.placeholder.animate({height: actualItemHeight}, collapseTime, 'linear');
 
                     // Ensure sortable is aware of the new height of the placeholder
                     setTimeout(() => {
                         $('[data-unit-list][data-sortable]').sortable('refreshPositions');
-                    }, 400);
+                    }, collapseTime);
                 }
             },
             update: async function (event, ui) {
@@ -344,6 +354,16 @@ Usage:
                 } catch (error) {
                     $toastFeedback.toastTimeout({ text: "Save failed!", css: "alert" });
                 }
+            },
+            stop: function (event, ui) {
+                // Re-expand the unit if it was expanded before dragging
+                if (currentDraggedUnitWasExpanded) {
+                    const unitId = ui.item.data('unit-spec');
+                    ui.item.find(`[data-collapser="unit-${unitId}"]`).trigger('click');
+                }
+
+                // Unset any temporary height set on the placeholder
+                ui.placeholder.css('height', '');
             }
         });
     });
