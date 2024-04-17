@@ -44,7 +44,12 @@
         <div class="card small-12">
             <span class="size-32 icon-home"></span>
             <h3>
-                <a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a>
+                <a href="/homepage/{{ courseImpl.folder.id }}"
+                    {% if courseOutlineComponentIds|length == 0 %}
+                        class="strike"
+                        title="Crossed-out because this course does not have a linked course outline component.  You may still import into this course, but the imported unit will not be visible on the class homepage."
+                    {% endif %}
+                >{{ courseImpl.folder.title }}</a>
                 {% for courseOutlineComponentId in courseOutlineComponentIds %}
                     <a href='/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}'>
                         (with linked course outline component)
