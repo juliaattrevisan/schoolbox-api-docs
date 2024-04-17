@@ -43,6 +43,11 @@
             <span class="size-32 icon-home"></span>
             <h3>
                 <a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a>
+                {% if courseImpl.courseOutlineComponentInstanceIds|length %}
+                    <a href='/homepage/{{ courseImpl.folder.id }}#component{{ courseImpl.courseOutlineComponentInstanceIds[0] }}'>
+                        (with linked course outline component)
+                    </a>
+                {% endif %}
                 <span class='pipe meta'>Course imported on {{ courseImpl.createdAt.long }}</span>
             </h3>
             <p class="meta">

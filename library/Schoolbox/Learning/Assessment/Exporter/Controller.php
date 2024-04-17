@@ -147,7 +147,11 @@ class Controller extends BaseController
     public function getExportFormForUnit(UnitSpecification\Model $unitSpec): void
     {
         $courseSpec = $unitSpec->getCourse();
-        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationIdInCourseOutlineComponentsOnly($courseSpec->getId());
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId(
+            $courseSpec->getId(), [],
+            false,
+            true
+        );
 
         // Filter out historical classes (no class code, no group).
         $courseImpls = $courseImpls->filter(

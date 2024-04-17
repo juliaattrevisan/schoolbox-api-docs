@@ -39,6 +39,11 @@ class Model extends AbstractCourse
      */
     private $unitImplementations;
 
+    /**
+     * IDs referring to rows of the component_instance table.
+     * @var array
+     */
+    private $courseOutlineComponentInstanceIds = [];
 
     /**
      * Constructor
@@ -68,7 +73,6 @@ class Model extends AbstractCourse
         return $this;
     }
 
-
     /**
      * @return Unit\Model[]|GenericCollection
      */
@@ -76,7 +80,6 @@ class Model extends AbstractCourse
     {
         return $this->unitImplementations;
     }
-
 
     /**
      * @param Unit\Model[]|GenericCollection $unitImplementations
@@ -86,6 +89,24 @@ class Model extends AbstractCourse
     public function setUnits(GenericCollection $unitImplementations): self
     {
         $this->unitImplementations->replaceWith($unitImplementations);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCourseOutlineComponentInstanceIds(): array
+    {
+        return $this->courseOutlineComponentInstanceIds;
+    }
+
+    /**
+     * @param array $courseOutlineComponentInstanceIds
+     * @return static
+     */
+    public function setCourseOutlineComponentInstanceIds(array $courseOutlineComponentInstanceIds): self
+    {
+        $this->courseOutlineComponentInstanceIds = $courseOutlineComponentInstanceIds;
         return $this;
     }
 }

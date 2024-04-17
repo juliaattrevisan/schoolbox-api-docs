@@ -134,12 +134,64 @@ class Mapper extends AbstractCourseMapper
      * @param bool      $loadUnits
      * @return Collection|Model[]
      */
-    public function findAllByCourseSpecificationId($courseSpecId, $options = [], $loadUnits = false)
+    public function findAllByCourseSpecificationId(
+        $courseSpecId,
+        $options = [],
+        $loadUnits = false,
+        $addCourseOutlineComponentIds = false
+    )
     {
         $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
 
+        // Hydrate course implementation folders so that class codes will be available.
+        $folderIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getFolder()->getId());
+        $folders = $this->getJoinMapper('folder')->findByColumn('id', $folderIds);
+        $foldersByFolderId = [];
+        foreach ($folders as $folder) {
+            $foldersByFolderId[$folder->getId()] = $folder;
+        }
+        foreach ($courseImpls as $courseImpl) {
+            $courseImpl->setFolder($foldersByFolderId[$courseImpl->getFolder()->getId()]);
+        }
+
         if ($loadUnits) {
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
+        }
+
+        if ($addCourseOutlineComponentIds) {
+            $courseImplIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getId())->getAll();
+            $rows = $this->getDatabase()->executeQuery(
+                'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId
+                FROM component_definition cd
+                JOIN component_instance ci ON (ci.component_definition_id=cd.id)
+                JOIN folder f ON f.id=ci.identifier
+                JOIN component_config_definition ccd_importedCourse ON (
+                    ccd_importedCourse.component_definition_id = cd.id AND
+                    ccd_importedCourse.key = "importedCourse"
+                )
+                LEFT JOIN component_config_instance cci_importedCourse ON (
+                    cci_importedCourse.component_config_definition_id=ccd_importedCourse.id AND
+                    cci_importedCourse.component_instance_id=ci.id
+                )
+                WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
+                AND ci.module="homepage"
+                AND cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
+            )->fetchAll();
+
+            $componentInstanceIdsByCourseImplId = [];
+
+            foreach ($rows as $row) {
+                if (!array_key_exists($row['courseImplId'], $componentInstanceIdsByCourseImplId)) {
+                    $componentInstanceIdsByCourseImplId[$row['courseImplId']] = [];
+                }
+                $componentInstanceIdsByCourseImplId[$row['courseImplId']][] = $row['componentInstanceId'];
+            }
+
+            foreach ($courseImpls as $courseImpl) {
+                if (array_key_exists($courseImpl->getId(), $componentInstanceIdsByCourseImplId)) {
+                    $courseImpl->setCourseOutlineComponentInstanceIds($componentInstanceIdsByCourseImplId[$courseImpl->getId()]);
+                }
+            }
         }
 
         return $courseImpls;
