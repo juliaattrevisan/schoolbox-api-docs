@@ -40,6 +40,6 @@ class Controller extends Base
             }
         }
 
-        $this->response = $this->responseAsJson($result)->withStatus($errorOccurred ? self::STATUS_SERVER_ERROR: self::STATUS_OK);
+        $this->response = $this->responseAsJson($result)->withStatus($errorOccurred ? self::STATUS_SERVER_ERROR : self::STATUS_OK);
     }
 }
