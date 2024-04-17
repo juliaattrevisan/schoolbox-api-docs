@@ -93,14 +93,10 @@ class Controller extends Base
         $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
         if (isset($idToken)) {
             if (!$this->verifyState($requestState)) {
-                $this->sendError('State sent to and received from OIDC provider do not match');
                 return;
             }
-
             $decodedIdToken = $this->decodeAccessToken($idToken);
-            // Check nonce, and then redirect
             if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null)) {
-                $this->sendError('Nonce sent to and received from OIDC provider do not match');
                 return;
             }
             $this->redirectToSessionInit($requestState, $idToken);
@@ -109,12 +105,11 @@ class Controller extends Base
 
         $accessToken = $this->requestPost->get('access_token') ?? $this->requestQuery->get('access_token');
         if (isset($accessToken)) {
-            // Exchange for an ID token, and redirect to it: first check state
             if (!$this->verifyState($requestState)) {
-                $this->sendError('State sent to and received from OIDC provider do not match');
                 return;
             }
 
+            // Get an ID token as a JWT using the userinfo endpoint
             $oidcConfig      = $this->retrieveOidcConfig();
             $idTokenResponse = $this->httpClient->get(
                 $oidcConfig['userinfo_endpoint'],
@@ -126,31 +121,28 @@ class Controller extends Base
                 ]
             );
             $idToken = $idTokenResponse->getBody()->getContents();
+
+            // Cannot check nonce, as it won't exist in a userinfo JWT
             $this->redirectToSessionInit($requestState, $idToken);
             return;
         }
 
         $code = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
         if (isset($code)) {
-            // Authorize user, but first check state
             if (!$this->verifyState($requestState)) {
-                $this->sendError('State sent to and received from OIDC provider do not match');
                 return;
             }
+
+            // Exchange auth code for access token
             $decodedAccessToken = $this->exchangeAuthorizationCodeForAccessToken($code);
-
-            // check nonce in ID token
-            // TODO this should be done in $loginUri, but that's too disruptive
-            //      a change right now
             if (!$this->verifyNonce($decodedAccessToken->getIdToken()->claims()->get('nonce'))) {
-                $this->sendError('Nonce sent to and received from OIDC provider do not match');
                 return;
             }
-
-            // Init the session from the ID token received from the OIDC provider
             $this->redirectToSessionInit($requestState, $decodedAccessToken->getIdToken()->toString());
             return;
         }
+
+        // No ID token, access token or auth code? Send an auth request
         $this->sendAuthorizationRequest();
     }
 
@@ -368,7 +360,7 @@ class Controller extends Base
     }
 
     /**
-     * Assert that the state value from the request matches what's in the
+     * Verify that the state value from the request matches what's in the
      * session.
      *
      * @param string|null $requestState
@@ -379,13 +371,14 @@ class Controller extends Base
         $sessionState = $this->session->get(self::SESSION_STATE_KEY);
         $this->session->set(self::SESSION_STATE_KEY, null);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+            $this->sendError('State sent to and received from OIDC provider do not match');
             return false;
         }
         return true;
     }
 
     /**
-     * Assert that the nonce value from ID token matches what's in the session.
+     * Verify that the nonce value from ID token matches what's in the session.
      *
      * @param string|null $nonce
      * @return bool
@@ -398,6 +391,7 @@ class Controller extends Base
         $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
         $this->session->set(self::SESSION_NONCE_KEY, null);
         if (!isset($nonce, $sessionNonce) || $nonce !== $sessionNonce) {
+            $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return false;
         }
         return true;
