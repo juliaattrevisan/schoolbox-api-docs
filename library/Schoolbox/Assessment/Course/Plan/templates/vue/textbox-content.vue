@@ -51,7 +51,7 @@ defineExpose({ focusEditor });
 function onEditorCreated(event: EditorCreatedEventInfo) {
     const editor = event.editor as InlineEditor;
 
-    editor.editing.view.document.on("change:isFocused", (_, __, isFocused: boolean) => {
+    editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
         store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
     });
 
@@ -77,7 +77,7 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
-        if (editor.editing.view.document.isFocused) {
+        if (editor.ui.focusTracker.isFocused) {
             store.updateFocusedUnitCell(props.unit.id, props.column, true);
         }
     }).catch(() => {
@@ -118,6 +118,9 @@ window.Vue.onMounted(initEditor);
 </template>
 
 <style scoped lang="scss">
+.editor-wrapper {
+    z-index: 1;
+}
 .editor-content {
     border: 0 !important;
     padding: 8px !important;
