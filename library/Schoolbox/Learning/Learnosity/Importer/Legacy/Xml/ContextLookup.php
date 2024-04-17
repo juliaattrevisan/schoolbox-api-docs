@@ -61,12 +61,25 @@ class ContextLookup implements IContextLookup
         } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             /* Course Implementation, when you randomly add to an already-imported course
              */
-            return [];
+            $courseSpec = $this->findCourseSpecViaImpl($this->context);
+            $courseUnitSpec = $this->findCourseUnitSpecViaImpl($this->context);
+            $folderCodes = $this->findFolderCodes($this->context->getCourse()->getFolder(0));
+
+            /* Generate the set of tags and remember it in $this->lookup for
+             * this particular combination of columns
+             */
+            $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], $folderCodes);
+
+            /* Use this tag so we know it's an impl
+             */
+            $tags[] = $this->tagFactory->produceImplFlag();
+
+            return $tags;
         }
 
         /* Directly into a homepage via the quiz component
          */
-        $folderCodes = $this->findFolderCodes($this->context);
+        $folderCodes = $this->findFolderCodes($this->context->getFolder());
 
         /* Generate the set of tags and remember it in $this->lookup for
          * this particular combination of columns
@@ -78,49 +91,6 @@ class ContextLookup implements IContextLookup
         $tags[] = $this->tagFactory->produceImplFlag();
 
         return $tags;
-
-        ///////////
-        $row = $this->findRow($assessmentId);
-
-        /* If course_specification_id is set, find out its name and uuid
-         * If course_unit_specification_id is set, find out its name and uuid
-         */
-        if ($row['course_specification_id'] && $row['course_unit_specification_id']) {
-            $courseSpec = $this->findCourseSpec($this->context);
-            $courseUnitSpec = $this->findCourseUnitSpec((int)$row['course_unit_specification_id']);
-
-            /* Generate the set of tags and remember it in $this->lookup for
-             * this particular combination of columns
-             */
-            $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], null);
-            $this->lookup[$key] = $tags;
-
-            return $this->lookup[$key];
-        }
-
-        /* If course_implementation_id is set, find out its corresponding spec's name and uuid
-         * If course_unit_implementation_id is set, find out its corresponding spec's name and uuid
-         */
-        if ($row['course_implementation_id'] && $row['course_unit_implementation_id']) {
-            $courseSpec = $this->findCourseSpecViaImpl((int)$row['course_implementation_id']);
-            $courseUnitSpec = $this->findCourseUnitSpecViaImpl((int)$row['course_unit_implementation_id']);
-            $folderCodes = $this->findFolderCodes((int)$row['folder_id']);
-
-            /* Generate the set of tags and remember it in $this->lookup for
-             * this particular combination of columns
-             */
-            $tags = $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], $folderCodes);
-
-            /* Use this tag so we know it's an impl
-             */
-            $tags[] = $this->tagFactory->produceImplFlag();
-
-            $this->lookup[$key] = $tags;
-
-            return $this->lookup[$key];
-        }
-
-        return $this->lookup[$key];
     }
 
 
@@ -186,49 +156,45 @@ class ContextLookup implements IContextLookup
     /**
      * Finds the (name, uuid) spec tuple for a course impl
      *
-     * @param int $courseImplId
+     * @param AssessmentContext $context
      * @return array
      * @throws \PDOException
      */
-    private function findCourseSpecViaImpl(int $courseImplId): array
+    private function findCourseSpecViaImpl(AssessmentContext $context): array
     {
-        $this->courseImplStatement->execute([
-            'id' => $courseImplId
-        ]);
-
-        return $this->courseImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return [
+            'uuid' => $context->getSpecification()->getCourse()->getUuid()
+        ];
     }
 
 
     /**
      * Finds the (name, uuid) spec tuple for a course unit impl
      *
-     * @param int $courseUnitImplId
+     * @param AssessmentContext $context
      * @return array
      * @throws \PDOException
      */
-    private function findCourseUnitSpecViaImpl(int $courseUnitImplId): array
+    private function findCourseUnitSpecViaImpl(AssessmentContext $context): array
     {
-        $this->courseUnitImplStatement->execute([
-            'id' => $courseUnitImplId
-        ]);
-
-        return $this->courseUnitImplStatement->fetch(\PDO::FETCH_ASSOC);
+        return [
+            'uuid' => $context->getSpecification()->getUuid()
+        ];
     }
 
 
     /**
-     * Finds the csv of folder codes for a folderId
+     * Finds the csv of folder codes for a fully hydrated $folder instance
      *
-     * @param AssessmentContext $context
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @return string
      * @throws \PDOException
      */
-    private function findFolderCodes(AssessmentContext $context): string
+    private function findFolderCodes(\Schoolbox\Resource\Folder\Model $folder): string
     {
         /* TODO Support multiple folder codes
          *  Do this as a single tag for now...?
          */
-        return $context->getFolder()->getCodeString();
+        return $folder->getCodeString();
     }
 }
