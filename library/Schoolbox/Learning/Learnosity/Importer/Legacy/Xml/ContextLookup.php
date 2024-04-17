@@ -51,7 +51,13 @@ class ContextLookup implements IContextLookup
         if ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
             /* Course Specification, when authoring a course's contents
              */
-            return [];
+            $courseSpec = $this->findCourseSpec($this->context);
+            $courseUnitSpec = $this->findCourseUnitSpec($this->context);
+
+            /* Generate the set of tags and remember it in $this->lookup for
+             * this particular combination of columns
+             */
+            return $this->tagFactory->produce($courseSpec['uuid'], $courseUnitSpec['uuid'], null);
         } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             /* Course Implementation, when you randomly add to an already-imported course
              */
@@ -80,7 +86,7 @@ class ContextLookup implements IContextLookup
          * If course_unit_specification_id is set, find out its name and uuid
          */
         if ($row['course_specification_id'] && $row['course_unit_specification_id']) {
-            $courseSpec = $this->findCourseSpec((int)$row['course_specification_id']);
+            $courseSpec = $this->findCourseSpec($this->context);
             $courseUnitSpec = $this->findCourseUnitSpec((int)$row['course_unit_specification_id']);
 
             /* Generate the set of tags and remember it in $this->lookup for
@@ -150,34 +156,30 @@ class ContextLookup implements IContextLookup
     /**
      * Finds the (name, uuid) tuple for a course spec
      *
-     * @param int $courseSpecId
+     * @param AssessmentContext $context
      * @return array
      * @throws \PDOException
      */
-    private function findCourseSpec(int $courseSpecId): array
+    private function findCourseSpec(AssessmentContext $context): array
     {
-        $this->courseSpecStatement->execute([
-            'id' => $courseSpecId
-        ]);
-
-        return $this->courseSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return [
+            'uuid' => $context->getCourse()->getUuid(),
+        ];
     }
 
 
     /**
      * Finds the (name, uuid) tuple for a course unit spec
      *
-     * @param int $courseUnitSpecId
+     * @param AssessmentContext $context
      * @return array
      * @throws \PDOException
      */
-    private function findCourseUnitSpec(int $courseUnitSpecId): array
+    private function findCourseUnitSpec(AssessmentContext $context): array
     {
-        $this->courseUnitSpecStatement->execute([
-            'id' => $courseUnitSpecId
-        ]);
-
-        return $this->courseUnitSpecStatement->fetch(\PDO::FETCH_ASSOC);
+        return [
+            'uuid' => $context->getUuid(),
+        ];
     }
 
 
