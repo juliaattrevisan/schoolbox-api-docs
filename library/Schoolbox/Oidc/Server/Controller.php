@@ -201,8 +201,9 @@ class Controller extends Base
         [, $accessToken] = $matches;
 
         // Extract the user out of the access token
+        $issuerUrl  = (new Factory($this->getConfigLoader()))->buildFullyQualified();
         $user       = $this->jwtParser->determineUser($accessToken);
-        $userEntity = new Entity\User($user, (new Factory($this->getConfigLoader()))->buildFullyQualified());
+        $userEntity = new Entity\User($user, $issuerUrl);
 
         // Actually decode the access token,
         // to determine which scopes the access token allows
@@ -225,7 +226,7 @@ class Controller extends Base
         $acceptedResponseType = $this->request->getHeaderLine('Accept');
         if (strtolower($acceptedResponseType) === 'application/jwt') {
             // Generate a JWT
-            $idTokenClaims[IParser::CLAIM_ISS] = $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_ISSUER);
+            $idTokenClaims[IParser::CLAIM_ISS] = $issuerUrl->__toString();
             $idTokenClaims[IParser::CLAIM_AUD] = $decodedJwt[IParser::CLAIM_AUD];
             $this->response = $this->responseFromContent(
                 \Firebase\JWT\JWT::encode(
