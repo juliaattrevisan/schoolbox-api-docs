@@ -327,9 +327,13 @@ class Query
             'SELECT DISTINCT
             f.id,
             ' . $this->buildFolderTypeExpression() . ' AS folderType,
-            IF(f.id IN (' . implode(',', array_map('intval', $involvedFolderIds)) . "), 1, 0) AS userIsInvolved
+            ' . (
+                count($involvedFolderIds) > 0
+                ? 'IF(f.id IN (' . implode(',', array_map('intval', $involvedFolderIds)) . '), 1, 0)'
+                : 'FALSE'
+            ) . ' AS userIsInvolved
             FROM folder f
-            " . $this->getJoinsFromFolderForFolderTypeExpression() . "
+            ' . $this->getJoinsFromFolderForFolderTypeExpression() . "
             $where
             GROUP BY f.id
             ORDER BY userIsInvolved DESC, IF(fc.code IS NOT NULL, 1, 0) DESC, f.name ASC"
