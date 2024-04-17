@@ -127,7 +127,7 @@ class Multi extends Base implements IStrategy
 
         return [
             'answers' => $options,
-            /* Sometimes config options are found here, and need to be move dup
+            /* Sometimes config options are found here, and need to be moved up
              */
             'config' => [
                 'randomiseOptionOrder' => (int)($answers->xpath('shuffleanswers')[0])

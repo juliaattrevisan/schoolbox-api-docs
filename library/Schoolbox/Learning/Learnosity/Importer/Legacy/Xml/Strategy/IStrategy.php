@@ -37,7 +37,8 @@ interface IStrategy
      * return their inputs.
      *
      * @param \SimpleXMLElement $answers
+     * @return array
      * @throws \RuntimeException
      */
-    public function decompileAnswer(\SimpleXMLElement $answers): mixed;
+    public function decompileAnswer(\SimpleXMLElement $answers): array;
 }
