@@ -15,5 +15,5 @@ INSERT INTO assess_luQuestionType (
     'false',
     'survey',
     'false',
-    'false'
+    'true'
 );
