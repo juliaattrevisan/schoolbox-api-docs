@@ -245,10 +245,10 @@ class Controller extends AbstractController
          */
         $postData = array_merge($this->requestPost->getArrayCopy(), [
             'assessmentType' => AssessmentType::TYPE_QUIZ,
-            'context' => $context,
+            'context'        => $context,
             /* Legacy xml only ever supported Total Mark marktype
              */
-            'markType' => (string)MarkType::TYPE_TOTAL
+            'markType'       => (string)MarkType::TYPE_TOTAL
         ]);
 
         /* No upload? No trabajo
@@ -272,7 +272,7 @@ class Controller extends AbstractController
 
             /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
             $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-            $data = $filesystemProxy->read($file);
+            $data            = $filesystemProxy->read($file);
         } catch (\Schoolbox\Resource\Exception $e) {
             /* Something went wrong reading the file's contents
              */
@@ -294,9 +294,9 @@ class Controller extends AbstractController
 
         /* For converting urls
          */
-        $server = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $server     = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
         $serverName = $server->getHost();
-        $domain = (string)$server;
+        $domain     = (string)$server;
 
         $api = new Api(
             $serverName,
@@ -306,19 +306,23 @@ class Controller extends AbstractController
             $logger
         );
 
-        $result = (new Legacy\Xml\Importer(
-            $logger,
-            $api,
-            $schoolCode,
-            $domain,
-            $this->getDi()->get('databaseInternal'),
-            $context,
-            $this->getUser(),
-            $assessmentMapperProxy,
-            $this->quizMapper,
-            $this->workTypeMapper,
-            $this->markTypeMapper
-        ))->import($data);
+        try {
+            $result = (new Legacy\Xml\Importer(
+                $logger,
+                $api,
+                $schoolCode,
+                $domain,
+                $this->getDi()->get('databaseInternal'),
+                $context,
+                $this->getUser(),
+                $assessmentMapperProxy,
+                $this->quizMapper,
+                $this->workTypeMapper,
+                $this->markTypeMapper
+            ))->import($data);
+        } catch (\DomainException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INVALID_QUESTION_XML);
+        }
 
         $this->response = $this->redirectFound(
             $this->routeGenerator->generate(

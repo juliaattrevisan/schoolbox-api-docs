@@ -32,6 +32,14 @@ use SimpleXMLElement;
 class Importer
 {
     /**
+     * The xml node must contain this string in the availability node
+     * so we only accept true legacy quizzes, and not some other random
+     * Survey xl
+     */
+    private const QUIZ_AVAILABILITY = 'assess';
+
+
+    /**
      * Maximum number of things per learnosity payload
      * (50 questions, 50 features, 50 items, 50 activities)
      */
@@ -111,6 +119,12 @@ class Importer
         /* We need to use this later
          */
         $xml = $this->prepareXml($data);
+
+        /* Only accept Quiz xmls; reject Surveys
+         */
+        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
+            throw new \DomainException('xml file did not contain a legacy quiz');
+        }
 
         /* Set up a parser to traverse the xml
          */
