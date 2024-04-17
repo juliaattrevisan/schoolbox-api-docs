@@ -320,7 +320,12 @@ class Controller extends AbstractController
             $this->markTypeMapper
         ))->import($data);
 
-        new \Alaress_Probe($result['legacyQuiz']);
+        $this->response = $this->redirectFound(
+            $this->routeGenerator->generate(
+                'learningAssessment.getAssessment',
+                ['assessmentId' => $result['assessment']->getId()]
+            )
+        );
     }
 
 
