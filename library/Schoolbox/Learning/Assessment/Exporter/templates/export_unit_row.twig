@@ -1,11 +1,9 @@
 {#
-    'unitSpec'         CourseUnitSpecificationModel - The unitSpec to export
     'courseImpl'       CourseImplementationModel    - The course implementation into which the unitSpec may be exported
     'folderWritePerms' bool[]                       - Does current user have WRITE+ perm to the class folder
 
     NOTE: If the ability to overwrite existing units is ever needed, see https://github.com/alaress/schoolbox/pull/28644.
 #}
-{% set unitImpl = null %}
 {% set isInstructor = folderWritePerms[courseImpl.folder.id] %}
 
 <script type="text/javascript">
