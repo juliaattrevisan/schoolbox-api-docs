@@ -20,6 +20,33 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      */
     protected $plugin = 'parentChild';
 
+    /**
+     * Creates an Answer. This is used when creating Questions and Answers in
+     * the setup phase.
+     *
+     * @param array $object
+     * @param int|string $question_id
+     * @return bool|int
+     */
+    public function create($object, $question_id = '')
+    {
+        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+        $answer['question_id'] = $question_id;
+
+        /* 'Short' always has only one answer per question so we can override
+         * the sequence here
+         */
+        $answer['sequence'] = 1;
+
+        $answer_id = parent::create($answer);
+
+        if (!$answer_id) {
+            return false;
+        }
+
+        return $answer_id;
+    }
+
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         $this->configureResponse($page, $question_id);
