@@ -53,7 +53,6 @@ class Controller extends AbstractController
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
      * @param MarkTypeMapper                                            $markTypeMapper
-     * @param Factory                                                   $urlFactory
      * @param string                                                    $learnosityVersion
      * @param string                                                    $learnosityConsumerKey
      * @param string                                                    $learnosityConsumerSecret
@@ -70,7 +69,6 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
-        private \Schoolbox\Url\Factory $urlFactory,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
