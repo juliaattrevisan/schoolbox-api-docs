@@ -185,6 +185,8 @@ class Controller extends Base
     /**
      * Userinfo endpoint: get an identity for the user from the access token.
      *
+     * @see https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
+     *
      * @api   GET /oidc/userinfo
      * @since 24.0
      */
@@ -211,7 +213,10 @@ class Controller extends Base
 
         // Create a response for the user identified by the access token,
         // with the claim set allowed in the access token's scopes.
-        $idTokenClaims  = $this->claimExtractor->extract($decodedJwt['scopes'] ?? [], $userEntity->getClaims());
+        $idTokenClaims = $this->claimExtractor->extract($decodedJwt['scopes'] ?? [], $userEntity->getClaims());
+
+        // Also include the "sub" claim if it's not in the ID token.
+        $idTokenClaims[IParser::CLAIM_SUB] ??= $user->getUsername();
         $this->response = $this->responseAsJson($idTokenClaims);
     }
 }
