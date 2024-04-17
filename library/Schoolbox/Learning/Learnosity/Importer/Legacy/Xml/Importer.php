@@ -138,8 +138,8 @@ class Importer
         $tagFactory = new TagFactory($this->schoolCode);
 
         /* A context lookup builder thing for conveniently deriving tags
-        */
-        /* FIXME Replace with usage of AssessmentContext since we have no
+         *
+         *  Replaced with usage of AssessmentContext since we have no
          *  idea where this assessment's context details are (it comes from
          *  an xml where there's no record of it in the db)
          */
