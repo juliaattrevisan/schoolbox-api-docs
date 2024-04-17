@@ -267,7 +267,7 @@ class Controller extends AbstractController
         /* Milk out some of the assessment settings from the xml itself
          */
         try {
-            /** @var \Schoolbox\Resource\Storage\Model $xml */
+            /** @var \Schoolbox\Resource\Storage\Model $file */
             $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
 
             /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
