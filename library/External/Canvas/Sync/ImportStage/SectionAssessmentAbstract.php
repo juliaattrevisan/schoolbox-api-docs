@@ -374,7 +374,7 @@ abstract class SectionAssessmentAbstract
                 // sync marks
                 if (!$this->courseSectionBridge->syncCanvasMarks()) {
                     $this->log->info('Skipping syncing Canvas Submissions');
-                    return;
+                    continue;
                 }
 
                 $this->log->notice("Synchronising Canvas Submissions");
