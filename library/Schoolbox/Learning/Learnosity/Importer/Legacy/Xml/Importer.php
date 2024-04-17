@@ -8,9 +8,8 @@
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
-
 use Alaress\Database\Connector\IConnector;
-use Evaluation\Import\Parser\IParser;
+use Assess\Import\Parser\IParser;
 use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
