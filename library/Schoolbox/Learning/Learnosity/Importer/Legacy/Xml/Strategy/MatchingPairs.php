@@ -95,7 +95,6 @@ class MatchingPairs extends Base implements IStrategy
      */
     public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-
         $options = [];
 
         foreach ($answers[0]->xpath('subquestion') as $answer) {
