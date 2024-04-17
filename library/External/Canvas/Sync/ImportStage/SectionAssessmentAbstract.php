@@ -183,8 +183,11 @@ abstract class SectionAssessmentAbstract
                 continue;
             }
             if (!array_key_exists($courseCanvasId, $coursesAssessmentData)) {
+                $this->log->debug(sprintf("No assessments to Sync, moving on..."));
                 continue;
             }
+
+            $this->log->info(sprintf("Count of assessments in course: %s", count($coursesAssessmentData[$courseCanvasId])));
             foreach ($coursesAssessmentData[$courseCanvasId] as $assessmentCanvasId => $assessment) {
                 /* We need to examine the Canvas assignment/quiz and assignment-overrides to determine:
                  * - What class folders does this assignment/quiz need to be copied to?
