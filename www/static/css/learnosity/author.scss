@@ -566,13 +566,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-c
     position: absolute;
     right: 150px;
     top: 65px;
-    z-index: 1;
+    z-index: var(--depth-default);
 }
 button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
     position: absolute;
     right: 0px;
     top: 65px;
-    z-index: 1;
+    z-index: var(--depth-default);
 }
 span.lrn-author-name-wrapper {
     border: 1px solid var(--form-border-color);

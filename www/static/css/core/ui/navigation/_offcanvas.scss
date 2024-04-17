@@ -71,7 +71,9 @@ $tabbar-hamburger-icon-gap: 6px !default;
 // Off Canvas Back-Link Overlay
 $off-canvas-overlay-transition: background 300ms ease !default;
 $off-canvas-overlay-cursor: pointer !default;
-$off-canvas-overlay-box-shadow: -4px 0 4px rgba($black, 0.5), 4px 0 4px rgba($black, 0.5) !default;
+$off-canvas-overlay-box-shadow:
+    -4px 0 4px rgba($black, 0.5),
+    4px 0 4px rgba($black, 0.5) !default;
 $off-canvas-overlay-background: rgba($white, 0.2) !default;
 $off-canvas-overlay-background-hover: rgba($white, 0.05) !default;
 
@@ -110,7 +112,7 @@ $menu-slide: "transform 500ms ease" !default;
     position: absolute;
     transition: transform 500ms ease 0s;
     width: $off-canvas-width;
-    z-index: 1001;
+    z-index: calc(var(--depth-menu) - 1);
 
     @if $position == left {
         @include translate3d(-100%, 0, 0);
@@ -297,7 +299,7 @@ $menu-slide: "transform 500ms ease" !default;
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 1002;
+    z-index: var(--depth-menu);
 
     @media #{$medium-up} {
         &:hover {
@@ -325,7 +327,7 @@ $menu-slide: "transform 500ms ease" !default;
     top: 0;
     width: $off-canvas-width;
     height: $off-canvas-height;
-    z-index: 1002;
+    z-index: var(--depth-menu);
     @if $position == left {
         @include translate3d(-100%, 0, 0);
         left: 0;
@@ -526,7 +528,7 @@ $menu-slide: "transform 500ms ease" !default;
             .top-off-canvas-menu,
             .bottom-off-canvas-menu {
                 transform: none;
-                z-index: 1003;
+                z-index: calc(1 + var(--depth-menu));
             }
             .exit-off-canvas {
                 @include back-link;
@@ -535,7 +537,7 @@ $menu-slide: "transform 500ms ease" !default;
         .offcanvas-overlap-left {
             .right-off-canvas-menu {
                 transform: none;
-                z-index: 1003;
+                z-index: calc(1 + var(--depth-menu));
             }
             .exit-off-canvas {
                 @include back-link;
@@ -544,7 +546,7 @@ $menu-slide: "transform 500ms ease" !default;
         .offcanvas-overlap-right {
             .left-off-canvas-menu {
                 transform: none;
-                z-index: 1003;
+                z-index: calc(1 + var(--depth-menu));
             }
             .exit-off-canvas {
                 @include back-link;
@@ -553,7 +555,7 @@ $menu-slide: "transform 500ms ease" !default;
         .offcanvas-overlap-top {
             .bottom-off-canvas-menu {
                 transform: none;
-                z-index: 1003;
+                z-index: calc(1 + var(--depth-menu));
             }
             .exit-off-canvas {
                 @include back-link;
@@ -562,7 +564,7 @@ $menu-slide: "transform 500ms ease" !default;
         .offcanvas-overlap-bottom {
             .top-off-canvas-menu {
                 transform: none;
-                z-index: 1003;
+                z-index: calc(1 + var(--depth-menu));
             }
             .exit-off-canvas {
                 @include back-link;

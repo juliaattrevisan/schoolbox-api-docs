@@ -61,7 +61,7 @@ h3.lrn-report-item-title {
 /* Set z-index to fix dropdown and side panels open behind the quiz modal */
 .lrn.lrn-author,
 .lrn.lrn-assess {
-    z-index: 0;
+    z-index: calc(var(--depth-default) - 1);
 }
 
 /* add new question button styles */

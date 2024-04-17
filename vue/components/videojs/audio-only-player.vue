@@ -89,7 +89,7 @@ export default {
                     "/storage/checkVideoStatus.php?" +
                         new URLSearchParams({
                             hash: this.hash,
-                        })
+                        }),
                 );
                 const responseData = await response.json();
                 const videoStatus = responseData.status;
@@ -127,7 +127,7 @@ export default {
             this.$emit(
                 "on-dimensions-ready",
                 this.$refs.audioContainer.offsetWidth,
-                this.$refs.audioContainer.offsetHeight
+                this.$refs.audioContainer.offsetHeight,
             );
         },
 
@@ -239,7 +239,7 @@ export default {
     .vjs-big-play-button {
         display: block;
         position: absolute;
-        z-index: 2;
+        z-index: calc(var(--depth-default) + 1);
         background-color: black;
         border: 2px solid white;
         border-radius: 0;

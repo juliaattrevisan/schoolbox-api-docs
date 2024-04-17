@@ -265,7 +265,7 @@ $rotate-span-width: 11rem;
 .diagonal-headings-table {
     thead {
         position: sticky;
-        z-index: 5;
+        z-index: calc(var(--depth-default) + 2);
         top: 0;
         background-color: $body-bg;
 
@@ -332,11 +332,13 @@ $rotate-span-width: 11rem;
         }
 
         th.fixed-left {
-            z-index: 4 !important; /* Z-index for top-left cells must be greater than z-index for top cells and left cells. */
+            z-index: calc(
+                var(--depth-default) + 1
+            ) !important; /* Z-index for top-left cells must be greater than z-index for top cells and left cells. */
         }
 
         th {
-            z-index: 3; /* Z-index for top cells must be greater than z-index for left cells. */
+            z-index: var(--depth-default); /* Z-index for top cells must be greater than z-index for left cells. */
         }
     }
 
@@ -355,7 +357,7 @@ $rotate-span-width: 11rem;
             position: sticky;
             left: 0;
         }
-        z-index: 2; /* Z-index for left cells. */
+        z-index: calc(var(--depth-default - 1)); /* Z-index for left cells. */
     }
 
     th.fixed-left:nth-child(2) {

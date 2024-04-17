@@ -194,11 +194,11 @@
 }
 
 .badge-img-container__background {
-    z-index: 1;
+    z-index: var(--depth-default);
 }
 
 .badge-img-container__foreground {
-    z-index: 2;
+    z-index: calc(var(--depth-default) + 1);
 }
 
 #badge-list-form-container {

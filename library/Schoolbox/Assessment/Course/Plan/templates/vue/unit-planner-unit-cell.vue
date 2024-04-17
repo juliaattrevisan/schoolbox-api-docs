@@ -259,7 +259,7 @@ window.Vue.onUnmounted(() => {
     height: 25px;
     position: absolute;
     width: 25px;
-    z-index: 100;
+    z-index: var(--depth-default);
 
     &:not(.isDragging) {
         transform: none !important;

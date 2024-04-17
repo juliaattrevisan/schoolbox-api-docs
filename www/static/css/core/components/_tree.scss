@@ -142,7 +142,7 @@ ul.jstree-default {
             display: block;
             position: absolute;
             content: "Loading...";
-            z-index: 1;
+            z-index: var(--depth-default);
         }
 
         .meta-preview {

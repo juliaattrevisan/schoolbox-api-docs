@@ -126,7 +126,7 @@ $allow-sidebar-stash: $large-up;
         box-shadow: none;
     }
     .exit-off-canvas {
-        z-index: 1000;
+        z-index: calc(var(--depth-menu) - 2);
     }
 }
 
@@ -144,7 +144,7 @@ $allow-sidebar-stash: $large-up;
         }
     }
     .exit-off-canvas {
-        z-index: 1000;
+        z-index: calc(var(--depth-menu) - 2);
     }
 }
 
@@ -165,7 +165,7 @@ $allow-sidebar-stash: $large-up;
 
     .left-small {
         width: $tabbar-height;
-        z-index: 1001;
+        z-index: calc(var(--depth-menu) - 2);
 
         svg {
             fill: $navigation-foreground;
@@ -174,7 +174,7 @@ $allow-sidebar-stash: $large-up;
 
     .right-small {
         width: $tabbar-height;
-        z-index: 1002;
+        z-index: var(--depth-menu);
     }
 
     .tab-bar {
@@ -276,7 +276,7 @@ $allow-sidebar-stash: $large-up;
         overflow-y: scroll;
         text-align: left;
         width: $off-canvas-width;
-        z-index: 100;
+        z-index: var(--depth-menu);
 
         @media #{$small-only} {
             top: $tabbar-height;
@@ -299,7 +299,7 @@ $allow-sidebar-stash: $large-up;
         .account-menu,
         .account-drop {
             right: 0;
-            z-index: 100001 !important;
+            z-index: calc(var(--depth-menu) + 2) !important;
         }
     }
 }
@@ -327,7 +327,7 @@ $allow-sidebar-stash: $large-up;
 	 * Appears when you click a guy's username in the left menu
 	 */
 
-    z-index: 1002;
+    z-index: var(--depth-menu);
 
     .account-menu-mobile {
         color: $accounts-menu-foreground;
@@ -429,7 +429,7 @@ $allow-sidebar-stash: $large-up;
             position: absolute;
             right: 0;
             width: 2.5rem;
-            z-index: 1; // Safari will not see the icon without this
+            z-index: var(--depth-default); // Safari will not see the icon without this
 
             &:hover {
                 background-color: $off-canvas-hover;
@@ -580,7 +580,7 @@ $allow-sidebar-stash: $large-up;
 
 // Right sidebar (notifications)
 .right-off-canvas-menu {
-    z-index: 99;
+    z-index: var(--depth-menu);
 }
 
 // Common account menu styles (sidebar & top menu variations)
@@ -669,7 +669,7 @@ $allow-sidebar-stash: $large-up;
         }
         #profile-drop {
             right: 0;
-            z-index: 101;
+            z-index: var(--depth-menu);
         }
         .account-drop {
             right: 0;
@@ -712,5 +712,5 @@ $allow-sidebar-stash: $large-up;
 
 // Injected when the search bar is hovered or focused and gets removed when the user clicked on other elements
 .search-is-active {
-    z-index: 1000 !important;
+    z-index: calc((--depth-pop-over) + 1) !important;
 }

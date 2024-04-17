@@ -104,7 +104,10 @@ window.Vue.onUnmounted(() => {
 <template>
     <li
         ref="activityListEl"
-        :class="{ 'ui-sortable-helper': props.isDragPlaceholder, 'actions-small-1': hasNavLinks }"
+        :class="[
+            props.isDragPlaceholder ? 'ui-sortable-helper' : undefined,
+            `actions-small-${(hasNavLinks ? 1 : 0) + (activitiesListStore().routes.reorder ? 1 : 0)}`,
+        ]"
         :style="{
             top: props.isDragPlaceholder ? `${activitiesListDragStore().dragPlaceholderY}px` : undefined,
         }"
@@ -184,7 +187,7 @@ li[data-sortable-active="true"] .sortable-holder {
     height: 100%;
     position: absolute;
     width: 40px;
-    z-index: 100;
+    z-index: var(--depth-default);
 }
 
 .card.compact {
