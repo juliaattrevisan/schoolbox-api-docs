@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Learnosity\Importer\IContextLookup;
 use Schoolbox\Learning\Learnosity\TagFactory;
 
 /**
@@ -23,7 +24,7 @@ use Schoolbox\Learning\Learnosity\TagFactory;
  *     (unit spec uuid, unit spec name)
  *     (folder code, folder name)
  */
-class ContextLookup
+class ContextLookup implements IContextLookup
 {
     /**
      * A set of (encoded columns, tags) tuples
@@ -46,7 +47,7 @@ class ContextLookup
      * For finding a row in mv_assessment_relation
      */
     private const QUERY_MV_RELATION = '
-        SELECT 
+        SELECT
             folder_id,
             course_implementation_id,
             course_unit_implementation_id,
@@ -62,7 +63,7 @@ class ContextLookup
      * For finding the (name, uuid) tuple of a course spec
      */
     private const QUERY_COURSE_SPEC = '
-        SELECT f.name, cs.uuid 
+        SELECT f.name, cs.uuid
         FROM course_specification cs
         LEFT JOIN folder f ON cs.folder_id = f.id
         WHERE cs.id = :id
@@ -73,7 +74,7 @@ class ContextLookup
      * For finding the (name, uuid) tuple of a course unit spec
      */
     private const QUERY_COURSE_UNIT_SPEC = '
-        SELECT f.name, cus.uuid 
+        SELECT f.name, cus.uuid
         FROM course_unit_specification cus
         LEFT JOIN folder f ON cus.folder_id = f.id
         WHERE cus.id = :id
@@ -85,7 +86,7 @@ class ContextLookup
      * via a course impl
      */
     private const QUERY_COURSE_IMPL = '
-        SELECT f.name, cs.uuid 
+        SELECT f.name, cs.uuid
         FROM course_implementation ci
         INNER JOIN course_specification cs ON ci.course_specification_id = cs.id
         INNER JOIN folder f ON cs.folder_id = f.id
@@ -98,7 +99,7 @@ class ContextLookup
      * via a course unit impl
      */
     private const QUERY_COURSE_UNIT_IMPL = '
-        SELECT f.name, cus.uuid 
+        SELECT f.name, cus.uuid
         FROM course_unit_implementation cui
         INNER JOIN course_unit_specification cus ON cui.course_unit_specification_id = cus.id
         LEFT JOIN folder f ON cus.folder_id = f.id
