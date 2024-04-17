@@ -145,7 +145,7 @@
                  {% endif %}</h1>
          </div>
      </div>
-     {% if assessment is quiz %}
+     {% if assessment is defined and assessment is quiz %}
      <nav>
          <sbx-pop-out content-id="header-options"></sbx-pop-out>
      </nav>
@@ -161,7 +161,7 @@
  # We haven't really subclassed the assessment create screen like this before...
  # To minimise master fallout I'll just inject the quiz-specific stuff right here
  #}
-{% if assessment is quiz %}
+{% if assessment is defined and assessment is quiz %}
     <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
     <script>
         $(function() {
