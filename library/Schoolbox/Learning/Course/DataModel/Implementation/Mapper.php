@@ -172,6 +172,10 @@ class Mapper extends AbstractCourseMapper
      * The multi-level data structure is used because each course implementation can be implemented in multiple folders,
      * each of which can have multiple course outline components linking to that course implementation.
      *
+     * Note that in practice a folder should never have multiple course outline components linking to the same course
+     * implementation, but since the database schema allows it, the data structure returned by this function must also
+     * allow it.
+     *
      * @param array $courseImplIds
      * @return array
      */
@@ -192,7 +196,11 @@ class Mapper extends AbstractCourseMapper
             )
             WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
             AND ci.module="homepage"
-            AND cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
+            AND ' . (
+                count($courseImplIds) > 0
+                ? 'cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
+                : 'FALSE'
+            )
         )->fetchAll();
 
         $componentInstanceIdsByFolderIdByCourseImplId = [];
