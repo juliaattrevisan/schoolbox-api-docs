@@ -49,7 +49,20 @@ class ContextLookup implements IContextLookup
     public function find(int $assessmentId): array
     {
         new \Alaress_Probe($this->context);
+
+        if ($this->context instanceof \Schoolbox\Resource\Folder\Model) {
+            /* Directly into a homepage via the quiz component
+             */
+        } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+            /* Course Specification, when authoring a course's contents
+             */
+        } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+            /* Course Implementation, when you randomly add to an already-imported course
+             */
+        }
+
         die();
+
         $row = $this->findRow($assessmentId);
 
         /* If course_specification_id is set, find out its name and uuid
