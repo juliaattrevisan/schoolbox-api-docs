@@ -321,6 +321,8 @@ class Controller extends AbstractController
             $this->workTypeMapper,
             $this->markTypeMapper
         ))->import($data);
+
+        new \Alaress_Probe($result['legacyQuiz']);
     }
 
 

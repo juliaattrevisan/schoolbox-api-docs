@@ -94,11 +94,13 @@ class Importer
      * so you can continue making data with it elsewhere
      *
      * @param string $data
-     * @return void
+     * @return array
      * @throws Deleted
      * @throws MapperException
+     * @throws ValidationException
+     * @throws \JsonException
      */
-    public function import(string $data): void
+    public function import(string $data): array
     {
         /* We need to use this later
          */
@@ -157,6 +159,18 @@ class Importer
             $blueprintBuilder,
             $this->api
         );
+
+        /* Return some constructed objects
+         */
+        return [
+            'assessment' => $instances['assessment'],
+            /* The quiz subobject belonging to the assessment instance itself
+             */
+            'quiz' => $instances['quiz'],
+            /* The conversion of quiz xml into the same format as the quiz from db
+             */
+            'legacyQuiz' => $legacyQuiz
+        ];
     }
 
 
