@@ -137,8 +137,10 @@ class DataSync
      */
     public function synchronise(): void
     {
-        $this->schoolboxDb->beginTransaction();
-
+        // If not persisting changes, wrap everything in a transaction we will subsequently rollback.
+        if (!$this->persist) {
+            $this->schoolboxDb->beginTransaction();
+        }
         try {
             $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
 
@@ -174,13 +176,10 @@ class DataSync
         } catch (\Exception $e) {
             $this->log->critical(sprintf("Sync Failure: %s", $e->getMessage()));
             $this->log->debug($e->getTraceAsString());
-            $this->schoolboxDb->rollBack();
             exit(1);
         }
 
-        if ($this->persist) {
-            $this->schoolboxDb->commit();
-        } else {
+        if (!$this->persist) {
             $this->schoolboxDb->rollBack();
         }
     }
@@ -323,6 +322,10 @@ class DataSync
             new Bridge\CourseSectionDates(),
             $this->schoolboxTimezone
         ))->synchronise();
+
+        if (!$this->persist) {
+            $this->schoolboxDb->rollBack();
+        }
     }
 
     /**
