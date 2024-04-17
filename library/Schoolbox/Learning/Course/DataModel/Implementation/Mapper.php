@@ -134,12 +134,7 @@ class Mapper extends AbstractCourseMapper
      * @param bool      $loadUnits
      * @return Collection|Model[]
      */
-    public function findAllByCourseSpecificationId(
-        $courseSpecId,
-        $options = [],
-        $loadUnits = false,
-        $addCourseOutlineComponentIds = false
-    )
+    public function findAllByCourseSpecificationId($courseSpecId, $options = [], $loadUnits = false)
     {
         $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
 
@@ -158,43 +153,63 @@ class Mapper extends AbstractCourseMapper
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
         }
 
-        if ($addCourseOutlineComponentIds) {
-            $courseImplIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getId())->getAll();
-            $rows = $this->getDatabase()->executeQuery(
-                'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId
-                FROM component_definition cd
-                JOIN component_instance ci ON (ci.component_definition_id=cd.id)
-                JOIN folder f ON f.id=ci.identifier
-                JOIN component_config_definition ccd_importedCourse ON (
-                    ccd_importedCourse.component_definition_id = cd.id AND
-                    ccd_importedCourse.key = "importedCourse"
-                )
-                LEFT JOIN component_config_instance cci_importedCourse ON (
-                    cci_importedCourse.component_config_definition_id=ccd_importedCourse.id AND
-                    cci_importedCourse.component_instance_id=ci.id
-                )
-                WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
-                AND ci.module="homepage"
-                AND cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
-            )->fetchAll();
+        return $courseImpls;
+    }
 
-            $componentInstanceIdsByCourseImplId = [];
+    /**
+     * Return an array of courseOutlineComponentInstanceIds, indexed by folderId, indexed by courseImplId.
+     *
+     * Example return value: [
+     *     23 => // courseImplId
+     *     [
+     *         80 => // folderId
+     *         [
+     *             4883, // componentInstanceIds referring to Course Outline components
+     *             4884, //
+     *         ]
+     *     ]
+     * ]
+     *
+     * The multi-level data structure is used because each course implementation can be implemented in multiple folders,
+     * each of which can have multiple course outline components linking to that course implementation.
+     *
+     * @param array $courseImplIds
+     * @return array
+     */
+    public function getCourseOutlineComponentIdsByFolderIdByCourseImplId(array $courseImplIds): array
+    {
+        $rows = $this->getDatabase()->executeQuery(
+            'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId, f.id AS folderId
+            FROM component_definition cd
+            JOIN component_instance ci ON (ci.component_definition_id=cd.id)
+            JOIN folder f ON f.id=ci.identifier
+            JOIN component_config_definition ccd_importedCourse ON (
+                ccd_importedCourse.component_definition_id = cd.id AND
+                ccd_importedCourse.key = "importedCourse"
+            )
+            LEFT JOIN component_config_instance cci_importedCourse ON (
+                cci_importedCourse.component_config_definition_id=ccd_importedCourse.id AND
+                cci_importedCourse.component_instance_id=ci.id
+            )
+            WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
+            AND ci.module="homepage"
+            AND cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
+        )->fetchAll();
 
-            foreach ($rows as $row) {
-                if (!array_key_exists($row['courseImplId'], $componentInstanceIdsByCourseImplId)) {
-                    $componentInstanceIdsByCourseImplId[$row['courseImplId']] = [];
-                }
-                $componentInstanceIdsByCourseImplId[$row['courseImplId']][] = $row['componentInstanceId'];
+        $componentInstanceIdsByFolderIdByCourseImplId = [];
+        foreach ($rows as $row) {
+            $courseImplId = $row['courseImplId'];
+            $folderId = $row['folderId'];
+            if (!array_key_exists($courseImplId, $componentInstanceIdsByFolderIdByCourseImplId)) {
+                $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId] = [];
             }
-
-            foreach ($courseImpls as $courseImpl) {
-                if (array_key_exists($courseImpl->getId(), $componentInstanceIdsByCourseImplId)) {
-                    $courseImpl->setCourseOutlineComponentInstanceIds($componentInstanceIdsByCourseImplId[$courseImpl->getId()]);
-                }
+            if (!array_key_exists($folderId, $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId])) {
+                $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId][$folderId] = [];
             }
+            $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId][$folderId][] = $row['componentInstanceId'];
         }
 
-        return $courseImpls;
+        return $componentInstanceIdsByFolderIdByCourseImplId;
     }
 
     /**

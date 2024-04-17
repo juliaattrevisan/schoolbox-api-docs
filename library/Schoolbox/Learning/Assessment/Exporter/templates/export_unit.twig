@@ -9,11 +9,12 @@
     So this is for the situation where a course specification has already been partially implemented in a class, and now
     the user wants to export a unit into a course implementation that currently does not contain that unit.
 
-    'unitSpec'                          CourseUnitSpecificationModel - The unit spec
-    'returnUrl'                         string                       - A URL to return to
-    'returnUrlName'                     string                       - query arg name
-    'courseImplsInWhichUnitNotImported' CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
-    'folderWritePerms'                  bool[]                       - Does current user have WRITE+ perm to the class folder
+    'unitSpec'                                          CourseUnitSpecificationModel - The unit spec
+    'returnUrl'                                         string                       - A URL to return to
+    'returnUrlName'                                     string                       - query arg name
+    'courseImplsInWhichUnitNotImported'                 CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
+    'courseOutlineComponentIdsByFolderIdByCourseImplId' []                           - Array of courseOutlineComponentInstanceIds, indexed by folderId, indexed by courseImplId
+    'folderWritePerms'                                  bool[]                       - Does current user have WRITE+ perm to the class folder
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
@@ -83,9 +84,20 @@
                         </ul>
                         <ul class="information-list card-selectable">
                             {% for courseImpl in courseImplsInWhichUnitNotImported %}
+                                {%
+                                    if (
+                                        courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id] is defined and
+                                        courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id][courseImpl.folder.id] is defined
+                                    )
+                                %}
+                                    {% set courseOutlineComponentIds = courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id][courseImpl.folder.id] %}
+                                {% else %}
+                                    {% set courseOutlineComponentIds = [] %}
+                                {% endif %}
                                 {% include '@learningAssessmentExporter/export_unit_row.twig' with {
-                                    courseImpl:       courseImpl,
-                                    folderWritePerms: folderWritePerms,
+                                    courseImpl:                courseImpl,
+                                    folderWritePerms:          folderWritePerms,
+                                    courseOutlineComponentIds: courseOutlineComponentIds
                                 } only %}
                             {% endfor %}
                         </ul>

@@ -1,6 +1,8 @@
 {#
-    'courseImpl'       CourseImplementationModel    - The course implementation into which the unitSpec may be exported
-    'folderWritePerms' bool[]                       - Does current user have WRITE+ perm to the class folder
+    'courseImpl'                CourseImplementationModel    - The course implementation into which the unitSpec may be exported
+    'folderWritePerms'          bool[]                       - Does current user have WRITE+ perm to the class folder
+    'courseOutlineComponentIds' int[]                        - The IDs of course outline component_instance rows
+                                                               from components attached to the same folder as the courseImpl.
 
     NOTE: If the ability to overwrite existing units is ever needed, see https://github.com/alaress/schoolbox/pull/28644.
 #}
@@ -43,11 +45,11 @@
             <span class="size-32 icon-home"></span>
             <h3>
                 <a href="/homepage/{{ courseImpl.folder.id }}">{{ courseImpl.folder.title }}</a>
-                {% if courseImpl.courseOutlineComponentInstanceIds|length %}
-                    <a href='/homepage/{{ courseImpl.folder.id }}#component{{ courseImpl.courseOutlineComponentInstanceIds[0] }}'>
+                {% for courseOutlineComponentId in courseOutlineComponentIds %}
+                    <a href='/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}'>
                         (with linked course outline component)
                     </a>
-                {% endif %}
+                {% endfor %}
                 <span class='pipe meta'>Course imported on {{ courseImpl.createdAt.long }}</span>
             </h3>
             <p class="meta">

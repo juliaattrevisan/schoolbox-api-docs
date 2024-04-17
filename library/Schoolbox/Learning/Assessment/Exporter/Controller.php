@@ -147,11 +147,7 @@ class Controller extends BaseController
     public function getExportFormForUnit(UnitSpecification\Model $unitSpec): void
     {
         $courseSpec = $unitSpec->getCourse();
-        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId(
-            $courseSpec->getId(), [],
-            false,
-            true
-        );
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
         // Filter out historical classes (no class code, no group).
         $courseImpls = $courseImpls->filter(
@@ -185,13 +181,19 @@ class Controller extends BaseController
             return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
         });
 
+        // Get info on related course outline components.
+        $courseOutlineComponentIdsByFolderIdByCourseImplId = $this->courseImplementationMapper->getCourseOutlineComponentIdsByFolderIdByCourseImplId(
+            $courseImpls->map(fn($courseImpl) => $courseImpl->getId())->getAll()
+        );
+
         $data = [
-            'unitSpec'                          => $unitSpec,
-            'returnUrl'                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'                     => Redirect::RETURN_URL,
-            'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
-            'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
-            'breadcrumbs'                       => [
+            'unitSpec'                                          => $unitSpec,
+            'returnUrl'                                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'                                     => Redirect::RETURN_URL,
+            'courseImplsInWhichUnitNotImported'                 => $courseImplsInWhichUnitNotImported,
+            'courseOutlineComponentIdsByFolderIdByCourseImplId' => $courseOutlineComponentIdsByFolderIdByCourseImplId,
+            'folderWritePerms'                                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
+            'breadcrumbs'                                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
                 [$courseSpec->getTitle(), '/homepage/' . $courseSpec->getFolder()->getId()],
                 [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],
