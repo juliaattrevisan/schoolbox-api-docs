@@ -138,4 +138,15 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
             );
         }
     }
+
+    /**
+     * Clear child blocks after parsing out the parent. Keep this in its own
+     * method for polymorphic algorithm
+     *
+     * @param SitePage $page
+     * @return void
+     */
+    public function cleanupParse(SitePage $page)
+    {
+    }
 }
