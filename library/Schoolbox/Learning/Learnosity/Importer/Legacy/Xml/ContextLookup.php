@@ -63,7 +63,7 @@ class ContextLookup implements IContextLookup
              */
             $courseSpec = $this->findCourseSpecViaImpl($this->context);
             $courseUnitSpec = $this->findCourseUnitSpecViaImpl($this->context);
-            $folderCodes = $this->findFolderCodes($this->context->getCourse()->getFolder(0));
+            $folderCodes = $this->findFolderCodes($this->context->getCourse()->getFolder());
 
             /* Generate the set of tags and remember it in $this->lookup for
              * this particular combination of columns
@@ -91,35 +91,6 @@ class ContextLookup implements IContextLookup
         $tags[] = $this->tagFactory->produceImplFlag();
 
         return $tags;
-    }
-
-
-    /**
-     * Finds a particular row from of mv_assessment_relation, for $assessmentId
-     *
-     * @param int $assessmentId
-     * @return array
-     * @throws \PDOException
-     */
-    private function findRow(int $assessmentId): array
-    {
-        $this->mvRelationStatement->execute([
-            'assessmentId' => $assessmentId
-        ]);
-
-        return $this->mvRelationStatement->fetch(\PDO::FETCH_ASSOC);
-    }
-
-
-    /**
-     * Encodes the columns of $row into a string to use as a hash lookup
-     *
-     * @param array $row
-     * @return string
-     */
-    private function encodeRow(array $row): string
-    {
-        return implode(',', array_values($row));
     }
 
 
