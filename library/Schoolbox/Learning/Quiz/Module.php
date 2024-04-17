@@ -66,7 +66,6 @@ class Module extends RestfulModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes()
     {

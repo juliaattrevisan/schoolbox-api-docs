@@ -143,7 +143,7 @@ class Builder
      *
      * @param array $question
      * @param \SimpleXMLElement $answers
-     * @return mixed
+     * @return array
      * @throws \RuntimeException
      */
     private function decompileAnswer(array $question, \SimpleXMLElement $answers): array
