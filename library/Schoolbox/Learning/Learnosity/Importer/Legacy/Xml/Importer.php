@@ -192,7 +192,7 @@ class Importer
         $result     = simplexml_load_string($xml);
 
         if (!($result instanceof SimpleXMLElement)) {
-            $result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
+            $result = simplexml_load_string(html_entity_decode($xml, ENT_QUOTES, 'UTF-8'));
         }
 
         libxml_use_internal_errors($use_errors);
