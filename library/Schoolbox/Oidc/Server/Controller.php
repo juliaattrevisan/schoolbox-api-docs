@@ -21,6 +21,7 @@ use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller for OpenID Connect identity provision.
@@ -195,7 +196,7 @@ class Controller extends Base
         $authHeader = $this->request->getHeaderLine('authorization');
         preg_match('/^Bearer\\s+(.*)/i', $authHeader, $matches);
         if (!$matches) {
-            $this->sendJsonError('Access token must be provided as a Bearer token', 400);
+            $this->sendJsonError('Access token must be provided as a Bearer token', Response::HTTP_BAD_REQUEST);
         }
         [, $accessToken] = $matches;
 
@@ -217,6 +218,25 @@ class Controller extends Base
 
         // Also include the "sub" claim if it's not in the ID token.
         $idTokenClaims[IParser::CLAIM_SUB] ??= $user->getUsername();
-        $this->response = $this->responseAsJson($idTokenClaims);
+
+        // What's the response type?
+        // application/json?
+        // application/jwt? return a JWT
+        $contentType = $this->request->getHeaderLine('Content-Type');
+        if (strtolower($contentType) === 'application/jwt') {
+            // Generate a JWT
+            $idTokenClaims[IParser::CLAIM_ISS] = $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_ISSUER);
+            $idTokenClaims[IParser::CLAIM_AUD] = $decodedJwt[IParser::CLAIM_AUD];
+            $this->response = $this->responseFromContent(
+                \Firebase\JWT\JWT::encode(
+                    $idTokenClaims,
+                    $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+                    Jwt::SIGNING_ALGORITHM,
+                    Jwt::KEY_ID,
+                )
+            )->withHeader('Content-Type', 'application/jwt');
+        } else {
+            $this->response = $this->responseAsJson($idTokenClaims);
+        }
     }
 }
