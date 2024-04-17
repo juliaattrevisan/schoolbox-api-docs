@@ -168,7 +168,9 @@
             $('[data-import]').on('click', function(event) {
                 event.preventDefault();
 
-                $('#xmlImportForm').submit();
+                $('#xmlImportForm').submit().hide();
+                $('#xml-import-actions').hide();
+                $('#xml-loader').show();
             });
         });
     </script>
@@ -181,6 +183,11 @@
         }) %}
 
         {% if xmlImportRoute %}
+        <div id="xml-loader" style="display:none">
+            <div class="loader"></div>
+            <p class="text-center">Importing legaxy quiz xml...</p>
+        </div>
+
         <form id='xmlImportForm' method="post" action="{{ xmlImportRoute }}">
             <input type="hidden" name="contextId" value="{{ context.id }}" />
             <input type="hidden" name="contextType" value="{{ contextType }}" />
@@ -193,7 +200,7 @@
                 </fieldset>
             </section>
         </form>
-        <div class="component-action">
+        <div id='xml-import-actions' class="component-action">
             <section>
                 <a class="button" data-import>
                     Import
