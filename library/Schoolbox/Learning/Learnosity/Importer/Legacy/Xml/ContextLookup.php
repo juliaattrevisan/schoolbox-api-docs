@@ -122,7 +122,6 @@ class ContextLookup implements IContextLookup
     private function findCourseUnitSpec(AssessmentContext $context): array
     {
         return [
-            /* @phpstan-ignore-next-line */
             'name' => $context->getFolder()->getName(),
             /* @phpstan-ignore-next-line */
             'uuid' => $context->getUuid(),
