@@ -293,6 +293,7 @@ class Controller extends Base
     private function exchangeAuthorizationCodeForAccessToken(string $code): AccessToken
     {
         // convert auth code to access token, checking PKCE code along the way
+        /** @phpstan-ignore-next-line - setPkceCode returns the same object buildOidcProvider builds */
         return $this->buildOidcProvider()
             ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
             ->getAccessToken('authorization_code', ['code' => $code]);
