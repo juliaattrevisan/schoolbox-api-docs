@@ -222,8 +222,8 @@ class Controller extends Base
         // What's the response type?
         // application/json?
         // application/jwt? return a JWT
-        $contentType = $this->request->getHeaderLine('Content-Type');
-        if (strtolower($contentType) === 'application/jwt') {
+        $acceptedResponseType = $this->request->getHeaderLine('Accept');
+        if (strtolower($acceptedResponseType) === 'application/jwt') {
             // Generate a JWT
             $idTokenClaims[IParser::CLAIM_ISS] = $this->getConfigLoader()->get(ConfigMapper::NAME_OAUTH_ISSUER);
             $idTokenClaims[IParser::CLAIM_AUD] = $decodedJwt[IParser::CLAIM_AUD];

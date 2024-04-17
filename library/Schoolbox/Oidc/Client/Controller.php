@@ -18,6 +18,7 @@ use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use OpenIDConnectClient\AccessToken;
@@ -104,7 +105,20 @@ class Controller extends Base
                 $this->sendError('State sent to and received from OIDC provider do not match');
                 return;
             }
-            $idToken = $this->decodeAccessToken($accessToken);
+
+            $oidcConfig      = $this->retrieveOidcConfig();
+            $idTokenResponse = $this->httpClient->get(
+                $oidcConfig['userinfo_endpoint'],
+                [
+                    RequestOptions::HEADERS => [
+                        'accept'        => 'application/jwt',
+                        'authorization' => 'Bearer ' . $accessToken,
+                    ]
+                ]
+            );
+            $idToken = $idTokenResponse->getBody()->getContents();
+            $this->redirectToSessionInit($requestState, $idToken);
+            return;
         }
 
         $code = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
@@ -223,12 +237,7 @@ class Controller extends Base
         // implements this, but it is not yet merged.
         // For now I will fetch the configuration manually, caching the response
         // if possible.
-        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
-        try {
-            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIssuerUri);
-        } catch (InvalidArgumentException $e) {
-            throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
-        }
+        $oidcConfig = $this->retrieveOidcConfig();
 
         // Redirect URI: here, I suppose?
         $redirectUri = (new Factory($config))
@@ -301,6 +310,29 @@ class Controller extends Base
             ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
             ->getAccessToken('authorization_code', ['code' => $code]);
     }
+
+//    /**
+//     * Retrieves the content of the JSON web key set for this instance's
+//     * configured oAuth provider.
+//     *
+//     * @return array
+//     * @throws ClientExceptionInterface
+//     */
+//    private function retrieveOidcConfig(): array
+//    {
+//        $config         = $this->getConfigLoader();
+//        $oauthIssuerUri = new Uri(
+//            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
+//                ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+//        );
+//
+//        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
+//        try {
+//            return $oidcCache->retrieveOidcConfig($oauthIssuerUri);
+//        } catch (InvalidArgumentException $e) {
+//            throw new SchoolboxException('Could not cache OIDC configuration', 0, $e, 500);
+//        }
+//    }
 
     /**
      * Retrieves the content of the JSON web key set for this instance's
@@ -377,5 +409,26 @@ class Controller extends Base
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return array
+     * @throws ClientExceptionInterface
+     */
+    private function retrieveOidcConfig(): array
+    {
+        $config         = $this->getConfigLoader();
+        $oauthIssuerUri = new Uri(
+            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
+                ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+        );
+
+        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
+        try {
+            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIssuerUri);
+        } catch (InvalidArgumentException $e) {
+            throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
+        }
+        return $oidcConfig;
     }
 }
