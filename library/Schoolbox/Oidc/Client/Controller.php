@@ -67,6 +67,17 @@ class Controller extends Base
     /**
      * Send OIDC auth requests and receive responses via the same endpoint.
      *
+     * Depending on the type of response the auth request sends, the OIDC server
+     * may respond with any of the following:
+     * * an ID token: send it directly to the init session endpoint
+     * * an access token: exchange for an ID token via the server's userinfo
+     *   endpoint, then send the ID token to the init session endpoint
+     * * an auth code: exchange the auth code for an access token + ID token,
+     *   then send the ID token to the init session endpoint
+     *
+     * All of the above cases check the request's state and the ID token's nonce
+     * value before forwarding the token.
+     *
      * @api GET /login/oidc
      * @since 23.1
      *
@@ -78,16 +89,14 @@ class Controller extends Base
      */
     public function getAuthorization(): void
     {
-        // What was received?
-        // * an ID token? send it straight to login if so, but not before
-        //   decoding and checking nonce
-        // * an access token? verify it if so, and create a session for the
-        //   identified user
-        // * an auth code? if so, exchange for an access token
-        // * neither: send the authorization request
         $idToken      = $this->requestPost->get('id_token') ?? $this->requestQuery->get('id_token');
         $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
         if (isset($idToken)) {
+            if (!$this->verifyState($requestState)) {
+                $this->sendError('State sent to and received from OIDC provider do not match');
+                return;
+            }
+
             $decodedIdToken = $this->decodeAccessToken($idToken);
             // Check nonce, and then redirect
             if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null)) {
@@ -311,28 +320,29 @@ class Controller extends Base
             ->getAccessToken('authorization_code', ['code' => $code]);
     }
 
-//    /**
-//     * Retrieves the content of the JSON web key set for this instance's
-//     * configured oAuth provider.
-//     *
-//     * @return array
-//     * @throws ClientExceptionInterface
-//     */
-//    private function retrieveOidcConfig(): array
-//    {
-//        $config         = $this->getConfigLoader();
-//        $oauthIssuerUri = new Uri(
-//            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
-//                ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
-//        );
-//
-//        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
-//        try {
-//            return $oidcCache->retrieveOidcConfig($oauthIssuerUri);
-//        } catch (InvalidArgumentException $e) {
-//            throw new SchoolboxException('Could not cache OIDC configuration', 0, $e, 500);
-//        }
-//    }
+    /**
+     * Retrieves the content of the well-known configuration for this instance's
+     * configured oAuth provider.
+     *
+     * @return array
+     * @throws ClientExceptionInterface
+     */
+    private function retrieveOidcConfig(): array
+    {
+        $config         = $this->getConfigLoader();
+        $oauthIssuerUri = new Uri(
+            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
+                ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
+        );
+
+        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
+        try {
+            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIssuerUri);
+        } catch (InvalidArgumentException $e) {
+            throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
+        }
+        return $oidcConfig;
+    }
 
     /**
      * Retrieves the content of the JSON web key set for this instance's
@@ -358,11 +368,27 @@ class Controller extends Base
     }
 
     /**
-     * Assert that nonce value from ID token matches what's in the session.
+     * Assert that the state value from the request matches what's in the
+     * session.
+     *
+     * @param string|null $requestState
+     * @return bool
+     */
+    private function verifyState(?string $requestState): bool
+    {
+        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
+        $this->session->set(self::SESSION_STATE_KEY, null);
+        if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Assert that the nonce value from ID token matches what's in the session.
      *
      * @param string|null $nonce
      * @return bool
-     * @throws ControllerException
      */
     private function verifyNonce(?string $nonce): bool
     {
@@ -378,8 +404,10 @@ class Controller extends Base
     }
 
     /**
-     * @param string $requestState
-     * @param string $decodedAccessToken
+     * Create a redirect response sending the user to the init session URL.
+     *
+     * @param string $requestState The encoded state of the request: may contain a URL to redirect to after session init
+     * @param string $idToken      The ID token to forward to the init session URL.
      * @return void
      * @throws RouteNotFound
      */
@@ -395,40 +423,5 @@ class Controller extends Base
                 ])
             );
         $this->response = $this->redirectTemporary($loginUri->__toString());
-    }
-
-    /**
-     * @param mixed $requestState
-     * @return bool
-     */
-    private function verifyState(string $requestState): bool
-    {
-        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
-        $this->session->set(self::SESSION_STATE_KEY, null);
-        if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return array
-     * @throws ClientExceptionInterface
-     */
-    private function retrieveOidcConfig(): array
-    {
-        $config         = $this->getConfigLoader();
-        $oauthIssuerUri = new Uri(
-            $config->get(ConfigMapper::NAME_OAUTH_ISSUER)
-                ?: $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
-        );
-
-        $oidcCache = new CacheHelper($this->httpClient, $this->cache);
-        try {
-            $oidcConfig = $oidcCache->retrieveOidcConfig($oauthIssuerUri);
-        } catch (InvalidArgumentException $e) {
-            throw new SchoolboxException('Could not cache OIDC configuration or public key', 0, $e, 500);
-        }
-        return $oidcConfig;
     }
 }
