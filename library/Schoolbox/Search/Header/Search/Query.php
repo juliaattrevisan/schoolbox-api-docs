@@ -330,7 +330,7 @@ class Query
             ' . (
                 count($involvedFolderIds) > 0
                 ? 'IF(f.id IN (' . implode(',', array_map('intval', $involvedFolderIds)) . '), 1, 0)'
-                : 'FALSE'
+                : '0'
             ) . ' AS userIsInvolved
             FROM folder f
             ' . $this->getJoinsFromFolderForFolderTypeExpression() . "
