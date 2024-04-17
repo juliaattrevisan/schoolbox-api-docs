@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
-use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
@@ -144,7 +143,7 @@ class Importer
          *  idea where this assessment's context details are (it comes from
          *  an xml where there's no record of it in the db)
          */
-        $contextLookup = new ContextLookup($this->databaseInternal, $tagFactory, $this->logger);
+        $contextLookup = new ContextLookup($tagFactory, $this->context);
 
         /* Generates payload array structs
          */

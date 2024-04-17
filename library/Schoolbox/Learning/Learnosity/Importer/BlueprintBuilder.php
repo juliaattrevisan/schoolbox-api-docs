@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\ContextLookup;
 
 /**
  * Build an array of payloads that we intend to send to Learnosity
@@ -82,13 +81,13 @@ class BlueprintBuilder
      *
      * @param string $schoolCode
      * @param PayloadFactory $payloadFactory
-     * @param ContextLookup $contextLookup
+     * @param IContextLookup $contextLookup
      * @param LoggerInterface $logger
      */
     public function __construct(
         private string $schoolCode,
         private PayloadFactory $payloadFactory,
-        private ContextLookup $contextLookup,
+        private IContextLookup $contextLookup,
         private LoggerInterface $logger
     ) {
         /* A generic author identifier attributed to each and every question
