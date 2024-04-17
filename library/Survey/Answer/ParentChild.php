@@ -13,23 +13,102 @@ declare(strict_types=1);
  */
 class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
 {
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'parentChild';
+
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
-        // TODO: Implement prepareResponse() method.
+        $this->configureResponse($page, $question_id);
+
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+
+        $currentAnswer = $this->getByQuestionID($question_id);
+
+        if ($existing['response']) {
+            $page->setVar(
+                array(
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => Scrub::text($existing['response']),
+                )
+            );
+        } else {
+            $page->setVar(
+                array(
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => '',
+                )
+            );
+        }
+
+        $page->parse('answerOption_block', 'answerOption', true);
     }
 
+    /**
+     * Saves a response for this Answer type. This should be customised based on
+     * the format and structure of the answer (e.g. serialize multichoice)
+     *
+     * @param array $data
+     * @return array
+     */
     public function saveResponse($data)
     {
-        // TODO: Implement saveResponse() method.
+        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
     }
 
     public function exportMoodleAnswer(SitePage $page, $question_id)
     {
-        // TODO: Implement exportMoodleAnswer() method.
+        $currentAnswer = $this->getByQuestionID($question_id);
+        $page->setVar('CORRECT_ANSWER', Scrub::text($currentAnswer['answer']));
+        $page->parse('answerOption_block', 'answerOption');
     }
 
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
-        // TODO: Implement importMoodleAnswer() method.
+        $object = array(
+            'question_id' => $question_id,
+            'sequence' => 1,
+            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
+        );
+
+        return $this->create($object, $question_id);
+    }
+
+
+    /**
+     * Renders answers when editing a Question. If a question_id was provided,
+     * load its existing answers and populate fields; otherwise empty them or
+     * set to other default values.
+     *
+     * @param SitePage $page
+     * @param string $question_id
+     * @return void
+     */
+    public function modify($page, $question_id = '')
+    {
+        if (is_numeric($question_id)) {
+            $currentAnswer = parent::getForQuestion($question_id);
+
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => Scrub::text($currentAnswer['answer']),
+                )
+            );
+        } else {
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => '',
+                    'ANSWER' => '',
+                )
+            );
+        }
     }
 }
