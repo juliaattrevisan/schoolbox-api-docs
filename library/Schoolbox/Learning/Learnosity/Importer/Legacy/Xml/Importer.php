@@ -335,7 +335,7 @@ class Importer
         array $legacyQuiz,
         BlueprintBuilder $blueprintBuilder,
         Api $api
-    ):void {
+    ): void {
         /* Make the overall Learnosity payloads which we then send later with
          * a little postprocessing to put things into the exactly correct format.
          * Learnosity is really particular about such things.

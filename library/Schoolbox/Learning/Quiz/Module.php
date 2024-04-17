@@ -12,7 +12,7 @@ use Alaress\Web\Controller\Base;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception\NotFound;;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -68,7 +68,8 @@ class Module extends RestfulModule
      * @return void
      * @throws InvalidArgumentException
      */
-    protected function registerRoutes() {
+    protected function registerRoutes()
+    {
         $canWrite = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -99,7 +100,7 @@ class Module extends RestfulModule
             return $this->preloadContext($params);
         };
 
-        $preloadAssessment = function($params) {
+        $preloadAssessment = function ($params) {
             /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
             $dataSource = $this->injector->get('assessmentDataSource');
 
