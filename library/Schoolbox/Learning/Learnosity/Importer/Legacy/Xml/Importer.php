@@ -455,7 +455,7 @@ class Importer
 
                 return;
             } catch (\PDOException $e) {
-                $this->getLogger()->warning($e->getMessage());
+                $this->logger->warning($e->getMessage());
                 $numFails++;
             }
         }
