@@ -78,52 +78,57 @@ class Controller extends Base
     public function getAuthorization(): void
     {
         // What was received?
-        // * an access token? verify it if so
+        // * an ID token? send it straight to login if so, but not before
+        //   decoding and checking nonce
+        // * an access token? verify it if so, and create a session for the
+        //   identified user
         // * an auth code? if so, exchange for an access token
         // * neither: send the authorization request
-        $token = $this->requestPost->get('access_token') ?? $this->requestQuery->get('access_token');
-        $code  = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
-        if (isset($token) || isset($code)) {
-            // Authorize user, but first check state
-            $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
-            $sessionState = $this->session->get(self::SESSION_STATE_KEY);
-            $this->session->set(self::SESSION_STATE_KEY, null);
-            if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+        $idToken      = $this->requestPost->get('id_token') ?? $this->requestQuery->get('id_token');
+        $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
+        if (isset($idToken)) {
+            $decodedIdToken = $this->decodeAccessToken($idToken);
+            // Check nonce, and then redirect
+            if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null)) {
+                $this->sendError('Nonce sent to and received from OIDC provider do not match');
+                return;
+            }
+            $this->redirectToSessionInit($requestState, $idToken);
+            return;
+        }
+
+        $accessToken = $this->requestPost->get('access_token') ?? $this->requestQuery->get('access_token');
+        if (isset($accessToken)) {
+            // Exchange for an ID token, and redirect to it: first check state
+            if (!$this->verifyState($requestState)) {
                 $this->sendError('State sent to and received from OIDC provider do not match');
                 return;
             }
+            $idToken = $this->decodeAccessToken($accessToken);
+        }
 
-            if (isset($token)) {
-                $accessToken = $this->decodeAccessToken($token);
-            } else {
-                $accessToken = $this->exchangeAuthorizationCodeForAccessToken($code);
+        $code = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
+        if (isset($code)) {
+            // Authorize user, but first check state
+            if (!$this->verifyState($requestState)) {
+                $this->sendError('State sent to and received from OIDC provider do not match');
+                return;
             }
+            $decodedAccessToken = $this->exchangeAuthorizationCodeForAccessToken($code);
 
             // check nonce in ID token
             // TODO this should be done in $loginUri, but that's too disruptive
             //      a change right now
-            $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
-            $this->session->set(self::SESSION_NONCE_KEY, null);
-            $idTokenNonce = $accessToken->getIdToken()->claims()->get('nonce');
-            if (!isset($idTokenNonce, $sessionNonce) || $idTokenNonce !== $sessionNonce) {
+            if (!$this->verifyNonce($decodedAccessToken->getIdToken()->claims()->get('nonce'))) {
                 $this->sendError('Nonce sent to and received from OIDC provider do not match');
                 return;
             }
 
             // Init the session from the ID token received from the OIDC provider
-            $decodedState = $this->codec->decode($requestState);
-            $loginUri     = (new Uri())
-                ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
-                ->withQuery(
-                    http_build_query([
-                        'jwt'      => $accessToken->getIdToken()->toString(),
-                        'redirect' => $decodedState['redirect'] ?? '/',
-                    ])
-                );
-            $this->response = $this->redirectTemporary($loginUri->__toString());
-        } else {
-            $this->sendAuthorizationRequest();
+            $this->redirectToSessionInit($requestState, $decodedAccessToken->getIdToken()->toString());
+            return;
         }
+        $this->sendAuthorizationRequest();
     }
 
     /**
@@ -267,16 +272,14 @@ class Controller extends Base
      * Decode an access token from the URL into an object.
      *
      * @param string $token
-     * @return AccessToken
+     * @return array
      */
-    private function decodeAccessToken(string $token): AccessToken
+    private function decodeAccessToken(string $token): array
     {
         $jwks         = $this->retrieveJsonWebKeySet();
         $keySet       = JWK::parseKeySet($jwks, \Schoolbox\API\Token\Jwt::SIGNING_ALGORITHM);
-
         Jwt::$leeway  = $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_LEEWAY);
-        $decodedToken = Jwt::decode($token, $keySet[\Schoolbox\API\Token\Jwt::KEY_ID]);
-        return new AccessToken((array)$decodedToken);
+        return (array)(Jwt::decode($token, $keySet[\Schoolbox\API\Token\Jwt::KEY_ID]));
     }
 
     /**
@@ -320,5 +323,59 @@ class Controller extends Base
         } catch (InvalidArgumentException $e) {
             throw new SchoolboxException('Could not cache OIDC public key', 0, $e, 500);
         }
+    }
+
+    /**
+     * Assert that nonce value from ID token matches what's in the session.
+     *
+     * @param string|null $nonce
+     * @return bool
+     * @throws ControllerException
+     */
+    private function verifyNonce(?string $nonce): bool
+    {
+        // check nonce in ID token
+        // TODO this should be done in $loginUri, but that's too disruptive
+        //      a change right now
+        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
+        $this->session->set(self::SESSION_NONCE_KEY, null);
+        if (!isset($nonce, $sessionNonce) || $nonce !== $sessionNonce) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $requestState
+     * @param string $decodedAccessToken
+     * @return void
+     * @throws RouteNotFound
+     */
+    private function redirectToSessionInit(string $requestState, string $idToken): void
+    {
+        $decodedState = $this->codec->decode($requestState);
+        $loginUri     = (new Uri())
+            ->withPath($this->routeGenerator->generate('api.initSessionFromQueryString'))
+            ->withQuery(
+                http_build_query([
+                    'jwt'      => $idToken,
+                    'redirect' => $decodedState['redirect'] ?? '/',
+                ])
+            );
+        $this->response = $this->redirectTemporary($loginUri->__toString());
+    }
+
+    /**
+     * @param mixed $requestState
+     * @return bool
+     */
+    private function verifyState(string $requestState): bool
+    {
+        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
+        $this->session->set(self::SESSION_STATE_KEY, null);
+        if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+            return false;
+        }
+        return true;
     }
 }
