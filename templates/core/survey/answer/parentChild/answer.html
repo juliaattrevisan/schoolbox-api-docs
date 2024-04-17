@@ -1,0 +1,61 @@
+<script type='text/javascript'>
+
+    /* Timeout closure
+     * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+     */
+    var signatureTimer = 0;
+
+    var createDelayManager = function() {
+        return function(callback, ms) {
+            clearTimeout(signatureTimer);
+            signatureTimer = setTimeout(callback, ms);
+        };
+    };
+
+    var dm = createDelayManager();
+
+    $(function() {
+        // {RESPONSE} can be empty - function wrapper caters for that possibility.
+        // {RESPONSE} can also be a parse error, I don't know how to handle that!
+        (function (response) {
+            $('[data-signature]').alaressSignaturePad({
+                init: response,
+                rescale: false,
+                displayOnly: false,
+                onDrawEnd: function() {
+                    /* Apply delay to auto-save, so the signature
+                     * process remains fluid
+                     *
+                     * http://stackoverflow.com/questions/5420776/how-do-i-reuse-this-javascript-timeout-closure
+                     */
+                    dm(function() {
+                        $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+                            id: {QUESTION_ID}
+                        });
+                    }, 3000);
+                }
+            });
+        })({ANSWER});
+        // What's that? I don't have a parseable output?
+    });
+</script>
+
+<script src="{CDN_PREFIX}/js/signature/jquery.signaturepad.min.js?v={SITE_VERSION}"></script>
+<script src="{CDN_PREFIX}/js/evaluation/type/jquery.signature-pad.js?v={SITE_VERSION}"></script>
+<link rel="stylesheet" href="{CDN_PREFIX}/js/signature/signaturepad.css?v={SITE_VERSION}">
+
+<span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+
+<div class="sigPad" data-signature>
+    <!-- BEGIN answerOption -->
+    <div class="sigPadWrapper">
+        <!--<div class="typed"></div>-->
+        <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
+
+        <!-- opacity:0, for validator to work - it doesn't like hidden fields -->
+        <input type="text" name="answer" class="signaturePadAnswer" data-role="signatureInput">
+    </div>
+
+    <a class="button expand" href="#" data-role="signatureClear">Clear Signature</a>
+    <!-- END answerOption -->
+</div>
