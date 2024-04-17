@@ -48,21 +48,32 @@ class ContextLookup implements IContextLookup
      */
     public function find(int $assessmentId): array
     {
-        new \Alaress_Probe($this->context);
-
-        if ($this->context instanceof \Schoolbox\Resource\Folder\Model) {
-            /* Directly into a homepage via the quiz component
-             */
-        } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+        if ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
             /* Course Specification, when authoring a course's contents
              */
+            return [];
         } elseif ($this->context instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
             /* Course Implementation, when you randomly add to an already-imported course
              */
+            return [];
         }
 
-        die();
+        /* Directly into a homepage via the quiz component
+         */
+        $folderCodes = $this->findFolderCodes($this->context);
 
+        /* Generate the set of tags and remember it in $this->lookup for
+         * this particular combination of columns
+         */
+        $tags = $this->tagFactory->produce(null, null, $folderCodes);
+
+        /* Use this tag so we know it's an impl
+         */
+        $tags[] = $this->tagFactory->produceImplFlag();
+
+        return $tags;
+
+        ///////////
         $row = $this->findRow($assessmentId);
 
         /* If course_specification_id is set, find out its name and uuid
@@ -102,22 +113,6 @@ class ContextLookup implements IContextLookup
 
             return $this->lookup[$key];
         }
-
-        /* If course_* is null and course_unit_* is null, then we're in a homepage context;
-         * use the folder id to find the folder's name and uuid
-         */
-        $folderCodes = $this->findFolderCodes((int)$row['folder_id']);
-
-        /* Generate the set of tags and remember it in $this->lookup for
-         * this particular combination of columns
-         */
-        $tags = $this->tagFactory->produce(null, null, $folderCodes);
-
-        /* Use this tag so we know it's an impl
-         */
-        $tags[] = $this->tagFactory->produceImplFlag();
-
-        $this->lookup[$key] = $tags;
 
         return $this->lookup[$key];
     }
@@ -223,25 +218,15 @@ class ContextLookup implements IContextLookup
     /**
      * Finds the csv of folder codes for a folderId
      *
-     * @param int $folderId
+     * @param AssessmentContext $context
      * @return string
      * @throws \PDOException
      */
-    private function findFolderCodes(int $folderId): string
+    private function findFolderCodes(AssessmentContext $context): string
     {
-        $this->folderStatement->execute([
-            'id' => $folderId
-        ]);
-
-        $codes = [];
-
         /* TODO Support multiple folder codes
          *  Do this as a single tag for now...?
          */
-        while ($row = $this->folderStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $codes[] = $row['code'];
-        }
-
-        return implode(', ', $codes);
+        return $context->getFolder()->getCodeString();
     }
 }
