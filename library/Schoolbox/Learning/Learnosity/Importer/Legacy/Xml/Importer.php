@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
+
 use Alaress\Database\Connector\IConnector;
 use Assess\Import\Parser\IParser;
 use LearnositySdk\Exceptions\ValidationException;
