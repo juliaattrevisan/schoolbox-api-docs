@@ -329,8 +329,6 @@ Usage:
             update: async function (event, ui) {
                 const sequence = Array.from(document.querySelectorAll('[data-unit-spec]')).map((unit) => parseInt(unit.dataset.folderId, 10));
 
-                console.log(sequence);
-
                 var $toastFeedback = $('[data-relation="ajax-response"]');
                 $toastFeedback.toastActivate({ text: "Saving..." });
                 try {
