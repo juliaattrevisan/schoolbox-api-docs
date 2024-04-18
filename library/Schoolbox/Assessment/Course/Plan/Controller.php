@@ -275,7 +275,8 @@ class Controller extends Base
                     $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
                 }
                 // default value it '0' so set to null for vue to work
-                if ('0' === $instanceConfig['curriculumTreeFilter']['value']) {
+                // when clearing the component filter (after something was filtered) it is empty (not 0) also catch that
+                if ('0' === $instanceConfig['curriculumTreeFilter']['value'] || '' === $instanceConfig['curriculumTreeFilter']['value']) {
                     $instanceConfig['curriculumTreeFilter']['value'] = null;
                 }
                 // if we are filtering we should return the curric node
