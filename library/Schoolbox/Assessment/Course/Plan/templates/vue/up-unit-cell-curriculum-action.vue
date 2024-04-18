@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * To display a curriculum overview component within the unit planner
+ * To display the actions available for the curriculum overview component,
+ * which is to modify the selected nodes via the curriculum selector modal
  */
 
-// import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
+import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
-// import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
 
@@ -16,7 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const curriculumStore = useUnitPlannerCurriculumStore();
-// const hasLoaded = window.Vue.ref(false);
+const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
 
 /**
  * To open the curriculum code mapping modal,
@@ -29,7 +29,7 @@ function onModifySelected() {
 </script>
 
 <template>
-    <fn-actions @modify-selected="onModifySelected" />
+    <fn-actions v-if="folderNodesStore().hasLoaded" @modify-selected="onModifySelected" />
 </template>
 
 <style scoped></style>
