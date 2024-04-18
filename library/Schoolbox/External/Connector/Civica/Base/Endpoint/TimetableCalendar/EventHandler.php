@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar;
 
 use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\Codec;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\Mapper\Exception;
@@ -141,7 +142,7 @@ class EventHandler
                 } elseif (('metadata' === $property) && is_array($values)) {
                     /* Re-encode metadata into a serialised string if it wasn't already done so
                      */
-                    $params[$property] = json_encode($newEvent->$getter());
+                    $params[$property] = (new Codec\Metadata())->encode($newEvent->$getter());
                 } else {
                     $params[$property] = $newEvent->$getter();
                 }

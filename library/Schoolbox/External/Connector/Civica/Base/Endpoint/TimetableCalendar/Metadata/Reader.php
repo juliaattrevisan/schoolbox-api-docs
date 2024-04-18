@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Metadata;
 
+use Schoolbox\External\Connector\Civica\Base\Endpoint\Codec;
+
 class Reader
 {
     /**
@@ -20,7 +22,7 @@ class Reader
      */
     public function getAttendanceLink(array|string $metadata): ?string
     {
-        $attendanceUrl = $this->deserialize($metadata)['links']['attendance'] ?? null;
+        $attendanceUrl = (new Codec\Metadata())->decode($metadata)['links']['attendance'] ?? null;
 
         if (null === $attendanceUrl) {
             return null;
@@ -33,26 +35,5 @@ class Reader
             '/iframe/civica/attendance/%s',
             base64_encode($attendanceUrl)
         );
-    }
-
-
-    /**
-     * Accept both the json-encoded metadata and string formats
-     * for interchangeability. You could be working with either the
-     * mapper-decoded version or the db-encoded versions...
-     *
-     * @param array|string $metadata
-     * @return array
-     * @throws \JsonException
-     */
-    private function deserialize(array|string $metadata): array
-    {
-        $deserialized = $metadata;
-
-        if (is_string($metadata)) {
-            $deserialized = json_decode($deserialized, true, 512, JSON_THROW_ON_ERROR);
-        }
-
-        return $deserialized;
     }
 }
