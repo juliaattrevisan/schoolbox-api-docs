@@ -33,10 +33,10 @@
 </ul>
 {% if user.current.linkedUsers is not empty or user.previous  %}
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
-        <li class="separator">Switch User</li>
 
-        {% set previousUser = user.previous | default(null) %}
         {% if user.current.linkedUsers is not empty %}
+        <li class="separator">Switch User</li>
+            {% set previousUser = user.previous | default(null) %}
             {% for linkedUser in user.current.linkedUsers %}
                 {% if not previousUser or previousUser.id != linkedUser.id %}
                 <li class="user">
@@ -52,7 +52,8 @@
             {% endfor %}
         {% endif %}
 
-        {% if previousUser %}
+        {% if user.previous %}
+            <li class="separator">End impersonation</li>
             <li class="user">
                 <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
                     <div class="card small-12">
