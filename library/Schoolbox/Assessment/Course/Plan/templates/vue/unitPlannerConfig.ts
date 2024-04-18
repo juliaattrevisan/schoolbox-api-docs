@@ -1,4 +1,4 @@
-import type { UnitTemplate } from "./unitPlannerTypes";
+import type { UnitTemplate, UnitTemplateComponent } from "./unitPlannerTypes";
 
 // All types of content that can be shown in a column
 export enum ColumnType {
@@ -122,22 +122,22 @@ function modifyColumnConfig(
  * @param {Tab["columns"]} tabColumns - The columns for the tab
  * @param {ColumnConfig} newColumnBase - The base configuration for the new columns
  * @param {ColumnType} columnTypeID - The type of column
- * @param {string[]} keys - The keys (labels) of the textboxes
+ * @param {string[]} components - The heading to use for each column
  */
-function getExtraColumns(
+function getColumns(
     tabColumns: Tab["columns"],
     newColumnBase: ColumnConfig,
     columnTypeID: ColumnType,
-    keys: string[],
+    components: UnitTemplateComponent[],
 ) {
     let columnId = 0;
-    keys.forEach((key) => {
+    components.forEach((component) => {
         columnId += 1;
         tabColumns.push({
             ...newColumnBase,
             id: `${columnTypeID}-${columnId}`,
             type: columnTypeID, // Add the missing 'type' property
-            label: key,
+            label: component.heading,
         });
     });
 }
@@ -145,11 +145,9 @@ function getExtraColumns(
 /**
  * Create the tabs for the unit planner
  * @param {UnitTemplate[]} template - The template for the unit
- * @param {string[]} allTextboxKeys - The keys (labels) of all the textboxes
- * @param {string[]} allCurriculumKeys - The keys (labels) of all the curriculum overview components
  * @returns {Tab[]} - The tabs for the unit planner
  */
-export function createTabs(template: UnitTemplate, allTextboxKeys: string[], allCurriculumKeys: string[]) {
+export function createTabs(template: UnitTemplate) {
     const modifiedTabConfig = modifyTabConfig(tabConfig, template);
     const modifiedColumnConfig = modifyColumnConfig(columnConfig, template);
 
@@ -164,11 +162,11 @@ export function createTabs(template: UnitTemplate, allTextboxKeys: string[], all
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
-                getExtraColumns(tabColumns, newColumnBase, columnTypeID, allTextboxKeys);
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.textboxes);
                 return;
             }
             if (columnTypeID === ColumnType.CURRICULUM_OVERVIEW) {
-                getExtraColumns(tabColumns, newColumnBase, columnTypeID, allCurriculumKeys);
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.curriculum);
                 return;
             }
             tabColumns.push(newColumnBase);

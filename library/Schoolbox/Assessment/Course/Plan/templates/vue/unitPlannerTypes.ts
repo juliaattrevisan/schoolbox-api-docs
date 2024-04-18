@@ -53,6 +53,7 @@ export type Unit = {
  */
 export type UnitTemplateComponent = {
     heading: string;
+    filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
 };
 
 /**
