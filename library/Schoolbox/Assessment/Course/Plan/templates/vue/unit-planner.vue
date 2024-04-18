@@ -269,18 +269,18 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-top.fixed-left {
-    z-index: calc(var(--depth-default) + 1); // On top of both the left column, the header, and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 2); // On top of both the left column, the header, and the dropdowns
 }
 
 .fixed-left {
     left: 0;
     position: sticky;
-    z-index: var(--depth-default); // Behind the dropdowns and table header, but on top of the content
+    z-index: var(--depth-ui-overlay); // Behind the dropdowns and table header, but on top of the content
 }
 .fixed-top {
     position: sticky;
     top: 0;
-    z-index: var(--depth-default); // On top of both the left column and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 1); // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {

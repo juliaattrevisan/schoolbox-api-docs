@@ -319,7 +319,7 @@ window.Vue.onUnmounted(() => {
     pointer-events: none;
     position: absolute;
     width: 100%;
-    z-index: 2; // Always appear above the content
+    z-index: calc(var(--depth-default) + 1); // Always appear above the content
 
     .content-overlay {
         display: flex;
