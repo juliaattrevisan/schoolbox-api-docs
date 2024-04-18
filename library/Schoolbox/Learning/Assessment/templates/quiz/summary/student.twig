@@ -142,11 +142,7 @@
                     </td>
                     <td>
                         {% if attempt.normalisedMark is not null %}
-                            {% if attempt.reviewed %}
-                                {{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}
-                            {% else %}
-                                <span class="meta" title="This attempt has not yet been reviewed by a teacher, so the mark is unconfirmed and may change following review.">{{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}</span>
-                            {% endif %}
+                            {{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}
                         {% else %}
                             —
                         {% endif %}
