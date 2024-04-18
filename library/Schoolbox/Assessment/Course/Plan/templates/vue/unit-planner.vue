@@ -269,7 +269,7 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-top.fixed-left {
-    z-index: calc(var(--depth-ui-overlay) + 2); // On top of both the left column, the header, and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 3); // On top of both the left column, the header, and the dropdowns
 }
 
 .fixed-left {
@@ -280,13 +280,13 @@ window.Vue.onUnmounted(() => {
 .fixed-top {
     position: sticky;
     top: 0;
-    z-index: calc(var(--depth-ui-overlay) + 1); // On top of both the left column and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 2); // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
     height: 0;
     position: sticky;
-    z-index: var(--depth-default); // On top of left column, but behind the header
+    z-index: calc(var(--depth-ui-overlay) + 1); // On top of left column, but behind the header
 }
 
 #unit-planner-sortable-container {
