@@ -171,11 +171,7 @@ class Importer
 
         /* Generates payload array structs
          */
-        try {
-            $payloadFactory = new PayloadFactory($strategyFactory);
-        } catch (\DomainException $e) {
-            $errors[] = $e->getMessage();
-        }
+        $payloadFactory = new PayloadFactory($strategyFactory);
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
