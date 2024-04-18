@@ -47,3 +47,20 @@ export type Unit = {
     extraTextboxes: number;
     sequence: number;
 };
+
+/**
+ * A component that has been set on a Unit template
+ */
+export type UnitTemplateComponent = {
+    heading: string;
+};
+
+/**
+ * All components that have been set on a Unit template,
+ * to help distinguish which component are linked to the Unit template,
+ * and which are just components added to a home page
+ */
+export type UnitTemplate = {
+    curriculum: UnitTemplateComponent[]; // Curriculum Overview components
+    textboxes: UnitTemplateComponent[]; // Textbox components
+};

@@ -8,7 +8,7 @@ import Toast from "@schoolboxVue/components/toast.vue";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
 import UnitPlannerCurriculum from "./unit-planner-curriculum.vue";
@@ -19,6 +19,7 @@ interface Props {
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
+    template: UnitTemplate;
 }
 
 const props = defineProps<Props>();
