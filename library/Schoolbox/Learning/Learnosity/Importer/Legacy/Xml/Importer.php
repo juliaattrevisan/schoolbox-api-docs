@@ -377,7 +377,7 @@ class Importer
          */
         try {
             $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
-        }  catch (\DomainException $e) {
+        } catch (\DomainException $e) {
             $errors[] = $e->getMessage();
 
             return $errors;

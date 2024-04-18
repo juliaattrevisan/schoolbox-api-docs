@@ -309,6 +309,11 @@ class Controller extends AbstractController
             null
         );
 
+        /* A 4-tuple of useful things we made
+         * Will likely be empty if something snapped along the way
+         */
+        $result = [];
+
         try {
             $result = (new Legacy\Xml\Importer(
                 $api,
@@ -337,7 +342,7 @@ class Controller extends AbstractController
 
         /* Display a list of errors
          */
-        if (\count($errors)) {
+        if (\count($errors) || empty($result)) {
             $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
                 'errors' => $errors,
             ]);
