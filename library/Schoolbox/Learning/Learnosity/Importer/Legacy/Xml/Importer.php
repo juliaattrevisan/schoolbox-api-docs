@@ -75,7 +75,6 @@ class Importer
     /**
      * Constructor.
      *
-     * @param LoggerInterface                    $logger
      * @param Api                                $api
      * @param string                             $schoolCode
      * @param string                             $domain
@@ -89,7 +88,6 @@ class Importer
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
-        private LoggerInterface $logger,
         private Api $api,
         private string $schoolCode,
         private string $domain,
@@ -377,7 +375,13 @@ class Importer
          * a little postprocessing to put things into the exactly correct format.
          * Learnosity is really particular about such things.
          */
-        $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+        try {
+            $blueprint = $blueprintBuilder->buildFlattenSections($legacyQuiz);
+        }  catch (\DomainException $e) {
+            $errors[] = $e->getMessage();
+
+            return $errors;
+        }
 
         foreach ($blueprint['payloadSequence'] as $payloadSequence) {
             $endpoint = $payloadSequence['endpoint'];

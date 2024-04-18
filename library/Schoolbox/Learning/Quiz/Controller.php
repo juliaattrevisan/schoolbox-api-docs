@@ -9,7 +9,9 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Lumberjack\Logger;
+use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
+use LearnositySdk\Exceptions\ValidationException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
@@ -32,6 +34,7 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Twig\Error\Error;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -230,14 +233,19 @@ class Controller extends AbstractController
      * Imports a quiz into the given context via its legacy xml representation.
      *
      * @api POST /learning/quiz/legacyQuizImport/contextType/contextId
+     *
      * @param AssessmentContext $context
      * @return void
-     * @throws Deleted
-     * @throws MapperException
-     * @throws FilesystemException
      * @throws ContainerExceptionInterface
+     * @throws Deleted
+     * @throws FilesystemException
+     * @throws MapperException
      * @throws NotFoundExceptionInterface
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws RouteNotFound
+     * @throws \DOMException
+     * @throws \JsonException
+     * @throws ValidationException
+     * @throws Error
      */
     public function postLegacyQuizImport(AssessmentContext $context): void
     {
@@ -283,12 +291,6 @@ class Controller extends AbstractController
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
-         */
-        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
-
         /* Used to segregate each school's data; used in tags and author identifiers
          */
         $schoolCode = $this->getConfigLoader()->get('site_school_code');
@@ -304,12 +306,11 @@ class Controller extends AbstractController
             $this->learnosityVersion,
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
-            $logger
+            null
         );
 
         try {
             $result = (new Legacy\Xml\Importer(
-                $logger,
                 $api,
                 $schoolCode,
                 $domain,
