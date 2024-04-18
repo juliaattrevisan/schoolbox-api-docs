@@ -54,14 +54,21 @@ class Controller extends Base
      */
     public function impersonate(User $user)
     {
-        $previous = $_SESSION;
-        $session = new \Session();
+        $currentSession  = $_SESSION;
+        $previousSession = $_SESSION['previous'] ?? null;
+        $sessionHandler  = new \Session();
 
-        if ($session->create($user->getUsername())) {
-            $_SESSION['previous'] ??= $previous;
+        if ($sessionHandler->create($user->getUsername())) {
+            // Is an impersonating user themselves impersonating another user?
+            // If so: ensure at the end of impersonation, the session gets
+            // switched back to the original user.
+            $_SESSION['previous'] = ($previousSession ?? $currentSession);
 
+            // Who assumed this session?
+            // IMO it is always the top-level user
+            // (the user who first started impersonating)
             /** @var User $previousUser */
-            $previousUser = $previous['user'];
+            $previousUser = $_SESSION['previous']['user'];
 
             $logItem = $this->assumeUserLogMapper->createModel()
                 ->setUser($previousUser->getUsername())
@@ -70,7 +77,7 @@ class Controller extends Base
 
             $this->assumeUserLogMapper->save($logItem);
         } else {
-            $_SESSION = $previous; //Recover old session
+            $_SESSION = $currentSession; //Recover old session
         }
         $this->response = $this->redirectFound('/');
     }
