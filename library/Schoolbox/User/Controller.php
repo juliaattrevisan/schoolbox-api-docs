@@ -58,7 +58,7 @@ class Controller extends Base
         $session = new \Session();
 
         if ($session->create($user->getUsername())) {
-            $_SESSION['previous'] = $previous;
+            $_SESSION['previous'] ??= $previous;
 
             /** @var User $previousUser */
             $previousUser = $previous['user'];
