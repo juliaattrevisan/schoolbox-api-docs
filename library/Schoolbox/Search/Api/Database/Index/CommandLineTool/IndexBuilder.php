@@ -36,7 +36,7 @@ class IndexBuilder extends App
      */
     public const LOCK_NAME = 'search_buildIndex';
 
-    private const LOCK_TTL = 300; // 300 seconds = 5 minutes.
+    private const LOCK_TTL = 3600; // 3600 seconds = 60 minutes = 1 hour.
 
     /**
      * Short options:
