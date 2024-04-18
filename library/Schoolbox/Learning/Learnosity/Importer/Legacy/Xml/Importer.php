@@ -191,11 +191,11 @@ class Importer
 
         /* Figure out how to consolidate payloads
          */
-        $this->importLarge(
+        $errors = array_merge($errors, $this->importLarge(
             $legacyQuiz,
             $blueprintBuilder,
             $this->api
-        );
+        ));
 
         /* Return some constructed objects
          */
@@ -362,7 +362,7 @@ class Importer
      * @param array            $legacyQuiz
      * @param BlueprintBuilder $blueprintBuilder
      * @param Api              $api
-     * @return void
+     * @return array
      * @throws \JsonException
      * @throws ValidationException
      */
@@ -370,7 +370,9 @@ class Importer
         array $legacyQuiz,
         BlueprintBuilder $blueprintBuilder,
         Api $api
-    ): void {
+    ): array {
+        $errors = [];
+
         /* Make the overall Learnosity payloads which we then send later with
          * a little postprocessing to put things into the exactly correct format.
          * Learnosity is really particular about such things.
@@ -402,7 +404,13 @@ class Importer
 
         /* Associate with a retry mechanism
          */
-        $this->associate($association);
+        try {
+            $this->associate($association);
+        } catch (\RuntimeException $e) {
+            $errors[] = $e->getMessage();
+        }
+
+        return $errors;
     }
 
 
@@ -490,7 +498,6 @@ class Importer
 
                 return;
             } catch (\PDOException $e) {
-                $this->logger->warning($e->getMessage());
                 $numFails++;
             }
         }
