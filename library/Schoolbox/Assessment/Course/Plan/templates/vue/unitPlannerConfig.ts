@@ -40,7 +40,7 @@ interface Tab extends TabConfig {
 // - The id of the tab
 // - The label of the tab
 // - The column types to display in the tab
-let tabConfig: TabConfig[] = [
+const tabConfig: TabConfig[] = [
     { id: "all", label: "All", columnTypeIDs: Object.values(ColumnType) },
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
     { id: "activities", label: "Learning Activities", columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES] },
@@ -68,17 +68,21 @@ export const columnConfig: Record<ColumnType, ColumnConfig> = {
 };
 
 /**
- * If there are no textboxes or curriculum components assigned to the unit,
+ * If there are no textboxes or curriculum components assigned to the unit template,
  * remove the relevant tabs
- * @param {UnitTemplate[]} template - The template for the unit
+ * @param {TabConfig[]} $tabConfig - the current tab config
+ * @param {UnitTemplate} template - The template for the unit
+ * @returns {TabConfig[]} - The modified tab config
  */
-function modifyTabConfig(template: UnitTemplate) {
+function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabConfig[] {
+    let modifiedTabConfig = $tabConfig;
     if (template.textboxes.length === 0) {
-        tabConfig = tabConfig.filter((tab) => tab.id !== "overview");
+        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "overview");
     }
     if (template.curriculum.length === 0) {
-        tabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
+        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
     }
+    return modifiedTabConfig;
 }
 
 /**
@@ -115,9 +119,9 @@ function getExtraColumns(
  * @returns {Tab[]} - The tabs for the unit planner
  */
 export function createTabs(template: UnitTemplate, allTextboxKeys: string[], allCurriculumKeys: string[]) {
-    modifyTabConfig(template);
+    const modifiedTabConfig = modifyTabConfig(tabConfig, template);
 
-    return tabConfig.map((tabInfo) => {
+    return modifiedTabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
 
         tabInfo.columnTypeIDs.forEach((columnTypeID) => {
