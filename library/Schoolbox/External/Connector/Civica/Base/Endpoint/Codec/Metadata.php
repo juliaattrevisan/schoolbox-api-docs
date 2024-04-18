@@ -17,7 +17,8 @@ class Metadata
      * @param array $metadata
      * @return string
      */
-    public function encode(array $metadata): string {
+    public function encode(array $metadata): string
+    {
         return json_encode($metadata);
     }
 
