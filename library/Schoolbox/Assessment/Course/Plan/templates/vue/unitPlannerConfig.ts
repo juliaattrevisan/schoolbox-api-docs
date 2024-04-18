@@ -117,7 +117,7 @@ function modifyColumnConfig(
 }
 
 /**
- * Get any extra columns for a particular Column Type
+ * Get all columns for a particular Column Type
  * For example a unit template could have multiple textboxes, so we need to add a column for each
  * @param {Tab["columns"]} tabColumns - The columns for the tab
  * @param {ColumnConfig} newColumnBase - The base configuration for the new columns
