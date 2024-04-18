@@ -115,6 +115,7 @@ class Importer
      * @throws Deleted
      * @throws MapperException
      * @throws ValidationException
+     * @throws \DOMException
      * @throws \JsonException
      */
     public function import(string $data): array
@@ -139,7 +140,7 @@ class Importer
         $instances = $this->buildAssessment($parser);
 
         /* Start manufacturing quiz payloads for learnosity
-         * This is mostly stolen from the cli ImpoterTool
+         * This is mostly stolen from the cli ImporterTool
          */
 
         /* Used to make representations of questions and answers
