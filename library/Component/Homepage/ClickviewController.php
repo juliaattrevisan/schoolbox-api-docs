@@ -7,10 +7,22 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Default: cache URL responses for 1 hour
+     */
+    private const CLICKVIEW_URL_CACHE_DEFAULT_TTL = 3600;
+
+    /**
+     * Where to cache the Clickview URL responses
+     * %s the md5 hash of the original URL we sent to Clickview
+     */
+    private const CLICKVIEW_URL_CACHE_KEY = 'clickview_url_%s';
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -27,7 +39,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'has_clickview', 'has_clickview_block');
         $this->setBlock($templateHandle, 'online_clickview', 'online_clickview_block');
         $this->setBlock($templateHandle, 'iframe_clickview', 'iframe_clickview_block');
-        $this->setBlock($templateHandle, 'iframe_clickview_net', 'iframe_clickview_net_block');
 
         $clickviewSchoolId = Config::get('clickview_school_id');
         $this->setVar('CLICKVIEW_SCHOOL_ID', $clickviewSchoolId);
@@ -51,7 +62,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     'has_clickview_block'    => '',
                     'online_clickview_block' => '',
                     'iframe_clickview_block' => '',
-                    'iframe_clickview_net_block' => '',
                     'HIDE_CLICKVIEW'         => '',
                 ]
             );
@@ -111,39 +121,66 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
             } elseif (preg_match($patternNet, $this->getConfig('url'), $matches)) {
-                $this->setVar('VIDEO_ID', $matches[1]);
-                $this->parse('iframe_clickview_net_block', 'iframe_clickview_net');
+                $this->setVar('CLICKVIEW_URL', '//clickview.net/share/embed/' . $matches[1]);
+                $this->parse('iframe_clickview_block', 'iframe_clickview');
             } elseif (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
                 // Is there a start and end?
                 // https://clickv.ie/w/idGe?t=305&et=408&i=2
                 // https://clickv.ie/w/idGe
 
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $this->getConfig('url'));
-                curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-                curl_exec($ch);
-                $curlinfo = curl_getinfo($ch);
+                /** @var CacheInterface $cache */
+                $cache = $this->getSitePage()->getDi()->get('component.homepage.clickview.cache');
 
-                if (preg_match($patternNet, $curlinfo['redirect_url'], $matchesNew)) {
-                    $this->setVar('VIDEO_ID', $matchesNew[1]);
-                    $this->parse('iframe_clickview_net_block', 'iframe_clickview_net');
-                } else {
-                    // Get the query params from the redirect URL, noting that there may be no query at all
-                    // If there is no sharecode parameter, then the URL is invalid
-                    parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY) ?? '', $parts);
-                    $parts = array_change_key_case($parts, CASE_LOWER);
-                    if (isset($parts['sharecode'])) {
-                        $this->setVar('VIDEO_ID', $parts['sharecode']);
-                        // Pass in start/end time parameters
-                        if (count($matches) == 3) {
-                            $this->setVar('START', "&t={$matches[1]}");
-                            $this->setVar('END', "&et={$matches[2]}");
+                $iframeUrl = $cache->get(sprintf(self::CLICKVIEW_URL_CACHE_KEY, md5($this->getConfig('url'))));
+
+                // If we don't have the iframe URL cached, then we need to fetch it
+                // This is cached to avoid repeated requests to ClickView when the same URL is used unnecessarily
+                if ($iframeUrl === null) {
+                    // Why fetch and not directly iframe? Some the link clickview returns to may not be an embeddable link, for instance:
+                    //  https://clickv.ie/w/FP4x will route to https://online.clickview.com.au/share?sharecode=94f3eda7
+                    // The above link is a whole interactive page, so we need to use the sharecode to make our own embeddable link.
+                    // ClickView's Content Security Policy also prevents us from embedding their pages directly as they have set frame-ancestors to 'none'
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $this->getConfig('url'));
+                    curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
+                    curl_setopt($ch, CURLOPT_HEADER, 0);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                    curl_exec($ch);
+                    $curlinfo = curl_getinfo($ch);
+
+                    if (preg_match($patternNet, $curlinfo['redirect_url'], $matchesNew)) {
+                        $iframeUrl = 'clickview.net/share/embed/' . $matchesNew[1];
+                    } else {
+                        // Get the query params from the redirect URL, noting that there may be no query at all
+                        // If there is no sharecode parameter, then the URL is invalid
+                        parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY) ?? '', $parts);
+                        $parts = array_change_key_case($parts, CASE_LOWER);
+                        if (isset($parts['sharecode'])) {
+                            $iframeUrl = $this->getVar('CLICKVIEW_URL') . '/share/embed?a=false&shareCode=' . $parts['sharecode'];
+
+                            // Pass in start/end time parameters
+                            if (count($matches) == 3) {
+                                $iframeUrl .= "&t={$matches[1]}&et={$matches[2]}";
+                            }
                         }
-                        $this->parse('iframe_clickview_block', 'iframe_clickview');
                     }
+
+                    // Did we manage to get a valid iframe URL? If so, cache it
+                    // If we didn't, the URL may have expired or is actually invalid
+                    if ($iframeUrl !== null) {
+                        $cache->set(
+                            sprintf(self::CLICKVIEW_URL_CACHE_KEY, md5($this->getConfig('url'))),
+                            $iframeUrl,
+                            self::CLICKVIEW_URL_CACHE_DEFAULT_TTL
+                        );
+                    }
+                }
+
+                // If we have a cached URL, then we can use it
+                if ($iframeUrl !== null) {
+                    $this->setVar('CLICKVIEW_URL', $iframeUrl);
+                    $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
             } else {
                 $showEmpty    = true;
