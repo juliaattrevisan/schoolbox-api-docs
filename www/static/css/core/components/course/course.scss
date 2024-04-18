@@ -1,7 +1,10 @@
 /* Shows a list of Units for a particular Course
  */
 ul.unit-list {
-    margin-bottom: 1rem;
+    // Only add margin if there are list items
+    &:has(li) {
+        margin-bottom: 1rem;
+    }
 
     li {
         list-style: none;
@@ -124,4 +127,9 @@ input[type="submit"][readonly] {
     @media #{$small-only} {
         padding: 0.75rem 1rem 0 1rem;
     }
+}
+
+// Special case to add a border between the unit list and the new unit input
+.unit-list.information-list > li:last-child {
+    border-bottom: 1px solid var(--body-background);
 }
