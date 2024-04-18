@@ -138,6 +138,10 @@ class EventHandler
                  */
                 if (\in_array($column, ['start_at', 'finish_at'], true)) {
                     $params[$property] = $newEvent->$getter()->getDatabase();
+                } elseif (('metadata' === $property) && is_array($values)) {
+                    /* Re-encode metadata into a serialised string if it wasn't already done so
+                     */
+                    $params[$property] = json_encode($newEvent->$getter());
                 } else {
                     $params[$property] = $newEvent->$getter();
                 }
