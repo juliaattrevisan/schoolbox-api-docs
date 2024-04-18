@@ -159,6 +159,10 @@ class Importer
          */
         $tagFactory = new TagFactory($this->schoolCode);
 
+        /* Find out if the build had any random errors
+         */
+        $errors = [];
+
         /* A context lookup builder thing for conveniently deriving tags
          *
          *  Replaced with usage of AssessmentContext since we have no
@@ -169,7 +173,11 @@ class Importer
 
         /* Generates payload array structs
          */
-        $payloadFactory = new PayloadFactory($strategyFactory);
+        try {
+            $payloadFactory = new PayloadFactory($strategyFactory);
+        } catch (\DomainException $e) {
+            $errors[] = $e->getMessage();
+        }
 
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
@@ -179,6 +187,7 @@ class Importer
         /* Traverse the xml, loading each question
          */
         $legacyQuiz = $quizBuilder->build($instances, $xml);
+        $errors = array_merge($errors, $quizBuilder->getErrors());
 
         /* Figure out how to consolidate payloads
          */
@@ -197,7 +206,11 @@ class Importer
             'quiz' => $instances['quiz'],
             /* The conversion of quiz xml into the same format as the quiz from db
              */
-            'legacyQuiz' => $legacyQuiz
+            'legacyQuiz' => $legacyQuiz,
+            /* Any errors we encountered along the way
+             * We shouldn't have any, but learnosity introduces a new category of problems to supervise
+             */
+            'errors' => $errors
         ];
     }
 

@@ -29,6 +29,18 @@ class Builder
 
 
     /**
+     * A list of errors (typically exceptions) that we encountered along the way
+     * Normally these are nonfatal (such as reasons to skip a question) and don't
+     * impede the rest of the import
+     *
+     * We can collate them here and report them in one big go at the end
+     *
+     * @var array
+     */
+    private array $errors = [];
+
+
+    /**
      * Constructor.
      *
      * @param User $user
@@ -69,7 +81,11 @@ class Builder
 
         /* Get its sections
          */
+        $nSection = 0;
+
         foreach ($xml->xpath('section') as $section) {
+            $nSection++;
+
             $sectionRow = [
                 'section_id' => self::ID_PLACEHOLDER,
                 'title' => trim((string)$section->xpath('title')[0]),
@@ -81,7 +97,11 @@ class Builder
 
             /* Get each section's questions
              */
+            $nQuestion = 0;
+
             foreach ($section->xpath('question') as $question) {
+                $nQuestion++;
+
                 $questionRow = [
                     'question_id' => self::ID_PLACEHOLDER,
                     'type_id' => (int)trim((string)$question->xpath('typeid')[0]),
@@ -102,12 +122,30 @@ class Builder
                     /* This question has busted html
                      * Skip it quietly
                      */
+                    $this->errors[] = sprintf(
+                        'Section %s, question %s: %s',
+                        $nSection,
+                        $nQuestion,
+                        $e->getMessage()
+                    );
+
                     continue;
                 }
 
                 /* xpath->answers is a one-node set, so you should read this really as $answers[0]
                  */
-                $struct = $this->decompileAnswer($questionRow, $question->xpath('answers')[0]);
+                try {
+                    $struct = $this->decompileAnswer($questionRow, $question->xpath('answers')[0]);
+                } catch (\DomainException $e) {
+                    $this->errors[] = sprintf(
+                        'Section %s, question %s: %s ',
+                        $nSection,
+                        $nQuestion,
+                        $e->getMessage()
+                    );
+
+                    continue;
+                }
 
                 /* Ensure each question knows about its potential answwrs
                  */
@@ -167,6 +205,24 @@ class Builder
         /* Quiz only uses types 2, 4 and 5
          * (6,8,9,10,17 are all Survey)
          */
-        return $this->strategyFactory->produce((int)$question['type_id'])?->decompileAnswer($answers);
+        $strategy = $this->strategyFactory->produce((int)$question['type_id']);
+
+        if (null === $strategy) {
+            throw new \DomainException(sprintf(
+                'Unknown question type: %s',
+                $question['type_id']
+            ));
+        }
+
+        return $strategy->decompileAnswer($answers);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

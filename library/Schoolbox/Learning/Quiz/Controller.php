@@ -322,8 +322,26 @@ class Controller extends AbstractController
                 $this->markTypeMapper,
                 $this->storageMapper
             ))->import($data);
+
+            /* Distill anything mostly non-fatal that we found during the import process
+             */
+            $errors = $result['errors'];
         } catch (\DomainException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INVALID_QUESTION_XML);
+            /* Something really important snapped and halted the import process
+             */
+            $errors = [
+                $e->getMessage()
+            ];
+        }
+
+        /* Display a list of errors
+         */
+        if (\count($errors)) {
+            $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
+                'errors' => $errors,
+            ]);
+
+            return;
         }
 
         $this->response = $this->redirectFound(
