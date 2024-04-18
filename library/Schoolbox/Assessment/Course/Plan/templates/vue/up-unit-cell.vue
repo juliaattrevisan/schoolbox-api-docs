@@ -19,7 +19,7 @@ import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
-import UpUnitCellCurriculum from "./up-unit-cell-curriculum.vue";
+import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -232,7 +232,7 @@ window.Vue.onUnmounted(() => {
             </template>
 
             <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
-                <up-unit-cell-curriculum
+                <up-unit-cell-curriculum-content
                     :selected-nodes="props.unit.curriculum.selectedNodes"
                     :nodes="props.unit.curriculum.nodes ?? []"
                     :folder-id="props.unit.folderId"
