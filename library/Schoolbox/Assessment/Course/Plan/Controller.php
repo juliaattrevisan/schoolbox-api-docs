@@ -173,12 +173,18 @@ class Controller extends Base
                 $heading = trim(CurriculumOverviewController::DEFAULT_COMPONENT_HEADING);
             }
 
-            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
-            // The frontend will use this to determine whether the textbox needs to be created or not.
-            // This saves needing to manipulate the initial data on the frontend on the first mount
+            /**
+             * we need to default and check if we have a valid curriculum filter, or just return null.
+             */
+            $curricFilter = $curricComponent->getConfigByKey('curriculumTreeFilter')->getValue();
+            if ('0' === $curricFilter || '' === $curricFilter) {
+                $curricFilter = null;
+            } else {
+                $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
+            }
             $curriculumnTemplate[] = [
                 'heading' => $heading,
-                'filter' => $this->nodeMapper->findOneByColumnList(['id' => $curricComponent->getConfigByKey('curriculumTreeFilter'), 'enabled' => true,])
+                'filter' => $curricFilter,
             ];
             $curriculumnKey[] = strtolower($heading);
         }
