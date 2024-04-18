@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
 use Schoolbox\User;
 
@@ -30,12 +31,14 @@ class Builder
     /**
      * Constructor.
      *
-     * @param User    $user
+     * @param User $user
      * @param Factory $strategyFactory
+     * @param InlineImageConverter $inlineImageConverter
      */
     public function __construct(
         private \Schoolbox\User $user,
-        private Strategy\Factory $strategyFactory
+        private Strategy\Factory $strategyFactory,
+        private InlineImageConverter $inlineImageConverter,
     ) {
     }
 
@@ -47,6 +50,7 @@ class Builder
      * @param array $instances
      * @param \SimpleXMLElement $xml
      * @return array
+     * @throws \DOMException
      */
     public function build(array $instances, \SimpleXMLElement $xml): array
     {
@@ -84,10 +88,22 @@ class Builder
                     'marks' => trim((string)$question->xpath('marks')[0]),
                     'config' => $this->decompileQuestionConfig($question),
                     'name' => trim((string)$question->xpath('name')[0]->xpath('text')[0]),
-                    'question' => trim((string)$question->xpath('questiontext')[0]->xpath('text')[0]),
+                    'question' => '',
                     'penalty' => trim((string)$question->xpath('penalty')[0]),
                     '_answers' => [],
                 ];
+
+                /* Clean out any weird whitespace/control chars from the end of this,
+                 * and convert base64 inline images to storage files
+                 */
+                try {
+                    $questionRow['question'] = $this->inlineImageConverter->convert((string)$question->xpath('questiontext')[0]->xpath('text')[0]);
+                } catch (\RuntimeException $e) {
+                    /* This question has busted html
+                     * Skip it quietly
+                     */
+                    continue;
+                }
 
                 /* xpath->answers is a one-node set, so you should read this really as $answers[0]
                  */

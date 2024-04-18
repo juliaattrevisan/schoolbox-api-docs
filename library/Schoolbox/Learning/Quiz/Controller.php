@@ -32,7 +32,6 @@ use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Url\Factory;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -53,6 +52,7 @@ class Controller extends AbstractController
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
      * @param MarkTypeMapper                                            $markTypeMapper
+     * @param \Schoolbox\Resource\Storage\Mapper                        $storageMapper
      * @param string                                                    $learnosityVersion
      * @param string                                                    $learnosityConsumerKey
      * @param string                                                    $learnosityConsumerSecret
@@ -69,6 +69,7 @@ class Controller extends AbstractController
         private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
@@ -318,7 +319,8 @@ class Controller extends AbstractController
                 $assessmentMapperProxy,
                 $this->quizMapper,
                 $this->workTypeMapper,
-                $this->markTypeMapper
+                $this->markTypeMapper,
+                $this->storageMapper
             ))->import($data);
         } catch (\DomainException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INVALID_QUESTION_XML);
