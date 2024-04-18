@@ -56,17 +56,6 @@ const tabConfig: TabConfig[] = [
     },
 ];
 
-// The configuration for the columns in the unit planner. Specifies:
-// - The label of the column
-// - Whether the column should be fixed to the left of the table
-export const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
-    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
-    [ColumnType.ACTIVITIES]: { label: "Learning Activities", fixedLeft: false },
-    [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", fixedLeft: false },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", fixedLeft: false },
-};
-
 /**
  * If there are no textboxes or curriculum components assigned to the unit template,
  * remove the relevant tabs
@@ -77,12 +66,54 @@ export const columnConfig: Record<ColumnType, ColumnConfig> = {
 function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabConfig[] {
     let modifiedTabConfig = $tabConfig;
     if (template.textboxes.length === 0) {
+        // remove the overview column from the all tab
+        const allTab = modifiedTabConfig.find((tab) => tab.id === "all") as TabConfig;
+        allTab.columnTypeIDs = allTab?.columnTypeIDs.filter((columnType) => columnType !== ColumnType.OVERVIEW);
+        // as well as the entire overview tab
         modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "overview");
     }
     if (template.curriculum.length === 0) {
+        // remove the curriculum overview column from the all tab
+        const allTab = modifiedTabConfig.find((tab) => tab.id === "all") as TabConfig;
+        allTab.columnTypeIDs = allTab?.columnTypeIDs.filter(
+            (columnType) => columnType !== ColumnType.CURRICULUM_OVERVIEW,
+        );
+        // as well as the entire curriculum overview tab
         modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
     }
     return modifiedTabConfig;
+}
+
+// The configuration for the columns in the unit planner. Specifies:
+// - The label of the column
+// - Whether the column should be fixed to the left of the table
+const columnConfig: Record<ColumnType, ColumnConfig> = {
+    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
+    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
+    [ColumnType.ACTIVITIES]: { label: "Learning Activities", fixedLeft: false },
+    [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", fixedLeft: false },
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", fixedLeft: false },
+};
+
+/**
+ * If there are no textboxes or curriculum components assigned to the unit template,
+ * remove the relevant columns
+ * @param {TabConfig[]} $columnConfig - the current column config
+ * @param {UnitTemplate} template - The template for the unit
+ * @returns {Record<ColumnType, ColumnConfig>} - The modified column config
+ */
+function modifyColumnConfig(
+    $columnConfig: Record<ColumnType, ColumnConfig>,
+    template: UnitTemplate,
+): Record<ColumnType, ColumnConfig> {
+    const modifiedColumnConfig = { ...$columnConfig };
+    if (template.textboxes.length === 0) {
+        delete modifiedColumnConfig[ColumnType.OVERVIEW as keyof typeof modifiedColumnConfig];
+    }
+    if (template.curriculum.length === 0) {
+        delete modifiedColumnConfig[ColumnType.CURRICULUM_OVERVIEW as keyof typeof modifiedColumnConfig];
+    }
+    return modifiedColumnConfig;
 }
 
 /**
@@ -120,16 +151,16 @@ function getExtraColumns(
  */
 export function createTabs(template: UnitTemplate, allTextboxKeys: string[], allCurriculumKeys: string[]) {
     const modifiedTabConfig = modifyTabConfig(tabConfig, template);
+    const modifiedColumnConfig = modifyColumnConfig(columnConfig, template);
 
     return modifiedTabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
-
         tabInfo.columnTypeIDs.forEach((columnTypeID) => {
             const newColumnBase = {
-                ...columnConfig[columnTypeID],
+                ...modifiedColumnConfig[columnTypeID],
                 id: `${columnTypeID}-1`,
                 type: columnTypeID,
-                label: columnConfig[columnTypeID].label || columnTypeID,
+                label: modifiedColumnConfig[columnTypeID].label || columnTypeID,
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
@@ -142,7 +173,6 @@ export function createTabs(template: UnitTemplate, allTextboxKeys: string[], all
             }
             tabColumns.push(newColumnBase);
         });
-
         return {
             ...tabInfo,
             columns: tabColumns,
