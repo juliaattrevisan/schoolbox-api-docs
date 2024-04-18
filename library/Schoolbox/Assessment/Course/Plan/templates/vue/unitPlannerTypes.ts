@@ -26,6 +26,7 @@ export type CurriculumOverviewComponent = {
     componentId: number;
     heading: string;
     filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
 };
 
 export type Unit = {

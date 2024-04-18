@@ -120,6 +120,7 @@ function getCurriculumComponent() {
 }
 
 const curriculumComponent = getCurriculumComponent();
+const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
 window.Vue.onMounted(() => {
     // Wait a tick to ensure the content has been rendered before measuring its height
@@ -186,11 +187,18 @@ window.Vue.onUnmounted(() => {
                         <a :href="props.unit.homepage">
                             <strong>{{ props.unit.title }}</strong>
                         </a>
-                        <p v-if="props.unit.extraTextboxes > 0" class="meta">
-                            {{ props.unit.extraTextboxes }} extra textbox{{
-                                props.unit.extraTextboxes === 1 ? "" : "es"
-                            }}
-                        </p>
+                        <ul>
+                            <li v-if="props.unit.extraTextboxes > 0" class="meta">
+                                {{ props.unit.extraTextboxes }} extra textbox{{
+                                    props.unit.extraTextboxes === 1 ? "" : "es"
+                                }}
+                            </li>
+                            <li v-if="extraCurriculumComponents > 0" class="meta">
+                                {{ extraCurriculumComponents }} extra curriculum component{{
+                                    extraCurriculumComponents === 1 ? "" : "s"
+                                }}
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </template>
