@@ -131,7 +131,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     $this->setVar('VIDEO_ID', $matchesNew[1]);
                     $this->parse('iframe_clickview_net_block', 'iframe_clickview_net');
                 } else {
-                    parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
+                    // Get the query params from the redirect URL, noting that there may be no query at all
+                    // If there is no sharecode parameter, then the URL is invalid
+                    parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY) ?? '', $parts);
                     $parts = array_change_key_case($parts, CASE_LOWER);
                     if (isset($parts['sharecode'])) {
                         $this->setVar('VIDEO_ID', $parts['sharecode']);
