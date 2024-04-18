@@ -10,8 +10,8 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
-import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
-import UnitPlannerCurriculum from "./unit-planner-curriculum.vue";
+import UpUnitCell from "./up-unit-cell.vue";
+import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
@@ -31,30 +31,30 @@ const dragStore = useUnitPlannerDragStore();
 // Get a list of every textbox that could be shown in a unit
 // in case a unit doesn't have a textbox for a particular key
 // Ensures that the table will always show all possible textboxes
-const allTextboxKeys: string[] = (() => {
-    const keysSet = new Set<keyof Unit["textboxes"]>();
-    props.units.forEach((unit) => {
-        Object.keys(unit.textboxes).forEach((key) => {
-            keysSet.add(key);
-        });
-    });
-    return Array.from(keysSet);
-})();
+// const allTextboxKeys: string[] = (() => {
+//     const keysSet = new Set<keyof Unit["textboxes"]>();
+//     props.units.forEach((unit) => {
+//         Object.keys(unit.textboxes).forEach((key) => {
+//             keysSet.add(key);
+//         });
+//     });
+//     return Array.from(keysSet);
+// })();
 
 // Get a list of every curriculum component that could be shown in a unit
 // in case a unit doesn't have a component for a particular key
 // Ensures that the table will always show all possible textboxes
-const allCurriculumKeys: string[] = (() => {
-    const keysSet: Set<string> = new Set();
-    props.units.forEach((unit) => {
-        unit.curriculum.components.forEach((component) => {
-            keysSet.add(component.heading);
-        });
-    });
-    return Array.from(keysSet);
-})();
+// const allCurriculumKeys: string[] = (() => {
+//     const keysSet: Set<string> = new Set();
+//     props.units.forEach((unit) => {
+//         unit.curriculum.components.forEach((component) => {
+//             keysSet.add(component.heading);
+//         });
+//     });
+//     return Array.from(keysSet);
+// })();
 
-const tabs = createTabs(props.template, allTextboxKeys, allCurriculumKeys);
+const tabs = createTabs(props.template);
 
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
@@ -194,7 +194,7 @@ window.Vue.onUnmounted(() => {
                 ref="unitElements"
                 class="grid-row unit-row"
             >
-                <unit-planner-unit-cell
+                <up-unit-cell
                     v-for="column in selectedTab.columns"
                     :key="column.id"
                     :unit="unit"
@@ -211,7 +211,7 @@ window.Vue.onUnmounted(() => {
                 }"
             >
                 <template v-if="store.dragCurrentUnit">
-                    <unit-planner-unit-cell
+                    <up-unit-cell
                         v-for="column in selectedTab.columns"
                         :key="column.id"
                         :unit="store.dragCurrentUnit"
@@ -224,7 +224,7 @@ window.Vue.onUnmounted(() => {
     </div>
 
     <activities-list-delete-modal />
-    <unit-planner-curriculum />
+    <up-curriculum />
     <toast ref="toastEl"></toast>
 </template>
 

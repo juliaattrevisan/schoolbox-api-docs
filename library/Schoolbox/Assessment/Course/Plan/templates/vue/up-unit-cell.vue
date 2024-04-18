@@ -19,7 +19,7 @@ import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
-import unitPlannerUnitCellCurriculum from "./unit-planner-unit-cell-curriculum.vue";
+import unitPlannerUnitCellCurriculum from "./up-unit-cell-curriculum.vue";
 
 gsap.registerPlugin(Draggable);
 
