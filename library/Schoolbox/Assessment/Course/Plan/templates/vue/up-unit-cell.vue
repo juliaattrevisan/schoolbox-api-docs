@@ -8,10 +8,8 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
@@ -20,6 +18,7 @@ import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
 import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
+import UpUnitCellCurriculumAction from "./up-unit-cell-curriculum-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -121,17 +120,6 @@ function getCurriculumComponent() {
 }
 
 const curriculumComponent = getCurriculumComponent();
-const curriculumStore = useUnitPlannerCurriculumStore();
-const isCurriculumLoaded = window.Vue.ref(false);
-
-/**
- * To open the curriculum code mapping modal,
- * ensuring the relevant selected nodes are displayed by
- * passing in the folderId and componentId to target the appropriate folderNodesStore
- */
-function onModifyCurriculumSelected() {
-    curriculumStore.openCurriculumSelectorModal(props.unit.folderId, curriculumComponent?.componentId as number);
-}
 
 window.Vue.onMounted(() => {
     // Wait a tick to ensure the content has been rendered before measuring its height
@@ -238,7 +226,6 @@ window.Vue.onUnmounted(() => {
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
                     @update-content-height="updateContentHeight"
-                    @loaded="isCurriculumLoaded = true"
                 />
             </template>
         </div>
@@ -267,13 +254,10 @@ window.Vue.onUnmounted(() => {
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
-                <fn-actions
-                    v-else-if="
-                        props.column.type === ColumnType.CURRICULUM_OVERVIEW &&
-                        curriculumComponent !== null &&
-                        isCurriculumLoaded
-                    "
-                    @modify-selected="onModifyCurriculumSelected"
+                <up-unit-cell-curriculum-action
+                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
+                    :folder-id="props.unit.folderId"
+                    :component="curriculumComponent"
                 />
             </div>
         </div>
