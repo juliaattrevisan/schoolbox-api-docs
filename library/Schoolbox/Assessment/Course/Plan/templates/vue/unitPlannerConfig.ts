@@ -1,3 +1,5 @@
+import type { UnitTemplate } from "./unitPlannerTypes";
+
 // All types of content that can be shown in a column
 export enum ColumnType {
     UNIT = "unit",
@@ -38,7 +40,7 @@ interface Tab extends TabConfig {
 // - The id of the tab
 // - The label of the tab
 // - The column types to display in the tab
-const tabConfig: TabConfig[] = [
+let tabConfig: TabConfig[] = [
     { id: "all", label: "All", columnTypeIDs: Object.values(ColumnType) },
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
     { id: "activities", label: "Learning Activities", columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES] },
@@ -57,13 +59,27 @@ const tabConfig: TabConfig[] = [
 // The configuration for the columns in the unit planner. Specifies:
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
-const columnConfig: Record<ColumnType, ColumnConfig> = {
+export const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.ACTIVITIES]: { label: "Learning Activities", fixedLeft: false },
     [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", fixedLeft: false },
     [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", fixedLeft: false },
 };
+
+/**
+ * If there are no textboxes or curriculum components assigned to the unit,
+ * remove the relevant tabs
+ * @param {UnitTemplate[]} template - The template for the unit
+ */
+function modifyTabConfig(template: UnitTemplate) {
+    if (template.textboxes.length === 0) {
+        tabConfig = tabConfig.filter((tab) => tab.id !== "overview");
+    }
+    if (template.curriculum.length === 0) {
+        tabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
+    }
+}
 
 /**
  * Get any extra columns for a particular Column Type
@@ -93,11 +109,14 @@ function getExtraColumns(
 
 /**
  * Create the tabs for the unit planner
+ * @param {UnitTemplate[]} template - The template for the unit
  * @param {string[]} allTextboxKeys - The keys (labels) of all the textboxes
  * @param {string[]} allCurriculumKeys - The keys (labels) of all the curriculum overview components
  * @returns {Tab[]} - The tabs for the unit planner
  */
-export function createTabs(allTextboxKeys: string[], allCurriculumKeys: string[]) {
+export function createTabs(template: UnitTemplate, allTextboxKeys: string[], allCurriculumKeys: string[]) {
+    modifyTabConfig(template);
+
     return tabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
 

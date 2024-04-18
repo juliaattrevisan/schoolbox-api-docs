@@ -54,7 +54,7 @@ const allCurriculumKeys: string[] = (() => {
     return Array.from(keysSet);
 })();
 
-const tabs = createTabs(allTextboxKeys, allCurriculumKeys);
+const tabs = createTabs(props.template, allTextboxKeys, allCurriculumKeys);
 
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
