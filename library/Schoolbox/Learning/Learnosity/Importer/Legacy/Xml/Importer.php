@@ -182,7 +182,7 @@ class Importer
         /* Generates payload "blueprints" so you can inspect them before committing to
          * sending them to Learnosity
          */
-        $blueprintBuilder = new BlueprintBuilder($this->schoolCode, $payloadFactory, $contextLookup, $this->logger);
+        $blueprintBuilder = new BlueprintBuilder($this->schoolCode, $payloadFactory, $contextLookup, null);
 
         /* Traverse the xml, loading each question
          */

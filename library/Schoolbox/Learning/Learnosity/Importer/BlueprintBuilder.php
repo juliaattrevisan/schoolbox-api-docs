@@ -82,13 +82,13 @@ class BlueprintBuilder
      * @param string $schoolCode
      * @param PayloadFactory $payloadFactory
      * @param IContextLookup $contextLookup
-     * @param LoggerInterface $logger
+     * @param null|LoggerInterface $logger
      */
     public function __construct(
         private string $schoolCode,
         private PayloadFactory $payloadFactory,
         private IContextLookup $contextLookup,
-        private LoggerInterface $logger
+        private ?LoggerInterface $logger
     ) {
         /* A generic author identifier attributed to each and every question
          * since we're aligning the strata of all questions from every quiz.
@@ -169,7 +169,7 @@ class BlueprintBuilder
          */
         $tags = $this->contextLookup->find((int)$legacyQuiz['assessment_id']);
 
-        $this->logger->debug(sprintf(
+        $this->logger?->debug(sprintf(
             'Assigning %s tags to this quiz: [%s]',
             \count($tags),
             implode(', ', array_column($tags, 'name'))
@@ -203,7 +203,7 @@ class BlueprintBuilder
             );
 
             if (!empty($feature)) {
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'Built blueprint for feature "%s" (section_id: %s) with learnosity_reference %s',
                     trim(\TextFormatter::cutSentence($section['title'], 64)),
                     $section['section_id'],
@@ -248,13 +248,13 @@ class BlueprintBuilder
                         null
                     );
                 } catch (\DomainException $e) {
-                    $this->logger->warning($e->getMessage());
+                    $this->logger?->warning($e->getMessage());
                     continue;
                 }
 
                 /* Put this question into the set
                  */
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'Built blueprint for question "%s" (question_id: %s, type: %s) with learnosity_reference %s',
                     \TextFormatter::cutSentence($question['question'], 64),
                     $question['question_id'],
@@ -293,7 +293,7 @@ class BlueprintBuilder
 
                 /* Put this item into the set
                  */
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'Built blueprint for item "%s" (section_id: %s) with learnosity_reference %s',
                     $section['title'],
                     $section['section_id'],
@@ -368,7 +368,7 @@ class BlueprintBuilder
             'count' => 1
         ];
 
-        $this->logger->debug(sprintf(
+        $this->logger?->debug(sprintf(
             'Built blueprint for quiz "%s" (assessmentId: %s, assess_id: %s) with assess.learnosity_reference %s',
             $legacyQuiz['title'],
             $legacyQuiz['assessment_id'],
