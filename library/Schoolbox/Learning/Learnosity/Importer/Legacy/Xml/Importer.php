@@ -152,7 +152,7 @@ class Importer
         $quizBuilder = new Builder(
             $this->user,
             $strategyFactory,
-            new InlineImageConverter($this->storageMapper, $this->logger)
+            new InlineImageConverter($this->storageMapper, null)
         );
 
         /* Generates sets of tags for Activities' and Items' assignations

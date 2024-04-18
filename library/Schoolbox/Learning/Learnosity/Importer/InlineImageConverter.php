@@ -60,9 +60,9 @@ class InlineImageConverter
      * Constructor.
      *
      * @param Mapper $storageMapper
-     * @param LoggerInterface $logger
+     * @param null|LoggerInterface $logger
      */
-    public function __construct(private \Schoolbox\Resource\Storage\Mapper $storageMapper, private LoggerInterface $logger)
+    public function __construct(private \Schoolbox\Resource\Storage\Mapper $storageMapper, private ?LoggerInterface $logger)
     {
     }
 
@@ -105,7 +105,7 @@ class InlineImageConverter
              */
             if ($isInline) {
                 $hasInline = true;
-                $this->logger->debug('Generating storage file for inline image');
+                $this->logger?->debug('Generating storage file for inline image');
 
                 $imageData = base64_decode($matches[2]);
                 $extension = $matches[1];
