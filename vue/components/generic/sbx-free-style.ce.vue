@@ -9,14 +9,15 @@
 </script>
 
 <template>
-    <label class="c-toggle" for="toggle">
-        <input id="toggle" type="checkbox" name="toggle" class="c-toggle__input" checked />
-        <span class="c-toggle__display" hidden>
-            <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-            <sbx-icon name="close" color="var(--color-text-primary)" />
-        </span>
-        Receive notifications
-    </label>
+    <select id="pet-select" name="pets" class="c-select">
+        <option value="">--Please choose an option--</option>
+        <option value="dog">Dog</option>
+        <option value="cat">Cat</option>
+        <option value="hamster">Hamster</option>
+        <option value="parrot">Parrot</option>
+        <option value="spider">Spider</option>
+        <option value="goldfish">Goldfish</option>
+    </select>
 </template>
 
 <style lang="scss" scoped>
@@ -26,5 +27,5 @@
     box-sizing: border-box;
 }
 
-// @import "www/static/css/core/ui/forms/_input-toggle.scss";
+@import "www/static/css/core/ui/forms/_select.scss";
 </style>
