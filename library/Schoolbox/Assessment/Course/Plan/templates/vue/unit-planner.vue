@@ -28,32 +28,6 @@ const store = useUnitPlannerStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
-// Get a list of every textbox that could be shown in a unit
-// in case a unit doesn't have a textbox for a particular key
-// Ensures that the table will always show all possible textboxes
-// const allTextboxKeys: string[] = (() => {
-//     const keysSet = new Set<keyof Unit["textboxes"]>();
-//     props.units.forEach((unit) => {
-//         Object.keys(unit.textboxes).forEach((key) => {
-//             keysSet.add(key);
-//         });
-//     });
-//     return Array.from(keysSet);
-// })();
-
-// Get a list of every curriculum component that could be shown in a unit
-// in case a unit doesn't have a component for a particular key
-// Ensures that the table will always show all possible textboxes
-// const allCurriculumKeys: string[] = (() => {
-//     const keysSet: Set<string> = new Set();
-//     props.units.forEach((unit) => {
-//         unit.curriculum.components.forEach((component) => {
-//             keysSet.add(component.heading);
-//         });
-//     });
-//     return Array.from(keysSet);
-// })();
-
 const tabs = createTabs(props.template);
 
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
