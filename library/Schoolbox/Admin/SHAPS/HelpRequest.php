@@ -23,6 +23,8 @@ use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use Custom\Help\CourseParticipation;
 
+use UnexpectedValueException;
+
 use function http_build_query;
 
 class HelpRequest
@@ -253,6 +255,11 @@ class HelpRequest
             if ($e->getResponse()) {
                 try {
                     $data = json_decode($e->getResponse()->getBody()->getContents(), true);
+
+                    if (!is_array($data)) {
+                        throw new UnexpectedValueException('Unexpected result from json_decode.');
+                    }
+
                     foreach ($data as $key => $emailAddress) {
                         $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
                     }
@@ -310,7 +317,7 @@ class HelpRequest
             } catch (GuzzleException $e) {
                 // any other exception
                 $code    = 500;
-                $message = 'Internal Server Error';
+                $message = $e->getMessage();
             }
         } else {
             // empty payload

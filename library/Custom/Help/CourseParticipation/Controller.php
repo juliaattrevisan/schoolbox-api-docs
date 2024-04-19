@@ -362,16 +362,30 @@ class Controller extends Base
         }
 
         try {
-            // check the server is correctly configured
+            // Check the server is correctly configured (part 1).
             $this->getRoleMapper()->findOneByColumn('name', Handler::DEFAULT_PARTICIPANT_ROLE_NAME);
-            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
         } catch (Mapper\Exception $e) {
-            // if this role doesn't exist, that's *bad* bad
-            // No need to advise a client of the cause of this error.
-            $this->sendGenericStatus(self::STATUS_SERVER_ERROR);
+            // If this role doesn't exist, that's *bad* bad
+            // Advise client of error to speed debugging.
+            $this->sendGenericStatus(
+                self::STATUS_SERVER_ERROR,
+                "Role '" . Handler::DEFAULT_PARTICIPANT_ROLE_NAME . "' does not exist on the Help instance."
+            );
             return;
         }
 
+        try {
+            // Check the server is correctly configured (part 2).
+            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
+        } catch (Mapper\Exception $e) {
+            // If this campus doesn't exist, we cannot proceed.
+            // Advise client of error to speed debugging.
+            $this->sendGenericStatus(
+                self::STATUS_SERVER_ERROR,
+                "No campus with ID " . Handler::PARTICIPANT_CAMPUS . " exists on the Help instance."
+            );
+            return;
+        }
 
         // process the payload
         if (empty($this->requestPost['user'])) {
@@ -390,7 +404,7 @@ class Controller extends Base
 
         if (\count($failedUsers)) {
             // just blame the client :P
-            $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST); // Details of errors sent below in POST response.
             $this->response = $this->responseAsJson($failedUsers);
         } else {
             // everything went fine, nothing to respond with

@@ -56,7 +56,7 @@ export default {
             } else if (this.courses.length > 0) {
                 return `Update Selected`;
             } else {
-                return 'Provision Selected';
+                return "Provision Selected";
             }
         },
     },
@@ -157,7 +157,7 @@ export default {
             <div v-if="hasUpdated">
                 <div>
                     <div v-if="hasDataError" class="alert-box alert">
-                        Error occurred. Further details are logged below.
+                        An error occurred. Further details are logged below.
                     </div>
                     <textarea v-html="logData"></textarea>
                 </div>

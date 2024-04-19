@@ -77,8 +77,7 @@ class Controller extends Base
                 $enrolments[$key]['participantIds'] = array_map('intval', array_column($enrolment['participants'], 'id'));
             }
         } catch (GuzzleException $e) {
-            $message = $this->getReasonPhrase($e);
-            $this->response = $this->responseAsJson(['error' => $message])->withStatus($e->getCode());
+            $this->response = $this->responseAsJson(['error' => $this->getReasonPhrase($e)])->withStatus($e->getCode());
             return;
         }
         // All the staff in our Schoolbox instance
@@ -197,6 +196,7 @@ class Controller extends Base
         try {
             $existingUsers = $this->helpRequest->users();
         } catch (GuzzleException $e) {
+            $messages[] = 'Error during retrieval of users: ' . $this->getReasonPhrase($e);
             $existingUsers = [];
         }
         $emails = [];
@@ -212,6 +212,10 @@ class Controller extends Base
                 $emails     = $newUsers->getPropertyValues('email');
             } else {
                 $messages = array_column($responseUser['data'], 'message');
+
+                if ($responseUser['status']['message'] !== '') {
+                    $messages[] = $responseUser['status']['message'];
+                }
             }
         }
 
