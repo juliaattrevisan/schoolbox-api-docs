@@ -18,7 +18,6 @@ use Schoolbox\Realtime\Notification\Decorator;
 
 abstract class AbstractService implements ServiceInterface
 {
-
     /**
      * Yes, this is private on purpose. See the protected accessor for the why.
      *
@@ -99,7 +98,7 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title, $unreadCount);
+        return $this->propagate($tokens, $id, $title, $unreadCount, $n);
     }
 
 
@@ -135,11 +134,12 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @param array  $tokens
-     * @param int    $id
-     * @param string $title
-     * @param int    $unreadCount
+     * @param array             $tokens
+     * @param int               $id
+     * @param string            $title
+     * @param int               $unreadCount
+     * @param Notification|null $notification
      * @return bool
      */
-    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0);
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null);
 }

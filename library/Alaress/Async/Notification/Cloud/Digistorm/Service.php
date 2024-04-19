@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Digistorm;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Notification;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
 use GuzzleHttp\Client;
@@ -90,7 +91,7 @@ class Service extends AbstractService
     /**
      * @inheritdoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
         $headers = [
             'X-Auth-Token' => $this->key,

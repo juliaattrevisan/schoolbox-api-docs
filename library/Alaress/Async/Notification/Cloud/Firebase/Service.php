@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Notification;
 use Kreait\Firebase;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
@@ -47,9 +48,14 @@ class Service extends AbstractService
 
 
     /**
+     * @param array      $tokens
+     * @param int        $id
+     * @param string     $title
+     * @param int        $unreadCount
+     * @param null|Notification $notification
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())
@@ -57,8 +63,19 @@ class Service extends AbstractService
             ->createMessaging();
 
         // Create message
-        $message = Firebase\Messaging\CloudMessage::new()
-            ->withNotification(Firebase\Messaging\Notification::create($this->appTitle, $title));
+        $config = Firebase\Messaging\WebPushConfig::fromArray([
+                                               'notification' => [
+                                                   'title' => $this->appTitle,
+                                                   'body' => $title,
+                                                   'icon' => $notification->getIcon(),
+                                                   'timestamp' => $notification->getTimestamp(),
+                                                   'href'      => $notification->getHref(),
+                                               ],
+                                               'fcm_options' => [
+                                                   'link' => $notification->getHref(),
+                                               ],
+                                           ]);
+        $message = Firebase\Messaging\CloudMessage::new()->withWebPushConfig($config);
 
         // Try to send it to all recipients
         $report = null;
