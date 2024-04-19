@@ -1,5 +1,55 @@
 /**
- *
- */
+ *   The <select> HTML element represents a control that provides a menu of options.
+ *   Styled primarily based from https://moderncss.dev/custom-select-styles-with-pure-css/
+*/
 .c-select {
+    align-items: center;
+    background-color: var(--color-foreground-primary);
+    border: 1px solid var(--color-form-elements);
+    border-radius: var(--roundness-inputs);
+    cursor: pointer;
+    display: grid; // to allow for the pseudo-element ::after to be positioned correctly
+    font-size: max(16px, 1rem);
+    grid-template-areas: "select";
+    line-height: 1.1;
+    padding: var(--spacing-s);
+    position: relative;
+    select,
+    &::after {
+        grid-area: select;
+    }
+    select {
+        appearance: none !important; // A reset of styles, including removing the default dropdown arrow // ^foundation-fixes^ - important not required once _forms.scss is removed
+        background-color: transparent;
+        background-image: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        border: none;
+        cursor: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        margin: 0;
+        min-height: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        outline: none; // Remove focus outline, will add on alternate element
+        padding: 0 var(--spacing-s) 0 0;
+        width: 100%;
+        z-index: var(--depth-default); // Stack above custom arrow
+    }
+    &::after {
+        // Custom arrow
+        background-color: var(--color-form-elements);
+        clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+        content: "";
+        height: 0.5em;
+        justify-self: end;
+        width: 0.8em;
+    }
+    &:focus-within {
+        @include form-input-focus;
+    }
+    &--disabled {
+        @include form-input-disabled;
+    }
+    &--error {
+        border: 1px solid var(--color-alert);
+    }
 }

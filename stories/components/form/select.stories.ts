@@ -6,10 +6,11 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select)
  *
- * The <`select>` HTML element represents a control that provides a menu of options.
+ * The `<select>` HTML element represents a control that provides a menu of options.
  *
  * **Usage notes**:
  * - Must always be accompanied by a `<label>` element.
+ * - The `multiple` attribute is not currently supported as we've not had a use case for it.
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
@@ -30,39 +31,50 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <select name="pets" id="pet-select" class="c-select">
-                <option value="">--Please choose an option--</option>
-                <option value="dog">Dog</option>
-                <option value="cat">Cat</option>
-                <option value="hamster">Hamster</option>
-                <option value="parrot">Parrot</option>
-                <option value="spider">Spider</option>
-                <option value="goldfish">Goldfish</option>
-            </select>
+            <div class="c-select">
+                <select id="standard-select">
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                    <option value="Option 4">Option 4</option>
+                    <option value="Option 5">Option 5</option>
+                    <option value="Option length">Option that has too long of a value to fit</option>
+                </select>
+            </div>
             `,
     }),
 };
 
-// export const Disabled: Story = {
-//     render: () => ({
-//         template: `
-//             <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm disabled" disabled />
-//             `,
-//     }),
-// };
+export const Disabled: Story = {
+    render: () => ({
+        template: `
+            <div class="c-select c-select--disabled">
+                <select id="standard-select" disabled>
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                    <option value="Option 4">Option 4</option>
+                    <option value="Option 5">Option 5</option>
+                    <option value="Option length">Option that has too long of a value to fit</option>
+                </select>
+            </div>
+            `,
+    }),
+};
 
-// export const ReadOnly: Story = {
-//     render: () => ({
-//         template: `
-//             <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm read only" readonly />
-//             `,
-//     }),
-// };
-
-// export const HasError: Story = {
-//     render: () => ({
-//         template: `
-//             <input id="news_default_expiry-field" class="c-input-text c-input-text--error" type="text" value="I'm invalid" />
-//             `,
-//     }),
-// };
+export const HasError: Story = {
+    render: () => ({
+        template: `
+            <div class="c-select c-select--error">
+                <select id="standard-select">
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                    <option value="Option 4">Option 4</option>
+                    <option value="Option 5">Option 5</option>
+                    <option value="Option length">Option that has too long of a value to fit</option>
+                </select>
+            </div>
+            `,
+    }),
+};

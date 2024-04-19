@@ -9,15 +9,16 @@
 </script>
 
 <template>
-    <select id="pet-select" name="pets" class="c-select">
-        <option value="">--Please choose an option--</option>
-        <option value="dog">Dog</option>
-        <option value="cat">Cat</option>
-        <option value="hamster">Hamster</option>
-        <option value="parrot">Parrot</option>
-        <option value="spider">Spider</option>
-        <option value="goldfish">Goldfish</option>
-    </select>
+    <div class="c-select">
+        <select id="standard-select">
+            <option value="Option 1">Option 1</option>
+            <option value="Option 2">Option 2</option>
+            <option value="Option 3">Option 3</option>
+            <option value="Option 4">Option 4</option>
+            <option value="Option 5">Option 5</option>
+            <option value="Option length">Option that has too long of a value to fit</option>
+        </select>
+    </div>
 </template>
 
 <style lang="scss" scoped>
@@ -27,5 +28,5 @@
     box-sizing: border-box;
 }
 
-@import "www/static/css/core/ui/forms/_select.scss";
+@import "stories/assets/styles/_form.scss";
 </style>
