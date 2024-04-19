@@ -6,13 +6,27 @@
  */
 
 /**
- * New suggested global roundness values
+ * New suggested custom properties
  */
 :root {
     --roundness-islands: var(--spacing-m);
     --roundness-images: 0px;
     --roundness-cards: var(--spacing-m);
     --roundness-inputs: var(--spacing-s);
+
+    --color-background: #e5eff7;
+    --color-foreground-primary: #ffffff;
+    --color-foreground-secondary: #f4f2f2;
+    --color-text-primary: #000000;
+    --color-text-secondary: #525252;
+    --color-form-elements: #4c94c8;
+    --color-focus: #4c94c8;
+    --color-loading: #ebeaea;
+    --color-alert: #d8201d;
+    --color-success: #298129;
+    --color-warning: #ff7d00;
+    --color-buttons: #0066b0;
+    --color-buttons-hover: #1e82c9;
 }
 
 /**

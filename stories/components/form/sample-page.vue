@@ -3,16 +3,62 @@
  * To show the form
  */
 
-import "@melloware/coloris/dist/coloris.css";
-import Coloris from "@melloware/coloris";
+const rootComputedStyle = getComputedStyle(document.documentElement);
+
+const colors = [
+    {
+        label: "Background",
+        hint: "The background colour",
+        variable: "--color-background",
+    },
+    {
+        label: "Foreground",
+        hint: "The primary foreground colour",
+        variable: "--color-foreground-primary",
+    },
+    {
+        label: "Foreground / Secondary",
+        hint: "The secondary foreground colour, ideally a subtle contrast to the primary",
+        variable: "--color-foreground-secondary",
+    },
+    {
+        label: "Text",
+        hint: "The primary text colour",
+        variable: "--color-text-primary",
+    },
+    {
+        label: "Form Elements Accent",
+        hint: "The accent colour for all form elements",
+        variable: "--color-form-elements",
+    },
+    {
+        label: "Focus",
+        hint: "The colour of the focus state for all interactive elements",
+        variable: "--color-focus",
+    },
+];
+
+/**
+ * Change the color of the element
+ * @param {Event} event - The event that triggered the change
+ */
+function onColorChange(event: Event) {
+    const colorPicker = event.target as HTMLInputElement;
+    const color = colorPicker.value;
+    document.documentElement.style.setProperty(colorPicker.getAttribute("data-change") as string, color);
+}
 
 window.Vue.onMounted(() => {
-    Coloris.init();
-    Coloris({
-        theme: "default",
-        margin: 10,
-        format: "hex",
-        alpha: false,
+    colors.forEach((color) => {
+        const colorPicker = document.querySelector(`[data-change="${color.variable}"]`) as HTMLInputElement;
+        colorPicker.value = rootComputedStyle.getPropertyValue(color.variable);
+        colorPicker.addEventListener("input", onColorChange);
+        colorPicker.addEventListener("change", onColorChange);
+    });
+
+    document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
+        const checkbox = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
     });
 });
 </script>
@@ -20,9 +66,27 @@ window.Vue.onMounted(() => {
 <template>
     <div class="l-flex-col l-gap-l l-pad-l">
         <div class="c-island">
-            <div class="l-flex-col l-gap-s">
-                <label for="input1" class="c-label">Colour Picker</label>
-                <input type="text" data-coloris />
+            <h2>Styles</h2>
+            <div class="l-flex-row l-gap-l">
+                <label class="c-label c-toggle" for="rounded-form-elements">
+                    Interactive elements
+                    <div class="c-hint">Add rounded styles to all interactive elements.</div>
+                    <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" checked />
+                    <span class="c-toggle__display" hidden>
+                        <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                        <sbx-icon name="close" color="var(--color-form-elements)" />
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="c-island">
+            <h2>Colours</h2>
+            <div class="l-flex-row l-gap-l">
+                <div v-for="color in colors" :key="color.variable" class="l-flex-col l-gap-s">
+                    <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                    <div class="c-hint">{{ color.hint }}</div>
+                    <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
+                </div>
             </div>
         </div>
         <div class="c-island">

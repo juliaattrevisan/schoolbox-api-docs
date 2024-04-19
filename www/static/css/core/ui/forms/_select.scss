@@ -11,6 +11,7 @@
     display: grid; // to allow for the pseudo-element ::after to be positioned correctly
     font-size: max(16px, 1rem);
     grid-template-areas: "select";
+    height: 2.25rem;
     line-height: 1.1;
     padding: var(--spacing-s);
     position: relative;
@@ -26,6 +27,7 @@
         cursor: inherit;
         font-family: inherit;
         font-size: inherit;
+        height: auto;
         line-height: inherit;
         margin: 0;
         min-height: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed

@@ -25,7 +25,7 @@
         ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
         color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
         border-color: var(
-            --form-border-color
+            --color-form-elements
         ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     }
     &::before {
