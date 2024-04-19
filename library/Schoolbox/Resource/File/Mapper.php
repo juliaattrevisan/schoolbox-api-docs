@@ -182,26 +182,28 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $sortColumn    = isset($sortFields[$sortColumn]) ? $sortColumn : 'name';
         $sortDirection = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
 
-        // sorting by name will be handled later to support natural sorting
+        // Sorting by name will have neither ORDER BY nor LIMIT on the query,
+        // as natural-case sorting and limiting cannot be done at a query level.
+        $hasQueryLimit = false;
         if ($sortColumn !== 'name') {
             $baseQuery .= " ORDER BY " . $sortFields[$sortColumn] . " " . $sortDirection;
-        }
-
-        if ($limit > 0) {
-            $baseQuery .= " LIMIT 0, :limit";
+            if ($limit > 0) {
+                $hasQueryLimit = true;
+                $baseQuery    .= " LIMIT 0, :limit";
+            }
         }
 
         $statement = $this->getDatabase()->prepare($baseQuery);
         foreach ($whereParams as $param => $value) {
             $statement->bindValue($param, $value);
         }
-        if ($limit > 0) {
+        if ($hasQueryLimit) {
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         $statement->execute();
         $files = $this->hydrateSelect($statement);
 
-        // sort the array by title using natural sort
+        // sort and limit the array by title using natural sort
         if ($sortColumn === 'name') {
             if ($sortDirection === 'DESC') {
                 $callback = function ($a, $b) {
@@ -213,6 +215,9 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 };
             }
             $files = $files->sortByCallback($callback, true);
+            if ($limit > 0) {
+                $files = $files->slice(0, $limit);
+            }
         }
 
         return $files;
