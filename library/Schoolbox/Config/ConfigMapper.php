@@ -128,6 +128,10 @@ class ConfigMapper extends Mapper
     public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';
     public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
     public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
+    public const NAME_OTFS_S3_CRED_KEY               = 'otfs_s3_cred_key';
+    public const NAME_OTFS_S3_CRED_SECRET            = 'otfs_s3_cred_secret';
+    public const NAME_OTFS_S3_REGION                 = 'otfs_s3_region';
+    public const NAME_OTFS_S3_VERSION                = 'otfs_s3_version';
 
     public const NAME_MAIL_ENABLED           = 'mail_enable';
     public const NAME_MAIL_ADDRESS           = 'mail_address';
@@ -162,6 +166,8 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
+    public const NAME_SITE_TYPE = 'site_type';
+    public const NAME_SITE_ENVIRONMENT = 'site_environment';
 
     public const NAME_GOTENBERG_HOST = 'gotenberg_host';
     public const NAME_GOTENBERG_API_KEY = 'gotenberg_api_key';
@@ -274,6 +280,7 @@ class ConfigMapper extends Mapper
      */
     public const NAME_REPORT_STAFF_ACCESS = 'report_staff_access';
     public const NAME_REPORT_STAFF_DIRECTORY_ENABLED = 'staff_directory_enabled';
+    public const NAME_BACKUP_DIR = 'backup_dir';
 
     /**
      * Isams specific
@@ -347,8 +354,8 @@ class ConfigMapper extends Mapper
         self::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS,
         self::NAME_OAUTH_ISSUER,
         self::NAME_OAUTH_ENABLE_SSO,
-//        self::NAME_OAUTH_SSO_IP_BLACKLIST,
-//        self::NAME_OAUTH_SSO_IP_WHITELIST,
+        //        self::NAME_OAUTH_SSO_IP_BLACKLIST,
+        //        self::NAME_OAUTH_SSO_IP_WHITELIST,
     ];
 
     /**
