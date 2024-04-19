@@ -67,7 +67,14 @@ class Controller extends Base
 
         // Filter assessments where the context is deleted, these cannot be restored
         $deletedAssessments = $deletedAssessments->filter(function (Assessment\DataModel\Model $node) {
-            return !$node->getAssessmentContext()->isDeleted();
+            /* ensure the context actually exists...
+             * if it doesn't then just return false
+             * we can't just nullcoalesce, as we are inverting the isDeleted call, so we would attempt to show things that had no parent.
+             */
+            if ($node->getAssessmentContext()) {
+                return !$node->getAssessmentContext()->isDeleted();
+            }
+            return false;
         });
 
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
