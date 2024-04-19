@@ -77,7 +77,8 @@ class Controller extends Base
                 $enrolments[$key]['participantIds'] = array_map('intval', array_column($enrolment['participants'], 'id'));
             }
         } catch (GuzzleException $e) {
-            $this->response = $this->responseAsJson(['error' => $this->getReasonPhrase($e)])->withStatus($e->getCode());
+            $message = $this->getReasonPhrase($e);
+            $this->response = $this->responseAsJson(['error' => $message])->withStatus($e->getCode());
             return;
         }
         // All the staff in our Schoolbox instance

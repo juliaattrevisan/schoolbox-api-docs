@@ -404,7 +404,7 @@ class Controller extends Base
 
         if (\count($failedUsers)) {
             // just blame the client :P
-            $this->sendGenericStatus(self::STATUS_BAD_REQUEST); // Details of errors sent below in POST response.
+            $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
             $this->response = $this->responseAsJson($failedUsers);
         } else {
             // everything went fine, nothing to respond with
