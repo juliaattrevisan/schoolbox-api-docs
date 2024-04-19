@@ -68,6 +68,19 @@ window.Vue.onMounted(() => {
                         </div>
                     </div>
                 </fieldset>
+                <div class="l-flex-col l-gap-s">
+                    <label for="standard-select" class="c-label c-label--required">Please select</label>
+                    <div class="c-select">
+                        <select id="standard-select">
+                            <option value="Option 1">Option 1</option>
+                            <option value="Option 2">Option 2</option>
+                            <option value="Option 3">Option 3</option>
+                            <option value="Option 4">Option 4</option>
+                            <option value="Option 5">Option 5</option>
+                            <option value="Option length">Option that has too long of a value to fit</option>
+                        </select>
+                    </div>
+                </div>
                 <label class="c-label c-toggle" for="tgl3">
                     Enable Curriculum Code Tagging
                     <div class="c-hint">

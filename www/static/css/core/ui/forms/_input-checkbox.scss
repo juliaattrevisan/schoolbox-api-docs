@@ -6,7 +6,7 @@
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
     background-color: var(--color-foreground-primary); // For iOS < 15
-    border: 1px solid var(--color-form-elements);
+    border: var(--size-form-input-border-width) solid var(--color-form-elements);
     border-radius: var(--roundness-inputs);
     color: var(--color-form-elements);
     cursor: pointer;

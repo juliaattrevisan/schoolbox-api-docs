@@ -62,7 +62,7 @@ a.c-button {
     }
     &--secondary {
         background-color: var(--color-foreground-primary);
-        border: 1px solid var(--color-buttons);
+        border: var(--size-form-input-border-width) solid var(--color-buttons);
         color: var(--color-buttons);
         padding: var(--spacing-s);
         &:hover,
@@ -71,7 +71,7 @@ a.c-button {
                 --color-foreground-primary
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
             color: var(--color-buttons-hover);
-            border: 1px solid var(--color-buttons-hover);
+            border: var(--size-form-input-border-width) solid var(--color-buttons-hover);
         }
         &:focus {
             background-color: var(
