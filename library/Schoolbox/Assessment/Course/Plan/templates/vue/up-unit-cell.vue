@@ -62,7 +62,6 @@ const contentIsFocused = window.Vue.computed(() => {
  * Update the content height in the store when the content height changes
  */
 function updateContentHeight() {
-    console.warn("updateContentHeight");
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
 
@@ -220,7 +219,6 @@ window.Vue.onUnmounted(() => {
                     ref="textboxContentComponent"
                     :unit="props.unit"
                     :column="props.column"
-                    @update-content-height="updateContentHeight"
                 ></textbox-content>
             </template>
 
@@ -245,7 +243,6 @@ window.Vue.onUnmounted(() => {
                     :nodes="props.unit.curriculum.nodes ?? []"
                     :folder-id="props.unit.folderId"
                     :component="curriculumComponent"
-                    @update-content-height="updateContentHeight"
                 />
             </template>
         </div>

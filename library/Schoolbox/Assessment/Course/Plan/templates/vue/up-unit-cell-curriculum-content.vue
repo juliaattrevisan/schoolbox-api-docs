@@ -20,11 +20,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits(["updateContentHeight", "loaded"]);
-
 const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
-const hasLoaded = window.Vue.ref(false);
 
 /**
  * To open the curriculum details modal when a node code is selected
@@ -58,26 +55,11 @@ window.Vue.onMounted(async () => {
     if (!folderNodesStore().hasLoaded) {
         await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     }
-    emit("loaded"); // to update the height of the unit planner cell
-    hasLoaded.value = true;
-    await window.Vue.nextTick();
-    emit("updateContentHeight"); // to update the height of the unit planner cell
 });
-
-/**
- * To update the content height when the nodes have changed
- */
-window.Vue.watch(
-    () => folderNodesStore().filteredNodes,
-    async () => {
-        await window.Vue.nextTick();
-        emit("updateContentHeight");
-    },
-);
 </script>
 
 <template>
-    <div v-if="!hasLoaded" class="loader"></div>
+    <div v-if="!folderNodesStore().hasLoaded" class="loader"></div>
     <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.component.componentId" :is-small="true" />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.component.componentId" />
 </template>

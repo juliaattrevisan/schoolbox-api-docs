@@ -17,9 +17,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["updateContentHeight"]);
 const store = useUnitPlannerStore();
-const textboxStore = useUnitPlannerTextboxStore();
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
@@ -57,14 +55,6 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 
     editor.model.document.on("change", () => {
         store.updateFocusedUnitCell(props.unit.id, props.column, true);
-        window.Vue.nextTick()
-            .then(() => {
-                emit("updateContentHeight");
-                textboxStore.updateTextboxContent(props.unit.id, props.column, editor.getData());
-            })
-            .catch(() => {
-                // noop
-            });
     });
 
     const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label];
@@ -72,7 +62,6 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
         storeTextbox.body = editor.getData();
     }
 
-    emit("updateContentHeight");
     editorCreated.value = true;
 
     // If the editor was focused initially, we need to update the store
