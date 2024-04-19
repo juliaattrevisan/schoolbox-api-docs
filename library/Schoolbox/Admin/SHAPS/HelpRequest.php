@@ -17,7 +17,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
-use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -143,7 +142,7 @@ class HelpRequest
         }
 
         // If this is an array, we can assume we got some data back from Help
-        if (\is_array($decoded_response)) {
+        if (is_array($decoded_response)) {
             return $decoded_response;
         }
         // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
@@ -255,15 +254,15 @@ class HelpRequest
             if ($e->getResponse()) {
                 try {
                     $data = json_decode($e->getResponse()->getBody()->getContents(), true);
-
                     if (!is_array($data)) {
-                        throw new UnexpectedValueException('Unexpected result from json_decode.');
+                        $code = '500';
+                        $message = 'Unexpected result from json_decode().';
+                    } else {
+                        foreach ($data as $key => $emailAddress) {
+                            $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
+                        }
                     }
-
-                    foreach ($data as $key => $emailAddress) {
-                        $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
-                    }
-                } catch (\RuntimeException $e) {
+                } catch (\RuntimeException) {
                     // Not much we can do here.
                 }
             }
@@ -307,10 +306,15 @@ class HelpRequest
                     try {
                         // Build human-readable error message
                         $data = json_decode($e->getResponse()->getBody()->getContents(), true);
-                        foreach ($data as $key => $failedUserData) {
-                            $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
+                        if (!is_array($data)) {
+                            $code = '500';
+                            $message = 'Unexpected result from json_decode().';
+                        } else {
+                            foreach ($data as $key => $failedUserData) {
+                                $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
+                            }
                         }
-                    } catch (\RuntimeException $e) {
+                    } catch (\RuntimeException) {
                         // Not much we can do here.
                     }
                 }
