@@ -18,7 +18,13 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div style="padding: 1rem">
+    <div class="l-flex-col l-gap-l l-pad-l">
+        <div class="c-island">
+            <div class="l-flex-col l-gap-s">
+                <label for="input1" class="c-label">Colour Picker</label>
+                <input type="text" data-coloris />
+            </div>
+        </div>
         <div class="c-island">
             <div class="l-flex-col l-gap-l">
                 <div class="l-flex-col l-gap-s">
@@ -110,10 +116,6 @@ window.Vue.onMounted(() => {
                 <div class="l-flex-row l-gap-s">
                     <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
                     <button class="c-button c-button--success l-flex__item--1" type="button">Primary Action</button>
-                </div>
-                <div class="l-flex-col l-gap-s">
-                    <label for="input1" class="c-label">Colour Picker</label>
-                    <input type="text" data-coloris />
                 </div>
             </div>
         </div>
