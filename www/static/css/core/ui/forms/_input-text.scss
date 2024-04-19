@@ -27,6 +27,14 @@
     &[readonly] {
         border: none;
         padding: 0;
+        &:hover {
+            background-color: inherit; // ^foundation-fixes^ - won't need once _forms.scss is removed
+            border-color: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
+            color: inherit; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        }
+        &:focus {
+            @include form-input-focus-not-visible;
+        }
     }
 }
 
