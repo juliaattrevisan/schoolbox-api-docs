@@ -62,6 +62,7 @@ const contentIsFocused = window.Vue.computed(() => {
  * Update the content height in the store when the content height changes
  */
 function updateContentHeight() {
+    console.warn("updateContentHeight");
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
 
@@ -122,7 +123,18 @@ function getCurriculumComponent() {
 const curriculumComponent = getCurriculumComponent();
 const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
+/**
+ * To detect when the dimensions of the cell changes,
+ * like when a different tab is selected
+ */
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => updateContentHeight());
+    resizeObserver.observe(contentEl.value as HTMLElement);
+}
+
 window.Vue.onMounted(() => {
+    initResizeObserver();
+
     // Wait a tick to ensure the content has been rendered before measuring its height
     setTimeout(updateContentHeight, 0);
 
