@@ -6,6 +6,16 @@
  */
 
 /**
+ * New suggested global roundness values
+ */
+:root {
+    --roundness-islands: var(--spacing-m);
+    --roundness-images: 0px;
+    --roundness-cards: var(--spacing-m);
+    --roundness-inputs: var(--spacing-s);
+}
+
+/**
  * Experimental new font style SBX
  */
 body {
