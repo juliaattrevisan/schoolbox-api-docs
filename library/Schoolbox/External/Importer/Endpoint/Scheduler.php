@@ -12,6 +12,8 @@ namespace Schoolbox\External\Importer\Endpoint;
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Scheduler
@@ -66,101 +68,47 @@ class Scheduler
      */
     public const DEFAULT_TIMEOUT = 10800;
 
+
     /**
      * lock identifier used to prevent more than one import process from running at a time
      */
     public const LOCK_NAME = 'schooldata_import';
 
-    /**
-     * @var IConnector
-     */
-    private IConnector $db;
-
-    /**
-     * One of [hourly, twiceDaily, daily]
-     *
-     * @var string
-     */
-    private $frequency;
-
-    /**
-     * Custom hours to run tool at, eg ['00','03','15','23']
-     *
-     * @var string[]
-     */
-    private array $customHours;
-
-    /**
-     * @var IFactory
-     */
-    private $factory;
-
-    /**
-     * Optional path to a file containing cached nodes that can be read instead of
-     * realtime endpoint access (nicer for development/debugging)
-     *
-     * @var string|null
-     */
-    private $file;
-
-    /**'
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-
-    /**
-     * @var \Schoolbox\External\Connector\Log\Mapper
-     */
-    private \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
-
 
     /**
      * Scheduler constructor.
      *
-     * @param IConnector                               $db
-     * @param string                                   $frequency
-     * @param string[]                                 $customHours
-     * @param IFactory                                 $factory
-     * @param string                                   $type
-     * @param string|null                              $file
-     * @param LoggerInterface                          $logger
-     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     * @param IConnector $db
+     * @param string $frequency One of [hourly, twiceDaily, daily]
+     * @param array $customHours Custom hours to run tool at, eg ['00','03','15','23']
+     * @param IFactory $factory
+     * @param string $type
+     * @param string|null $file Optional path to a file containing cached nodes that can be read instead of realtime endpoint access (nicer for development/debugging)
+     * @param LoggerInterface $logger
+     * @param ImportLogMapper $importLogMapper
      */
     public function __construct(
-        IConnector $db,
-        string $frequency,
-        array $customHours,
-        IFactory $factory,
-        string $type,
-        ?string $file,
-        LoggerInterface $logger,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        private IConnector $db,
+        private string $frequency,
+        private array $customHours,
+        private IFactory $factory,
+        private string $type,
+        private ?string $file,
+        private LoggerInterface $logger,
+        private ImportLogMapper $importLogMapper
     ) {
-        $this->db = $db;
-        $this->frequency = $frequency;
-        $this->customHours = $customHours;
-        $this->factory = $factory;
-        $this->type = $type;
-        $this->file = $file;
-        $this->logger = $logger;
-        $this->importLogMapper = $importLogMapper;
     }
 
 
     /**
      * Execute the importer at $now
      *
-     * @param int    $now
+     * @param int $now
      * @param string $runId
      * @param string $scriptName
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
+     * @throws \Throwable
      * @throws \UnexpectedValueException
      */
     public function run(int $now, string $runId, string $scriptName): void

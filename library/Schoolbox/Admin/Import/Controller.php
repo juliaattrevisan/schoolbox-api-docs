@@ -49,7 +49,9 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Symfony\Component\Lock\LockInterface;
+use Twig\Error\Error;
 use UnexpectedValueException;
 
 /**
@@ -71,15 +73,16 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param ConfigMapper                       $configMapper
-     * @param FieldStrategyFactory               $fieldStrategyFactory
-     * @param Rebuilder                          $rebuilder
-     * @param CacheInterface                     $oidcCache
-     * @param Mapper                             $importLogMapper
-     * @param ClientInterface                    $redisStorage
-     * @param \Schoolbox\External\Event\Mapper   $eventMapper
-     * @param ClassEntryMapper                   $classEntryMapper
+     * @param ConfigMapper $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder $rebuilder
+     * @param CacheInterface $oidcCache
+     * @param Mapper $importLogMapper
+     * @param ClientInterface $redisStorage
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param \Schoolbox\Resource\File\Mapper $fileMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -90,7 +93,8 @@ class Controller extends ConfigController
         private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private \Schoolbox\Resource\File\Mapper $fileMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -104,6 +108,7 @@ class Controller extends ConfigController
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws RouteNotFound
+     * @throws Error
      */
     public function getSchoolDataIndex(): void
     {
@@ -141,7 +146,7 @@ class Controller extends ConfigController
          */
         $canPerformUpdate = false;
 
-        if ('' !== $type && Factory::CSV !== $type) {
+        if ('' !== $type) {
             /* No lock? You can perform the update, but immediately release the lock
              * so you can actually do that
              */
@@ -162,6 +167,10 @@ class Controller extends ConfigController
             }
         }
 
+        /* Input payloads for liss that we capture and store
+         */
+        $lissInputPayloads = (new PayloadList($this->storageMapper))->generate();
+
         $this->response = $this->responseFromTemplate(
             '@adminImportIndex/schoolData/index.twig',
             [
@@ -175,7 +184,7 @@ class Controller extends ConfigController
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
                 /* Find any LISS input payloads that we might have logged
                  */
-                'lissInputPayloads' => (new PayloadList($this->storageMapper))->generate(),
+                'lissInputPayloads' => $lissInputPayloads,
                 /* Decide if the Perform Live Sync is available based on the current
                  * data source selected (you can't do it if you're using No Data Source
                  * or if you're using CSV Files)
@@ -225,6 +234,7 @@ class Controller extends ConfigController
         /* Save it
          */
         $this->updateConfig($postData, $this->buildConfigPredicate());
+
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
@@ -316,6 +326,7 @@ class Controller extends ConfigController
      * Set up the live sync
      *
      * @throws RouteNotFound
+     * @throws \Exception
      */
     public function getPerformUpdate(): void
     {
@@ -328,7 +339,7 @@ class Controller extends ConfigController
          * throw a generic error. You could perhaps get here
          * by bookmarking the url or visiting it directly.
          */
-        if ('' === $type || Factory::CSV === $type) {
+        if ('' === $type) {
             throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -344,7 +355,8 @@ class Controller extends ConfigController
         $this->postOutputCallbacks[] = function () use ($logger) {
             $this->syncCallback($logger);
         };
-        $this->response              = $this->responseEmpty();
+
+        $this->response = $this->responseEmpty();
     }
 
 
@@ -372,16 +384,27 @@ class Controller extends ConfigController
             $file        = null;
             $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
 
-            /* Cannot do this with No Data Source, or with CSV Files
-             * Exit early if either of those are selected
+            /* LISS Additive Mode
+             *
+             * If on, liss data will be **added** to whatever the sis gave to us. We don't actually
+             * know whether liss data should add, or replace, existing data; only the school can know
+             * what they meant by having their liss data here.
+             *
+             * Turning it on lets us skip the Prepare and Cleanup strats from the liss factory.
+             * It's off by default.
              */
-            if ('' === $type || Factory::CSV === $type) {
+            $lissAdditiveMode = (bool)$this->getConfigLoader()->get('external_liss_additive_mode');
+
+            /* Cannot do this with No Data Source
+             * Exit early if selected
+             */
+            if ('' === $type) {
                 return;
             }
 
             /* Nobody is on the watchlist in this context
              */
-            $watchlist   = (new Watchlist())->filter('');
+            $watchlist = (new Watchlist())->filter('');
 
             try {
                 $lock = $this->acquireLock($logger, Scheduler::LOCK_NAME, $timeout);
@@ -416,6 +439,11 @@ class Controller extends ConfigController
              */
             $time = time();
 
+            /* This is needed to process liss data from storage files
+             */
+            /** @var FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
             foreach ($splitStrats as $currentStrat) {
                 /* Each part of a Segregated Import gets its own run id
                  */
@@ -427,7 +455,16 @@ class Controller extends ConfigController
 
                 /* Execute scheduler: sis stuff
                  */
-                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+                $sisFactory = new Factory(
+                    $host,
+                    $key,
+                    true,
+                    $lissAdditiveMode,
+                    $logger,
+                    $watchlist,
+                    $validStrats,
+                    $filesystemProxy
+                );
 
                 /* Importer strat gets suffixed onto the end
                  */
@@ -578,19 +615,21 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_event into a csv format
      *
-     * @api /adminv2/import/schoolDataImport/timetable/export
      * @return void
      * @throws PDOException
+     * @throws \InvalidArgumentException
+     * @api /adminv2/import/schoolDataImport/timetable/export
      */
     public function getTimetableExport(): void
     {
         $content = (new Timetable($this->eventMapper))->export();
+
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', \strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"")
         ;
     }
 
@@ -598,19 +637,56 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_class into a csv format
      *
-     * @api /adminv2/import/schoolDataImport/classes/export
      * @return void
      * @throws PDOException
+     * @throws \InvalidArgumentException
+     * @api /adminv2/import/schoolDataImport/classes/export
      */
     public function getClassesExport(): void
     {
         $content = (new Classes($this->classEntryMapper))->export();
         $this->response = $this->responseFromContent($content)
-                               ->withHeader('Pragma', ' ')
-                               ->withHeader('Cache-Control', ' ')
-                               ->withHeader('Content-Type', 'text/csv')
-                               ->withHeader('Content-Length', \strlen($content))
-                               ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"")
-        ;
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
+    }
+
+
+    /**
+     * Explicitly hard-delete a storage file corresponding to a liss payload
+     *
+     * @return void
+     */
+    public function postDeleteLissPayload(): void
+    {
+        $hash = $this->requestPost->get('hash');
+
+        if (null === $hash) {
+            return;
+        }
+
+        /* Delete from the file table, if you dragged it into Resource Browser manually
+         */
+        try {
+            $file = $this->fileMapper->findOneByColumn('hash', $hash);
+
+            $this->fileMapper->hardDelete($file);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* noop
+             * This might have been uploaded by the system, not a human
+             */
+        }
+
+        try {
+            $payload = $this->storageMapper->findByHash($hash);
+
+            $this->storageMapper->actualDelete($payload);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* noop
+             * Hash not found, for some reason; maybe deleted via another tab
+             */
+        }
     }
 }
