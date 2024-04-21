@@ -22,8 +22,6 @@ use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use Custom\Help\CourseParticipation;
 
-use UnexpectedValueException;
-
 use function http_build_query;
 
 class HelpRequest
