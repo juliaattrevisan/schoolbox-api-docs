@@ -10,8 +10,10 @@
 
 namespace Schoolbox\Admin\SHAPS;
 
+use Alaress\ArrayValidator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Custom\Help\CourseParticipation;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
@@ -21,7 +23,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-use Custom\Help\CourseParticipation;
 
 use function strpos;
 
@@ -193,7 +194,6 @@ class Controller extends Base
         $responseCode = 200;
         $messages     = [];
 
-        // data, status => code, message
         try {
             $existingUsers = $this->helpRequest->users();
         } catch (GuzzleException $e) {
@@ -202,32 +202,64 @@ class Controller extends Base
         }
         $emails = [];
 
-        // provision new users
+        // Provision new users.
         $newUserIds = array_diff($userIds, array_keys($existingUsers));
         if (count($newUserIds) > 0) {
-            $newUsers     = $this->userMapper->findByColumn('id', $newUserIds);
-            $responseUser = $this->helpRequest->provisionUsers($newUsers->getAll());
-            $responseCode = $responseUser['status']['code'];
-            if ($responseCode === 200) {
-                $messages[] = $newUsers->count() . ' user' . ($newUsers->count() > 1 ? 's' : '') . ' provisioned successfully';
-                $emails     = $newUsers->getPropertyValues('email');
-            } else {
-                $messages = array_column($responseUser['data'], 'message');
+            $newUsers = $this->userMapper->findByColumn('id', $newUserIds);
 
-                if ($responseUser['status']['message'] !== '') {
-                    $messages[] = $responseUser['status']['message'];
+            $responseUser = $this->helpRequest->provisionUsers($newUsers->getAll());
+            // Expect response like: ['status' => ['code' => 200, 'message' => 'OK'], 'data' => [array containing non-critical error info]].
+            // TODO: Maybe use array shapes here instead of ArrayValidator.
+            ArrayValidator::checkArray($responseUser, ['status' => 'array', 'data' => 'array']);
+            ArrayValidator::checkArray($responseUser['status'], ['code' => 'int', 'message' => 'string']);
+
+            if ($responseUser['status']['code'] === 200) {
+                $nUsersFailed = count($responseUser['data']); // Info on failures for specific users will be in $responseUser['data'].
+                $nUsersSucceeded = $newUsers->count() - $nUsersFailed;
+                if ($nUsersSucceeded === 0) {
+                    $messages[] = "$nUsersSucceeded user" . ($newUsers->count() > 1 ? 's' : '') . ' provisioned successfully.';
+                }
+                if ($nUsersFailed > 0) {
+                    // Add info on failures for specific users to $messages, so it will be seen by the user.
+                    $message = "$nUsersFailed users not provisioned successfully:\n";
+                    foreach ($responseUser['data'] as $errorInfo) {
+                        if (
+                            count($errorInfo) !== 2 ||
+                            !is_string($errorInfo[0]) ||
+                            // TODO: Maybe use array shapes here instead of ArrayValidator.
+                            !ArrayValidator::checkArrayReturnBool(
+                                $errorInfo[1],
+                                ['id' => 'string', 'firstname' => 'string', 'lastname' => 'string', 'email' => 'string'], // Required keys.
+                                ['title' => 'string'] // Optional keys.
+                            )
+                        ) {
+                            $messages[] = "(user error info in unexpected format): " . var_export($errorInfo, true);
+                        } else {
+                            $errorDesc = $errorInfo[0];
+                            $userInfo = $errorInfo[1];
+                            $message .= "$errorDesc: {$userInfo['firstname']} {$userInfo['lastname']}, {$userInfo['email']}, userId:{$userInfo['id']}\n";
+                        }
+                    }
+                    $messages[] = $message;
+                }
+
+                $emails = $newUsers->getPropertyValues('email');
+            } else {
+                $responseCode = $responseUser['status']['code'];
+                if (array_key_exists('data', $responseUser)) {
+                    $messages[] = $responseUser['data'];
                 }
             }
         }
 
-        // gather usernames in response which correspond to user ids
+        // Gather usernames in response that correspond to user ids.
         foreach ($existingUsers as $existingUserId => $existingUserEmail) {
             if (in_array($existingUserId, $userIds)) {
                 $emails[] = $existingUserEmail;
             }
         }
 
-        // course participation
+        // Course participation.
         if (!empty($courses)) {
             $courses            = array_map('boolVal', $courses);
             $responseCourse     = $this->helpRequest->provisionUserParticipation($emails, $courses);
@@ -240,7 +272,7 @@ class Controller extends Base
             }
         }
 
-        // Build response
+        // Build response.
         $this->response = $this->responseAsJson(
             [
                 'data' => $messages,

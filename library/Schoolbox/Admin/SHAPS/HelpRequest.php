@@ -284,7 +284,7 @@ class HelpRequest
      *
      * @param array $users
      * @return array
-     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @throws InvalidArgumentException If unable to instantiate a guzzle client
      */
     public function provisionUsers(array $users): array
     {
@@ -293,7 +293,7 @@ class HelpRequest
         if (!empty($payload)) {
             // Send each user to Help
             try {
-                $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
+                $data    = $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
                 $code    = 200;
                 $message = 'OK';
             } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
