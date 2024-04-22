@@ -220,7 +220,10 @@ class Controller extends Base
                     $messages[] = "$nUsersSucceeded user" . ($nUsersSucceeded > 1 ? 's' : '') . ' provisioned successfully.';
                 }
                 if ($nUsersFailed > 0) {
-                    // Add info on failures for specific users to $messages, so it will be seen by the user.
+                    // Add info on failures for specific users to $messages, so this info will be seen by the user.
+                    // Expect $responseCourse['data'] to contain an array of arrays, that each contain two elements
+                    // like this: [string $errorDesc, array $userInfo].
+                    // See Custom/Help/CourseParticipation/Handler->postUserRegistrations().
                     $message = "$nUsersFailed user" . ($nUsersFailed > 1 ? 's' : '') . " not provisioned:\n";
                     foreach ($responseUser['data'] as $errorInfo) {
                         if (
@@ -277,9 +280,10 @@ class Controller extends Base
                     $messages[] = "$nUsersSucceeded user's course participation updated successfully.";
                 }
                 if ($nUsersFailed > 0) {
-                    // Add info on failures for specific users to $messages, so it will be seen by the user.
+                    // Add info on failures for specific users to $messages, so this info will be seen by the user.
                     // Expect $responseCourse['data'] to contain an array of email addresses,
                     // belonging to users for whom one or more participation changes failed.
+                    // See Custom/Help/CourseParticipation/Controller->postFolderAccessBySchool().
                     $message = "$nUsersFailed user's course participation not updated or partially updated (see email addresses below):\n";
                     foreach ($responseCourse['data'] as $emailAddress) {
                         $message .= " * $emailAddress\n";
