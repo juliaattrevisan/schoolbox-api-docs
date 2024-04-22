@@ -9,7 +9,7 @@
 :root {
     --animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
     --color-form-disabled-background: #edecec;
-    --size-form-input-border-width: 1px;
+    --size-form-element-border-width: 2px;
 }
 
 /**
@@ -18,8 +18,8 @@
 @mixin form-input-focus {
     background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
     border-color: var(--color-form-elements);
-    outline: calc(var(--size-form-input-border-width) + 2px) solid var(--color-focus-form-elements);
-    outline-offset: calc(var(--size-form-input-border-width) + 1px);
+    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--color-focus-form-elements);
+    outline-offset: calc(var(--size-form-el-border-width) + 1px);
 }
 
 /**

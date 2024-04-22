@@ -36,7 +36,7 @@ export const Default: Story = {
 export const Disabled: Story = {
     render: () => ({
         template: `
-            <button class="c-button" type="button" disabled aria-disabled="true">Disabled Button</button>
+            <button class="c-button" type="button" disabled aria-disabled="true">Button</button>
         `,
     }),
 };
@@ -48,7 +48,7 @@ export const Disabled: Story = {
 export const LinkButton: Story = {
     render: () => ({
         template: `
-            <a href="javascript:;" class="c-button">Button Link</a>
+            <a href="javascript:;" class="c-button">Button</a>
         `,
     }),
 };
@@ -61,7 +61,7 @@ export const WithIcon: Story = {
         template: `
             <button type="button" class="c-button">
                 <sbx-icon name="advanced-list"></sbx-icon>
-                <span>Real Button</span>
+                <span>Button</span>
             </button>
         `,
     }),
@@ -88,7 +88,21 @@ export const Secondary: Story = {
         template: `
             <button type="button" class="c-button c-button--secondary">
                 <sbx-icon name="approve"></sbx-icon>
-                <span>Save</span>
+                <span>Button</span>
+            </button>
+        `,
+    }),
+};
+
+/**
+ *
+ */
+export const Tertiary: Story = {
+    render: () => ({
+        template: `
+            <button type="button" class="c-button c-button--tertiary">
+                <sbx-icon name="approve"></sbx-icon>
+                <span>Button</span>
             </button>
         `,
     }),

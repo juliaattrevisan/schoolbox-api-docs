@@ -62,7 +62,7 @@ a.c-button {
     }
     &--secondary {
         background-color: var(--color-foreground-primary);
-        border: var(--size-form-input-border-width) solid var(--color-buttons);
+        border: var(--size-form-element-border-width) solid var(--color-buttons);
         color: var(--color-buttons);
         padding: var(--spacing-s);
         &:hover,
@@ -71,7 +71,29 @@ a.c-button {
                 --color-foreground-primary
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
             color: var(--color-buttons-hover);
-            border: var(--size-form-input-border-width) solid var(--color-buttons-hover);
+            border: var(--size-form-element-border-width) solid var(--color-buttons-hover);
+        }
+        &:focus {
+            background-color: var(
+                --color-foreground-primary
+            ); // ^foundation-fixes^ - keep the same background colour on focus
+            color: var(--color-buttons); // ^foundation-fixes^ - remove the change of text colour on focus
+        }
+    }
+    &--tertiary {
+        background-color: var(--color-foreground-primary);
+        border: 1px solid var(--color-buttons);
+        color: var(--color-buttons);
+        font-size: var(--font-size-s);
+        min-height: 2rem;
+        padding: var(--spacing-s);
+        &:hover,
+        &:active {
+            background-color: var(
+                --color-foreground-primary
+            ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+            color: var(--color-buttons-hover);
+            border: 1px solid var(--color-buttons-hover);
         }
         &:focus {
             background-color: var(
