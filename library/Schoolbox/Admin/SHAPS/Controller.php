@@ -246,9 +246,10 @@ class Controller extends Base
                 $emails = $newUsers->getPropertyValues('email');
             } else {
                 $responseCode = $responseUser['status']['code'];
-                if (array_key_exists('data', $responseUser)) {
-                    $messages[] = $responseUser['data'];
+                if ($responseUser['status']['message'] !== '') {
+                    $messages[] = $responseUser['status']['message'];
                 }
+                // The format of $responseUser['data'] is unknown in this situation, so cannot add it to $messages.
             }
         }
 
@@ -260,12 +261,44 @@ class Controller extends Base
         }
 
         // Course participation.
-        if (!empty($courses)) {
-            $courses            = array_map('boolVal', $courses);
-            $responseCourse     = $this->helpRequest->provisionUserParticipation($emails, $courses);
+        if (!empty($courses) && !empty($emails)) {
+            $courses        = array_map('boolVal', $courses);
+            $responseCourse = $this->helpRequest->provisionUserParticipation($emails, $courses);
+            // Expect response like: ['status' => ['code' => 200, 'message' => 'OK'], 'data' => [array containing non-critical error info]].
+            // TODO: Maybe use array shapes here instead of ArrayValidator.
+            ArrayValidator::checkArray($responseCourse, ['status' => 'array', 'data' => 'array']);
+            ArrayValidator::checkArray($responseCourse['status'], ['code' => 'int', 'message' => 'string']);
+
             $responseCourseCode = $responseCourse['status']['code'];
             if ($responseCourseCode === 200) {
-                $messages[] = 'Course participation updated successfully.';
+                $nUsersFailed = count($responseCourse['data']); // Info on failures for specific users will be in $responseUser['data'].
+                $nUsersSucceeded = count($emails) - $nUsersFailed;
+                if ($nUsersSucceeded === 0) {
+                    $messages[] = "$nUsersSucceeded user" . (count($emails) > 1 ? 's' : '') . ' course participation updated successfully.';
+                }
+                if ($nUsersFailed > 0) {
+                    // Add info on failures for specific users to $messages, so it will be seen by the user.
+                    $message = "$nUsersFailed users course participation not updated successfully:\n";
+                    foreach ($responseCourse['data'] as $errorInfo) {
+                        if (
+                            count($errorInfo) !== 2 ||
+                            !is_string($errorInfo[0]) ||
+                            // TODO: Maybe use array shapes here instead of ArrayValidator.
+                            !ArrayValidator::checkArrayReturnBool(
+                                $errorInfo[1],
+                                ['id' => 'string', 'firstname' => 'string', 'lastname' => 'string', 'email' => 'string'], // Required keys.
+                                ['title' => 'string'] // Optional keys.
+                            )
+                        ) {
+                            $messages[] = "(user error info in unexpected format): " . var_export($errorInfo, true);
+                        } else {
+                            $errorDesc = $errorInfo[0];
+                            $userInfo = $errorInfo[1];
+                            $message .= "$errorDesc: {$userInfo['firstname']} {$userInfo['lastname']}, {$userInfo['email']}, userId:{$userInfo['id']}\n";
+                        }
+                    }
+                    $messages[] = $message;
+                }
             } else {
                 $responseCode = $responseCourseCode;
                 $messages     = array_merge($messages, array_column($responseCourse['data'], 'message'));
