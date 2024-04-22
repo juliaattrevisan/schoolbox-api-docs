@@ -270,9 +270,10 @@ export default {
 
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
-            <label for="addItem-name">Name</label>
+            <label for="addItem-name" class="required">Name</label>
             <input id="addItem-name" required v-model="addingItem.name" />
-            <label for="addItem-redirectUri">Redirect URI</label>
+
+            <label for="addItem-redirectUri" class="required">Redirect URI</label>
             <input id="addItem-redirectUri" required v-model="addingItem.redirectUri" />
 
             <label for="addItem-clientCredentialsUser">Client Credentials User</label>
@@ -342,11 +343,11 @@ export default {
 
         <reveal-modal ref="modifyItemModal">
             <h2>Modify oAuth Client</h2>
-            <label for="modifyItem-name">Name</label>
-            <input id="modifyItem-name" v-model="modifyingItem.name" />
+            <label for="modifyItem-name" class="required">Name</label>
+            <input id="modifyItem-name" required v-model="modifyingItem.name" />
 
-            <label for="modifyItem-redirectUri">Redirect URI</label>
-            <input id="modifyItem-redirectUri" v-model="modifyingItem.redirectUri" />
+            <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
+            <input id="modifyItem-redirectUri" required v-model="modifyingItem.redirectUri" />
 
             <label for="modifyItem-clientId">Client ID</label>
             <input id="modifyItem-clientId" readonly v-model="modifyingItem.clientId" />
