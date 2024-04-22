@@ -344,7 +344,7 @@ export default {
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret:
-                it will no longer be retrievable after reloading this page.
+                it will no longer be retrievable after closing this dialog.
             </div>
 
             <div class="component-action">
