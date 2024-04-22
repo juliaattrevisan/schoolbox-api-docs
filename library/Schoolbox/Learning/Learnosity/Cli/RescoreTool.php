@@ -67,7 +67,7 @@ tool, which lets you specify a particular quiz whose attempts you want to update
 It uses an assessment's learnosity_reference for a quiz whose attempts you want to rescore.
 
 Usage: rescore.php --assessment=... [-vvv] [--perform]
-
+Ex.    rescore.php --assessment=656 -vvv --perform
 
 HELP;
             exit;
