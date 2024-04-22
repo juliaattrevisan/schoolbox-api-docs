@@ -173,16 +173,18 @@ window.Vue.onMounted(() => {
                             </span>
                         </label>
                     </div>
-                    <div class="c-form-element">
-                        <label class="c-label c-toggle" for="islands-drop-shadow">
-                            Drop shadow
-                            <div class="c-hint">Add a drop shadow to all Islands.</div>
-                            <input id="islands-drop-shadow" type="checkbox" class="c-toggle__input" />
-                            <span class="c-toggle__display" hidden>
-                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-form-elements)" />
-                            </span>
-                        </label>
+                    <div class="c-form-element c-input-range">
+                        <label class="c-label" for="islands-drop-shadow-size">Drop shadow size</label>
+                        <div class="c-hint">Size of the drop shadow.</div>
+                        <input
+                            id="islands-drop-shadow-size"
+                            class="c-input-range__input"
+                            type="range"
+                            min="0"
+                            max="7"
+                            step="1"
+                            value="0"
+                        />
                     </div>
                     <div class="c-form-element">
                         <label for="--color-island-blur" class="c-label">Drop shadow colour</label>
@@ -195,53 +197,27 @@ window.Vue.onMounted(() => {
                         />
                     </div>
                     <div class="c-form-element c-input-range">
-                        <label class="c-label" for="islands-drop-shadow-size">Drop shadow size</label>
-                        <div class="c-hint">Size of the drop shadow.</div>
+                        <label class="c-label" for="islands-border-size">Border size</label>
+                        <div class="c-hint">Size of the border.</div>
                         <input
-                            id="islands-drop-shadow-size"
+                            id="islands-border-size"
                             class="c-input-range__input"
                             type="range"
-                            min="1"
-                            max="7"
+                            min="0"
+                            max="5"
                             step="1"
-                            value="3"
+                            value="0"
                         />
                     </div>
-                    <div class="l-flex-row l-gap-l">
-                        <div class="c-form-element">
-                            <label class="c-label c-toggle" for="islands-borders">
-                                Borders
-                                <div class="c-hint">Add a border to all Islands.</div>
-                                <input id="islands-borders" type="checkbox" class="c-toggle__input" />
-                                <span class="c-toggle__display" hidden>
-                                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                    <sbx-icon name="close" color="var(--color-form-elements)" />
-                                </span>
-                            </label>
-                        </div>
-                        <div class="c-form-element">
-                            <label for="--color-island-border" class="c-label">Border colour</label>
-                            <div class="c-hint">Colour of the border</div>
-                            <input
-                                id="--color-island-border"
-                                type="color"
-                                class="f-no-margins"
-                                data-change="--color-island-border"
-                            />
-                        </div>
-                        <div class="c-form-element c-input-range">
-                            <label class="c-label" for="islands-border-size">Border size</label>
-                            <div class="c-hint">Size of the border.</div>
-                            <input
-                                id="islands-border-size"
-                                class="c-input-range__input"
-                                type="range"
-                                min="1"
-                                max="5"
-                                step="1"
-                                value="2"
-                            />
-                        </div>
+                    <div class="c-form-element">
+                        <label for="--color-island-border" class="c-label">Border colour</label>
+                        <div class="c-hint">Colour of the border</div>
+                        <input
+                            id="--color-island-border"
+                            type="color"
+                            class="f-no-margins"
+                            data-change="--color-island-border"
+                        />
                     </div>
                 </div>
             </div>
