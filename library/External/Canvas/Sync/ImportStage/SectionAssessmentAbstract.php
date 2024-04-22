@@ -299,7 +299,7 @@ abstract class SectionAssessmentAbstract
                         );
                     } catch (Mapper\Exception\Deleted $exception) {
                         $this->log->warning("Skipping because object is deleted {$canvasEntity} '{$assessment['title']}' (CanvasId: $assessmentCanvasId)");
-                        continue;
+                        continue 2;
                     }
 
                     if (!$assessableImpl) {
