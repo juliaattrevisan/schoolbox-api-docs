@@ -124,6 +124,7 @@ class Module extends BaseModule
             new Database\ResultType\Page\Hydrator(
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
+                $config,
                 $routeGenerator,
                 $authorizer
             ),
