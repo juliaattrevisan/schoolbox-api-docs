@@ -216,9 +216,7 @@ class Controller extends Base
             if ($responseUser['status']['code'] === 200) {
                 $nUsersFailed = count($responseUser['data']); // Info on failures for specific users will be in $responseUser['data'].
                 $nUsersSucceeded = $newUsers->count() - $nUsersFailed;
-                if ($nUsersSucceeded > 0) {
-                    $messages[] = "$nUsersSucceeded user" . ($nUsersSucceeded > 1 ? 's' : '') . ' provisioned successfully.';
-                }
+                $messages[] = "$nUsersSucceeded user" . ($nUsersSucceeded > 1 ? 's' : '') . ' provisioned successfully.';
                 if ($nUsersFailed > 0) {
                     // Add info on failures for specific users to $messages, so this info will be seen by the user.
                     // Expect $responseCourse['data'] to contain an array of arrays, that each contain two elements
@@ -276,15 +274,13 @@ class Controller extends Base
             if ($responseCourseCode === 200) {
                 $nUsersFailed = count($responseCourse['data']); // Info on failures for specific users will be in $responseUser['data'].
                 $nUsersSucceeded = count($emails) - $nUsersFailed;
-                if ($nUsersSucceeded > 0) {
-                    $messages[] = "$nUsersSucceeded user's course participation updated successfully.";
-                }
+                $messages[] = "$nUsersSucceeded user's course participation updated successfully.";
                 if ($nUsersFailed > 0) {
                     // Add info on failures for specific users to $messages, so this info will be seen by the user.
                     // Expect $responseCourse['data'] to contain an array of email addresses,
                     // belonging to users for whom one or more participation changes failed.
                     // See Custom/Help/CourseParticipation/Controller->postFolderAccessBySchool().
-                    $message = "$nUsersFailed user's course participation not updated or partially updated (see email addresses below):\n";
+                    $message = "$nUsersFailed user's course participation not updated (see email addresses of those users below):\n";
                     foreach ($responseCourse['data'] as $emailAddress) {
                         $message .= " * $emailAddress\n";
                     }
