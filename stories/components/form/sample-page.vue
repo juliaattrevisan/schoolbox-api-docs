@@ -5,7 +5,7 @@
 
 const rootComputedStyle = getComputedStyle(document.documentElement);
 
-const colors = [
+const coreColors = [
     {
         label: "Background",
         hint: "The background colour",
@@ -26,6 +26,14 @@ const colors = [
         hint: "The primary text colour",
         variable: "--color-text-primary",
     },
+    {
+        label: "Text / Secondary",
+        hint: "The secondary text colour, ideally slightly lighter than the primary",
+        variable: "--color-text-secondary",
+    },
+];
+
+const formColors = [
     {
         label: "Form Elements Accent",
         hint: "The accent colour for all form elements",
@@ -49,23 +57,110 @@ function onColorChange(event: Event) {
 }
 
 window.Vue.onMounted(() => {
-    colors.forEach((color) => {
-        const colorPicker = document.querySelector(`[data-change="${color.variable}"]`) as HTMLInputElement;
-        colorPicker.value = rootComputedStyle.getPropertyValue(color.variable);
+    const colorPickers = document.querySelectorAll("input[type='color']");
+    Array.from(colorPickers).forEach((colorPicker) => {
+        (colorPicker as HTMLInputElement).value = rootComputedStyle.getPropertyValue(
+            colorPicker.getAttribute("data-change") as string,
+        );
         colorPicker.addEventListener("input", onColorChange);
         colorPicker.addEventListener("change", onColorChange);
     });
 
-    document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
+    document.querySelector("#islands-rounded")?.addEventListener("change", (event) => {
         const checkbox = event.target as HTMLInputElement;
-        document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
+        document.documentElement.style.setProperty("--roundness-islands", checkbox.checked ? "var(--spacing-m)" : "0");
     });
+
+    document.querySelector("#islands-drop-shadow")?.addEventListener("change", (event) => {
+        const checkbox = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--shadow-island-length", checkbox.checked ? "1px" : "0px");
+        document.documentElement.style.setProperty("--shadow-island-blur", checkbox.checked ? "0.25rem" : "0px");
+    });
+
+    document.querySelector("#islands-borders")?.addEventListener("change", (event) => {
+        const checkbox = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--border-islands-size", checkbox.checked ? "3px" : "0px");
+    });
+
+    // document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
+    //     const checkbox = event.target as HTMLInputElement;
+    //     document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
+    // });
 });
 </script>
 
 <template>
     <div class="l-flex-col l-gap-l l-pad-l">
         <div class="c-island">
+            <div class="l-flex-col l-gap-l">
+                <div class="c-form-element">
+                    <h2 class="c-label c-label--large f-no-margins">Core Colours</h2>
+                    <div class="c-hint">These are the main colours that are used throughout the entire system.</div>
+                </div>
+                <div class="l-flex-row l-gap-l">
+                    <div v-for="color in coreColors" :key="color.variable" class="c-form-element">
+                        <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                        <div class="c-hint">{{ color.hint }}</div>
+                        <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="c-island">
+            <div class="l-flex-col l-gap-l">
+                <div class="c-form-element">
+                    <h2 class="c-label c-label--large f-no-margins">Islands</h2>
+                    <div class="c-hint">To better group related content, page content typically sits on 'islands'.</div>
+                </div>
+                <div class="c-form-element">
+                    <label class="c-label c-toggle" for="islands-rounded">
+                        Rounded corners?
+                        <div class="c-hint">Add rounded borders to all Islands.</div>
+                        <input id="islands-rounded" type="checkbox" class="c-toggle__input" />
+                        <span class="c-toggle__display" hidden>
+                            <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                            <sbx-icon name="close" color="var(--color-form-elements)" />
+                        </span>
+                    </label>
+                </div>
+                <div class="c-form-element">
+                    <label class="c-label c-toggle" for="islands-drop-shadow">
+                        Drop shadow?
+                        <div class="c-hint">Add a drop shadow to all Islands.</div>
+                        <input id="islands-drop-shadow" type="checkbox" class="c-toggle__input" />
+                        <span class="c-toggle__display" hidden>
+                            <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                            <sbx-icon name="close" color="var(--color-form-elements)" />
+                        </span>
+                    </label>
+                </div>
+                <div class="l-flex-row l-gap-l">
+                    <div class="c-form-element">
+                        <label class="c-label c-toggle" for="islands-borders">
+                            Borders?
+                            <div class="c-hint">Add a border to all Islands.</div>
+                            <input id="islands-borders" type="checkbox" class="c-toggle__input" />
+                            <span class="c-toggle__display" hidden>
+                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                            </span>
+                        </label>
+                    </div>
+                    <div class="c-form-element">
+                        <label for="--color-islands-border" class="c-label">Border colour</label>
+                        <div class="c-hint">Colour of the border</div>
+                        <input
+                            id="--color-islands-border"
+                            type="color"
+                            name="head"
+                            data-change="--color-islands-border"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="c-island">
             <h2>Styles</h2>
             <div class="l-flex-row l-gap-l">
                 <label class="c-label c-toggle" for="rounded-form-elements">
@@ -82,7 +177,7 @@ window.Vue.onMounted(() => {
         <div class="c-island">
             <h2>Colours</h2>
             <div class="l-flex-row l-gap-l">
-                <div v-for="color in colors" :key="color.variable" class="l-flex-col l-gap-s">
+                <div v-for="color in formColors" :key="color.variable" class="l-flex-col l-gap-s">
                     <label :for="color.variable" class="c-label">{{ color.label }}</label>
                     <div class="c-hint">{{ color.hint }}</div>
                     <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
@@ -182,7 +277,7 @@ window.Vue.onMounted(() => {
                     <button class="c-button c-button--success l-flex__item--1" type="button">Primary Action</button>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 

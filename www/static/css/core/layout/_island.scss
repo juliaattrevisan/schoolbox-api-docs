@@ -2,9 +2,20 @@
  * To identify 'islands' of content, sitting on --color-foreground-primary
  * This `c-island` will replace the `c-island` in `www/static/css/core/layout/_container.scss`
  */
+
+:root {
+    --border-islands-size: 0px;
+    --color-islands-border: #4c94c8;
+    --shadow-island-length: 0px;
+    --shadow-island-blur: 0px;
+}
+
 .c-island {
     background-color: var(--color-foreground-primary);
+    border: var(--border-islands-size) solid var(--color-islands-border);
     border-radius: var(--roundness-islands);
     padding: var(--spacing-l);
-    // filter: drop-shadow(0 0 var(--spacing-xs) grey);
+    filter: drop-shadow(
+        rgb(192, 192, 192) var(--shadow-island-length) var(--shadow-island-length) var(--shadow-island-blur)
+    );
 }

@@ -9,7 +9,7 @@
  * New suggested custom properties
  */
 :root {
-    --roundness-islands: var(--spacing-m);
+    --roundness-islands: 0px;
     --roundness-images: 0px;
     --roundness-cards: var(--spacing-m);
     --roundness-inputs: var(--spacing-s);
@@ -38,6 +38,11 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+@import "docs";
+@import "form";
+@import "../../../www/static/css/core/layout/island";
+@import "card";
+
 /**
  * Clear any borders
  */
@@ -45,7 +50,10 @@ body {
     border: 0;
 }
 
-@import "docs";
-@import "form";
-@import "../../../www/static/css/core/layout/island";
-@import "card";
+/**
+ * Clear any gaps, not needed in SBX, utility classes should have precedence
+ * when used in production
+ */
+.l-gap--0 {
+    gap: 0;
+}
