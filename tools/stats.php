@@ -190,6 +190,16 @@ $app = new class extends CliTool\App {
                 AND deleted_at IS NULL
             ",
 
+            // Quizzes with titles that contain utf8 chars
+            // these if imported prior to SA-17115 (2024-02-05)
+            // they may be in a hidden failed state, where we have a learnosity ID, but they didn't save anything
+            'quiz_title_utf8' => "
+                SELECT COUNT(*) FROM assess
+                WHERE LENGTH(title) != CHAR_LENGTH(title)
+                AND availability = 'assess'
+                AND deleted_at IS NULL;
+            ",
+
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
