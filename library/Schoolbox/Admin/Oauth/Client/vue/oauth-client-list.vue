@@ -206,7 +206,6 @@ export default {
                             <th>Name</th>
                             <th>Redirect URI</th>
                             <th>Client ID</th>
-                            <th>Client Secret</th>
                             <th>Client Credentials User</th>
                             <th>&nbsp;</th>
                         </tr>
@@ -214,12 +213,6 @@ export default {
                             <td>{{ row.name }}</td>
                             <td>{{ row.redirectUri }}</td>
                             <td>{{ row.clientId }}</td>
-                            <td>
-                                <template v-if="row.clientSecret">{{ row.clientSecret }}
-                                    <span class="icon-alert" title="The client secret will no longer be retrievable after reloading this page." />
-                                </template>
-                                <template v-else>&mdash;</template>
-                            </td>
                             <td>
                                 <a v-if="row.clientCredentialsUser" :href="row.clientCredentialsUser._links.profile">{{ row.clientCredentialsUser.fullName }}</a>
                                 <em v-else>No user</em>
