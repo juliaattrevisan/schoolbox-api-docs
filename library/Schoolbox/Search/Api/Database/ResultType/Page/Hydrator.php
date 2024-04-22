@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use OverflowException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -166,7 +167,7 @@ class Hydrator extends BaseHydrator
                     'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
-            if ($this->config->get('lms_enabled')) {
+            if ($this->config->get(ConfigMapper::NAME_LMS_ENABLED)) {
                 $route = 'learningMarkbook.getMarkbookForClass';
                 // Params needed here are the same as set above.
                 if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
@@ -179,7 +180,7 @@ class Hydrator extends BaseHydrator
             }
         }
 
-        if ($this->config->get('lms_enabled')) {
+        if ($this->config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             if ($isCoursePage || $isUnitPage) {
                 if ($isCoursePage) {
                     $courseSpec = $folder->getCourseSpecification();
