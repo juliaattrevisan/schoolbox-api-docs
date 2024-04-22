@@ -274,12 +274,26 @@ export default {
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
             <label for="addItem-name" class="required">Name</label>
+            <p class="meta">
+                A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
+                whether they wish to share their details.
+            </p>
             <input id="addItem-name" required v-model="addingItem.name" />
 
             <label for="addItem-redirectUri" class="required">Redirect URI</label>
+            <p class="meta">
+                When the user approves a request to share details, where should they be redirected to?
+                (This URI must be able to process an oAuth authorization code.)
+            </p>
             <input id="addItem-redirectUri" required v-model="addingItem.redirectUri" />
 
             <label for="addItem-clientCredentialsUser">Client Credentials User</label>
+            <p class="meta">
+                Any client credentials requests
+                (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user)
+                will be authenticated as this user;
+                if no user is set here, this client may not use client credentials requests.
+            </p>
             <v-select
                 input-id="addItem-clientCredentialsUser"
                 :options="searchUsers"
@@ -343,12 +357,26 @@ export default {
         <reveal-modal ref="modifyItemModal">
             <h2>Modify oAuth Client</h2>
             <label for="modifyItem-name" class="required">Name</label>
+            <p class="meta">
+                A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
+                whether they wish to share their details.
+            </p>
             <input id="modifyItem-name" required v-model="modifyingItem.name" />
 
             <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
+            <p class="meta">
+                When the user approves a request to share details, where should they be redirected to?
+                (This URI must be able to process an oAuth authorization code.)
+            </p>
             <input id="modifyItem-redirectUri" required v-model="modifyingItem.redirectUri" />
 
             <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
+            <p class="meta">
+                Any client credentials requests
+                (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user)
+                will be authenticated as this user;
+                if no user is set here, this client may not use client credentials requests.
+            </p>
             <v-select
                 input-id="modifyItem-clientCredentialsUser"
                 :options="searchUsers"
