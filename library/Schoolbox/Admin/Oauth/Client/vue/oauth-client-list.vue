@@ -276,21 +276,17 @@ export default {
                 class="schoolbox-vue-selectize"
                 :clear-search-on-blur="() => true"
                 :clear-search-on-select="true"
-                :close-on-select="false"
+                :close-on-select="true"
                 @search="onUserSearch"
                 label="fullName"
                 placeholder="Search for user, or leave empty for no user"
                 v-model="addingItem.clientCredentialsUser"
             >
                 <template #option="option">
-                <span class="d-center">
-                    {{ option.fullName }}
-                </span>
+                    <span class="d-center">{{ option.fullName }}</span>
                 </template>
                 <template #selected-option="option">
-                <span class="selected d-center">
-                    {{ option.fullName }}
-                </span>
+                    <span class="selected d-center">{{ option.fullName }}</span>
                 </template>
             </v-select>
 
@@ -349,21 +345,17 @@ export default {
                 class="schoolbox-vue-selectize"
                 :clear-search-on-blur="() => true"
                 :clear-search-on-select="true"
-                :close-on-select="false"
+                :close-on-select="true"
                 @search="onUserSearch"
                 label="fullName"
                 placeholder="Search for user, or leave empty for no user"
                 v-model="modifyingItem.clientCredentialsUser"
             >
                 <template #option="option">
-                <span class="d-center">
-                    {{ option.fullName }}
-                </span>
+                    <span class="d-center">{{ option.fullName }}</span>
                 </template>
                 <template #selected-option="option">
-                <span class="selected d-center">
-                    {{ option.fullName }}
-                </span>
+                    <span class="selected d-center">{{ option.fullName }}</span>
                 </template>
             </v-select>
 
