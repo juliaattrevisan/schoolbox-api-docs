@@ -11,11 +11,9 @@ declare(strict_types=1);
 
 use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Log\Guid;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -88,8 +86,8 @@ HELP;
          * Though maybe it should be able to do that...? It would allow people
          * to ftp stuff to a folder instead of providing an api endpoint
          */
-        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
-        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $host        = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key         = $this->getConfig()->get('schooldata_import_endpoint_key');
 
         /* Detect frequency. "select an option" and "none" mean we should just exit early
          */
@@ -100,7 +98,6 @@ HELP;
                 'Frequency set to "%s"; nothing to do. Exiting.',
                 $frequency ?: 'select an option'
             ));
-
             exit(1);
         }
 
@@ -108,17 +105,6 @@ HELP;
         $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
-
-        /* LISS Additive Mode
-         *
-         * If on, liss data will be **added** to whatever the sis gave to us. We don't actually
-         * know whether liss data should add, or replace, existing data; only the school can know
-         * what they meant by having their liss data here.
-         *
-         * Turning it on lets us skip the Prepare and Cleanup strats from the liss factory.
-         * It's off by default.
-         */
-        $lissAdditiveMode = (bool)$this->getConfig()->get('external_liss_additive_mode');
 
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
@@ -164,7 +150,7 @@ HELP;
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
-        $runId = (new Guid())->generate();
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
 
         /* Split the transaction in half for suds connectors that can actually do that
          * Otherwise just import everything like it always did
@@ -183,11 +169,6 @@ HELP;
          */
         $time = time();
 
-        /* This is needed to process liss data from storage files
-         */
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
         foreach ($splitStrats as $currentStrat) {
             /* Importer strats can be defined by cli args
              * null or empty string means "import everything"
@@ -202,16 +183,7 @@ HELP;
 
             /* Execute scheduler: sis stuff
              */
-            $sisFactory = new Endpoint\Factory(
-                $host,
-                $key,
-                $perform,
-                $lissAdditiveMode,
-                $this->getLogger(),
-                [],
-                $validStrats,
-                $filesystemProxy
-            );
+            $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
 
             /* Importer strat gets suffixed onto the end
              */

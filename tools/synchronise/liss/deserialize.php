@@ -9,8 +9,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Codec\PayloadFilename;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -36,11 +34,11 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --hash
+     * --file
      *
      * The input liss payload that you want to convert
      */
-    private const OPT_LONG_HASH = 'hash:';
+    private const OPT_LONG_FILE = 'file:';
 
 
     /**
@@ -50,7 +48,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_HASH,
+            self::OPT_LONG_FILE,
         ];
     }
 
@@ -69,9 +67,9 @@ Use the redirect symbol to do it, otherwise it prints to terminal.
 
 Don't forget to clean up after yourself when you're done
 
-Usage: deserialize.php --hash=... > ./path/to/output.txt
+Usage: deserialize.php --file=... > ./path/to/output.txt
 
-Example: deserialize.php --hash=abcd1234jkl5678 > output.txt
+Example: deserialize.php --file=./suds_liss_dailydata_20230803_155733.log > output.txt
 
 
 HELP;
@@ -80,30 +78,22 @@ HELP;
 
         /* See if the file exists and is in a readable condition
          */
-        $inputHash = trim((string)$this->getOpt(self::OPT_LONG_HASH));
-
-        /* This is needed to process liss data from storage files
-         */
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
-        $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
+        $inputFilename = trim((string)$this->getOpt(self::OPT_LONG_FILE));
 
         try {
-            $file = $storageMapper->findByHash($inputHash);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+            $in = fopen($inputFilename, 'r');
+        } catch (\Exception $e) {
             $this->getLogger()->warning(sprintf(
-                'LISS Payload for %s not found; exiting.',
-                $inputHash
+                'Cannot read input file for reading: %s',
+                $inputFilename
             ));
 
-            exit(1);
+            return;
         }
 
-        /* Once we can get the saved payload, try to reconstruct it
-         * into something we can feed back into the Receiver
+        /* Grab the input contents and plop it into the output file
          */
-        $mockMessage = unserialize($filesystemProxy->read($file), [
+        $mockMessage = unserialize(file_get_contents($inputFilename), [
             'allowed_classes' => true
         ]);
 
