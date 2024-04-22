@@ -108,7 +108,7 @@ class ArrayValidator
             }
 
             try {
-                self::checkType($array[$key], $type);
+                self::checkType($array[$key], $typeByOptionalKey[$key]);
             } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException("Type check failed for optional key '$key'.\n" . $e->getMessage());
             }
@@ -175,7 +175,7 @@ class ArrayValidator
                 "Variable type check failed.  Expected '$type', received " . (
                     (gettype($v) == 'object')
                     ? 'object of class \'' . get_class($v) . '\'.'
-                    : 'variable of type \'' . gettype($v) . '\'' . ((gettype($v) == 'string')? " ('$v')": '') . ".  (value: $v)."
+                    : 'variable of type \'' . gettype($v) . '\'' . (gettype($v) == 'string' ? " ('$v')" : '') . ".  (value: $v)."
                 )
             );
         }
