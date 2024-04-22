@@ -14,31 +14,34 @@ Usage:
     });
 </script>
 
-<li class="actions-small-1 content" data-unit-spec="{{ unitSpec.id }}">
-    <div class="list-item">
-        <div class="small-1 column">
-            <a data-collapser="unit-{{ unitSpec.id }}" class="icon-{{ _expanded ? 'up' : 'down' }}-arrow"></a>
+<li class="content" data-unit-spec="{{ unitSpec.id }}" data-folder-id="{{ unitSpec.folder.id }}">
+    <div class="actions-small-1" data-unit-actions>
+        <div data-grip-unit class="grip compact ui-sortable-handle"></div>
+        <div class="list-item l-flex-row l-flex--align-center">
+            <div class="small-1 column">
+                <a data-collapser="unit-{{ unitSpec.id }}" class="icon-{{ _expanded ? 'up' : 'down' }}-arrow"></a>
+            </div>
+            <div class="small-11 column">
+                <label>
+                    <input type="text" value="{{ unitSpec.folder.name }}" placeholder="Unit Name" name="unit[{{ unitSpec.id }}][name]" data-unit-name maxlength="255"/>
+                </label>
+            </div>
         </div>
-        <div class="small-11 column">
-            <label>
-                <input type="text" value="{{ unitSpec.folder.name }}" placeholder="Unit Name" name="unit[{{ unitSpec.id }}][name]" data-unit-name maxlength="255"/>
-            </label>
-        </div>
+        <nav>
+            <sbx-pop-out content-id="unit-{{ unitSpec.id }}-modify"></sbx-pop-out>
+        </nav>
+        <ul id="unit-{{ unitSpec.id }}-modify" class="f-dropdown" data-dropdown-content>
+            {% if unitSpec.folder.hasHomepage %}
+                <li><a href="/homepage/{{ unitSpec.folder.id }}" class="icon-home">View Homepage</a></li>
+            {% else %}
+                <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
+            {% endif %}
+            <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForUnit', {unitSpecId: unitSpec.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-import" data-action="import-unit">Import into Classes</a></li>
+            <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
+            {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unitSpec.course, courseSpecId: unitSpec.course.id, unitSpecId: unitSpec.id, folderId: 0}) %}
+            {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
+        </ul>
     </div>
-    <nav>
-        <sbx-pop-out content-id="unit-{{ unitSpec.id }}-modify"></sbx-pop-out>
-    </nav>
-    <ul id="unit-{{ unitSpec.id }}-modify" class="f-dropdown" data-dropdown-content>
-        {% if unitSpec.folder.hasHomepage %}
-            <li><a href="/homepage/{{ unitSpec.folder.id }}" class="icon-home">View Homepage</a></li>
-        {% else %}
-            <li><a href="/resources/{{ unitSpec.folder.id }}" class="icon-folder">Browse Resources</a></li>
-        {% endif %}
-        <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForUnit', {unitSpecId: unitSpec.id}) }}?returnUrl={{ encodedReturnUrl }}" class="icon-import" data-action="import-unit">Import into Classes</a></li>
-        <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unitSpec.id}) }}" class="icon-delete" data-action="delete-unit">Delete Unit</a></li>
-        {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unitSpec.course, courseSpecId: unitSpec.course.id, unitSpecId: unitSpec.id, folderId: 0}) %}
-        {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
-    </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unitSpec.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <div class="empty-state{% if unitSpec.assessables|length %} hide{% endif %}" data-empty-state>
             <i class="icon-course"></i>
