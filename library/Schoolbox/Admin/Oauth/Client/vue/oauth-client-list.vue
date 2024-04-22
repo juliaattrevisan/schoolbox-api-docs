@@ -94,15 +94,18 @@ export default {
                         },
                     }
                 );
-                const addedItem = await response.json();
-                this.addingItem = addedItem;
-                this.$refs.addItemModal.close();
-                this.$refs.itemAddedModal.open();
-                this.loadedData.push({...addedItem});
-                this.$refs.toast.timeout("Created", true);
+                if (response.ok) {
+                    const addedItem = await response.json();
+                    this.addingItem = addedItem;
+                    this.$refs.addItemModal.close();
+                    this.$refs.itemAddedModal.open();
+                    this.loadedData.push({...addedItem});
+                    this.$refs.toast.timeout("Created", true);
+                } else {
+                    this.$refs.toast.timeout("Could not create", false);
+                }
             } catch (error) {
                 this.$refs.toast.timeout("Could not create", false);
-                console.warn(error);
             }
         },
         showModifyModal(item) {
@@ -123,19 +126,20 @@ export default {
                         },
                     }
                 );
-                this.$refs.modifyItemModal.close();
-                this.$refs.toast.timeout("Modified", true);
+                if (response.ok) {
+                    this.$refs.modifyItemModal.close();
+                    this.$refs.toast.timeout("Modified", true);
 
-                // Replace the existing modified item with the new version
-                const modifiedItem = await response.json();
-                this.loadedData  = this.loadedData.map(
-                    v => v.id === modifiedItem.id ? modifiedItem : v
-                );
-
-                // Show toast
+                    // Replace the existing modified item with the new version
+                    const modifiedItem = await response.json();
+                    this.loadedData  = this.loadedData.map(
+                        v => v.id === modifiedItem.id ? modifiedItem : v
+                    );
+                } else {
+                    this.$refs.toast.timeout("Could not modify", false);
+                }
             } catch (error) {
                 this.$refs.toast.timeout("Could not modify", false);
-                console.warn(error);
             }
         },
         showDeleteModal(item) {
