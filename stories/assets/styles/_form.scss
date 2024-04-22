@@ -65,6 +65,23 @@ hr {
     border-color: var(--color-text-secondary);
 }
 
+/**
+ *  Tweaks to make the range slider more inline with draft styles,
+ *  eventually this should be added into the proper range slider styles
+ */
+.c-input-range {
+    &__input::-webkit-slider-runnable-track {
+        background-color: var(--color-foreground-primary);
+        border: var(--size-form-element-border-width) solid var(--color-form-elements);
+    }
+    &__input::-webkit-slider-thumb {
+        background-color: var(--color-form-elements);
+    }
+    &__input:focus-visible::-webkit-slider-thumb {
+        outline: 3px solid var(--color-focus-form-elements);
+    }
+}
+
 @import "../../../www/static/css/core/ui/forms/fieldset";
 @import "../../../www/static/css/core/ui/forms/label";
 @import "../../../www/static/css/core/ui/forms/hint";
