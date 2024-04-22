@@ -35,7 +35,7 @@ const coreColors = [
 
 const formColors = [
     {
-        label: "Form Elements Accent",
+        label: "Accent",
         hint: "The accent colour for all form elements",
         variable: "--color-form-elements",
     },
@@ -82,10 +82,10 @@ window.Vue.onMounted(() => {
         document.documentElement.style.setProperty("--border-islands-size", checkbox.checked ? "3px" : "0px");
     });
 
-    // document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
-    //     const checkbox = event.target as HTMLInputElement;
-    //     document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
-    // });
+    document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
+        const checkbox = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
+    });
 });
 </script>
 
@@ -101,7 +101,13 @@ window.Vue.onMounted(() => {
                     <div v-for="color in coreColors" :key="color.variable" class="c-form-element">
                         <label :for="color.variable" class="c-label">{{ color.label }}</label>
                         <div class="c-hint">{{ color.hint }}</div>
-                        <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
+                        <input
+                            :id="color.variable"
+                            type="color"
+                            class="f-no-margins"
+                            name="head"
+                            :data-change="color.variable"
+                        />
                     </div>
                 </div>
             </div>
@@ -112,34 +118,12 @@ window.Vue.onMounted(() => {
                     <h2 class="c-label c-label--large f-no-margins">Islands</h2>
                     <div class="c-hint">To better group related content, page content typically sits on 'islands'.</div>
                 </div>
-                <div class="c-form-element">
-                    <label class="c-label c-toggle" for="islands-rounded">
-                        Rounded corners?
-                        <div class="c-hint">Add rounded borders to all Islands.</div>
-                        <input id="islands-rounded" type="checkbox" class="c-toggle__input" />
-                        <span class="c-toggle__display" hidden>
-                            <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                            <sbx-icon name="close" color="var(--color-form-elements)" />
-                        </span>
-                    </label>
-                </div>
-                <div class="c-form-element">
-                    <label class="c-label c-toggle" for="islands-drop-shadow">
-                        Drop shadow?
-                        <div class="c-hint">Add a drop shadow to all Islands.</div>
-                        <input id="islands-drop-shadow" type="checkbox" class="c-toggle__input" />
-                        <span class="c-toggle__display" hidden>
-                            <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                            <sbx-icon name="close" color="var(--color-form-elements)" />
-                        </span>
-                    </label>
-                </div>
                 <div class="l-flex-row l-gap-l">
                     <div class="c-form-element">
-                        <label class="c-label c-toggle" for="islands-borders">
-                            Borders?
-                            <div class="c-hint">Add a border to all Islands.</div>
-                            <input id="islands-borders" type="checkbox" class="c-toggle__input" />
+                        <label class="c-label c-toggle" for="islands-rounded">
+                            Rounded
+                            <div class="c-hint">Add rounded styles to all Islands.</div>
+                            <input id="islands-rounded" type="checkbox" class="c-toggle__input" />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
                                 <sbx-icon name="close" color="var(--color-form-elements)" />
@@ -147,45 +131,68 @@ window.Vue.onMounted(() => {
                         </label>
                     </div>
                     <div class="c-form-element">
-                        <label for="--color-islands-border" class="c-label">Border colour</label>
-                        <div class="c-hint">Colour of the border</div>
-                        <input
-                            id="--color-islands-border"
-                            type="color"
-                            name="head"
-                            data-change="--color-islands-border"
-                        />
+                        <label class="c-label c-toggle" for="islands-drop-shadow">
+                            Drop shadow
+                            <div class="c-hint">Add a drop shadow to all Islands.</div>
+                            <input id="islands-drop-shadow" type="checkbox" class="c-toggle__input" />
+                            <span class="c-toggle__display" hidden>
+                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                            </span>
+                        </label>
+                    </div>
+                    <div class="l-flex-row l-gap-l">
+                        <div class="c-form-element">
+                            <label class="c-label c-toggle" for="islands-borders">
+                                Borders
+                                <div class="c-hint">Add a border to all Islands.</div>
+                                <input id="islands-borders" type="checkbox" class="c-toggle__input" />
+                                <span class="c-toggle__display" hidden>
+                                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                                    <sbx-icon name="close" color="var(--color-form-elements)" />
+                                </span>
+                            </label>
+                        </div>
+                        <div class="c-form-element">
+                            <label for="--color-islands-border" class="c-label">Border colour</label>
+                            <div class="c-hint">Colour of the border</div>
+                            <input
+                                id="--color-islands-border"
+                                type="color"
+                                class="f-no-margins"
+                                data-change="--color-islands-border"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- <div class="c-island">
-            <h2>Styles</h2>
-            <div class="l-flex-row l-gap-l">
-                <label class="c-label c-toggle" for="rounded-form-elements">
-                    Interactive elements
-                    <div class="c-hint">Add rounded styles to all interactive elements.</div>
-                    <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" checked />
-                    <span class="c-toggle__display" hidden>
-                        <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                        <sbx-icon name="close" color="var(--color-form-elements)" />
-                    </span>
-                </label>
-            </div>
-        </div>
-        <div class="c-island">
-            <h2>Colours</h2>
-            <div class="l-flex-row l-gap-l">
-                <div v-for="color in formColors" :key="color.variable" class="l-flex-col l-gap-s">
-                    <label :for="color.variable" class="c-label">{{ color.label }}</label>
-                    <div class="c-hint">{{ color.hint }}</div>
-                    <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
-                </div>
-            </div>
-        </div>
         <div class="c-island">
             <div class="l-flex-col l-gap-l">
+                <div class="c-form-element">
+                    <h2 class="c-label c-label--large f-no-margins">Form elements</h2>
+                    <div class="c-hint">To alter the appearance of all form elements</div>
+                </div>
+                <div class="l-flex-row l-gap-l">
+                    <div v-for="color in formColors" :key="color.variable" class="c-form-element">
+                        <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                        <div class="c-hint">{{ color.hint }}</div>
+                        <input :id="color.variable" type="color" class="f-no-margins" :data-change="color.variable" />
+                    </div>
+                    <div class="c-form-element">
+                        <label class="c-label c-toggle" for="rounded-form-elements">
+                            Rounded
+                            <div class="c-hint">Add rounded styles to all form elements.</div>
+                            <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" />
+                            <span class="c-toggle__display" hidden>
+                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <hr />
                 <div class="l-flex-col l-gap-s">
                     <label for="input1" class="c-label c-label--required">Title</label>
                     <input id="input1" class="c-input-text" type="text" />
@@ -258,20 +265,36 @@ window.Vue.onMounted(() => {
                         <sbx-icon name="close" color="var(--color-form-elements)" />
                     </span>
                 </label>
-                <div class="l-flex-col l-gap-s">
-                    <label class="c-label" for="start-date">Start date</label>
-                    <div>
-                        <input
-                            id="start-date"
-                            class="c-input-text c-input-text--with-button l-flex__item--1"
-                            type="text"
-                        />
-                        <button class="c-button c-button--with-input l-width-100">
-                            <sbx-icon name="calendar"></sbx-icon>
-                            <span>Select date</span>
-                        </button>
-                    </div>
+            </div>
+        </div>
+
+        <!-- <div class="c-island">
+            <h2>Styles</h2>
+            <div class="l-flex-row l-gap-l">
+                <label class="c-label c-toggle" for="rounded-form-elements">
+                    Interactive elements
+                    <div class="c-hint">Add rounded styles to all interactive elements.</div>
+                    <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" checked />
+                    <span class="c-toggle__display" hidden>
+                        <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                        <sbx-icon name="close" color="var(--color-form-elements)" />
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="c-island">
+            <h2>Colours</h2>
+            <div class="l-flex-row l-gap-l">
+                <div v-for="color in formColors" :key="color.variable" class="l-flex-col l-gap-s">
+                    <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                    <div class="c-hint">{{ color.hint }}</div>
+                    <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
                 </div>
+            </div>
+        </div>
+        <div class="c-island">
+            <div class="l-flex-col l-gap-l">
+
                 <div class="l-flex-row l-gap-s">
                     <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
                     <button class="c-button c-button--success l-flex__item--1" type="button">Primary Action</button>

@@ -47,6 +47,11 @@
     }
 }
 
+input[type="color"] {
+    background-color: var(--color-foreground-primary);
+    border-color: var(--color-form-elements);
+}
+
 @import "../../../www/static/css/core/ui/forms/fieldset";
 @import "../../../www/static/css/core/ui/forms/label";
 @import "../../../www/static/css/core/ui/forms/hint";
