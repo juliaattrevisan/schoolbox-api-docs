@@ -317,7 +317,7 @@ export default {
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="addItem" href="#">Add</a>
-                    <a class="button" @click.prevent="$refs.addItem.close" href="#">Cancel</a>
+                    <a class="button" @click.prevent="$refs.addItemModal.close" href="#">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -400,6 +400,7 @@ export default {
             <div class="component-action">
                 <section>
                     <a class="button" @click.prevent="modifyItem(modifyingItem)" href="#">Modify</a>
+                    <a class="button" @click.prevent="$refs.modifyItemModal.close" href="#">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
