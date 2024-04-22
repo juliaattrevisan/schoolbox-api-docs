@@ -228,6 +228,11 @@ HELP;
                      */
                     if ($this->perform()) {
                         $this->getLogger()->info(sprintf(
+                            'Assigning %s as new max mark to question %s',
+                            $updatedQuestion['data']['validation']['valid_response']['score'],
+                            $updatedQuestion['reference']
+                        ));
+                        $this->getLogger()->debug(sprintf(
                             'Copying validation.valid_response.score %s to validation.max_score',
                             $updatedQuestion['data']['validation']['valid_response']['score']
                         ));
