@@ -100,9 +100,19 @@ window.Vue.onMounted(() => {
         document.documentElement.style.setProperty("--shadow-island-blur", checkbox.checked ? "0.25rem" : "0px");
     });
 
+    document.querySelector("#islands-drop-shadow-size")?.addEventListener("change", (event) => {
+        const rangeSlider = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--shadow-island-length", `${rangeSlider.value}px`);
+    });
+
     document.querySelector("#islands-borders")?.addEventListener("change", (event) => {
         const checkbox = event.target as HTMLInputElement;
-        document.documentElement.style.setProperty("--border-islands-size", checkbox.checked ? "3px" : "0px");
+        document.documentElement.style.setProperty("--size-island-border", checkbox.checked ? "3px" : "0px");
+    });
+
+    document.querySelector("#islands-border-size")?.addEventListener("change", (event) => {
+        const rangeSlider = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--size-island-border", `${rangeSlider.value}px`);
     });
 
     document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
@@ -147,7 +157,9 @@ window.Vue.onMounted(() => {
             <div class="l-flex-col l-gap-l">
                 <div class="c-form-element">
                     <h2 class="c-label c-label--large f-no-margins">Islands</h2>
-                    <div class="c-hint">To better group related content, page content typically sits on 'islands'.</div>
+                    <div class="c-hint">
+                        To better group related content, most page content typically sits on 'islands'.
+                    </div>
                 </div>
                 <div class="l-flex-row l-gap-l">
                     <div class="c-form-element">
@@ -172,6 +184,29 @@ window.Vue.onMounted(() => {
                             </span>
                         </label>
                     </div>
+                    <div class="c-form-element">
+                        <label for="--color-island-blur" class="c-label">Drop shadow colour</label>
+                        <div class="c-hint">Colour of the drop shadow</div>
+                        <input
+                            id="--color-island-blur"
+                            type="color"
+                            class="f-no-margins"
+                            data-change="--color-island-blur"
+                        />
+                    </div>
+                    <div class="c-form-element c-input-range">
+                        <label class="c-label" for="islands-drop-shadow-size">Drop shadow size</label>
+                        <div class="c-hint">Size of the drop shadow.</div>
+                        <input
+                            id="islands-drop-shadow-size"
+                            class="c-input-range__input"
+                            type="range"
+                            min="1"
+                            max="7"
+                            step="1"
+                            value="3"
+                        />
+                    </div>
                     <div class="l-flex-row l-gap-l">
                         <div class="c-form-element">
                             <label class="c-label c-toggle" for="islands-borders">
@@ -185,13 +220,26 @@ window.Vue.onMounted(() => {
                             </label>
                         </div>
                         <div class="c-form-element">
-                            <label for="--color-islands-border" class="c-label">Border colour</label>
+                            <label for="--color-island-border" class="c-label">Border colour</label>
                             <div class="c-hint">Colour of the border</div>
                             <input
-                                id="--color-islands-border"
+                                id="--color-island-border"
                                 type="color"
                                 class="f-no-margins"
-                                data-change="--color-islands-border"
+                                data-change="--color-island-border"
+                            />
+                        </div>
+                        <div class="c-form-element c-input-range">
+                            <label class="c-label" for="islands-border-size">Border size</label>
+                            <div class="c-hint">Size of the border.</div>
+                            <input
+                                id="islands-border-size"
+                                class="c-input-range__input"
+                                type="range"
+                                min="1"
+                                max="5"
+                                step="1"
+                                value="2"
                             />
                         </div>
                     </div>
@@ -321,22 +369,21 @@ window.Vue.onMounted(() => {
                     </div>
                 </div>
                 <hr />
+                <div class="c-form-element">
+                    <label class="c-label">Sample form elements to review the changes</label>
+                </div>
                 <div class="l-flex-row l-gap-l">
                     <button type="button" class="c-button">
                         <sbx-icon name="advanced-list"></sbx-icon>
-                        <span>Primary Button</span>
+                        <span>Button</span>
                     </button>
                     <button type="button" class="c-button c-button--secondary">
                         <sbx-icon name="approve"></sbx-icon>
                         <span>Secondary Button</span>
                     </button>
-                    <button
-                        type="button"
-                        class="c-button c-button--secondary c-button--icon-only"
-                        title="Add to favourties"
-                        aria-label="Add to favourites"
-                    >
-                        <sbx-icon name="favourite"></sbx-icon>
+                    <button type="button" class="c-button c-button--tertiary">
+                        <span>Tertiary Button</span>
+                        <sbx-icon name="more"></sbx-icon>
                     </button>
                 </div>
             </div>

@@ -4,18 +4,19 @@
  */
 
 :root {
-    --border-islands-size: 0px;
-    --color-islands-border: #4c94c8;
+    --size-island-border: 0px;
+    --color-island-border: #4c94c8;
     --shadow-island-length: 0px;
     --shadow-island-blur: 0px;
+    --color-island-blur: #b3b3b3;
 }
 
 .c-island {
     background-color: var(--color-foreground-primary);
-    border: var(--border-islands-size) solid var(--color-islands-border);
+    border: var(--size-island-border) solid var(--color-island-border);
     border-radius: var(--roundness-islands);
     padding: var(--spacing-l);
     filter: drop-shadow(
-        rgb(192, 192, 192) var(--shadow-island-length) var(--shadow-island-length) var(--shadow-island-blur)
+        var(--color-island-blur) var(--shadow-island-length) var(--shadow-island-length) var(--shadow-island-blur)
     );
 }

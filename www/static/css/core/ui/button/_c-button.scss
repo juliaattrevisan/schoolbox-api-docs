@@ -3,6 +3,11 @@
     as well as some custom tweaks
 */
 
+:root {
+    --size-button-secondary-border-width: 2px;
+    --size-button-tertiary-border-width: 1px;
+}
+
 // Reset default link styles
 a.c-button {
     text-decoration: none;
@@ -62,7 +67,7 @@ a.c-button {
     }
     &--secondary {
         background-color: var(--color-foreground-primary);
-        border: var(--size-form-element-border-width) solid var(--color-buttons);
+        border: var(--size-button-secondary-border-width) solid var(--color-buttons);
         color: var(--color-buttons);
         padding: var(--spacing-s);
         &:hover,
@@ -71,7 +76,7 @@ a.c-button {
                 --color-foreground-primary
             ); // ^foundation-fixes^ - remove the use of --content-ui-hover
             color: var(--color-buttons-hover);
-            border: var(--size-form-element-border-width) solid var(--color-buttons-hover);
+            border: var(--size-button-secondary-border-width) solid var(--color-buttons-hover);
         }
         &:focus {
             background-color: var(
@@ -82,9 +87,9 @@ a.c-button {
     }
     &--tertiary {
         background-color: var(--color-foreground-primary);
-        border: 1px solid var(--color-buttons);
+        border: var(--size-button-tertiary-border-width) solid var(--color-buttons);
         color: var(--color-buttons);
-        font-size: var(--font-size-s);
+        font-size: 0.875rem;
         min-height: 2rem;
         padding: var(--spacing-s);
         &:hover,
