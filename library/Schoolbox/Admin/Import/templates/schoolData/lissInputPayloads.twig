@@ -1,20 +1,115 @@
+<script>
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
+
+    $('#container').on('click', 'a[data-delete]', function(event) {
+        event.preventDefault();
+
+        let element = $(this);
+
+        element.confirmDialog({
+            text: 'Are you sure you want to delete this LISS payload?',
+            confirmEvent: function() {
+                $.post(element.attr('href'), {hash: element.attr('data-delete')})
+                    .done(function () {
+                        window.location.reload();
+                    });
+            }
+        });
+    });
+</script>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Most Recent LISS Input Payloads</h2>
+            <p class="meta">These files will be used for the next LISS import.</p>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-down-arrow" data-collapser="liss-input-payloads-all"></a>
+    </nav>
+</div>
 <table>
     <thead>
-        <tr>
-            <th>Filename</th>
-            <th>Created</th>
-        </tr>
+    <tr>
+        <th>Method</th>
+        <th>Filename</th>
+        <th>Source</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-    {% for file in lissInputPayloads %}
-        <tr>
-            <td>
-                <a href="/storage/fetch.php?hash={{ file.hash }}&save=1">{{ file.filename }}</a>
-            </td>
-            <td>
-                {{ file.createdAt.local }}
-            </td>
-        </tr>
+    {% for payloadName, payload in lissInputPayloads.scheduled %}
+        {% for source, file in payload.sources %}
+            <tr>
+                <td>
+                    {{ payload.title }}
+                </td>
+                {% if file %}
+                    <td>
+                        <a href="/storage/fetch.php?hash={{ file.hash }}&save=1">{{ file.filename }}</a>
+                    </td>
+                    <td>
+                        {{ source }}
+                    </td>
+                    <td>
+                        <time title="{{ file.createdAt.local }}">{{ file.createdAt.relativeTime }}</time>
+                    </td>
+                    {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postDeleteLissPayload') %}
+                    {% if deleteRoute %}
+                        <td class="actions-small-1">
+                            <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete="{{ file.hash }}"></a></nav>
+                        </td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                {% else %}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
     {% endfor %}
     </tbody>
 </table>
+
+<div class="hide" data-collapsable="liss-input-payloads-all" data-collapse-state="collapsed">
+    <h3 class="subheader">All LISS Input Payloads</h3>
+    <p class="meta">A list of all the LISS payloads we've stored so far.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in lissInputPayloads.all %}
+            <tr>
+                <td>
+                    <a href="/storage/fetch.php?hash={{ file.hash }}&save=1">{{ file.filename }}</a>
+                </td>
+                <td>
+                    {{ file.createdAt.local }}
+                </td>
+                {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postDeleteLissPayload') %}
+                {% if deleteRoute %}
+                    <td class="actions-small-1">
+                        <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete="{{ file.hash }}"></a></nav>
+                    </td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
