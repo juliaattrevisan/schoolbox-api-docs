@@ -229,7 +229,7 @@ class HelpRequest
      * Provision course participation
      * @param array $usernames
      * @param array $courses
-     * @return array
+     * @return array{data: array, status: array}
      */
     public function provisionUserParticipation(array $usernames, array $courses): array
     {
@@ -269,7 +269,7 @@ class HelpRequest
             $code    = 500;
             $message = 'Internal Server Error';
         }
-        // Build response
+
         return [
             'data'   => $data,
             'status' => [
@@ -283,7 +283,7 @@ class HelpRequest
      * Provision users
      *
      * @param array $users
-     * @return array
+     * @return array{data: array, status: array}
      * @throws InvalidArgumentException If unable to instantiate a guzzle client
      */
     public function provisionUsers(array $users): array
