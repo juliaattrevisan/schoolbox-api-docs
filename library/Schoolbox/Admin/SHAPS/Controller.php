@@ -278,24 +278,11 @@ class Controller extends Base
                 }
                 if ($nUsersFailed > 0) {
                     // Add info on failures for specific users to $messages, so it will be seen by the user.
-                    $message = "$nUsersFailed user's course participation not updated:\n";
-                    foreach ($responseCourse['data'] as $errorInfo) {
-                        if (
-                            count($errorInfo) !== 2 ||
-                            !is_string($errorInfo[0]) ||
-                            // TODO: Maybe use array shapes here instead of ArrayValidator.
-                            !ArrayValidator::checkArrayReturnBool(
-                                $errorInfo[1],
-                                ['id' => 'string', 'firstname' => 'string', 'lastname' => 'string', 'email' => 'string'], // Required keys.
-                                ['title' => 'string'] // Optional keys.
-                            )
-                        ) {
-                            $messages[] = "(user error info in unexpected format): " . var_export($errorInfo, true);
-                        } else {
-                            $errorDesc = $errorInfo[0];
-                            $userInfo = $errorInfo[1];
-                            $message .= "$errorDesc: {$userInfo['firstname']} {$userInfo['lastname']}, {$userInfo['email']}, userId:{$userInfo['id']}\n";
-                        }
+                    // Expect $responseCourse['data'] to contain an array of email addresses,
+                    // belonging to users for whom one or more participation changes failed.
+                    $message = "$nUsersFailed user's course participation not updated or partially updated (see email addresses below):\n";
+                    foreach ($responseCourse['data'] as $emailAddress) {
+                        $message .= " * $emailAddress\n";
                     }
                     $messages[] = $message;
                 }
