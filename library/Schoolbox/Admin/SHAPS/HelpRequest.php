@@ -242,7 +242,7 @@ class HelpRequest
         $data = [];
 
         try {
-            $this->execute('post', 'courses', ['course' => $coursePayload], ['byUsername' => '1']);
+            $data    = $this->execute('post', 'courses', ['course' => $coursePayload], ['byUsername' => '1']);
             $code    = 200;
             $message = 'OK';
         } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
@@ -254,7 +254,7 @@ class HelpRequest
                     $data = json_decode($e->getResponse()->getBody()->getContents(), true);
                     if (!is_array($data)) {
                         $code = '500';
-                        $message = 'Unexpected result from json_decode().';
+                        $message = 'Unexpected result from json_decode() while provisioning user participation..';
                     } else {
                         foreach ($data as $key => $emailAddress) {
                             $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
@@ -306,7 +306,7 @@ class HelpRequest
                         $data = json_decode($e->getResponse()->getBody()->getContents(), true);
                         if (!is_array($data)) {
                             $code = '500';
-                            $message = 'Unexpected result from json_decode().';
+                            $message = 'Unexpected result from json_decode() while provisioning users.';
                         } else {
                             foreach ($data as $key => $failedUserData) {
                                 $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
