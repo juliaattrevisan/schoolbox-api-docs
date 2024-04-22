@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -28,11 +27,13 @@ class Cleanup implements IStrategy
      *
      * @param LoggerInterface $log
      * @param bool            $perform
+     * @param string          $sourceName
      * @param Mapper          $eventMapper
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private string $sourceName,
         private \Schoolbox\External\Event\Mapper $eventMapper
     ) {
     }
@@ -46,23 +47,18 @@ class Cleanup implements IStrategy
         /* Only remove profiles if we're performing
          */
         if ($this->perform) {
-            /* Delete anything to do with suds_liss that we previously imported
-             * This is a bit special, because of user-configurable source names.
-             * (Redlands)
-             */
-            $source = Factory::SOURCE_NAME;
-
             /* Remove everything that wasn't touched
              */
             $statement = $this->eventMapper->getDatabase()->prepare("
                 DELETE FROM {$this->eventMapper->getTable()}
                 WHERE (updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL)
                 AND classification = :classification
-                AND source LIKE '{$source}%'
+                AND source = :source
             ");
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => $this->sourceName
             ]);
 
             $this->log->info("Removed stale timetable events.");

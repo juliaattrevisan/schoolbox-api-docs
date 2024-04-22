@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -32,6 +31,7 @@ class Prepare implements IStrategy
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
+     * @param string                                     $sourceName
      * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
@@ -42,6 +42,7 @@ class Prepare implements IStrategy
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private string $sourceName,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
@@ -58,25 +59,6 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
-            /* Delete anything to do with suds_liss that we previously imported
-             * This is a bit special, because of user-configurable source names.
-             * (Redlands)
-             */
-            $source = Factory::SOURCE_NAME;
-
-            $query = "
-                UPDATE {$this->eventMapper->getTable()}
-                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` LIKE '{$source}%'
-            ";
-
-            $statement = $this->eventMapper->getDatabase()->prepare($query);
-            $statement->execute([
-                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            ]);
-
             /* Delete any overrides that existed
              */
             $query = "
@@ -84,15 +66,30 @@ class Prepare implements IStrategy
                 FROM {$this->overridesMapper->getTable()} seuo
                 INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
                 WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` LIKE '{$source}%'
+                AND {$this->eventMapper->getTable()}.`source` = :source
             ";
 
             $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => $this->sourceName
             ]);
 
             $this->log->debug('Purged timetable event overrides');
+
+            $query = "
+                UPDATE {$this->eventMapper->getTable()}
+                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source
+            ";
+
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => $this->sourceName,
+            ]);
 
             /* Truncate other data entirely
              */

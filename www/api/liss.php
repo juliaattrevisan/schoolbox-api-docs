@@ -7,10 +7,8 @@
 
 declare(strict_types=1);
 
-use Alaress\Lumberjack\Logger;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -36,29 +34,27 @@ $superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\Use
  * You must specifically reconnect in the sdk by clicking the Connect button again
  * after you make your change.
  */
-$sourceName = $_GET['source'] ?? PayloadCache::DEFAULT_SOURCE_NAME;
+$sourceName = $_GET['source'] ?? Factory::SOURCE_NAME;
 
-/* This is needed to process liss data from storage files
- */
-/** @var FilesystemProxy $filesystemProxy */
-$filesystemProxy = $kernel->get('filesystem.storageProxy');
+$liss = new Receiver(
+    (int)$config->get('external_enable'),
+    $config->get('external_type'),
+    $config->get('external_liss_username'),
+    $config->get('external_liss_password'),
+    $config->get('external_liss_exclusions'),
+    $config->get('external_liss_default_event_type'),
+    $config->get('external_liss_teacher_identifier'),
+    (bool)$config->get('external_liss_storage_logging'),
+    $sourceName,
+    $superuser,
+    \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+    \Schoolbox\Resource\Storage\Mapper::getInstance()
+);
 
-/* A random logger
- */
-$logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, 'liss');
+$log = $liss->log();
 
 try {
-    (new Receiver(
-        $logger,
-        (int)$config->get('external_enable'),
-        $config->get('external_type'),
-        $config->get('external_liss_username'),
-        $config->get('external_liss_password'),
-        $sourceName,
-        $filesystemProxy,
-        $superuser,
-        \Schoolbox\Resource\Storage\Mapper::getInstance()
-    ))->start();
+    $liss->start();
 } catch (\Exception | \Throwable $e) {
-    $logger->critical("Internal Error: {$e->getMessage()}");
+    $log->critical("Internal Error: {$e->getMessage()}");
 }
