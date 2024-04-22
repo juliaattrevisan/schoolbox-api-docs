@@ -47,9 +47,14 @@
     }
 }
 
+/**
+ *  Some tweaks to the color input so it blends in with the rest of the form elements
+ *  on the skin configurer
+ */
 input[type="color"] {
     background-color: var(--color-foreground-primary);
     border-color: var(--color-form-elements);
+    border-radius: var(--roundness-inputs);
 }
 
 @import "../../../www/static/css/core/ui/forms/fieldset";

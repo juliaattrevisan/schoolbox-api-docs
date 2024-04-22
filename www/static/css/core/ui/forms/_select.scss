@@ -24,6 +24,7 @@
         background-color: transparent;
         background-image: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
         border: none;
+        color: var(--color-text-primary);
         cursor: inherit;
         font-family: inherit;
         font-size: inherit;
