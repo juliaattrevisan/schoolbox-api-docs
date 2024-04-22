@@ -151,6 +151,10 @@ window.Vue.onMounted(() => {
                         />
                     </div>
                 </div>
+                <div class="c-form-element l-pad-l" style="background: var(--color-foreground-secondary)">
+                    <label class="c-label f-no-margins">Secondary Foreground</label>
+                    <div class="c-hint">To review changes made to the Foreground / Secondary</div>
+                </div>
             </div>
         </div>
         <div class="c-island">
@@ -248,7 +252,7 @@ window.Vue.onMounted(() => {
                 </div>
                 <hr />
                 <div class="c-form-element">
-                    <label class="c-label">Sample form elements to review the changes</label>
+                    <label class="c-label">Sample form elements to review changes</label>
                 </div>
                 <div class="c-form-element">
                     <label for="input1" class="c-label c-label--required">Title</label>
@@ -346,7 +350,7 @@ window.Vue.onMounted(() => {
                 </div>
                 <hr />
                 <div class="c-form-element">
-                    <label class="c-label">Sample form elements to review the changes</label>
+                    <label class="c-label">Sample form elements to review changes</label>
                 </div>
                 <div class="l-flex-row l-gap-l">
                     <button type="button" class="c-button">
