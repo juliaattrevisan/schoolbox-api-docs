@@ -1,11 +1,11 @@
 <script>
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-
-// Vue-select for selecting a user
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
+import Toast from "@schoolboxVue/components/toast.vue";
+
 vSelect.props.components.default = () => ({ Deselect });
 
 // The number of milliseconds to wait between the user's input and a search for
@@ -13,7 +13,7 @@ vSelect.props.components.default = () => ({ Deselect });
 const SEARCH_RESULT_RETRIEVE_DELAY = 350;
 
 export default {
-    components: {RevealModal, vSelect},
+    components: {RevealModal, vSelect, Toast},
     props: {
         getListEndpoint: {
             // The endpoint for fetching the list of items.
@@ -82,12 +82,14 @@ export default {
         },
         async addItem() {
             try {
+                this.$refs.toast.activate("Creating...");
                 const response = await fetch(
                     this.postItemEndpoint,
                     {
                         method: 'POST',
                         body: JSON.stringify(this.addingItem),
                         headers: {
+                            "Accept": "application/json",
                             "Content-Type": "application/json",
                         },
                     }
@@ -97,9 +99,9 @@ export default {
                 this.$refs.addItemModal.close();
                 this.$refs.itemAddedModal.open();
                 this.loadedData.push({...addedItem});
-
-                // Show toast
+                this.$refs.toast.timeout("Created", true);
             } catch (error) {
+                this.$refs.toast.timeout("Could not create", false);
                 console.warn(error);
             }
         },
@@ -109,17 +111,20 @@ export default {
         },
         async modifyItem(item) {
             try {
+                this.$refs.toast.activate("Modifying...");
                 const response = await fetch(
                     item._links.patch,
                     {
                         method: 'PATCH',
                         body: JSON.stringify(item),
                         headers: {
+                            "Accept": "application/json",
                             "Content-Type": "application/json",
                         },
                     }
                 );
                 this.$refs.modifyItemModal.close();
+                this.$refs.toast.timeout("Modified", true);
 
                 // Replace the existing modified item with the new version
                 const modifiedItem = await response.json();
@@ -129,6 +134,7 @@ export default {
 
                 // Show toast
             } catch (error) {
+                this.$refs.toast.timeout("Could not modify", false);
                 console.warn(error);
             }
         },
@@ -375,6 +381,8 @@ export default {
                 </section>
             </div>
         </reveal-modal>
+
+        <toast ref="toast"></toast>
     </div>
 </template>
 
