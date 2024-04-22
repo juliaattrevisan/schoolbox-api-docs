@@ -342,9 +342,6 @@ export default {
             <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
             <input id="modifyItem-redirectUri" required v-model="modifyingItem.redirectUri" />
 
-            <label for="modifyItem-clientId">Client ID</label>
-            <input id="modifyItem-clientId" readonly v-model="modifyingItem.clientId" />
-
             <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
             <v-select
                 input-id="modifyItem-clientCredentialsUser"
