@@ -22,17 +22,16 @@ firebaseApps.forEach((app) => {
     messaging.onBackgroundMessage(function (payload) {
         console.warn("[firebase-messaging-sw.js] Received background message ", payload);
         // Customize notification here
-        const data = JSON.parse(payload.data);
         const notificationOptions = {
             body: payload.notification.body,
             icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-            image: data.icon,
+            image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
             badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
             renotify: false,
-            data: data
+            href: payload.notification.href ?? '/'
         };
-        if (data.timestamp !== '0') {
-            notificationOptions.timestamp = data.timestamp;
+        if (payload.notification.timestamp !== '0') {
+            notificationOptions.timestamp = payload.notification.timestamp;
         }
         self.registration.showNotification(payload.notification.title, notificationOptions);
     });
@@ -48,14 +47,14 @@ firebaseApps.forEach((app) => {
                 clients.matchAll({ type: "window" }).then((clientsArr) => {
                     // If a Window tab matching the targeted URL already exists, focus that;
                     const hadWindowToFocus = clientsArr.some((windowClient) =>
-                            windowClient.url === e.notification.data.href
+                            windowClient.url === e.notification.href
                                     ? (windowClient.focus(), true)
                                     : false,
                     );
                     // Otherwise, open a new tab to the applicable URL and focus it.
                     if (!hadWindowToFocus)
                         clients
-                                .openWindow(e.notification.data.href)
+                                .openWindow(e.notification.href)
                                 .then((windowClient) => (windowClient ? windowClient.focus() : null));
                 }),
         );
