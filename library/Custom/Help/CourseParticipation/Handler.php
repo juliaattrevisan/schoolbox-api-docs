@@ -229,6 +229,7 @@ class Handler
         $failedUsers = [];
 
         foreach ($post['user'] as $userData) {
+$userData = 'TEST FOR PHPSTAN - STRING DATA INSTEAD OF ARRAY DATA';
             if (!$this->userPayloadIsValid($userData)) {
                 $failedUsers[] = [
                     'Failed: required data was missing', $userData
