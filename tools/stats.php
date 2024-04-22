@@ -196,6 +196,7 @@ $app = new class extends CliTool\App {
             'quiz_title_utf8' => "
                 SELECT COUNT(*) FROM assess
                 WHERE LENGTH(title) != CHAR_LENGTH(title)
+                AND availability = 'assess'
                 AND deleted_at IS NULL;
             ",
 
