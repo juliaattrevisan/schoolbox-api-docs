@@ -206,14 +206,10 @@ class Controller extends Base
         if (count($newUserIds) > 0) {
             $newUsers = $this->userMapper->findByColumn('id', $newUserIds);
 
-            /**
-             * @var $responseUser array{status: array, data: array}
-             */
+            /** @var array{status: array, data: array} $responseUser */
             $responseUser = $this->helpRequest->provisionUsers($newUsers->getAll());
 
-            /**
-             * @var $responseUserStatus array{code: int, message: string}
-             */
+            /** @var array{code: int, message: string} $responseUserStatus */
             $responseUserStatus = $responseUser['status'];
 
             if ($responseUserStatus['code'] === 200) {
@@ -233,10 +229,8 @@ class Controller extends Base
                         } else {
                             $errorDesc = $errorInfo[0];
 
-                            /**
-                             * @var $userInfo array{id: string, firstname: string, lastname: string, email: string, title?: string}
-                             */
-                            $userInfo = $errorInfo[1] ?? null;
+                            /** @var array{id: string, firstname: string, lastname: string, email: string, title?: string} $userInfo */
+                            $userInfo = $errorInfo[1];
 
                             $message .= "$errorDesc: {$userInfo['firstname']} {$userInfo['lastname']}, {$userInfo['email']}, userId:{$userInfo['id']}\n";
                         }
@@ -265,14 +259,10 @@ class Controller extends Base
         if (!empty($courses) && !empty($emails)) {
             $courses = array_map('boolVal', $courses);
 
-            /**
-             * @var $responseCourse array{status: array, data: array}
-             */
+            /** @var array{status: array, data: array} $responseCourse */
             $responseCourse = $this->helpRequest->provisionUserParticipation($emails, $courses);
 
-            /**
-             * @var $responseCourseStatus array{code: int, message: string}
-             */
+            /** @var array{code: int, message: string} $responseCourseStatus */
             $responseCourseStatus = $responseCourse['status'];
 
             if ($responseCourseStatus['code'] === 200) {
