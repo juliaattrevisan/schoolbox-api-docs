@@ -216,12 +216,12 @@ class Controller extends Base
             if ($responseUser['status']['code'] === 200) {
                 $nUsersFailed = count($responseUser['data']); // Info on failures for specific users will be in $responseUser['data'].
                 $nUsersSucceeded = $newUsers->count() - $nUsersFailed;
-                if ($nUsersSucceeded === 0) {
-                    $messages[] = "$nUsersSucceeded user" . ($newUsers->count() > 1 ? 's' : '') . ' provisioned successfully.';
+                if ($nUsersSucceeded > 0) {
+                    $messages[] = "$nUsersSucceeded user" . ($nUsersSucceeded > 1 ? 's' : '') . ' provisioned successfully.';
                 }
                 if ($nUsersFailed > 0) {
                     // Add info on failures for specific users to $messages, so it will be seen by the user.
-                    $message = "$nUsersFailed users not provisioned successfully:\n";
+                    $message = "$nUsersFailed user" . ($nUsersFailed > 1 ? 's' : '') . " not provisioned:\n";
                     foreach ($responseUser['data'] as $errorInfo) {
                         if (
                             count($errorInfo) !== 2 ||
@@ -273,12 +273,12 @@ class Controller extends Base
             if ($responseCourseCode === 200) {
                 $nUsersFailed = count($responseCourse['data']); // Info on failures for specific users will be in $responseUser['data'].
                 $nUsersSucceeded = count($emails) - $nUsersFailed;
-                if ($nUsersSucceeded === 0) {
-                    $messages[] = "$nUsersSucceeded user" . (count($emails) > 1 ? 's' : '') . ' course participation updated successfully.';
+                if ($nUsersSucceeded > 0) {
+                    $messages[] = "$nUsersSucceeded user's course participation updated successfully.";
                 }
                 if ($nUsersFailed > 0) {
                     // Add info on failures for specific users to $messages, so it will be seen by the user.
-                    $message = "$nUsersFailed users course participation not updated successfully:\n";
+                    $message = "$nUsersFailed user's course participation not updated:\n";
                     foreach ($responseCourse['data'] as $errorInfo) {
                         if (
                             count($errorInfo) !== 2 ||
@@ -301,7 +301,10 @@ class Controller extends Base
                 }
             } else {
                 $responseCode = $responseCourseCode;
-                $messages     = array_merge($messages, array_column($responseCourse['data'], 'message'));
+                if ($responseCourse['status']['message'] !== '') {
+                    $messages[] = $responseCourse['status']['message'];
+                }
+                // The format of $responseUser['data'] is unknown in this situation, so cannot add it to $messages.
             }
         }
 
