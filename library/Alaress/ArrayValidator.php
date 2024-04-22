@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class for validating that an array contains expected keys, and that the value for each key has the expected type.
  *
@@ -37,8 +38,7 @@ class ArrayValidator
     ): bool {
         try {
             self::checkArray($array, $typeByRequiredKey, $typeByOptionalKey, $ignoreExtraKeys);
-        }
-        catch (Exception) {
+        } catch (Exception) {
             return false;
         }
 
@@ -58,7 +58,7 @@ class ArrayValidator
         array $typeByOptionalKey = [],
         bool $ignoreExtraKeys = false
     ): void {
-        $nKeys         = count($array            );
+        $nKeys         = count($array);
         $nKeysRequired = count($typeByRequiredKey);
         $nKeysOptional = count($typeByOptionalKey);
         $nKeysMax      = $nKeysRequired + $nKeysOptional;
@@ -68,8 +68,7 @@ class ArrayValidator
                 "Too few keys in array ($nKeys keys).  Expected number in range [$nKeysRequired, $nKeysMax]." .
                 '  Missing keys: {' . implode(', ', array_diff(array_keys($typeByRequiredKey), array_keys($array))) . '}'
             );
-        }
-        elseif ($nKeys > $nKeysMax && !$ignoreExtraKeys) {
+        } elseif ($nKeys > $nKeysMax && !$ignoreExtraKeys) {
             throw new InvalidArgumentException(
                 "Too many keys in array ($nKeys keys).  Expected number in range [$nKeysRequired, $nKeysMax]." .
                 '  Extra keys: {' .
@@ -92,8 +91,7 @@ class ArrayValidator
 
             try {
                 self::checkType($array[$key], $type);
-            }
-            catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException("Type check failed for required key '$key'.\n" . $e->getMessage());
             }
         }
@@ -111,8 +109,7 @@ class ArrayValidator
 
             try {
                 self::checkType($array[$key], $type);
-            }
-            catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException("Type check failed for optional key '$key'.\n" . $e->getMessage());
             }
         }
@@ -127,37 +124,58 @@ class ArrayValidator
     {
         switch ($type) {
             // Basic types.
-            case 'array'      : $b = is_array($v)   ; break;
-            case 'bool'       : // Fall through.
-            case 'boolean'    : $b = is_bool($v)    ; break;
-            case 'float'      : $b = is_float($v)   ; break;
-            case 'int'        : $b = is_int($v)     ; break;
-            case 'null'       : $b = is_null($v)    ; break;
-            case 'numeric'    : $b = is_numeric($v) ; break;
-            case 'object'     : $b = is_object($v)  ; break;
-            case 'resource'   : $b = is_resource($v); break;
-            case 'scalar'     : $b = is_scalar($v)  ; break;
-            case 'string'     : $b = is_string($v)  ; break;
-            case 'floatString': $b = filter_var($v, FILTER_VALIDATE_FLOAT) !== false; break;
+            case 'array':
+                $b = is_array($v);
+                break;
+            case 'bool': // Fall through.
+            case 'boolean':
+                $b = is_bool($v);
+                break;
+            case 'float':
+                $b = is_float($v);
+                break;
+            case 'int':
+                $b = is_int($v);
+                break;
+            case 'null':
+                $b = is_null($v);
+                break;
+            case 'numeric':
+                $b = is_numeric($v);
+                break;
+            case 'object':
+                $b = is_object($v);
+                break;
+            case 'resource':
+                $b = is_resource($v);
+                break;
+            case 'scalar':
+                $b = is_scalar($v);
+                break;
+            case 'string':
+                $b = is_string($v);
+                break;
+            case 'floatString':
+                $b = filter_var($v, FILTER_VALIDATE_FLOAT) !== false;
+                break;
 
             // More complicated types can be added here as needed.
             // E.g. 'nullOrArray', 'nullOrString', 'nonEmptyString', 'nonEmptyArray', 'positiveInt', 'nonNegativeInt', 'dateStringY-m-d', etc.
 
             default:
                 if (gettype($v) === 'object') {
-                   $b = (get_class($v) === $type);
-                }
-                else {
-                   throw new InvalidArgumentException("Unknown validation type '$type'.");
+                    $b = (get_class($v) === $type);
+                } else {
+                    throw new InvalidArgumentException("Unknown validation type '$type'.");
                 }
         }
 
         if (!$b) {
             throw new InvalidArgumentException(
                 "Variable type check failed.  Expected '$type', received " . (
-                    (gettype($v) == 'object')?
-                    'object of class \'' . get_class($v) . '\'.':
-                    'variable of type \'' . gettype($v) . '\'' . ((gettype($v) == 'string')? " ('$v')": '') . ".  (value: $v)."
+                    (gettype($v) == 'object')
+                    ? 'object of class \'' . get_class($v) . '\'.'
+                    : 'variable of type \'' . gettype($v) . '\'' . ((gettype($v) == 'string')? " ('$v')": '') . ".  (value: $v)."
                 )
             );
         }
