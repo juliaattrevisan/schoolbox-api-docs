@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server;
 
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Codec\Json\Base64;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Redis\Cache\ItemPool;
@@ -46,8 +47,9 @@ class Module extends BaseModule
     {
         // Routes:
         // authorization page: user either allows or denies RP access to SB data
-        $this->register(self::METHOD_GET, '/oidc/authorize', 'getAuthorization');
-        $this->register(self::METHOD_POST, '/oidc/authorize', 'postAuthorization');
+        $loggedIn = new IsLoggedIn();
+        $this->register(self::METHOD_GET, '/oidc/authorize', 'getAuthorization', $loggedIn);
+        $this->register(self::METHOD_POST, '/oidc/authorize', 'postAuthorization', $loggedIn);
 
         // Allow/deny authorization request links:
 

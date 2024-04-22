@@ -61,16 +61,9 @@ class Controller extends Base
     public function getAuthorization(): void
     {
         $authRequest = $this->authServer->validateAuthorizationRequest($this->request);
-
-        // There needs to be a currently authenticated user:
-        // If nobody's logged in, and logging in with client credentials:
-        // auth as whoever's configured, otherwise return 403.
-        // TODO move to permissions?
-        $user = $this->getUser();
-        if (!$user->getId()) {
-            throw new NotAuthenticated();
-        }
-        $authRequest->setUser(new Entity\User($user, (new Factory($this->getConfigLoader()))->buildFullyQualified()));
+        $authRequest->setUser(
+            new Entity\User($this->getUser(), (new Factory($this->getConfigLoader()))->buildFullyQualified()),
+        );
 
         // Display confirm auth page:
         // this should be bypassed if the user has already given permission
