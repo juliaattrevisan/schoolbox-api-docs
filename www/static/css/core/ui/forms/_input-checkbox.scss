@@ -7,7 +7,7 @@
     appearance: none; // Remove most all native input styles
     background-color: var(--color-foreground-primary); // For iOS < 15
     border: var(--size-form-input-border-width) solid var(--color-form-elements);
-    border-radius: var(--roundness-inputs);
+    border-radius: var(--roundness-form-elements);
     color: var(--color-form-elements);
     cursor: pointer;
     display: grid;

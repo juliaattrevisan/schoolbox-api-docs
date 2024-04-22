@@ -4,7 +4,7 @@
 .c-input-text[type="text"] {
     background-color: var(--color-foreground-primary);
     border: var(--size-form-input-border-width) solid var(--color-form-elements);
-    border-radius: var(--roundness-inputs);
+    border-radius: var(--roundness-form-elements);
     color: var(--color-text-primary);
     font-size: max(16px, 1rem);
     font-family: inherit;
@@ -43,5 +43,5 @@
 }
 
 .c-input-text--with-button[type="text"] {
-    border-radius: var(--roundness-inputs) var(--roundness-inputs) 0 0;
+    border-radius: var(--roundness-form-elements) var(--roundness-form-elements) 0 0;
 }

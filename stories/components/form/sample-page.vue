@@ -35,14 +35,37 @@ const coreColors = [
 
 const formColors = [
     {
-        label: "Accent",
-        hint: "The accent colour for all form elements",
+        label: "Primary",
+        hint: "The primary colour for all form elements",
         variable: "--color-form-elements",
     },
     {
         label: "Focus",
-        hint: "The colour of the focus state for all interactive elements",
-        variable: "--color-focus",
+        hint: "The colour used to highlight the form element is focused",
+        variable: "--color-focus-form-elements",
+    },
+];
+
+const buttonColors = [
+    {
+        label: "Primary",
+        hint: "The primary colour for all buttons",
+        variable: "--color-buttons",
+    },
+    {
+        label: "Hover",
+        hint: "The hover colour for all buttons",
+        variable: "--color-buttons-hover",
+    },
+    {
+        label: "Primary Text",
+        hint: "Text colour of a primary button",
+        variable: "--color-buttons-text",
+    },
+    {
+        label: "Focus",
+        hint: "The colour used to highlight the button is focused",
+        variable: "--color-focus-buttons",
     },
 ];
 
@@ -84,7 +107,15 @@ window.Vue.onMounted(() => {
 
     document.querySelector("#rounded-form-elements")?.addEventListener("change", (event) => {
         const checkbox = event.target as HTMLInputElement;
-        document.documentElement.style.setProperty("--roundness-inputs", checkbox.checked ? "var(--spacing-s)" : "0");
+        document.documentElement.style.setProperty(
+            "--roundness-form-elements",
+            checkbox.checked ? "var(--spacing-s)" : "0",
+        );
+    });
+
+    document.querySelector("#rounded-buttons")?.addEventListener("change", (event) => {
+        const checkbox = event.target as HTMLInputElement;
+        document.documentElement.style.setProperty("--roundness-buttons", checkbox.checked ? "var(--spacing-s)" : "0");
     });
 });
 </script>
@@ -167,7 +198,6 @@ window.Vue.onMounted(() => {
                 </div>
             </div>
         </div>
-
         <div class="c-island">
             <div class="l-flex-col l-gap-l">
                 <div class="c-form-element">
@@ -175,11 +205,6 @@ window.Vue.onMounted(() => {
                     <div class="c-hint">To alter the appearance of all form elements</div>
                 </div>
                 <div class="l-flex-row l-gap-l">
-                    <div v-for="color in formColors" :key="color.variable" class="c-form-element">
-                        <label :for="color.variable" class="c-label">{{ color.label }}</label>
-                        <div class="c-hint">{{ color.hint }}</div>
-                        <input :id="color.variable" type="color" class="f-no-margins" :data-change="color.variable" />
-                    </div>
                     <div class="c-form-element">
                         <label class="c-label c-toggle" for="rounded-form-elements">
                             Rounded
@@ -190,6 +215,11 @@ window.Vue.onMounted(() => {
                                 <sbx-icon name="close" color="var(--color-form-elements)" />
                             </span>
                         </label>
+                    </div>
+                    <div v-for="color in formColors" :key="color.variable" class="c-form-element">
+                        <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                        <div class="c-hint">{{ color.hint }}</div>
+                        <input :id="color.variable" type="color" class="f-no-margins" :data-change="color.variable" />
                     </div>
                 </div>
                 <hr />
@@ -266,40 +296,51 @@ window.Vue.onMounted(() => {
                 </div>
             </div>
         </div>
-
-        <!-- <div class="c-island">
-            <h2>Styles</h2>
-            <div class="l-flex-row l-gap-l">
-                <label class="c-label c-toggle" for="rounded-form-elements">
-                    Interactive elements
-                    <div class="c-hint">Add rounded styles to all interactive elements.</div>
-                    <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" checked />
-                    <span class="c-toggle__display" hidden>
-                        <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                        <sbx-icon name="close" color="var(--color-form-elements)" />
-                    </span>
-                </label>
-            </div>
-        </div>
-        <div class="c-island">
-            <h2>Colours</h2>
-            <div class="l-flex-row l-gap-l">
-                <div v-for="color in formColors" :key="color.variable" class="l-flex-col l-gap-s">
-                    <label :for="color.variable" class="c-label">{{ color.label }}</label>
-                    <div class="c-hint">{{ color.hint }}</div>
-                    <input :id="color.variable" type="color" name="head" :data-change="color.variable" />
-                </div>
-            </div>
-        </div>
         <div class="c-island">
             <div class="l-flex-col l-gap-l">
-
-                <div class="l-flex-row l-gap-s">
-                    <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
-                    <button class="c-button c-button--success l-flex__item--1" type="button">Primary Action</button>
+                <div class="c-form-element">
+                    <h2 class="c-label c-label--large f-no-margins">Buttons</h2>
+                    <div class="c-hint">To alter the appearance of all buttons</div>
+                </div>
+                <div class="l-flex-row l-gap-l">
+                    <div class="c-form-element">
+                        <label class="c-label c-toggle" for="rounded-buttons">
+                            Rounded
+                            <div class="c-hint">Add rounded styles to all form elements.</div>
+                            <input id="rounded-buttons" type="checkbox" class="c-toggle__input" />
+                            <span class="c-toggle__display" hidden>
+                                <sbx-icon name="approve" color="var(--color-foreground-primary)" />
+                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                            </span>
+                        </label>
+                    </div>
+                    <div v-for="color in buttonColors" :key="color.variable" class="c-form-element">
+                        <label :for="color.variable" class="c-label">{{ color.label }}</label>
+                        <div class="c-hint">{{ color.hint }}</div>
+                        <input :id="color.variable" type="color" class="f-no-margins" :data-change="color.variable" />
+                    </div>
+                </div>
+                <hr />
+                <div class="l-flex-row l-gap-l">
+                    <button type="button" class="c-button">
+                        <sbx-icon name="advanced-list"></sbx-icon>
+                        <span>Primary Button</span>
+                    </button>
+                    <button type="button" class="c-button c-button--secondary">
+                        <sbx-icon name="approve"></sbx-icon>
+                        <span>Secondary Button</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="c-button c-button--secondary c-button--icon-only"
+                        title="Add to favourties"
+                        aria-label="Add to favourites"
+                    >
+                        <sbx-icon name="favourite"></sbx-icon>
+                    </button>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </template>
 

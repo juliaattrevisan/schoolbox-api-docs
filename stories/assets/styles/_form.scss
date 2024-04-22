@@ -17,7 +17,8 @@
  */
 @mixin form-input-focus {
     background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
-    outline: calc(var(--size-form-input-border-width) + 2px) solid var(--color-focus);
+    border-color: var(--color-form-elements);
+    outline: calc(var(--size-form-input-border-width) + 2px) solid var(--color-focus-form-elements);
     outline-offset: calc(var(--size-form-input-border-width) + 1px);
 }
 
@@ -54,7 +55,14 @@
 input[type="color"] {
     background-color: var(--color-foreground-primary);
     border-color: var(--color-form-elements);
-    border-radius: var(--roundness-inputs);
+    border-radius: var(--roundness-form-elements);
+}
+
+/**
+ *  So the hr also changes on the skin configurer
+ */
+hr {
+    border-color: var(--color-text-secondary);
 }
 
 @import "../../../www/static/css/core/ui/forms/fieldset";
