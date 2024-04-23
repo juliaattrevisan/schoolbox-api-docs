@@ -177,7 +177,10 @@ class Controller extends Base
              * we need to default and check if we have a valid curriculum filter, or just return null.
              */
             $curricFilter = $curricComponent->getConfigByKey('curriculumTreeFilter')->getValue();
-            if ('0' === $curricFilter || '' === $curricFilter) {
+            /**
+             * the default value is '0' if we add a node and remove it it becomes '' and legacy components don't have the config so will be null
+             */
+            if ('0' === $curricFilter || '' === $curricFilter || null === $curricFilter) {
                 $curricFilter = null;
             } else {
                 $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
@@ -575,7 +578,7 @@ class Controller extends Base
             );
         }
 
-        if ($curriculumNodes && $curriculumNodes->count()) {
+        if ($curriculumNodes->count()) {
             Node\Mapper::sortNodes($curriculumNodes, 0);
         }
         return $curriculumNodes;
