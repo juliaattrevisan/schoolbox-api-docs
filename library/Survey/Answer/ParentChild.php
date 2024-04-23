@@ -49,33 +49,58 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
 
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
+        /** @var \Schoolbox\User $currentUser */
+        $currentUser = $page->getDi()->get('user');
+
+        /* Optional configuration hook
+         */
         $this->configureResponse($page, $question_id);
 
+//        $questionConfig = json_decode($this->questionHandler->getByID($question_id)['config']);
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
-        $currentAnswer = $this->getByQuestionID($question_id);
+        $children = $currentUser->getChildren() ?? [];
+        if (count($children) > 0) {
+            foreach ($children as $child) {
+                $page->setVar(
+                    [
+                        'QUESTION_ID'        => $question_id,
+                        'QUESTION_PLUGIN'    => $this->plugin,
+                        'ANSWER_VALUE'       => $child->getId(),
+                        'ANSWER_DESCRIPTION' => Scrub::text($child->getFullName()),
+                    ]
+                );
 
-        if ($existing['response']) {
-            $page->setVar(
-                array(
-                    'QUESTION_ID' => $question_id,
-                    'QUESTION_PLUGIN' => $this->plugin,
-                    'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => Scrub::text($existing['response']),
-                )
-            );
+//                if ($existing['response']) {
+//                    $existingAnswer = unserialize($existing['response']);
+//                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+//                        $page->setVar(
+//                            array(
+//                                'ANSWER_CHECKED' => 'checked=\'checked\'',
+//                            )
+//                        );
+//                    } else {
+//                        $page->setVar(
+//                            array(
+//                                'ANSWER_CHECKED' => '',
+//                            )
+//                        );
+//                    }
+//                } else {
+//                    $page->setVar(
+//                        array(
+//                            'ANSWER_CHECKED' => '',
+//                        )
+//                    );
+//                }
+//
+                $page->parse('answerOption_block', 'answerOption', true);
+//
+//                $i++;
+            }
         } else {
-            $page->setVar(
-                array(
-                    'QUESTION_ID' => $question_id,
-                    'QUESTION_PLUGIN' => $this->plugin,
-                    'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => '',
-                )
-            );
+            $page->setVar('answerOption_block', '');
         }
-
-        $page->parse('answerOption_block', 'answerOption', true);
     }
 
     /**
