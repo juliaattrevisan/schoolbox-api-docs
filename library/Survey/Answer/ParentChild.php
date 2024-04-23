@@ -70,11 +70,8 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
                 );
 
                 $isChecked = false;
-                if ($existing['response']) {
-                    $existingAnswer = unserialize($existing['response']);
-                    if (is_array($existingAnswer) && in_array($child->getId(), $existingAnswer)) {
-                        $isChecked = true;
-                    }
+                if ($existing['response'] && $child->getId() === (int)($existing['response'])) {
+                    $isChecked = true;
                 }
                 $page->setVar('ANSWER_CHECKED', $isChecked ? 'checked=\'checked\'' : '');
                 $page->parse('answerOption_block', 'answerOption', true);
