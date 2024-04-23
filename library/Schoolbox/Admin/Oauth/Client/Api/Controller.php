@@ -118,9 +118,6 @@ class Controller extends Base
     /**
      * Partially update a relying party's fields.
      *
-     * This is currently the same as `putItem`, because only the name can
-     * change.
-     *
      * @api   PATCH /adminv2/oauth/client/api/{id}
      * @since 24.0
      *
@@ -140,9 +137,6 @@ class Controller extends Base
     /**
      * Delete a relying party.
      *
-     * This is currently the same as `putItem`, because only the name can
-     * change.
-     *
      * @api   DELETE /adminv2/oauth/client/api/{id}
      * @since 24.0
      *
@@ -152,6 +146,25 @@ class Controller extends Base
     {
         $this->mapper->delete($model);
         $this->response = $this->responseEmpty();
+    }
+
+    /**
+     * Regenerate this relying party's client secret.
+     *
+     * @api   POST /adminv2/oauth/client/api/{id}/regenerateSecret
+     * @since 24.0
+     *
+     * @param RelyingParty\Model $model
+     */
+    public function postRegenerateSecret(RelyingParty\Model $model): void
+    {
+        $clientSecret = RelyingParty\Generator\ClientSecret::generate();
+        $model->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
+        $this->mapper->save($model);
+        $this->response = $this->responseAsJson(
+            $this->translateModelToArray($model)
+            + ['clientSecret' => $clientSecret]
+        );
     }
 
     /**

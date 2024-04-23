@@ -40,6 +40,13 @@ class Module extends BaseModule
         $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putItem', $permission, $preload);
         $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchItem', $permission, $preload);
         $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteItem', $permission, $preload);
+        $this->register(
+            self::METHOD_POST,
+            '/{id:\\d+}/regenerateSecret',
+            'postRegenerateSecret',
+            $permission,
+            $preload,
+        );
     }
 
     /**
