@@ -151,7 +151,7 @@ Usage:
             });
         });
 
-        var noonitName = $('#noonit-name');
+        var newUnitName = $('#new-unit-name');
 
         // 'Next' Button
         $mageNextButton.mage({
@@ -205,12 +205,12 @@ Usage:
             submittable: '[data-unit-spec]',
 
             setFormData: function (formData) {
-                formData.push({name: 'name', value: noonitName.val()});
+                formData.push({name: 'name', value: newUnitName.val()});
             },
 
             onXhrDone: function (data) {
                 var newDOM = $(data).hide();
-                $(this).closest('[data-new-unit]').before(newDOM);
+                $('[data-unit-list]').append(newDOM);
                 /* 400ms is the default value
                  */
                 newDOM.slideDown(400, function() {
@@ -238,7 +238,7 @@ Usage:
                 if (newDOM[0].tagName === "SCRIPT") { //just make sure it only applies to <script> tags, as I don't know if this is accessed in other ways
                     newDOM[0].style.display = 'none';
                 }
-                noonitName.val('');
+                newUnitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('disabled').removeData('mage-submitted');
                 $(document).foundation();
             },
@@ -283,7 +283,6 @@ Usage:
 
         // To track if we need to re-expand the unit after dragging
         let currentDraggedUnitWasExpanded = false;
-
         // If the units can be sorted, set up the drag/drop functionality
         $('[data-unit-list][data-sortable]').sortable({
             placeholder: 'sortable-placeholder',
@@ -500,6 +499,7 @@ Usage:
                                 data-unit-list
                                 data-action="{{ routeLookup('folder.postFolderSequence', {id: courseSpec.folder.id, folder: courseSpec.folder}) }}"
                             {% else %}
+                                data-unit-list
                                 class="information-list unit-list"
                             {% endif %}
                         >
@@ -524,7 +524,7 @@ Usage:
                                     <div class="new-unit">
                                         <label for="newUnitName">{{ locale.unit.proper }} name</label>
                                         <div class="input-group">
-                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="noonit-name" name="newUnitName" maxlength="255" />
+                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="new-unit-name" name="newUnitName" maxlength="255" />
                                             <button name="spawn-unit"
                                                     class="button icon-add"
                                                     data-mage-next="spawn-unit"
