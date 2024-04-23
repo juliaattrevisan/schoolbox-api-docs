@@ -17,6 +17,7 @@ export type RubricCapability = {
 export type TextboxContent = {
     id: number;
     body: string;
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
 };
 
 /**
