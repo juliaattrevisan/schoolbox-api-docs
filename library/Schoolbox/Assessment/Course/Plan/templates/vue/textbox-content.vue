@@ -29,6 +29,7 @@ const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
 const textboxStore = useUnitPlannerTextboxStore();
+let editor: InlineEditor;
 
 /**
  * Focus the editor
@@ -37,7 +38,14 @@ function focusEditor() {
     if (!editorContentEl.value) return;
     if (!textboxIsCreated.value) return; // Don't focus if the textbox hasn't been created yet
 
-    editorContentEl.value.focus();
+    editor?.focus();
+    // to assign the cursor to the end of the editor
+    editor?.model.change((writer) => {
+        const root = editor.model.document.getRoot();
+        if (root) {
+            writer.setSelection(writer.createPositionAt(root, "end"));
+        }
+    });
 }
 
 // Allow the parent component to focus the editor
@@ -48,7 +56,7 @@ defineExpose({ focusEditor });
  * @param { EditorCreatedEventInfo } event - the editor created event data
  */
 function onEditorCreated(event: EditorCreatedEventInfo) {
-    const editor = event.editor as InlineEditor;
+    editor = event.editor as InlineEditor;
 
     editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
         store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
