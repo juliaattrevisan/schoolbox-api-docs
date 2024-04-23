@@ -118,7 +118,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('online_clickview_block', 'online_clickview');
             } elseif (preg_match($patternIframe, $this->getConfig('url'), $matches)) {
-                $this->setVar('VIDEO_ID', $matches[2]);
+                // online.clickview.com.au uses a shareCode parameter in the URL.
+                // As this regex matches any URL with a shareCode parameter, use the shareCode to build our own ClickView embed URL
+                $this->setVar('CLICKVIEW_URL', $this->getVar('CLICKVIEW_URL') . '/share/embed?a=false&shareCode=' . $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
             } elseif (preg_match($patternNet, $this->getConfig('url'), $matches)) {
                 $this->setVar('CLICKVIEW_URL', '//clickview.net/share/embed/' . $matches[1]);
