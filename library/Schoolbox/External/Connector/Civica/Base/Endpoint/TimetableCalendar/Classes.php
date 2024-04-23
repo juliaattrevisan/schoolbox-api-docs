@@ -266,7 +266,16 @@ class Classes implements IStrategy
         $classCode = trim((string)$class['className']);
         $day = null;
         $detail = null;
-        $guid = trim((string)$classInstance['sessionId']);
+
+        /* The session id isn't unique per class; it can be shared
+         * We can dedupe further by namespacing with the classCode
+         */
+        $guid = sprintf(
+            '%s-%s',
+            trim((string)$classInstance['sessionId']),
+            $classCode
+        );
+
         $period = null;
         $room = trim((string)$classInstance['room']);
         $title = trim((string)$class['subjectFullName']);
