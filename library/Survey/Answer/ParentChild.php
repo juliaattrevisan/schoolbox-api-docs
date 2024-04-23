@@ -56,9 +56,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
          */
         $this->configureResponse($page, $question_id);
 
-//        $questionConfig = json_decode($this->questionHandler->getByID($question_id)['config']);
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-
         $children = $currentUser->getChildren() ?? [];
         if (count($children) > 0) {
             foreach ($children as $child) {
@@ -71,32 +69,15 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
                     ]
                 );
 
-//                if ($existing['response']) {
-//                    $existingAnswer = unserialize($existing['response']);
-//                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-//                        $page->setVar(
-//                            array(
-//                                'ANSWER_CHECKED' => 'checked=\'checked\'',
-//                            )
-//                        );
-//                    } else {
-//                        $page->setVar(
-//                            array(
-//                                'ANSWER_CHECKED' => '',
-//                            )
-//                        );
-//                    }
-//                } else {
-//                    $page->setVar(
-//                        array(
-//                            'ANSWER_CHECKED' => '',
-//                        )
-//                    );
-//                }
-//
+                $isChecked = false;
+                if ($existing['response']) {
+                    $existingAnswer = unserialize($existing['response']);
+                    if (is_array($existingAnswer) && in_array($child->getId(), $existingAnswer)) {
+                        $isChecked = true;
+                    }
+                }
+                $page->setVar('ANSWER_CHECKED', $isChecked ? 'checked=\'checked\'' : '');
                 $page->parse('answerOption_block', 'answerOption', true);
-//
-//                $i++;
             }
         } else {
             $page->setVar('answerOption_block', '');
