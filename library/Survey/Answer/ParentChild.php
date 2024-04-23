@@ -18,7 +18,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      *
      * @var string
      */
-    protected $plugin = 'parentChild';
+    protected $plugin = 'evaluationRadio';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
