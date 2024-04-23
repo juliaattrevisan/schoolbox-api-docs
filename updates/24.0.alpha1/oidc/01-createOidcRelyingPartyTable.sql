@@ -15,7 +15,5 @@ create table oidc_relying_party
     deleted_at         datetime     null,
     primary key (id),
     constraint oidc_client_client_id
-        unique (client_id),
-    constraint oidc_client_name
-        unique (name)
+        unique (client_id)
 );
