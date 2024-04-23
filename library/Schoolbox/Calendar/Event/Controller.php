@@ -28,7 +28,6 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -662,8 +661,8 @@ class Controller extends Base
          * if it does not, or if it is malformed (ddmm/yyyy, dd/mmyyyy) just set the repeat date till the endDay->endOfDay
          */
         try {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->requestPost['repeat_until'] ?? '')->endOfDay();
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            $untilDate = new Alaress_Date_Format($this->requestPost['repeat_until'], $acceptedDateFormats);
+        } catch (InvalidArgumentException) {
             $untilDate = (clone $endDate)->endOfDay();
         }
         /**
