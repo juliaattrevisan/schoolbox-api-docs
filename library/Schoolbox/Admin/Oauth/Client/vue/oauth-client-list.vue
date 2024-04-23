@@ -59,6 +59,7 @@ export default {
             loadedData: [],
             addingItem: {},
             modifyingItem: {},
+            regeneratingItem: {},
             deletingItem: {},
             searchUsers: [],
         };
@@ -141,6 +142,13 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout("Could not modify", false);
             }
+        },
+        showRegenerateModal(item) {
+            this.regeneratingItem = {...item};
+            this.$refs.regenerateItemModal.open();
+        },
+        async regenerateItem(item) {
+            this.$refs.regenerateItemModal.close();
         },
         showDeleteModal(item) {
             this.deletingItem = {...item};
@@ -229,6 +237,7 @@ export default {
                             </td>
                             <td>
                                 <a href="#" class="icon-modify" title="Modify this client" @click.prevent="showModifyModal(row)"></a>
+                                <a href="#" class="icon-refresh" title="Regenerate this client&rsquo;s secret" @click.prevent="showRegenerateModal(row)"></a>
                                 <a href="#" class="icon-delete" title="Delete this client" @click.prevent="showDeleteModal(row)"></a>
                             </td>
                         </tr>
@@ -401,6 +410,38 @@ export default {
                 <section>
                     <a class="button" @click.prevent="modifyItem(modifyingItem)" href="#">Modify</a>
                     <a class="button" @click.prevent="$refs.modifyItemModal.close" href="#">Cancel</a>
+                </section>
+            </div>
+        </reveal-modal>
+
+        <reveal-modal ref="regenerateItemModal">
+            <h2>Regenerate Client Secret for oAuth Client {{ regeneratingItem.name }}?</h2>
+            <div data-alert="" class="alert-box warning">
+                Regenerating this client&rsquo;s secret will invalidate the configuration of this Schoolbox instance as
+                an oAuth Provider within the client application: it will need to be updated with the regenerated secret.
+            </div>
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="regenerateItem(regeneratingItem)" href="#">Regenerate</a>
+                    <a class="button" @click.prevent="$refs.regenerateItemModal.close" href="#">Cancel</a>
+                </section>
+            </div>
+        </reveal-modal>
+
+        <reveal-modal ref="itemRegeneratedModal">
+            <h2>Client Secret for oAuth Client {{ regeneratingItem.name }} Regenerated</h2>
+
+            <label for="itemRegenerated-clientSecret">Client Secret</label>
+            <input id="itemRegenerated-clientSecret" readonly v-model="regeneratingItem.clientSecret" />
+
+            <div data-alert="" class="alert-box warning">
+                You must copy and store the client secret:
+                it will no longer be retrievable after closing this dialog.
+            </div>
+
+            <div class="component-action">
+                <section>
+                    <a class="button" @click.prevent="$refs.itemRegeneratedModal.close" href="#">Close</a>
                 </section>
             </div>
         </reveal-modal>
