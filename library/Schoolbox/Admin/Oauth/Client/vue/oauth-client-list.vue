@@ -62,6 +62,7 @@ export default {
             regeneratingItem: {},
             deletingItem: {},
             searchUsers: [],
+            saveError: null,
         };
     },
 
@@ -78,6 +79,7 @@ export default {
             }
         },
         showAddModal() {
+            this.saveError  = null;
             this.addingItem = {};
             this.$refs.addItemModal.open();
         },
@@ -103,6 +105,10 @@ export default {
                     this.loadedData.push({...addedItem});
                     this.$refs.toast.timeout("Created", true);
                 } else {
+                    const error = await response.json();
+                    if (error.title) {
+                        this.saveError = error.title;
+                    }
                     this.$refs.toast.timeout("Could not create", false);
                 }
             } catch (error) {
@@ -110,6 +116,7 @@ export default {
             }
         },
         showModifyModal(item) {
+            this.saveError     = null;
             this.modifyingItem = {...item};
             this.$refs.modifyItemModal.open();
         },
@@ -133,10 +140,14 @@ export default {
 
                     // Replace the existing modified item with the new version
                     const modifiedItem = await response.json();
-                    this.loadedData  = this.loadedData.map(
+                    this.loadedData    = this.loadedData.map(
                         v => v.id === modifiedItem.id ? modifiedItem : v
                     );
                 } else {
+                    const error = await response.json();
+                    if (error.title) {
+                        this.saveError = error.title;
+                    }
                     this.$refs.toast.timeout("Could not modify", false);
                 }
             } catch (error) {
@@ -144,6 +155,7 @@ export default {
             }
         },
         showRegenerateModal(item) {
+            this.saveError        = null;
             this.regeneratingItem = {...item};
             this.$refs.regenerateItemModal.open();
         },
@@ -165,6 +177,10 @@ export default {
                     this.$refs.itemRegeneratedModal.open();
                     this.$refs.toast.timeout("Regenerated", true);
                 } else {
+                    const error = await response.json();
+                    if (error.title) {
+                        this.saveError = error.title;
+                    }
                     this.$refs.toast.timeout("Could not regenerate", false);
                 }
             } catch (error) {
@@ -303,6 +319,7 @@ export default {
 
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
+            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
             <label for="addItem-name" class="required">Name</label>
             <p class="meta">
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
@@ -386,6 +403,7 @@ export default {
 
         <reveal-modal ref="modifyItemModal">
             <h2>Modify oAuth Client</h2>
+            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
             <label for="modifyItem-name" class="required">Name</label>
             <p class="meta">
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
@@ -437,6 +455,7 @@ export default {
 
         <reveal-modal ref="regenerateItemModal">
             <h2>Regenerate Client Secret for oAuth Client {{ regeneratingItem.name }}?</h2>
+            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
             <div data-alert="" class="alert-box warning">
                 Regenerating this client&rsquo;s secret will invalidate the configuration of this Schoolbox instance as
                 an oAuth Provider within the client application: it will need to be updated with the regenerated secret.
