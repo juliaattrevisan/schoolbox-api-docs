@@ -28,6 +28,7 @@ const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].bo
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
+const textboxStore = useUnitPlannerTextboxStore();
 
 /**
  * Focus the editor
@@ -55,6 +56,13 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 
     editor.model.document.on("change", () => {
         store.updateFocusedUnitCell(props.unit.id, props.column, true);
+        window.Vue.nextTick()
+            .then(() => {
+                textboxStore.updateTextboxContent(props.unit.id, props.column, editor.getData());
+            })
+            .catch(() => {
+                // noop
+            });
     });
 
     const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label];
