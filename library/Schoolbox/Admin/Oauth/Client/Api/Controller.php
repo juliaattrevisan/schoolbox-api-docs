@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Oauth\Client\Api;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Oidc\Server\RelyingParty;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller actions for setting up oAuth clients (a.k.a. OpenID Connect
@@ -85,14 +87,7 @@ class Controller extends Base
         $model
             ->setClientId(RelyingParty\Generator\ClientId::generate())
             ->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
-        $this->mapper->save($model);
-
-        // Refetch model so that client credentials are rehydrated
-        $model = $this->mapper->findById($model->getId());
-        $this->response = $this->responseAsJson(
-            $this->translateModelToArray($model)
-            + ['clientSecret' => $clientSecret]
-        );
+        $this->persistAndRespond($model, $clientSecret);
     }
 
     /**
@@ -110,9 +105,7 @@ class Controller extends Base
         /** @var RelyingParty\Model $newModel */
         $newModel = call_user_func($this->arrayToModel, $data);
         $newModel->setId($model->getId());
-        $this->mapper->save($newModel);
-        $newModel = $this->mapper->findById($newModel->getId());
-        $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
+        $this->persistAndRespond($newModel, null);
     }
 
     /**
@@ -129,9 +122,7 @@ class Controller extends Base
 
         /** @var RelyingParty\Model $newModel */
         $newModel = call_user_func($this->arrayToModel, $data, $model);
-        $this->mapper->save($newModel);
-        $newModel = $this->mapper->findById($newModel->getId());
-        $this->response = $this->responseAsJson($this->translateModelToArray($newModel));
+        $this->persistAndRespond($newModel, null);
     }
 
     /**
@@ -160,11 +151,7 @@ class Controller extends Base
     {
         $clientSecret = RelyingParty\Generator\ClientSecret::generate();
         $model->setClientSecretHash(RelyingParty\Generator\ClientSecret::hash($clientSecret));
-        $this->mapper->save($model);
-        $this->response = $this->responseAsJson(
-            $this->translateModelToArray($model)
-            + ['clientSecret' => $clientSecret]
-        );
+        $this->persistAndRespond($model, $clientSecret);
     }
 
     /**
@@ -182,5 +169,36 @@ class Controller extends Base
             new UserTranslator(),
         );
         return call_user_func($this->modelToArray, $model);
+    }
+
+    /**
+     * Persist `$model`, and respond with an array representation
+     * (including `$clientSecret` if set) or an error if save failed.
+     *
+     * @param RelyingParty\Model $model
+     * @param string|null        $newClientSecret
+     * @return void
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    private function persistAndRespond(RelyingParty\Model $model, ?string $newClientSecret): void
+    {
+        try {
+            $this->mapper->save($model);
+        } catch (MapperException\CallbackException $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+            return;
+        } catch (MapperException $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        // Reload the model, so the entire thing can be translated
+        $model           = $this->mapper->findById($model->getId());
+        $translatedModel = $this->translateModelToArray($model);
+        if (isset($newClientSecret)) {
+            $translatedModel = $translatedModel + ['client_secret' => $newClientSecret];
+        }
+        $this->response = $this->responseAsJson($translatedModel);
     }
 }

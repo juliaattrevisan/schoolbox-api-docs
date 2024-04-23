@@ -48,6 +48,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->assertUniqueName(...));
     }
 
     /**
@@ -98,5 +99,26 @@ class Mapper extends BaseMapper
     public function findByClientId(string $clientId): ?Model
     {
         return $this->findByColumn('client_id', $clientId)->first();
+    }
+
+    /**
+     * Assert whether this relying party's name is unique.
+     *
+     * @param Model|null $model
+     * @return bool
+     */
+    public function assertUniqueName(?Model $model): bool
+    {
+        if ($model) {
+            if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+                throw new BaseMapper\Exception\CallbackException(
+                    sprintf(
+                        'The name "%s" is already in use',
+                        $model->getName()
+                    )
+                );
+            }
+        }
+        return true;
     }
 }
