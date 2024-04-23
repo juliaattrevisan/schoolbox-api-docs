@@ -148,7 +148,28 @@ export default {
             this.$refs.regenerateItemModal.open();
         },
         async regenerateItem(item) {
-            this.$refs.regenerateItemModal.close();
+            try {
+                this.$refs.toast.activate("Regenerating...");
+                const response = await fetch(
+                    item._links.regenerate,
+                    {
+                        method: 'POST',
+                        headers: {
+                            "Accept": "application/json",
+                        },
+                    }
+                );
+                if (response.ok) {
+                    this.regeneratingItem = await response.json();
+                    this.$refs.regenerateItemModal.close();
+                    this.$refs.itemRegeneratedModal.open();
+                    this.$refs.toast.timeout("Regenerated", true);
+                } else {
+                    this.$refs.toast.timeout("Could not regenerate", false);
+                }
+            } catch (error) {
+                this.$refs.toast.timeout("Could not regenerate", false);
+            }
         },
         showDeleteModal(item) {
             this.deletingItem = {...item};

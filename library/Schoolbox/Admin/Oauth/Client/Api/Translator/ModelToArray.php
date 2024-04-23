@@ -58,9 +58,10 @@ class ModelToArray
                 ? call_user_func($this->userTranslator, $model->getClientCredentialsUser())
                 : null,
             '_links'                => [
-                'put'    => $this->getRouteIfAuthorized('adminOauthClientApi.putItem', $params),
-                'patch'  => $this->getRouteIfAuthorized('adminOauthClientApi.patchItem', $params),
-                'delete' => $this->getRouteIfAuthorized('adminOauthClientApi.deleteItem', $params),
+                'put'        => $this->getRouteIfAuthorized('adminOauthClientApi.putItem', $params),
+                'patch'      => $this->getRouteIfAuthorized('adminOauthClientApi.patchItem', $params),
+                'delete'     => $this->getRouteIfAuthorized('adminOauthClientApi.deleteItem', $params),
+                'regenerate' => $this->getRouteIfAuthorized('adminOauthClientApi.postRegenerateSecret', $params),
             ]
         ];
     }
