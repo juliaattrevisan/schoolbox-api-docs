@@ -7,6 +7,10 @@
 
 declare(strict_types=1);
 
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 /**
  * Answer type for surveys: accepts one of the current user's children as a
  * valid response.
@@ -19,6 +23,11 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * @var string
      */
     protected $plugin = 'evaluationRadio';
+
+    /**
+     * @var string
+     */
+    protected $graphTemplateFile = 'survey/answer/parentChild/graph.html';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -165,5 +174,85 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      */
     public function cleanupParse(SitePage $page)
     {
+    }
+
+    /**
+     * Graph the results for this answer type
+     *
+     * @param SitePage $page
+     * @param array $currentQuestion
+     * @return void
+     */
+    public function graphResults($page, $currentQuestion)
+    {
+        $graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
+        $graph->graph();
+    }
+
+    /**
+     * Get the response for a particular question
+     *
+     * @param int $attempt_id
+     * @param int $question_id
+     * @return mixed
+     */
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+        $data     = [
+            'response' => '',
+            'comment'  => '',
+            'mark'     => 'No User Selected'
+        ];
+
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist
+         */
+        if (!$response) {
+            return $data;
+        }
+
+        $userMapper     = UserMapper::getInstance();
+        $responseUserId = $response['response'] ?? null;
+        if ($responseUserId) {
+            /** @var User $student */
+            try {
+                $student = $userMapper->findById($responseUserId);
+            } catch (Exception\Deleted $e) {
+                $student = $e->getDeletedObject();
+            } catch (Exception) {
+                $student = $userMapper->getUnknownUser();
+            }
+            // Show the student and their external ID
+            $responseText = $student->getFullName();
+            if ($student->getExternalId()) {
+                $responseText = sprintf('%s (%s)', $responseText, $student->getExternalId());
+            }
+            $data['response'] = $responseText;
+        }
+        return $data;
+    }
+
+    /**
+     * Identical to exportResponseToCSV(), which generates data on the
+     * resultsForQuestion screen and the csv file itself, unless otherwise
+     * specified.
+     *
+     * This special method for having a different csv export response value, than
+     * to the one you see on resultsForQuestion screens (which by default use
+     * the same method), is another level of abstraction that isn't needed
+     * in most places
+     *
+     * @param int $attempt_id
+     * @param int $question_id
+     * @return mixed
+     */
+    public function resultsForQuestion($attempt_id, $question_id)
+    {
+        $data = $this->exportResponseToCSV($attempt_id, $question_id);
+
+        $data['responses'] = $data['responsesData'] = Scrub::text($data['response'] ?? '');
+
+        return $data;
     }
 }
