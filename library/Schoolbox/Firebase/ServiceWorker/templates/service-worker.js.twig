@@ -16,47 +16,49 @@ firebaseApps.push({
 });
 {% endfor %}
 
-firebaseApps.forEach((app) => {
-    firebase.initializeApp(app.publicConfiguration);
-    const messaging = firebase.messaging();
-    messaging.onBackgroundMessage(function (payload) {
-        console.warn("[firebase-messaging-sw.js] Received background message ", payload);
-        // Customize notification here
-        const notificationOptions = {
-            body: payload.notification.body,
-            icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-            image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
-            badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-            renotify: false,
-            href: payload.notification.href ?? '/'
-        };
-        if (payload.notification.timestamp !== '0') {
-            notificationOptions.timestamp = payload.notification.timestamp;
-        }
-        self.registration.showNotification(payload.notification.title, notificationOptions);
-    });
+self.addEventListener('push', function(event) {
+    console.log('[Service Worker] Push Received.');
+    const payload = event.data.json();  // Assuming the payload is sent as JSON
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+        image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
+        badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+        renotify: false
+    };
+    const href = payload.notification.href ?? '';
+    // if no href or undefined then cast to user's dashboard
+    if (href === '') {
+        notificationOptions.href = "/";
+    } else {
+        //else go to the href specified in the noitf
+        notificationOptions.href = href;
+    }
+    event.waitUntil(
+        self.registration.showNotification(notificationTitle, notificationOptions)
+    );
+});
 
-
-    // example from: https://developer.mozilla.org/en-US/docs/Web/API/Clients/openWindow
-    // Notification click event listener
-    self.addEventListener("notificationclick", (e) => {
-        // Close the notification popout
-        e.notification.close();
-        // Get all the Window clients
-        e.waitUntil(
-                clients.matchAll({ type: "window" }).then((clientsArr) => {
-                    // If a Window tab matching the targeted URL already exists, focus that;
-                    const hadWindowToFocus = clientsArr.some((windowClient) =>
-                            windowClient.url === e.notification.href
-                                    ? (windowClient.focus(), true)
-                                    : false,
-                    );
-                    // Otherwise, open a new tab to the applicable URL and focus it.
-                    if (!hadWindowToFocus)
-                        clients
-                                .openWindow(e.notification.href)
-                                .then((windowClient) => (windowClient ? windowClient.focus() : null));
-                }),
-        );
-    });
+// example from: https://developer.mozilla.org/en-US/docs/Web/API/Clients/openWindow
+// Notification click event listener
+self.addEventListener("notificationclick", (e) => {
+    // Close the notification popout
+    e.notification.close();
+    // Get all the Window clients
+    e.waitUntil(
+        clients.matchAll({ type: "window" }).then((clientsArr) => {
+            // If a Window tab matching the targeted URL already exists, focus that;
+            const hadWindowToFocus = clientsArr.some((windowClient) =>
+                windowClient.url === e.notification.href
+                    ? (windowClient.focus(), true)
+                    : false,
+            );
+            // Otherwise, open a new tab to the applicable URL and focus it.
+            if (!hadWindowToFocus)
+                clients
+                    .openWindow(e.notification.href)
+                    .then((windowClient) => (windowClient ? windowClient.focus() : null));
+        }),
+    );
 });
