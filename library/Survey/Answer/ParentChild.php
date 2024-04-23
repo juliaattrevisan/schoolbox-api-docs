@@ -55,6 +55,13 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         /* Optional configuration hook
          */
         $this->configureResponse($page, $question_id);
+        $page->setBlock('answerFormFragment', 'emptyAnswerState', 'emptyAnswerState_block');
+        $page->setVar(
+            [
+                'QUESTION_ID'     => $question_id,
+                'QUESTION_PLUGIN' => $this->plugin,
+            ]
+        );
 
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $children = $currentUser->getChildren() ?? [];
@@ -76,8 +83,10 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
                 $page->setVar('ANSWER_CHECKED', $isChecked ? 'checked=\'checked\'' : '');
                 $page->parse('answerOption_block', 'answerOption', true);
             }
+            $page->setVar('emptyAnswerState_block', '');
         } else {
             $page->setVar('answerOption_block', '');
+            $page->parse('emptyAnswerState_block', 'emptyAnswerState');
         }
     }
 
