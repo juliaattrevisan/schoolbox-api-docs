@@ -99,7 +99,12 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      */
     public function saveResponse($data)
     {
-        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
+        return parent::saveResponseInternal(
+            $data['attempt_id'],
+            $data['section_id'],
+            $data['question_id'],
+            $data['answer'] ?? null,
+        );
     }
 
     public function exportMoodleAnswer(SitePage $page, $question_id)
