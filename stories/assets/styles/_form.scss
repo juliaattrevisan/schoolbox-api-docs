@@ -9,6 +9,7 @@
 :root {
     --animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
     --color-form-disabled-background: #edecec;
+    --size-form-element-border-width: 1px;
 }
 
 /**
@@ -16,8 +17,9 @@
  */
 @mixin form-input-focus {
     background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
-    outline: 3px solid var(--color-focus);
-    outline-offset: 2px;
+    border-color: var(--color-form-elements);
+    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--color-focus-form-elements);
+    outline-offset: calc(var(--size-form-el-border-width) + 1px);
 }
 
 /**
@@ -46,6 +48,40 @@
     }
 }
 
+/**
+ *  Some tweaks to the color input so it blends in with the rest of the form elements
+ *  on the skin configurer
+ */
+input[type="color"] {
+    background-color: var(--color-foreground-primary);
+    border-color: var(--color-form-elements);
+    border-radius: var(--roundness-form-elements);
+}
+
+/**
+ *  So the hr also changes on the skin configurer
+ */
+hr {
+    border-color: var(--color-text-secondary);
+}
+
+/**
+ *  Tweaks to make the range slider more inline with draft styles,
+ *  eventually this should be added into the proper range slider styles
+ */
+.c-input-range {
+    &__input::-webkit-slider-runnable-track {
+        background-color: var(--color-foreground-primary);
+        border: var(--size-form-element-border-width) solid var(--color-form-elements);
+    }
+    &__input::-webkit-slider-thumb {
+        background-color: var(--color-form-elements);
+    }
+    &__input:focus-visible::-webkit-slider-thumb {
+        outline: 3px solid var(--color-focus-form-elements);
+    }
+}
+
 @import "../../../www/static/css/core/ui/forms/fieldset";
 @import "../../../www/static/css/core/ui/forms/label";
 @import "../../../www/static/css/core/ui/forms/hint";
@@ -53,3 +89,5 @@
 @import "../../../www/static/css/core/ui/forms/input-checkbox";
 @import "../../../www/static/css/core/ui/forms/input-toggle";
 @import "../../../www/static/css/core/ui/forms/input-radio";
+@import "../../../www/static/css/core/ui/forms/select";
+@import "../../../www/static/css/core/ui/forms/form-element";

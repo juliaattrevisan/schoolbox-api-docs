@@ -1,0 +1,25 @@
+import { Meta } from "@storybook/addon-docs";
+
+<Meta title="Getting Started/Design Tokens/Depth" />
+
+# Depth _(z-index)_
+
+`www/static/css/core/base/_depth.scss`
+
+To globally manage the stacking order of elements, we have created the below CSS custom properties.
+All `z-index` values should be derived from these. Using `calc()`, these values can be added or subtracted to.
+However, if more than `3` additions or subtractions are required it signals that introducing another base number may be necessary for better management.
+
+_Draft_
+
+| CSS Custom Property         | Value | Description                                                                                                | Example                                                     |
+| --------------------------- | ----- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `--depth-default`           | `1`   | The default depth level when `z-index` is required.                                                        | ![depth modal example](/depth/depth-default.jpg)            |
+| `--depth-ui-overlay `       | `10`  | Elements like video player ui, image gallery ui, `position: sticky` table headers etc.                     | ![depth modal example](/depth/depth-ui-overlay.jpg)!        |
+| `--depth-pop-over`          | `20`  | Small "pop over" elements like the menus within `sbx-pop-out` or full calendar pop over                    | ![depth modal example](/depth/depth-pop-over.jpg)           |
+| `--depth-menu`              | `30`  | Core menu, ensuring when unpinned it sits above                                                            | ![depth modal example](/depth/depth-menu.jpg)               |
+| `--depth-modal`             | `40`  | Modal dialogs, typically taking up the full screen with a background that covers the entire browser window | ![depth modal example](/depth/depth-modal.jpg)              |
+| `--depth-modal-ui-overlay ` | `50`  | Elements like CKEditor menus when they are within modals                                                   | ![depth modal example](/depth/depth-modal-ui-overlay.jpg)   |
+| `--depth-toast`             | `60`  | Toast notifications                                                                                        | ![depth modal example](/depth/depth-toast.jpg)              |
+| `--depth-intro`             | `70`  | Intro tour, which highlights various elements                                                              | ![depth modal example](/depth/depth-intro.jpg)              |
+| `--depth-fullscreen`        | `80`  | Full screen overlays, ensuring it appears over everything                                                  | ![depth modal example](/depth/depth-ui-overlay-gallery.jpg) |

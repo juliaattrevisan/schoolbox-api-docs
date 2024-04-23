@@ -57,14 +57,16 @@ export const OutsideSchoolboxStyles: Story = {
 export const InsideSchoolboxStyles: Story = {
     render: () => ({
         template: `
-            <label class="c-label c-toggle" for="toggle">
-                <input id="toggle" type="checkbox" name="toggle" class="c-toggle__input" checked />
-                <span class="c-toggle__display" hidden>
-                    <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                    <sbx-icon name="close" color="var(--color-text-primary)" />
-                </span>
-                Receive notifications
-            </label>
+            <div class="c-select">
+                <select id="standard-select">
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                    <option value="Option 4">Option 4</option>
+                    <option value="Option 5">Option 5</option>
+                    <option value="Option length">Option that has too long of a value to fit</option>
+                </select>
+            </div>
         `,
     }),
 };

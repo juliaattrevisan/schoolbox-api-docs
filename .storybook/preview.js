@@ -63,7 +63,7 @@ export const parameters = {
         values: [
             {
                 name: "demo",
-                value: "rgb(229, 239, 247)",
+                value: "var(--color-background)",
             },
         ],
     },

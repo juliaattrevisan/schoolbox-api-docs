@@ -7,8 +7,8 @@
 */
 
 :root {
-    --roundness-islands: var(--spacing-m);
+    --roundness-islands: 0px;
     --roundness-images: 0px;
-    --roundness-cards: var(--spacing-m);
-    --roundness-inputs: var(--spacing-s);
+    --roundness-cards: 0px;
+    --roundness-form-elements: 0px;
 }

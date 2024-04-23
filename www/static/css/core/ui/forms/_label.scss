@@ -13,6 +13,10 @@
             color: var(--color-alert);
         }
     }
+    &--large {
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
     &--small {
         font-size: 0.875rem;
         font-weight: 400;

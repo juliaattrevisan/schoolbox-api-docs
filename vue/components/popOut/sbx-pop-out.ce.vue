@@ -121,7 +121,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background: none;
     border: none;
-    // border-radius: var(--roundness-inputs); // ^foundation-fixes^ - will round in a future release
+    // border-radius: var(--roundness-form-elements); // ^foundation-fixes^ - will round in a future release
     border-radius: 0;
     color: var(--content-ui-foreground);
     cursor: pointer;

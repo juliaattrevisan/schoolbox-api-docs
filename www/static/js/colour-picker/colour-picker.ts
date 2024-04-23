@@ -21,7 +21,7 @@ document.addEventListener("colourPickerInitialize", (e) => {
 
     const targetEl = document.querySelector(e.detail.target);
     if (!targetEl) {
-        console.warn(`colourPickerInitialize: target element ${e.detail.target} not found`)
+        console.warn(`colourPickerInitialize: target element ${e.detail.target} not found`);
     }
 
     // If value is of format "ffffff" then append "#" to correct HEX format, otherwise leave as is
