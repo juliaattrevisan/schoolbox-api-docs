@@ -44,7 +44,7 @@ class Fillgap extends Base implements IStrategy
          * answers, whereas Learnosity used {{response}}. Our implementation was almost
          * identical to theirs, but Learnosity relied on sequence.
          */
-        preg_match_all('/<span\ class="selected-word">(.*)<\/span>/mi', $answer, $matches);
+        preg_match_all('#<?span class="selected-word">(.*?)</span\b[^>]*>#ms', $answer, $matches);
 
         /* Convert each $matches[0] to {{response}} for learnosity compatibility
          */
