@@ -16,4 +16,13 @@ INSERT INTO assess_luQuestionType (
     'survey',
     'false',
     'true'
+), (
+    'DateTime',
+    'dateTime',
+    'Date and Time',
+    null,
+    'false',
+    'survey',
+    'false',
+    'true'
 );
