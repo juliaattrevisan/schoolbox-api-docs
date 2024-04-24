@@ -193,6 +193,8 @@ HELP;
             ));
 
             $this->process($attempts);
+
+            $this->getLogger()->info('');
         }
 
         if (!$this->perform()) {
