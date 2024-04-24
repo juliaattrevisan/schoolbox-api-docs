@@ -58,7 +58,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
 
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
-        /** @var \Schoolbox\User $currentUser */
+        /** @var User $currentUser */
         $currentUser = $page->getDi()->get('user');
 
         /* Optional configuration hook
@@ -215,10 +215,10 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         $userMapper     = UserMapper::getInstance();
         $responseUserId = $response['response'] ?? null;
         if ($responseUserId) {
-            /** @var User $student */
             try {
                 $student = $userMapper->findById($responseUserId);
             } catch (Exception\Deleted $e) {
+                /** @var User $student */
                 $student = $e->getDeletedObject();
             } catch (Exception) {
                 $student = $userMapper->getUnknownUser();
@@ -254,5 +254,55 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         $data['responses'] = $data['responsesData'] = Scrub::text($data['response'] ?? '');
 
         return $data;
+    }
+
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
+     * @return void
+     */
+    public function reviewResponse($page, $attemptId, $question_id)
+    {
+        /** @var User $currentUser */
+        $currentUser = $page->getDi()->get('user');
+        $children    = $currentUser->getChildren() ?? [];
+        $existing    = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        if (count($children) > 0) {
+            $page->setVar(
+                [
+                    'RESPONSE_ID'      => $existing['response_id'],
+                    'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                    'REVIEWED_MARKS'   => $existing['mark'],
+                ]
+            );
+
+            foreach ($children as $child) {
+                $page->setVar(
+                    [
+                        'ACTUAL_CORRECT_VALUE' => '',
+                        'ANSWER_VALUE'         => $child->getId(),
+                        'ANSWER_DESCRIPTION'   => Scrub::text($child->getFullName()),
+                    ]
+                );
+
+                $isChecked = false;
+                if ($existing['response'] && $child->getId() === (int)($existing['response'])) {
+                    $isChecked = true;
+                }
+                $page->setVar(
+                    [
+                        'ANSWER_OPTION_STATUS' => $isChecked ? 'evaluation-selected-answer-option' : '',
+                        'ANSWER_CHECKED'       => $isChecked ? 'checked' : '',
+                    ]
+                );
+                $page->parse('answerOption_block', 'answerOption', true);
+            }
+        } else {
+            $page->setVar('answerOption_block', '');
+        }
     }
 }
