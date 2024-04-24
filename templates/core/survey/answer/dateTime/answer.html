@@ -7,25 +7,10 @@
 </script>
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-<ul class="option-list">
-    <!-- BEGIN answerOption -->
-    <li>
-        <input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}'
-               name="answer"
-               type="radio"
-               value="{ANSWER_VALUE}"
-               {ANSWER_CHECKED}
-        />
-        <label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}"
-               class="radio-label"
-        >{ANSWER_DESCRIPTION}</label>
-    </li>
-    <!-- END answerOption -->
-</ul>
-
-<!-- BEGIN emptyAnswerState -->
-<div class="empty-state">
-    <i class="icon-staff-students"></i>
-    <p>You have no enrolled children: please skip to the next question, or the end of the survey.</p>
-</div>
-<!-- END emptyAnswerState -->
+<input type="text"
+       id="questionForm-{QUESTION_ID}"
+       name="answer"
+       data-datepicker
+       data-datepicker-time
+       value="{ANSWER}"
+/>

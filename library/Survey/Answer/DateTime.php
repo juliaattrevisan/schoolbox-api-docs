@@ -57,46 +57,32 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
 
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
-        /** @var User $currentUser */
-        $currentUser = $page->getDi()->get('user');
-
         /* Optional configuration hook
          */
         $this->configureResponse($page, $question_id);
-        $page->setBlock('answerFormFragment', 'emptyAnswerState', 'emptyAnswerState_block');
-        $page->setVar(
-            [
-                'QUESTION_ID'     => $question_id,
-                'QUESTION_PLUGIN' => $this->plugin,
-            ]
-        );
-
-        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-        $children = $currentUser->getChildren() ?? [];
-        if (count($children) > 0) {
-            foreach ($children as $child) {
-                $page->setVar(
-                    [
-                        'QUESTION_ID'        => $question_id,
-                        'QUESTION_PLUGIN'    => $this->plugin,
-                        'ANSWER_VALUE'       => $child->getId(),
-                        'ANSWER_DESCRIPTION' => Scrub::text($child->getFullName()),
-                    ]
-                );
-
-                $isChecked = false;
-                if ($existing['response'] && $child->getId() === (int)($existing['response'])) {
-                    $isChecked = true;
-                }
-                $page->setVar('ANSWER_CHECKED', $isChecked ? 'checked=\'checked\'' : '');
-                $page->parse('answerOption_block', 'answerOption', true);
-            }
-            // What's the datetime input?
-            $page->setVar('emptyAnswerState_block', '');
+        $existing      = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $currentAnswer = $this->getByQuestionID($question_id);
+        if ($existing['response']) {
+            $page->setVar(
+                [
+                    'QUESTION_ID'     => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID'       => $currentAnswer['answer_id'],
+                    'ANSWER'          => Scrub::text($existing['response']),
+                ]
+            );
         } else {
-            $page->setVar('answerOption_block', '');
-            $page->parse('emptyAnswerState_block', 'emptyAnswerState');
+            $page->setVar(
+                [
+                    'QUESTION_ID'     => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
+                    'ANSWER_ID'       => $currentAnswer['answer_id'],
+                    'ANSWER'          => '',
+                ]
+            );
         }
+
+        $page->parse('answerOption_block', 'answerOption', true);
     }
 
     /**
