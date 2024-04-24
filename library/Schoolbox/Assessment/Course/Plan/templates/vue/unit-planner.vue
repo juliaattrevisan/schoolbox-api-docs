@@ -8,9 +8,10 @@ import Toast from "@schoolboxVue/components/toast.vue";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Unit } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
-import UnitPlannerUnitCell from "./unit-planner-unit-cell.vue";
+import UpUnitCell from "./up-unit-cell.vue";
+import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
+    template: UnitTemplate;
 }
 
 const props = defineProps<Props>();
@@ -26,20 +28,7 @@ const store = useUnitPlannerStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
-// Get a list of every textbox that could be shown in a unit
-// in case a unit doesn't have a textbox for a particular key
-// Ensures that the table will always show all possible textboxes
-const allTextboxKeys: string[] = (() => {
-    const keysSet = new Set<keyof Unit["textboxes"]>();
-    props.units.forEach((unit) => {
-        Object.keys(unit.textboxes).forEach((key) => {
-            keysSet.add(key);
-        });
-    });
-    return Array.from(keysSet);
-})();
-
-const tabs = createTabs(allTextboxKeys);
+const tabs = createTabs(props.template);
 
 const selectedTab = window.Vue.ref<(typeof tabs)[0]>(tabs[0]);
 
@@ -115,7 +104,6 @@ window.Vue.watch(
 window.Vue.onMounted(() => {
     store.init(props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
-
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
@@ -180,13 +168,13 @@ window.Vue.onUnmounted(() => {
                 ref="unitElements"
                 class="grid-row unit-row"
             >
-                <unit-planner-unit-cell
+                <up-unit-cell
                     v-for="column in selectedTab.columns"
                     :key="column.id"
                     :unit="unit"
                     :column="column"
                     :is-sortable-placeholder="false"
-                ></unit-planner-unit-cell>
+                />
             </div>
 
             <div
@@ -197,21 +185,20 @@ window.Vue.onUnmounted(() => {
                 }"
             >
                 <template v-if="store.dragCurrentUnit">
-                    <unit-planner-unit-cell
+                    <up-unit-cell
                         v-for="column in selectedTab.columns"
                         :key="column.id"
                         :unit="store.dragCurrentUnit"
                         :column="column"
-                        :activity-type-locale="props.activityTypeLocale"
-                        :lti-assessments-enabled="props.ltiAssessmentsEnabled"
                         :is-sortable-placeholder="true"
-                    ></unit-planner-unit-cell>
+                    />
                 </template>
             </div>
         </div>
     </div>
 
     <activities-list-delete-modal />
+    <up-curriculum />
     <toast ref="toastEl"></toast>
 </template>
 
@@ -257,24 +244,24 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-top.fixed-left {
-    z-index: calc(var(--depth-default) + 1); // On top of both the left column, the header, and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 3); // On top of both the left column, the header, and the dropdowns
 }
 
 .fixed-left {
     left: 0;
     position: sticky;
-    z-index: var(--depth-default); // Behind the dropdowns and table header, but on top of the content
+    z-index: var(--depth-ui-overlay); // Behind the dropdowns and table header, but on top of the content
 }
 .fixed-top {
     position: sticky;
     top: 0;
-    z-index: var(--depth-default); // On top of both the left column and the dropdowns
+    z-index: calc(var(--depth-ui-overlay) + 2); // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
     height: 0;
     position: sticky;
-    z-index: var(--depth-default); // On top of left column, but behind the header
+    z-index: calc(var(--depth-ui-overlay) + 1); // On top of left column, but behind the header
 }
 
 #unit-planner-sortable-container {

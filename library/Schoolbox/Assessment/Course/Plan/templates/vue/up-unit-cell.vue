@@ -8,17 +8,17 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
-import { Unit } from "./unitPlannerTypes";
+import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
-import CurriculumCodesList from "./curriculum-codes-list.vue";
 import TextboxContent from "./textbox-content.vue";
 import TextboxAction from "./textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
+import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
+import UpUnitCellCurriculumAction from "./up-unit-cell-curriculum-action.vue";
 
 gsap.registerPlugin(Draggable);
 
@@ -27,8 +27,8 @@ interface Props {
     column: Column;
     isSortablePlaceholder: boolean;
 }
-
 const props = defineProps<Props>();
+
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 
@@ -103,7 +103,37 @@ function onContentClicked(event: MouseEvent) {
     }
 }
 
+/**
+ * To retrieve the curriculum component id for the column if it's available,
+ * so we can retrieve the correct folderNodesStore and load in the appropriate node tree
+ * @returns {CurriculumOverviewComponent|null} - the component found or null
+ */
+function getCurriculumComponent() {
+    // loop through the curriculum components on the unit, matching the component heading to the column label
+    const matchedComponent = props.unit.curriculum.components.find(
+        (component) => component.heading === props.column.label,
+    );
+    if (matchedComponent) {
+        return matchedComponent;
+    }
+    return null;
+}
+
+const curriculumComponent = getCurriculumComponent();
+const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
+
+/**
+ * To detect when the dimensions of the cell changes,
+ * like when a different tab is selected
+ */
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => updateContentHeight());
+    resizeObserver.observe(contentEl.value as HTMLElement);
+}
+
 window.Vue.onMounted(() => {
+    initResizeObserver();
+
     // Wait a tick to ensure the content has been rendered before measuring its height
     setTimeout(updateContentHeight, 0);
 
@@ -168,11 +198,18 @@ window.Vue.onUnmounted(() => {
                         <a :href="props.unit.homepage">
                             <strong>{{ props.unit.title }}</strong>
                         </a>
-                        <p v-if="props.unit.extraTextboxes > 0" class="meta">
-                            {{ props.unit.extraTextboxes }} extra textbox{{
-                                props.unit.extraTextboxes === 1 ? "" : "es"
-                            }}
-                        </p>
+                        <ul>
+                            <li v-if="props.unit.extraTextboxes > 0" class="meta">
+                                {{ props.unit.extraTextboxes }} extra textbox{{
+                                    props.unit.extraTextboxes === 1 ? "" : "es"
+                                }}
+                            </li>
+                            <li v-if="extraCurriculumComponents > 0" class="meta">
+                                {{ extraCurriculumComponents }} extra curriculum component{{
+                                    extraCurriculumComponents === 1 ? "" : "s"
+                                }}
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </template>
@@ -182,7 +219,6 @@ window.Vue.onUnmounted(() => {
                     ref="textboxContentComponent"
                     :unit="props.unit"
                     :column="props.column"
-                    @update-content-height="updateContentHeight"
                 ></textbox-content>
             </template>
 
@@ -201,9 +237,13 @@ window.Vue.onUnmounted(() => {
                 <rubric-capabilities :rubric-capabilities="props.unit.rubricCapabilities"></rubric-capabilities>
             </template>
 
-            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <curriculum-codes-list :curriculum-codes="props.unit.curriculumCodes"></curriculum-codes-list>
-                <curriculum-details-modal />
+            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
+                <up-unit-cell-curriculum-content
+                    :selected-nodes="props.unit.curriculum.selectedNodes"
+                    :nodes="props.unit.curriculum.nodes ?? []"
+                    :folder-id="props.unit.folderId"
+                    :component="curriculumComponent"
+                />
             </template>
         </div>
 
@@ -227,10 +267,14 @@ window.Vue.onUnmounted(() => {
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
-
                 <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
+                />
+                <up-unit-cell-curriculum-action
+                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
+                    :folder-id="props.unit.folderId"
+                    :component="curriculumComponent"
                 />
             </div>
         </div>
@@ -276,7 +320,7 @@ window.Vue.onUnmounted(() => {
     pointer-events: none;
     position: absolute;
     width: 100%;
-    z-index: 2; // Always appear above the content
+    z-index: calc(var(--depth-default) + 1); // Always appear above the content
 
     .content-overlay {
         display: flex;

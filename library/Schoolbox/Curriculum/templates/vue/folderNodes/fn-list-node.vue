@@ -10,6 +10,7 @@ interface Props {
     node: Node; // the assigned node to display
     folderId: number; // The folder id to display the nodes for, primarily used to reference the appropriate store
     componentInstanceId: number; // The component instance id to display the nodes on
+    isSmall?: boolean; // Whether the list should be displayed in a small format
 }
 
 const props = defineProps<Props>();
@@ -28,6 +29,24 @@ const showChildren = window.Vue.computed(() => props.node.children && props.node
  * @returns {boolean}
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
+
+/**
+ * Shrink the font size if props.isSmall is true
+ * @returns {string}
+ */
+const fontSize = window.Vue.computed(() => {
+    if (props.isSmall) return "0.8125rem";
+    return "1rem";
+});
+
+/**
+ * Tighten up the margins down the node tree when props.isSmall is true
+ * @returns {string}
+ */
+const marginStart = window.Vue.computed(() => {
+    if (props.isSmall) return "var(--spacing-s)";
+    return "var(--spacing-m)";
+});
 
 /**
  * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
@@ -76,15 +95,16 @@ function onRemoveSelected() {
             ></button>
         </div>
         <template v-if="showChildren">
-            <transition-group name="list" tag="ul">
+            <ul>
                 <fn-list-node
                     v-for="viewNode in props.node.children"
                     :key="viewNode.id"
                     :node="viewNode"
                     :folder-id="props.folderId"
                     :component-instance-id="props.componentInstanceId"
+                    :is-small="props.isSmall"
                 />
-            </transition-group>
+            </ul>
         </template>
     </li>
 </template>
@@ -96,7 +116,7 @@ function onRemoveSelected() {
 
 .node__code,
 .node__name {
-    font-size: 1rem;
+    font-size: v-bind(fontSize);
 }
 
 .node__name {
@@ -108,12 +128,7 @@ function onRemoveSelected() {
     width: 2.5rem;
 }
 
-.list-enter-active,
-.list-leave-active {
-    transition: opacity 0.5s ease;
-}
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
+ul li ul {
+    margin-inline-start: v-bind(marginStart);
 }
 </style>

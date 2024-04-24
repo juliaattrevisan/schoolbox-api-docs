@@ -17,6 +17,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -152,6 +153,76 @@ class Controller extends Base
         $units = [];
 
         /**
+         * Grab the list of curriculum components from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = CurriculumOverviewController::class;
+        $curriculumnTemplate = [];
+        $curriculumnKey = [];
+        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+
+        foreach ($unitCurricComp as $curricComponent) {
+            if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $curricComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CurriculumOverviewController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            /**
+             * we need to default and check if we have a valid curriculum filter, or just return null.
+             */
+            $curricFilter = $curricComponent->getConfigByKey('curriculumTreeFilter')->getValue();
+            /**
+             * the default value is '0' if we add a node and remove it it becomes '' and legacy components don't have the config so will be null
+             */
+            if ('0' === $curricFilter || '' === $curricFilter || null === $curricFilter) {
+                $curricFilter = null;
+            } else {
+                $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
+            }
+            $curriculumnTemplate[] = [
+                'heading' => $heading,
+                'filter' => $curricFilter,
+            ];
+            $curriculumnKey[] = strtolower($heading);
+        }
+
+        /**
+         * Grab the list of textbox components from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = TextboxComponentController::class;
+        $textboxTemplate = [];
+        $textboxKey = [];
+        $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
+
+        foreach ($unitTextboxComp as $textboxComponent) {
+            if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $textboxComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+            // The frontend will use this to determine whether the textbox needs to be created or not.
+            // This saves needing to manipulate the initial data on the frontend on the first mount
+            $textboxTemplate[] = [
+                'heading' => $heading,
+            ];
+            $textboxKey[] = strtolower($heading);
+        }
+
+        /**
          * for each unit, generate the data...
          *
          * Maybe one day we can separate textboxData, assessments, rubricData, etc.
@@ -184,7 +255,45 @@ class Controller extends Base
              * A unique set of curriculum nodes collated from various places:
              * folders, assessments, capabilities and indicators
              */
-            $curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
+            // now unused, as we are only now caring about curriculum nodes on the folder, not all children items also.
+            //$curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
+
+            //new curriculum array structure
+            $curriculum = [
+                'nodes' => $this->getCurriculumNodes($unit),
+                'selectedNodes' => $unit->getFolder()->getCurriculumNodes()->reindex(),
+                'components' => [],
+            ];
+
+            // grab list collection of curriculum overview components on the unit page
+            $components = $this->componentInstanceMapper->findByContextAndClass(
+                'homepage',
+                $unit->getFolder()->getId(),
+                CurriculumOverviewController::class
+            );
+            foreach ($components as $component) {
+                // extract the configs.
+                $instanceConfig = $component->getConfigArray();
+                if ('' === trim($instanceConfig['componentname']['value'])) {
+                    $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
+                }
+                // default value it '0' so set to null for vue to work
+                // when clearing the component filter (after something was filtered) it is empty (not 0) also catch that
+                if ('0' === $instanceConfig['curriculumTreeFilter']['value'] || '' === $instanceConfig['curriculumTreeFilter']['value']) {
+                    $instanceConfig['curriculumTreeFilter']['value'] = null;
+                }
+                // if we are filtering we should return the curric node
+                if ($instanceConfig['curriculumTreeFilter']['value']) {
+                    $instanceConfig['curriculumTreeFilter']['value'] =
+                        $this->nodeMapper->findOneByColumnList(['id' => $instanceConfig['curriculumTreeFilter']['value'], 'enabled' => true,]);
+                }
+                $curriculum['components'][] = [
+                    'componentId' => $component->getId(),
+                    'heading' => $instanceConfig['componentname']['value'],
+                    'filter' => $instanceConfig['curriculumTreeFilter']['value'],
+                    'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
+                ];
+            }
 
             $activitiesListRoutes = [
                 'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
@@ -237,10 +346,9 @@ class Controller extends Base
                  * the assessment specs in this unit
                  */
                 'rubricCapabilities' => $rubricCapabilities,
-                /* All the unique curriculum nodes that are in use by all the assessment specs
-                 * in this unit
+                /* Curriculum data object, containing selected, and filtered curriculum nodes
                  */
-                'curriculumCodes' => $curriculumNodes,
+                'curriculum' => $curriculum,
                 'sequence' => $unit->getFolder()->getSequence(),
             ];
 
@@ -261,7 +369,11 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'activityTypeLocale' => $activityTypeLocale
+            'activityTypeLocale' => $activityTypeLocale,
+            'template'  => [
+                'textboxes' => $textboxTemplate,
+                'curriculum' => $curriculumnTemplate,
+            ]
         ], "Unit Planner - {$course->getTitle()}");
     }
 
@@ -272,7 +384,7 @@ class Controller extends Base
      * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
      * is thrown into extraTextboxes)
      *
-     * @param int|null $unitTemplateId|null
+     * @param null|int $unitTemplateId
      * @param int $unitFolderId
      * @return array
      * @throws Exception
@@ -347,7 +459,8 @@ class Controller extends Base
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
                     'id' => $row['textboxID'],
-                    'body' => Scrub::html($row['textboxBody'])
+                    'body' => Scrub::html($row['textboxBody']),
+                    'inTemplate' => true,
                 ];
             } else {
                 // increase the extra textboxes by 1
@@ -434,129 +547,40 @@ class Controller extends Base
 
 
     /**
-     * Find all the unique curriculum nodes used in:
-     *     - folders
-     *     - assessments
-     *     - capabilities
-     *     - indicators
-     *
-     * Capabilities' and Indicators' curriculum nodes won't be hydrated;
-     * do those separately, but you can mine out the ones from Folders
-     * and Assessments - those should already exist.
+     * Build the tree of curriculum nodes for the specified unit
+     * if there are no nodes, will just return null
+     * direct clone from \Schoolbox\Curriculum\Component\CurriculumOverviewController::execute
      *
      * @param Model $unit
-     * @param Collection $assessments
-     * @param array $rubricData
-     * @return GenericCollection
-     * @throws \PDOException
+     * @return Collection
      */
-    private function findCurriculumNodes(
-        \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit,
-        Collection $assessments,
-        array $rubricData
-    ): \Schoolbox\GenericCollection {
-        $curriculumNodes = $this->nodeMapper->createCollection();
-
-        /* Nodes from the folder
-         */
-        $curriculumNodes = $curriculumNodes->merge($unit->getFolder()->getCurriculumNodes());
-
-        /* Nodes from the assessment
-         */
-        foreach ($assessments as $assessment) {
-            $curriculumNodes = $curriculumNodes->merge($assessment->getCurriculumNodes());
-        }
-
-        /* Nodes from the capabilities and indicators needs their own prehydration
-         * Capabilities might not exist; indicators might not exist.
-         */
-        $query = [];
-        $params = [];
-
-        if (\count($rubricData['used']['capabilityIds'])) {
-            $placeholders = Builder::getArrayPlaceholders($rubricData['used']['capabilityIds'], 'capabilityIds');
-            $params += Builder::getArrayParameters($rubricData['used']['capabilityIds'], 'capabilityIds');
-
-            $query[] = "
-                SELECT curriculum_node_id
-                FROM curriculum_node_for_rubric_capability
-                WHERE rubric_capability_id IN {$placeholders}
-            ";
-        }
-
-        if (\count($rubricData['used']['indicatorIds'])) {
-            $placeholders = Builder::getArrayPlaceholders($rubricData['used']['indicatorIds'], 'indicatorIds');
-            $params += Builder::getArrayParameters($rubricData['used']['indicatorIds'], 'indicatorIds');
-
-            $query[] = "
-                SELECT curriculum_node_id
-                FROM curriculum_node_for_rubric_indicator
-                WHERE rubric_indicator_id IN {$placeholders}
-            ";
-        }
-
-        if (\count($query)) {
-            $statement = $this->nodeMapper->getDatabase()->prepare(implode(' UNION ', $query));
-            $statement->execute($params);
-
-            $nodeIds = [];
-
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $nodeIds[$row['curriculum_node_id']] = $row['curriculum_node_id'];
-            }
-
-            if (\count($nodeIds)) {
-                $curriculumNodes = $curriculumNodes->merge($this->nodeMapper->findByColumnList([
-                    'id' => array_values($nodeIds),
-                    'enabled' => 1
-                ]));
-            }
-        }
-
-        /* Unique this set
-         */
-        $curriculumNodes = $curriculumNodes->indexBy('id');
-
-        /* Remove any curriculum nodes that aren't enabled
-         * Remove any curriculum nodes that have a meaningless code
-         */
-        foreach ($curriculumNodes as $nodeId => $node) {
-            if (!$node->getEnabled() || '' === $node->getCode()) {
-                /* Did we really need these right now?
-                 * Temporarily disabled for speed; re-enable when you actually need it
-                 */
-                //                $this->nodeMapper->loadAncestors($node);
-                //                $this->nodeMapper->loadDescendants($node);
-
-                $ancestorIds = $this->getAllAncestorIds($node);
-                $diff = array_diff($ancestorIds, $curriculumNodes->keys());
-
-                if (count($diff) !== count($ancestorIds)) {
-                    $curriculumNodes->offsetUnset($nodeId);
-                }
-            }
-        }
-
-        Node\Mapper::sortNodes($curriculumNodes, 0);
-
-        return $curriculumNodes;
-    }
-
-
-    /**
-     * Find all ancestor ids to remove duplicates
-     * Dupe of \Schoolbox\Curriculum\Component\CurriculumOverviewController::getAllAncestorIds
-     *
-     * @param Node\Model $node
-     * @return array
-     */
-    private function getAllAncestorIds(Node\Model $node): array
+    private function getCurriculumNodes(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit): Collection
     {
-        $parentIds = [];
-        if ($node->getParent() instanceof Node\Model) {
-            $parentIds   = $this->getAllAncestorIds($node->getParent());
-            $parentIds[] = $node->getParent()->getId();
+        $curriculumNodes = $this->nodeMapper->createCollection();
+        if ($unit->getFolder()->getCurriculumNodes()->count()) {
+            $nodeIds = [];
+            foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
+                if (!$node->getEnabled()) {
+                    continue;
+                }
+
+                $nodeIds[] = $node->getId();
+            }
+
+            // Fetch every node which is an ancestor or descendant of one of
+            // this folder's nodes, and is still enabled:
+            // only enabled nodes should be selectable.
+            $nodeIds = $this->nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
+
+            // Then, sort the entire list of nodes into a tree structure.
+            $curriculumNodes = $this->nodeMapper->getCollectionAsTree(
+                $this->nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+            );
         }
-        return $parentIds;
+
+        if ($curriculumNodes->count()) {
+            Node\Mapper::sortNodes($curriculumNodes, 0);
+        }
+        return $curriculumNodes;
     }
 }

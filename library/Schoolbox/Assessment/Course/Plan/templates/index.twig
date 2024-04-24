@@ -11,6 +11,7 @@
                 :units="{{ units |json_encode }}"
                 :activity-type-locale="{{ activityTypeLocale |json_encode }}"
                 :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
+                :template="{{ template |json_encode }}"
             ></unit-planner>
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>

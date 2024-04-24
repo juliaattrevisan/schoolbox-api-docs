@@ -1,3 +1,5 @@
+import type { UnitTemplate, UnitTemplateComponent } from "./unitPlannerTypes";
+
 // All types of content that can be shown in a column
 export enum ColumnType {
     UNIT = "unit",
@@ -54,6 +56,34 @@ const tabConfig: TabConfig[] = [
     },
 ];
 
+/**
+ * If there are no textboxes or curriculum components assigned to the unit template,
+ * remove the relevant tabs
+ * @param {TabConfig[]} $tabConfig - the current tab config
+ * @param {UnitTemplate} template - The template for the unit
+ * @returns {TabConfig[]} - The modified tab config
+ */
+function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabConfig[] {
+    let modifiedTabConfig = $tabConfig;
+    if (template.textboxes.length === 0) {
+        // remove the overview column from the all tab
+        const allTab = modifiedTabConfig.find((tab) => tab.id === "all") as TabConfig;
+        allTab.columnTypeIDs = allTab?.columnTypeIDs.filter((columnType) => columnType !== ColumnType.OVERVIEW);
+        // as well as the entire overview tab
+        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "overview");
+    }
+    if (template.curriculum.length === 0) {
+        // remove the curriculum overview column from the all tab
+        const allTab = modifiedTabConfig.find((tab) => tab.id === "all") as TabConfig;
+        allTab.columnTypeIDs = allTab?.columnTypeIDs.filter(
+            (columnType) => columnType !== ColumnType.CURRICULUM_OVERVIEW,
+        );
+        // as well as the entire curriculum overview tab
+        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
+    }
+    return modifiedTabConfig;
+}
+
 // The configuration for the columns in the unit planner. Specifies:
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
@@ -66,38 +96,81 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
 };
 
 /**
+ * If there are no textboxes or curriculum components assigned to the unit template,
+ * remove the relevant columns
+ * @param {TabConfig[]} $columnConfig - the current column config
+ * @param {UnitTemplate} template - The template for the unit
+ * @returns {Record<ColumnType, ColumnConfig>} - The modified column config
+ */
+function modifyColumnConfig(
+    $columnConfig: Record<ColumnType, ColumnConfig>,
+    template: UnitTemplate,
+): Record<ColumnType, ColumnConfig> {
+    const modifiedColumnConfig = { ...$columnConfig };
+    if (template.textboxes.length === 0) {
+        delete modifiedColumnConfig[ColumnType.OVERVIEW as keyof typeof modifiedColumnConfig];
+    }
+    if (template.curriculum.length === 0) {
+        delete modifiedColumnConfig[ColumnType.CURRICULUM_OVERVIEW as keyof typeof modifiedColumnConfig];
+    }
+    return modifiedColumnConfig;
+}
+
+/**
+ * Get all columns for a particular Column Type
+ * For example a unit template could have multiple textboxes, so we need to add a column for each
+ * @param {Tab["columns"]} tabColumns - The columns for the tab
+ * @param {ColumnConfig} newColumnBase - The base configuration for the new columns
+ * @param {ColumnType} columnTypeID - The type of column
+ * @param {string[]} components - The heading to use for each column
+ */
+function getColumns(
+    tabColumns: Tab["columns"],
+    newColumnBase: ColumnConfig,
+    columnTypeID: ColumnType,
+    components: UnitTemplateComponent[],
+) {
+    let columnId = 0;
+    components.forEach((component) => {
+        columnId += 1;
+        tabColumns.push({
+            ...newColumnBase,
+            id: `${columnTypeID}-${columnId}`,
+            type: columnTypeID, // Add the missing 'type' property
+            label: component.heading,
+        });
+    });
+}
+
+/**
  * Create the tabs for the unit planner
- * @param {string[]} allTextboxKeys - The keys (labels) of all the textboxes
+ * @param {UnitTemplate[]} template - The template for the unit
  * @returns {Tab[]} - The tabs for the unit planner
  */
-export function createTabs(allTextboxKeys: string[]) {
-    return tabConfig.map((tabInfo) => {
-        const tabColumns: Tab["columns"] = [];
+export function createTabs(template: UnitTemplate) {
+    const modifiedTabConfig = modifyTabConfig(tabConfig, template);
+    const modifiedColumnConfig = modifyColumnConfig(columnConfig, template);
 
+    return modifiedTabConfig.map((tabInfo) => {
+        const tabColumns: Tab["columns"] = [];
         tabInfo.columnTypeIDs.forEach((columnTypeID) => {
             const newColumnBase = {
-                ...columnConfig[columnTypeID],
+                ...modifiedColumnConfig[columnTypeID],
                 id: `${columnTypeID}-1`,
                 type: columnTypeID,
-                label: columnConfig[columnTypeID].label || columnTypeID,
+                label: modifiedColumnConfig[columnTypeID].label || columnTypeID,
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
-                let columnId = 0;
-                allTextboxKeys.forEach((textboxKey) => {
-                    columnId += 1;
-                    tabColumns.push({
-                        ...newColumnBase,
-                        id: `${columnTypeID}-${columnId}`,
-                        label: textboxKey,
-                    });
-                });
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.textboxes);
                 return;
             }
-
+            if (columnTypeID === ColumnType.CURRICULUM_OVERVIEW) {
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.curriculum);
+                return;
+            }
             tabColumns.push(newColumnBase);
         });
-
         return {
             ...tabInfo,
             columns: tabColumns,

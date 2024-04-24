@@ -17,7 +17,8 @@ const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED"; // the event to trigge
  * The details passed with an UPDATE event
  */
 type UpdateEventDetail = {
-    updatedComponentInstanceId: number;
+    folderId: number;
+    componentInstanceId: number;
     updatedNodes: Node[];
     updatedSelectedNodes: Node[];
 };
@@ -32,6 +33,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
         const isProcessing = window.Vue.ref<boolean>(false); // to disable further backend actions while we're already processing
         const nodeToRemove = window.Vue.ref<Node | null>(null); // the node to remove
+        const hasLoaded = window.Vue.ref<boolean>(false); // whether the store has been initialised, so nodes aren't displayed until the filter has been considered
 
         /**
          * To notify the backend of a change in the selected nodes
@@ -62,7 +64,8 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                     document.dispatchEvent(
                         new CustomEvent(FOLDER_NODES_UPDATED, {
                             detail: {
-                                updatedComponentInstanceId: componentInstanceId,
+                                folderId,
+                                componentInstanceId,
                                 updatedNodes: newNodes,
                                 updatedSelectedNodes: selectedNodes.value,
                             } as UpdateEventDetail,
@@ -88,7 +91,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         }
 
         /**
-         * Multiple instances of the component linked to this store could exist on the page,
+         * Multiple instances of the curriculum overview component could exist on the page,
          * even in entirely different Vue apps.
          * As such we need to ensure that when a change is made in one instance,
          * the other instances are updated to reflect the latest changes
@@ -96,7 +99,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         function initEventListener() {
             document.addEventListener(FOLDER_NODES_UPDATED, (event) => {
                 const eventDetail = (event as CustomEvent).detail as UpdateEventDetail;
-                if (eventDetail.updatedComponentInstanceId !== componentInstanceId) {
+                if (eventDetail.folderId === folderId && eventDetail.componentInstanceId !== componentInstanceId) {
                     nodes.value = eventDetail.updatedNodes;
                     selectedNodes.value = eventDetail.updatedSelectedNodes;
                 }
@@ -105,17 +108,23 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         /**
          * Store a reference to the nodes to display
-         * @param {Node[]} $nodes - the node trees to display
          * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
+         * @param {Node[]} $nodes - the node trees to display
          * @param {Node|null} $filter - to only display nodes that are children of this node
          * @param {boolean} $isReadOnly - whether the user can edit nodes or not
          */
-        function init($nodes: Node[], $selectedNodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
-            nodes.value = $nodes;
+        async function init(
+            $selectedNodes: Node[],
+            $nodes: Node[],
+            $filter: Node | null,
+            $isReadOnly: boolean,
+        ): Promise<void> {
             selectedNodes.value = $selectedNodes;
+            nodes.value = $nodes;
             filter.value = $filter;
             isReadOnly.value = $isReadOnly;
-            void pushChanges();
+            await pushChanges();
+            hasLoaded.value = true;
             initEventListener();
         }
 
@@ -132,7 +141,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             }
             const filterNode = findById(nodes.value, filter.value.id);
             if (filterNode === undefined) {
-                // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesnt currently contain any selected nodes
+                // if the filter node isn't within the list of nodes, we'll just return an empty node, highlighting that the filter node doesn't currently contain any selected nodes
                 return [];
             }
             if (filterNode.children === null) {
@@ -196,6 +205,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         return {
             selectedNodes,
+            filter,
             filteredNodes,
             isReadOnly,
             selectedNodeIds,
@@ -204,6 +214,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             selectedDetailsNodeId,
             isProcessing,
             nodeToRemove,
+            hasLoaded,
             init,
             removeNode,
             confirmRemoveNode,

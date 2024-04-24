@@ -17,9 +17,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["updateContentHeight"]);
 const store = useUnitPlannerStore();
-const textboxStore = useUnitPlannerTextboxStore();
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
@@ -30,6 +28,8 @@ const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].bo
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
+const textboxStore = useUnitPlannerTextboxStore();
+let editor: InlineEditor;
 
 /**
  * Focus the editor
@@ -38,7 +38,14 @@ function focusEditor() {
     if (!editorContentEl.value) return;
     if (!textboxIsCreated.value) return; // Don't focus if the textbox hasn't been created yet
 
-    editorContentEl.value.focus();
+    editor?.focus();
+    // to assign the cursor to the end of the editor
+    editor?.model.change((writer) => {
+        const root = editor.model.document.getRoot();
+        if (root) {
+            writer.setSelection(writer.createPositionAt(root, "end"));
+        }
+    });
 }
 
 // Allow the parent component to focus the editor
@@ -49,7 +56,7 @@ defineExpose({ focusEditor });
  * @param { EditorCreatedEventInfo } event - the editor created event data
  */
 function onEditorCreated(event: EditorCreatedEventInfo) {
-    const editor = event.editor as InlineEditor;
+    editor = event.editor as InlineEditor;
 
     editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
         store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
@@ -59,7 +66,6 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
         store.updateFocusedUnitCell(props.unit.id, props.column, true);
         window.Vue.nextTick()
             .then(() => {
-                emit("updateContentHeight");
                 textboxStore.updateTextboxContent(props.unit.id, props.column, editor.getData());
             })
             .catch(() => {
@@ -72,7 +78,6 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
         storeTextbox.body = editor.getData();
     }
 
-    emit("updateContentHeight");
     editorCreated.value = true;
 
     // If the editor was focused initially, we need to update the store

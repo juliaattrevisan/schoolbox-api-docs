@@ -64,6 +64,19 @@ window.Vue.watch(
 );
 
 /**
+ *
+ */
+window.Vue.watch(
+    () => props.startingNodeId,
+    () => {
+        if (props.startingNodeId !== UNSET_ID) {
+            modalViewNodesStore.reset();
+            void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
+        }
+    },
+);
+
+/**
  * when the badge-detail is closed, we need to reset the selected badge,
  * otherwise we can't re-open the same badge
  *

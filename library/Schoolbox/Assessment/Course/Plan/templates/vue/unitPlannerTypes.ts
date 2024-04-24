@@ -17,6 +17,17 @@ export type RubricCapability = {
 export type TextboxContent = {
     id: number;
     body: string;
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
+};
+
+/**
+ * A single Curriculum Overview component that's been added to a Unit's home page
+ */
+export type CurriculumOverviewComponent = {
+    componentId: number;
+    heading: string;
+    filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
 };
 
 export type Unit = {
@@ -28,9 +39,31 @@ export type Unit = {
         _routes: ActivitiesListRoutes;
         items: Activity[];
     };
-    curriculumCodes: Node[];
+    curriculum: {
+        selectedNodes: Node[]; // the individual nodes assigned to the folder
+        nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
+        components: CurriculumOverviewComponent[];
+    };
     rubricCapabilities: RubricCapability[];
     textboxes: Record<string, TextboxContent>;
     extraTextboxes: number;
     sequence: number;
+};
+
+/**
+ * A component that has been set on a Unit template
+ */
+export type UnitTemplateComponent = {
+    heading: string;
+    filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
+};
+
+/**
+ * All components that have been set on a Unit template,
+ * to help distinguish which component are linked to the Unit template,
+ * and which are just components added to a home page
+ */
+export type UnitTemplate = {
+    curriculum: UnitTemplateComponent[]; // Curriculum Overview components
+    textboxes: UnitTemplateComponent[]; // Textbox components
 };

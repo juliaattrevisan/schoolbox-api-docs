@@ -21,7 +21,7 @@ const modalViewNodesStore = useModalViewNodesStore();
 </script>
 
 <template>
-    <TransitionGroup name="list" class="breadcrumb" tag="ul">
+    <ul name="list" class="breadcrumb" tag="ul">
         <cs-modal-header-breadcrumb
             v-for="(breadcrumb, index) in modalViewNodesStore.breadcrumbs"
             :key="breadcrumb.id"
@@ -29,21 +29,7 @@ const modalViewNodesStore = useModalViewNodesStore();
             :is-disabled="props.isDisabled"
             :is-last="index === modalViewNodesStore.breadcrumbs.length - 1"
         />
-    </TransitionGroup>
+    </ul>
 </template>
 
-<style lang="scss" scoped>
-//animate on/off the breadcrumbs, sliding in when added, sliding out when removed
-.list-enter-active,
-.list-leave-active {
-    transition: all 0.3s ease;
-}
-.list-enter-from {
-    opacity: 0;
-    transform: translateX(-10px);
-}
-.list-leave-to {
-    opacity: 0;
-    transform: translateX(10px);
-}
-</style>
+<style lang="scss" scoped></style>

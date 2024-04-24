@@ -10,6 +10,7 @@ import FnListNode from "./fn-list-node.vue";
 interface Props {
     folderId: number; // The folder id to display the nodes for
     componentInstanceId: number; // The component instance id to display the nodes on
+    isSmall?: boolean; // Whether the list should be displayed in a small format
 }
 const props = defineProps<Props>();
 
@@ -17,15 +18,16 @@ const store = useStore(props.folderId, props.componentInstanceId);
 </script>
 
 <template>
-    <transition-group name="list" tag="ul" class="nodes l-flex-col">
+    <ul v-if="store().hasLoaded" class="nodes l-flex-col">
         <fn-list-node
             v-for="node in store().filteredNodes"
             :key="node.id"
             :node="node"
             :folder-id="props.folderId"
             :component-instance-id="props.componentInstanceId"
+            :is-small="props.isSmall"
         />
-    </transition-group>
+    </ul>
 </template>
 
 <style scoped>
@@ -35,12 +37,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
     margin-block-end: 0;
     padding-inline-start: var(--spacing-m);
 }
-.list-enter-active,
-.list-leave-active {
-    transition: opacity 0.5s ease;
-}
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
+.nodes li ul {
+    margin-inline-start: var(--spacing-xs);
 }
 </style>
