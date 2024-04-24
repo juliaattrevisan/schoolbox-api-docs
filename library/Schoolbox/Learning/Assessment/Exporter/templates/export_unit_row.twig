@@ -47,7 +47,7 @@
                 <a href="/homepage/{{ courseImpl.folder.id }}"
                     {% if courseOutlineComponentIds|length == 0 %}
                         class="strike"
-                        title="Crossed-out because this course does not have a linked course outline component.  You may still import into this course, but the imported unit will not be visible on the class homepage."
+                        title="This course is not linked with a course outline component. You can still import units into this course but they won't be visible on the Class homepage."
                     {% endif %}
                 >{{ courseImpl.folder.title }}</a>
                 {% for courseOutlineComponentId in courseOutlineComponentIds %}
