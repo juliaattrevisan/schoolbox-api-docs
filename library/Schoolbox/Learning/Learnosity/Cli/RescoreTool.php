@@ -304,7 +304,7 @@ HELP;
          * eta = 2*numAttempts + 2*numItemResponses + 5*0.75*numItemResponses
          *     = 2*numAttempts + 3.75*numItemResponses
          */
-        $eta = (self::AVERAGE_API_REQUEST_DURATION*$numAttempts) + (self::UPDATE_PENALTY*$numItemResponses);
+        $eta = (self::AVERAGE_API_REQUEST_DURATION * $numAttempts) + (self::UPDATE_PENALTY * $numItemResponses);
 
         $this->getLogger()->info(sprintf(
             '    Estimated duration: %s seconds',
