@@ -36,6 +36,14 @@ class RescoreTool extends CliTool\App
 
 
     /**
+     * A learnosity api instance
+     *
+     * @var Api
+     */
+    private Api $api;
+
+
+    /**
      * @var \Schoolbox\Learning\Quiz\Mapper
      */
     private \Schoolbox\Learning\Quiz\Mapper $quizMapper;
@@ -116,7 +124,7 @@ HELP;
 
         /* Build dependencies
          */
-        $api = new Api(
+        $this->api = new Api(
             (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
             $this->getConfig()->get('learnosity_version'),
             $this->getConfig()->get('learnosity_consumer_key'),
@@ -146,6 +154,32 @@ HELP;
             exit(1);
         }
 
+        if ($this->perform()) {
+            /* Actually perform the mutation
+             */
+            $this->process($attempts);
+        } else {
+            /* Metrics: announce how many attempts we have, and how many things we're going to touch
+             */
+        }
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+    }
+
+
+    /**
+     * Mutate attempts in learnosity
+     *
+     * @param \Schoolbox\GenericCollection $attempts
+     * @return void
+     * @throws ApiException
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function process(\Schoolbox\GenericCollection $attempts): void
+    {
         foreach ($attempts as $attempt) {
             $this->getLogger()->info('');
 
@@ -177,7 +211,7 @@ HELP;
              * Such a circumstance gives you http 400 "Check session_ids - target_item not used: b985ec0c....."
              * but there's nothing we can do about that
              */
-            $itemResponses = $api->dataGetRequest('/sessions/responses', [
+            $itemResponses = $this->api->dataGetRequest('/sessions/responses', [
                 'session_id' => [
                     $attempt->getLearnosityReference()
                 ]
@@ -221,7 +255,7 @@ HELP;
                  */
                 if ($this->perform()) {
                     try {
-                        $job = $api->dataUpdateRequest('/sessions/item', $payload);
+                        $job = $this->api->dataUpdateRequest('/sessions/item', $payload);
 
                         $this->getLogger()->info(sprintf(
                             'Rescoring request made to learnosity and returned job_reference %s for item %s',
@@ -233,10 +267,6 @@ HELP;
                     }
                 }
             }
-        }
-
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
         }
     }
 
@@ -250,7 +280,7 @@ HELP;
      * @return Quiz
      * @throws \RuntimeException
      */
-    protected function getQuizForAssessmentId(int $assessmentId): Quiz
+    private function getQuizForAssessmentId(int $assessmentId): Quiz
     {
         /** @var null|Quiz $quiz */
         $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
