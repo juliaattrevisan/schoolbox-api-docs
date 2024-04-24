@@ -25,16 +25,9 @@ self.addEventListener('push', function(event) {
         icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
         image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
         badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-        renotify: false
+        renotify: false,
+        data: payload.notification
     };
-    const href = payload.notification.href ?? '';
-    // if no href or undefined then cast to user's dashboard
-    if (href === '') {
-        notificationOptions.href = "/";
-    } else {
-        //else go to the href specified in the noitf
-        notificationOptions.href = href;
-    }
     event.waitUntil(
         self.registration.showNotification(notificationTitle, notificationOptions)
     );
@@ -48,16 +41,21 @@ self.addEventListener("notificationclick", (e) => {
     // Get all the Window clients
     e.waitUntil(
         clients.matchAll({ type: "window" }).then((clientsArr) => {
+            let href = "/";
+            // if no href or undefined then cast to user's dashboard
+            if (e.notification.data.href !== '' && e.notification.data.href !== undefined) {
+                href = e.notification.data.href;
+            }
             // If a Window tab matching the targeted URL already exists, focus that;
             const hadWindowToFocus = clientsArr.some((windowClient) =>
-                windowClient.url === e.notification.href
+                windowClient.url === href
                     ? (windowClient.focus(), true)
                     : false,
             );
             // Otherwise, open a new tab to the applicable URL and focus it.
             if (!hadWindowToFocus)
                 clients
-                    .openWindow(e.notification.href)
+                    .openWindow(href)
                     .then((windowClient) => (windowClient ? windowClient.focus() : null));
         }),
     );
