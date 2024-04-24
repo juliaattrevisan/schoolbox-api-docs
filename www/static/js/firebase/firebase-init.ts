@@ -46,18 +46,15 @@ window.sbProps.firebaseApps.forEach((app) => {
             // Receipt of a message
             onMessage(messaging, (payload) => {
                 console.log('Message received. ', payload);
-                // parse notification data, including extra info
-                const data = JSON.parse(payload.data.data);
                 const notificationOptions = {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: data.icon,
+                    image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
-                    data: data
                 };
-                if (data.timestamp !== '0') {
-                    notificationOptions.timestamp = data.timestamp;
+                if (payload.notification.timestamp !== '0') {
+                    notificationOptions.timestamp = payload.notification.timestamp;
                 }
                 let notif = new Notification(payload.notification.title, notificationOptions);
                 notif.onclick = (event) => {
@@ -65,7 +62,7 @@ window.sbProps.firebaseApps.forEach((app) => {
                     console.log("On notification click: .ts");
                     event.preventDefault(); // prevent the browser from focusing the Notification's tab
                     // some notifications have a href, some don't just load the dashboard for those missing hrefs.
-                    const notifHref = data.href ?? "/";
+                    const notifHref = payload.notification.href ?? "/";
 
                     // debug log?
                     console.log("opening: ", notifHref);
