@@ -1,0 +1,25 @@
+{#
+configContext:  array     - Data required to render a config settings form
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+
+        <div id="oauth-client-list">
+            <oauth-client-list
+                get-list-endpoint="{{ routeLookup('adminOauthClientApi.getList') }}"
+                post-item-endpoint="{{ routeLookup('adminOauthClientApi.postItem') }}"
+                user-search-endpoint="{{ routeLookup('apiuser.apiUserSearch') }}"
+            >
+            </oauth-client-list>
+        </div>
+        <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/oauthClientList.js?v={{ config.site_version }}"></script>
+    </div>
+</div>

@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Schoolbox\Application\Login\Oidc\Module;
+use Schoolbox\Oidc\Client;
+use Schoolbox\Oidc\Server;
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -27,11 +28,16 @@ class Oidc extends ModuleLoader
     {
         /** @var IConfigLoader $config */
         $config = $di->get('config');
+
+        // OIDC client
         if (
             $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)
             && $config->get(ConfigMapper::NAME_OAUTH_ENABLE_SSO)
         ) {
-            $this->loadModule($di, Module::class, "/login/oidc");
+            $this->loadModule($di, Client\Module::class, "/login/oidc");
         }
+
+        // OIDC server
+        $this->loadModule($di, Server\Module::class, "");
     }
 }

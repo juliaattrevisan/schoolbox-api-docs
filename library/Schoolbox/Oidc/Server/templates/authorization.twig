@@ -1,0 +1,41 @@
+{##
+ # Authorize sharing of identity with a relying party.
+ #
+ # @param \League\OAuth2\Server\RequestTypes\AuthorizationRequest authRequest    The request for authorization.
+ # @param string                                                  schoolboxScope The custom scope for Schoolbox data:
+ #                                                                               role type, external ID
+ #}
+
+{% extends 'include/styledIframe.twig' %}
+
+{% block title %}Share your identity with {{ authRequest.client.name }}?{% endblock title %}
+
+{% block content %}
+    <h1>Share your identity with <strong>{{ authRequest.client.name }}</strong>?</h1>
+    <p>
+        {{ authRequest.client.name }} will have access to your:
+    </p>
+    <ul>
+        {% for scope in authRequest.scopes %}
+            {% if scope.identifier == 'openid' %}
+                <li>Identity in {{ config.title }} ({{ USER.fullname }})</li>
+            {% elseif scope.identifier == 'profile' %}
+                <li>User profile (name, profile picture)</li>
+            {% elseif scope.identifier == 'email' %}
+                {% if USER.email %}
+                    <li>Email address ({{ USER.email }})</li>
+                {% endif %}
+            {% elseif scope.identifier == schoolboxScope %}
+                <li>Role type ({{ USER.role.type }})</li>
+                <li>Identifier in external systems</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ authorizationUrl }}">
+        <ul class="flex-list buttons">
+            <li><button type="submit" name="permission" value="1">Allow</button></li>
+            <li><button type="submit" name="permission" value="0">Deny</button></li>
+        </ul>
+    </form>
+{% endblock content %}

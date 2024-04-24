@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+note left of Paperly
+  It's presumed that Paperly handles logic for when to
+  generate notifications, and for whom.
+end note
+
+[-> Paperly : send notification request
+
+group oAuth client credentials grant
+    Paperly -> Schoolbox : send request with client ID + secret
+    Schoolbox -> Paperly : sends access token
+end
+
+note right of Paperly
+  Paperly does not know the internal ID of Schoolbox users:
+  only their SIS ID and role type.
+
+  This means that Schoolbox will need an endpoint for sending
+  notifications to a user based on their SIS ID + role type:
+  currently the caller must know the user's internal ID.
+end note
+
+Paperly -> Schoolbox : sends request to send notification, with access token as authorization
+Schoolbox ->]: sends notification via configured channels
+note right of Schoolbox
+  Schoolbox knows a user's notification preferences,
+  and can forward them appropriately.
+end note
+
+@enduml

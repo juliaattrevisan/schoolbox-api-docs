@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
+use Firebase\JWT\Key;
 use Schoolbox\User;
 use SensitiveParameter;
 
@@ -119,6 +120,24 @@ interface IParser
      *                               parsed.
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool;
+
+    /**
+     * Decodes a JWT, and verifies that the JWT has been signed appropriately
+     * and not tampered with.
+     *
+     * @param string               $jwt         The JWT to parse.
+     * @param Key|array<Key>|mixed $keyOrKeySet A key object (or set thereof) to verify the JWT against.
+     * @param int                  $leeway      The amount of clock skew allowance when checking the JWT's time claims.
+     *                                          Allows leeway for:
+     *                                          * nbf (not before)
+     *                                          * iat (issued at)
+     *                                          * exp (expiry)
+     * @return array The claims within the JWT.
+     * @throws Exception\Rejected JWT cannot be decoded for some reason
+     *                            (e.g. the key is not valid for the given JWT,
+     *                            or the signature is invalid)
+     */
+    public function decode(#[SensitiveParameter] string $jwt, mixed $keyOrKeySet, int $leeway): array;
 
     /**
      * Determine the user identified by the JWT.

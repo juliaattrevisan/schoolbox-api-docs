@@ -140,6 +140,8 @@ use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
+use Schoolbox\Oidc\CacheHelper;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -1896,11 +1898,13 @@ abstract class Kernel
                     $oidcCache              = $di->get('oidc.cache');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
                     );
                 }
             )
@@ -2017,7 +2021,7 @@ abstract class Kernel
                         new ItemPool(
                             $di->get('redis.cache'),
                             new Base64(),
-                            new KeyGenerator('oidc', INSTANCE_ID),
+                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
                         )
                     );
                 }

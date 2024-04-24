@@ -58,6 +58,19 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
+    public function decode(#[SensitiveParameter] string $jwt, mixed $keyOrKeySet, int $leeway): array
+    {
+        foreach ($this->parsers as $parser) {
+            if ($parser->accepts($jwt)) {
+                return $parser->decode($jwt, $keyOrKeySet, $leeway);
+            }
+        }
+        throw new Exception\Rejected('No parser in this object accepts this JWT');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function determineUser(#[SensitiveParameter] string $jwt): User
     {
         foreach ($this->parsers as $parser) {

@@ -822,6 +822,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
+                    '/adminv2/oauth/client'                   => [
+                        'name'        => 'oAuth Client Configuration',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure oAuth/OIDC clients which may use this Schoolbox instance as an identity provider.',
+                    ],
                     '/adminv2/setting/Paths'                  => [
                         'name'        => 'Paths',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_PATHS] ?? []) > 0,

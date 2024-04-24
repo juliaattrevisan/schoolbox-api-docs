@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use Schoolbox\Oidc\CacheHelper;
 
 class Registry
 {
@@ -47,9 +48,11 @@ class Registry
             'routeCache:' . INSTANCE_ID,
             'moduleCache:' . INSTANCE_ID,
 
-            // OIDC cache
-            'oidc:' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
-            'oidc:' . INSTANCE_ID . ':',
+            // OIDC client cache, used for caching:
+            // * OpenID configuration and JWKS responses from the configured
+            //   oAuth/OIDC provider
+            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
@@ -105,6 +108,14 @@ class Registry
             '^group:g\.',
             '^session:s\.',
             "^groups$",
+
+            // OIDC server cache, used for caching:
+            // * auth codes
+            // * access tokens
+            // * nonces
+            // * refresh tokens
+            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
