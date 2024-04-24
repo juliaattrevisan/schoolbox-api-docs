@@ -506,7 +506,7 @@ class Controller extends Base
             $row['componentId'] ?? 'NULL',
             $row['textboxHeading'] ?? 'NULL',
             $row['id'] ?? 'NULL',
-            str_replace('"', '\'', $row['textboxBody'] ?? 'NULL'),
+            $row['textboxBody'] ?? 'NULL',
             ]);
         }
 
@@ -563,7 +563,7 @@ class Controller extends Base
             'No Component',
             $row['textboxHeading'] ?? 'NULL',
             $row['id'] ?? 'NULL',
-            str_replace('"', '\'', $row['textboxBody'] ?? 'NULL'),
+            $row['textboxBody'] ?? 'NULL',
             ]);
         }
         exit(1);
