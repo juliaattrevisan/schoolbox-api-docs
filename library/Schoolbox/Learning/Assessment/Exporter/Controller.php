@@ -182,18 +182,18 @@ class Controller extends BaseController
         });
 
         // Get info on related course outline components.
-        $courseOutlineComponentIdsByFolderIdByCourseImplId = $this->courseImplementationMapper->getCourseOutlineComponentIdsByFolderIdByCourseImplId(
+        $courseOutlineComponentIdsStruct = $this->courseImplementationMapper->getCourseOutlineComponentIdsStruct(
             $courseImpls->map(fn($courseImpl) => $courseImpl->getId())->getAll()
         );
 
         $data = [
-            'unitSpec'                                          => $unitSpec,
-            'returnUrl'                                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
-            'returnUrlName'                                     => Redirect::RETURN_URL,
-            'courseImplsInWhichUnitNotImported'                 => $courseImplsInWhichUnitNotImported,
-            'courseOutlineComponentIdsByFolderIdByCourseImplId' => $courseOutlineComponentIdsByFolderIdByCourseImplId,
-            'folderWritePerms'                                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
-            'breadcrumbs'                                       => [
+            'unitSpec'                          => $unitSpec,
+            'returnUrl'                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
+            'returnUrlName'                     => Redirect::RETURN_URL,
+            'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
+            'courseOutlineComponentIdsStruct'   => $courseOutlineComponentIdsStruct,
+            'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
+            'breadcrumbs'                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
                 [$courseSpec->getTitle(), '/homepage/' . $courseSpec->getFolder()->getId()],
                 [$unitSpec->getTitle(), '/homepage/' . $unitSpec->getFolder()->getId()],

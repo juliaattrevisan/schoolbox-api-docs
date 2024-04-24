@@ -9,12 +9,12 @@
     So this is for the situation where a course specification has already been partially implemented in a class, and now
     the user wants to export a unit into a course implementation that currently does not contain that unit.
 
-    'unitSpec'                                          CourseUnitSpecificationModel - The unit spec
-    'returnUrl'                                         string                       - A URL to return to
-    'returnUrlName'                                     string                       - query arg name
-    'courseImplsInWhichUnitNotImported'                 CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
-    'courseOutlineComponentIdsByFolderIdByCourseImplId' []                           - Array of courseOutlineComponentInstanceIds, indexed by folderId, indexed by courseImplId
-    'folderWritePerms'                                  bool[]                       - Does current user have WRITE+ perm to the class folder
+    'unitSpec'                            CourseUnitSpecificationModel - The unit spec
+    'returnUrl'                           string                       - A URL to return to
+    'returnUrlName'                       string                       - query arg name
+    'courseImplsInWhichUnitNotImported'   CourseImplementationModel[]  - Course implementations in which unitSpec has not been imported
+    'courseOutlineComponentIdsStruct'     array[]                      - Array of courseOutlineComponentInstanceIds, indexed by folderId, indexed by courseImplId
+    'folderWritePerms'                    bool[]                       - Does current user have WRITE+ perm to the class folder
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
@@ -86,11 +86,11 @@
                             {% for courseImpl in courseImplsInWhichUnitNotImported %}
                                 {%
                                     if (
-                                        courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id] is defined and
-                                        courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id][courseImpl.folder.id] is defined
+                                        courseOutlineComponentIdsStruct[courseImpl.id] is defined and
+                                        courseOutlineComponentIdsStruct[courseImpl.id][courseImpl.folder.id] is defined
                                     )
                                 %}
-                                    {% set courseOutlineComponentIds = courseOutlineComponentIdsByFolderIdByCourseImplId[courseImpl.id][courseImpl.folder.id] %}
+                                    {% set courseOutlineComponentIds = courseOutlineComponentIdsStruct[courseImpl.id][courseImpl.folder.id] %}
                                 {% else %}
                                     {% set courseOutlineComponentIds = [] %}
                                 {% endif %}

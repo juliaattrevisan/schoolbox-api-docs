@@ -156,7 +156,7 @@ class Mapper extends AbstractCourseMapper
     }
 
     /**
-     * Return an array of courseOutlineComponentInstanceIds, indexed by folderId, indexed by courseImplId.
+     * Return a data structure like the following:
      *
      * Example return value: [
      *     23 => // courseImplId
@@ -179,7 +179,7 @@ class Mapper extends AbstractCourseMapper
      * @param array $courseImplIds
      * @return array
      */
-    public function getCourseOutlineComponentIdsByFolderIdByCourseImplId(array $courseImplIds): array
+    public function getCourseOutlineComponentIdsStruct(array $courseImplIds): array
     {
         $rows = $this->getDatabase()->executeQuery(
             'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId, f.id AS folderId
@@ -203,20 +203,20 @@ class Mapper extends AbstractCourseMapper
             )
         )->fetchAll();
 
-        $componentInstanceIdsByFolderIdByCourseImplId = [];
+        $componentIdsStruct = [];
         foreach ($rows as $row) {
             $courseImplId = $row['courseImplId'];
             $folderId = $row['folderId'];
-            if (!array_key_exists($courseImplId, $componentInstanceIdsByFolderIdByCourseImplId)) {
-                $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId] = [];
+            if (!array_key_exists($courseImplId, $componentIdsStruct)) {
+                $componentIdsStruct[$courseImplId] = [];
             }
-            if (!array_key_exists($folderId, $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId])) {
-                $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId][$folderId] = [];
+            if (!array_key_exists($folderId, $componentIdsStruct[$courseImplId])) {
+                $componentIdsStruct[$courseImplId][$folderId] = [];
             }
-            $componentInstanceIdsByFolderIdByCourseImplId[$courseImplId][$folderId][] = $row['componentInstanceId'];
+            $componentIdsStruct[$courseImplId][$folderId][] = $row['componentInstanceId'];
         }
 
-        return $componentInstanceIdsByFolderIdByCourseImplId;
+        return $componentIdsStruct;
     }
 
     /**
