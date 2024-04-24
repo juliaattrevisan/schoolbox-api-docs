@@ -1,0 +1,20 @@
+<!-- injectable for rendering signature vector data into signaturePad -->
+<script type="text/javascript">
+    $(function() {
+        // {RESPONSE} can be empty - function wrapper caters for that possibility.
+        (function (response) {
+            $('[data-signature="{ID}"]').alaressSignaturePad({
+                displayOnly: true,
+                rescale: true,
+                init: response
+            });
+        })({RESPONSE});
+    });
+</script>
+<div class="answer-given-container">
+    <div class="sigPad readonly" data-signature="{ID}">
+        <div class="sigPadWrapper">
+            <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
+        </div>
+    </div>
+</div>
