@@ -344,4 +344,39 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         $config   = json_decode($question['config']);
         $page->setVar('CONFIGURATION_MANDATORY', ($config->mandatory ?? false) ? 'required' : '');
     }
+
+    /**
+     * Get the response for a particular question
+     *
+     * @param int $attempt_id
+     * @param int $question_id
+     * @return mixed
+     */
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
+        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist; return empty array
+         */
+        if ($response && isset($response['response'])) {
+            return [
+                (int)($response['response'])
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Gets the text associated with an array-based multiple choice answer
+     *
+     * @param int $question_id
+     * @param int $value
+     * @return string
+     */
+    public function getAnswerText($question_id, $value)
+    {
+        return $this->loadUser((int)($value))->getFullName();
+    }
 }
