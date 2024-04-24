@@ -28,23 +28,6 @@ self.addEventListener('push', function(event) {
         renotify: false,
         data: payload.notification
     };
-    const meta = JSON.parse(payload.notification.meta);
-    // if calendar with RSVP, show actions for these
-    if (meta.approve && meta.decline) {
-        notificationOptions.actions = [
-            {
-                action: 'approve',
-                type: 'button',
-                title: 'Approve'
-            },
-            {
-                action: 'decline',
-                type: 'button',
-                title: 'Decline'
-            }
-
-        ]
-    }
     event.waitUntil(
         self.registration.showNotification(notificationTitle, notificationOptions)
     );
@@ -55,24 +38,6 @@ self.addEventListener('push', function(event) {
 self.addEventListener("notificationclick", (e) => {
     // Close the notification popout
     e.notification.close();
-    const meta = JSON.parse(e.notification.data.meta);
-
-    // was action button clicked?
-    if (e.action) {
-        switch (e.action) {
-            case 'approve':
-                let approveResponse = new Request(meta.approve, {
-                    method: "POST"
-                });
-                break;
-            case 'decline':
-                let declineResponse = new Request(meta.decline, {
-                    method: "POST"
-                });
-                break;
-        }
-    }
-
     // Get all the Window clients
     e.waitUntil(
         clients.matchAll({ type: "window" }).then((clientsArr) => {
