@@ -46,7 +46,6 @@ window.sbProps.firebaseApps.forEach((app) => {
             // Receipt of a message
             onMessage(messaging, (payload) => {
                 console.log('Message received. ', payload);
-                debugger;
                 const notificationOptions = {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
