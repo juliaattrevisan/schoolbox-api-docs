@@ -214,7 +214,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
 
         $userId = filter_var($response['response'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if ($userId) {
-            $student = $this->loadStudent($userId);
+            $student = $this->loadUser($userId);
             // Show the student and their external ID
             $responseText = $student->getFullName();
             if ($student->getExternalId()) {
@@ -260,10 +260,14 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
     public function reviewResponse($page, $attemptId, $question_id)
     {
         // Need the user which took the survey, not the current user?
-        /** @var User $currentUser */
-        $currentUser = $page->getDi()->get('user');
-        $children    = $currentUser->getChildren() ?? [];
-        $existing    = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $attemptHandler = new Assess_Attempt();
+        $attempt        = $attemptHandler->getByID($attemptId);
+        $attemptUser    = $this->loadUser($attempt['user_id']);
+        $externalUser   = new \Schoolbox\External\User();
+        $externalUser->loadChildren([$attemptUser]);
+
+        $children = $attemptUser->getChildren() ?? [];
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         if (count($children) > 0) {
             $page->setVar(
                 [
@@ -300,16 +304,16 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
     }
 
     /**
-     * Load a user from the given student ID.
+     * Load a user from the given user ID.
      *
-     * @param int $studentId
+     * @param int $userId
      * @return User
      */
-    private function loadStudent(int $studentId): User
+    private function loadUser(int $userId): User
     {
         $userMapper = UserMapper::getInstance();
         try {
-            $student = $userMapper->findById($studentId);
+            $student = $userMapper->findById($userId);
         } catch (Exception\Deleted $e) {
             /** @var User $student */
             $student = $e->getDeletedObject();
