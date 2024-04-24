@@ -53,6 +53,16 @@ class RescoreTool extends CliTool\App
 
 
     /**
+     * A coefficient applied to a set of item responses that calculates how long
+     * it takes to update that set of item responses. Each item costs AVERAGE_API_REQUEST_DURATION
+     * plus a rate limit penalty (about 5sec) roughly three in four requests.
+     *
+     * penalty = 2 + (5 * 0.75) = 3.75
+     */
+    private const UPDATE_PENALTY = 3.75;
+
+
+    /**
      * A learnosity api instance
      *
      * @var Api
@@ -286,14 +296,19 @@ HELP;
         $this->getLogger()->info('');
 
         /* Calculate an estimated duration
-         * Each request to learnosity takes about 2 seconds in a vagrant
          *
-         * eta = 2*numAttempts + 2*numItemResponses
-         *     = 2*($numAttempts + $numItemResponses)
+         * Each request to learnosity takes about 2 seconds in a vagrant,
+         * but updating to the Australia region incurs a Rate Limit penalty, usually ~5sec
+         * about 75% of the time
+         *
+         * eta = 2*numAttempts + 2*numItemResponses + 5*0.75*numItemResponses
+         *     = 2*numAttempts + 3.75*numItemResponses
          */
+        $eta = (self::AVERAGE_API_REQUEST_DURATION*$numAttempts) + (self::UPDATE_PENALTY*$numItemResponses);
+
         $this->getLogger()->info(sprintf(
             '    Estimated duration: %s seconds',
-            self::AVERAGE_API_REQUEST_DURATION*($numAttempts + $numItemResponses)
+            $eta
         ));
 
         $this->getLogger()->info('');
