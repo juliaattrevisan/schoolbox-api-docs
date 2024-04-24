@@ -322,4 +322,26 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         }
         return $student;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function configure(SitePage $page, $config)
+    {
+        $options = json_decode($config);
+        $page->setVar('CONFIGURATION_MANDATORY_CHECKED', ($options->mandatory ?? false) ? 'checked="checked"' : '');
+    }
+
+    /**
+     * Configure mandatoryness and other settings for this response
+     *
+     * @param SitePage $page
+     * @param int $question_id
+     */
+    protected function configureResponse($page, $question_id)
+    {
+        $question = $this->questionHandler->getByID($question_id);
+        $config   = json_decode($question['config']);
+        $page->setVar('CONFIGURATION_MANDATORY', ($config->mandatory ?? false) ? 'required' : '');
+    }
 }
