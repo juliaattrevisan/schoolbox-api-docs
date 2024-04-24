@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Cli;
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
@@ -154,14 +156,14 @@ HELP;
             exit(1);
         }
 
-        if ($this->perform()) {
-            /* Actually perform the mutation
-             */
-            $this->process($attempts);
-        } else {
-            /* Metrics: announce how many attempts we have, and how many things we're going to touch
-             */
-        }
+        /* Metrics: announce how many attempts we have, and how many things we're going to touch
+         */
+        $this->getLogger()->info(sprintf(
+            'Found %s attempt(s) to process.',
+            $attempts->count()
+        ));
+
+        $this->process($attempts);
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
@@ -172,15 +174,22 @@ HELP;
     /**
      * Mutate attempts in learnosity
      *
-     * @param \Schoolbox\GenericCollection $attempts
+     * @param GenericCollection $attempts
      * @return void
      * @throws ApiException
      * @throws \JsonException
-     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @throws ValidationException
      */
     private function process(\Schoolbox\GenericCollection $attempts): void
     {
+        /* A counter for attempts
+         */
+        $numAttempts = $attempts->count();
+        $i = 0;
+
         foreach ($attempts as $attempt) {
+            $i++;
+
             $this->getLogger()->info('');
 
             /* Legacy attempts might not have a learnosity reference;
@@ -188,7 +197,9 @@ HELP;
              */
             if ('' === trim((string)$attempt->getLearnosityReference())) {
                 $this->getLogger()->info(sprintf(
-                    'Attempt %s does not have a learnosity reference; skipping',
+                    '(%s/%s) Attempt %s does not have a learnosity reference; skipping',
+                    $i,
+                    $numAttempts,
                     $attempt->getId()
                 ));
 
@@ -196,7 +207,9 @@ HELP;
             }
 
             $this->getLogger()->info(sprintf(
-                'Preparing attempt %s (%s) for rescoring',
+                '(%s/%s) Preparing attempt %s (%s) for rescoring',
+                $i,
+                $numAttempts,
                 $attempt->getId(),
                 $attempt->getLearnosityReference()
             ));
@@ -221,7 +234,9 @@ HELP;
              */
             if (null === $itemResponses) {
                 $this->getLogger()->info(sprintf(
-                    'No items found for attempt %s; skipping',
+                    '(%s/%s) No items found for attempt %s; skipping',
+                    $i,
+                    $numAttempts,
                     $attempt->getLearnosityReference(),
                 ));
 
@@ -232,11 +247,20 @@ HELP;
              * Tell learnosity about the ones we need to rescore
              */
             $this->getLogger()->info(sprintf(
-                'Sending %s item(s) to learnosity for rescoring',
+                '(%s/%s) Sending %s item(s) to learnosity for rescoring',
+                $i,
+                $numAttempts,
                 count($itemResponses)
             ));
 
+            /* A counter for items in this attempt
+             */
+            $numItemResponses = count($itemResponses);
+            $j = 0;
+
             foreach ($itemResponses as $itemResponse) {
+                $j++;
+
                 $payload = [
                     'session_ids' => [
                         $attempt->getLearnosityReference()
@@ -247,7 +271,11 @@ HELP;
                 ];
 
                 $this->getLogger()->debug(sprintf(
-                    'Sending item %s to learnosity for rescoring',
+                    '(%s/%s) [%s/%s] Sending item %s to learnosity for rescoring',
+                    $i,
+                    $numAttempts,
+                    $j,
+                    $numItemResponses,
                     $itemResponse['reference']
                 ));
 
@@ -258,7 +286,11 @@ HELP;
                         $job = $this->api->dataUpdateRequest('/sessions/item', $payload);
 
                         $this->getLogger()->info(sprintf(
-                            'Rescoring request made to learnosity and returned job_reference %s for item %s',
+                            '(%s/%s) [%s/%s] Rescoring request made to learnosity and returned job_reference %s for item %s',
+                            $i,
+                            $numAttempts,
+                            $j,
+                            $numItemResponses,
                             $job['data']['job_reference'],
                             $itemResponse['reference']
                         ));
