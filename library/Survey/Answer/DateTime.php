@@ -185,30 +185,19 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     public function exportResponseToCSV($attempt_id, $question_id)
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
-        $data     = [
-            'response' => '',
-            'comment'  => '',
-            'mark'     => 'No User Selected'
-        ];
 
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist
          */
         if (!$response) {
-            return $data;
+            return [
+                'response' => '',
+                'comment' => '',
+                'mark' => ''
+            ];
         }
 
-        $userId = filter_var($response['response'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        if ($userId) {
-            $student = $this->loadUser($userId);
-            // Show the student and their external ID
-            $responseText = $student->getFullName();
-            if ($student->getExternalId()) {
-                $responseText = sprintf('%s (%s)', $responseText, $student->getExternalId());
-            }
-            $data['response'] = $responseText;
-        }
-        return $data;
+        return $response;
     }
 
     /**
@@ -340,18 +329,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      */
     public function exportResponseToArray($attempt_id, $question_id)
     {
-        $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
-
-        /* If a question was added after the attempt was made by the student,
-         * then $response['response'] might not even exist; return empty array
-         */
-        if ($response && isset($response['response'])) {
-            return [
-                (int)($response['response'])
-            ];
-        }
-
-        return [];
+        return $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
     }
 
     /**
