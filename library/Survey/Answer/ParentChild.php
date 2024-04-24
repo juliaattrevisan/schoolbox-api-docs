@@ -212,17 +212,9 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
             return $data;
         }
 
-        $userMapper     = UserMapper::getInstance();
-        $responseUserId = $response['response'] ?? null;
-        if ($responseUserId) {
-            try {
-                $student = $userMapper->findById($responseUserId);
-            } catch (Exception\Deleted $e) {
-                /** @var User $student */
-                $student = $e->getDeletedObject();
-            } catch (Exception) {
-                $student = $userMapper->getUnknownUser();
-            }
+        $userId = filter_var($response['response'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if ($userId) {
+            $student = $this->loadStudent($userId);
             // Show the student and their external ID
             $responseText = $student->getFullName();
             if ($student->getExternalId()) {
@@ -267,6 +259,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      */
     public function reviewResponse($page, $attemptId, $question_id)
     {
+        // Need the user which took the survey, not the current user?
         /** @var User $currentUser */
         $currentUser = $page->getDi()->get('user');
         $children    = $currentUser->getChildren() ?? [];
@@ -304,5 +297,25 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         } else {
             $page->setVar('answerOption_block', '');
         }
+    }
+
+    /**
+     * Load a user from the given student ID.
+     *
+     * @param int $studentId
+     * @return User
+     */
+    private function loadStudent(int $studentId): User
+    {
+        $userMapper = UserMapper::getInstance();
+        try {
+            $student = $userMapper->findById($studentId);
+        } catch (Exception\Deleted $e) {
+            /** @var User $student */
+            $student = $e->getDeletedObject();
+        } catch (Exception) {
+            $student = $userMapper->getUnknownUser();
+        }
+        return $student;
     }
 }
