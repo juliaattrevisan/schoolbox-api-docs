@@ -514,6 +514,11 @@ class EventNotifier extends AbstractModuleNotifier
                             'user' => new UserParam($effector),
                             'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         ]
+                    )->setMeta(
+                        [
+                            'approve' => sprintf("/calendar/event/attendance/%s/accept", $event->getId()),
+                            'decline' => sprintf("/calendar/event/attendance/%s/decline", $event->getId()),
+                        ]
                     );
 
         foreach ($newlyInvited as $guest) {
