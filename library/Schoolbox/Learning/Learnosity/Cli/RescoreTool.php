@@ -29,12 +29,27 @@ class RescoreTool extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+
     /**
      * --assessment
      *
-     * Import a particular quiz from the schoolbox.assessment table
+     * Update attempts from a particular quiz from the schoolbox.assessment table
      */
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
+
+
+    /**
+     * --lookahead
+     *
+     * Scout ahead to see how many attempts and items would be mutated, roughly
+     */
+    private const OPT_LONG_LOOKAHEAD = 'lookahead';
+
+
+    /**
+     * Roughly how long each learnosioty api requests costs, in seconds
+     */
+    private const AVERAGE_API_REQUEST_DURATION = 2;
 
 
     /**
@@ -56,7 +71,8 @@ class RescoreTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_ASSESSMENT_ID
+            self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_LOOKAHEAD,
         ];
     }
 
@@ -75,8 +91,16 @@ tool, which lets you specify a particular quiz whose attempts you want to update
 
 It uses an assessment's learnosity_reference for a quiz whose attempts you want to rescore.
 
-Usage: rescore.php --assessment=... [-vvv] [--perform]
+Usage: rescore.php --assessment=... [--lookahead] [-vvv] [--perform]
 Ex.    rescore.php --assessment=656 -vvv --perform
+
+
+Lookahead Mode: you can specify the --lookahead arg which specifically elucidates how many
+attempts and items would be updated. It works exclusively; if you specify this arg, this
+tool will not perform any mutations, just tell you what it found. You should use this when
+you're running Rescore for the first time, to get an idea of what's to come.
+
+Ex.    rescore.php --assessment=656 -vvv --lookahead
 
 HELP;
             exit;
@@ -156,18 +180,142 @@ HELP;
             exit(1);
         }
 
-        /* Metrics: announce how many attempts we have, and how many things we're going to touch
+        /* Choose whether we're scouting, or actually gonna do the thing
          */
-        $this->getLogger()->info(sprintf(
-            'Found %s attempt(s) to process.',
-            $attempts->count()
-        ));
+        if ($this->getOpt(self::OPT_LONG_LOOKAHEAD)) {
+            $this->lookahead($attempts);
+        } else {
+            /* Metrics: announce how many attempts we have, and how many things we're going to touch
+             */
+            $this->getLogger()->info(sprintf(
+                'Found %s attempt(s) to process.',
+                $attempts->count()
+            ));
 
-        $this->process($attempts);
+            $this->process($attempts);
+        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+    }
+
+
+    /**
+     * Mutate attempts in learnosity
+     *
+     * @param GenericCollection $attempts
+     * @return void
+     * @throws ApiException
+     * @throws \JsonException
+     * @throws ValidationException
+     */
+    private function lookahead(\Schoolbox\GenericCollection $attempts): void
+    {
+        /* A counter for attempts
+         */
+        $numAttempts = $attempts->count();
+        $numSkipped = 0;
+        $numItemResponses = 0;
+
+        /* A set of (attempt, num item updates) tuples so you know roughly
+         * how many item update requests are required for each attempt
+         */
+        $breakdown = [];
+
+        foreach ($attempts as $attempt) {
+            /* Legacy attempts might not have a learnosity reference;
+             * skip those and keep going (this happens in vagrants)
+             */
+            if ('' === trim((string)$attempt->getLearnosityReference())) {
+                $numSkipped++;
+                continue;
+            }
+
+            /* Find the learnosity Responses for this $attempt as each attempt's
+             * contents might actually vary between users
+             *
+             * This can happen when your item list isn't the same across Sessions
+             * such as when you add or remove questions, and students' attempt
+             * consequently vary in their content
+             *
+             * Such a circumstance gives you http 400 "Check session_ids - target_item not used: b985ec0c....."
+             * but there's nothing we can do about that
+             */
+            $itemResponses = $this->api->dataGetRequest('/sessions/responses', [
+                'session_id' => [
+                    $attempt->getLearnosityReference()
+                ]
+            ])['data'][0]['items'] ?? null;
+
+            /* No items? No trabajo
+             */
+            if (null === $itemResponses) {
+                $numSkipped++;
+                continue;
+            }
+
+            /* A counter for items in this attempt
+             */
+            $n = count($itemResponses);
+            $numItemResponses += $n;
+
+            /* Store some more details here
+             */
+            $key1 = sprintf(
+                '%s (%s)',
+                $attempt->getUser()->getFullname(),
+                $attempt->getUser()->getId()
+            );
+
+            $key2 = sprintf(
+                'Attempt %s: %s',
+                $attempt->getId(),
+                $attempt->getLearnosityReference()
+            );
+
+            $breakdown[$key1][$key2] = $n;
+        }
+
+        /* Log metrics, I guess
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Lookahead Summary');
+        $this->getLogger()->info('');
+
+        /* Calculate an estimated duration
+         * Each request to learnosity takes about 2 seconds in a vagrant
+         *
+         * eta = 2*numAttempts + 2*numItemResponses
+         *     = 2*($numAttempts + $numItemResponses)
+         */
+        $this->getLogger()->info(sprintf(
+            '    Estimated duration: %s seconds',
+            self::AVERAGE_API_REQUEST_DURATION*($numAttempts + $numItemResponses)
+        ));
+
+        $this->getLogger()->info('');
+
+        $this->getLogger()->info(sprintf(
+            '    Number of attempts found: %s',
+            $numAttempts
+        ));
+
+        $this->getLogger()->info(sprintf(
+            '    Number of attempts skipped: %s',
+            $numSkipped
+        ));
+
+        $this->getLogger()->info(sprintf(
+            '    Number of items found: %s',
+            $numItemResponses
+        ));
+
+        $this->getLogger()->info('');
+
+        /* Brutally dump some per-user stats
+         */
+        print_r($breakdown);
     }
 
 
