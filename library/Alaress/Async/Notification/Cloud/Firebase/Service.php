@@ -70,6 +70,7 @@ class Service extends AbstractService
                                                    'icon' => $notification->getIcon(),
                                                    'timestamp' => $notification->getTimestamp(),
                                                    'href'      => $notification->getHref(),
+                                                   'meta'      => json_encode($notification->getMeta())
                                                ],
                                                'fcm_options' => [
                                                    'link' => $notification->getHref(),
