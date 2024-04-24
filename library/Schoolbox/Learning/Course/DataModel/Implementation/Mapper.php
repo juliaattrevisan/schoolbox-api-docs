@@ -177,7 +177,7 @@ class Mapper extends AbstractCourseMapper
      * allow it.
      *
      * @param array $courseImplIds
-     * @return array
+     * @return array<int, array<int, array<int>>> See more detailed description above.
      */
     public function getCourseOutlineComponentIdsStruct(array $courseImplIds): array
     {
