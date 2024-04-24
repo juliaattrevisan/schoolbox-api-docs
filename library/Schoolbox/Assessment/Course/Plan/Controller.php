@@ -483,9 +483,9 @@ class Controller extends Base
          */
         $compTextQuery->execute(array_merge(
             [
-                                        'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-                                        'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                                    ],
+                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            ],
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
         while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
@@ -496,17 +496,17 @@ class Controller extends Base
             }
             //build the row and send
             fputcsv($fp, [
-            $units[$row['folder_id']]['course.name'],
-            $units[$row['folder_id']]['course.id'],
-            $units[$row['folder_id']]['framework'],
-            $units[$row['folder_id']]['unit.name'],
-            $units[$row['folder_id']]['unit.id'],
-            $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder_id']]['unit.id']))->withFragment(sprintf("component%s", $row['componentId'])),
-            $componentName,
-            $row['componentId'] ?? 'NULL',
-            $row['textboxHeading'] ?? 'NULL',
-            $row['id'] ?? 'NULL',
-            $row['textboxBody'] ?? 'NULL',
+                $units[$row['folder_id']]['course.name'],
+                $units[$row['folder_id']]['course.id'],
+                $units[$row['folder_id']]['framework'],
+                $units[$row['folder_id']]['unit.name'],
+                $units[$row['folder_id']]['unit.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder_id']]['unit.id']))->withFragment(sprintf("component%s", $row['componentId'])),
+                $componentName,
+                $row['componentId'] ?? 'NULL',
+                $row['textboxHeading'] ?? 'NULL',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
             ]);
         }
 
@@ -547,23 +547,23 @@ class Controller extends Base
          */
         $textQuery->execute(array_merge(
             [
-                                    'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY],
+                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY],
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
         while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
             //build the row and send
             fputcsv($fp, [
-            $units[$row['folderId']]['course.name'],
-            $units[$row['folderId']]['course.id'],
-            $units[$row['folderId']]['framework'],
-            $units[$row['folderId']]['unit.name'],
-            $units[$row['folderId']]['unit.id'],
-            $urlBase->withPath(sprintf("/textbox/folder/%s", $units[$row['folderId']]['unit.id'])),
-            'No Component',
-            'No Component',
-            $row['textboxHeading'] ?? 'NULL',
-            $row['id'] ?? 'NULL',
-            $row['textboxBody'] ?? 'NULL',
+                $units[$row['folderId']]['course.name'],
+                $units[$row['folderId']]['course.id'],
+                $units[$row['folderId']]['framework'],
+                $units[$row['folderId']]['unit.name'],
+                $units[$row['folderId']]['unit.id'],
+                $urlBase->withPath(sprintf("/textbox/folder/%s", $units[$row['folderId']]['unit.id'])),
+                'No Component',
+                'No Component',
+                $row['textboxHeading'] ?? 'NULL',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
             ]);
         }
         exit(1);
