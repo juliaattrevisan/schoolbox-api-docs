@@ -16,8 +16,10 @@
          #}
 
         {# These config elements can be either hidden or shown, contextually
+         # csv is a special subset
          #}
-        let configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
+        let sisConfigElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
+        let csvConfigElements = $('#schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
 
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
@@ -49,22 +51,26 @@
          * @param {string} dataSource
          */
         function initIslands(dataSource) {
-            if (['', 'csv'].indexOf(dataSource) !== -1) {
-
-                {# If you haven't chosen anything,
-                 # or if Data Source is csv,
-                 #
-                 # Hide Status Island and Hide config fields
+            if ([''].indexOf(dataSource) !== -1) {
+                {# If you haven't chosen anything (select an option)
+                 # Hide the Status Island and all configuration fields
                  #}
-                 $('#status-island').hide();
-                hideConfig(configElements);
+                $('#status-island').hide();
+                hideConfig(sisConfigElements);
+            } else if (['csv'].indexOf(dataSource) !== -1) {
+                {# If you chose CSV, you now have the chance to manage the
+                 # scheduler frequency for liss inputs (if you choose to use it)
+                 # Otherwise you can just ignore them and just use csv files alone
+                 #}
+                $('#status-island').show();
+                hideConfig(sisConfigElements);
+                showConfig(csvConfigElements);
             } else {
-
                 {# Otherwise, show the config island and hide the csv island
                  # Show the host/key/frequency input elements
                  #}
                 $('#status-island').show();
-                showConfig(configElements);
+                showConfig(sisConfigElements);
             }
         }
 
@@ -88,13 +94,14 @@
              #}
             if (dataSource === '') {
                 $('#status-island').hide();
-                hideConfig(configElements);
+                hideConfig(sisConfigElements);
             } else if (dataSource === 'csv') {
-                $('#status-island').hide();
-                hideConfig(configElements);
+                $('#status-island').show();
+                hideConfig(sisConfigElements);
+                showConfig(csvConfigElements);
             } else  {
                 $('#status-island').show();
-                showConfig(configElements);
+                showConfig(sisConfigElements);
             }
         }
 
@@ -118,7 +125,7 @@
              * And the import frequency is sb,
              * Show the options
              */
-            if (['', 'csv'].indexOf(dataSource) === -1) {
+            if ([''].indexOf(dataSource) === -1) {
                 if ('sb' === importFrequency) {
                     importFrequencyContainer.show();
                 }
@@ -273,9 +280,8 @@
             </div>
         {% endif %}
 
-        {% if lissInputPayloads|length %}
-            <div class="small-12 island" id="liss-input-payloads">
-                <h3 class="subheader">LISS Input Payloads</h3>
+        {% if lissInputPayloads.all|length %}
+            <div class="small-12 island liss-input-payloads" id="liss-input-payloads">
                 {% include '@adminImportIndex/schoolData/lissInputPayloads.twig' with {
                     lissInputPayloads: lissInputPayloads
                 } %}

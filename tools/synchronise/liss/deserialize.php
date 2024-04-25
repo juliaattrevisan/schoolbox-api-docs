@@ -9,6 +9,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Codec\PayloadFilename;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -34,11 +36,11 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --file
+     * --hash
      *
      * The input liss payload that you want to convert
      */
-    private const OPT_LONG_FILE = 'file:';
+    private const OPT_LONG_HASH = 'hash:';
 
 
     /**
@@ -48,7 +50,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FILE,
+            self::OPT_LONG_HASH,
         ];
     }
 
@@ -67,9 +69,9 @@ Use the redirect symbol to do it, otherwise it prints to terminal.
 
 Don't forget to clean up after yourself when you're done
 
-Usage: deserialize.php --file=... > ./path/to/output.txt
+Usage: deserialize.php --hash=... > ./path/to/output.txt
 
-Example: deserialize.php --file=./suds_liss_dailydata_20230803_155733.log > output.txt
+Example: deserialize.php --hash=abcd1234jkl5678 > output.txt
 
 
 HELP;
@@ -78,22 +80,30 @@ HELP;
 
         /* See if the file exists and is in a readable condition
          */
-        $inputFilename = trim((string)$this->getOpt(self::OPT_LONG_FILE));
+        $inputHash = trim((string)$this->getOpt(self::OPT_LONG_HASH));
+
+        /* This is needed to process liss data from storage files
+         */
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
+        $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
 
         try {
-            $in = fopen($inputFilename, 'r');
-        } catch (\Exception $e) {
+            $file = $storageMapper->findByHash($inputHash);
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $this->getLogger()->warning(sprintf(
-                'Cannot read input file for reading: %s',
-                $inputFilename
+                'LISS Payload for %s not found; exiting.',
+                $inputHash
             ));
 
-            return;
+            exit(1);
         }
 
-        /* Grab the input contents and plop it into the output file
+        /* Once we can get the saved payload, try to reconstruct it
+         * into something we can feed back into the Receiver
          */
-        $mockMessage = unserialize(file_get_contents($inputFilename), [
+        $mockMessage = unserialize($filesystemProxy->read($file), [
             'allowed_classes' => true
         ]);
 

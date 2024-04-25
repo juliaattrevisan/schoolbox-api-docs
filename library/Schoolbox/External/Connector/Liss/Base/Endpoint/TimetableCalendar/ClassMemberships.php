@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,14 +9,23 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
-use PhpXmlRpc\Request;
+use Alaress\Database\Predicate\InvalidColumnException;
+use League\Flysystem\FilesystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper;
 
+/**
+ * Class ClassMemberships
+ *
+ * Adds enrolment information to our sis_class_user table.
+ */
 class ClassMemberships implements IStrategy
 {
     /**
@@ -38,18 +47,20 @@ class ClassMemberships implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface        $log
-     * @param bool                   $perform
-     * @param ClassEntryMapper       $classEntryMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param FilesystemProxy $filesystemProxy
+     * @param Mapper $storageMapper
+     * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
-     * @param Request                $message
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
+        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         private ClassEntryMapper $classEntryMapper,
-        private ClassInvolvementMapper $classInvolvementMapper,
-        private Request $message
+        private ClassInvolvementMapper $classInvolvementMapper
     ) {
     }
 
@@ -59,31 +70,54 @@ class ClassMemberships implements IStrategy
      *
      * @return void
      * @throws Exception
+     * @throws InvalidColumnException
+     * @throws FilesystemException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-        $classMemberships = $this->message->getParam(1)->me['array'];
+        /* Load data from the previously-saved liss payload
+         */
+        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
+            ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
-        foreach ($classMemberships as $classMembership) {
-            $classCode = (string)$classMembership->me['struct']['ClassCode']->me['string'];
-            $externalId = (string)$classMembership->me['struct']['StudentId']->me['string'];
+        if (null === $payloads) {
+            return;
+        }
 
-            /* This might sometimes exist; sometimes it won't be there
-             */
-            $edvalClassCode = (string)($classMembership->me['struct']['EdvalClassCode']->me['string'] ?? '');
-
+        foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
-                'Enrolling student %s in class %s (Edval Class Code: %s)',
-                $externalId,
-                $classCode,
-                $edvalClassCode
+                '(%s) publishClassMemberships: processing request',
+                $source
             ));
 
-            $classEntry = $this->createClassEntry($classCode);
+            $classMemberships = $payload->getParam(1)->me['array'];
 
-            $this->createEnrolment($classEntry, $externalId);
+            foreach ($classMemberships as $classMembership) {
+                $classCode = (string)$classMembership->me['struct']['ClassCode']->me['string'];
+                $externalId = (string)$classMembership->me['struct']['StudentId']->me['string'];
+
+                /* This might sometimes exist; sometimes it won't be there
+                 */
+                $edvalClassCode = (string)($classMembership->me['struct']['EdvalClassCode']->me['string'] ?? '');
+
+                $this->log->debug(sprintf(
+                    'Enrolling student %s in class %s (Edval Class Code: %s)',
+                    $externalId,
+                    $classCode,
+                    $edvalClassCode
+                ));
+
+                $classEntry = $this->createClassEntry($classCode);
+
+                $this->createEnrolment($classEntry, $externalId);
+            }
+
+            $this->log->info(sprintf(
+                '(%s) publishClassMemberships: completed request',
+                $source
+            ));
         }
     }
 
@@ -171,15 +205,15 @@ class ClassMemberships implements IStrategy
                     $classEntry->getCode()
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
+                $classInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setClass($classEntry)
+                    ->setExternalId($externalId);
+
                 $this->log->debug(sprintf(
                     'Creating new class involvement for %s in class %s',
                     $externalId,
                     $classEntry->getCode()
                 ));
-
-                $classInvolvement = $this->classInvolvementMapper->createModel()
-                    ->setClass($classEntry)
-                    ->setExternalId($externalId);
 
                 if ($this->perform) {
                     $this->classInvolvementMapper->save($classInvolvement);
