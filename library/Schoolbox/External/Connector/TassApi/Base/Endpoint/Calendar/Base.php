@@ -270,12 +270,27 @@ class Base
              */
             $detail = (string)$tassEvent['description'];
 
+            $allDay = (int)$tassEvent['all_day'];
+
             /* Datetimes for the event and whether it's an all-day event
              */
             $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
-            $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
 
-            $allDay = (int)$tassEvent['all_day'];
+            /* All day events need to go to the start of 1 day into the future.
+             *
+             * We generally use 23:59:59 to indicate "end of day" but some vendors like to incorporate
+             * micro- and nano-seconds as part of their definition of "all day". An all day event that
+             * spans multiple days - e.g. if ANZAC Day was two days long - you'd need to tell fullcalendar
+             * to include the entirety of the 25th and the entirety of the 26th (including micro- and nano-seconds)
+             * which means it has to go to the start of the 27th to display the way you'd want.
+             *
+             * (23:59:59 is not the mathematically-correct end of day)
+             */
+            if ($allDay) {
+                $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end'])->addDays(1)->startOfDay();
+            } else {
+                $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
+            }
 
             /* Third-party source identifier for our import
              */
