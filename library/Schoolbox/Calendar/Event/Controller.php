@@ -661,7 +661,12 @@ class Controller extends Base
          * if it does not, or if it is malformed (ddmm/yyyy, dd/mmyyyy) just set the repeat date till the endDay->endOfDay
          */
         try {
-            $untilDate = new Alaress_Date_Format($this->requestPost['repeat_until'], $acceptedDateFormats);
+            // Unlike the other dates, until date is currently always a date and
+            // not a date+time.
+            $untilDate = (new Alaress_Date_Format(
+                $this->requestPost['repeat_until'],
+                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
+            ))->endOfDay();
         } catch (InvalidArgumentException) {
             $untilDate = (clone $endDate)->endOfDay();
         }
