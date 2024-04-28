@@ -16,6 +16,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventRecurrenceMapper;
+use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -130,7 +131,7 @@ class Controller extends Base
         }
 
         $previous = clone $event;
-        $previous->setGuests($oldGuestIds);
+        $previous->setGuests(new Collection($oldGuestIds));
 
         /* Don't exceed the maximum number of guests, if one was specified
          */

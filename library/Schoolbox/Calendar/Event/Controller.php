@@ -11,6 +11,8 @@ namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Alaress_Date_Locale_Config;
+use DateTimeInterface;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
@@ -21,6 +23,7 @@ use Schoolbox\Calendar\EventLevelCollection;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -31,8 +34,10 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -191,7 +196,6 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-
         /* Set up default values
          */
         $event = (new Event())
@@ -417,7 +421,6 @@ class Controller extends Base
      */
     private function getFolders(Event $event)
     {
-
         /* Groups that were chosen for this even, from previous selections
          */
         $tempFolderIds = $event->getFolderCollection()->getPropertyValues('id');
@@ -536,8 +539,10 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
+        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId']);
+
         $event = new Event();
-        $event->setOwner($this->userMapper->createModel()->setId($this->requestPost['userId']));
+        $event->setOwner($this->userMapper->createModel()->setId($userId));
 
         $this->postModify($event);
     }
@@ -554,10 +559,10 @@ class Controller extends Base
      * @throws LogicException
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Exception
      */
     public function postModify(Event $event): void
     {
-
         /* Check owner still exists
          * If not - pass ownership to the author
          */
@@ -567,26 +572,29 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
+        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId'] ?? null);
+
         /* Check if author still exists
          * If not - pass author to the author
          */
         try {
-            $author = $this->userMapper->findById($this->requestPost['authorId']);
+            $author = $this->userMapper->findById($authorId);
         } catch (Exception $e) {
             $author = $this->getUser();
         }
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders     = array_map('intval', $this->requestPost['folder'] ?? []);
-        $campuses    = array_map('intval', $this->requestPost['campus'] ?? []);
         $accessLevel = (int)($this->requestPost['level'] ?? null);
-        $eventTypeId = (int)($this->requestPost['type'] ?? null);
+        $eventTypeId = (int)($this->requestPost['type']['id'] ?? $this->requestPost['type'] ?? null);
         $title       = $this->requestPost['title'] ?? null;
         $location    = $this->requestPost['location'] ?? null;
         $detail      = $this->requestPost['detail'] ?? null;
         $allDay      = (int)($this->requestPost['allDay'] ?? null);
-        $roles       = $this->requestPost['roles'] ?? [];
+
+        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folders'] ?? []);
+        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campuses'] ?? []);
+        $roles    = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['roles'] ?? []);
 
         /* Recurrence settings
          */
@@ -611,20 +619,37 @@ class Controller extends Base
 
         /* Check the dates
          */
+        $locale = new Alaress_Date_Locale_Config();
+
         $publishDate = null;
 
         if ('' !== ($this->requestPost['publishDate'] ?? '')) {
-            $publishDate = Alaress_Date_Format::newLocal($this->requestPost['publishDate']);
+            $publishDate = new Alaress_Date_Format(
+                $this->requestPost['publishDate'],
+                [
+                    $locale->localFormat(),
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    DateTimeInterface::RFC3339,
+                    DateTimeInterface::RFC3339_EXTENDED
+                ]
+            );
         }
+
+        $acceptedDateFormats = [
+            // The localShortFormat does not include time, so is only appropriate for all day events.
+            ($allDay === Event::ALL_DAY) ? $locale->localShortFormat() : $locale->localFormat(),
+            // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+            DateTimeInterface::RFC3339,
+            DateTimeInterface::RFC3339_EXTENDED
+        ];
+        $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
+        $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
 
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
-            $startDate = Alaress_Date_Format::newLocalShort($this->requestPost['startDate'] ?? '')->startOfDay();
-            $endDate   = Alaress_Date_Format::newLocalShort($this->requestPost['endDate'] ?? '')->endOfDay();
-        } else {
-            $startDate = Alaress_Date_Format::newLocal($this->requestPost['startDate'] ?? '');
-            $endDate   = Alaress_Date_Format::newLocal($this->requestPost['endDate'] ?? '');
+            $startDate = $startDate->startOfDay();
+            $endDate   = $endDate->endOfDay();
         }
 
         /* All events recur, due to the dropdown "Repeat" always being set.
@@ -636,8 +661,13 @@ class Controller extends Base
          * if it does not, or if it is malformed (ddmm/yyyy, dd/mmyyyy) just set the repeat date till the endDay->endOfDay
          */
         try {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->requestPost['repeat_until'] ?? '')->endOfDay();
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            // Unlike the other dates, until date is currently always a date and
+            // not a date+time.
+            $untilDate = (new Alaress_Date_Format(
+                $this->requestPost['repeat_until'],
+                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
+            ))->endOfDay();
+        } catch (InvalidArgumentException) {
             $untilDate = (clone $endDate)->endOfDay();
         }
         /**
@@ -671,8 +701,18 @@ class Controller extends Base
         $guests = [];
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if ('' !== (string)($this->requestPost['guests'] ?? '')) {
-                $guests = explode(',', $this->requestPost['guests']);
+            if (is_array($this->requestPost['guests'])) {
+                // Guests can be supplied as an array of userIds, or an array of JSON objects.
+                // The array of userIds method is for similarity with 'roles', 'campus', and 'folder'.
+                // The object stub method is documented at api.schoolbox.com.au.
+                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['guests'] ?? []);
+            } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
+                // Guests can also be supplied as a comma-separated string of userIds.
+                // This method is used by the form at route calendarEvent.getModify.
+                $guests = array_map(
+                    fn($guestId) => (int)$guestId,
+                    explode(',', $this->requestPost['guests'])
+                );
             }
         }
 
@@ -724,9 +764,53 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        /* Apply redirect - go back to the place from whence you came
-         */
-        $this->response = $this->redirectFound(Redirect::decode($returnUrl));
+        if ($this->isJsonRequest()) {
+            /**
+             * @var eventType $eventType EventType
+             */
+            $eventType = $this->eventTypeMapper->findById($event->getType()->getId());
+            $event->setType($eventType);
+
+            $userTranslator = new UserTranslator();
+            $this->response = $this->responseAsJson(
+                [
+                    'id' => $event->getId(),
+                    'user' => $userTranslator->convertLinkedUser($event->getOwner()),
+                    'author' => $userTranslator->convertLinkedUser($event->getAuthor()),
+                    'allDay' => ($event->getAllDay() === 1), // Convert from int to boolean.
+                    'efficacy' => $efficacy,
+                    'title' => $event->getTitle(),
+                    'startDate' => $event->getStartDateTime()->getJson(),
+                    'endDate' => $event->getEndDateTime()->getJson(),
+                    'repeat' => $repeat,
+                    'repeat_until' => $untilDate->getJson(),
+                    'type' => $event->getType(),
+                    'location' => $event->getLocation(),
+                    'detail' => $event->getDetail(),
+                    'publishDate' => $event->getPublishDateTime()->getJson(),
+                    'level' => $accessLevel,
+                    'roles' => $this->translateRoleModelsToArrays(
+                        $this->roleMapper->findByColumn('id', $event->getRoleCollection())
+                    ),
+                    'campuses' => $this->translateCampusModelsToArrays(
+                        $this->campusMapper->findByColumn('id', $event->getCampusCollection())
+                    ),
+                    'folders' => $this->translateFolderModelsToArrays(
+                        $this->folderMapper->findByColumn('id', $event->getFolderCollection())
+                    ),
+                    'attendance' => $event->getAttendance(),
+                    'guests' => $this->translateUserModelsToArrays(
+                        $this->userMapper->findByColumn('id', $event->getGuests()->getAll()),
+                    ),
+                    'maxAttendees' => $event->getMaxAttendees(),
+                    'showAttendees' => $event->getShowAttendees(),
+                ]
+            );
+        } else {
+            /* Apply redirect - go back to the place from whence you came
+             */
+            $this->response = $this->redirectFound(Redirect::decode($returnUrl));
+        }
     }
 
 
@@ -778,7 +862,8 @@ class Controller extends Base
             $eventRelations
         );
 
-        // No real need to return anything
+        // Return empty '200 OK' regardless of whether JSON was requested.
+        $this->response = $this->responseEmpty()->withStatus(200);
     }
 
 
@@ -786,20 +871,21 @@ class Controller extends Base
      * Delete an event, or a set of events from a series
      *
      * @param Event $event
-     * @throws Exception
+     * @throws \Exception
      */
     public function postDelete(Event $event): void
     {
         /* Delete an entire series, if the seriesId is not null
          */
         if ($event->getSeriesId() !== null) {
-            if ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES) {
+            $efficacy = $this->requestPost->get('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
+            if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
                 $allEvents = $this->eventMapper->getAllInSeries($event);
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
                 }
-            } elseif ($this->requestPost['efficacy'] === EventRecurrenceMapper::EFFICACY_SELF) {
+            } elseif ($efficacy === EventRecurrenceMapper::EFFICACY_SELF) {
                 $this->eventMapper->delete($event);
             }
         } else {
@@ -829,7 +915,100 @@ class Controller extends Base
                 'callbackUrl' => $redirect
             ]);
         } else {
-            $this->response = $this->redirectFound($redirect);
+            if ($this->isJsonRequest()) {
+                $this->response = $this->responseAsJson('')->withStatus(204); // HTTP status 204 means 'No Content'.
+            } else {
+                $this->response = $this->redirectFound($redirect);
+            }
         }
+    }
+
+    /**
+     * @param array $items of digit strings or (arrays containing an 'id' key (e.g. ["id" => 123])
+     * @return array of integers
+     */
+    private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
+    {
+        $ids = [];
+
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                if (!array_key_exists('id', $item)) {
+                    throw new InvalidArgumentException("No 'id' key supplied in object.");
+                }
+
+                $value = $item['id'];
+            } else {
+                $value = $item;
+            }
+
+            if (is_int($value)) {
+                $id = $value;
+            } elseif (is_string($value) && ctype_digit($value)) {
+                $id = (int)$value;
+            } else {
+                throw new InvalidArgumentException("Invalid 'id' value.  Expected integer or digit string.");
+            }
+
+            $ids[] = $id;
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param Collection $roles (each element is a \Schoolbox\Role)
+     * @return array
+     */
+    private function translateRoleModelsToArrays(Collection $roles): array
+    {
+        $translator = new UserTranslator();
+        $roleArrays = [];
+        foreach ($roles as $role) {
+            $roleArrays[] = $translator->convertRole($role);
+        }
+        return $roleArrays;
+    }
+
+    /**
+     * @param Collection $campuses (each element is a \Schoolbox\Campus)
+     * @return array
+     */
+    private function translateCampusModelsToArrays(Collection $campuses): array
+    {
+        $translator = new UserTranslator();
+        $campusArrays = [];
+        foreach ($campuses as $campus) {
+            $campusArrays[] = $translator->convertCampus($campus);
+        }
+        return $campusArrays;
+    }
+
+    /**
+     * @param Collection $folders (each element is a Folder)
+     * @return array
+     */
+    private function translateFolderModelsToArrays(Collection $folders): array
+    {
+        $translator = new FolderLinkOnlyTranslator(0);
+        $folderArrays = [];
+        foreach ($folders as $folder) {
+            $folderArrays[] = $translator($folder);
+        }
+        return $folderArrays;
+    }
+
+    /**
+     * @param Collection $users (each element is a User)
+     * @return array
+     */
+    private function translateUserModelsToArrays(Collection $users): array
+    {
+        $translator = new UserTranslator();
+        $userArrays = [];
+        foreach ($users as $user) {
+            $userArrays[] = $translator->convertLinkedUser($user);
+        }
+        return $userArrays;
     }
 }

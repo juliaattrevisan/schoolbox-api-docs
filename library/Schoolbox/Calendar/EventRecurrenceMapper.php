@@ -409,6 +409,12 @@ class EventRecurrenceMapper
      */
     protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access)
     {
+        // Save event state to avoid mutating object.
+        // Note that just saving the date object will do no good, because that object is modified in the loop.
+        $origStartDateTimeDb = $event->getStartDateTime()->getDatabase();
+        $origEndDateTimeDb = $event->getEndDateTime()->getDatabase();
+        $origSeriesId = $event->getSeriesId();
+
         $event->setSeriesId($sid)->setAccess($access);
 
         foreach ($dates as $currentDate) {
@@ -426,6 +432,11 @@ class EventRecurrenceMapper
             // Assign relations
             $eventRelations->resetRelations($event);
         }
+
+        // Restore event to previous state.
+        $event->setStartDateTime(new Alaress_date_format($origStartDateTimeDb, Alaress_Date_Format::DATABASE_FORMAT));
+        $event->setEndDateTime(new Alaress_date_format($origEndDateTimeDb, Alaress_Date_Format::DATABASE_FORMAT));
+        $event->setSeriesId($origSeriesId);
     }
 
     /**

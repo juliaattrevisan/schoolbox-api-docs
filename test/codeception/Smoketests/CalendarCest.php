@@ -74,7 +74,7 @@ class CalendarCest
         $createEventRequest = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_PERSONAL);
-        $createEventRequest->setFormParam('campus[0]', 1);
+        $createEventRequest->setFormParam('campuses[0]', 1);
         $createEventRequest->setFormParam('type', 1);
         $i->amGoingTo('Send request to create personal calendar event');
         $i->sendRequest($createEventRequest);
@@ -102,8 +102,8 @@ class CalendarCest
         $createEventRequest = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_GROUP);
-        $createEventRequest->setFormParam('folder[0]', $targetGroup);
-        $createEventRequest->setFormParam('campus[0]', 1);
+        $createEventRequest->setFormParam('folders[0]', $targetGroup);
+        $createEventRequest->setFormParam('campuses[0]', 1);
         $createEventRequest->setFormParam('type', 1);
         $i->amGoingTo('Send request to create group calendar event');
         $i->sendRequest($createEventRequest);
@@ -132,8 +132,8 @@ class CalendarCest
         $createEventRequest = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_CAMPUS);
-        $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
-        $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
+        $createEventRequest->setFormParam('campuses[0]', $targetCampuses[0]);
+        $createEventRequest->setFormParam('campuses[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
         $createEventRequest->setFormParam('roles[1]', $targetRoles[1]);
         $createEventRequest->setFormParam('type', 1);
@@ -161,7 +161,7 @@ class CalendarCest
         $eventPayload = new Payload\Calendar\Event\Create($admin->getId(), $admin->getId());
         $eventPayload->setTitle($title);
         $eventPayload->setFormParam('level', Calendar\Event::ACCESS_PERSONAL);
-        $eventPayload->setFormParam('campus[0]', 1);
+        $eventPayload->setFormParam('campuses[0]', 1);
         $eventPayload->setFormParam('type', 1);
         $i->amGoingTo('Send request to create personal calendar event');
         $i->sendRequest($eventPayload);
@@ -199,8 +199,8 @@ class CalendarCest
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_CAMPUS);
         $createEventRequest->setFormParam('type', 1);
-        $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
-        $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
+        $createEventRequest->setFormParam('campuses[0]', $targetCampuses[0]);
+        $createEventRequest->setFormParam('campuses[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
         $createEventRequest->setFormParam('roles[1]', $targetRoles[1]);
         $createEventRequest->setFormParam('attendance', 2);
@@ -242,8 +242,8 @@ class CalendarCest
         $createEventRequest->setTitle($title);
         $createEventRequest->setFormParam('type', 1);
         $createEventRequest->setFormParam('level', Calendar\Event::ACCESS_CAMPUS);
-        $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
-        $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
+        $createEventRequest->setFormParam('campuses[0]', $targetCampuses[0]);
+        $createEventRequest->setFormParam('campuses[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
         $createEventRequest->setFormParam('roles[1]', $targetRoles[1]);
         $createEventRequest->setFormParam('attendance', 2);

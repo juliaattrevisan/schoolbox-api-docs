@@ -391,18 +391,18 @@ class Event implements ISoftDeletable
      */
 
     /**
-     * @return Collection|int[]
+     * @return Collection|null of int
      */
-    public function getGuests()
+    public function getGuests(): Collection|null
     {
         return $this->guests;
     }
 
     /**
-     * @param Collection|int[] $guests
+     * @param Collection $guests Collection of guest IDs.
      * @return $this
      */
-    public function setGuests($guests): self
+    public function setGuests(Collection $guests): self
     {
         $this->guests = $guests;
         return $this;

@@ -101,7 +101,7 @@ class ModelToArray
      * @param Campus $campus
      * @return array
      */
-    private function convertCampus(Campus $campus): array
+    public function convertCampus(Campus $campus): array
     {
         return [
             'id'   => $campus->getId(),
@@ -117,7 +117,7 @@ class ModelToArray
      * @param Role $role
      * @return array|null
      */
-    private function convertRole(Role $role): ?array
+    public function convertRole(Role $role): ?array
     {
         return $role->getId()
             ? [
@@ -166,7 +166,7 @@ class ModelToArray
      * @param User $linkedUser
      * @return array
      */
-    private function convertLinkedUser(User $linkedUser): array
+    public function convertLinkedUser(User $linkedUser): array
     {
         $role = $linkedUser->getRole();
         $year = $linkedUser->getYear();

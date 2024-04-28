@@ -223,7 +223,7 @@
                             <ul class="option-list">
                                 {% for folder in folders.all %}
                                     <li>
-                                        <input type="checkbox" name="folder[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
+                                        <input type="checkbox" name="folders[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
                                         <label for="folder{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
                                     </li>
                                 {% endfor %}
@@ -263,7 +263,7 @@
                                 </li>
                                 {% for campus in campuses.all %}
                                     <li>
-                                        <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
+                                        <input type="checkbox" class="campusCheck" name="campuses[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
                                         <label for="campus{{ campus.id }}">{{ campus.name }}</label>
                                     </li>
                                 {% endfor %}
