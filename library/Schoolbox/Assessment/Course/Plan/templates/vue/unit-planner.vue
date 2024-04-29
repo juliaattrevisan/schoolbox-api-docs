@@ -132,72 +132,76 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <dl ref="tabsEl" class="tabs">
-        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
-            <a @click="selectedTab = tab">{{ tab.label }}</a>
-        </dd>
-    </dl>
-    <div
-        ref="unitPlannerContainerEl"
-        class="scrollable"
-        :style="{
-            height: containerHeight + 'px',
-            '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
-            '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
-        }"
-    >
-        <div id="unitplanner-dropdown-container">
-            <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
-                The specific placement of this element ensures that the dropdowns are still contained within the table -->
-        </div>
-        <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
-            <div id="unit-planner-sortable-container"></div>
-            <div ref="headerRowEl" class="grid-row header-row">
-                <div
-                    v-for="column in selectedTab.columns"
-                    :key="column.id"
-                    class="fixed-top"
-                    :class="{ 'fixed-left': column.fixedLeft }"
-                >
-                    {{ column.label }}
-                </div>
-            </div>
-
+    <div class="row">
+        <div class="small-12 island">
+            <h1>Unit Planner - {{ props.courseTitle }}</h1>
+            <dl ref="tabsEl" class="tabs">
+                <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
+                    <a @click="selectedTab = tab">{{ tab.label }}</a>
+                </dd>
+            </dl>
             <div
-                v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
-                :key="unit.id"
-                ref="unitElements"
-                class="grid-row unit-row"
-            >
-                <up-unit-cell
-                    v-for="column in selectedTab.columns"
-                    :key="column.id"
-                    :unit="unit"
-                    :column="column"
-                    :is-sortable-placeholder="false"
-                />
-            </div>
-
-            <div
-                class="unit-planner-sortable-placeholder grid-row"
+                ref="unitPlannerContainerEl"
+                class="scrollable"
                 :style="{
-                    display: dragStore.isDragging ? 'grid' : 'none',
-                    top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                    height: containerHeight + 'px',
+                    '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
+                    '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
                 }"
             >
-                <template v-if="store.dragCurrentUnit">
-                    <up-unit-cell
-                        v-for="column in selectedTab.columns"
-                        :key="column.id"
-                        :unit="store.dragCurrentUnit"
-                        :column="column"
-                        :is-sortable-placeholder="true"
-                    />
-                </template>
+                <div id="unitplanner-dropdown-container">
+                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                The specific placement of this element ensures that the dropdowns are still contained within the table -->
+                </div>
+                <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+                    <div id="unit-planner-sortable-container"></div>
+                    <div ref="headerRowEl" class="grid-row header-row">
+                        <div
+                            v-for="column in selectedTab.columns"
+                            :key="column.id"
+                            class="fixed-top"
+                            :class="{ 'fixed-left': column.fixedLeft }"
+                        >
+                            {{ column.label }}
+                        </div>
+                    </div>
+
+                    <div
+                        v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
+                        :key="unit.id"
+                        ref="unitElements"
+                        class="grid-row unit-row"
+                    >
+                        <up-unit-cell
+                            v-for="column in selectedTab.columns"
+                            :key="column.id"
+                            :unit="unit"
+                            :column="column"
+                            :is-sortable-placeholder="false"
+                        />
+                    </div>
+
+                    <div
+                        class="unit-planner-sortable-placeholder grid-row"
+                        :style="{
+                            display: dragStore.isDragging ? 'grid' : 'none',
+                            top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                        }"
+                    >
+                        <template v-if="store.dragCurrentUnit">
+                            <up-unit-cell
+                                v-for="column in selectedTab.columns"
+                                :key="column.id"
+                                :unit="store.dragCurrentUnit"
+                                :column="column"
+                                :is-sortable-placeholder="true"
+                            />
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
     <activities-list-delete-modal />
     <up-curriculum />
     <toast ref="toastEl"></toast>

@@ -1,20 +1,12 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Unit Planner - {{ course.title }}</h1>
-        <div id="unit-planner-container">
-            <unit-planner
-                course-title="{{ course.title }}"
-                {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
-                :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
-                :units="{{ units |json_encode }}"
-                :activity-type-locale="{{ activityTypeLocale |json_encode }}"
-                :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
-                :template="{{ template |json_encode }}"
-            ></unit-planner>
-        </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>
-    </div>
+<div id="unit-planner-container">
+    <unit-planner
+        course-title="{{ course.title }}"
+        {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
+        :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
+        :units="{{ units |json_encode }}"
+        :activity-type-locale="{{ activityTypeLocale |json_encode }}"
+        :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
+        :template="{{ template |json_encode }}"
+    ></unit-planner>
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>
