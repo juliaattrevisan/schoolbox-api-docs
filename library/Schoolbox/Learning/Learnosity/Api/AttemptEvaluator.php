@@ -54,7 +54,7 @@ class AttemptEvaluator
      * @param Attempt\Model   $existingAttempt
      * @return void
      */
-    public function initiatePollingForAttemptScore(
+    public function poll(
         User $user,
         QuizDomainModel $assessment,
         Attempt\Model $existingAttempt

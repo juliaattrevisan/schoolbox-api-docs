@@ -668,7 +668,7 @@ class Controller extends Base
 
         if ($existingAttempt->getLearnosityStatus() === Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING) {
             $attemptEvaluator = $this->buildAttemptEvaluator();
-            $attemptEvaluator->initiatePollingForAttemptScore(
+            $attemptEvaluator->poll(
                 $this->getUser(),
                 $assessment,
                 $existingAttempt,
