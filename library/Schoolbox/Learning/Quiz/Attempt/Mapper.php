@@ -284,6 +284,7 @@ class Mapper extends BaseMapper
      * * it has not yet been reviewed
      *   (the instructor's review renders an auto-score redundant)
      * * it has a Learnosity reference (otherwise, no auto-score can exist)
+     * * its quiz has a Learnosity reference
      * * it is neither deleted, nor for a quiz which has been deleted
      * * it is in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
      * * optionally is in `null` status, if `$includeNullStatus` is true
@@ -310,6 +311,7 @@ class Mapper extends BaseMapper
             ->notNull('finish')
             ->isNull('reviewed_at')
             ->notNull('learnosity_reference')
+            ->notNull('a.learnosity_reference')
             ->isNull('deleted_at')
             ->isNull('a.deleted_at');
 
