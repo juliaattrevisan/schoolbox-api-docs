@@ -51,12 +51,19 @@ class Module extends BaseModule
             )
         );
 
+        $superOnly = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser()
+            )
+        );
+
         $preloadCourse = function ($params) {
             return $this->preloadCourse($params);
         };
 
         $this->register('GET', '/{id:\d+}', 'getPlan', $getPerms, $preloadCourse);
-        $this->register('GET', '/audit', 'getAudit', $getPerms);
+        $this->register('GET', '/audit', 'getAudit', $superOnly);
     }
 
     /**
