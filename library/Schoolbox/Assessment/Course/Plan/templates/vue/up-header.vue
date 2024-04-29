@@ -15,9 +15,7 @@ const addUnitStore = useAddUnitStore();
  * To show / hide the add unit display
  */
 function onCreateNewSelected() {
-    if (addUnitStore.isOpen) {
-        addUnitStore.cancel();
-    } else {
+    if (!addUnitStore.isOpen) {
         addUnitStore.prompt();
     }
 }
@@ -25,24 +23,17 @@ function onCreateNewSelected() {
 
 <template>
     <div class="row actions-small-1 actions-medium-2">
-        <div class="list-item">
-            <div class="small-12 column">
-                <h1>Unit Planner - {{ props.courseTitle }}</h1>
-            </div>
-        </div>
-        <!-- <template v-if="store.hasLoadedOk && !store.isReadOnly"> -->
-        <nav>
-            <a
-                href="#create-curriculum"
-                data-interaction="create-curriculum"
-                data-test-toggle-create-curriculum
-                :class="`icon ${addUnitStore.isOpen ? 'icon-close' : 'icon-add'}`"
-                title="Create New Unit"
+        <div class="button-action small-12 columns">
+            <h1>Unit Planner - {{ props.courseTitle }}</h1>
+            <button
+                class="button icon-add"
+                data-interaction="add-unit"
+                data-test-add-unit
                 @click.prevent="onCreateNewSelected"
             >
-            </a>
-        </nav>
-        <!-- </template> -->
+                Add Unit
+            </button>
+        </div>
     </div>
 </template>
 
