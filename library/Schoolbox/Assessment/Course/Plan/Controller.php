@@ -795,7 +795,7 @@ class Controller extends Base
             }
             $curriculum['components'][] = [
                 'componentId' => $component->getId(),
-                'heading' => $instanceConfig['componentname']['value'],
+                'heading' => trim($instanceConfig['componentname']['value']),
                 'filter' => $instanceConfig['curriculumTreeFilter']['value'],
                 'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
             ];
