@@ -17,9 +17,11 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -78,6 +80,8 @@ class Module extends BaseModule
             $this->getNodeMapper(),
             $this->getComponentInstanceMapper(),
             $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(CourseConfigMapper::class),
+            $this->getMapperFactory()->get(UnitSpecificationMapper::class),
         );
     }
 

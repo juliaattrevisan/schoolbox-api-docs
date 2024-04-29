@@ -17,6 +17,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
@@ -26,6 +27,7 @@ use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
@@ -62,7 +64,9 @@ class Controller extends Base
         private RubricIndicatorMapper $rubricIndicatorMapper,
         private Node\Mapper $nodeMapper,
         private \Component_InstanceMapper $componentInstanceMapper,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        private CourseConfigMapper $courseConfigMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper
     ) {
         /* Only prepare the textbox statement once
          */
@@ -231,130 +235,8 @@ class Controller extends Base
          * improve object cohesion somewhat, but this will suffice for now
          */
         foreach ($course->getUnits() as $unit) {
-            /* Gather up the textboxes and extraTextboxes meta
-             */
-            $textboxData = $this->findTextboxes($course->getTemplate()?->getUnitTemplate()->getId(), $unit->getFolder()->getId());
-
-            // Learning Activities
-            $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
-                'order' => [
-                    'sequence' => 'ASC',
-                ],
-            ]);
-
-            /* Get a set of rubrics that were used among all the assessment specs
-             * This also comes with all the cap ids and indicator ids
-             */
-            $rubricData = $this->findRubrics($unit->getFolder()->getId());
-
-            /* TODO Later on we can provide a list of rubrics that exist in the whole course
-             *  and diff them in some way so users can see what they haven't planned properly
-             */
-            $rubricCapabilities = array_values($rubricData['used']['capabilities']);
-
-            /* Curriculum nodes
-             * A unique set of curriculum nodes collated from various places:
-             * folders, assessments, capabilities and indicators
-             */
-            // now unused, as we are only now caring about curriculum nodes on the folder, not all children items also.
-            //$curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
-
-            //new curriculum array structure
-            $curriculum = [
-                'nodes' => $this->getCurriculumNodes($unit),
-                'selectedNodes' => $unit->getFolder()->getCurriculumNodes()->reindex(),
-                'components' => [],
-            ];
-
-            // grab list collection of curriculum overview components on the unit page
-            $components = $this->componentInstanceMapper->findByContextAndClass(
-                'homepage',
-                $unit->getFolder()->getId(),
-                CurriculumOverviewController::class
-            );
-            foreach ($components as $component) {
-                // extract the configs.
-                $instanceConfig = $component->getConfigArray();
-                if ('' === trim($instanceConfig['componentname']['value'])) {
-                    $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
-                }
-                // default value it '0' so set to null for vue to work
-                // when clearing the component filter (after something was filtered) it is empty (not 0) also catch that
-                if ('0' === $instanceConfig['curriculumTreeFilter']['value'] || '' === $instanceConfig['curriculumTreeFilter']['value']) {
-                    $instanceConfig['curriculumTreeFilter']['value'] = null;
-                }
-                // if we are filtering we should return the curric node
-                if ($instanceConfig['curriculumTreeFilter']['value']) {
-                    $instanceConfig['curriculumTreeFilter']['value'] =
-                        $this->nodeMapper->findOneByColumnList(['id' => $instanceConfig['curriculumTreeFilter']['value'], 'enabled' => true,]);
-                }
-                $curriculum['components'][] = [
-                    'componentId' => $component->getId(),
-                    'heading' => trim($instanceConfig['componentname']['value']),
-                    'filter' => $instanceConfig['curriculumTreeFilter']['value'],
-                    'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
-                ];
-            }
-
-            $activitiesListRoutes = [
-                'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
-                    'contextType' => 'unitspecs',
-                    'contextId' => $unit->getId(),
-                    'context' => $unit,
-                ]],
-                'reorder' => ["route" => "learningAssessment.postReorderAssessments", "params" => [
-                    'contextType' => 'unitspecs',
-                    'contextId' => $unit->getId(),
-                    'context' => $unit,
-                ]],
-            ];
-
-            foreach ($activitiesListRoutes as $key => $link) {
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
-                    $activitiesListRoutes[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
-                } else {
-                    $activitiesListRoutes[$key] = null;
-                }
-            }
-
-            /* Aggregated data for each unit appears as a row in the Unit Planner
-             * on the front end - this is basically the contract between back- and
-             * front-end implementations and the basis of an api-first philosophy
-             */
-            $unitOut = [
-                'id' => $unit->getId(),
-                'title' => $unit->getTitle(),
-                'homepage' => "/homepage/{$unit->getFolder()->getId()}",
-                'folderId' => $unit->getFolder()->getId(),
-                /* Textboxes in the Unit that circumstantially match ones in the Template
-                 */
-                'textboxes' => $textboxData['textboxes'],
-                /* All the other random textboxes that don't match
-                 */
-                'extraTextboxes' => $textboxData['extraTextboxes'],
-                /* All the assessment specs in this unit
-                 */
-                'activities' => [
-                    '_routes' => $activitiesListRoutes,
-                    'items' => $assessments->map(new UnitAssessments(
-                        $this->routeGenerator,
-                        $this->getAuthorizer(),
-                        $this->getUser(),
-                        $this->getUser()
-                    )),
-                ],
-                /* All the rubric capabilities and indicators that are in use among all
-                 * the assessment specs in this unit
-                 */
-                'rubricCapabilities' => $rubricCapabilities,
-                /* Curriculum data object, containing selected, and filtered curriculum nodes
-                 */
-                'curriculum' => $curriculum,
-                'sequence' => $unit->getFolder()->getSequence(),
-            ];
-
             // add this units data to the whole course units collection.
-            $units[] = $unitOut;
+            $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
         }
 
         // Locales required to translate the activity types
@@ -580,7 +462,7 @@ class Controller extends Base
     public function newUnit(CourseSpecification $course)
     {
         // assume course exists.
-        // ensure the specified title is valid.
+        // ensure the specified title is valid whilst trimming the title
         $unitName = trim($this->requestPost->get('name') ?? '');
         if (!$unitName) {
             $problem = (new ApiProblem('Could not create unit. You need to give the unit a name'))
@@ -591,9 +473,7 @@ class Controller extends Base
             return; // exit early don't try to create a new unit with no name
         }
 
-        // create a new folder trimming the title
-        // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-
+        // create the new unit
         try {
             // Need:
             // base config
@@ -610,7 +490,7 @@ class Controller extends Base
                 $unitName,
                 $course->getFolder()->getId(),
                 [],
-                $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
                 $course->getTemplate()->getUnitTemplate()->getId(),
                 $rolePermissions,
                 false,
@@ -623,6 +503,19 @@ class Controller extends Base
                 ->setCourse($course);
 
             $this->unitSpecificationMapper->save($unitSpec);
+
+            // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
+            [$curriculumnTemplate, $curriculumnKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
+            $this->response = $this->responseAsJson($this->getUnitData($unitSpec, $course->getTemplate()->getUnitTemplate()->getId(), $curriculumnKey))
+                ->withStatus(201);
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($e->getCode())
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($e->getCode());
+            return;
+        }
     }
 
     /**
@@ -801,7 +694,7 @@ class Controller extends Base
      * @param Model $unit
      * @return Collection
      */
-    private function getCurriculumNodes(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit): Collection
+    private function getCurriculumNodes(Model $unit): Collection
     {
         $curriculumNodes = $this->nodeMapper->createCollection();
         if ($unit->getFolder()->getCurriculumNodes()->count()) {
@@ -829,5 +722,184 @@ class Controller extends Base
             Node\Mapper::sortNodes($curriculumNodes, 0);
         }
         return $curriculumNodes;
+    }
+
+    /**
+     * helper common function to fetch the content of the unit and its components in a standard format
+     * @param Model $unit
+     * @param int $templateId // id of the homepage template used to standardize the unit
+     * @param array $curriculumnKey // what curriculum components titles exist in the component, if any
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    private function getUnitData(Model $unit, int $templateId, array $curriculumnKey)
+    {
+        /* Gather up the textboxes and extraTextboxes meta
+             */
+        $textboxData = $this->findTextboxes($templateId, $unit->getFolder()->getId());
+
+        // Learning Activities
+        $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
+            'order' => [
+                'sequence' => 'ASC',
+            ],
+        ]);
+
+        /* Get a set of rubrics that were used among all the assessment specs
+         * This also comes with all the cap ids and indicator ids
+         */
+        $rubricData = $this->findRubrics($unit->getFolder()->getId());
+
+        /* TODO Later on we can provide a list of rubrics that exist in the whole course
+         *  and diff them in some way so users can see what they haven't planned properly
+         */
+        $rubricCapabilities = array_values($rubricData['used']['capabilities']);
+
+        /* Curriculum nodes
+         * A unique set of curriculum nodes collated from various places:
+         * folders, assessments, capabilities and indicators
+         */
+        // now unused, as we are only now caring about curriculum nodes on the folder, not all children items also.
+        //$curriculumNodes = $this->findCurriculumNodes($unit, $assessments, $rubricData);
+
+        //new curriculum array structure
+        $curriculum = [
+            'nodes' => $this->getCurriculumNodes($unit),
+            'selectedNodes' => $unit->getFolder()->getCurriculumNodes()->reindex(),
+            'components' => [],
+        ];
+
+        // grab list collection of curriculum overview components on the unit page
+        $components = $this->componentInstanceMapper->findByContextAndClass(
+            'homepage',
+            $unit->getFolder()->getId(),
+            CurriculumOverviewController::class
+        );
+        foreach ($components as $component) {
+            // extract the configs.
+            $instanceConfig = $component->getConfigArray();
+            if ('' === trim($instanceConfig['componentname']['value'])) {
+                $instanceConfig['componentname']['value'] = $instanceConfig['componentname']['defaultValue'];
+            }
+            // default value it '0' so set to null for vue to work
+            // when clearing the component filter (after something was filtered) it is empty (not 0) also catch that
+            if ('0' === $instanceConfig['curriculumTreeFilter']['value'] || '' === $instanceConfig['curriculumTreeFilter']['value']) {
+                $instanceConfig['curriculumTreeFilter']['value'] = null;
+            }
+            // if we are filtering we should return the curric node
+            if ($instanceConfig['curriculumTreeFilter']['value']) {
+                $instanceConfig['curriculumTreeFilter']['value'] =
+                    $this->nodeMapper->findOneByColumnList(['id' => $instanceConfig['curriculumTreeFilter']['value'], 'enabled' => true,]);
+            }
+            $curriculum['components'][] = [
+                'componentId' => $component->getId(),
+                'heading' => $instanceConfig['componentname']['value'],
+                'filter' => $instanceConfig['curriculumTreeFilter']['value'],
+                'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
+            ];
+        }
+
+        $activitiesListRoutes = [
+            'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
+                'contextType' => 'unitspecs',
+                'contextId' => $unit->getId(),
+                'context' => $unit,
+            ]],
+            'reorder' => ["route" => "learningAssessment.postReorderAssessments", "params" => [
+                'contextType' => 'unitspecs',
+                'contextId' => $unit->getId(),
+                'context' => $unit,
+            ]],
+        ];
+
+        foreach ($activitiesListRoutes as $key => $link) {
+            if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
+                $activitiesListRoutes[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+            } else {
+                $activitiesListRoutes[$key] = null;
+            }
+        }
+
+        /* Aggregated data for each unit appears as a row in the Unit Planner
+         * on the front end - this is basically the contract between back- and
+         * front-end implementations and the basis of an api-first philosophy
+         */
+        return [
+            'id' => $unit->getId(),
+            'title' => $unit->getTitle(),
+            'homepage' => "/homepage/{$unit->getFolder()->getId()}",
+            'folderId' => $unit->getFolder()->getId(),
+            /* Textboxes in the Unit that circumstantially match ones in the Template
+             */
+            'textboxes' => $textboxData['textboxes'],
+            /* All the other random textboxes that don't match
+             */
+            'extraTextboxes' => $textboxData['extraTextboxes'],
+            /* All the assessment specs in this unit
+             */
+            'activities' => [
+                '_routes' => $activitiesListRoutes,
+                'items' => $assessments->map(new UnitAssessments(
+                    $this->routeGenerator,
+                    $this->getAuthorizer(),
+                    $this->getUser(),
+                    $this->getUser()
+                )),
+            ],
+            /* All the rubric capabilities and indicators that are in use among all
+             * the assessment specs in this unit
+             */
+            'rubricCapabilities' => $rubricCapabilities,
+            /* Curriculum data object, containing selected, and filtered curriculum nodes
+             */
+            'curriculum' => $curriculum,
+            'sequence' => $unit->getFolder()->getSequence(),
+        ];
+    }
+
+    private function getTemplateCurric(int $courseTemplateId)
+    {
+        /**
+         * Grab the list of curriculum components from the Unit Template
+         */
+        $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+        $class = CurriculumOverviewController::class;
+        $curriculumnTemplate = [];
+        $curriculumnKey = [];
+        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $courseTemplateId, $class);
+
+        foreach ($unitCurricComp as $curricComponent) {
+            if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
+                // if there is a value set for the component use that
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
+            } elseif ('' !== $curricComponent->getConfigByKey('componentname')->getDefaultValue()) {
+                // is there a system default value for the component
+                $heading = trim($curricComponent->getConfigByKey('componentname')->getDefaultValue());
+            } else {
+                // Fallback of the php default title for textbox components
+                $heading = trim(CurriculumOverviewController::DEFAULT_COMPONENT_HEADING);
+            }
+
+            /**
+             * we need to default and check if we have a valid curriculum filter, or just return null.
+             */
+            $curricFilter = $curricComponent->getConfigByKey('curriculumTreeFilter')->getValue();
+            /**
+             * the default value is '0' if we add a node and remove it it becomes '' and legacy components don't have the config so will be null
+             */
+            if ('0' === $curricFilter || '' === $curricFilter || null === $curricFilter) {
+                $curricFilter = null;
+            } else {
+                $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
+            }
+            $curriculumnTemplate[] = [
+                'heading' => $heading,
+                'filter' => $curricFilter,
+            ];
+            $curriculumnKey[] = strtolower($heading);
+        }
+        return [$curriculumnTemplate, $curriculumnKey];
     }
 }
