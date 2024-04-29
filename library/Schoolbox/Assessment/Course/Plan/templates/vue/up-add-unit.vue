@@ -6,6 +6,7 @@
 import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";
 
 const addUnitStore = useAddUnitStore();
+const hasNoName = window.Vue.ref(false);
 
 /**
  * To update the button text as the component state changes.
@@ -23,13 +24,22 @@ const addButtonText = window.Vue.computed(() => {
  */
 function onCancelSelected() {
     addUnitStore.cancel();
+    hasNoName.value = false;
 }
 
 /**
  * to add a new unit
  */
 function onAddSelected() {
-    void addUnitStore.add();
+    if (addUnitStore.isProcessing) {
+        return;
+    }
+    if (addUnitStore.name === "") {
+        hasNoName.value = true;
+    } else {
+        void addUnitStore.add();
+        hasNoName.value = false;
+    }
 }
 </script>
 
@@ -40,9 +50,19 @@ function onAddSelected() {
                 <section>
                     <fieldset class="content">
                         <legend>Add new Unit</legend>
-                        <div class="small-12 columns">
+                        <div class="small-12 columns l-mar-m--bottom">
                             <label for="name" class="required">Name</label>
-                            <input id="name" maxlength="2048" required type="text" />
+                            <input
+                                id="name"
+                                v-model="addUnitStore.name"
+                                class="f-no-margins"
+                                maxlength="2048"
+                                required
+                                type="text"
+                            />
+                            <label v-if="hasNoName" class="error f-no-margins"
+                                >Please enter a name for your new unit</label
+                            >
                         </div>
                         <div class="small-12 columns">
                             <ul class="flex-list">

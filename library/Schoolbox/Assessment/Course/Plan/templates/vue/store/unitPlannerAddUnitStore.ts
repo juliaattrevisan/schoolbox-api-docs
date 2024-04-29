@@ -26,6 +26,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const name = window.Vue.ref(""); // the name of the new unit
 
     /**
      * to display a prompt to add a curriculum
@@ -39,6 +40,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      */
     function cancel() {
         isOpen.value = false;
+        name.value = "";
     }
 
     /**
@@ -83,6 +85,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
         isOpen,
         // curriculum,
         // id,
+        name,
         prompt,
         add,
         cancel,
