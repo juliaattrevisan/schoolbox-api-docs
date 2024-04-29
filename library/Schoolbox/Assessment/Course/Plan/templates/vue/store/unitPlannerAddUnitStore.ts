@@ -1,27 +1,10 @@
 /**
- * Add a new curriculum
+ * Add a new unit
  */
 
 import { defineStore } from "pinia";
 import { useUnitPlannerStore } from "./unitPlannerStore";
-// import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
-// import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-// import type { Node } from "@schoolboxCurriculum/types/Node";
-
-// const UNSET_ID = -1;
-
-/**
- * Get the data to pass to the backend
- * @param { Node } node - the node with the fields to update
- * @returns { string } - the data to send to the backend
- */
-// function getFormData(node: Partial<Node>) {
-//     return JSON.stringify({
-//         name: node.name,
-//         code: node.code,
-//         description: node.description,
-//     });
-// }
+import type { Unit } from "../unitPlannerTypes";
 
 export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     const isProcessing = window.Vue.ref(false);
@@ -29,7 +12,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     const name = window.Vue.ref(""); // the name of the new unit
 
     /**
-     * to display a prompt to add a curriculum
+     * to display a prompt to add a unit
      */
     function prompt() {
         isOpen.value = true;
@@ -44,29 +27,72 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     }
 
     /**
-     * pass the new unit details to the backend
+     * Get the data to pass to the backend
+     * @returns {FormData} the form data
+     */
+    function getFormData() {
+        const formData = new FormData();
+        const store = useUnitPlannerStore();
+        store.units.forEach((unit) => {
+            formData.append(`unit[${unit.id}][name]`, unit.title);
+            formData.append("spawn-unit", "1");
+        });
+        formData.append("name", name.value);
+        return formData;
+    }
+
+    /**
+     * Get the new unit
+     * @param {HTMLElement} html - the html element that's used to extract the new unit details
+     * @returns {Unit} the new Unit
+     */
+    function getNewUnit(html: HTMLElement) {
+        const item = html.querySelector("[data-folder-id]") as HTMLElement;
+        const folderId = item.getAttribute("data-folder-id") as string;
+        const unit = {
+            id: item.getAttribute("data-unit-spec"),
+            title: name.value,
+            homepage: `/homepage/${newFolderId}`,
+            folderId,
+            activities: {
+                _routes: {
+                    create:
+                },
+                items: [],
+            },
+            rubricCapabilities: [],
+            textboxes: {
+                "Text Box": {
+                    body: "",
+                    id: -1,
+                }
+            }
+            extraTextboxes: 0,
+            sequence: useUnitPlannerStore().units.length + 1,
+        } as Unit;
+        return unit;
+    }
+
+    /**
+     * pass the new unit details to the backen
      */
     async function add() {
         try {
             isProcessing.value = true;
-            const response = await fetch(`course/${useUnitPlannerStore().courseId}/unitspecs/new`, {
+            const response = await fetch(`/course/${useUnitPlannerStore().courseId}/unitspecs/new`, {
                 method: "POST",
-                // headers: {
-                //     "Content-Type": "application/json",
-                // },
-                body: getFormData(curriculum.value as Partial<Node>),
+                body: getFormData(),
             });
-            const responseJson = await response.json();
-            if (response.ok) {
-                const newCurriculum: Node = responseJson as Node;
-                id.value = newCurriculum.id;
-                const nodesStore = useNodesStore();
-                nodesStore.addNewCurriculum(newCurriculum);
-                useViewNodesStore().setSelected(0);
-                isProcessing.value = false;
-                cancel();
-                return { id: newCurriculum.id, message: "Curriculum successfully added" };
-            }
+            // if (response.ok) {
+            const responseHtml = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(responseHtml, "text/html");
+            // const unit = getNewUnit(doc);
+
+            console.warn(newFolderId);
+            isProcessing.value = false;
+            cancel();
+            // }
             // throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {
             // throw new Error(error.message, error.options);
@@ -83,7 +109,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     return {
         isProcessing,
         isOpen,
-        // curriculum,
+        // unit,
         // id,
         name,
         prompt,

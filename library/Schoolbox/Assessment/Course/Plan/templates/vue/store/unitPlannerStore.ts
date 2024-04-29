@@ -13,7 +13,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unexpandedUnitHeight: number = 300; // The default unexpanded height of a unit, in px
     const dragUnitHeight: number = 80; // The height of a unit when it is being dragged, in px
 
-    let courseId = 0;
+    const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
@@ -24,7 +24,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * @param { typeof Toast } $toastEl - the toast element
      */
     function init($courseId: number, $units: Unit[], $toastEl: typeof Toast) {
-        courseId = $courseId;
+        courseId.value = $courseId;
         units.value = $units;
         toastEl.value = $toastEl;
     }
