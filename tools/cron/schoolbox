@@ -139,7 +139,8 @@ MAILTO="support@schoolbox.com.au"
 */15 * * * *    www-data    php /usr/share/schoolbox/tools/learnosity/reset-failed.php -p >> /var/log/schoolbox/learnosity-reset-failed.log 2>&1
 
 # poll processing quiz attempts every 20 minutes, just after completion of expired quizzes?
-9,29,49 * * * *    www-data     php /usr/share/schoolbox/tools/learnosity/autoscore-attempts.php -p >> /var/log/schoolbox/learnosity-autoscore-attempts.log 2>&1
+# (Jitter by 1 minute I guess)
+10,30,50 * * * *    www-data     /usr/local/bin/jitter 60 php /usr/share/schoolbox/tools/learnosity/autoscore-attempts.php -p >> /var/log/schoolbox/learnosity-autoscore-attempts.log 2>&1
 
 # deploy new credentials: sometime overnight?
 15 0 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/learnosity/deploy-credentials.php -vv >> /var/log/schoolbox/learnosity-deploy-credentials.log 2>&1
