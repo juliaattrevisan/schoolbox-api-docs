@@ -279,14 +279,14 @@ class Mapper extends BaseMapper
     /**
      * Find all attempts which are awaiting an auto-score.
      *
-     * An attempt is awaiting an auto-score if it:
-     * * has been finished
-     * * has not yet been reviewed
+     * An attempt is awaiting an auto-score if it fulfils all of these criteria:
+     * * it has been finished
+     * * it has not yet been reviewed
      *   (the instructor's review renders an auto-score redundant)
-     * * has a Learnosity reference (otherwise, no auto-score can exist)
-     * * is neither deleted, nor for a quiz which has been deleted
-     * * is in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
-     * * optionally is in `null` status
+     * * it has a Learnosity reference (otherwise, no auto-score can exist)
+     * * it is neither deleted, nor for a quiz which has been deleted
+     * * it is in status `\Schoolbox\Learning\Learnosity\Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING`; or:
+     * * optionally is in `null` status, if `$includeNullStatus` is true
      *
      * @param bool                     $includeNullStatus if true: find attempts with a `null` Learnosity status, as
      *                                                    well as `processing`: otherwise, find only attempts in
