@@ -102,8 +102,12 @@ class IndexBuilder extends BaseBuilder
     /**
      * Return an SQL condition that will be true for news articles that are currently published,
      * and false for those that are not.
-     * Note this function assumes that the comms_news_article database table can be referenced using alias 'n'.
      * See News\Mapper->getPredicatePublished().
+     *
+     * Notes:
+     *  - this function assumes that the comms_news_article database table can be referenced using alias 'n'.
+     *  - this function ignores expired_at because archived news articles should be searchable.
+     *
      * @returns string
      */
     private function getSqlConditionForCurrentlyPublished(): string
@@ -114,7 +118,6 @@ class IndexBuilder extends BaseBuilder
                 n.rejected_at IS NULL AND
                 n.accepted_at IS NOT NULL AND
                 (n.publish_at IS NOT NULL AND n.publish_at <= NOW()) AND
-                (n.expires_at IS NOT NULL AND n.expires_at > NOW()) AND
                 n.deleted_at IS NOT NULL
             )"
         );
