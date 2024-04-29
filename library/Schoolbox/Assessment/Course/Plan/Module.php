@@ -24,8 +24,11 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -45,11 +48,37 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $getPerms = new Rule\All(
+        $getCourse = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF)
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_READ,
+                    static function (array $params): int {
+                        if (isset($params['course']) && $params['course'] instanceof CourseSpecificationModel) {
+                            return $params['course']->getFolder()->getId();
+                        }
+                        throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                    },
+                    $this->getMapperFactory()->get(Access::class),
+                ),
+            )
+        );
+
+        $editCourse = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    static function (array $params): int {
+                        if (isset($params['course']) && $params['course'] instanceof CourseSpecificationModel) {
+                            return $params['course']->getFolder()->getId();
+                        }
+                        throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                    },
+                    $this->getMapperFactory()->get(Access::class),
+                ),
             )
         );
 
@@ -64,9 +93,9 @@ class Module extends BaseModule
             return $this->preloadCourse($params);
         };
 
-        $this->register('GET', '/{id:\d+}', 'getPlan', $getPerms, $preloadCourse);
+        $this->register('GET', '/{id:\d+}', 'getPlan', $getCourse, $preloadCourse);
         $this->register('GET', '/audit', 'getAudit', $superOnly);
-        $this->register('POST', '/{id:\d+}/newUnit', 'newUnit', $superOnly, $preloadCourse);
+        $this->register('POST', '/{id:\d+}/newUnit', 'newUnit', $editCourse, $preloadCourse);
     }
 
     /**
