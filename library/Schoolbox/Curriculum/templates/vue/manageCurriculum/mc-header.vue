@@ -3,7 +3,7 @@
  *
  */
 
-import { slideDown, slideUp } from "@js/util/animateUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import McAddCurriculum from "./mc-add-curriculum.vue";
@@ -20,26 +20,6 @@ function onCreateNewSelected() {
     } else {
         addCurriculumStore.prompt();
     }
-}
-
-/**
- * Slide down to show the add curriculum display
- *
- * @param { DOMElement }
- */
-async function onEnter(el, done) {
-    await slideDown(el);
-    done();
-}
-
-/**
- * Slide up on close or when the curriculum is added
- *
- * @param { DOMElement }
- */
-async function onLeave(el, done) {
-    await slideUp(el);
-    done();
 }
 </script>
 
@@ -64,7 +44,7 @@ async function onLeave(el, done) {
             </nav>
         </template>
     </div>
-    <Transition @enter="onEnter" @leave="onLeave">
+    <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <mc-add-curriculum v-if="addCurriculumStore.isOpen" />
     </Transition>
 </template>
