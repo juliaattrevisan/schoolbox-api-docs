@@ -3,10 +3,10 @@
  */
 
 import { defineStore } from "pinia";
-// import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useUnitPlannerStore } from "./unitPlannerStore";
 // import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 // import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-import type { Node } from "@schoolboxCurriculum/types/Node";
+// import type { Node } from "@schoolboxCurriculum/types/Node";
 
 // const UNSET_ID = -1;
 
@@ -47,30 +47,30 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      * pass the new unit details to the backend
      */
     async function add() {
-        // try {
-        //     isProcessing.value = true;
-        //     const response = await fetch(`${useStore().getApiEndpoint()}/`, {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: getFormData(curriculum.value as Partial<Node>),
-        //     });
-        //     const responseJson = await response.json();
-        //     if (response.ok) {
-        //         const newCurriculum: Node = responseJson as Node;
-        //         id.value = newCurriculum.id;
-        //         const nodesStore = useNodesStore();
-        //         nodesStore.addNewCurriculum(newCurriculum);
-        //         useViewNodesStore().setSelected(0);
-        //         isProcessing.value = false;
-        //         cancel();
-        //         return { id: newCurriculum.id, message: "Curriculum successfully added" };
-        //     }
-        //     throw new Error(responseJson.title, { ...responseJson });
-        // } catch (error) {
-        //     throw new Error(error.message, error.options);
-        // }
+        try {
+            isProcessing.value = true;
+            const response = await fetch(`course/${useUnitPlannerStore().courseId}/unitspecs/new`, {
+                method: "POST",
+                // headers: {
+                //     "Content-Type": "application/json",
+                // },
+                body: getFormData(curriculum.value as Partial<Node>),
+            });
+            const responseJson = await response.json();
+            if (response.ok) {
+                const newCurriculum: Node = responseJson as Node;
+                id.value = newCurriculum.id;
+                const nodesStore = useNodesStore();
+                nodesStore.addNewCurriculum(newCurriculum);
+                useViewNodesStore().setSelected(0);
+                isProcessing.value = false;
+                cancel();
+                return { id: newCurriculum.id, message: "Curriculum successfully added" };
+            }
+            // throw new Error(responseJson.title, { ...responseJson });
+        } catch (error) {
+            // throw new Error(error.message, error.options);
+        }
     }
 
     /**

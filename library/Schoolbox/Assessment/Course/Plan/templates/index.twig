@@ -1,5 +1,6 @@
 <div id="unit-planner-container">
     <unit-planner
+        :course-id="{{ course.id }}"
         course-title="{{ course.title }}"
         {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
         :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"

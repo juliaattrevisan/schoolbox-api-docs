@@ -16,6 +16,7 @@ import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
+    courseId: number;
     courseTitle: string;
     units: Unit[];
     activityTypeLocale: ActivityTypeLocale;
@@ -104,7 +105,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.units, toastEl.value!);
+    store.init(props.courseId, props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
     dragStore.init(
         props.routeFolderSequence,
