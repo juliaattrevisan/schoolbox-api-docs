@@ -570,6 +570,51 @@ class Controller extends Base
         exit(1);
     }
 
+    /**
+     * Super Only endpoint
+     * @api POST /course/plan/{courseID}/newUnit
+     * @param CourseSpecification $course
+     * @return void
+     */
+    public function newUnit(CourseSpecification $course)
+    {
+        // assume course exists.
+        // ensure the specified title is valid.
+        // create a new folder trimming the title
+        // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
+        if (!$name) {
+            $this->sendError('Could not create unit.', ['You need to give the unit a name']);
+            return;
+        }
+
+        try {
+            // Need:
+            // base config
+            // course config
+            $rolePermissions = [];
+
+            foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
+                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+            }
+
+            $folder = $this->persistFolder(
+                $name,
+                $courseSpec->getFolder()->getId(),
+                [],
+                $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                $courseSpec->getTemplate()->getUnitTemplate()->getId(),
+                $rolePermissions,
+                false,
+                []
+            );
+
+            // Persist the unit too
+            $unitSpec = $this->unitSpecificationMapper->createModel()
+                ->setFolder($folder)
+                ->setCourse($courseSpec);
+
+            $this->unitSpecificationMapper->save($unitSpec);
+    }
 
     /**
      * Find all the textboxes currently in use by $unitFolderId

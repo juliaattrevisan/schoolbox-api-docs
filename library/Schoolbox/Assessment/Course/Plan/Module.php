@@ -64,6 +64,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{id:\d+}', 'getPlan', $getPerms, $preloadCourse);
         $this->register('GET', '/audit', 'getAudit', $superOnly);
+        $this->register('POST', '/{id:\d+}/newUnit', 'newUnit', $superOnly, $preloadCourse);
     }
 
     /**
