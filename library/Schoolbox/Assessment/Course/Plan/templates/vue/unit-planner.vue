@@ -15,6 +15,7 @@ import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
+    courseTitle: string;
     units: Unit[];
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
