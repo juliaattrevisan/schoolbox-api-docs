@@ -10,6 +10,7 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
+import UpHeader from "./up-header.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
@@ -134,7 +135,7 @@ window.Vue.onUnmounted(() => {
 <template>
     <div class="row">
         <div class="small-12 island">
-            <h1>Unit Planner - {{ props.courseTitle }}</h1>
+            <up-header :course-title="props.courseTitle" />
             <dl ref="tabsEl" class="tabs">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
                     <a @click="selectedTab = tab">{{ tab.label }}</a>
