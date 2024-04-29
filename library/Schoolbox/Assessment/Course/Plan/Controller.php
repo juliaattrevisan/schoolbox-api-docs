@@ -16,6 +16,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
@@ -580,12 +581,18 @@ class Controller extends Base
     {
         // assume course exists.
         // ensure the specified title is valid.
+        $unitName = trim($this->requestPost->get('name') ?? '');
+        if (!$unitName) {
+            $problem = (new ApiProblem('Could not create unit. You need to give the unit a name'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(400);
+            return; // exit early don't try to create a new unit with no name
+        }
+
         // create a new folder trimming the title
         // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-        if (!$name) {
-            $this->sendError('Could not create unit.', ['You need to give the unit a name']);
-            return;
-        }
 
         try {
             // Need:
@@ -596,13 +603,15 @@ class Controller extends Base
             foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
+            /** @var \Schoolbox\Assessment\Course\Controller $courseController */
+            $courseController = $this->getController('course');
 
-            $folder = $this->persistFolder(
-                $name,
-                $courseSpec->getFolder()->getId(),
+            $folder = $courseController->persistFolder(
+                $unitName,
+                $course->getFolder()->getId(),
                 [],
                 $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                $courseSpec->getTemplate()->getUnitTemplate()->getId(),
+                $course->getTemplate()->getUnitTemplate()->getId(),
                 $rolePermissions,
                 false,
                 []
@@ -611,7 +620,7 @@ class Controller extends Base
             // Persist the unit too
             $unitSpec = $this->unitSpecificationMapper->createModel()
                 ->setFolder($folder)
-                ->setCourse($courseSpec);
+                ->setCourse($course);
 
             $this->unitSpecificationMapper->save($unitSpec);
     }

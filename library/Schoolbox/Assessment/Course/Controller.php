@@ -860,7 +860,7 @@ class Controller extends Base\Base
      * @throws UnexpectedValueException
      * @throws BaseMapper\DefinitionException
      */
-    private function persistFolder(
+    public function persistFolder(
         string $name,
         int $parentId,
         array $curriculumCodeIds,
