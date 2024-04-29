@@ -1,27 +1,30 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy;
 
 /**
- * Converts a Schoolbox "Exact Answer" question into its Learnosity equivalent
+ * Converts a Schoolbox "Numeric" question into its Learnosity equivalent
  * https://reference.learnosity.com/questions-api/questiontypes#shorttext
  *
- * Circumstantially almost identical to Short, main difference being the strictness
- * of its marking
+ * There isn't really a good allegory in Learnosity afaict for what we
+ * previously allowed. It was only circumstantially limited to a certain
+ * set of characters and built on Short Answer. If you were to do it in
+ * Learnosity, you'd use one of the Math Formula question types, not a
+ * weird variant of Short Answer.
  */
-class Exact extends Base implements IStrategy
+class Numeric extends Base implements IStrategy
 {
     /**
      * Corresponds to a row in our assess_luQuestionType lookup
      */
-    public const QUESTION_TYPE_ID = 15;
+    public const QUESTION_TYPE_ID = 13;
 
 
     /**
@@ -41,7 +44,7 @@ class Exact extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $answer = trim($question['_answers'][0]['answer']);
+        $answer = trim($question['_answers']);
 
         return [
             'case_sensitive' => false,
@@ -62,12 +65,17 @@ class Exact extends Base implements IStrategy
 
 
     /**
-     * @inheritDoc
-     * @param array $answer
-     * @return mixed
+     * Decompiles $answer's xml value
+     *
+     * @param \SimpleXMLElement $answers
+     * @return array
+     * @throws \RuntimeException
      */
-    public function decompileAnswer(array $answer): mixed
+    public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-        return $this->decompileNonserializedAnswer($answer);
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }

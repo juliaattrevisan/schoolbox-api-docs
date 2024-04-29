@@ -11,7 +11,8 @@ namespace Schoolbox\Learning\Learnosity\Importer;
 
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Learning\Learnosity\Helper;
-use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory as LegacyDbStrategyFactory;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory as LegacyXmlStrategyFactory;
 
 /**
  * Spawns a Learnosity-friendly payload structure for Activities,
@@ -43,10 +44,11 @@ class PayloadFactory
     /**
      * Constructor.
      *
-     * @param Factory $strategyFactory
+     * @param LegacyDbStrategyFactory|LegacyXmlStrategyFactory $strategyFactory
      */
-    public function __construct(private Strategy\Factory $strategyFactory)
-    {
+    public function __construct(
+        private LegacyDbStrategyFactory|LegacyXmlStrategyFactory $strategyFactory
+    ) {
     }
 
 

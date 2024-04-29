@@ -145,8 +145,72 @@
                  {% endif %}</h1>
          </div>
      </div>
+     {% if assessment is defined and assessment is quiz %}
+     <nav>
+         <sbx-pop-out content-id="header-options"></sbx-pop-out>
+     </nav>
+     <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+         <li>
+             <a class="icon-import" title="Import legacy XML" data-reveal-id="xmlImportModal" />Import Legacy XML</a>
+         </li>
+     </ul>
+     {% endif %}
 </div>
 
+{# Legacy Quiz XML Import
+ # We haven't really subclassed the assessment create screen like this before...
+ # To minimise master fallout I'll just inject the quiz-specific stuff right here
+ #}
+{% if assessment is defined and assessment is quiz %}
+    <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
+    <script>
+        $(function() {
+            $('[data-import]').on('click', function(event) {
+                event.preventDefault();
+
+                $('#xmlImportForm').submit().hide();
+                $('#xml-import-actions').hide();
+                $('#xml-loader').show();
+            });
+        });
+    </script>
+    <div id="xmlImportModal" class="reveal-modal" data-reveal>
+        <h2>Legacy XML Import</h2>
+
+        {% set xmlImportRoute = routeLookup('learningQuiz.postLegacyQuizImport', {
+            contextId: context.id,
+            contextType: contextType
+        }) %}
+
+        {% if xmlImportRoute %}
+        <div id="xml-loader" style="display:none">
+            <div class="loader"></div>
+            <p class="text-center">Importing legacy quiz xml...</p>
+        </div>
+
+        <form id='xmlImportForm' method="post" action="{{ xmlImportRoute }}">
+            <input type="hidden" name="contextId" value="{{ context.id }}" />
+            <input type="hidden" name="contextType" value="{{ contextType }}" />
+
+            <section>
+                <fieldset class="no-pad">
+                    <div class="small-12 columns no-pad">
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+        <div id='xml-import-actions' class="component-action">
+            <section>
+                <a class="button" data-import>
+                    Import
+                </a>
+            </section>
+        </div>
+        {% endif %}
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+{% endif %}
 
 {% if assessmentType is defined and assessmentType|length %}
     {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}

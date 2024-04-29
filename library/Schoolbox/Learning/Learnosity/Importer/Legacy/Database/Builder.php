@@ -7,17 +7,19 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Learnosity\Importer\Strategy\Factory;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory;
+use Schoolbox\Learning\Learnosity\Importer\Strategy;
 
 /**
  * Takes a given schoolbox.assess_id and fetches all the sections, questions,
  * and answers, constructing a complete array representation.
  */
-class LegacyQuizBuilder
+class Builder
 {
     /**
      * Get a particular schoolbox.assess row
@@ -91,7 +93,7 @@ class LegacyQuizBuilder
      */
     public function __construct(
         IConnector $db,
-        private Strategy\Factory $strategyFactory,
+        private \Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory $strategyFactory,
         private InlineImageConverter $inlineImageConverter,
         private LoggerInterface $logger
     ) {

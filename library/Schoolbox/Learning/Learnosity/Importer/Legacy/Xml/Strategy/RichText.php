@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy;
 
 /**
  * Converts a Schoolbox "Rich Text" question into its Learnosity equivalent
@@ -53,12 +53,17 @@ class RichText extends Base implements IStrategy
 
 
     /**
-     * @inheritDoc
-     * @param array $answer
-     * @return mixed
+     * Decompiles $answer's xml value
+     *
+     * @param \SimpleXMLElement $answers
+     * @return array
+     * @throws \RuntimeException
      */
-    public function decompileAnswer(array $answer): mixed
+    public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-        return $this->decompileNonserializedAnswer($answer);
+        return [
+            'answers' => trim((string)$answers[0]->xpath('answer')[0]->xpath('text')[0]),
+            'config' => []
+        ];
     }
 }

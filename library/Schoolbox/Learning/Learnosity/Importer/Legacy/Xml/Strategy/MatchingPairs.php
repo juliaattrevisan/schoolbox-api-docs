@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy;
 
 /**
  * Converts a Schoolbox "Matching Pairs" question into its Learnosity equivalent
@@ -38,7 +38,7 @@ class MatchingPairs extends Base implements IStrategy
         /* FIXME This should always exist but what happens if it somehow doesn't?
          *  Is that even a possibility in the fleet atm
          */
-        $possibleAnswers = $question['_answers'][0]['answer'] ?? [];
+        $possibleAnswers = $question['_answers'] ?? [];
 
         /* Compile into a learnosity-friendly struct
          */
@@ -46,8 +46,8 @@ class MatchingPairs extends Base implements IStrategy
         $correctAnswers = [];
 
         foreach ($possibleAnswers as $possibleAnswer) {
-            $left = trim($possibleAnswer->answerLeft ?? '');
-            $right = trim($possibleAnswer->answerRight ?? '');
+            $left = $possibleAnswer['label'] ?? '';
+            $right = $possibleAnswer['value'] ?? '';
 
             /* Skip left/right combinations that are meaningless
              * These weren't intended, but somehow exist in prod data
@@ -87,13 +87,33 @@ class MatchingPairs extends Base implements IStrategy
 
 
     /**
-     * @inheritDoc
-     * @param array $answer
-     * @return mixed
+     * Decompiles $answer's xml value
+     *
+     * @param \SimpleXMLElement $answers
+     * @return array
      * @throws \RuntimeException
      */
-    public function decompileAnswer(array $answer): mixed
+    public function decompileAnswer(\SimpleXMLElement $answers): array
     {
-        return $this->decompileSerializedAnswer($answer);
+        $options = [];
+
+        foreach ($answers[0]->xpath('subquestion') as $answer) {
+            $description = trim((string)$answer->xpath('text')[0]);
+            $value = trim((string)$answer->xpath('answer')[0]);
+
+            $options[] = [
+                'label' => $description,
+                'value' => $value,
+            ];
+        }
+
+        return [
+            'answers' => $options,
+            /* Sometimes config options are found here, and need to be moved up
+             */
+            'config' => [
+                'randomiseOptionOrder' => (int)($answers->xpath('shuffleanswers')[0])
+            ]
+        ];
     }
 }

@@ -28,6 +28,7 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
@@ -92,27 +93,27 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
-     * @param UserMapper $userMapper
-     * @param ErrorMapper $errorMapper
-     * @param MapperProxy $assessmentMapper
-     * @param WorkTypeMapper $workTypeMapper
-     * @param Access $access
-     * @param Transactor $transactor
-     * @param BreadcrumbFactory $bakery
-     * @param QuizMapper $quizMapper
-     * @param QuizSectionMapper $quizSectionMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
-     * @param Mapper $termMapper
-     * @param DataSource $participantDataSource
-     * @param CourseSpecificationMapper $courseSpecificationMapper
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param Replicator $replicator
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param LatestViewMapper $latestViewMapper
+     * @param UserMapper                            $userMapper
+     * @param ErrorMapper                           $errorMapper
+     * @param MapperProxy                           $assessmentMapper
+     * @param WorkTypeMapper                        $workTypeMapper
+     * @param Access                                $access
+     * @param Transactor                            $transactor
+     * @param BreadcrumbFactory                     $bakery
+     * @param QuizMapper                            $quizMapper
+     * @param QuizSectionMapper                     $quizSectionMapper
+     * @param QuizAttemptMapper                     $quizAttemptMapper
+     * @param Mapper                                $termMapper
+     * @param DataSource                            $participantDataSource
+     * @param CourseSpecificationMapper             $courseSpecificationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param Replicator                            $replicator
+     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
+     * @param LatestViewMapper                      $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param QuizAttemptMapper $attemptMapper
+     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param QuizAttemptMapper                     $attemptMapper
      */
     public function __construct(
         UserMapper $userMapper,

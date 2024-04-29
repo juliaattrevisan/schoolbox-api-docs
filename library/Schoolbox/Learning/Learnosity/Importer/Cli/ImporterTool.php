@@ -15,9 +15,9 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
-use Schoolbox\Learning\Learnosity\Importer\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
-use Schoolbox\Learning\Learnosity\Importer\LegacyQuizBuilder;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Builder;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
 use Schoolbox\Learning\Learnosity\Importer\Strategy;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -446,11 +446,11 @@ HELP;
 
         /* Used to make representations of questions and answers
          */
-        $strategyFactory = new Strategy\Factory($domain);
+        $strategyFactory = new \Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory($domain);
 
         /* Used to manufacture an array containing all the legacy quiz's contents
          */
-        $legacyQuizBuilder = new LegacyQuizBuilder(
+        $legacyQuizBuilder = new Builder(
             $this->getDatabaseInternal(),
             $strategyFactory,
             new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger()),
@@ -705,7 +705,7 @@ HELP;
      *              otherwise something went wrong and this row is still a candidate for import
      *
      * @param LockInterface $lock
-     * @param LegacyQuizBuilder $legacyQuizBuilder
+     * @param Builder $legacyQuizBuilder
      * @param BlueprintBuilder $blueprintBuilder
      * @param Api $api
      * @param array $legacyQuizIds
@@ -713,7 +713,7 @@ HELP;
      */
     private function importSmall(
         LockInterface $lock,
-        LegacyQuizBuilder $legacyQuizBuilder,
+        Builder $legacyQuizBuilder,
         BlueprintBuilder $blueprintBuilder,
         Api $api,
         array $legacyQuizIds
@@ -860,21 +860,20 @@ HELP;
     /**
      * Import large quizzes by spreading their guts out over multiple payloads
      *
-     * @param LockInterface $lock
-     * @param LegacyQuizBuilder $legacyQuizBuilder
+     * @param LockInterface    $lock
+     * @param Builder          $legacyQuizBuilder
      * @param BlueprintBuilder $blueprintBuilder
-     * @param Api $api
-     * @param array $legacyQuizIds
+     * @param Api              $api
+     * @param array            $legacyQuizIds
      * @return void
      * @throws LockRefreshException
      * @throws ValidationException
+     * @throws \DOMException
      * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
      */
     private function importLarge(
         LockInterface $lock,
-        LegacyQuizBuilder $legacyQuizBuilder,
+        Builder $legacyQuizBuilder,
         BlueprintBuilder $blueprintBuilder,
         Api $api,
         array $legacyQuizIds

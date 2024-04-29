@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer\Strategy;
+namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy;
 
 /**
  * Decide which converter to spawn

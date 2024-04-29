@@ -8,73 +8,76 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use Schoolbox\Application\WebRequest\RequestUriParser;
+use Alaress\Lumberjack\Logger;
+use Aura\Router\Exception\RouteNotFound;
+use League\Flysystem\FilesystemException;
+use LearnositySdk\Exceptions\ValidationException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\Legacy;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Twig\Error\Error;
 
 /**
  * Placeholder for the ~170 Quiz Re-write
  */
 class Controller extends AbstractController
 {
-    /** @var ErrorMapper */
-    private $errorMapper;
-
-    /** @var QuizSectionMapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestionMapper */
-    private $quizQuestionMapper;
-
-    /** @var QuizSolutionMapper */
-    private $quizSolutionMapper;
-
-    /** @var QuizAttemptMapper */
-    private $quizAttemptMapper;
-
-    /** @var QuizAnswerMapper */
-    private $quizAnswerMapper;
-
-
     /**
-     * @param Mapper                                                    $quizMapper
+     * Constructor.
+     *
+     * @param \Schoolbox\Learning\Quiz\Mapper                           $quizMapper
      * @param ErrorMapper                                               $errorMapper
      * @param QuizSectionMapper                                         $quizSectionMapper
      * @param QuizQuestionMapper                                        $quizQuestionMapper
      * @param QuizSolutionMapper                                        $quizSolutionMapper
      * @param QuizAttemptMapper                                         $quizAttemptMapper
      * @param QuizAnswerMapper                                          $quizAnswerMapper
-     * @param MapperProxy                                               $assessmentMapperProxy
+     * @param AssessmentMapperProxy                                     $assessmentMapperProxy
      * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper            $workTypeMapper
+     * @param MarkTypeMapper                                            $markTypeMapper
+     * @param \Schoolbox\Resource\Storage\Mapper                        $storageMapper
+     * @param string                                                    $learnosityVersion
+     * @param string                                                    $learnosityConsumerKey
+     * @param string                                                    $learnosityConsumerSecret
      */
     public function __construct(
-        Mapper $quizMapper,
-        ErrorMapper $errorMapper,
-        QuizSectionMapper $quizSectionMapper,
-        QuizQuestionMapper $quizQuestionMapper,
-        QuizSolutionMapper $quizSolutionMapper,
-        QuizAttemptMapper $quizAttemptMapper,
-        QuizAnswerMapper $quizAnswerMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private ErrorMapper $errorMapper,
+        private QuizSectionMapper $quizSectionMapper,
+        private QuizQuestionMapper $quizQuestionMapper,
+        private QuizSolutionMapper $quizSolutionMapper,
+        private QuizAttemptMapper $quizAttemptMapper,
+        private QuizAnswerMapper $quizAnswerMapper,
         private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
+        private \Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper $markTypeMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         parent::__construct($quizMapper);
-        $this->errorMapper = $errorMapper;
-        $this->quizSectionMapper = $quizSectionMapper;
-        $this->quizQuestionMapper = $quizQuestionMapper;
-        $this->quizSolutionMapper = $quizSolutionMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
-        $this->quizAnswerMapper = $quizAnswerMapper;
     }
 
 //    /**
@@ -224,6 +227,137 @@ class Controller extends AbstractController
 
         return $quiz;
     }
+
+
+    /**
+     * Imports a quiz into the given context via its legacy xml representation.
+     *
+     * @api POST /learning/quiz/legacyQuizImport/contextType/contextId
+     *
+     * @param AssessmentContext $context
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws Deleted
+     * @throws FilesystemException
+     * @throws MapperException
+     * @throws NotFoundExceptionInterface
+     * @throws RouteNotFound
+     * @throws \DOMException
+     * @throws \JsonException
+     * @throws ValidationException
+     * @throws Error
+     */
+    public function postLegacyQuizImport(AssessmentContext $context): void
+    {
+        /* Intentionally prefill with an instance of AssessmentContext
+         * and other POST vars the Factory assumes exist
+         */
+        $postData = array_merge($this->requestPost->getArrayCopy(), [
+            'assessmentType' => AssessmentType::TYPE_QUIZ,
+            'context'        => $context,
+            /* Legacy xml only ever supported Total Mark marktype
+             */
+            'markType'       => (string)MarkType::TYPE_TOTAL
+        ]);
+
+        /* No upload? No trabajo
+         */
+        if (!isset($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* An unusual outcome where the key might exist, but nothing else is in
+         * the way we thought - probably our mistake
+         */
+        if (!is_array($postData['attachment'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /* Milk out some of the assessment settings from the xml itself
+         */
+        try {
+            /** @var \Schoolbox\Resource\Storage\Model $file */
+            $file = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+
+            /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+            $data            = $filesystemProxy->read($file);
+        } catch (\Schoolbox\Resource\Exception $e) {
+            /* Something went wrong reading the file's contents
+             */
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
+        }
+
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* Used to segregate each school's data; used in tags and author identifiers
+         */
+        $schoolCode = $this->getConfigLoader()->get('site_school_code');
+
+        /* For converting urls
+         */
+        $server     = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $serverName = $server->getHost();
+        $domain     = (string)$server;
+
+        $api = new Api(
+            $serverName,
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            null
+        );
+
+        /* A 4-tuple of useful things we made
+         * Will likely be empty if something snapped along the way
+         */
+        $result = [];
+
+        try {
+            $result = (new Legacy\Xml\Importer(
+                $api,
+                $schoolCode,
+                $domain,
+                $this->getDi()->get('databaseInternal'),
+                $context,
+                $this->getUser(),
+                $assessmentMapperProxy,
+                $this->quizMapper,
+                $this->workTypeMapper,
+                $this->markTypeMapper,
+                $this->storageMapper
+            ))->import($data);
+
+            /* Distill anything mostly non-fatal that we found during the import process
+             */
+            $errors = $result['errors'];
+        } catch (\DomainException $e) {
+            /* Something really important snapped and halted the import process
+             */
+            $errors = [
+                $e->getMessage()
+            ];
+        }
+
+        /* Display a list of errors
+         */
+        if (\count($errors) || empty($result)) {
+            $this->response = $this->responseFromTemplate('@learningQuiz/xmlImportLog.twig', [
+                'errors' => $errors,
+            ]);
+
+            return;
+        }
+
+        $this->response = $this->redirectFound(
+            $this->routeGenerator->generate(
+                'learningAssessment.getAssessment',
+                ['assessmentId' => $result['assessment']->getId()]
+            )
+        );
+    }
+
 
 //    /**
 //     * Marks an attempt as completed
