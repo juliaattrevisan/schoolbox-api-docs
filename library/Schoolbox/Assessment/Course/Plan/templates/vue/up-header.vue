@@ -3,7 +3,9 @@
  * The Unit planner header, containing the title and functionality to add a new unit
  */
 
+import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";
+import UpAddUnit from "./up-add-unit.vue";
 
 interface Props {
     courseTitle: string;
@@ -18,6 +20,24 @@ function onCreateNewSelected() {
     if (!addUnitStore.isOpen) {
         addUnitStore.prompt();
     }
+}
+
+/**
+ * Slide down to show the add curriculum display
+ * @param { DOMElement }
+ */
+async function onEnter(el, done) {
+    await slideDown(el);
+    done();
+}
+
+/**
+ * Slide up on close or when the curriculum is added
+ * @param { DOMElement }
+ */
+async function onLeave(el, done) {
+    await slideUp(el);
+    done();
 }
 </script>
 
@@ -35,6 +55,9 @@ function onCreateNewSelected() {
             </button>
         </div>
     </div>
+    <Transition @enter="onEnter" @leave="onLeave">
+        <up-add-unit v-if="addUnitStore.isOpen" />
+    </Transition>
 </template>
 
 <style scoped></style>
