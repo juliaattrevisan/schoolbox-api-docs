@@ -21,7 +21,7 @@ use Schoolbox\User;
 
 /**
  * API for evaluating attempts, and for initiating polling of Learnosity for
- * whether an attempt is complete.
+ * whether an attempt has been scored.
  */
 class AttemptEvaluator
 {

@@ -410,7 +410,12 @@ class Helper
 
 
     /**
-     * Process the completion of an attempt by retrieving the score and updating the attempt.
+     * Process whether an attempt has been completed, by retrieving its score
+     * from Learnosity and checking that score's status.
+     *
+     * If Learnosity reports that the score's status is
+     * `self::LEARNOSITY_PROCESS_STATUS_COMPLETED`: set the score from
+     * Learnosity into `$existingAttempt`.
      *
      * Uses the (learnosityReference, attemptId) tuple so you can't
      * randomly shut down some other dude's attempt; knowing their
