@@ -3,6 +3,8 @@
  */
 
 import { defineStore } from "pinia";
+import { ToastEvent } from "@schoolboxVue/components/toast/sbxToastEvent";
+import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
@@ -31,90 +33,61 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      * @returns {FormData} the form data
      */
     function getFormData() {
-        const formData = new FormData();
-        const store = useUnitPlannerStore();
-        store.units.forEach((unit) => {
-            formData.append(`unit[${unit.id}][name]`, unit.title);
-            formData.append("spawn-unit", "1");
+        return JSON.stringify({
+            name: name.value,
         });
-        formData.append("name", name.value);
-        return formData;
     }
 
     /**
-     * Get the new unit
-     * @param {HTMLElement} html - the html element that's used to extract the new unit details
-     * @returns {Unit} the new Unit
-     */
-    function getNewUnit(html: HTMLElement) {
-        const item = html.querySelector("[data-folder-id]") as HTMLElement;
-        const folderId = item.getAttribute("data-folder-id") as string;
-        const unit = {
-            id: item.getAttribute("data-unit-spec"),
-            title: name.value,
-            homepage: `/homepage/${newFolderId}`,
-            folderId,
-            activities: {
-                _routes: {
-                    create:
-                },
-                items: [],
-            },
-            rubricCapabilities: [],
-            textboxes: {
-                "Text Box": {
-                    body: "",
-                    id: -1,
-                }
-            }
-            extraTextboxes: 0,
-            sequence: useUnitPlannerStore().units.length + 1,
-        } as Unit;
-        return unit;
-    }
-
-    /**
-     * pass the new unit details to the backen
+     * pass the new unit details to the backend
      */
     async function add() {
+        const unitPlannerStore = useUnitPlannerStore();
         try {
+            document.dispatchEvent(
+                new CustomEvent(ToastEvent.ACTIVATE, {
+                    detail: { text: "Adding..." } as ToastActivateEventDetail,
+                }),
+            );
             isProcessing.value = true;
-            const response = await fetch(`/course/${useUnitPlannerStore().courseId}/unitspecs/new`, {
+            const response = await fetch(`/course/plan/${unitPlannerStore.courseId}/newUnit`, {
                 method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
                 body: getFormData(),
             });
-            // if (response.ok) {
-            const responseHtml = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(responseHtml, "text/html");
-            // const unit = getNewUnit(doc);
-
-            console.warn(newFolderId);
-            isProcessing.value = false;
-            cancel();
-            // }
-            // throw new Error(responseJson.title, { ...responseJson });
+            if (response.ok) {
+                const newUnit = (await response.json()) as Unit;
+                unitPlannerStore.units = [...unitPlannerStore.units, newUnit];
+                isProcessing.value = false;
+                cancel();
+            } else {
+                const responseText = (await response.json()) as { title: string; type: string; status: number };
+                document.dispatchEvent(
+                    new CustomEvent(ToastEvent.TIMEOUT, {
+                        detail: { text: responseText.title, isSuccess: false } as ToastTimeoutEventDetail,
+                    }),
+                );
+            }
         } catch (error) {
-            // throw new Error(error.message, error.options);
+            document.dispatchEvent(
+                new CustomEvent(ToastEvent.TIMEOUT, {
+                    detail: { text: "There was an unexpected error", isSuccess: false } as ToastTimeoutEventDetail,
+                }),
+            );
+        } finally {
+            isProcessing.value = false;
         }
     }
-
-    /**
-     * to unset the id, called when the toast has already been displayed once
-     */
-    // function unsetId() {
-    //     id.value = UNSET_ID;
-    // }
 
     return {
         isProcessing,
         isOpen,
-        // unit,
-        // id,
         name,
         prompt,
         add,
         cancel,
-        // unsetId,
     };
 });
