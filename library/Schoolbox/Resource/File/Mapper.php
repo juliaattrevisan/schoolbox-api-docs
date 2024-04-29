@@ -207,11 +207,11 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         if ($sortColumn === 'name') {
             if ($sortDirection === 'DESC') {
                 $callback = function ($a, $b) {
-                    return strnatcasecmp($b->getTitle(), $a->getTitle());
+                    return strnatcasecmp((string)$b->getTitle(), (string)$a->getTitle());
                 };
             } else {
                 $callback = function ($a, $b) {
-                    return strnatcasecmp($a->getTitle(), $b->getTitle());
+                    return strnatcasecmp((string)$a->getTitle(), (string)$b->getTitle());
                 };
             }
             $files = $files->sortByCallback($callback, true);
