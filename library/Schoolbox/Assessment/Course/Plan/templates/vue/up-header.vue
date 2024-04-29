@@ -3,7 +3,7 @@
  * The Unit planner header, containing the title and functionality to add a new unit
  */
 
-import { slideDown, slideUp } from "@js/util/animateUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";
 import UpAddUnit from "./up-add-unit.vue";
 
@@ -21,24 +21,6 @@ function onCreateNewSelected() {
         addUnitStore.prompt();
     }
 }
-
-/**
- * Slide down to show the add curriculum display
- * @param {Element} element - The element to animate
- * @param {Function} done - Callback to call when the animation is complete
- */
-function onEnter(element: Element, done: () => void) {
-    void slideDown(element as HTMLElement).then(() => done());
-}
-
-/**
- * Slide up on close or when the curriculum is added
- * @param {Element} element - The element to animate
- * @param {Function} done - Callback to call when the animation is complete
- */
-function onLeave(element: Element, done: () => void) {
-    void slideUp(element as HTMLElement).then(() => done());
-}
 </script>
 
 <template>
@@ -55,7 +37,7 @@ function onLeave(element: Element, done: () => void) {
             </button>
         </div>
     </div>
-    <Transition @enter="onEnter" @leave="onLeave">
+    <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <up-add-unit v-if="addUnitStore.isOpen" />
     </Transition>
 </template>
