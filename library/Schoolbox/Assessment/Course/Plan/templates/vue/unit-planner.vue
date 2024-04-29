@@ -133,9 +133,9 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
+    <up-header :course-title="props.courseTitle" />
     <div class="row">
         <div class="small-12 island">
-            <up-header :course-title="props.courseTitle" />
             <dl ref="tabsEl" class="tabs">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
                     <a @click="selectedTab = tab">{{ tab.label }}</a>
