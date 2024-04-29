@@ -22,7 +22,8 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        $queryString = "
+        // Include all articles that are currently published.
+        $queryString = '
             SELECT
                 n.id,
                 n.title,
@@ -31,11 +32,8 @@ class IndexBuilder extends BaseBuilder
                 n.body AS fulltext_index1,
                 n.blurb AS fulltext_index2
             FROM comms_news_article n
-            WHERE n.deleted_at IS NULL
-            AND n.accepted_at IS NOT NULL
-            AND n.rejected_at IS NULL
-            AND n.publish_at IS NOT NULL
-        ";
+            WHERE ' . $this->getSqlConditionForCurrentlyPublished() . '
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND n.updated_at >= :fromDate';
@@ -70,15 +68,12 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
     {
-        // Not sure how news deletions should be handled:
-        // IMO articles rejected should be removed from the index,
-        // but don't know how to handle that and also deletion.
-        // I guess just delete any which are not published, either?
-        $queryString = "SELECT
+        // Remove all articles that are not currently published.
+        $queryString = 'SELECT
             n.id
             FROM comms_news_article n
-            WHERE n.deleted_at IS NOT NULL
-        ";
+            WHERE NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
+        ';
         $params      = [];
         if ($fromDate) {
             $queryString        .= ' AND n.deleted_at >= :fromDate';
@@ -102,5 +97,26 @@ class IndexBuilder extends BaseBuilder
                 null,
             );
         }
+    }
+
+    /**
+     * Return an SQL condition that will be true for news articles that are currently published,
+     * and false for those that are not.
+     * Note this function assumes that the comms_news_article database table can be referenced using alias 'n'.
+     * See News\Mapper->getPredicatePublished().
+     * @returns string
+     */
+    private function getSqlConditionForCurrentlyPublished(): string
+    {
+        return (
+            "(
+                n.submitted_at IS NOT NULL AND
+                n.rejected_at IS NULL AND
+                n.accepted_at IS NOT NULL AND
+                (n.publish_at IS NOT NULL AND n.publish_at <= NOW()) AND
+                (n.expires_at IS NOT NULL AND n.expires_at > NOW()) AND
+                n.deleted_at IS NOT NULL
+            )"
+        );
     }
 }
