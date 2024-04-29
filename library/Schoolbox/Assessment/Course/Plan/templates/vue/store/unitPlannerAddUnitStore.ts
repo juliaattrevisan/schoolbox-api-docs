@@ -3,8 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { ToastEvent } from "@schoolboxVue/components/toast/sbxToastEvent";
-import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
@@ -44,11 +43,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     async function add() {
         const unitPlannerStore = useUnitPlannerStore();
         try {
-            document.dispatchEvent(
-                new CustomEvent(ToastEvent.ACTIVATE, {
-                    detail: { text: "Adding..." } as ToastActivateEventDetail,
-                }),
-            );
+            activate("Adding...");
             isProcessing.value = true;
             const response = await fetch(`/course/plan/${unitPlannerStore.courseId}/newUnit`, {
                 method: "POST",
@@ -65,18 +60,10 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
                 cancel();
             } else {
                 const responseText = (await response.json()) as { title: string; type: string; status: number };
-                document.dispatchEvent(
-                    new CustomEvent(ToastEvent.TIMEOUT, {
-                        detail: { text: responseText.title, isSuccess: false } as ToastTimeoutEventDetail,
-                    }),
-                );
+                timeout({ text: responseText.title, isSuccess: false });
             }
         } catch (error) {
-            document.dispatchEvent(
-                new CustomEvent(ToastEvent.TIMEOUT, {
-                    detail: { text: "There was an unexpected error", isSuccess: false } as ToastTimeoutEventDetail,
-                }),
-            );
+            timeout({ text: "There was an unexpected error", isSuccess: false });
         } finally {
             isProcessing.value = false;
         }
