@@ -121,7 +121,7 @@ class Controller extends BaseController
      */
     public function getParent(string $registerCode)
     {
-        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_STUDENT_REGISTERS) ?? '');
+        $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '');
 
         /**
          * fetch both the register id / details and the admin settings for that register
