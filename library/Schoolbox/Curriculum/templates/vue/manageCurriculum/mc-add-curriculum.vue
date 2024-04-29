@@ -50,7 +50,7 @@ const isAddDisabled = window.Vue.computed(() => {
 const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
     ckeditorIdAttr,
-    isMaxCharCountExceeded
+    isMaxCharCountExceeded,
 );
 
 /**
@@ -97,7 +97,7 @@ function onCancelSelected() {
             <form>
                 <section>
                     <fieldset class="content">
-                        <legend>Add new Curriculum</legend>
+                        <legend class="l-mar-m--bottom t-fs-m">Add new Curriculum</legend>
                         <div class="small-12 columns">
                             <label for="name" class="required">Name</label>
                             <input
@@ -148,9 +148,4 @@ function onCancelSelected() {
     </div>
 </template>
 
-<style lang="scss" scoped>
-legend {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-</style>
+<style lang="scss" scoped></style>

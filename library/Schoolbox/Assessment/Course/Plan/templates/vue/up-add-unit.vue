@@ -49,7 +49,7 @@ function onAddSelected() {
             <form>
                 <section>
                     <fieldset class="content">
-                        <legend>Add new Unit</legend>
+                        <legend class="l-mar-m--bottom t-fs-m">Add new Unit</legend>
                         <div class="small-12 columns l-mar-m--bottom">
                             <label for="name" class="required">Name</label>
                             <input
@@ -93,9 +93,4 @@ function onAddSelected() {
     </div>
 </template>
 
-<style lang="scss" scoped>
-legend {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-</style>
+<style lang="scss" scoped></style>
