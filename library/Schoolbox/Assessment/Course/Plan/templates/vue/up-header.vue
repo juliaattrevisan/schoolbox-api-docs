@@ -24,20 +24,20 @@ function onCreateNewSelected() {
 
 /**
  * Slide down to show the add curriculum display
- * @param { DOMElement }
+ * @param {Element} element - The element to animate
+ * @param {Function} done - Callback to call when the animation is complete
  */
-async function onEnter(el, done) {
-    await slideDown(el);
-    done();
+function onEnter(element: Element, done: () => void) {
+    void slideDown(element as HTMLElement).then(() => done());
 }
 
 /**
  * Slide up on close or when the curriculum is added
- * @param { DOMElement }
+ * @param {Element} element - The element to animate
+ * @param {Function} done - Callback to call when the animation is complete
  */
-async function onLeave(el, done) {
-    await slideUp(el);
-    done();
+function onLeave(element: Element, done: () => void) {
+    void slideUp(element as HTMLElement).then(() => done());
 }
 </script>
 
