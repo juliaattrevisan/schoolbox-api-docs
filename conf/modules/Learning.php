@@ -62,7 +62,7 @@ class Learning extends ModuleLoader
             $this->loadModule($di, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
             $this->loadModule($di, DueworkResponseModule::class, "/{$namespace}");
             $this->loadModule($di, QuizModule::class, "/{$namespace}");
-            $this->loadModule($di, QuizAttemptModule::class, "/{$namespace}/quiz/attempt");
+            $this->loadModule($di, QuizAttemptModule::class, "/{$namespace}");
             $this->loadModule($di, MarkbookModule::class, "/{$namespace}/markbook");
             $this->loadModule($di, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
             $this->loadModule($di, Upcoming\Module::class, "/{$namespace}/due");

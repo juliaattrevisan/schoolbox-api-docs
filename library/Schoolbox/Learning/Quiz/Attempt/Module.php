@@ -14,15 +14,25 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use DomainException;
 use InvalidArgumentException;
+use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 class Module extends BaseModule
 {
@@ -47,8 +57,8 @@ class Module extends BaseModule
             return $this->preloadAttempt($params);
         };
 
-        $this->register('GET', '/{learnosityReference}', 'getModify', $instructorPerms, $preloadAttempt);
-        $this->register('POST', '/{learnosityReference}', 'postModify', $instructorPerms, $preloadAttempt);
+        $this->register('GET', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getModify', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'postModify', $instructorPerms, $preloadAttempt);
     }
 
 
@@ -97,19 +107,102 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
+     * @throws DomainException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws NotFound
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadAttempt(array $params): array
     {
+        $participantPreload = $this->preloadAssessmentAndStudent($params);
+
         try {
             $attempt = $this->getAttemptMapper()->findOneByColumnList([
+                'user_id' => $params['studentId'],
                 'learnosity_reference' => $params['learnositySessionReference']
             ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new NotFound();
         }
 
-        return [
+        return array_merge($participantPreload, [
             'attempt' => $attempt
+        ]);
+    }
+
+
+    /**
+     * Convert route params into a participant object
+     *
+     * @param array $params
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException If a specified join mapper is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws Exception If assessment is not found
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws NotFound
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadAssessmentAndStudent(array $params): array
+    {
+        try {
+            // obtain the assessment from our other preload
+            $student     = $this->getUserMapper()->findById($params['studentId']);
+            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
+        } catch (UnexpectedValueException $e) {
+            // Student isn't a participant
+            throw new NotFound();
+        } catch (MapperException $e) {
+            // either assessment or user was not found
+            throw new NotFound();
+        }
+
+        return [
+            'assessment'  => $assessment,
+            'student'     => $student, //IsParentOfStudent accesses this
+        ];
+    }
+
+
+    /**
+     * Convert route params into an assessment object
+     *
+     * @param array $params
+     * @param null|User $student If provided, only load this student's participation
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException If a specified join mapper is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws Exception If assessment is not found
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws NotFoundExceptionInterface
+     * @throws UnexpectedValueException If unable to derive project participant collections
+     */
+    protected function preloadAssessment(array $params, User $student = null): array
+    {
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
+        } catch (MapperException\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // Not a quiz: invalid
+        if (!$assessment instanceof QuizDomainObject) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'assessment' => $assessment
         ];
     }
 
@@ -162,4 +255,25 @@ class Module extends BaseModule
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
     }
+
+
+    /**
+     * @return ErrorMapper
+     * @throws InvalidArgumentException
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws InvalidArgumentException
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
 }
