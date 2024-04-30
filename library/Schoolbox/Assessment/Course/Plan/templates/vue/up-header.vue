@@ -41,5 +41,3 @@ function onCreateSelected() {
         <up-add-unit v-if="addUnitStore.isOpen" />
     </Transition>
 </template>
-
-<style scoped></style>

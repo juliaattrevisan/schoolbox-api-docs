@@ -1,6 +1,8 @@
 /**
- * Shared Vue transitions the show/hide elements
+ * Any shared Vue transitions that are used by multiple components
+ * https://vuejs.org/guide/built-ins/transition.html#javascript-hooks
  */
+
 import { slideDown, slideUp } from "@js/util/animateUtils";
 
 /**

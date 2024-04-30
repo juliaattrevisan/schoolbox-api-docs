@@ -14,9 +14,9 @@ const hasNoName = window.Vue.ref(false);
  */
 const addButtonText = window.Vue.computed(() => {
     if (addUnitStore.isProcessing) {
-        return "Adding...";
+        return "Creating...";
     }
-    return "Add Unit";
+    return "Create Unit";
 });
 
 /**
@@ -61,13 +61,14 @@ function onAddSelected() {
                                 type="text"
                             />
                             <label v-if="hasNoName" class="error f-no-margins"
-                                >Please enter a name for your new unit</label
+                                >Please enter a name for your new Unit</label
                             >
                         </div>
                         <div class="small-12 columns">
                             <ul class="flex-list">
                                 <li>
                                     <button
+                                        type="button"
                                         class="button icon-close"
                                         :disabled="addUnitStore.isProcessing"
                                         @click.prevent="onCancelSelected"
@@ -77,6 +78,7 @@ function onAddSelected() {
                                 </li>
                                 <li>
                                     <button
+                                        type="submit"
                                         class="button icon-add submit"
                                         data-test-add-unit
                                         @click.prevent="onAddSelected"
@@ -92,5 +94,3 @@ function onAddSelected() {
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped></style>
