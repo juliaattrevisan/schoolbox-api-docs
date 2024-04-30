@@ -10,6 +10,7 @@ namespace Tests\Support\Helper;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
+use PDO;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -754,7 +755,20 @@ class Api extends \Codeception\Module
         if ($articleId) {
             $articleIds = [$articleId];
         } else {
-            $articleIds = $db->grabColumnFromDatabase('comms_news_article', 'id', ['deleted_at' => null]);
+            $articleIds = $db->_getDriver()->executeQuery(
+                // Select the id of a currently published article.
+                // Query 'WHERE' conditions copied from News\IndexBuilder->getSqlConditionForCurrentlyPublished().
+                'SELECT id
+                FROM comms_news_article
+                WHERE submitted_at IS NOT NULL AND
+                rejected_at IS NULL AND
+                accepted_at IS NOT NULL AND
+                (publish_at IS NOT NULL AND publish_at <= NOW()) AND
+                deleted_at IS NULL
+                ORDER BY RAND()
+                LIMIT 1',
+                []
+            )->fetchAll(PDO::FETCH_COLUMN);
         }
         return $this->newsMapper->findById($articleIds[0]);
     }
