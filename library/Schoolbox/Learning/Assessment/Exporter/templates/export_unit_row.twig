@@ -45,14 +45,7 @@
             <a href="/homepage/{{ courseImpl.folder.id }}">
                 <h3>
                     <span class="icon-home"></span>
-                    <span
-                        {% if courseOutlineComponentIds|length == 0 %}
-                            class="del"
-                            title="This course is not linked with a course outline component. You can still import units into this course but they won't be visible on the Class homepage."
-                        {% endif %}
-                    >
-                        {{ courseImpl.folder.title }}
-                    </span>
+                    <span{% if courseOutlineComponentIds|length == 0 %} class="del" title="This course is not linked with a course outline component. You can still import units into this course but they won't be visible on the Class homepage."{% endif %}>{{ courseImpl.folder.title }}</span>
                 </h3>
             </a>
             <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
