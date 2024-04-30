@@ -76,11 +76,11 @@ class IndexBuilder extends BaseBuilder
         ';
         $params      = [];
         if ($fromDate) {
-            $queryString        .= ' AND n.deleted_at >= :fromDate';
+            $queryString .= ' AND n.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND n.deleted_at <= :toDate';
+            $queryString .= ' AND n.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
