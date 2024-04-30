@@ -14,6 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class Module extends BaseModule
 {
@@ -30,6 +33,10 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        /* Instructors only
+         */
+        $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
+
         /* Anyone can see the form
          */
         $getPerms = new Rule\All(
@@ -45,6 +52,46 @@ class Module extends BaseModule
 
         $this->register('GET', '/{learnosityReference}', 'getModify', $getPerms, null);
         $this->register('POST', '/{learnosityReference}', 'postModify', $postPerms, null);
+    }
+
+
+    /**
+     * TODO: Literally copypasta'd: how do we spoc this?
+     *  Probably think about dissolving the Learnosity/Controller and Learnosity/Module
+     *  into these Quiz* variants, since we aren't considering seriously divorcing them
+     *
+     * Prevent non-instructors from marking or modifying assessments.
+     *
+     * This uses the `IsInstructor` validator, which is the new standard for
+     * checking if a user has instructor permission over a folder.
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException
+     */
+    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsInstructor(
+                    $this->getAccess(),
+                    static function (array $params): FolderModel {
+                        if (isset($params['assessment'])) {
+                            $ctx = $params['assessment']->getContext()->getFolder();
+                        } elseif (isset($params['participant'])) {
+                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                        } elseif (isset($params['context'])) {
+                            $ctx = $params['context']->getFolder();
+                        } else {
+                            throw new NotFound('No assessment or context preloaded');
+                        }
+
+                        return $ctx;
+                    }
+                )
+            )
+        );
     }
 
 
