@@ -42,30 +42,29 @@
             <label for="import-{{ courseImpl.id }}" class="checkbox-label"></label>
         </div>
         <div class="card small-12">
-            {% if courseOutlineComponentIds|length == 0 %}
-                <a href="/homepage/{{ courseImpl.folder.id }}">
-                    <h3>
-                        <span class="icon-home"></span>
-                        <span
+            <a href="/homepage/{{ courseImpl.folder.id }}">
+                <h3>
+                    <span class="icon-home"></span>
+                    <span
+                        {% if courseOutlineComponentIds|length == 0 %}
                             class="del"
                             title="This course is not linked with a course outline component. You can still import units into this course but they won't be visible on the Class homepage."
-                        >
-                            {{ courseImpl.folder.title }}
-                        </span>
-                    </h3>
-                </a>
-                <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
+                        {% endif %}
+                    >
+                        {{ courseImpl.folder.title }}
+                    </span>
+                </h3>
+            </a>
+            <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
+            {% if courseOutlineComponentIds|length > 0 %}
+                <p class="meta">
+                    Displayed in
+                    {% for courseOutlineComponentId in courseOutlineComponentIds %}
+                        <a href="/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}">course outline</a>
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </p>
             {% endif %}
-            {% for courseOutlineComponentId in courseOutlineComponentIds %}
-                <a href="/homepage/{{ courseImpl.folder.id }}">
-                    <h3>
-                        <span class="icon-home"></span>
-                        <span>{{ courseImpl.folder.title }}</span>
-                    </h3>
-                </a>
-                <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
-                <p class="meta">Displayed in <a href="/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}">course outline</a></p>
-            {% endfor %}
         </div>
     </div>
     <div class="list-item" id="course-{{ courseImpl.id }}-dates" hidden>
