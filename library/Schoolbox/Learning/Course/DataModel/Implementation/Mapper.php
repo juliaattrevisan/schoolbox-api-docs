@@ -140,12 +140,8 @@ class Mapper extends AbstractCourseMapper
         // Hydrate course implementation folders so that class codes will be available.
         $folderIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getFolder()->getId());
         $folders = $this->getJoinMapper('folder')->findByColumn('id', $folderIds);
-        $foldersByFolderId = [];
-        foreach ($folders as $folder) {
-            $foldersByFolderId[$folder->getId()] = $folder;
-        }
         foreach ($courseImpls as $courseImpl) {
-            $courseImpl->setFolder($foldersByFolderId[$courseImpl->getFolder()->getId()]);
+            $courseImpl->setFolder($folders->getBy('id', $courseImpl->getFolder()->getId()));
         }
 
         if ($loadUnits) {
