@@ -57,14 +57,14 @@
                 <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
             {% endif %}
             {% for courseOutlineComponentId in courseOutlineComponentIds %}
-                <a href="/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}">
+                <a href="/homepage/{{ courseImpl.folder.id }}">
                     <h3>
                         <span class="icon-home"></span>
                         <span>{{ courseImpl.folder.title }}</span>
                     </h3>
                 </a>
                 <p class="meta">Course imported on {{ courseImpl.createdAt.long }}</p>
-                <p class="meta">Displayed in course outline</p>
+                <p class="meta">Displayed in <a href="/homepage/{{ courseImpl.folder.id }}#component{{ courseOutlineComponentId }}">course outline</a></p>
             {% endfor %}
         </div>
     </div>
