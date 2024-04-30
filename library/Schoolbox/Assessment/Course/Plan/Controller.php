@@ -289,7 +289,7 @@ class Controller extends Base
                 }
                 $curriculum['components'][] = [
                     'componentId' => $component->getId(),
-                    'heading' => $instanceConfig['componentname']['value'],
+                    'heading' => trim($instanceConfig['componentname']['value']),
                     'filter' => $instanceConfig['curriculumTreeFilter']['value'],
                     'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
                 ];
@@ -547,7 +547,8 @@ class Controller extends Base
          */
         $textQuery->execute(array_merge(
             [
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY],
+                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY
+            ],
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
         while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {

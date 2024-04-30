@@ -137,7 +137,7 @@ function getColumns(
             ...newColumnBase,
             id: `${columnTypeID}-${columnId}`,
             type: columnTypeID, // Add the missing 'type' property
-            label: component.heading,
+            label: component.heading.trim(), // Ignore trailing or leading whitespace
         });
     });
 }

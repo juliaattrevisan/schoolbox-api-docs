@@ -111,7 +111,7 @@ function onContentClicked(event: MouseEvent) {
 function getCurriculumComponent() {
     // loop through the curriculum components on the unit, matching the component heading to the column label
     const matchedComponent = props.unit.curriculum.components.find(
-        (component) => component.heading === props.column.label,
+        (component) => component.heading.trim() === props.column.label.trim(), // Ignore trailing or leading whitespace
     );
     if (matchedComponent) {
         return matchedComponent;
