@@ -14,8 +14,14 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class Module extends BaseModule
@@ -37,21 +43,12 @@ class Module extends BaseModule
          */
         $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
 
-        /* Anyone can see the form
-         */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
+        $preloadAttempt = function ($params) {
+            return $this->preloadAttempt($params);
+        };
 
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
-        );
-
-        $this->register('GET', '/{learnosityReference}', 'getModify', $getPerms, null);
-        $this->register('POST', '/{learnosityReference}', 'postModify', $postPerms, null);
+        $this->register('GET', '/{learnosityReference}', 'getModify', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/{learnosityReference}', 'postModify', $instructorPerms, $preloadAttempt);
     }
 
 
@@ -96,6 +93,28 @@ class Module extends BaseModule
 
 
     /**
+     * Preloads an attempt via its learnosity reference identifier
+     *
+     * @param array $params
+     * @return array
+     */
+    protected function preloadAttempt(array $params): array
+    {
+        try {
+            $attempt = $this->getAttemptMapper()->findOneByColumnList([
+                'learnosity_reference' => $params['learnositySessionReference']
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'attempt' => $attempt
+        ];
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function buildController(): Base
@@ -110,5 +129,37 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
+     * @return object|AssessmentMapperProxy
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
+    }
+
+
+    /**
+     * @return Mapper|\Schoolbox\Learning\Quiz\Attempt\Mapper
+     * @throws InvalidArgumentException
+     */
+    protected function getAttemptMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
+    }
+
+
+    /**
+     * @return Access
+     * @throws InvalidArgumentException
+     */
+    protected function getAccess()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getMapperFactory()->get(Access::class);
     }
 }
