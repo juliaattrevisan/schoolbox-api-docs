@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Url\Factory;
 
@@ -31,6 +32,13 @@ class RepairBrokenTool extends CliTool\App
      */
     private const OPT_LONG_ASSESSMENT = 'assessment:';
 
+    /**
+     * --repair
+     *
+     * repair the specified assessment
+     */
+    private const OPT_LONG_REPAIR = 'repair';
+
     private API $api;
 
     /** @inheritdoc */
@@ -38,7 +46,8 @@ class RepairBrokenTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_ASSESSMENT
+            self::OPT_LONG_ASSESSMENT,
+            self::OPT_LONG_REPAIR,
         ];
     }
 
@@ -66,9 +75,9 @@ class RepairBrokenTool extends CliTool\App
             echo <<<HELP
 
 Confirm with learnosity if the specified assessment contains any items, or searches all assessments for those with missing items.
-If specified with [TODO:] will purge the learnosity reference for quizzes with no learnosity items, and reimports. if it still has no learnosity items, displays error.
+If specified with --repair will purge the learnosity reference for quizzes with no learnosity items, and reimports. if it still has no learnosity items, displays error.
 
-Usage: repairBroken.php --assessment=... -p [-vvv]
+Usage: repairBroken.php --assessment=... -p --repair [-vvv]
 
 
 HELP;
@@ -95,7 +104,14 @@ HELP;
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
         if ('' !== $assessmentId) {
-            $query = $this->getDatabaseInternal()->executeQuery("SELECT title, learnosity_reference from assess where assessment_id = ? AND availability = 'assess' and learnosity_reference is not NULL LIMIT 1", [$assessmentId]);
+            $query = $this->getDatabaseInternal()->executeQuery(
+                "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
+                        FROM assess
+                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
+                        LIMIT 1",
+                ['assessmentId' => $assessmentId]
+            );
             // if no results... was this a quiz?
             if (!$query->rowCount()) {
                 $this->getLogger()->error("Not a Quiz, please confirm the Assessment ID");
@@ -106,11 +122,34 @@ HELP;
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) successfully has learnosity items", $row['title'], $assessmentId));
             } else {
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $assessmentId, $row['learnosity_reference']));
+                if (null === $row['assess_section.assess_id']) {
+                    $this->getLogger()->notice("Quiz build in learnosity, unable to re import. Manual work is required... Good luck...");
+                    exit;
+                }
+                // fix this?
+                if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+                    if ($this->perform()) {
+                        $this->getLogger()->notice("Repairing...");
+                        $this->getDatabaseInternal()->executeQuery("UPDATE assess SET learnosity_reference = null WHERE assessment_id = :assessmentId LIMIT 1", ['assessmentId' => $assessmentId]);
+                    } else {
+                        $this->getLogger()->notice("Planning to repair...");
+                        $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $row['title'], $assessmentId));
+                    }
+                    $app = new ImporterTool();
+                    $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+                    (new CliTool\Kernel($app, $options))->runApp();
+                }
             }
         } else {
             $brokenQuizze = 0;
             // check all learnosity references
-            $query = $this->getDatabaseInternal()->executeQuery("SELECT assessment_id, title, learnosity_reference from assess where availability = 'assess' and learnosity_reference is not NULL");
+            $query = $this->getDatabaseInternal()->executeQuery(
+                "SELECT assessment_id, assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
+                        FROM assess
+                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        WHERE availability = 'assess' AND learnosity_reference IS NOT NULL"
+            );
             $quizCount = $query->rowCount();
             $this->getLogger()->debug(sprintf("Found: %s quizzes, checking...", $quizCount));
             while ($row = $query->fetch()) {
@@ -118,6 +157,9 @@ HELP;
                 if (!$this->hasItems($row['learnosity_reference'])) {
                     $brokenQuizze++;
                     $this->getLogger()->debug(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
+                    if (null === $row['assess_section.assess_id']) {
+                        $this->getLogger()->notice("Quiz build in learnosity, unable to re import. Manual work is required... Good luck...");
+                    }
                 }
             }
             $this->getLogger()->notice(
