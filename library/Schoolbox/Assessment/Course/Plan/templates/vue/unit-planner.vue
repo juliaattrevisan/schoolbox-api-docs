@@ -67,6 +67,7 @@ function updateScrollPosition(): void {
  * @returns {void}
  */
 function updateContainerHeight(): void {
+    console.warn("updateContainerHeight");
     if (!tabsEl.value || !unitPlannerContainerEl.value) {
         containerHeight.value = window.innerHeight;
         return;
@@ -117,7 +118,7 @@ window.Vue.onMounted(() => {
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
-    resizeObserver.value.observe(document.querySelector("#container")!);
+    resizeObserver.value.observe(document.querySelector("#unit-planner-container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
