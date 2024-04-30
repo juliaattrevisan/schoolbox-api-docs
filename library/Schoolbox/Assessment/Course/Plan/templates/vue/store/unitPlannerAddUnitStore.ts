@@ -1,5 +1,5 @@
 /**
- * Add a new unit
+ * Add a new unit, also contains the prompt to open/close the new unit display
  */
 
 import { defineStore } from "pinia";
@@ -56,7 +56,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
             if (response.ok) {
                 const newUnit = (await response.json()) as Unit;
                 unitPlannerStore.units = [...unitPlannerStore.units, newUnit];
-                timeout({ text: "Unit added" });
+                timeout({ text: "Unit created" });
                 cancel();
             } else {
                 const responseText = (await response.json()) as { title: string; type: string; status: number };
