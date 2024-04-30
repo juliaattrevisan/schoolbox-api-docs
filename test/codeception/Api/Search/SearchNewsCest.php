@@ -25,7 +25,6 @@ class SearchNewsCest
 
     public function _before(ApiTester $i)
     {
-        // rely on an existing assessment for now
         $this->article = $i->getExistingNewsArticle(null);
     }
 
