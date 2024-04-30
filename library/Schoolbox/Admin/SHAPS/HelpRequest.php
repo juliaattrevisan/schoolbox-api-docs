@@ -306,7 +306,7 @@ class HelpRequest
                         $data = json_decode($e->getResponse()->getBody()->getContents(), true);
                         if (!is_array($data)) {
                             $code = '500';
-                            $message = 'Unexpected response from from help.schoolbox.cloud while provisioning users.';
+                            $message = 'Unexpected response from help.schoolbox.cloud while provisioning users.';
                         } else {
                             foreach ($data as $key => $failedUserData) {
                                 $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
