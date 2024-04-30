@@ -33,6 +33,7 @@ use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
+use Schoolbox\Learning\Quiz\Attempt\Module as QuizAttemptModule;
 use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Student\Module as StudentCourseModule;
 use Schoolbox\Learning\Upcoming;
@@ -61,6 +62,7 @@ class Learning extends ModuleLoader
             $this->loadModule($di, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
             $this->loadModule($di, DueworkResponseModule::class, "/{$namespace}");
             $this->loadModule($di, QuizModule::class, "/{$namespace}");
+            $this->loadModule($di, QuizAttemptModule::class, "/{$namespace}/quiz/attempt");
             $this->loadModule($di, MarkbookModule::class, "/{$namespace}/markbook");
             $this->loadModule($di, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
             $this->loadModule($di, Upcoming\Module::class, "/{$namespace}/due");
