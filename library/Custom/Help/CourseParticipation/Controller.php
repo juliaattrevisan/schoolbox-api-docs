@@ -369,7 +369,7 @@ class Controller extends Base
             // Advise client of error to speed debugging.
             $this->sendGenericStatus(
                 self::STATUS_SERVER_ERROR,
-                "Role '" . Handler::DEFAULT_PARTICIPANT_ROLE_NAME . "' does not exist on the Help instance."
+                "Role '" . Handler::DEFAULT_PARTICIPANT_ROLE_NAME . "' does not exist on help.schoolbox.cloud."
             );
             return;
         }
@@ -382,7 +382,7 @@ class Controller extends Base
             // Advise client of error to speed debugging.
             $this->sendGenericStatus(
                 self::STATUS_SERVER_ERROR,
-                "No campus with ID " . Handler::PARTICIPANT_CAMPUS . " exists on the Help instance."
+                "No campus with ID " . Handler::PARTICIPANT_CAMPUS . " exists on help.schoolbox.cloud."
             );
             return;
         }
