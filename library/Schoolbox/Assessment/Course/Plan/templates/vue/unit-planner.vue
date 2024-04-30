@@ -67,7 +67,6 @@ function updateScrollPosition(): void {
  * @returns {void}
  */
 function updateContainerHeight(): void {
-    console.warn("updateContainerHeight");
     if (!tabsEl.value || !unitPlannerContainerEl.value) {
         containerHeight.value = window.innerHeight;
         return;
