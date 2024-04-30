@@ -118,7 +118,7 @@ class IndexBuilder extends BaseBuilder
                 n.rejected_at IS NULL AND
                 n.accepted_at IS NOT NULL AND
                 (n.publish_at IS NOT NULL AND n.publish_at <= NOW()) AND
-                n.deleted_at IS NOT NULL
+                n.deleted_at IS NULL
             )"
         );
     }
