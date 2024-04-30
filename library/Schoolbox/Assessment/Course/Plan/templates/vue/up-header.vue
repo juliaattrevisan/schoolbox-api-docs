@@ -14,9 +14,9 @@ const props = defineProps<Props>();
 const addUnitStore = useAddUnitStore();
 
 /**
- * To show / hide the add unit display
+ * To show the add unit display
  */
-function onCreateNewSelected() {
+function onCreateSelected() {
     if (!addUnitStore.isOpen) {
         addUnitStore.prompt();
     }
@@ -31,7 +31,7 @@ function onCreateNewSelected() {
                 class="button icon-add"
                 data-interaction="add-unit"
                 data-test-add-unit
-                @click.prevent="onCreateNewSelected"
+                @click.prevent="onCreateSelected"
             >
                 Create Unit
             </button>
