@@ -95,9 +95,6 @@
 
         <div id="{{ createAttemptIdBase }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
             <h2>Create score for {{ participant.user.fullname }}</h2>
-            <div data-alert="" class="alert-box highlight">
-                This form is for testing only: this may not exist in the final product.
-            </div>
             <form action="{{ routeLookup(
                 'learningAssessment.postCreateResponse',
                 {assessmentId: participant.assessable.id, studentId: participant.user.id })
