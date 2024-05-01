@@ -53,6 +53,9 @@ class Registry
             //   oAuth/OIDC provider
             CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
             CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':',
+
+            // ClickView (Homepage Component) cache
+            'component.homepage.clickview:' . INSTANCE_ID . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [

@@ -2028,6 +2028,22 @@ abstract class Kernel
             )
         );
 
+        // ClickView homepage component cache for storing URL responses from the ClickView API
+        $di->set(
+            'component.homepage.clickview.cache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                        )
+                    );
+                }
+            )
+        );
+
         // Filesystems
         $di->set(
             'filesystem.storage',
