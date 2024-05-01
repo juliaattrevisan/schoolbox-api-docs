@@ -172,8 +172,6 @@ abstract class SectionAssessmentAbstract
         /** @var User[] $classTeacherCache Indexed by `section`.`sisSourceId` */
         $classTeacherCache = [];
 
-        $this->schoolboxDb->beginTransaction();
-
         foreach ($coursesSectionData as $courseCanvasId => $courseSectionsData) {
             $this->log->info("Processing Canvas Course '{$courseSectionsData['name']}' (CanvasId: $courseCanvasId)");
             try {
@@ -183,8 +181,11 @@ abstract class SectionAssessmentAbstract
                 continue;
             }
             if (!array_key_exists($courseCanvasId, $coursesAssessmentData)) {
+                $this->log->debug(sprintf("No assessments to Sync, moving on..."));
                 continue;
             }
+
+            $this->log->info(sprintf("Count of assessments in course: %s", count($coursesAssessmentData[$courseCanvasId])));
             foreach ($coursesAssessmentData[$courseCanvasId] as $assessmentCanvasId => $assessment) {
                 /* We need to examine the Canvas assignment/quiz and assignment-overrides to determine:
                  * - What class folders does this assignment/quiz need to be copied to?
@@ -374,7 +375,7 @@ abstract class SectionAssessmentAbstract
                 // sync marks
                 if (!$this->courseSectionBridge->syncCanvasMarks()) {
                     $this->log->info('Skipping syncing Canvas Submissions');
-                    return;
+                    continue;
                 }
 
                 $this->log->notice("Synchronising Canvas Submissions");
@@ -384,7 +385,6 @@ abstract class SectionAssessmentAbstract
 
         $this->deleteUnSynchronisedAssessableImpl($assessmentImplIdSynchronised);
         $this->deleteUnSynchronisedAssessablePlans($this->getCandidatePlanIds(), array_keys($plansSynchronised));
-        $this->schoolboxDb->commit();
         $this->printCounts();
     }
 

@@ -131,10 +131,12 @@ class SectionAssignment extends SectionAssessmentAbstract
     protected function loadCanvasAssessmentAndOverrideData(array $sectionSisSourceIds): array
     {
         if (!count($sectionSisSourceIds)) {
+            $this->log->debug("No canvas section id, exit early");
             return [];
         }
         $assignmentCanvasIds = $this->getAssignmentCanvasIds();
         if (!count($assignmentCanvasIds)) {
+            $this->log->debug("No canvas assessments in schoolbox, exit early");
             return [];
         }
 

@@ -210,6 +210,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         foreach ($coursesData as $courseCanvasId => $courseData) {
             $pb             = $this->courseBridge->equalsCanvasCourse($courseCanvasId);
             $unitSpecFolder = $this->folderMapper->findOneByPredicates($pb);
+            $this->log->debug(sprintf("Importing Course Assignments into Unit: '%s'", $unitSpecFolder->getTitle()));
 
             foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
                 if ($assignmentData['points_possible'] > 999) {
