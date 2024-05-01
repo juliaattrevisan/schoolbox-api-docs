@@ -595,7 +595,7 @@ class Helper
             // item, as well as in "feedback".
             $feedbackFields = [
                 'mark'           => $row['mark'],
-                'normalisedMark' => (float)$row['norm_mark'],
+                'normalisedMark' => is_numeric($row['norm_mark']) ? (float)$row['norm_mark'] : null,
                 'comment'        => $row['comment'],
                 'date'           => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'instructor'     => $row['reviewer_id'] ? [
