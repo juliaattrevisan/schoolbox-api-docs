@@ -197,7 +197,7 @@ class Controller extends Base
         $model           = $this->mapper->findById($model->getId());
         $translatedModel = $this->translateModelToArray($model);
         if (isset($newClientSecret)) {
-            $translatedModel = $translatedModel + ['client_secret' => $newClientSecret];
+            $translatedModel = $translatedModel + ['clientSecret' => $newClientSecret];
         }
         $this->response = $this->responseAsJson($translatedModel);
     }
