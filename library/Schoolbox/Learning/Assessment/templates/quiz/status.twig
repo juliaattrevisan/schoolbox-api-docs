@@ -63,6 +63,9 @@
 
     {% set pActionCount = (pActionSummary ? 1 : 0) %}
 
+    {# A discriminator for tabindexes #}
+    {% set inputNo = 1 %}
+
     {# Progress icon
      # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
      # The green dot/grey square/oj diamond
@@ -240,6 +243,34 @@
                 {% endif %}
             {% endset %}
         {% endapply %}
+
+        {# Quizzes now support Submission States #}
+        <div class="content">
+            <div class="row">
+                {# Quiz always has a Mark Type (it's mandatory) #}
+                <div class="small-12 medium-3 column">
+                    <label>{{ locale.grades.proper }}
+                        {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                            participant: participant,
+                            feedback:    participant.findMostRecentInstructorGivenFeedback,
+                            markScheme:  assessment.markScheme,
+                            tabIndex:    loop.index0 + inputNo,
+                            errors:      errors ?? [],
+                            readonly:    false
+                        } only %}
+                        {% set inputNo = inputNo + 1 %}
+                    </label>
+                </div>
+                <div class="small-12 medium-9 column">
+                    {% include '@learningAssessment/quiz/comment.twig' with {
+                        feedback:       participant.findMostRecentInstructorGivenFeedback,
+                        participant:    participant,
+                        tabIndex:       loop.index0 + inputNo
+                    } only %}
+                    {% set inputNo = inputNo + 1 %}
+                </div>
+            </div>
+        </div>
 
         {% include '@learningAssessment/fragments/actionBar.twig' with {
             actionStyle:  actionStyle,

@@ -170,7 +170,9 @@ class Controller extends Assessment\Controller
      * This place is Staff Only
      *
      * @api GET /learning/assessment/:assessmentId/status
+     *
      * @param IAssessable $assessment
+     * @throws ApiException
      * @throws DefinitionException
      * @throws Deleted
      * @throws DomainException
@@ -180,7 +182,9 @@ class Controller extends Assessment\Controller
      * @throws PDOException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @throws ValidationException
      * @throws \InvalidArgumentException
+     * @throws \JsonException
      * @throws \LogicException
      */
     public function getStatus(IAssessable $assessment): void
@@ -212,7 +216,9 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
-
+            /* Quizzes now support Submission States
+             */
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz
              */
