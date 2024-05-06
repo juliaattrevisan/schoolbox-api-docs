@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
-use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Url\Factory;
 
 /**
@@ -56,7 +55,7 @@ class RepairBrokenTool extends CliTool\App
      * @param string $learnosityReference
      * @return bool
      */
-    private function hasItems(string $learnosityReference, ?string $title = null): bool
+    private function hasItems(string $learnosityReference): bool
     {
         $this->getLogger()->debug(sprintf('Polling learnosity to check if it has items: %s', $learnosityReference));
         $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
@@ -73,7 +72,7 @@ class RepairBrokenTool extends CliTool\App
         $title = $activity['title'] ?? null;
         $items = $activity['data']['items'] ?? null;
         if (null === $title) {
-            $this->getLogger()->debug("learnosity activity has no title... probably good to reimport.");
+            $this->getLogger()->debug("learnosity activity has no title... probably safe to reimport.");
         }
         if (null !== $title && null === $items) {
             $this->getLogger()->debug("learnosity activity has title, but no items... school may have removed the items, manually?");
@@ -96,6 +95,8 @@ Confirm with learnosity if the specified assessment contains any items, or searc
 If specified with --repair will purge the learnosity reference for quizzes with no learnosity items, and reimports. if it still has no learnosity items, displays error.
 
 Usage: repairBroken.php --assessment=... -p --repair [-vvv]
+To scan: repairBroken.php (will give summary at the end)
+To Repair: repairBroken.php --assessment=... -p --repair (single assessment at a time)
 
 
 HELP;
@@ -212,9 +213,5 @@ HELP;
                 sprintf("%s quizzes scanned, %s quizzes broken", $quizCount, $brokenQuizze)
             );
         }
-
-        // fetch learnosity reference
-        // check if missing items?
-        // if perform, clear and re import
     }
 }
