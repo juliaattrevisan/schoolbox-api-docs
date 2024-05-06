@@ -234,48 +234,13 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      */
     public function reviewResponse($page, $attemptId, $question_id)
     {
-        // Need the user which took the survey, not the current user?
-        $attemptHandler = new Assess_Attempt();
-        $attempt        = $attemptHandler->getByID($attemptId);
-        $attemptUser    = $this->loadUser($attempt['user_id']);
-        $externalUser   = new \Schoolbox\External\User();
-        $externalUser->loadChildren([$attemptUser]);
-
-        $children = $attemptUser->getChildren() ?? [];
-        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-        if (count($children) > 0) {
-            $page->setVar(
-                [
-                    'RESPONSE_ID'      => $existing['response_id'],
-                    'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-                    'REVIEWED_MARKS'   => $existing['mark'],
-                ]
-            );
-
-            foreach ($children as $child) {
-                $page->setVar(
-                    [
-                        'ACTUAL_CORRECT_VALUE' => '',
-                        'ANSWER_VALUE'         => $child->getId(),
-                        'ANSWER_DESCRIPTION'   => Scrub::text($child->getFullName()),
-                    ]
-                );
-
-                $isChecked = false;
-                if ($existing['response'] && $child->getId() === (int)($existing['response'])) {
-                    $isChecked = true;
-                }
-                $page->setVar(
-                    [
-                        'ANSWER_OPTION_STATUS' => $isChecked ? 'evaluation-selected-answer-option' : '',
-                        'ANSWER_CHECKED'       => $isChecked ? 'checked' : '',
-                    ]
-                );
-                $page->parse('answerOption_block', 'answerOption', true);
-            }
-        } else {
-            $page->setVar('answerOption_block', '');
-        }
+        $existing      = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $currentAnswer = $this->getByQuestionID($question_id);
+        $page->setVar([
+            'ANSWER_ID'   => $currentAnswer['answer_id'],
+            'ANSWER'      => Scrub::text($existing['response']),
+            'RESPONSE_ID' => $existing['response_id'],
+        ]);
     }
 
     /**
