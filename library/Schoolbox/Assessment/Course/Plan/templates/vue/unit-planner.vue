@@ -105,6 +105,7 @@ window.Vue.watch(
     { once: true },
 );
 
+// Scroll to the bottom of the container when a new unit is added to ensure it is visible
 window.Vue.watch(
     () => store.unitCount,
     (newCount, oldCount) => {
