@@ -94,11 +94,18 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      */
     public function saveResponse($data)
     {
+        // Convert answer to a standard date format,
+        // either with or without a time component?
+        try {
+            $dateObject = Alaress_Date_Format::newLocal($data['answer']);
+        } catch (InvalidArgumentException $e) {
+            $dateObject = null;
+        }
         return parent::saveResponseInternal(
             $data['attempt_id'],
             $data['section_id'],
             $data['question_id'],
-            $data['answer'] ?? null,
+            $dateObject?->toRfc3339String(),
         );
     }
 
@@ -234,11 +241,23 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      */
     public function reviewResponse($page, $attemptId, $question_id)
     {
-        $existing      = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $answer   = '';
+        if ($existing['response'] ?? null) {
+            try {
+                $existingDate = new Alaress_Date_Format(
+                    $existing['response'],
+                    [DateTimeInterface::RFC3339, DateTimeInterface::RFC3339_EXTENDED],
+                );
+                $answer = $existingDate->getLocal();
+            } catch (InvalidArgumentException $e) {
+                // noop
+            }
+        }
         $currentAnswer = $this->getByQuestionID($question_id);
         $page->setVar([
             'ANSWER_ID'   => $currentAnswer['answer_id'],
-            'ANSWER'      => Scrub::text($existing['response']),
+            'ANSWER'      => Scrub::text($answer),
             'RESPONSE_ID' => $existing['response_id'],
         ]);
     }
