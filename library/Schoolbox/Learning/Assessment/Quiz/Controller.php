@@ -29,7 +29,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
@@ -38,6 +37,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -97,27 +97,32 @@ class Controller extends Assessment\Controller
     /**
      * Controller constructor.
      *
-     * @param UserMapper                            $userMapper
-     * @param ErrorMapper                           $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param BreadcrumbFactory                     $bakery
-     * @param QuizMapper                            $quizMapper
-     * @param QuizSectionMapper                     $quizSectionMapper
-     * @param QuizAttemptMapper                     $quizAttemptMapper
-     * @param Mapper                                $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param Replicator                            $replicator
-     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param QuizMapper $quizMapper
+     * @param QuizSectionMapper $quizSectionMapper
+     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator $replicator
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
-     * @param QuizAttemptMapper                     $attemptMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param QuizAttemptMapper $attemptMapper
+     * @param StateMapper $stateMapper
+     * @param \Schoolbox\Url\Factory $urlFactory
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
      */
     public function __construct(
         UserMapper $userMapper,
@@ -141,6 +146,7 @@ class Controller extends Assessment\Controller
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private StateMapper $stateMapper,
         private \Schoolbox\Url\Factory $urlFactory,
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
@@ -268,9 +274,10 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
             /* Quizzes now support Submission States
+             * Annoyingly, Submission States are in the $errors array...
              */
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'errors' => [],
+            'errors' => $this->stateMapper->listDisplayValues(),
             /* Each guy's maximum available marks
              */
             'maxMarks' => $maxMarks,
