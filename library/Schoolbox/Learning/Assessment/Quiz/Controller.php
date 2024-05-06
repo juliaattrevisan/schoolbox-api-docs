@@ -71,30 +71,6 @@ use UnexpectedValueException;
 class Controller extends Assessment\Controller
 {
     /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
-
-
-    /**
-     * @var QuizSectionMapper
-     */
-    private $quizSectionMapper;
-
-
-    /**
-     * @var QuizAttemptMapper
-     */
-    private $quizAttemptMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
      * Controller constructor.
      *
      * @param UserMapper $userMapper
@@ -132,15 +108,15 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
-        QuizMapper $quizMapper,
-        QuizSectionMapper $quizSectionMapper,
-        QuizAttemptMapper $quizAttemptMapper,
+        private QuizMapper $quizMapper,
+        private QuizSectionMapper $quizSectionMapper,
+        private QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
@@ -170,10 +146,6 @@ class Controller extends Assessment\Controller
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper
         );
-        $this->quizMapper        = $quizMapper;
-        $this->quizSectionMapper = $quizSectionMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
-        $this->folderMapper      = $folderMapper;
     }
 
 
