@@ -340,6 +340,7 @@ class ConfigMapper extends Mapper
         self::NAME_SUMMATIVE_REPORT_ENABLED,
         self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
         self::NAME_OAUTH_ENABLE_SSO,
+        self::NAME_MAIL_ENABLED,
     ];
 
     /**
