@@ -177,7 +177,8 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
     }
 
     /**
-     * Graph the results for this answer type
+     * Parent's child answers aren't graphable: at least, no method has been
+     * specified for graphing them.
      *
      * @param SitePage $page
      * @param array $currentQuestion
@@ -185,8 +186,9 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      */
     public function graphResults($page, $currentQuestion)
     {
-        $graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
-        $graph->graph();
+        $componentHandle = 'temp' . $currentQuestion['question_id'];
+        $page->setFile($componentHandle, $this->getGraphTemplateFile());
+        $page->parse('graph_block', $componentHandle);
     }
 
     /**
