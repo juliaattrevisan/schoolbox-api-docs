@@ -227,6 +227,7 @@ class Controller extends Assessment\Controller
             } else {
                 /* TODO Derive from learnosity atm
                  *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+                 *   This only matters when it's a Total Mark markscheme: everything else is out of 100
                  */
                 $maxMarks[$participant->getUser()->getId()] = 99;
             }
