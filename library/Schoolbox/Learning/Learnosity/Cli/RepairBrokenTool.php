@@ -142,7 +142,7 @@ HELP;
             } else {
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $assessmentId, $row['learnosity_reference']));
                 if (null === $row['assess_section.assess_id']) {
-                    $this->getLogger()->notice("Quiz build in learnosity, unable to re import. Manual work is required... Good luck...");
+                    $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $assessmentId));
                     exit;
                 }
                 // fix this?
@@ -205,7 +205,7 @@ HELP;
                     $brokenQuizze++;
                     $this->getLogger()->debug(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
                     if (null === $row['assess_section.assess_id']) {
-                        $this->getLogger()->notice("Quiz build in learnosity, unable to re import. Manual work is required... Good luck...");
+                        $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $row['assessment_id']));
                     }
                 }
             }
