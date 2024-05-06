@@ -23,8 +23,8 @@ function onCreateSelected() {
             <div class="empty-state">
                 <i class="icon-unit"></i>
                 <p>
-                    No Units are currently linked to this Course.
-                    <a href="#create-unit" @click.prevent="onCreateSelected">Create Unit</a>
+                    This course currently does not have any units. To begin building this course start by
+                    <a href="#create-unit" @click.prevent="onCreateSelected">creating a unit.</a>
                 </p>
             </div>
         </div>
