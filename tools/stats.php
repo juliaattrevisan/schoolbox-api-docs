@@ -200,9 +200,7 @@ $app = new class extends CliTool\App {
                 AND deleted_at IS NULL;
             ",
 
-            // Quizzes with titles that contain utf8 chars
-            // these if imported prior to SA-17115 (2024-02-05)
-            // they may be in a hidden failed state, where we have a learnosity ID, but they didn't save anything
+            // Quizzes with short question answers longer than 250 characters will make the field blank
             'quiz_short_ans_250' => "
                 select count(*) from assess
                 join assess_section on (assess_section.assess_id = assess.assess_id AND assess_section.deleted_at IS NULL)
