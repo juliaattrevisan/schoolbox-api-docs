@@ -16,7 +16,7 @@ const addButtonText = window.Vue.computed(() => {
     if (addUnitStore.isProcessing) {
         return "Creating...";
     }
-    return "Create Unit";
+    return "Create unit";
 });
 
 /**
@@ -49,7 +49,7 @@ function onAddSelected() {
             <form>
                 <section>
                     <fieldset class="content">
-                        <legend class="l-mar-m--bottom t-fs-m">Add new Unit</legend>
+                        <legend class="l-mar-m--bottom t-fs-m">Add new unit</legend>
                         <div class="small-12 columns l-mar-m--bottom">
                             <label for="name" class="required">Name</label>
                             <input
@@ -60,9 +60,7 @@ function onAddSelected() {
                                 required
                                 type="text"
                             />
-                            <label v-if="hasNoName" class="error f-no-margins"
-                                >Please enter a name for your new Unit</label
-                            >
+                            <label v-if="hasNoName" class="error f-no-margins">Please enter a name for the unit</label>
                         </div>
                         <div class="small-12 columns">
                             <ul class="flex-list">
