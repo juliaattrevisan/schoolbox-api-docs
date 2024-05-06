@@ -219,6 +219,7 @@ class Controller extends Assessment\Controller
             /* Quizzes now support Submission States
              */
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'errors' => [],
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz
              */

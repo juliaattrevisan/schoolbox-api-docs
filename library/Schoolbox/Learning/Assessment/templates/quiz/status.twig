@@ -245,31 +245,33 @@
         {% endapply %}
 
         {# Quizzes now support Submission States #}
-        <div class="content">
-            <div class="row">
-                {# Quiz always has a Mark Type (it's mandatory) #}
-                <div class="small-12 medium-3 column">
-                    <label>{{ locale.grades.proper }}
-                        {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                            participant: participant,
-                            feedback:    participant.findMostRecentInstructorGivenFeedback,
-                            markScheme:  assessment.markScheme,
-                            tabIndex:    loop.index0 + inputNo,
-                            errors:      errors ?? [],
-                            readonly:    false
+        <div class="small-12 column">
+            <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+                <div class="row">
+                    {# Quiz always has a Mark Type (it's mandatory) #}
+                    <div class="small-12 medium-3 column">
+                        <label>{{ locale.grades.proper }}
+                            {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                participant: participant,
+                                feedback:    participant.findMostRecentInstructorGivenFeedback,
+                                markScheme:  assessment.markScheme,
+                                tabIndex:    loop.index0 + inputNo,
+                                errors:      errors,
+                                readonly:    false
+                            } only %}
+                            {% set inputNo = inputNo + 1 %}
+                        </label>
+                    </div>
+                    <div class="small-12 medium-9 column">
+                        {% include '@learningAssessment/quiz/comment.twig' with {
+                            feedback:       participant.findMostRecentInstructorGivenFeedback,
+                            participant:    participant,
+                            tabIndex:       loop.index0 + inputNo
                         } only %}
                         {% set inputNo = inputNo + 1 %}
-                    </label>
+                    </div>
                 </div>
-                <div class="small-12 medium-9 column">
-                    {% include '@learningAssessment/quiz/comment.twig' with {
-                        feedback:       participant.findMostRecentInstructorGivenFeedback,
-                        participant:    participant,
-                        tabIndex:       loop.index0 + inputNo
-                    } only %}
-                    {% set inputNo = inputNo + 1 %}
-                </div>
-            </div>
+            </form>
         </div>
 
         {% include '@learningAssessment/fragments/actionBar.twig' with {
@@ -334,9 +336,42 @@
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
             var $participantList  = $('#assessment-status');
+
+            $.fn.dynamicFeedback({
+                {#statusIncomplete: '{{ statusIncomplete }}',#}
+                {#statusFailed: '{{ statusFailed }}',#}
+                {#statusPending: '{{ statusPending }}',#}
+                {#statusReviewed: '{{ statusReviewed }}',#}
+                {#reviewedText: '{{ labelReviewed }}',#}
+                onPreDraftCallback: function () {
+                },
+                onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+                    let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                        $publishButton = $actionBar.find('[data-draft=publish]');
+                    $publishButton.attr('data-draft-id', feedbackId);
+                    $actionBar.attr('data-mass-publish', '');
+                    $actionBar.removeAttr('data-mass-submit');
+                },
+                onPrePublishCallback: function () {
+                },
+                onPublishCallback: function (userId) {
+                    let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                        $ackButton = $actionBar.find('[data-sobo]'),
+                        $publishButton = $actionBar.find('[data-draft=publish]');
+                    $publishButton.removeAttr('data-draft-id');
+                    $actionBar.removeAttr('data-mass-publish');
+                    $actionBar.removeAttr('data-mass-submit');
+                    $ackButton.fadeOut({
+                        done: function () {
+                            $ackButton.remove();
+                        }
+                    });
+                }
+            });
 
             {# Mass review submitted but unreviewed quiz attempts #}
             $('#mass-review').bulky({
