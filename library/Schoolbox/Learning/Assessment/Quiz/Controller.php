@@ -220,15 +220,11 @@ class Controller extends Assessment\Controller
         $maxMarks = [];
 
         foreach ($assessment->getAllParticipants() as $participant) {
-            $latestResponse = $participant->findMostRecentResponse();
-
-            if ($latestResponse) {
-                $maxMarks[$participant->getUser()->getId()] = $latestResponse->getMarksAvailable();
-            } else {
-                /* TODO Derive from learnosity atm
-                 *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
-                 *   This only matters when it's a Total Mark markscheme: everything else is out of 100
-                 */
+            /* TODO Derive from learnosity atm
+             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+             */
+            if (!$participant->findMostRecentResponse()) {
                 $maxMarks[$participant->getUser()->getId()] = 99;
             }
         }

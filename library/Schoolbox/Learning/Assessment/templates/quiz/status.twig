@@ -263,7 +263,7 @@
                                 participant: participant,
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 markScheme:  assessment.markScheme,
-                                limit:       maxMarks[participant.user.id],
+                                limit:       latestResponse.marksAvailable ?? maxMarks[participant.user.id],
                                 tabIndex:    loop.index0 + inputNo,
                                 errors:      errors,
                                 readonly:    false,
