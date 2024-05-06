@@ -166,6 +166,10 @@ HELP;
                 }
             }
         } else {
+            if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+                $this->getLogger()->error("Unable to bulk repair, either scan for issues, or repair a single");
+                exit;
+            }
             $brokenQuizze = 0;
             // check all learnosity references
             $query = $this->getDatabaseInternal()->executeQuery(
