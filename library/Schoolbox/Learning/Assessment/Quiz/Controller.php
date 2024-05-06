@@ -217,11 +217,18 @@ class Controller extends Assessment\Controller
          * every attempt. Each one could be unique. Build a hash lookup of what the maximums are,
          * and for those who never completed an attempt: ask learnosity how much is available
          */
+        $maxMarks = [];
+
         foreach ($assessment->getAllParticipants() as $participant) {
-            if ($participant->getUser()->getFirstname() === 'Eden') {
-                $participant->findMostRecentResponse()->getAssessable()->getMarkScheme()->setTotalMark(122);
+            $latestResponse = $participant->findMostRecentResponse();
+
+            if ($latestResponse) {
+                $maxMarks[$participant->getUser()->getId()] = $latestResponse->getMarksAvailable();
             } else {
-                $assessment->getMarkScheme()->setTotalMark(4);
+                /* TODO Derive from learnosity atm
+                 *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+                 */
+                $maxMarks[$participant->getUser()->getId()] = 99;
             }
         }
 
@@ -232,6 +239,9 @@ class Controller extends Assessment\Controller
              */
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
             'errors' => [],
+            /* Each guy's maximum available marks
+             */
+            'maxMarks' => $maxMarks,
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz
              */

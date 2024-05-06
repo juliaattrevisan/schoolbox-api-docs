@@ -251,14 +251,22 @@
                     {# Quiz always has a Mark Type (it's mandatory) #}
                     <div class="small-12 medium-3 column">
                         <label>{{ locale.grades.proper }}
+                            {# For quizzes, each person's attempt can vary from other attempts, which occurs
+                             # when the content of quiz changes halfway through everyone doing it. This means
+                             # the $limit param can't be derived from the assessment's markScheme instance,
+                             # which would apply the same limit to everyone. This necessitates a $maxMark
+                             # lookup for each person, and in the absence of an attempt, ask Learnosity for
+                             # what's available at the moment.
+                             #}
                             {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                assessment:  assessment,
                                 participant: participant,
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 markScheme:  assessment.markScheme,
-                                limit:       latestResponse.marksAvailable ?? 9999,
+                                limit:       maxMarks[participant.user.id],
                                 tabIndex:    loop.index0 + inputNo,
                                 errors:      errors,
-                                readonly:    false
+                                readonly:    false,
                             } only %}
                             {% set inputNo = inputNo + 1 %}
                         </label>
