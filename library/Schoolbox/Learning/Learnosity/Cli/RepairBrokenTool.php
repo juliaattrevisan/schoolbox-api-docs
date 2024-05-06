@@ -52,11 +52,11 @@ class RepairBrokenTool extends CliTool\App
     }
 
     /**
-     * actually hit learnosity and confirm if they have any items, or not...
+     * actually hit learnosity and confirm if they have a title and any items, or not...
      * @param string $learnosityReference
-     * @return array|null
+     * @return bool
      */
-    private function hasItems(string $learnosityReference): ?array
+    private function hasItems(string $learnosityReference, ?string $title = null): bool
     {
         $this->getLogger()->debug(sprintf('Polling learnosity to check if it has items: %s', $learnosityReference));
         $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
@@ -64,7 +64,25 @@ class RepairBrokenTool extends CliTool\App
                 $learnosityReference
             ]
         ]);
-        return $itemReferences['data'][0]['data']['items'] ?? null;
+        // saw this once... looks like it is very broken, probably good to note, even if we are just re importing...
+        $activity = $itemReferences['data'][0] ?? null;
+        if (null === $activity) {
+            $this->getLogger()->debug("learnosity activity has no data... probably good to reimport.");
+            return false;
+        }
+        $title = $activity['title'] ?? null;
+        $items = $activity['data']['items'] ?? null;
+        if (null === $title) {
+            $this->getLogger()->debug("learnosity activity has no title... probably good to reimport.");
+        }
+        if (null !== $title && null === $items) {
+            $this->getLogger()->debug("learnosity activity has title, but no items... school may have removed the items, manually?");
+        }
+        // we should ensure both the title and the items are null, not just empty
+        if (null === $title && null === $items) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -118,7 +136,7 @@ HELP;
                 exit;
             }
             $row = $query->fetch();
-            if ($this->hasItems($row['learnosity_reference']) !== null) {
+            if ($this->hasItems($row['learnosity_reference'])) {
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) successfully has learnosity items", $row['title'], $assessmentId));
             } else {
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $assessmentId, $row['learnosity_reference']));
@@ -158,7 +176,7 @@ HELP;
                         exit;
                     }
                     $row = $query->fetch();
-                    if ($this->hasItems($row['learnosity_reference']) !== null) {
+                    if ($this->hasItems($row['learnosity_reference'])) {
                         $this->getLogger()->notice(sprintf("Quiz repair succeeded %s, has questions", $assessmentId));
                     } else {
                         $this->getLogger()->error(sprintf("Quiz repair broke for %s. Still no items...", $assessmentId));
