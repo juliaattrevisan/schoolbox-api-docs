@@ -139,6 +139,30 @@ HELP;
                     $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
                     (new CliTool\Kernel($app, $options))->runApp();
+
+                    // wait for learnosity to persist the data to where it needs to be
+                    // just set a random number (15sec may be enough..)
+                    sleep(15);
+                    // check / ensure the quiz has been fixed...
+                    $query = $this->getDatabaseInternal()->executeQuery(
+                        "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
+                        FROM assess
+                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
+                        LIMIT 1",
+                        ['assessmentId' => $assessmentId]
+                    );
+                    // if no results... something broke...?
+                    if (!$query->rowCount()) {
+                        $this->getLogger()->error(sprintf("Quiz repair broke for %s, no learnosity reference...", $assessmentId));
+                        exit;
+                    }
+                    $row = $query->fetch();
+                    if ($this->hasItems($row['learnosity_reference']) !== null) {
+                        $this->getLogger()->notice(sprintf("Quiz repair succeeded %s, has questions", $assessmentId));
+                    } else {
+                        $this->getLogger()->error(sprintf("Quiz repair broke for %s. Still no items...", $assessmentId));
+                    }
                 }
             }
         } else {
