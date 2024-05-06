@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
+use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use CFPropertyList\IOException;
@@ -37,7 +38,9 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -137,6 +140,10 @@ class Controller extends Assessment\Controller
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private \Schoolbox\Url\Factory $urlFactory,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         parent::__construct(
             $userMapper,
@@ -220,12 +227,78 @@ class Controller extends Assessment\Controller
         $maxMarks = [];
 
         foreach ($assessment->getAllParticipants() as $participant) {
+            if (!$participant->findMostRecentResponse() && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+                $maxMarks[$participant->getUser()->getId()] = null;
+            }
+        }
+
+        /* If the quiz is a Total Mark markscheme and if there was someone without a response,
+         * ask learnosity what they could potentially get; otherwise skip the api penalty
+         */
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        if (\count($maxMarks) && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
             /* TODO Derive from learnosity atm
              *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
              *   This only matters when it's a Total Mark markscheme: everything else is out of 100
              */
-            if (!$participant->findMostRecentResponse()) {
-                $maxMarks[$participant->getUser()->getId()] = 99;
+            $api = new Api(
+                $this->urlFactory->buildFullyQualified()->getHost(),
+                $this->learnosityVersion,
+                $this->learnosityConsumerKey,
+                $this->learnosityConsumerSecret,
+                $logger
+            );
+
+            $itemReferences = $api->dataGetRequest('/itembank/activities', [
+                'references' => [
+                    $assessment->getLearnosityReference()
+                ]
+            ])['data'][0]['data']['items'] ?? null;
+
+            $itemReferenceList = [];
+
+            if (null !== $itemReferences) {
+                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+                 */
+                if (is_array($itemReferences[0])) {
+                    /* Forcibly mutate this, because learnosity insanity
+                     */
+                    $itemReferenceList = array_column($itemReferences, 'id');
+                } else {
+                    /* Presume it was a list of reference strings already
+                     */
+                    $itemReferenceList = $itemReferences;
+                }
+            }
+
+            /* Maybe this max_score isn't available everywhere, due to the Short Answer fiasco
+             * where validation.score isn't the same as max_score. It *seems* to still just work though?
+             */
+            $items = $api->dataGetRequest('/itembank/items', [
+                'references' => $itemReferenceList,
+                'include' => [
+                    'items' => ['max_score']
+                ]
+            ])['data'] ?? null;
+
+            /* Add it all up for the guys who haven't attempted yet
+             */
+            $available = 0;
+
+            foreach ($items as $item) {
+                $available += $item['max_score'];
+            }
+
+            /* Now assign it to them
+             */
+            foreach ($maxMarks as $userId => $value) {
+                $maxMarks[$userId] = $available;
             }
         }
 
