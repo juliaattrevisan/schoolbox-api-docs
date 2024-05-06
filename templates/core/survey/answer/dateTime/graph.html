@@ -1,1 +1,16 @@
-<!-- prevent empty file errors -->
+<script type='text/javascript'>
+    $(function() {
+        $('#{GRAPH_ID}').evaluationBarchart({
+            series: [
+                <!-- BEGIN series -->
+                {
+                    name: "{SERIES_LABEL}",
+                    data: [[{SERIES_INDEX}, {SERIES_DATA}]],
+                }<!-- BEGIN series_separator -->,<!-- END series_separator -->
+                <!-- END series -->
+            ]
+        });
+    });
+</script>
+
+<div id='{GRAPH_ID}'></div>

@@ -96,16 +96,12 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     {
         // Convert answer to a standard date format,
         // either with or without a time component?
-        try {
-            $dateObject = Alaress_Date_Format::newLocal($data['answer']);
-        } catch (InvalidArgumentException $e) {
-            $dateObject = null;
-        }
+        $dehydratedDate = $this->dehydrateDate($data['answer'] ?? null);
         return parent::saveResponseInternal(
             $data['attempt_id'],
             $data['section_id'],
             $data['question_id'],
-            $dateObject?->toRfc3339String(),
+            $dehydratedDate,
         );
     }
 
@@ -203,7 +199,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
                 'mark' => ''
             ];
         }
-
+        $response['response'] = $this->hydrateDate($response['response'] ?? null) ?? '';
         return $response;
     }
 
@@ -242,18 +238,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     public function reviewResponse($page, $attemptId, $question_id)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-        $answer   = '';
-        if ($existing['response'] ?? null) {
-            try {
-                $existingDate = new Alaress_Date_Format(
-                    $existing['response'],
-                    [DateTimeInterface::RFC3339, DateTimeInterface::RFC3339_EXTENDED],
-                );
-                $answer = $existingDate->getLocal();
-            } catch (InvalidArgumentException $e) {
-                // noop
-            }
-        }
+        $answer   = $this->hydrateDate($existing['response'] ?? null) ?? '';
         $currentAnswer = $this->getByQuestionID($question_id);
         $page->setVar([
             'ANSWER_ID'   => $currentAnswer['answer_id'],
@@ -326,5 +311,46 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     public function getAnswerText($question_id, $value)
     {
         return $this->loadUser((int)($value))->getFullName();
+    }
+
+    /**
+     * Converts date from storage to output format.
+     *
+     * @param string|null $date
+     * @return string|null
+     */
+    private function hydrateDate(?string $date): ?string
+    {
+        if (!isset($date)) {
+            return null;
+        }
+        try {
+            $dateObject = new Alaress_Date_Format(
+                $date,
+                [DateTimeInterface::RFC3339, DateTimeInterface::RFC3339_EXTENDED],
+            );
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
+        return $dateObject->getLocal();
+    }
+
+    /**
+     * Converts date from input to storage format.
+     *
+     * @param string|null $date
+     * @return string|null
+     */
+    private function dehydrateDate(?string $date): ?string
+    {
+        if (!isset($date)) {
+            return null;
+        }
+        try {
+            $dateObject = Alaress_Date_Format::newLocal($date);
+        } catch (InvalidArgumentException $e) {
+            $dateObject = null;
+        }
+        return $dateObject?->toRfc3339String();
     }
 }
