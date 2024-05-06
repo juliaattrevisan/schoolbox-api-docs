@@ -33,13 +33,13 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param array $object
+     * @param array      $object
      * @param int|string $question_id
      * @return bool|int
      */
     public function create($object, $question_id = '')
     {
-        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+        $answer                = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
         /* 'Short' always has only one answer per question so we can override
@@ -125,11 +125,11 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
 
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
-        $object = array(
+        $object = [
             'question_id' => $question_id,
-            'sequence' => 1,
-            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
-        );
+            'sequence'    => 1,
+            'answer'      => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
+        ];
 
         return $this->create($object, $question_id);
     }
@@ -141,7 +141,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * set to other default values.
      *
      * @param SitePage $page
-     * @param string $question_id
+     * @param string   $question_id
      * @return void
      */
     public function modify($page, $question_id = '')
@@ -150,17 +150,17 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
             $currentAnswer = parent::getForQuestion($question_id);
 
             $page->setVar(
-                array(
+                [
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => Scrub::text($currentAnswer['answer']),
-                )
+                    'ANSWER'    => Scrub::text($currentAnswer['answer']),
+                ]
             );
         } else {
             $page->setVar(
-                array(
+                [
                     'ANSWER_ID' => '',
-                    'ANSWER' => '',
-                )
+                    'ANSWER'    => '',
+                ]
             );
         }
     }
@@ -181,7 +181,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * specified for graphing them.
      *
      * @param SitePage $page
-     * @param array $currentQuestion
+     * @param array    $currentQuestion
      * @return void
      */
     public function graphResults($page, $currentQuestion)
@@ -204,7 +204,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
         $data     = [
             'response' => '',
             'comment'  => '',
-            'mark'     => 'No User Selected'
+            'mark'     => 'No User Selected',
         ];
 
         /* If a question was added after the attempt was made by the student,
@@ -255,8 +255,8 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param SitePage $page
-     * @param int $attemptId
-     * @param int $question_id
+     * @param int      $attemptId
+     * @param int      $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
@@ -338,7 +338,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
      * Configure mandatoryness and other settings for this response
      *
      * @param SitePage $page
-     * @param int $question_id
+     * @param int      $question_id
      */
     protected function configureResponse($page, $question_id)
     {
@@ -363,7 +363,7 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
          */
         if ($response && isset($response['response'])) {
             return [
-                (int)($response['response'])
+                (int)($response['response']),
             ];
         }
 

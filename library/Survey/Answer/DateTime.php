@@ -28,13 +28,13 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
      *
-     * @param array $object
+     * @param array      $object
      * @param int|string $question_id
      * @return bool|int
      */
     public function create($object, $question_id = '')
     {
-        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+        $answer                = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
         /* 'Short' always has only one answer per question so we can override
@@ -110,11 +110,11 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
 
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
-        $object = array(
+        $object = [
             'question_id' => $question_id,
-            'sequence' => 1,
-            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
-        );
+            'sequence'    => 1,
+            'answer'      => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
+        ];
 
         return $this->create($object, $question_id);
     }
@@ -126,7 +126,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      * set to other default values.
      *
      * @param SitePage $page
-     * @param string $question_id
+     * @param string   $question_id
      * @return void
      */
     public function modify($page, $question_id = '')
@@ -135,17 +135,17 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
             $currentAnswer = parent::getForQuestion($question_id);
 
             $page->setVar(
-                array(
+                [
                     'ANSWER_ID' => $currentAnswer['answer_id'],
-                    'ANSWER' => Scrub::text($currentAnswer['answer']),
-                )
+                    'ANSWER'    => Scrub::text($currentAnswer['answer']),
+                ]
             );
         } else {
             $page->setVar(
-                array(
+                [
                     'ANSWER_ID' => '',
-                    'ANSWER' => '',
-                )
+                    'ANSWER'    => '',
+                ]
             );
         }
     }
@@ -166,7 +166,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      * specified for graphing them.
      *
      * @param SitePage $page
-     * @param array $currentQuestion
+     * @param array    $currentQuestion
      * @return void
      */
     public function graphResults($page, $currentQuestion)
@@ -193,8 +193,8 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
         if (!$response) {
             return [
                 'response' => '',
-                'comment' => '',
-                'mark' => ''
+                'comment'  => '',
+                'mark'     => '',
             ];
         }
         $response['response'] = $this->hydrateDate($response['response'] ?? null) ?? '';
@@ -229,14 +229,14 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param SitePage $page
-     * @param int $attemptId
-     * @param int $question_id
+     * @param int      $attemptId
+     * @param int      $question_id
      * @return void
      */
     public function reviewResponse($page, $attemptId, $question_id)
     {
-        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
-        $answer   = $this->hydrateDate($existing['response'] ?? null) ?? '';
+        $existing      = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $answer        = $this->hydrateDate($existing['response'] ?? null) ?? '';
         $currentAnswer = $this->getByQuestionID($question_id);
         $page->setVar([
             'ANSWER_ID'   => $currentAnswer['answer_id'],
@@ -258,7 +258,7 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
      * Configure mandatoryness and other settings for this response
      *
      * @param SitePage $page
-     * @param int $question_id
+     * @param int      $question_id
      */
     protected function configureResponse($page, $question_id)
     {
