@@ -255,6 +255,7 @@
                                 participant: participant,
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 markScheme:  assessment.markScheme,
+                                limit:       latestResponse.marksAvailable ?? 9999,
                                 tabIndex:    loop.index0 + inputNo,
                                 errors:      errors,
                                 readonly:    false
