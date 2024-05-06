@@ -40,6 +40,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
@@ -254,46 +255,7 @@ class Controller extends Assessment\Controller
                 $logger
             );
 
-            $itemReferences = $api->dataGetRequest('/itembank/activities', [
-                'references' => [
-                    $assessment->getLearnosityReference()
-                ]
-            ])['data'][0]['data']['items'] ?? null;
-
-            $itemReferenceList = [];
-
-            if (null !== $itemReferences) {
-                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                 */
-                if (is_array($itemReferences[0])) {
-                    /* Forcibly mutate this, because learnosity insanity
-                     */
-                    $itemReferenceList = array_column($itemReferences, 'id');
-                } else {
-                    /* Presume it was a list of reference strings already
-                     */
-                    $itemReferenceList = $itemReferences;
-                }
-            }
-
-            /* Maybe this max_score isn't available everywhere, due to the Short Answer fiasco
-             * where validation.score isn't the same as max_score. It *seems* to still just work though?
-             */
-            $items = $api->dataGetRequest('/itembank/items', [
-                'references' => $itemReferenceList,
-                'include' => [
-                    'items' => ['max_score']
-                ]
-            ])['data'] ?? null;
-
-            /* Add it all up for the guys who haven't attempted yet
-             */
-            $available = 0;
-
-            foreach ($items as $item) {
-                $available += $item['max_score'];
-            }
+            $available = (new Helper($api, $logger))->findAvailableMarks($assessment->getLearnosityReference());
 
             /* Now assign it to them
              */
