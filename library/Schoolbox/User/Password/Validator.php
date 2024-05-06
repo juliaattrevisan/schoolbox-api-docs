@@ -61,7 +61,7 @@ class Validator
             return false;
         }
 
-        // Matches new-style password
+        // Matches password
         if ($this->passwordService->verify($password, $hash)) {
             // Maybe requires rehash
             if ($this->passwordService->needsRehash($hash)) {
@@ -70,14 +70,6 @@ class Validator
             return $enabled;
         }
 
-        // Matches old-style password
-        if ($this->userMapper->hashPassword($password) == $hash) {
-            // Definitely requires rehash
-            $this->saveUserPassword($user, $password);
-            return $enabled;
-        }
-
-        // Doesn't match either
         return false;
     }
 
