@@ -105,6 +105,15 @@ window.Vue.watch(
     { once: true },
 );
 
+window.Vue.watch(
+    () => store.unitCount,
+    (newCount, oldCount) => {
+        if (newCount > oldCount && unitPlannerContainerEl.value) {
+            unitPlannerContainerEl.value.scrollTop = unitPlannerContainerEl.value.scrollHeight;
+        }
+    },
+);
+
 window.Vue.onMounted(() => {
     store.init(props.courseId, props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);

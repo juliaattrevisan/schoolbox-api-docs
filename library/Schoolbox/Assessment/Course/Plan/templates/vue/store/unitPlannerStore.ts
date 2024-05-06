@@ -15,6 +15,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
+    const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     /**
@@ -167,6 +168,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         dragUnitHeight,
         courseId,
         units,
+        unitCount,
         toastEl,
         dragCurrentUnit,
         dragCurrentUnitNextTick,
