@@ -57,8 +57,12 @@ class Module extends BaseModule
             return $this->preloadAttempt($params);
         };
 
-        $this->register('GET', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'getModify', $instructorPerms, $preloadAttempt);
-        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}', 'postModify', $instructorPerms, $preloadAttempt);
+        /* The /update part is so we deconflict with the other Learnosity/Module.php routes,
+         * specifically the complete route: /{assessmentId}/attempt/{studentId}/complete
+         * "complete" is not a valid learnosity reference lol
+         */
+        $this->register('GET', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/update', 'getModify', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/update', 'postModify', $instructorPerms, $preloadAttempt);
     }
 
 
