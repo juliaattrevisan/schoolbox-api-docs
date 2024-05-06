@@ -734,22 +734,6 @@ class UserMapper extends Mapper
 
 
     /**
-     * @deprecated Don't even ask what a password hashing method is doing in a mapper.
-     *             (this will be removed in 16 and replaced with `password_hash`)
-     *
-     * @param string $password
-     * @return string
-     * @throws \PDOException
-     */
-    public function hashPassword(#[SensitiveParameter] string $password): string
-    {
-        $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
-        $statement->execute([$password]);
-        return $statement->fetchColumn();
-    }
-
-
-    /**
      * Pre-save callback for verifying whether a user's name is unique.
      *
      * For data-integrity, this method relies on a post-save/restore

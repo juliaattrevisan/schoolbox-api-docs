@@ -8,9 +8,8 @@
  * that that script's module+route refresh call may set the enabled modules
  * appropriately.
  */
-UPDATE user SET password=PASSWORD('password');
-UPDATE user SET password=PASSWORD('alaress') WHERE username='alaress';
-UPDATE user SET password=PASSWORD('286') WHERE username='286';
+UPDATE user SET password='$2y$10$EdUTdtulwEH8tzcfmgGeTuAU0KR5RZjA9JNnLnt0glmvB4pVZlXMm'; /* Encrypted 'password' */
+UPDATE user SET password='$2y$10$nCDOhnG78sTv6TrjWLsv8OsPiS1ODvkibaxPB.JlXWFi7fZWth5Du' WHERE username='alaress'; /* Encrypted 'alaress' */
 UPDATE config
 SET hidden='false', editable='true'
 WHERE name IN (
