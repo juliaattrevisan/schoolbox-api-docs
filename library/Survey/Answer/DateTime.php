@@ -7,10 +7,6 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Mapper\Exception;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-
 /**
  * Answer type for surveys: accepts a datetime as a valid response.
  */
@@ -248,26 +244,6 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     }
 
     /**
-     * Load a user from the given user ID.
-     *
-     * @param int $userId
-     * @return User
-     */
-    private function loadUser(int $userId): User
-    {
-        $userMapper = UserMapper::getInstance();
-        try {
-            $student = $userMapper->findById($userId);
-        } catch (Exception\Deleted $e) {
-            /** @var User $student */
-            $student = $e->getDeletedObject();
-        } catch (Exception) {
-            $student = $userMapper->getUnknownUser();
-        }
-        return $student;
-    }
-
-    /**
      * @inheritdoc
      */
     public function configure(SitePage $page, $config)
@@ -299,18 +275,6 @@ class Survey_Answer_DateTime extends Evaluation_Answer_DateTime
     public function exportResponseToArray($attempt_id, $question_id)
     {
         return $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
-    }
-
-    /**
-     * Gets the text associated with an array-based multiple choice answer
-     *
-     * @param int $question_id
-     * @param int $value
-     * @return string
-     */
-    public function getAnswerText($question_id, $value)
-    {
-        return $this->loadUser((int)($value))->getFullName();
     }
 
     /**
