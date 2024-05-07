@@ -86,8 +86,10 @@
                     Class Average
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
+                {% set draftWeightedMean = markbook.draftWeightedMean %}
                 <th class="fixed-left {{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
-                        {{ weightedMean | default('-') }}
+                    <span data-actual-mark>{{ weightedMean | default('-') }}</span>
+                    <span data-draft-mark style="display:none">{{ draftWeightedMean | default('-') }}</span>
                 </th>
                 {% if rankEnabled %}
                 <th>-</th>
