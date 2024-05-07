@@ -76,8 +76,7 @@ export default class PanelTweaks extends Plugin {
      * the balloon is on top of the modal, otherwise it will be hidden underneath
      */
     checkForModal() {
-        // a modal is typically set to 1005, so we need to be higher than that
-        const zIndex = "1010";
+        const zIndex = "var(--depth-modal-ui-overlay)";
         if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
             const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
             // fired when the balloon is shown or hidden by any UI

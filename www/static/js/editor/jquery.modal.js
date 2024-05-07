@@ -43,7 +43,7 @@
                 {
                     opacity: 1,
                 },
-                250
+                250,
             );
         }, 275);
     };
@@ -263,7 +263,7 @@
             } else {
                 singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />').data(
                     "content",
-                    data
+                    data,
                 );
 
                 body.append(singletonModal);
@@ -294,17 +294,6 @@
                 });
             }
 
-            /* Hide cke overlay and adjust a z-index so the
-             * Schoolbox Resource Browser appears on top of the
-             * ckeditor dialog (enormous sigh)
-             */
-            $(".cke_dialog_background_cover").addClass("hide");
-
-            /* ckeditor dialog appears at z-index 10010 so our
-             * Resource Browser needs to be more
-             */
-            $("[data-reveal]").css({ zIndex: 20000 });
-
             // reinit
             $(document)
                 //.foundation('reveal', 'reflow')
@@ -322,8 +311,6 @@
                     if (undefined !== config.previousModal) {
                         config.previousModal.removeClass("hide");
                     }
-                    // Show the cke dialog overlay again
-                    $(".cke_dialog_background_cover").removeClass("hide");
 
                     config.onModalClosed();
                 });
@@ -432,12 +419,12 @@
                                             responseText.type,
                                             responseText.filesystem,
                                             responseText.hash,
-                                            responseText.id
+                                            responseText.id,
                                         ),
                                         responseText.name,
                                         responseText.mime,
                                         dialog,
-                                        responseText
+                                        responseText,
                                     );
 
                                     /* Shut modal, go back to Dialog
@@ -447,7 +434,7 @@
                                     config.onAfterClose();
 
                                     $.fn.schoolboxRestorePreviousModal(config.restoreModal);
-                                }
+                                },
                             );
                         } else {
                             // Unknown status: assume error and do nothing, as the modal already shows the error
@@ -459,7 +446,7 @@
                             processSelection("meetingUrl", "", "", message.data.meetingUrl),
                             "Microsoft Teams Meeting",
                             null,
-                            dialog
+                            dialog,
                         );
 
                         /* Shut modal, go back to Dialog
@@ -549,7 +536,7 @@
                  */
                 onAfterClose: function () {},
             },
-            options
+            options,
         );
     };
 
@@ -580,7 +567,7 @@
 
             /* Combine with modal configuration requirements
              */
-            $.fn.schoolboxModalConfig(options)
+            $.fn.schoolboxModalConfig(options),
 
             /* Other elements of this object literal as a result of merging with defaults:
              *
