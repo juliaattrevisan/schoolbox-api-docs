@@ -327,18 +327,19 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Output course modify link if course page
-        $this->setVar('course_link_block');
-
-        /* Decide if you have WRITE permissions before providing Modify link
-         */
-        if ($isCoursePage && $this->getAccess()->getFolderAccess($this->getUser(), $this->getContext()->getCourseSpecification()->getFolder()->getId()) > UserAccess::ACCESS_READ) {
-            $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
-            $this->parse('course_link_block', 'course_link');
-            $hasClassActions = true;
+        if ($lmsEnabled) {
+            $this->setVar('course_link_block');
+            /* Decide if you have WRITE permissions before providing Modify link
+             */
+            if ($isCoursePage && $this->getAccess()->getFolderAccess($this->getUser(), $this->getContext()->getCourseSpecification()->getFolder()->getId()) > UserAccess::ACCESS_READ) {
+                $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
+                $this->parse('course_link_block', 'course_link');
+                $hasClassActions = true;
+            }
         }
 
         // Unit planner link should show for both Unit and Course pages.
-        if ($isCoursePage || $isUnitPage) {
+        if ($lmsEnabled && ($isCoursePage || $isUnitPage)) {
             $unitPlannerLink = null;
             if ($isUnitPage) {
                 $unitPlannerLink = $this->getRouteGenerator()->generate('coursePlan.getPlan', ['id' => $this->getContext()->getUnitSpecification()->getCourse()->getId()]);

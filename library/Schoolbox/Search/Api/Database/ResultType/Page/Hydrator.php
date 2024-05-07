@@ -13,6 +13,8 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use OverflowException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -50,14 +52,16 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param Mapper           $folderMapper     Used to fetch folders for hydration.
-     * @param Access           $access           Used to determine if the current user may view this page.
-     * @param Generator        $routeGenerator   Used to build a route to the result search for pages.
-     * @param Authorizer       $authorizer       Used to find page access permissions.
+     * @param Mapper        $folderMapper   Used to fetch folders for hydration.
+     * @param Access        $access         Used to determine if the current user may view this page.
+     * @param IConfigLoader $config         Used to determine if modules are enabled for links
+     * @param Generator     $routeGenerator Used to build a route to the result search for pages.
+     * @param Authorizer    $authorizer     Used to find page access permissions.
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
         private Access $access,
+        private IConfigLoader $config,
         private Generator $routeGenerator,
         private Authorizer $authorizer
     ) {
@@ -163,36 +167,39 @@ class Hydrator extends BaseHydrator
                     'url' => $this->routeGenerator->generate($route, $params),
                 ];
             }
-            $route = 'learningMarkbook.getMarkbookForClass';
-            // Params needed here are the same as set above.
-            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-                $links[] = [
-                    'title' => 'Class Markbook',
-                    'icon' => 'icon-curriculum',
-                    'url' => $this->routeGenerator->generate($route, $params),
-                ];
+            if ($this->config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+                $route = 'learningMarkbook.getMarkbookForClass';
+                // Params needed here are the same as set above.
+                if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                    $links[] = [
+                        'title' => 'Class Markbook',
+                        'icon'  => 'icon-curriculum',
+                        'url'   => $this->routeGenerator->generate($route, $params),
+                    ];
+                }
             }
         }
 
-        if ($isCoursePage || $isUnitPage) {
-            if ($isCoursePage) {
-                $courseSpec = $folder->getCourseSpecification();
-            } elseif ($isUnitPage) {
-                $courseSpec = $folder->getUnitSpecification()->getCourse();
-            }
+        if ($this->config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            if ($isCoursePage || $isUnitPage) {
+                if ($isCoursePage) {
+                    $courseSpec = $folder->getCourseSpecification();
+                } elseif ($isUnitPage) {
+                    $courseSpec = $folder->getUnitSpecification()->getCourse();
+                }
 
-            $route      = 'course.modifyCourse';
+                $route = 'course.modifyCourse';
 
-            $params = ['id' => $courseSpec->getId(), 'course' => $courseSpec];
-            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
-                $links[] = [
-                    'title' => 'Modify Course',
-                    'icon' => 'icon-modify',
-                    'url' => $this->routeGenerator->generate($route, $params),
-                ];
+                $params = ['id' => $courseSpec->getId(), 'course' => $courseSpec];
+                if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                    $links[] = [
+                        'title' => 'Modify Course',
+                        'icon'  => 'icon-course',
+                        'url'   => $this->routeGenerator->generate($route, $params),
+                    ];
+                }
             }
         }
-
         if ($isGroupPage) {
             $route = 'group.getModify';
             $params = ['folderId' => $folder->getId(), 'folder' => $folder];
