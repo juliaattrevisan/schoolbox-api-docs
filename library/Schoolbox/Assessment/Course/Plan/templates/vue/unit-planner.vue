@@ -105,13 +105,19 @@ window.Vue.watch(
     { once: true },
 );
 
-// Scroll to the bottom of the container when a new unit is added to ensure it is visible
+// Scroll to the bottom of the container when a new unit is added to ensure it's visible
 window.Vue.watch(
     () => store.unitCount,
     (newCount, oldCount) => {
-        if (newCount > oldCount && unitPlannerContainerEl.value) {
-            unitPlannerContainerEl.value.scrollTop = unitPlannerContainerEl.value.scrollHeight;
-        }
+        window.Vue.nextTick()
+            .then(() => {
+                if (newCount > oldCount && unitPlannerContainerEl.value) {
+                    unitPlannerContainerEl.value.scrollTop = unitPlannerContainerEl.value.scrollHeight;
+                }
+            })
+            .catch(() => {
+                // noop
+            });
     },
 );
 
@@ -127,7 +133,7 @@ window.Vue.onMounted(() => {
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
-    resizeObserver.value.observe(document.querySelector("#unit-planner-container")!);
+    resizeObserver.value.observe(document.querySelector("#container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
