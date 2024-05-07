@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Markbook\AbstractCSV;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\User;
@@ -221,10 +222,32 @@ class CSV extends AbstractCSV
             && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {
             $participant = $participants[$assessment->getId()][$userId];
-            $feedback    = $participant->getAuthoritativeFeedback(!$showDrafts);
-            if ($feedback) {
-                $suffix           = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
-                $humanReadableMark = $feedback->getHumanReadableMark();
+            $suffix = null;
+            $humanReadableMark = null;
+            $normalisedMark = null;
+            $comment = null;
+            $dataFound = false;
+
+            if ($assessment instanceof Project) {
+                // For projects, there is no feedback, so get data from other places.
+                $suffix = $assessment->isReviewComplete($participant) ? self::DRAFT_SUFFIX : '';
+                $humanReadableMark = $participant->getHumanReadableMark(!$showDrafts);
+                $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
+                $comment = '';
+                $dataFound = true;
+            } else {
+                // For non-projects, all the data is in the feedback.
+                $feedback = $participant->getAuthoritativeFeedback(!$showDrafts);
+                if ($feedback) {
+                    $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
+                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $normalisedMark = $feedback->getNormalisedMark();
+                    $comment = $feedback->getComment();
+                    $dataFound = true;
+                }
+            }
+
+            if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment)) {
                     $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
                     $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
@@ -232,10 +255,10 @@ class CSV extends AbstractCSV
                     $row[] = $humanReadableMark . $suffix;
                 }
                 if ($this->hasNormalizedMarkColumn($assessment)) {
-                    $row[] = $feedback->getNormalisedMark() . $suffix;
+                    $row[] = (is_null($normalisedMark ? '': round($normalisedMark, 2))) . $suffix;
                 }
                 if ($this->hasCommentColumn($assessment)) {
-                    $row[] = $feedback->getComment() . $suffix;
+                    $row[] = $comment . $suffix;
                 }
                 return $row;
             }
