@@ -56,6 +56,13 @@ module.exports = {
         // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
+        // allow devDependencies to be imported so that we can use them in our tests
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
+            },
+        ],
     },
     settings: {
         "import/parsers": {

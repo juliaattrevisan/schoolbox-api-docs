@@ -41,5 +41,7 @@
         "types/**/*",
         "vue/**/*",
         "www/static/js/**/*",
+        "test/playwright/**/*",
+        "playwright.config.ts",
     ]
 }
