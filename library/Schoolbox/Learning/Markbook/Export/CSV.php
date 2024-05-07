@@ -255,7 +255,7 @@ class CSV extends AbstractCSV
                     $row[] = $humanReadableMark . $suffix;
                 }
                 if ($this->hasNormalizedMarkColumn($assessment)) {
-                    $row[] = (is_null($normalisedMark ? '': round($normalisedMark, 2))) . $suffix;
+                    $row[] = ($normalisedMark === null ? '' : round($normalisedMark, 2)) . $suffix;
                 }
                 if ($this->hasCommentColumn($assessment)) {
                     $row[] = $comment . $suffix;
