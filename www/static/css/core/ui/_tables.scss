@@ -459,3 +459,16 @@ $rotate-span-width: 11rem;
 .component-container table {
     background: transparent;
 }
+
+// Quiz Attempts table
+table.attempts-table {
+    td {
+        vertical-align: middle;
+    }
+    td.actions-small-2 {
+        text-align: right;
+        > nav {
+            position: relative;
+        }
+    }
+}
