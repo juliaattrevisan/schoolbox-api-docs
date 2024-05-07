@@ -185,11 +185,16 @@ class CSV extends AbstractCSV
     private function addAverage(array $row, Markbook $markbook, IAssessable $assessment, bool $showDrafts): array
     {
         $stats = $markbook->getAssessmentStatistics()[$assessment->getId()];
+
+        // The 'mean' obtained here is the mean of the normalised marks (see Markbook->collateAssessmentStatistics()).
         $row[] = $this->extractDraftOrPublishedValue($stats, $showDrafts, 'mean', 'draftMean');
+
         if ($this->hasTotalMarkColumn($assessment)) {
+            // Not needed because the average of the normalised marks is more useful and already provided (see above).
             $row[] = '';
         }
         if ($this->hasNormalizedMarkColumn($assessment)) {
+            // Not needed because the provided value is already normalised (see above).
             $row[] = '';
         }
         if ($this->hasCommentColumn($assessment)) {
