@@ -29,7 +29,7 @@
                 <section>
                     <ul class="information-list">
                         {% for report in reports %}
-                        {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}
+                        {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {report: report, reportId: report.id}) %}
 
                         <li class="actions-small-5">
                             <div class="list-item">
@@ -54,17 +54,16 @@
                                 </div>
                             </div>
                             <nav>
-                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getPreview', {reportId:report.id}) %}
-                                {% if generateRoute %}
-                                    <a class="icon-eye" href="{{ generateRoute }}" title="Preview Report" data-preview></a>
+                                {% set previewRoute = routeLookupIfAuthorized('adminSummativeReport.getPreview', {report: report, reportId: report.id}) %}
+                                {% if previewRoute %}
+                                    <a class="icon-eye" href="{{ previewRoute }}" title="Preview Report" data-preview></a>
                                 {% endif %}
 
-                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
+                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report: report, reportId: report.id}) %}
                                 {% if generateRoute %}
                                 <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
                                 {% endif %}
 
-                                {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}
                                 {% if updateRoute %}
                                     <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
                                 {% endif %}
