@@ -56,7 +56,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
             if (response.ok) {
                 const newUnit = (await response.json()) as Unit;
                 unitPlannerStore.units = [...unitPlannerStore.units, newUnit];
-                timeout({ text: "Unit created" });
+                timeout({ text: "Unit created successfully" });
                 cancel();
             } else {
                 const responseText = (await response.json()) as { title: string; type: string; status: number };

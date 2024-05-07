@@ -33,7 +33,7 @@ function onCreateSelected() {
                 data-test-add-unit
                 @click.prevent="onCreateSelected"
             >
-                Create Unit
+                Create unit
             </button>
         </div>
     </div>

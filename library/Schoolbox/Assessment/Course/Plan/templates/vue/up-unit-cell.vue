@@ -214,37 +214,35 @@ window.Vue.onUnmounted(() => {
                 </div>
             </template>
 
-            <template v-else-if="props.column.type === ColumnType.OVERVIEW">
-                <textbox-content
-                    ref="textboxContentComponent"
-                    :unit="props.unit"
-                    :column="props.column"
-                ></textbox-content>
-            </template>
+            <textbox-content
+                v-else-if="props.column.type === ColumnType.OVERVIEW"
+                ref="textboxContentComponent"
+                :unit="props.unit"
+                :column="props.column"
+            />
 
-            <template v-else-if="props.column.type === ColumnType.ACTIVITIES">
-                <activities-list-content
-                    :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
-                    :activities="props.unit.activities.items"
-                    :activities-list-routes="props.unit.activities._routes"
-                    :prevent-store-init="props.isSortablePlaceholder"
-                    @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
-                    @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
-                />
-            </template>
+            <activities-list-content
+                v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
+                :activities="props.unit.activities.items"
+                :activities-list-routes="props.unit.activities._routes"
+                :prevent-store-init="props.isSortablePlaceholder"
+                @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
+                @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
+            />
 
-            <template v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES">
-                <rubric-capabilities :rubric-capabilities="props.unit.rubricCapabilities"></rubric-capabilities>
-            </template>
+            <rubric-capabilities
+                v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
+                :rubric-capabilities="props.unit.rubricCapabilities"
+            />
 
-            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null">
-                <up-unit-cell-curriculum-content
-                    :selected-nodes="props.unit.curriculum.selectedNodes"
-                    :nodes="props.unit.curriculum.nodes ?? []"
-                    :folder-id="props.unit.folderId"
-                    :component="curriculumComponent"
-                />
-            </template>
+            <up-unit-cell-curriculum-content
+                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
+                :selected-nodes="props.unit.curriculum.selectedNodes"
+                :nodes="props.unit.curriculum.nodes ?? []"
+                :folder-id="props.unit.folderId"
+                :component="curriculumComponent"
+            />
         </div>
 
         <div class="content-container-fixed">
