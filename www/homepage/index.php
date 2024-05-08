@@ -90,8 +90,7 @@ if ($this->getDi()->has('sentry')) {
  */
 $canvasUrl = $this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL);
 
-if (
-    !empty($canvasUrl) &&
+if (!empty($canvasUrl) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
     '' !== $folder->getCodeString()
@@ -239,8 +238,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec   = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if (
-        (!$hasCourseSpec && !$hasUnitSpec)
+    if ((!$hasCourseSpec && !$hasUnitSpec)
         && Config::get('lms_enabled')
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {
@@ -535,26 +533,28 @@ function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepa
 
     // Schoolbox analytics link.
     // Grab magic code to grab course IDs this folder is part of.
-    $currentTerm      = $manageClassController->getCurrentTerm();
-    $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
-    $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
-        [$manageClassController->getContext()->getId()],
-        $currentTerm->getStart(),
-        $currentTerm->getActualFinish()
-    );
-    if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
-        $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
-        foreach ($courses[$manageClassController->getContext()->getId()] as $courseId => $courseTitle) {
-            $params = [
-                'courseSpecId' => $courseId,
-                'folderId'     => $manageClassController->getContext()->getId(),
-                'termCode'     => $currentTerm->getCode(),
-            ];
-            if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
-                $hasAnalytics = true;
-                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($schoolboxAnalytics, $params));
-                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
-                $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+    if (Config::get('lms_enabled')) {
+        $currentTerm      = $manageClassController->getCurrentTerm();
+        $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
+        $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
+            [$manageClassController->getContext()->getId()],
+            $currentTerm->getStart(),
+            $currentTerm->getActualFinish()
+        );
+        if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
+            $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
+            foreach ($courses[$manageClassController->getContext()->getId()] as $courseId => $courseTitle) {
+                $params = [
+                    'courseSpecId' => $courseId,
+                    'folderId'     => $manageClassController->getContext()->getId(),
+                    'termCode'     => $currentTerm->getCode(),
+                ];
+                if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
+                    $hasAnalytics = true;
+                    $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($schoolboxAnalytics, $params));
+                    $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
+                    $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+                }
             }
         }
     }
