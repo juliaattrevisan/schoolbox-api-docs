@@ -206,8 +206,18 @@ class Controller extends Assessment\Controller
         $maxMarks = [];
 
         foreach ($assessment->getAllParticipants() as $participant) {
-            if (!$participant->findMostRecentResponse() && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
-                $maxMarks[$participant->getUser()->getId()] = null;
+            if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+                /* If this participant never made an attempt, or
+                 * this attempt is currently in progress and not yet saved in our db,
+                 *
+                 * ask learnosity to find out how much their attempt *would* be worth
+                 * based on the current set of questions
+                 */
+                if (!$participant->findMostRecentResponse()) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                } elseif (!$participant->findMostRecentResponse()->isSubmitted()) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                }
             }
         }
 
