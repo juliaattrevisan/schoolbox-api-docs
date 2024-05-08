@@ -180,7 +180,34 @@ class BellTimes implements IStrategy
                         $timetablePeriod->setSequence($i);
 
                         if ($this->perform) {
-                            $this->periodMapper->save($timetablePeriod);
+                            /* The multi-source capability allows a Timetable Period to be set from one source
+                             * but will conflict from another source trying to redefine it in the exact same way;
+                             * unfortunately not particularly elegant to avoid but we can maybe save an excessive
+                             * db write in the meantime. There aren't many Periods for this to make me itchy
+                             */
+                            try {
+                                $this->periodMapper->findOneByColumnList([
+                                    'day' => $timetablePeriod->getDay(),
+                                    'sequence' => $timetablePeriod->getSequence(),
+                                    'cycle_id' => $timetablePeriod->getCycle()->getId(),
+                                ]);
+
+                                $this->log->debug(sprintf(
+                                    'Reusing existing TimetablePeriod with unique key %s-%s-%s',
+                                    $timetablePeriod->getDay(),
+                                    $timetablePeriod->getSequence(),
+                                    $timetablePeriod->getCycle()->getId()
+                                ));
+                            } catch (\Schoolbox\Mapper\Exception $e) {
+                                $this->log->debug(sprintf(
+                                    'Creating new TimetablePeriod with unique key %s-%s-%s',
+                                    $timetablePeriod->getDay(),
+                                    $timetablePeriod->getSequence(),
+                                    $timetablePeriod->getCycle()->getId()
+                                ));
+
+                                $this->periodMapper->save($timetablePeriod);
+                            }
                         }
 
                         $i++;
