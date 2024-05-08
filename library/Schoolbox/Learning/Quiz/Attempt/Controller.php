@@ -11,7 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -20,6 +24,9 @@ class Controller extends Base
      * Constructor.
      */
     public function __construct(
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
     ) {
     }
 
@@ -46,9 +53,75 @@ class Controller extends Base
     /**
      * Update the details of an attempt by superimposing a POST array's values
      */
-    public function postModify(): void
+    public function postModify(QuizDomainObject $assessment, \Schoolbox\User $student): void
     {
-        print_r($this->requestPost->getArrayCopy());
-        new \Alaress_Probe('post modify');
+        $postData = $this->requestPost->getArrayCopy();
+
+        if ('' !== trim((string)$postData['responseId'])) {
+            /* Load an existing Learnosity attempt and update its contents with the new
+             * mark and overall commentary
+             */
+            $attempt = $this->attemptMapper->findById($postData['responseId']);
+        } else {
+            /* Create a whole new random attempt with some defaults
+             * TODO make defaults editable via Attempt Editor
+             */
+            $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+            $attempt = $this->attemptMapper->createModel()
+                ->setQuiz($quiz)
+                ->setUser($student)
+                ->setStart(\Alaress_Date_Format::now())
+                ->setFinish(\Alaress_Date_Format::now());
+        }
+
+
+        /* Assign the maximum available marks based on what's potentially available
+         */
+        $maxMark = 100.00;
+
+        if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            $maxMark = (float)($postData['maxMarks']);
+
+            $assessment->getMarkScheme()->setTotalMark($maxMark);
+        }
+
+        /* Human-readable mark, from the combobox
+         * Normalised mark derived from the human-readable mark
+         */
+        $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark(trim((string)$postData['mark']));
+        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
+        /* Update the deets and save it
+         */
+        $attempt->setComment(trim((string)$postData['comment']))
+            ->setMark($humanReadableMark)
+            ->setMaxMark($maxMark)
+            ->setNormalisedMark($normalisedMark)
+            ->setReviewer($this->getUser())
+            ->setReviewed(\Alaress_Date_Format::now());
+
+        $this->attemptMapper->save($attempt);
+    }
+
+    /**
+     * TODO Literally copypasta'd
+     *
+     * Converts an assessment_id to a Quiz
+     *
+     * @param int $assessmentId
+     * @return Quiz
+     * @throws Exception
+     */
+    protected function getQuizForAssessmentId(int $assessmentId): Quiz
+    {
+        /** @var Quiz $quiz */
+        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
+
+        if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        return $quiz;
     }
 }

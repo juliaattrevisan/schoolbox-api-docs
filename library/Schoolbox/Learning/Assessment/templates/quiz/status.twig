@@ -255,8 +255,12 @@
         {# Quizzes now support Submission States #}
         <div class="small-12 column">
             <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuizAttempt.postModify', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id }) }}">
+                {# Maximum available marks for this guy #}
+                {% set maxMarks = latestResponse.marksAvailable ?? maxMarks[participant.user.id] %}
+
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
-                <input type="hidden" name="learnosityReference" value="{{ latestResponse.learnosityReference ?? '' }}"/>
+                <input type="hidden" name="learnosityReference" value="{{ latestResponse.learnosityReference ?? '' }}" />
+                <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
 
                 <div class="row">
                     {# Quiz always has a Mark Type (it's mandatory) #}
@@ -274,7 +278,7 @@
                                 participant: participant,
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 markScheme:  assessment.markScheme,
-                                limit:       latestResponse.marksAvailable ?? maxMarks[participant.user.id],
+                                limit:       maxMarks,
                                 tabIndex:    loop.index0 + inputNo,
                                 errors:      errors,
                                 readonly:    false,

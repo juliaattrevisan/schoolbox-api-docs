@@ -124,6 +124,7 @@ class Module extends BaseModule
     {
         try {
             // obtain the assessment from our other preload
+
             $student     = $this->getUserMapper()->findById($params['studentId']);
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
         } catch (UnexpectedValueException $e) {
@@ -183,7 +184,11 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getErrorMapper(),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
+        );
     }
 
 
