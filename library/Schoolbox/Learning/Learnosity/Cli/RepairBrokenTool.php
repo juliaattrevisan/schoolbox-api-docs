@@ -88,7 +88,7 @@ class RepairBrokenTool extends CliTool\App
     private function hasItems(string $learnosityReference, $cache = true): bool
     {
         // if we are just using the already hydrated cache (and the entry exists in there use it, else poll the server
-        if (!$cache || !in_array($learnosityReference, $this->learnosityActivity)) {
+        if (!$cache || !array_key_exists($learnosityReference, $this->learnosityActivity)) {
             $this->fetchActivity([$learnosityReference]);
         }
 
@@ -231,7 +231,8 @@ HELP;
                 "SELECT assessment_id, assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
                         FROM assess
                         LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
-                        WHERE availability = 'assess' AND learnosity_reference IS NOT NULL"
+                        WHERE availability = 'assess' AND learnosity_reference IS NOT NULL
+                        GROUP BY assessment_id"
             );
             $quizCount = $query->rowCount();
             $this->getLogger()->debug(sprintf("Found: %s quizzes, checking...", $quizCount));
