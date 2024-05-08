@@ -93,7 +93,9 @@ class RepairBrokenTool extends CliTool\App
         }
 
         // now we have the 'new/cached' learnosity activity, lets check it
-        $activity = $this->learnosityActivity[$learnosityReference];
+        // found an activity that is null (with no data at all)...
+        // looks like it is very broken, probably good to note, even if we are just re importing...
+        $activity = $this->learnosityActivity[$learnosityReference] ?? null;
         if (null === $activity) {
             $this->getLogger()->debug("learnosity activity has no data... probably good to reimport.");
             return false;
@@ -234,10 +236,20 @@ HELP;
             $quizCount = $query->rowCount();
             $this->getLogger()->debug(sprintf("Found: %s quizzes, checking...", $quizCount));
 
-            // hit learnosity and fetch them all
-            $this->fetchActivity($query->fetchColumnArray('learnosity_reference'));
+            // build tmp arrays
+            $learnosityReferences = [];
+            $schoolboxQuizzes = [];
 
+            // extract learnosity references and build a schoolbox array
             while ($row = $query->fetch()) {
+                $learnosityReferences[] = $row['learnosity_reference'];
+                $schoolboxQuizzes[] = $row;
+            }
+
+            // hit learnosity and fetch them all
+            $this->fetchActivity($learnosityReferences);
+
+            foreach ($schoolboxQuizzes as $row) {
                 $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
                     $brokenQuizzes++;
