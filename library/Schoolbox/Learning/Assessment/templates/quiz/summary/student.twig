@@ -90,95 +90,96 @@
 <div id='attempts' class="row">
     <div class="small-12 columns">
         <h2 class="subheader">Attempts</h2>
-
-        <table>
-            <thead>
-            <tr>
-                <th>Start</th>
-                <th>Finish</th>
-                <th>Time Taken</th>
-                <th>Reviewed</th>
-                <th>Reviewer</th>
-                <th>Grade</th>
-                <th>&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for attempt in attempts %}
-                {% set finished = attempt.finish %}
-                <tr data-attempt>
-                    <td>{{ attempt.start.short }}</td>
-                    <td>
-                        {% if finished %}
-                            {{ attempt.finish.short }}
-                        {% else %}
-                            <em>Attempt in progress</em>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if finished %}
-                            {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
-                        {% else %}
-                            <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if attempt.reviewed %}
-                            {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if attempt.reviewed %}
-                            {% if attempt.reviewer.deleted %}
-                                {{ attempt.reviewer.fullname }}
+        <div class="scrollable">
+            <table class="attempts-table">
+                <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Finish</th>
+                    <th>Time Taken</th>
+                    <th>Reviewed</th>
+                    <th>Reviewer</th>
+                    <th>Grade</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for attempt in attempts %}
+                    {% set finished = attempt.finish %}
+                    <tr data-attempt>
+                        <td>{{ attempt.start.short }}</td>
+                        <td>
+                            {% if finished %}
+                                {{ attempt.finish.short }}
                             {% else %}
-                                <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                                <em>Attempt in progress</em>
                             {% endif %}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if attempt.normalisedMark is not null %}
+                        </td>
+                        <td>
+                            {% if finished %}
+                                {{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(attempt.finish, true)) }}
+                            {% else %}
+                                <em>{{ duration.secondsToHoursAndMinutes(attempt.start.diffInSeconds(NOW, true)) }}</em>
+                            {% endif %}
+                        </td>
+                        <td>
                             {% if attempt.reviewed %}
-                                {{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}
+                                {{ markVisible.showIfVisible(assessment, attempt.reviewed.short, '—' ) }}
                             {% else %}
-                                <span class="meta" title="This attempt has not yet been reviewed by a teacher, so the mark is unconfirmed and may change following review.">{{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}</span>
+                                —
                             {% endif %}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td class="actions-small-2">
-                        <nav>
-                            {% if attempt.learnosityReference %}
-                                {% if not finished and canAttempt %}
-                                    <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                        </td>
+                        <td>
+                            {% if attempt.reviewed %}
+                                {% if attempt.reviewer.deleted %}
+                                    {{ attempt.reviewer.fullname }}
                                 {% else %}
-                                    {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
-                                    {% if reviewRoute %}
-                                        <a href="{{ reviewRoute }}" class="icon-view" title="Review"></a>
-                                    {% endif %}
+                                    <a href="/search/user/{{ attempt.reviewer.id }}">{{ attempt.reviewer.fullname }}</a>
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if attempt.normalisedMark is not null %}
+                                {% if attempt.reviewed %}
+                                    {{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}
+                                {% else %}
+                                    <span class="meta" title="This attempt has not yet been reviewed by a teacher, so the mark is unconfirmed and may change following review.">{{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}</span>
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td class="actions-small-2">
+                            <nav>
+                                {% if attempt.learnosityReference %}
+                                    {% if not finished and canAttempt %}
+                                        <a href="{{ routeLookupIfAuthorized('learnosity.getAttempt', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id}) }}" class="icon-next" title="Resume"></a>
+                                    {% else %}
+                                        {% set reviewRoute = routeLookupIfAuthorized('learnosity.getReview', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
+                                        {% if reviewRoute %}
+                                            <a href="{{ reviewRoute }}" class="icon-view" title="Review"></a>
+                                        {% endif %}
 
-                                    {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
-                                    {% if feedbackRoute %}
-                                        <a href="{{ feedbackRoute }}" class="icon-staff" title="Feedback"></a>
+                                        {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
+                                        {% if feedbackRoute %}
+                                            <a href="{{ feedbackRoute }}" class="icon-staff" title="Feedback"></a>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
-                            {% endif %}
 
-                            {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
-                            {% if deleteRoute %}
-                                <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
-                            {% endif %}
-                        </nav>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                                {% set deleteRoute = routeLookupIfAuthorized('learningQuiz.postAttemptDelete', {assessmentId: assessment.id, assessment: assessment}) %}
+                                {% if deleteRoute %}
+                                    <a href="{{ deleteRoute }}" class="icon-delete" title="Delete Attempt" data-delete="{{ attempt.id }}"></a>
+                                {% endif %}
+                            </nav>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+         </div>
     </div>
 </div>
 {% endif %}
