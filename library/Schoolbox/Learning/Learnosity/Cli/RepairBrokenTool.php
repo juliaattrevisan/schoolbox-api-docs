@@ -89,6 +89,7 @@ class RepairBrokenTool extends CliTool\App
     {
         // if we are just using the already hydrated cache (and the entry exists in there use it, else poll the server
         if (!$cache || !array_key_exists($learnosityReference, $this->learnosityActivity)) {
+            $this->getLogger()->debug("Breaking Cache, or Learnosity Reference not found in the cache...");
             $this->fetchActivity([$learnosityReference]);
         }
 
@@ -254,7 +255,7 @@ HELP;
                 $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
                     $brokenQuizzes++;
-                    $this->getLogger()->debug(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
+                    $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
                     if (null === $row['assess_section.assess_id']) {
                         $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $row['assessment_id']));
                     }
