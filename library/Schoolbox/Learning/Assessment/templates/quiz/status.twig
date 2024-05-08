@@ -178,6 +178,19 @@
                                 <span>In Progress</span>
                             </div>
                         {% endif %}
+                    {% else %}
+                        {# Legacy quiz attempts are rendered here
+                         # mostly synonymously with learnosity
+                         # except for the things you can't action here (ie. to be reviewed)
+                         # hence the mark will be hidden from the screen
+                         #}
+                        {% if latestResponse.submitted %}
+                            {% if latestFeedback and latestFeedback.normalisedMark|length %}
+                                <div class="grade {{ urgencyClass }}-bg">
+                                    <span>{{ latestFeedback.humanReadableMark }}</span>
+                                </div>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                 {% else %}
                     &ndash;
