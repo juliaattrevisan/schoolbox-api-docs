@@ -270,7 +270,7 @@ Usage:
         var templateInput = $('[data-template]');
 
         templateInput.change(function() {
-            $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id }}) === Number(templateInput.val()));
+            $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id ?? null }}) === Number(templateInput.val()));
         });
         {% endif %}
 
@@ -440,11 +440,20 @@ Usage:
                             Course Framework
                         </label>
                         <select data-template name="template" required>
+                            {# if the course template is not set (doesn't exist)
+                             # either canvas is not saying which template it is using with its import
+                             # or possibly a failed migration.
+                             #
+                             # we should show a default of `please select`, and force the user to fix it
+                            #}
+                            {% if courseSpec and courseSpec.template.id is not defined %}
+                                <option disabled selected="selected" value="">Please Select</option>
+                            {% endif %}
                             {% if templates.count > 1 %}
                                 {% for template in templates %}
                                     {# only render the template if it is not deleted or if it is deleted and being used by the spec #}
-                                    {% if not template.isDeleted or courseSpec and courseSpec.template.id == template.id %}
-                                        <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id == template.id %}selected{% endif %}>{{ template.name }}{% if template.isDeleted %} (Deleted){% endif %}</option>
+                                    {% if not template.isDeleted or courseSpec and courseSpec.template.id ?? null == template.id %}
+                                        <option value="{{ template.id }}" {% if courseSpec and courseSpec.template.id ?? null == template.id %}selected{% endif %}>{{ template.name }}{% if template.isDeleted %} (Deleted){% endif %}</option>
                                     {% endif %}
                                 {% endfor %}
                             {% else %}

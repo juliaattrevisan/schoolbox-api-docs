@@ -694,7 +694,7 @@ class Controller extends Base\Base
             || array_diff($newCurriculumCodes, $currentCurriculumCodes)
             || $originalParentFolderId !== $parentFolderId
             || $courseSpec->getSubjectCode() !== $subjectCode
-            || $courseSpec->getTemplate()->getId() !== $template->getId()
+            || $courseSpec->getTemplate()?->getId() !== $template->getId()
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
                 $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
@@ -707,7 +707,7 @@ class Controller extends Base\Base
             $courseSpec->setSubjectCode($subjectCode);
 
             // Only update existing course / unit folders, if we changed the template
-            if ($courseSpec->getTemplate()->getId() !== $template->getId()) {
+            if ($courseSpec->getTemplate()?->getId() !== $template->getId()) {
                 $courseSpec->setTemplate($template);
                 // update existing units / course with the new templates
                 $this->updateExistingFolders($courseSpec, $template);
