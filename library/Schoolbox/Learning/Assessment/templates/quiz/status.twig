@@ -255,6 +255,8 @@
         {# Quizzes now support Submission States #}
         <div class="small-12 column">
             <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+                <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
+
                 <div class="row">
                     {# Quiz always has a Mark Type (it's mandatory) #}
                     <div class="small-12 medium-3 column">
