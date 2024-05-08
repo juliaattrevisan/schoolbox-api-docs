@@ -77,6 +77,7 @@ class Controller extends Base
 
 
         /* Assign the maximum available marks based on what's potentially available
+         * TODO check what happens with other mark schemes
          */
         $maxMark = 100.00;
 
@@ -100,6 +101,10 @@ class Controller extends Base
             ->setNormalisedMark($normalisedMark)
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
+
+        /* TODO stop spawning new attempts by using the form
+         * TODO use setReviewed() as the publish mechanism
+         */
 
         $this->attemptMapper->save($attempt);
     }
