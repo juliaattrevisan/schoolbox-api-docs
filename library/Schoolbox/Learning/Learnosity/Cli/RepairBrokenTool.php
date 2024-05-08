@@ -40,6 +40,12 @@ class RepairBrokenTool extends CliTool\App
 
     private API $api;
 
+    /**
+     * array to cache the learnosity activity payload data, which includes the quiz title, description and the items (questions)
+     * @var array
+     */
+    private array $learnosityActivity = [];
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -51,20 +57,43 @@ class RepairBrokenTool extends CliTool\App
     }
 
     /**
-     * actually hit learnosity and confirm if they have a title and any items, or not...
+     * Hit Learnosity to get either a single or multiple activity data
+     * @param array $learnosityReferences
+     * @return void
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     */
+    private function fetchActivity(array $learnosityReferences): void
+    {
+        $this->getLogger()->debug(sprintf("%s activities to fetch, chunking into 999 sized chunks", count($learnosityReferences)));
+
+        // Learnosity has a limit of 1000 activities on the endpoint, lets get close but not quite hit it...
+        foreach (array_chunk($learnosityReferences, 999) as $chunk) {
+            $this->getLogger()->debug(sprintf('Polling learnosity to check if it has items: %s', implode(',', $chunk)));
+            $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
+                'references' => $chunk
+            ]);
+            foreach ($itemReferences['data'] as $item) {
+                $this->learnosityActivity[$item['reference']] = $item;
+            }
+        }
+    }
+
+    /**
+     * Check if the specified learnosity reference was built correctly...
+     * Each activity should have a title that is not null, and have a list of items (questions/sections)
      * @param string $learnosityReference
      * @return bool
      */
-    private function hasItems(string $learnosityReference): bool
+    private function hasItems(string $learnosityReference, $cache = true): bool
     {
-        $this->getLogger()->debug(sprintf('Polling learnosity to check if it has items: %s', $learnosityReference));
-        $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
-            'references' => [
-                $learnosityReference
-            ]
-        ]);
-        // saw this once... looks like it is very broken, probably good to note, even if we are just re importing...
-        $activity = $itemReferences['data'][0] ?? null;
+        // if we are just using the already hydrated cache (and the entry exists in there use it, else poll the server
+        if (!$cache || !in_array($learnosityReference, $this->learnosityActivity)) {
+            $this->fetchActivity([$learnosityReference]);
+        }
+
+        // now we have the 'new/cached' learnosity activity, lets check it
+        $activity = $this->learnosityActivity[$learnosityReference];
         if (null === $activity) {
             $this->getLogger()->debug("learnosity activity has no data... probably good to reimport.");
             return false;
@@ -177,6 +206,11 @@ HELP;
                         exit;
                     }
                     $row = $query->fetch();
+                    // force the cached entry to be re fetched (we should be generating a new uuid here..
+                    // but just to ensure we are grabbing the latest learnosity entry, do it again
+                    $this->fetchActivity([$row['learnosity_reference']]);
+
+                    // do we now have items? did the reimport fix the issue?
                     if ($this->hasItems($row['learnosity_reference'])) {
                         $this->getLogger()->notice(sprintf("Quiz repair succeeded %s, has questions", $assessmentId));
                     } else {
@@ -189,7 +223,7 @@ HELP;
                 $this->getLogger()->error("Unable to bulk repair, either scan for issues, or repair a single");
                 exit;
             }
-            $brokenQuizze = 0;
+            $brokenQuizzes = 0;
             // check all learnosity references
             $query = $this->getDatabaseInternal()->executeQuery(
                 "SELECT assessment_id, assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
@@ -199,10 +233,14 @@ HELP;
             );
             $quizCount = $query->rowCount();
             $this->getLogger()->debug(sprintf("Found: %s quizzes, checking...", $quizCount));
+
+            // hit learnosity and fetch them all
+            $this->fetchActivity($query->fetchColumnArray('learnosity_reference'));
+
             while ($row = $query->fetch()) {
                 $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
-                    $brokenQuizze++;
+                    $brokenQuizzes++;
                     $this->getLogger()->debug(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
                     if (null === $row['assess_section.assess_id']) {
                         $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $row['assessment_id']));
@@ -210,7 +248,7 @@ HELP;
                 }
             }
             $this->getLogger()->notice(
-                sprintf("%s quizzes scanned, %s quizzes broken", $quizCount, $brokenQuizze)
+                sprintf("%s quizzes scanned, %s quizzes broken", $quizCount, $brokenQuizzes)
             );
         }
     }
