@@ -46,6 +46,7 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
@@ -53,16 +54,15 @@ class Module extends BaseModule
          */
         $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
 
-        $preloadAttempt = function ($params) {
-            return $this->preloadAttempt($params);
+        $preloadParticipant = function ($params) {
+            return $this->preloadAssessmentAndStudent($params);
         };
 
         /* The /update part is so we deconflict with the other Learnosity/Module.php routes,
          * specifically the complete route: /{assessmentId}/attempt/{studentId}/complete
          * "complete" is not a valid learnosity reference lol
          */
-        $this->register('GET', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/update', 'getModify', $instructorPerms, $preloadAttempt);
-        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/update', 'postModify', $instructorPerms, $preloadAttempt);
+        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/update', 'postModify', $instructorPerms, $preloadParticipant);
     }
 
 
@@ -97,45 +97,12 @@ class Module extends BaseModule
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-
+;
                         return $ctx;
                     }
                 )
             )
         );
-    }
-
-
-    /**
-     * Preloads an attempt via its learnosity reference identifier
-     *
-     * @param array $params
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws DefinitionException
-     * @throws DomainException
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws NotFound
-     * @throws NotFoundExceptionInterface
-     */
-    protected function preloadAttempt(array $params): array
-    {
-        $participantPreload = $this->preloadAssessmentAndStudent($params);
-
-        try {
-            $attempt = $this->getAttemptMapper()->findOneByColumnList([
-                'user_id' => $params['studentId'],
-                'learnosity_reference' => $params['learnositySessionReference']
-            ]);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new NotFound();
-        }
-
-        return array_merge($participantPreload, [
-            'attempt' => $attempt
-        ]);
     }
 
 
@@ -230,27 +197,6 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|AssessmentMapperProxy
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->injector->get('assessmentDataSource');
-    }
-
-
-    /**
-     * @return Mapper|\Schoolbox\Learning\Quiz\Attempt\Mapper
-     * @throws InvalidArgumentException
-     */
-    protected function getAttemptMapper()
-    {
-        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
-    }
-
-
-    /**
      * @return Access
      * @throws InvalidArgumentException
      */
@@ -280,4 +226,14 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
+
+    /**
+     * @return object|AssessmentMapperProxy
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
+    }
 }

@@ -254,8 +254,9 @@
 
         {# Quizzes now support Submission States #}
         <div class="small-12 column">
-            <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+            <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuizAttempt.postModify', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id }) }}">
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
+                <input type="hidden" name="learnosityReference" value="{{ latestResponse.learnosityReference ?? '' }}"/>
 
                 <div class="row">
                     {# Quiz always has a Mark Type (it's mandatory) #}
