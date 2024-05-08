@@ -70,7 +70,7 @@ $app = new class extends CliTool\App {
             'course_specifications'       => 'SELECT COUNT(*) FROM course_specification WHERE deleted_at IS NULL',
             'course_implementation_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_due_work'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL',
-            'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assessment.deleted_at IS NULL',
+            'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
             'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
             'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
@@ -103,6 +103,7 @@ $app = new class extends CliTool\App {
                                           FROM assess
                                                    INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
                                           where assess.deleted_at is null
+                                            and assess.availability = "assess"
                                             and assess_section.deleted_at is null
                                           GROUP BY assess.assess_id
                                           having numSections > 1) as moreThan1;',
@@ -111,6 +112,7 @@ $app = new class extends CliTool\App {
                                                    inner join assess_section on assess.assess_id = assess_section.assess_id
                                                    inner join assess_question on assess_section.section_id = assess_question.section_id
                                           where assess.deleted_at is null
+                                            and assess.availability = "assess"
                                             and assess_section.deleted_at is null
                                             and assess_question.deleted_at is null
                                           group by assess.assess_id
@@ -120,6 +122,7 @@ $app = new class extends CliTool\App {
                                                    inner join assess_section on assess.assess_id = assess_section.assess_id
                                                    inner join assess_question on assess_section.section_id = assess_question.section_id
                                           where assess.deleted_at is null
+                                            and assess.availability = "assess"
                                             and assess_section.deleted_at is null
                                             and assess_question.deleted_at is null
                                           group by assess.assess_id
@@ -130,19 +133,21 @@ $app = new class extends CliTool\App {
                                         inner join assess_section on assess.assess_id = assess_section.assess_id
                                         where random != 0
                                         and assess.deleted_at is null
+                                        and assess.availability = "assess"
                                         and assess_section.deleted_at is null',
             'quiz_sections'     => '
                                     select count(*) as num
                                     from assess
                                     inner join assess_section on assess.assess_id = assess_section.assess_id
                                     and assess.deleted_at is null
+                                    and assess.availability = "assess"
                                     and assess_section.deleted_at is null',
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
             'quiz_without_learnosity_reference' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_reference IS NULL
                 AND deleted_at IS NULL
             ",
@@ -150,7 +155,7 @@ $app = new class extends CliTool\App {
             // I've seen this happen before, and am not sure why
             'quiz_with_empty_learnosity_reference' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_reference = ''
                 AND deleted_at IS NULL
             ",
@@ -159,7 +164,7 @@ $app = new class extends CliTool\App {
             // a quiz unable to even begin processing
             'quiz_status_pending' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_job_status = 'pending'
                 AND deleted_at IS NULL
             ",
@@ -167,7 +172,7 @@ $app = new class extends CliTool\App {
             // again, some number is acceptable
             'quiz_status_processing' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_job_status = 'processing'
                 AND deleted_at IS NULL
             ",
@@ -176,7 +181,7 @@ $app = new class extends CliTool\App {
             // back to pending and eventually unprocessable
             'quiz_status_failed' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_job_status = 'failed'
                 AND deleted_at IS NULL
             ",
@@ -185,7 +190,7 @@ $app = new class extends CliTool\App {
             // processed
             'quiz_status_unprocessable' => "
                 SELECT COUNT(*) FROM assess
-                WHERE assessment_id IS NOT NULL
+                WHERE availability = 'assess'
                 AND learnosity_job_status = 'unprocessable'
                 AND deleted_at IS NULL
             ",
