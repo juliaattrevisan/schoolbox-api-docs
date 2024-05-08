@@ -205,6 +205,18 @@ $app = new class extends CliTool\App {
                 AND deleted_at IS NULL;
             ",
 
+            // Quizzes with short question answers longer than 250 characters will make the field blank
+            'quiz_short_ans_250' => "
+                select count(*) from assess
+                join assess_section on (assess_section.assess_id = assess.assess_id AND assess_section.deleted_at IS NULL)
+                join assess_question on (assess_question.section_id = assess_section.section_id AND assess_question.deleted_at IS NULL)
+                join assess_answer on (assess_question.question_id = assess_answer.question_id AND assess_answer.deleted_at IS NULL)
+                join assess_luQuestionType on (assess_luQuestionType.type_id = assess_question.type_id AND assess_luQuestionType.moodle = 'shortanswer' AND assess_luQuestionType.availability = 'assess')
+                where CHAR_LENGTH(assess_answer.answer) > 250
+                  AND assess.availability = 'assess'
+                  AND assess.deleted_at IS NULL;
+            ",
+
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
