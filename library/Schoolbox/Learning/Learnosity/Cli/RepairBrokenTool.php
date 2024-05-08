@@ -121,6 +121,7 @@ class RepairBrokenTool extends CliTool\App
      * This clears the `assess.learnosity_reference` for the assessment id, then re imports using the original learnosity quiz importer
      *
      * @param string $assessmentId
+     * @param string $title
      * @return void
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -130,15 +131,14 @@ class RepairBrokenTool extends CliTool\App
      * @throws \LearnositySdk\Exceptions\ValidationException
      * @throws \Schoolbox\External\Exception
      */
-    private function repair(string $assessmentId): void
+    private function repair(string $assessmentId, string $title): void
     {
-
         if ($this->perform()) {
             $this->getLogger()->notice("Clearing `learnosity_reference` from the assess entry...");
             $this->getDatabaseInternal()->executeQuery("UPDATE assess SET learnosity_reference = null WHERE assessment_id = :assessmentId LIMIT 1", ['assessmentId' => $assessmentId]);
         } else {
             $this->getLogger()->notice("Planning to repair...");
-            $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $row['title'], $assessmentId));
+            $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $title, $assessmentId));
         }
 
         /**
@@ -256,7 +256,7 @@ HELP;
 
                 // are we wanting to fix this? or just checking if it was broken?
                 if ($this->getOpt(self::OPT_LONG_REPAIR)) {
-                    $this->repair($assessmentId);
+                    $this->repair($assessmentId, $row['title']);
                 }
             }
         } else {
@@ -318,7 +318,7 @@ HELP;
                     }
 
                     // this is where we would auto repair the quizzes (not something that we want to do just yet)
-                    // $this->repair($row['assessment_id']);
+                    // $this->repair($row['assessment_id'], $row['title']);
                 }
             }
 
