@@ -163,29 +163,44 @@ HELP;
                         LIMIT 1",
                 ['assessmentId' => $assessmentId]
             );
+
             // if no results... was this a quiz?
             if (!$query->rowCount()) {
                 $this->getLogger()->error("Not a Quiz, please confirm the Assessment ID");
                 exit;
             }
             $row = $query->fetch();
+
             if ($this->hasItems($row['learnosity_reference'])) {
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) successfully has learnosity items", $row['title'], $assessmentId));
             } else {
+                // quiz failed to import (no items, or title)
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $assessmentId, $row['learnosity_reference']));
                 if (null === $row['assess_section.assess_id']) {
+                    /**
+                     * This may have been caused by a broken (no items) quiz in the course being imported into the class.
+                     * this quiz has no schoolbox sections or questions, to attempt to rebuild the learnosity quiz.
+                     * suggested manual debug is to take a look where this quiz was imported from (course/class) check if that still have sections,
+                     * if that is also broken, re import that, then re import that (now fixed) quiz back to this space.
+                     */
                     $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $assessmentId));
                     exit;
                 }
-                // fix this?
+
+                // are we wanting to fix this? or just checking if it was broken?
                 if ($this->getOpt(self::OPT_LONG_REPAIR)) {
                     if ($this->perform()) {
-                        $this->getLogger()->notice("Repairing...");
+                        $this->getLogger()->notice("Clearing `learnosity_reference` from the assess entry...");
                         $this->getDatabaseInternal()->executeQuery("UPDATE assess SET learnosity_reference = null WHERE assessment_id = :assessmentId LIMIT 1", ['assessmentId' => $assessmentId]);
                     } else {
                         $this->getLogger()->notice("Planning to repair...");
                         $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $row['title'], $assessmentId));
                     }
+
+                    /**
+                     * spawn the original learnosity importer tool (rather than re build its functionality)
+                     * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
+                     */
                     $app = new ImporterTool();
                     $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
@@ -194,6 +209,7 @@ HELP;
                     // wait for learnosity to persist the data to where it needs to be
                     // just set a random number (15sec may be enough..)
                     sleep(15);
+
                     // check / ensure the quiz has been fixed...
                     $query = $this->getDatabaseInternal()->executeQuery(
                         "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
@@ -203,12 +219,14 @@ HELP;
                         LIMIT 1",
                         ['assessmentId' => $assessmentId]
                     );
+
                     // if no results... something broke...?
                     if (!$query->rowCount()) {
                         $this->getLogger()->error(sprintf("Quiz repair broke for %s, no learnosity reference...", $assessmentId));
                         exit;
                     }
                     $row = $query->fetch();
+
                     // force the cached entry to be re fetched (we should be generating a new uuid here..
                     // but just to ensure we are grabbing the latest learnosity entry, do it again
                     $this->fetchActivity([$row['learnosity_reference']]);
@@ -222,12 +240,16 @@ HELP;
                 }
             }
         } else {
+            /**
+             * just scanning for possible broken quizzes (no repair available currently...)
+             */
             if ($this->getOpt(self::OPT_LONG_REPAIR)) {
                 $this->getLogger()->error("Unable to bulk repair, either scan for issues, or repair a single");
                 exit;
             }
+
             $brokenQuizzes = 0;
-            // check all learnosity references
+            // find all learnosity references
             $query = $this->getDatabaseInternal()->executeQuery(
                 "SELECT assessment_id, assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
                         FROM assess
@@ -251,16 +273,35 @@ HELP;
             // hit learnosity and fetch them all
             $this->fetchActivity($learnosityReferences);
 
+            /**
+             * check each leanosity activity (from the cache)
+             * check if they have items and a title, if not log it
+             */
             foreach ($schoolboxQuizzes as $row) {
                 $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
+                    // quiz broken
                     $brokenQuizzes++;
+
                     $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $row['assessment_id'], $row['learnosity_reference']));
                     if (null === $row['assess_section.assess_id']) {
+                        /**
+                         * This may have been caused by a broken (no items) quiz in the course being imported into the class.
+                         * this quiz has no schoolbox sections or questions, to attempt to rebuild the learnosity quiz.
+                         * suggested manual debug is to take a look where this quiz was imported from (course/class) check if that still have sections,
+                         * if that is also broken, re import that, then re import that (now fixed) quiz back to this space.
+                         */
                         $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $row['assessment_id']));
+
+                        // in future we may be auto repairing the broken learnosity quizzes, this continue is here to ensure we don't repair learnosity only quizzes
+                        continue;
                     }
+
+                    // this is where we would auto repair the quizzes (not something that we want to do just yet)
                 }
             }
+
+            // give summary count of how many learnosity quizzes exist and how many are broken.
             $this->getLogger()->notice(
                 sprintf("%s quizzes scanned, %s quizzes broken", $quizCount, $brokenQuizzes)
             );
