@@ -97,14 +97,14 @@ class Helper
          */
         $startTime = $currentEvent->me['struct']['StartTime']->me['string'] ?? '';
         if ($startTime !== '') {
-            $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
+            $startDateTime = "{$date} {$startTime}:00";
         }
 
         /* If EndTime was provided amend accordingly
          */
         $endTime = $currentEvent->me['struct']['EndTime']->me['string'] ?? '';
         if ($endTime !== '') {
-            $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
+            $endDateTime = "{$date} {$endTime}:00";
         }
 
         /* Recompile everything
