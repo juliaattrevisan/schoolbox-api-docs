@@ -692,6 +692,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         // into the third party.  If $pastoral->save() was used here, the last time the record was changed
                         // by an author in schoolbox would be overwritten with the time that a synchronisation occurred.
                         $this->pastoralMapper->setExternalIdWithoutChangingUpdatedAt($pastoralCareSeq, $pastoral->getId());
+
+                        // But still need to set the external ID in the object,
+                        // for later processes (e.g. pastoral action sync).
+                        $pastoral->setExternalId($pastoralCareSeq);
                     } catch (UnexpectedValueException) {
                         if (!$inOuterTransaction) {
                             $this->connector->rollBack();
