@@ -239,7 +239,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec   = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
     if ((!$hasCourseSpec && !$hasUnitSpec)
-        && Config::get('lms_enabled')
+        && Config::get(ConfigMapper::NAME_LMS_ENABLED)
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {
         $this->parse('course_actions_block', 'course_actions');
@@ -533,7 +533,7 @@ function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepa
 
     // Schoolbox analytics link.
     // Grab magic code to grab course IDs this folder is part of.
-    if (Config::get('lms_enabled')) {
+    if (Config::get(ConfigMapper::NAME_LMS_ENABLED)) {
         $currentTerm      = $manageClassController->getCurrentTerm();
         $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
         $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
