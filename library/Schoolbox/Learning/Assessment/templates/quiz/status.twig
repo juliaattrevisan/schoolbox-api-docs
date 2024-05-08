@@ -205,11 +205,16 @@
          # Action Bar at the bottom of each participant's row
          #}
         {% set canFinish  = latestResponse and not latestResponse.submitted %}
-        {% set canPublish = latestResponse and latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+
+        {# If you have made an attempt, it's officially submitted, you can publish a feedback
+         # The existing feedback, if it exists, gets updated with the new grade and comment;
+         # otherwise, a new one spawns
+         #}
+        {% set canPublish = latestResponse and latestResponse.submitted %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
-        {# Hide if no attempts, or attempt has published review #}
-        {% set actionStyle = not latestResponse or (latestFeedback.published ?? false) ? 'display:none;' : '' %}
+        {# Always show an action row since you can always spawn a rando feedback now #}
+        {% set actionStyle = '' %}
 
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
@@ -241,6 +246,9 @@
                         </a>
                     {% endif %}
                 {% endif %}
+
+                {# You can always publish a new feedback...even if the student never attempted it #}
+                <a class="button" data-interaction-publish="" href="#">Publish</a>
             {% endset %}
         {% endapply %}
 
