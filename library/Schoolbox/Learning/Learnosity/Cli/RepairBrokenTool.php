@@ -116,6 +116,73 @@ class RepairBrokenTool extends CliTool\App
         return true;
     }
 
+    /**
+     * Repair the broken learnosity quiz, and ensure we did infact fix the issue
+     * This clears the `assess.learnosity_reference` for the assessment id, then re imports using the original learnosity quiz importer
+     *
+     * @param string $assessmentId
+     * @return void
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \JsonException
+     * @throws \LearnositySdk\Exceptions\ValidationException
+     * @throws \Schoolbox\External\Exception
+     */
+    private function repair(string $assessmentId): void
+    {
+
+        if ($this->perform()) {
+            $this->getLogger()->notice("Clearing `learnosity_reference` from the assess entry...");
+            $this->getDatabaseInternal()->executeQuery("UPDATE assess SET learnosity_reference = null WHERE assessment_id = :assessmentId LIMIT 1", ['assessmentId' => $assessmentId]);
+        } else {
+            $this->getLogger()->notice("Planning to repair...");
+            $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $row['title'], $assessmentId));
+        }
+
+        /**
+         * spawn the original learnosity importer tool (rather than re build its functionality)
+         * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
+         */
+        $app = new ImporterTool();
+        $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+        (new CliTool\Kernel($app, $options))->runApp();
+
+        // wait for learnosity to persist the data to where it needs to be
+        // just set a random number (15sec may be enough..)
+        sleep(15);
+
+        // check / ensure the quiz has been fixed...
+        $query = $this->getDatabaseInternal()->executeQuery(
+            "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
+                        FROM assess
+                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
+                        LIMIT 1",
+            ['assessmentId' => $assessmentId]
+        );
+
+        // if no results... something broke...?
+        if (!$query->rowCount()) {
+            $this->getLogger()->error(sprintf("Quiz repair broke for %s, no learnosity reference...", $assessmentId));
+            exit;
+        }
+        $row = $query->fetch();
+
+        // force the cached entry to be re fetched (we should be generating a new uuid here..
+        // but just to ensure we are grabbing the latest learnosity entry, do it again
+        $this->fetchActivity([$row['learnosity_reference']]);
+
+        // do we now have items? did the reimport fix the issue?
+        if ($this->hasItems($row['learnosity_reference'])) {
+            $this->getLogger()->notice(sprintf("Quiz repair succeeded %s, has questions", $assessmentId));
+        } else {
+            $this->getLogger()->error(sprintf("Quiz repair broke for %s. Still no items...", $assessmentId));
+        }
+    }
+
 
     /** @inheritDoc */
     public function run(): void
@@ -189,54 +256,7 @@ HELP;
 
                 // are we wanting to fix this? or just checking if it was broken?
                 if ($this->getOpt(self::OPT_LONG_REPAIR)) {
-                    if ($this->perform()) {
-                        $this->getLogger()->notice("Clearing `learnosity_reference` from the assess entry...");
-                        $this->getDatabaseInternal()->executeQuery("UPDATE assess SET learnosity_reference = null WHERE assessment_id = :assessmentId LIMIT 1", ['assessmentId' => $assessmentId]);
-                    } else {
-                        $this->getLogger()->notice("Planning to repair...");
-                        $this->getLogger()->debug(sprintf("Would have cleared the learnosity reference for Quiz '%s' (Assessment Id: %s)...", $row['title'], $assessmentId));
-                    }
-
-                    /**
-                     * spawn the original learnosity importer tool (rather than re build its functionality)
-                     * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
-                     */
-                    $app = new ImporterTool();
-                    $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
-
-                    (new CliTool\Kernel($app, $options))->runApp();
-
-                    // wait for learnosity to persist the data to where it needs to be
-                    // just set a random number (15sec may be enough..)
-                    sleep(15);
-
-                    // check / ensure the quiz has been fixed...
-                    $query = $this->getDatabaseInternal()->executeQuery(
-                        "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
-                        FROM assess
-                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
-                        WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
-                        LIMIT 1",
-                        ['assessmentId' => $assessmentId]
-                    );
-
-                    // if no results... something broke...?
-                    if (!$query->rowCount()) {
-                        $this->getLogger()->error(sprintf("Quiz repair broke for %s, no learnosity reference...", $assessmentId));
-                        exit;
-                    }
-                    $row = $query->fetch();
-
-                    // force the cached entry to be re fetched (we should be generating a new uuid here..
-                    // but just to ensure we are grabbing the latest learnosity entry, do it again
-                    $this->fetchActivity([$row['learnosity_reference']]);
-
-                    // do we now have items? did the reimport fix the issue?
-                    if ($this->hasItems($row['learnosity_reference'])) {
-                        $this->getLogger()->notice(sprintf("Quiz repair succeeded %s, has questions", $assessmentId));
-                    } else {
-                        $this->getLogger()->error(sprintf("Quiz repair broke for %s. Still no items...", $assessmentId));
-                    }
+                    $this->repair($assessmentId);
                 }
             }
         } else {
@@ -274,7 +294,7 @@ HELP;
             $this->fetchActivity($learnosityReferences);
 
             /**
-             * check each leanosity activity (from the cache)
+             * check each learnosity activity (from the cache)
              * check if they have items and a title, if not log it
              */
             foreach ($schoolboxQuizzes as $row) {
@@ -298,6 +318,7 @@ HELP;
                     }
 
                     // this is where we would auto repair the quizzes (not something that we want to do just yet)
+                    // $this->repair($row['assessment_id']);
                 }
             }
 
