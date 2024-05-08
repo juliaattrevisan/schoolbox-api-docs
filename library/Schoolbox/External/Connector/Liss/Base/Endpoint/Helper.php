@@ -95,14 +95,16 @@ class Helper
 
         /* If StartTime was provided amend accordingly
          */
-        if (isset($currentEvent->me['struct']['StartTime']->me['string'])) {
-            $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
+        $startTime = $currentEvent->me['struct']['StartTime']->me['string'] ?? '';
+        if ($startTime !== '') {
+            $startDateTime = "{$date} {$startTime}:00";
         }
 
         /* If EndTime was provided amend accordingly
          */
-        if (isset($currentEvent->me['struct']['EndTime']->me['string'])) {
-            $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
+        $endTime = $currentEvent->me['struct']['EndTime']->me['string'] ?? '';
+        if ($endTime !== '') {
+            $endDateTime = "{$date} {$endTime}:00";
         }
 
         /* Recompile everything
