@@ -158,8 +158,9 @@ class RepairBrokenTool extends CliTool\App
         $query = $this->getDatabaseInternal()->executeQuery(
             "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
                         FROM assess
-                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        LEFT JOIN assess_section ON (assess.assess_id = assess_section.assess_id AND assess_section.deleted_at IS NULL)
                         WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
+                        AND assess.deleted_at is null
                         LIMIT 1",
             ['assessmentId' => $assessmentId]
         );
@@ -225,8 +226,9 @@ HELP;
             $query = $this->getDatabaseInternal()->executeQuery(
                 "SELECT assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
                         FROM assess
-                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        LEFT JOIN assess_section ON (assess.assess_id = assess_section.assess_id AND assess_section.deleted_at IS NULL)
                         WHERE assessment_id = :assessmentId AND availability = 'assess' AND learnosity_reference IS NOT NULL
+                        AND assess.deleted_at is null
                         LIMIT 1",
                 ['assessmentId' => $assessmentId]
             );
@@ -273,8 +275,9 @@ HELP;
             $query = $this->getDatabaseInternal()->executeQuery(
                 "SELECT assessment_id, assess.title, learnosity_reference, assess_section.assess_id as `assess_section.assess_id`
                         FROM assess
-                        LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+                        LEFT JOIN assess_section ON (assess.assess_id = assess_section.assess_id AND assess_section.deleted_at IS NULL)
                         WHERE availability = 'assess' AND learnosity_reference IS NOT NULL
+                        AND assess.deleted_at is null
                         GROUP BY assessment_id"
             );
             $quizCount = $query->rowCount();
