@@ -90,7 +90,8 @@ if ($this->getDi()->has('sentry')) {
  */
 $canvasUrl = $this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL);
 
-if (!empty($canvasUrl) &&
+if (
+    !empty($canvasUrl) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
     '' !== $folder->getCodeString()
@@ -238,7 +239,8 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec   = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if ((!$hasCourseSpec && !$hasUnitSpec)
+    if (
+        (!$hasCourseSpec && !$hasUnitSpec)
         && Config::get(ConfigMapper::NAME_LMS_ENABLED)
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {
