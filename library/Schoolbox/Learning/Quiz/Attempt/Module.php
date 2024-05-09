@@ -97,7 +97,7 @@ class Module extends BaseModule
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-;
+
                         return $ctx;
                     }
                 )

@@ -45,8 +45,7 @@ class Controller extends Base
         QuizDomainObject $assessment,
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void
-    {
+    ): void {
         /* TODO build attempt editor form here, which submits to postModify()
          */
     }
