@@ -133,13 +133,13 @@
         <span data-tab>
             <span class="switch inline" id="component-lock-switch">
                 <input id="component-lock-toggle" type="checkbox" autocomplete="off" />
-                <label for="component-lock-toggle">
+                <label for="component-lock-toggle" data-test="homepage-component-lock-toggle">
                     <span class="icon-unlocked">&nbsp;</span>
                     <span class="icon-locked">&nbsp;</span>
                 </label>
             </span>
             <span class="tab-title" data-show-empty>
-                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component"></a>
+                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component" data-test="homepage-tab-activator-addComponent"></a>
             </span>
             <span class="tab-title" data-hide-empty>
                 <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
@@ -264,7 +264,7 @@
                     <!-- END stats_data -->
                     <!-- BEGIN manage_page -->
                     <li>
-                        <a href="{MANAGE_GROUP_LINK}" class="icon-group">Manage Group</a>
+                        <a href="{MANAGE_GROUP_LINK}" class="icon-group" data-test="homepage-actions-folder-manageGroup">Manage Group</a>
                     </li>
                     <!-- END manage_page -->
                     <!-- BEGIN addmylinks -->
@@ -355,7 +355,7 @@
             <dl class="tabs" data-tab>
                 <!-- BEGIN homepage_component_tab -->
                 <dd class="{COMPONENT_CATEGORY_CLASS}">
-                    <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                    <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}" data-test="homepage-component-palette-tab-{COMPONENT_CATEGORY_ID}">
                         {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
                     </a>
                 </dd>
@@ -367,6 +367,7 @@
                     <!-- BEGIN homepage_component -->
                     <li>
                         <div class="card small-12 {HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
+                            data-test="homepage-component-palette-item-{HOMEPAGE_COMPONENT_ID}"
                             data-count="{HOMEPAGE_COMPONENT_COUNT}"
                             data-multi="{HOMEPAGE_COMPONENT_MULTIPLE_STATE}"
                             data-component-palette>

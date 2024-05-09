@@ -118,6 +118,7 @@ const addButtonText = window.Vue.computed(() => (addMembersStore.isProcessing ? 
                     <p class="meta">{{ inputDetails }}</p>
                     <button
                         class="button submit"
+                        data-test="manage-group-add-members-submit"
                         :disabled="!searchStore.canAddMembers"
                         @click.prevent="onAddMembersSelected"
                     >

@@ -260,10 +260,10 @@
 
                         {% block accountMenu %}
                             {% if user.current.id %}
-                                <a href="#" id="profile-drop" title="{{ user.current.fullName }}" class="account-menu">
+                                <a href="#" id="profile-drop" data-test="profile-drop" title="{{ user.current.fullName }}" class="account-menu">
                                     {% include 'include/portrait.twig' with {user: user.current, render: 'menuMobile'} only %}
                                 </a>
-                                <div id="account-content" class="account-drop">
+                                <div id="account-content" class="account-drop" data-test="account-content">
                                     {% include 'include/accountMenu.twig' with {user: user, mobile: false} only %}
                                 </div>
                             {% endif %}

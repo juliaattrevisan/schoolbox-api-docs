@@ -24,7 +24,7 @@
         <div class="card small-12">
             {% set route = viewRoute.viewRoute(assessable, USER) %}
             {% if route %}<a href="{{ route }}">{% endif %}
-                <h3 data-assessment-title>{{ assessable.title }}</h3>
+                <h3 data-assessment-title data-test="component-assessment-title-{{ assessable.id }}">{{ assessable.title }}</h3>
             {% if route %}</a>{% endif %}
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
@@ -53,7 +53,7 @@
                     {% endif %}
                 {% endif %}
 
-                {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>{% endif %}
+                {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" data-test="component-assessment-actions-delete-{{ assessable.id }}">Delete</a></li>{% endif %}
             {% endapply %}
         </ul>
     {% endif %}

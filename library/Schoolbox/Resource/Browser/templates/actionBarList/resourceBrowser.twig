@@ -9,7 +9,7 @@
 {% set viewFilesName  = (folder.id != 0 and (user.isSuperuser or access >= 2)) ? 'Manage Files' : 'View Files' %}
 {% set routeManageGroup = routeLookupIfAuthorized('group.getModify', {folderId: folder.id, folder: folder}) %}
 
-{% if folder.hasHomepage %}<li><a class="icon-home"     data-action="folder"   href="/homepage/{{ folder.id }}">Homepage</a></li>{% endif %}
+{% if folder.hasHomepage %}<li><a class="icon-home"     data-action="folder"   data-test="resource-action-homepage" href="/homepage/{{ folder.id }}">Homepage</a></li>{% endif %}
 {% if routeModify        %}<li><a class="icon-modify"   data-action="modify"   href="{{ routeModify }}">Modify</a></li>{% endif %}
 {% if routePostFile      %}<li><a class="icon-drop-box" data-action="file"     href="{{ routePostFile }}">Post File</a></li>{% endif %}
 {% if routeViewFiles     %}<li><a class="icon-files"    data-action="file"     href="{{ routeViewFiles }}">{{ viewFilesName }}</a></li>{% endif %}

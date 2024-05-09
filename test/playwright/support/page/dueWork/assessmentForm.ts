@@ -1,6 +1,9 @@
 import { Page, expect } from "@playwright/test";
+import { AcceptanceTester } from "@schoolboxTest/playwright/support/acceptanceTester";
 
 export class AssessmentForm {
+    private tester: AcceptanceTester;
+
     private page: Page;
 
     static readonly URL = "/learning/folders/{class_id}/assessments/new?type=dueWork";
@@ -10,7 +13,11 @@ export class AssessmentForm {
 
     static readonly SELECTOR_TITLE = "assessment-form-input-title";
 
+    static readonly SELECTOR_DESCRIPTION = "assessment-form-input-description";
+
     static readonly SELECTOR_WORKTYPE = "assessment-form-select-workType";
+
+    static readonly SELECTOR_WEIGHT = "assessment-form-input-weight";
 
     static readonly SELECTOR_VISIBILITY = "assessment-form-select-visibility";
 
@@ -47,6 +54,8 @@ export class AssessmentForm {
 
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
 
+    static readonly SELECTOR_HOMEPAGE_TABS = "homepage-tabs";
+
     // Work type constants
     static readonly WORKTYPE_ASSESSMENT_TASK = 1;
 
@@ -81,7 +90,8 @@ export class AssessmentForm {
 
     static readonly ACCEPT_SUBMISSION_MULTIPLE = 2;
 
-    constructor(page: Page) {
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
         this.page = page;
     }
 
@@ -98,15 +108,15 @@ export class AssessmentForm {
      * Verifies that the homepage is visible after submission
      */
     async create() {
-        await this.page.click(AssessmentForm.SELECTOR_BUTTON_CREATE);
-        await expect(this.page.getByTestId("tabs-homepage")).toBeVisible();
+        await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
+        await expect(this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS)).toHaveCount(1);
     }
 
     /**
      * Submits this form to update a duework
      */
     async update() {
-        await this.page.click(AssessmentForm.SELECTOR_BUTTON_UPDATE);
+        await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_UPDATE).click();
     }
 
     /**
@@ -125,6 +135,14 @@ export class AssessmentForm {
     async setMarkType(markType: number) {
         const markTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Sets the weight of the assessment
+     * @param { number } weight - The weight to set
+     */
+    async setWeight(weight: number) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_WEIGHT).fill(weight.toString());
     }
 
     /**
@@ -151,6 +169,16 @@ export class AssessmentForm {
      */
     async setTitle(title: string) {
         await this.page.getByTestId(AssessmentForm.SELECTOR_TITLE).fill(title);
+    }
+
+    /**
+     * Sets description
+     * @param { string } description - The description to set
+     */
+    async setDescription(description: string) {
+        // await this.page.getByTestId(AssessmentForm.SELECTOR_DESCRIPTION).fill(description);
+        const descriptionTextarea = this.page.getByTestId(AssessmentForm.SELECTOR_DESCRIPTION);
+        await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
     /**

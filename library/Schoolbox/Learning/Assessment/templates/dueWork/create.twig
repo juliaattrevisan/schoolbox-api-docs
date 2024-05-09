@@ -68,7 +68,7 @@
     </div>
 
     <label for="assessment-description">Description</label>
-    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
 
     {% include 'sub/attachzone.twig' %}
 

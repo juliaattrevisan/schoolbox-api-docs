@@ -97,7 +97,7 @@ window.Vue.watch(
             searchStore.enableSearch();
             debounceSearch();
         }
-    }
+    },
 );
 
 /**
@@ -113,6 +113,7 @@ const debounceSearch = debounce(() => {
         <input
             id="search-text"
             type="text"
+            data-test="manage-group-search-text"
             v-model="searchStore.query"
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
