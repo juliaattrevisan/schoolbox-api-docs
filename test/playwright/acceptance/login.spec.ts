@@ -14,9 +14,13 @@ test.describe("Login functionality tests", () => {
         await loginPage.verifyLoginSuccess();
     });
 
-    test("login with an invalid username and password", async () => {
+    test("login with an invalid username and password", async ({ db }) => {
         await loginPage.login("wrong", "wrong", true);
         await loginPage.verifyLoginFailure();
+
+        // Test DB contents (Expect no user with username "wrong")
+        const count = await db.countInDatabase("user", { username: "wrong" });
+        expect(count).toBe(0);
     });
 
     test.afterEach(async () => {
