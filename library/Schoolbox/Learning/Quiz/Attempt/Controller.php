@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\User;
@@ -26,7 +27,8 @@ class Controller extends Base
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private StateMapper $stateMapper
     ) {
     }
 
@@ -106,12 +108,26 @@ class Controller extends Base
          *     - Human-readable mark, from the combobox
          *     - Normalised mark derived from the human-readable mark
          */
-        $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark(trim((string)$postData['mark']));
-        $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        $mark = trim((string)$postData['mark']);
 
-        /* If it's a Submission State, save the text as the human readable mark
-         * and derive its normalised mark from the uh Lists in admin
+        /* Apparently this is how you detect a Submission State: an exception is thrown
+         * trying to interpret it as one of the Mark Schemes. No wonder it was classified
+         * as the $errors var. Wild!
+         *
+         * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
          */
+        try {
+            $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark($mark);
+            $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        } catch (\InvalidArgumentException $e) {
+            /* If it's a Submission State, save the text as the human readable mark
+             * and derive its normalised mark from the uh Lists in admin
+             */
+            $code = $this->stateMapper->findOneByColumn('display_as', $mark);
+
+            $normalisedMark = $code->getNormaliseAs();
+            $humanReadableMark = $mark;
+        }
 
         /* Update the deets and save it
          */

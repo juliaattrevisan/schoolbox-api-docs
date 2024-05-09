@@ -188,6 +188,7 @@ class Module extends BaseModule
             $this->getErrorMapper(),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\DueWork\StateMapper::class)
         );
     }
 
