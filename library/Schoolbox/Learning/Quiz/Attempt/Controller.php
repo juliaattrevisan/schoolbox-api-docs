@@ -102,11 +102,16 @@ class Controller extends Base
             $assessment->getMarkScheme()->setTotalMark($maxMark);
         }
 
-        /* Human-readable mark, from the combobox
-         * Normalised mark derived from the human-readable mark
+        /* If this is an actual grade, try to interpret the pieces:
+         *     - Human-readable mark, from the combobox
+         *     - Normalised mark derived from the human-readable mark
          */
         $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark(trim((string)$postData['mark']));
         $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+
+        /* If it's a Submission State, save the text as the human readable mark
+         * and derive its normalised mark from the uh Lists in admin
+         */
 
         /* Update the deets and save it
          */
@@ -121,6 +126,7 @@ class Controller extends Base
          */
         $this->attemptMapper->save($attempt);
     }
+
 
     /**
      * TODO Literally copypasta'd
