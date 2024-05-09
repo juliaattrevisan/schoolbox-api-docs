@@ -1,3 +1,7 @@
+/**
+ * Login successfully, login with invalid password,
+ * SAML tests do not exist in the Playwright implementation yet, see codeception
+ */
 import { test, expect } from "@schoolboxTest/playwright/support/fixtures";
 import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
 

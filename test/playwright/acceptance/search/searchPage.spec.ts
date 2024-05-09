@@ -1,3 +1,8 @@
+/**
+ * Check 2 characters warning, search terms and check the number of results presented, search without passing filters,
+ * search by passing filters(news), search by creator, search by passing dates,
+ * view search results by passing filters in the URL
+ */
 import { test } from "@schoolboxTest/playwright/support/fixtures";
 import { SearchPage } from "@schoolboxTest/playwright/support/page/search/searchPage";
 

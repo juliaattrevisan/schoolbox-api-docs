@@ -3,38 +3,38 @@ import { Page, expect } from "@playwright/test";
 export class SearchPage {
     private page: Page;
 
-    static URL = "/search";
+    static readonly URL = "/search";
 
     // Constants for data-test selectors
-    static RESULTS_RESULT = "sp-results-result";
+    static readonly RESULTS_RESULT = "sp-results-result";
 
-    static RESULTS_ERROR = "sp-results-error";
+    static readonly RESULTS_ERROR = "sp-results-error";
 
-    static RESULTS_NONE = "sp-results-none";
+    static readonly RESULTS_NONE = "sp-results-none";
 
-    static RESULTS_LOAD_MORE_BUTTON = "sp-results-load-more-button";
+    static readonly RESULTS_LOAD_MORE_BUTTON = "sp-results-load-more-button";
 
-    static RESULTS_LOAD_MORE_ALL_LOADED = "sp-results-load-more-all-loaded";
+    static readonly RESULTS_LOAD_MORE_ALL_LOADED = "sp-results-load-more-all-loaded";
 
-    static RESULTS_SUB_RESULTS_RESULT = "sp-results-sub-results-result";
+    static readonly RESULTS_SUB_RESULTS_RESULT = "sp-results-sub-results-result";
 
-    static RESULTS_SUB_RESULTS_LOAD_MORE = "sp-results-sub-results-load-more";
+    static readonly RESULTS_SUB_RESULTS_LOAD_MORE = "sp-results-sub-results-load-more";
 
-    static SEARCH_FIELD = "sp-search-field";
+    static readonly SEARCH_FIELD = "sp-search-field";
 
-    static SUBMIT_BUTTON = "sp-submit-button";
+    static readonly SUBMIT_BUTTON = "sp-submit-button";
 
-    static FILTER_CLEAR_BUTTON = "sp-filter-clear-button";
+    static readonly FILTER_CLEAR_BUTTON = "sp-filter-clear-button";
 
-    static FILTER_APPLY_BUTTON = "sp-filter-apply-button";
+    static readonly FILTER_APPLY_BUTTON = "sp-filter-apply-button";
 
-    static FILTER_DATE_RANGE_END = "sp-filter-date-range-end";
+    static readonly FILTER_DATE_RANGE_END = "sp-filter-date-range-end";
 
-    static FILTER_TYPE_LABEL = "sp-filter-type-label"; // Append "-[type]" like "-news", "-blog" etc.
+    static readonly FILTER_TYPE_LABEL = "sp-filter-type-label"; // Append "-[type]" like "-news", "-blog" etc.
 
-    static CREATOR_SEARCH_SELECT_INPUT = "search-select-input";
+    static readonly CREATOR_SEARCH_SELECT_INPUT = "search-select-input";
 
-    static CREATOR_SEARCH_SELECT_RESULT = "search-select-result"; // Append "-id"
+    static readonly CREATOR_SEARCH_SELECT_RESULT = "search-select-result"; // Append "-id"
 
     constructor(page: Page) {
         this.page = page;

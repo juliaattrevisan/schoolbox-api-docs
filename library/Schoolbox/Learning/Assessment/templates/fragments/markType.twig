@@ -47,7 +47,7 @@
     <div class="small-12 medium-6 columns">
         <label>
             {{ markTypeLabel | default('Mark Type') }}
-            <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
+            <select id="{{ context }}markType" name="{{ context }}markType" data-test="assessment-form-select-{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
                 {% for index, title in allMarkTypes %}
                     <option value="{{ index }}"
                         {% if index == (selectedMarkType ?? markTypeNone) %}

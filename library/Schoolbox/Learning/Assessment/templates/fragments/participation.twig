@@ -13,7 +13,7 @@
             {% set hasCustomisation = true %}
         {% endif %}
     {% endfor %}
-    <legend data-collapser="participation" {% if hasCustomisation %} class="icon-up-arrow" {% else %} class="icon-down-arrow" {% endif %}>
+    <legend data-collapser="participation" data-test="participation-plan-legend" {% if hasCustomisation %} class="icon-up-arrow" {% else %} class="icon-down-arrow" {% endif %}>
         Participation and Learning Plans
     </legend>
 
@@ -28,14 +28,14 @@
                                 <sbx-pop-out id="plan-dropdown" class="hide" content-id="plan-options" button-text="Modify Plans" is-arrow-icon is-close-on-content-click></sbx-pop-out>
                             </div>
                             <ul class="f-dropdown" id="customise-options" data-dropdown-content aria-hidden="true">
-                                <li><a href="#" data-participant-change="exclude" class="hide">Exclude from assessment</a></li>
+                                <li><a href="#" data-participant-change="exclude" class="hide" data-test="participation-plan-customise-exclude">Exclude from assessment</a></li>
                                 <li><a href="#" data-participant-change="include" class="hide">Include in assessment</a></li>
                                 <li class="separator">Learning Plans</li>
                                 <li><a href="#" data-participant-change="default" class="hide">Remove customisations</a></li>
                                 {% for plan in assessment.plans | filter(plan => not plan.isDynamic) %}
                                     <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                                 {% endfor %}
-                                <li><a href="#" id="participant-customise">Create new plan...</a></li>
+                                <li><a href="#" id="participant-customise" data-test="participation-plan-customise-create">Create new plan...</a></li>
                             </ul>
                             <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
                                 {% for plan in assessment.plans | filter(plan => not plan.isDynamic) %}
@@ -87,7 +87,7 @@
                         {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
                         {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
 
-                        <li data-participant="{{ user.id }}">
+                        <li data-participant="{{ user.id }}" data-test="participation-plan-participant-{{ user.id }}">
                             <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
                             <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
                                    value="{{ (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : 0 }}">

@@ -1,0 +1,219 @@
+import { Page, expect } from "@playwright/test";
+
+export class AssessmentForm {
+    private page: Page;
+
+    static readonly URL = "/learning/folders/{class_id}/assessments/new?type=dueWork";
+
+    // Constants for data-test selectors
+    static readonly SELECTOR_FORM = "assessment-form";
+
+    static readonly SELECTOR_TITLE = "assessment-form-input-title";
+
+    static readonly SELECTOR_WORKTYPE = "assessment-form-select-workType";
+
+    static readonly SELECTOR_VISIBILITY = "assessment-form-select-visibility";
+
+    static readonly SELECTOR_ACCEPT_SUBMISSION = "assessment-form-select-acceptOnline";
+
+    static readonly SELECTOR_PUBLISH_DATE = "assessment-form-input-date-publish";
+
+    static readonly SELECTOR_OPEN_DATE = "assessment-form-input-date-open";
+
+    static readonly SELECTOR_DUE_DATE = "assessment-form-input-date-due";
+
+    static readonly SELECTOR_MARK_TYPE = "assessment-form-select-markType";
+
+    static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
+
+    static readonly SELECTOR_BUTTON_UPDATE = "assessment-form-button-submit-Update";
+
+    static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
+
+    static readonly SELECTOR_PARTICIPATION_LEGEND = "participation-plan-legend";
+
+    static readonly SELECTOR_PARTICIPATION_PARTICIPANT = "participation-plan-participant"; // Append "-[userId]"
+
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_POPOUT_BUTTON = "sbx-pop-out-customise-options-button";
+
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_EXCLUDE = "participation-plan-customise-exclude";
+
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_CREATE = "participation-plan-customise-create";
+
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_NAME = "participation-plan-customise-modal-input-name";
+
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE =
+        "participation-plan-customise-modal-input-due-date";
+
+    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
+
+    // Work type constants
+    static readonly WORKTYPE_ASSESSMENT_TASK = 1;
+
+    static readonly WORKTYPE_ASSIGNMENT = 2;
+
+    static readonly WORKTYPE_HOMEWORK = 3;
+
+    static readonly WORKTYPE_NONE = 7;
+
+    // Mark type constants
+    static readonly MARK_TYPE_NONE = 0;
+
+    static readonly MARK_TYPE_PERCENTAGE = 1;
+
+    static readonly MARK_TYPE_TOTAL_MARK = 3;
+
+    static readonly MARK_TYPE_LETTER_GRADE = 2;
+
+    // Visibility constants
+    // NOTE: The PHP implementation referenced Schoolbox\Assessment\Component\SubmissionBox
+    //       but as we are in TypeScript, we do not have access to this class.
+    static readonly VISIBILITY_STAFF_ONLY = 0;
+
+    static readonly VISIBILITY_STAFF_AND_STUDENT = 1;
+
+    static readonly VISIBILITY_ALL = 2;
+
+    // Accepts online submission constants
+    static readonly ACCEPT_SUBMISSION_NONE = 0;
+
+    static readonly ACCEPT_SUBMISSION_SINGLE = 1;
+
+    static readonly ACCEPT_SUBMISSION_MULTIPLE = 2;
+
+    constructor(page: Page) {
+        this.page = page;
+    }
+
+    /**
+     * Navigates to create duework form for a class ID
+     * @param { string } classId - The class ID to navigate to
+     */
+    async goto(classId: string) {
+        await this.page.goto(AssessmentForm.URL.replace("{class_id}", classId));
+    }
+
+    /**
+     * Submits this form to create a duework
+     * Verifies that the homepage is visible after submission
+     */
+    async create() {
+        await this.page.click(AssessmentForm.SELECTOR_BUTTON_CREATE);
+        await expect(this.page.getByTestId("tabs-homepage")).toBeVisible();
+    }
+
+    /**
+     * Submits this form to update a duework
+     */
+    async update() {
+        await this.page.click(AssessmentForm.SELECTOR_BUTTON_UPDATE);
+    }
+
+    /**
+     * Sets work type
+     * @param { number } workType - The work type to set
+     */
+    async setWorkType(workType: number) {
+        const workTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_WORKTYPE);
+        await workTypeSelectEl.selectOption({ value: workType.toString() });
+    }
+
+    /**
+     * Sets mark type
+     * @param { number } markType - The mark type to set
+     */
+    async setMarkType(markType: number) {
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_MARK_TYPE);
+        await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Sets visibility
+     * @param { number } visibility - The visibility to set
+     */
+    async setVisibility(visibility: number) {
+        const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
+        await visibilitySelectEl.selectOption({ value: visibility.toString() });
+    }
+
+    /**
+     * Sets accepts online submissions
+     * @param { number } acceptSubmission - The accept submission to set
+     */
+    async setAcceptSubmission(acceptSubmission: number) {
+        const acceptSubmissionSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_ACCEPT_SUBMISSION);
+        await acceptSubmissionSelectEl.selectOption({ value: acceptSubmission.toString() });
+    }
+
+    /**
+     * Sets title
+     * @param { string } title - The title to set
+     */
+    async setTitle(title: string) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_TITLE).fill(title);
+    }
+
+    /**
+     * Sets publish date
+     * @param { string } publishDate - The publish date to set
+     */
+    async setPublishDate(publishDate: string) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(publishDate);
+    }
+
+    /**
+     * Sets open date
+     * @param { string } openDate - The open date to set
+     */
+    async setOpenDate(openDate: string) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(openDate);
+    }
+
+    /**
+     * Sets due date
+     * @param { string } dueDate - The due date to set
+     */
+    async setDueDate(dueDate: string) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(dueDate);
+    }
+
+    /**
+     * Excludes a user from participants
+     * @param { number } userId - The user ID to exclude
+     * @param { boolean } confirm - Whether to confirm the exclusion
+     * @param { boolean } openSection - Whether to open the section
+     */
+    async modifyParticipation(userId: number, confirm: boolean, openSection: boolean) {
+        if (openSection) {
+            await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
+        }
+
+        await this.page.getByTestId(`${AssessmentForm.SELECTOR_PARTICIPATION_PARTICIPANT}-${userId}`).click();
+
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_POPOUT_BUTTON).click();
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_EXCLUDE).click();
+
+        if (confirm) {
+            await this.page.getByTestId(AssessmentForm.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
+        }
+    }
+
+    /**
+     * Creates a learning plan
+     * @param { number } userId - The user ID to create a learning plan for
+     * @param { string } planName - The plan name to set
+     * @param { string } date - The date to set
+     */
+    async createLearningPlan(userId: number, planName: string, date: string) {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
+        await this.page.getByTestId(`${AssessmentForm.SELECTOR_PARTICIPATION_PARTICIPANT}-${userId}`).click();
+
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_POPOUT_BUTTON).click();
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_CREATE).click();
+
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_NAME).fill(planName);
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE).fill(date);
+
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_BUTTON_SAVE).click();
+    }
+}
