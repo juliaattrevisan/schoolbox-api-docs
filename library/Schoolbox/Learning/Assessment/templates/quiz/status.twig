@@ -265,7 +265,6 @@
                 {% set maxMarks = latestResponse.marksAvailable ?? maxMarks[participant.user.id] ?? null %}
 
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
-                <input type="hidden" name="learnosityReference" value="{{ latestResponse.learnosityReference ?? '' }}" />
                 <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
 
                 <div class="row">
