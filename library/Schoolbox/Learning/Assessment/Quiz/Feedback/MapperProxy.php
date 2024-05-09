@@ -144,8 +144,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
-                // TODO figure out if this is the right field
-                ->setPublishedAt($attempt->getReviewed())
                 ->setComment($attempt->getComment())
             ;
 
