@@ -368,40 +368,21 @@
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
+    <div class="toast" data-alert data-save-draft></div>
+
     <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
             var $participantList  = $('#assessment-status');
 
             $.fn.dynamicFeedback({
-                {#statusIncomplete: '{{ statusIncomplete }}',#}
-                {#statusFailed: '{{ statusFailed }}',#}
-                {#statusPending: '{{ statusPending }}',#}
-                {#statusReviewed: '{{ statusReviewed }}',#}
-                {#reviewedText: '{{ labelReviewed }}',#}
                 onPreDraftCallback: function () {
                 },
                 onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-                    let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
-                        $publishButton = $actionBar.find('[data-draft=publish]');
-                    $publishButton.attr('data-draft-id', feedbackId);
-                    $actionBar.attr('data-mass-publish', '');
-                    $actionBar.removeAttr('data-mass-submit');
                 },
                 onPrePublishCallback: function () {
                 },
                 onPublishCallback: function (userId) {
-                    let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
-                        $ackButton = $actionBar.find('[data-sobo]'),
-                        $publishButton = $actionBar.find('[data-draft=publish]');
-                    $publishButton.removeAttr('data-draft-id');
-                    $actionBar.removeAttr('data-mass-publish');
-                    $actionBar.removeAttr('data-mass-submit');
-                    $ackButton.fadeOut({
-                        done: function () {
-                            $ackButton.remove();
-                        }
-                    });
                 }
             });
 

@@ -141,6 +141,16 @@ class Controller extends Base
         /* TODO use setReviewed() as the publish mechanism
          */
         $this->attemptMapper->save($attempt);
+
+        /* Async stuff for the frontend land
+         */
+        $data = [
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $attempt->getId(),
+        ];
+
+        $this->response = $this->responseDependentOnRequest('', $data)->withStatus(200);
     }
 
 
