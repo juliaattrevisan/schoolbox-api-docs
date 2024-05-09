@@ -255,8 +255,14 @@
         {# Quizzes now support Submission States #}
         <div class="small-12 column">
             <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuizAttempt.postModify', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id }) }}">
-                {# Maximum available marks for this guy #}
-                {% set maxMarks = latestResponse.marksAvailable ?? maxMarks[participant.user.id] %}
+                {# Maximum available marks for this guy. Total Mark required a learnosity interrogation.
+                 # Everything else can be assumed to be out of 100, since that is already hardcoded in each
+                 # MarkScheme template already, for whatever reason; this nullsafe operator is syntactic only
+                 #
+                 # In the absence of any learnosity-derived specific maxMarks values, use the template's
+                 # defaulted hardcoded value of 100.
+                 #}
+                {% set maxMarks = latestResponse.marksAvailable ?? maxMarks[participant.user.id] ?? null %}
 
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
                 <input type="hidden" name="learnosityReference" value="{{ latestResponse.learnosityReference ?? '' }}" />
