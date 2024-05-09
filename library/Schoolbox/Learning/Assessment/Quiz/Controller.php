@@ -219,12 +219,14 @@ class Controller extends Assessment\Controller
                  *         swamp is a series of floatval() calls that cast nulls to zero.
                  *         TODO maybe find out the breadth of this idea and undo it to support null
                  */
+                $mostRecentResponse = $participant->findMostRecentResponse();
+
                 /** @phpstan-ignore-next-line */
-                if (!$participant->findMostRecentResponse()) {
+                if (!$mostRecentResponse) {
                     $maxMarks[$participant->getUser()->getId()] = null;
-                } elseif (!$participant->findMostRecentResponse()->isSubmitted()) {
+                } elseif (!$mostRecentResponse->isSubmitted()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
-                } elseif (!$participant->findMostRecentResponse()->getMarksAvailable()) {
+                } elseif (!$mostRecentResponse->getMarksAvailable()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
                 }
             }
