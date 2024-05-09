@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../support/page/loginPage";
+import { test, expect } from "@schoolboxTest/playwright/support/fixtures";
+import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
 
 test.describe("Login functionality tests", () => {
     let loginPage: LoginPage;
