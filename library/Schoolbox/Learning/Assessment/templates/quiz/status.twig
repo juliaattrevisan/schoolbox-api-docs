@@ -264,6 +264,9 @@
                  #}
                 {% set maxMarks = maxMarks[participant.user.id] ?? latestResponse.marksAvailable ?? null %}
 
+                {# The most recent feedback, supposedly #}
+                {% set latestFeedback = participant.findMostRecentInstructorGivenFeedback %}
+
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
                 <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
 
@@ -281,7 +284,7 @@
                             {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                 assessment:  assessment,
                                 participant: participant,
-                                feedback:    latestResponse,
+                                feedback:    latestFeedback,
                                 markScheme:  assessment.markScheme,
                                 limit:       maxMarks,
                                 tabIndex:    loop.index0 + inputNo,
@@ -293,7 +296,7 @@
                     </div>
                     <div class="small-12 medium-9 column">
                         {% include '@learningAssessment/quiz/comment.twig' with {
-                            feedback:       latestResponse,
+                            feedback:       latestFeedback,
                             participant:    participant,
                             tabIndex:       loop.index0 + inputNo
                         } only %}
