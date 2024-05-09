@@ -260,6 +260,15 @@ class Controller extends Assessment\Controller
             }
         }
 
+        foreach ($assessment->getAllParticipants() as $participant) {
+            if ($participant->getUser()->getId() == 63) {
+                new \Alaress_Probe(
+                    get_class($participant->findMostRecentInstructorGivenFeedback())
+                );
+                die();
+            }
+        }
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,

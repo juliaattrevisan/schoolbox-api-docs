@@ -281,7 +281,7 @@
                             {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                 assessment:  assessment,
                                 participant: participant,
-                                feedback:    participant.findMostRecentInstructorGivenFeedback,
+                                feedback:    latestResponse,
                                 markScheme:  assessment.markScheme,
                                 limit:       maxMarks,
                                 tabIndex:    loop.index0 + inputNo,
@@ -293,7 +293,7 @@
                     </div>
                     <div class="small-12 medium-9 column">
                         {% include '@learningAssessment/quiz/comment.twig' with {
-                            feedback:       participant.findMostRecentInstructorGivenFeedback,
+                            feedback:       latestResponse,
                             participant:    participant,
                             tabIndex:       loop.index0 + inputNo
                         } only %}
