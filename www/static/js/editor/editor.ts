@@ -5,9 +5,8 @@
 
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
-import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
-import { EditorConfig, EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
+import { Editor, EditorConfig, EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
 import { EditorDeleteEventInfo, EditorEvent } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
