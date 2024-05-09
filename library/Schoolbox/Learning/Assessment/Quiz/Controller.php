@@ -221,7 +221,6 @@ class Controller extends Assessment\Controller
                  */
                 $mostRecentResponse = $participant->findMostRecentResponse();
 
-                /** @phpstan-ignore-next-line */
                 if (!$mostRecentResponse) {
                     $maxMarks[$participant->getUser()->getId()] = null;
                 } elseif (!$mostRecentResponse->isSubmitted()) {

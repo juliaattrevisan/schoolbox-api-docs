@@ -5962,3 +5962,12 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setLearnosityReference\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Controller.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IResponse\\:\\:getMarksAvailable\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getLearnosityReference\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+
