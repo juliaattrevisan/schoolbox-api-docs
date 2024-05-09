@@ -259,6 +259,10 @@ HELP;
                 // are we wanting to fix this? or just checking if it was broken?
                 if ($this->getOpt(self::OPT_LONG_REPAIR)) {
                     $this->repair($assessmentId, $row['title']);
+                } else {
+                    $this->getLogger()->notice(
+                        "This quiz may be repaired by running this command with the `--repair` flag"
+                    );
                 }
             }
         } else {
@@ -317,7 +321,13 @@ HELP;
                         $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) build in learnosity, unable to re import. Manual work is required... Good luck...", $row['title'], $row['assessment_id']));
 
                         // in future we may be auto repairing the broken learnosity quizzes, this continue is here to ensure we don't repair learnosity only quizzes
-                        continue;
+                    } else {
+                        $this->getLogger()->notice(
+                            sprintf(
+                                "This quiz may be repaired by running this command with the flags: `--repair --assessment=%d`",
+                                $row['assessment_id'],
+                            )
+                        );
                     }
 
                     // this is where we would auto repair the quizzes (not something that we want to do just yet)
