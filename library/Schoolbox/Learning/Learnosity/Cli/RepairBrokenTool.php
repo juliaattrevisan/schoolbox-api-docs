@@ -241,7 +241,7 @@ HELP;
             $row = $query->fetch();
 
             if ($this->hasItems($row['learnosity_reference'])) {
-                $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) successfully has learnosity items", $row['title'], $assessmentId));
+                $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has learnosity items - No fix needed", $row['title'], $assessmentId));
             } else {
                 // quiz failed to import (no items, or title)
                 $this->getLogger()->notice(sprintf("Quiz '%s' (Assessment Id: %s) has no learnosity items (learnosity reference: '%s')", $row['title'], $assessmentId, $row['learnosity_reference']));
