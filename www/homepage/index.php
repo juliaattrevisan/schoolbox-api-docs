@@ -241,7 +241,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $hasUnitSpec   = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
     if (
         (!$hasCourseSpec && !$hasUnitSpec)
-        && Config::get('lms_enabled')
+        && Config::get(ConfigMapper::NAME_LMS_ENABLED)
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {
         $this->parse('course_actions_block', 'course_actions');
@@ -535,26 +535,28 @@ function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepa
 
     // Schoolbox analytics link.
     // Grab magic code to grab course IDs this folder is part of.
-    $currentTerm      = $manageClassController->getCurrentTerm();
-    $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
-    $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
-        [$manageClassController->getContext()->getId()],
-        $currentTerm->getStart(),
-        $currentTerm->getActualFinish()
-    );
-    if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
-        $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
-        foreach ($courses[$manageClassController->getContext()->getId()] as $courseId => $courseTitle) {
-            $params = [
-                'courseSpecId' => $courseId,
-                'folderId'     => $manageClassController->getContext()->getId(),
-                'termCode'     => $currentTerm->getCode(),
-            ];
-            if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
-                $hasAnalytics = true;
-                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($schoolboxAnalytics, $params));
-                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
-                $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+    if (Config::get(ConfigMapper::NAME_LMS_ENABLED)) {
+        $currentTerm      = $manageClassController->getCurrentTerm();
+        $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
+        $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
+            [$manageClassController->getContext()->getId()],
+            $currentTerm->getStart(),
+            $currentTerm->getActualFinish()
+        );
+        if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
+            $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
+            foreach ($courses[$manageClassController->getContext()->getId()] as $courseId => $courseTitle) {
+                $params = [
+                    'courseSpecId' => $courseId,
+                    'folderId'     => $manageClassController->getContext()->getId(),
+                    'termCode'     => $currentTerm->getCode(),
+                ];
+                if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
+                    $hasAnalytics = true;
+                    $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouteGenerator()->generate($schoolboxAnalytics, $params));
+                    $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
+                    $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+                }
             }
         }
     }
