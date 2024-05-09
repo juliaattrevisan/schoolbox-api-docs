@@ -40,6 +40,29 @@ export class AcceptanceTester {
     }
 
     /**
+     * Impersonate a user via user profile drop when alaress is presented in the drop
+     * @param { string } fullname - The full name of the user to impersonate
+     */
+    async impersonate(fullname: string) {
+        this.isGoingTo("impersonate a user by the name of " + fullname);
+        await this.logout();
+        await this.loginAsAdmin();
+        await this.page.getByTestId("profile-drop").click();
+
+        const accountContent = this.page.getByTestId("account-content");
+        await accountContent.getByText(fullname).click();
+
+        await this.skipWhatsNewTour();
+    }
+
+    /**
+     * Impersonate a teacher (Jack Coles) - sales data
+     */
+    async impersonateTeacher() {
+        await this.impersonate("Jack Coles");
+    }
+
+    /**
      * Skip the "What's New" tour if it exists
      */
     async skipWhatsNewTour() {
