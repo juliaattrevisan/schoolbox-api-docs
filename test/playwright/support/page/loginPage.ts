@@ -12,6 +12,13 @@ export class LoginPage {
     }
 
     /**
+     * Navigate to the login page
+     */
+    async goto() {
+        await this.page.goto(LoginPage.LOGIN_URL);
+    }
+
+    /**
      * Logout the user
      */
     async logout() {

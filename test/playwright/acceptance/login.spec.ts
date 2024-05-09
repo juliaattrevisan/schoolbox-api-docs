@@ -6,7 +6,7 @@ test.describe("Login functionality tests", () => {
 
     test.beforeEach(async ({ page }) => {
         loginPage = new LoginPage(page);
-        await page.goto("/login/");
+        await loginPage.goto();
     });
 
     test("login successfully", async () => {
