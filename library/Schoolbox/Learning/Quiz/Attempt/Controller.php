@@ -67,14 +67,21 @@ class Controller extends Base
              * it sounds really weird, but it's because the feedback and the submission
              * are in the same table and model.
              */
-            $attempt = $assessment->getParticipant($student)->findMostRecentSubmittedResponse();
+            $response = $assessment->getParticipant($student)->findMostRecentSubmittedResponse();
 
-            /* If a feedback didn't already exist,
-             * create a whole new random attempt with some defaults
+            /* A Response model here isn't really the attempt model we're trying to manipulate;
+             * we must fetch that corresponding instance separately. Swamp!
              *
-             * TODO make defaults editable via Attempt Editor
+             * If that exists, recycle it; otherwise spawn a new one altogether.
              */
-            if (null === $attempt) {
+            if (null !== $response) {
+                $attempt = $this->attemptMapper->findById($response->getId());
+            } else {
+                /* If a feedback didn't already exist,
+                 * create a whole new random attempt with some defaults
+                 *
+                 * TODO make defaults editable via Attempt Editor
+                 */
                 $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
                 $attempt = $this->attemptMapper->createModel()
@@ -111,10 +118,8 @@ class Controller extends Base
             ->setReviewer($this->getUser())
             ->setReviewed(\Alaress_Date_Format::now());
 
-        /* TODO stop spawning new attempts by using the form
-         * TODO use setReviewed() as the publish mechanism
+        /* TODO use setReviewed() as the publish mechanism
          */
-
         $this->attemptMapper->save($attempt);
     }
 
