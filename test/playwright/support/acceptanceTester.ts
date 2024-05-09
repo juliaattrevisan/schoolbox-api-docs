@@ -48,4 +48,14 @@ export class AcceptanceTester {
             await tourButtons.getByText("Finish").click();
         }
     }
+
+    /**
+     * Create an "I am going to " comment for debugging
+     * @param { string } argumentation - The message to log
+     */
+    // eslint-disable-next-line class-methods-use-this
+    isGoingTo(argumentation: string) {
+        // eslint-disable-next-line no-console
+        console.log("I am going to", argumentation);
+    }
 }
