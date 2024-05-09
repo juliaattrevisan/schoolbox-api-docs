@@ -3,9 +3,11 @@
  * https://playwright.dev/docs/test-fixtures
  */
 import { test as base } from "@playwright/test";
+import { AcceptanceTester } from "@schoolboxTest/playwright/support/acceptanceTester";
 import { DatabaseHelper } from "@schoolboxTest/playwright/support/databaseHelper";
 
 type Fixtures = {
+    tester: AcceptanceTester;
     db: DatabaseHelper;
 };
 
@@ -18,6 +20,10 @@ export const test = base.extend<Fixtures>({
         } finally {
             await db.closePool();
         }
+    },
+    tester: ({ page }, use) => {
+        const tester = new AcceptanceTester(page);
+        return use(tester);
     },
 });
 
