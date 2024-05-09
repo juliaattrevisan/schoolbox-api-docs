@@ -235,11 +235,11 @@ class Controller extends Assessment\Controller
         /* If the quiz is a Total Mark markscheme and if there was someone without a response,
          * ask learnosity what they could potentially get; otherwise skip the api penalty
          */
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
-         */
         if (\count($maxMarks) && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            /* Probably inject this one day, but for now,
+             * I want to avoid dumping Yet Another Thing into the kernel
+             * I don't have a convenient means to access SERVER_NAME except like this, sadly
+             */
             $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
 
             /* TODO Derive from learnosity atm
