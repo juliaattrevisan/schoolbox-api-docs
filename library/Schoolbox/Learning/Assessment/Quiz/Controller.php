@@ -207,15 +207,23 @@ class Controller extends Assessment\Controller
 
         foreach ($assessment->getAllParticipants() as $participant) {
             if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
-                /* If this participant never made an attempt, or
-                 * this attempt is currently in progress and not yet saved in our db,
+                /* Ask learnosity to find out how much their attempt *would* be worth
+                 * based on the current set of questions if any of the following occurs:
                  *
-                 * ask learnosity to find out how much their attempt *would* be worth
-                 * based on the current set of questions
+                 *     - this participant never made an attempt.
+                 *     - this participant's attempt is still in progress (db row won't exist yet).
+                 *     - most recent response's marksAvailable is zero.
+                 *         this occurs when you spawn an arbitrary attempt with a Letter Grade,
+                 *         then changed it to Total Mark; we never asked or recorded what the
+                 *         quantitative total actually was. Deeper in the andyland part of the
+                 *         swamp is a series of floatval() calls that cast nulls to zero.
+                 *         TODO maybe find out the breadth of this idea and undo it to support null
                  */
                 if (!$participant->findMostRecentResponse()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
                 } elseif (!$participant->findMostRecentResponse()->isSubmitted()) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                } elseif (!$participant->findMostRecentResponse()->getMarksAvailable()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
                 }
             }

@@ -93,9 +93,8 @@ class Controller extends Base
         }
 
         /* Assign the maximum available marks based on what's potentially available
-         * TODO check what happens with other mark schemes
          */
-        $maxMark = 100.00;
+        $maxMark = null;
 
         if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
             $maxMark = (float)($postData['maxMarks']);

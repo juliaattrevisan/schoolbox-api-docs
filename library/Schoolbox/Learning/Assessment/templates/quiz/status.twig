@@ -262,7 +262,7 @@
                  # In the absence of any learnosity-derived specific maxMarks values, use the template's
                  # defaulted hardcoded value of 100.
                  #}
-                {% set maxMarks = latestResponse.marksAvailable ?? maxMarks[participant.user.id] ?? null %}
+                {% set maxMarks = maxMarks[participant.user.id] ?? latestResponse.marksAvailable ?? null %}
 
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
                 <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
