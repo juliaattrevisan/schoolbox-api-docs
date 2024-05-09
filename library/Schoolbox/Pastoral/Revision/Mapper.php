@@ -185,13 +185,13 @@ class Mapper extends BaseMapper
 
         // If the private body looks empty, make it really empty
 
-        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate())))) {
+        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate(), "<img>")))) {
             $model->setBodyPrivate('');
         }
 
         // If the public body looks empty, make it really empty
 
-        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic())))) {
+        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic(), "<img>")))) {
             $model->setBodyPublic('');
         }
 

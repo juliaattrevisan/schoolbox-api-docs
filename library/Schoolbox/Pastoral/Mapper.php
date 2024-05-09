@@ -298,13 +298,13 @@ class Mapper extends BaseMapper
 
         // If the private body looks empty, make it really empty
 
-        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate())))) {
+        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate(), "<img>")))) {
             $model->setBodyPrivate('');
         }
 
         // If the public body looks empty, make it really empty
 
-        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic())))) {
+        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic(), "<img>")))) {
             $model->setBodyPublic('');
         }
 
@@ -395,9 +395,9 @@ class Mapper extends BaseMapper
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
-                    'order' => ['created_at' => 'DESC'],
-                    'limit' => $limit,
-                ]);
+                'order' => ['created_at' => 'DESC'],
+                'limit' => $limit,
+            ]);
     }
 
     /**
@@ -504,17 +504,17 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $recordNotDeletedClause = $this->getPredicateBuilder()
-                                       ->setParamPrefix('rec_nondel')
-                                       ->isNull('pastoral.deleted_at')
-                                       ->getWhere()[0];
+            ->setParamPrefix('rec_nondel')
+            ->isNull('pastoral.deleted_at')
+            ->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
         // Pastoral record heading
         // --------------------------------------------------------------------------------------------------------
 
         $pbHeadingSearch     = $this->getPredicateBuilder()
-                                    ->setParamPrefix('heading')
-                                    ->likeAny('pastoral.heading', $words);
+            ->setParamPrefix('heading')
+            ->likeAny('pastoral.heading', $words);
         $recordHeadingClause = $pbHeadingSearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -522,8 +522,8 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPublicBodySearch     = $this->getPredicateBuilder()
-                                       ->setParamPrefix('pub_body')
-                                       ->likeAny('pastoral.body_public', $words);
+            ->setParamPrefix('pub_body')
+            ->likeAny('pastoral.body_public', $words);
         $recordPublicBodyClause = $pbPublicBodySearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -531,8 +531,8 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPrivateBodySearch     = $this->getPredicateBuilder()
-                                        ->setParamPrefix('pri_body')
-                                        ->likeAny('pastoral.body_private', $words);
+            ->setParamPrefix('pri_body')
+            ->likeAny('pastoral.body_private', $words);
         $recordPrivateBodyClause = $pbPrivateBodySearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -540,23 +540,23 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $commentNotDeletedClause = $this->getPredicateBuilder()
-                                        ->setParamPrefix('com_nondel')
-                                        ->isNull('pastoral_comment.deleted_at')
-                                        ->getWhere()[0];
+            ->setParamPrefix('com_nondel')
+            ->isNull('pastoral_comment.deleted_at')
+            ->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
         // Public comments
         // --------------------------------------------------------------------------------------------------------
 
         $pbPublicCommentSearch = $this->getPredicateBuilder()
-                                      ->setParamPrefix('pub_cs')
-                                      ->likeAny('pastoral_comment.body', $words);
+            ->setParamPrefix('pub_cs')
+            ->likeAny('pastoral_comment.body', $words);
 
         $commentPublicClause = implode(' OR ', $pbPublicCommentSearch->getWhere());
 
         $pbPublicCommentNotPrivateSearch = $this->getPredicateBuilder()
-                                                ->setParamPrefix('pub_ispub')
-                                                ->isFalse('pastoral_comment.private');
+            ->setParamPrefix('pub_ispub')
+            ->isFalse('pastoral_comment.private');
 
         $commentPublicClause = "
             (
@@ -571,14 +571,14 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPrivateCommentSearch = $this->getPredicateBuilder()
-                                       ->setParamPrefix('pri_cs')
-                                       ->likeAny('pastoral_comment.body', $words);
+            ->setParamPrefix('pri_cs')
+            ->likeAny('pastoral_comment.body', $words);
 
         $commentPrivateClause = implode(' OR ', $pbPrivateCommentSearch->getWhere());
 
         $pbPrivateCommentIsPrivateSearch = $this->getPredicateBuilder()
-                                                ->setParamPrefix('pri_ispri')
-                                                ->isTrue('pastoral_comment.private');
+            ->setParamPrefix('pri_ispri')
+            ->isTrue('pastoral_comment.private');
 
         $commentPrivateClause = "
             (
@@ -593,8 +593,8 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbOwnerSearch     = $this->getPredicateBuilder()
-                                  ->setParamPrefix('os')
-                                  ->equals('pastoral.owner_id', $user->getId());
+            ->setParamPrefix('os')
+            ->equals('pastoral.owner_id', $user->getId());
         $recordOwnerClause = $pbOwnerSearch->getWhere()[0];
 
         // --------------------------------------------------------------------------------------------------------
@@ -602,25 +602,25 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPublicGroupSearch = $this->getPredicateBuilder()
-                                    ->setParamPrefix('pub_gs')
-                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                                    ->notNull('pastoral_access.group_id')
-                                    ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pub_gs')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+            ->notNull('pastoral_access.group_id')
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPublicGroupClause = implode(' AND ', $pbPublicGroupSearch->getWhere());
 
         $pbPrivateGroupSearch = $this->getPredicateBuilder()
-                                     ->setParamPrefix('pri_gs')
-                                     ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                                     ->notNull('pastoral_access.group_id')
-                                     ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pri_gs')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+            ->notNull('pastoral_access.group_id')
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPrivateGroupClause = implode(' AND ', $pbPrivateGroupSearch->getWhere());
 
         $pbGroupMemberSearch = $this->getPredicateBuilder()
-                                    ->setParamPrefix('gms')
-                                    ->equals('pastoral_group_member.user_id', $user->getId())
-                                    ->isNull('pastoral_group_member.deleted_at');
+            ->setParamPrefix('gms')
+            ->equals('pastoral_group_member.user_id', $user->getId())
+            ->isNull('pastoral_group_member.deleted_at');
 
         $recordGroupMemberClause = implode(' AND ', $pbGroupMemberSearch->getWhere());
 
@@ -629,18 +629,18 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPublicRoleSearch = $this->getPredicateBuilder()
-                                   ->setParamPrefix('pub_rs')
-                                   ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                                   ->equals('pastoral_access.role_id', $user->getRole()->getId())
-                                   ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pub_rs')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+            ->equals('pastoral_access.role_id', $user->getRole()->getId())
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPublicRoleClause = implode(' AND ', $pbPublicRoleSearch->getWhere());
 
         $pbPrivateRoleSearch = $this->getPredicateBuilder()
-                                    ->setParamPrefix('pri_rs')
-                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                                    ->equals('pastoral_access.role_id', $user->getRole()->getId())
-                                    ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pri_rs')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+            ->equals('pastoral_access.role_id', $user->getRole()->getId())
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPrivateRoleClause = implode(' AND ', $pbPrivateRoleSearch->getWhere());
 
@@ -649,18 +649,18 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $pbPublicUserSearch = $this->getPredicateBuilder()
-                                   ->setParamPrefix('pub_us')
-                                   ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
-                                   ->equals('pastoral_access.user_id', $user->getId())
-                                   ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pub_us')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PUBLIC)
+            ->equals('pastoral_access.user_id', $user->getId())
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPublicUserClause = implode(' AND ', $pbPublicUserSearch->getWhere());
 
         $pbPrivateUserSearch = $this->getPredicateBuilder()
-                                    ->setParamPrefix('pri_us')
-                                    ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
-                                    ->equals('pastoral_access.user_id', $user->getId())
-                                    ->isNull('pastoral_access.deleted_at');
+            ->setParamPrefix('pri_us')
+            ->greaterThanOrEqualTo('pastoral_access.access', PastoralAccessMapper::ACCESS_PRIVATE)
+            ->equals('pastoral_access.user_id', $user->getId())
+            ->isNull('pastoral_access.deleted_at');
 
         $recordPrivateUserClause = implode(' AND ', $pbPrivateUserSearch->getWhere());
 
@@ -866,14 +866,14 @@ class Mapper extends BaseMapper
 
         if ($before_date instanceof Alaress_Date_Format) {
             $this->bindings[':beforeDate'] = $before_date->endOfDay()
-                                                         ->toIso8601String();
+                ->toIso8601String();
 
             $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) <= :beforeDate)';
         }
 
         if ($after_date instanceof Alaress_Date_Format) {
             $this->bindings[':afterDate'] = $after_date->startOfDay()
-                                                       ->toIso8601String();
+                ->toIso8601String();
 
             $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)';
         }
