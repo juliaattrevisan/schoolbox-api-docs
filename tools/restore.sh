@@ -46,7 +46,11 @@ readonly PRESERVED_CONFIG=(
   "learnosity_consumer_key" "learnosity_consumer_secret" "learnosity_version"
 
   # Others
-  "xml_dir" "file_dir"  "api_key"
+  "xml_dir" "file_dir"  "api_key" "schooldata_import_frequency"
+);
+
+readonly DISABLED_CONFIG=(
+  "schooldata_import_frequency"
 );
 
 declare -A sql_config=();                # Associative array of config to preserve during restoration. Maps config_name to config_value.
@@ -233,6 +237,12 @@ setsqlconfig() {
     sql_command="UPDATE config SET value=FROM_BASE64('${sql_config[$config_name]}') WHERE name='$config_name'"
     if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
       echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
+    fi
+  done
+  for config_name in "${DISABLED_CONFIG[@]}"; do
+    sql_command="UPDATE config SET editable='false' where name='$config_name'"
+    if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+      echo "Unable to set editable for config '$config_name' to false" >&2
     fi
   done
   sql_command="UPDATE user SET password = '$alaress_password' WHERE username = 'alaress' AND deleted_at IS NULL"
