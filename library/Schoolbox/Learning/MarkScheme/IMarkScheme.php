@@ -21,6 +21,15 @@ interface IMarkScheme
     public const NORMALISED_MARK_MIN = 0.0;
     public const NORMALISED_MARK_MAX = 100.0;
 
+
+    /**
+     * Get this Mark Scheme instance's name
+     *
+     * @return string
+     */
+    public function getName(): string;
+
+
     /**
      * Is this mark scheme quantitative?
      *

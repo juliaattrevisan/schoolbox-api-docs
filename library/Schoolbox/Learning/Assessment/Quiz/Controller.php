@@ -268,7 +268,7 @@ class Controller extends Assessment\Controller
             /* Quizzes now support Submission States
              * Annoyingly, Submission States are in the $errors array...
              */
-            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'markSchemeName' => $assessment->getMarkScheme()->getName(),
             'errors' => $this->stateMapper->listDisplayValues(),
             /* Each guy's maximum available marks
              */
