@@ -11,6 +11,11 @@
  # @param string         $attemptComment     The overall comment for the attempt
  # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
  # @param object         $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ #
+ # These are needed for Submission States
+ # @param Participant/Model $participant     The student who did the attempt
+ # @param float             $maxMarks        Maximum available marks in this attempt
+ # @param array             $errors          A list of submission states that can be chosen
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -18,6 +23,36 @@
 <script src="https://reports-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.dynamicFeedback({
+            onPreDraftCallback: function () {
+            },
+            onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+            },
+            onPrePublishCallback: function () {
+            },
+            onPublishCallback: function (userId) {
+            }
+        });
+    });
+</script>
+
+<form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+    {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+        assessment:  assessment,
+        participant: participant,
+        feedback:    latestFeedback ?? null,
+        markScheme:  assessment.markScheme,
+        limit:       maxMarks,
+        tabIndex:    1,
+        errors:      errors,
+        readonly:    false,
+    } only %}
+</form>
 
 <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
     <h1>Feedback for {{ assessment.title }}</h1>
@@ -39,13 +74,5 @@
 <script src="https://cdn.iframe.ly/embed.js?cancel=0&key={{ config.iframely_license_key_public ?? null }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
 
-{% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-    assessment:  assessment,
-    participant: participant,
-    feedback:    latestFeedback ?? null,
-    markScheme:  assessment.markScheme,
-    limit:       maxMarks,
-    tabIndex:    1,
-    errors:      errors,
-    readonly:    false,
-} only %}
+<div class="toast" data-alert data-save-draft></div>
+

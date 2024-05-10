@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
@@ -177,6 +178,7 @@ class Controller extends Base
      * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
      * @param Feedback\Mapper $feedbackMapper
      * @param UserMapper $userMapper
+     * @param StateMapper $stateMapper
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
      * @param Producer $messageProducer for sending messages to taskd
@@ -195,6 +197,7 @@ class Controller extends Base
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
         private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
         private \Schoolbox\UserMapper $userMapper,
+        private StateMapper $stateMapper,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
@@ -1027,7 +1030,7 @@ class Controller extends Base
             'feedback' => $attempt,
             'markSchemeName' => $assessment->getMarkScheme()->getName(),
             'maxMarks' => $attempt->getMaxMark(),
-            'errors' => [],
+            'errors' => $this->stateMapper->listDisplayValues(),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
