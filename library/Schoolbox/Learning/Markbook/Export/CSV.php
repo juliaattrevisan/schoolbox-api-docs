@@ -234,10 +234,12 @@ class CSV extends AbstractCSV
             $dataFound = false;
 
             if ($assessment instanceof Project) {
-                // For projects, there is no feedback, so get data from other places.
-                $reviewComplete = $assessment->isReviewComplete($participant);
-                if ($assessment->hasSubmittedResponse($participant) && ($reviewComplete || $showDrafts)) {
-                    $suffix = $reviewComplete ? '' : self::DRAFT_SUFFIX;
+                if (
+                    $assessment->hasPublishedFeedback($participant) ||
+                    ($showDrafts && $assessment->hasPendingDraftAuthoritativeFeedback($participant))
+                ) {
+                    // For projects, there is no feedback, so get data from other places.
+                    $suffix = $assessment->isReviewComplete($participant) ? '' : self::DRAFT_SUFFIX;
                     $humanReadableMark = $participant->getHumanReadableMark(!$showDrafts);
                     $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
                     $comment = '';
@@ -260,13 +262,13 @@ class CSV extends AbstractCSV
                     $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
                     $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
                 } else {
-                    $row[] = $humanReadableMark . $suffix;
+                    $row[] = $humanReadableMark . (($humanReadableMark == '') ? '' : $suffix);
                 }
                 if ($this->hasNormalizedMarkColumn($assessment)) {
-                    $row[] = ($normalisedMark === null ? '' : round($normalisedMark, 2)) . $suffix;
+                    $row[] = ($normalisedMark === null ? '' : round($normalisedMark, 2)) . (($normalisedMark === null) ? '' : $suffix);
                 }
                 if ($this->hasCommentColumn($assessment)) {
-                    $row[] = $comment . $suffix;
+                    $row[] = $comment . (($comment == '') ? '' : $suffix);
                 }
                 return $row;
             }
