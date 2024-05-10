@@ -259,16 +259,16 @@ class CSV extends AbstractCSV
 
             if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment)) {
-                    $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
-                    $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
+                    $row[] = $humanReadableMark == '' ? '' : $this->parseNumerator($humanReadableMark) . $suffix;
+                    $row[] = $humanReadableMark == '' ? '' : $this->parseDenominator($humanReadableMark) . $suffix;
                 } else {
-                    $row[] = $humanReadableMark . (($humanReadableMark == '') ? '' : $suffix);
+                    $row[] = $humanReadableMark == '' ? '' : $humanReadableMark . $suffix;
                 }
                 if ($this->hasNormalizedMarkColumn($assessment)) {
-                    $row[] = ($normalisedMark === null ? '' : round($normalisedMark, 2)) . (($normalisedMark === null) ? '' : $suffix);
+                    $row[] = $normalisedMark === null ? '' : round($normalisedMark, 2) . $suffix;
                 }
                 if ($this->hasCommentColumn($assessment)) {
-                    $row[] = $comment . (($comment == '') ? '' : $suffix);
+                    $row[] = $comment == '' ? '' : $comment . $suffix;
                 }
                 return $row;
             }
