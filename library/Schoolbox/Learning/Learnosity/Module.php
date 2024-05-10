@@ -436,7 +436,6 @@ class Module extends BaseModule
                  * or a student that adheres all the non-instructor criteria
                  */
                 new Rule\Any(
-                    $this->buildAuthRuleHasInstructorAccess(),
                     /* Parents can view students' attempts if:
                      *   - They are the parent of this particular student (and thus their attempt)
                      *   - restrict_student_submissions config is disabled
