@@ -1020,7 +1020,14 @@ class Controller extends Base
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
             'attemptComment' => $this->getAttemptComment($attempt),
-            'urls' => $urls
+            'urls' => $urls,
+            /* For Submission States
+             */
+            'participant' => $assessment->getParticipant($student),
+            'feedback' => $attempt,
+            'markSchemeName' => $assessment->getMarkScheme()->getName(),
+            'maxMarks' => $attempt->getMaxMark(),
+            'errors' => [],
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
