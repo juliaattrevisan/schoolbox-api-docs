@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Custom\Help\CourseParticipation;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
@@ -21,7 +22,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-use Custom\Help\CourseParticipation;
 
 use function strpos;
 
@@ -193,49 +193,102 @@ class Controller extends Base
         $responseCode = 200;
         $messages     = [];
 
-        // data, status => code, message
         try {
             $existingUsers = $this->helpRequest->users();
         } catch (GuzzleException $e) {
+            $messages[] = 'Error during retrieval of users: ' . $this->getReasonPhrase($e);
             $existingUsers = [];
         }
         $emails = [];
 
-        // provision new users
+        // Provision new users.
         $newUserIds = array_diff($userIds, array_keys($existingUsers));
         if (count($newUserIds) > 0) {
-            $newUsers     = $this->userMapper->findByColumn('id', $newUserIds);
+            $newUsers = $this->userMapper->findByColumn('id', $newUserIds);
+
+            /** @var array{status: array, data: array} $responseUser */
             $responseUser = $this->helpRequest->provisionUsers($newUsers->getAll());
-            $responseCode = $responseUser['status']['code'];
-            if ($responseCode === 200) {
-                $messages[] = $newUsers->count() . ' user' . ($newUsers->count() > 1 ? 's' : '') . ' provisioned successfully';
-                $emails     = $newUsers->getPropertyValues('email');
+
+            /** @var array{code: int, message: string} $responseUserStatus */
+            $responseUserStatus = $responseUser['status'];
+
+            if ($responseUserStatus['code'] === 200) {
+                $nUsersFailed = count($responseUser['data']); // Info on failures for specific users will be in $responseUser['data'].
+                $nUsersSucceeded = $newUsers->count() - $nUsersFailed;
+                $messages[] = "$nUsersSucceeded user" . ($nUsersSucceeded > 1 ? 's' : '') . ' provisioned successfully.';
+                if ($nUsersFailed > 0) {
+                    // Add info on failures for specific users to $messages, so this info will be seen by the user.
+                    // See Custom/Help/CourseParticipation/Handler->postUserRegistrations().
+                    $message = "$nUsersFailed user" . ($nUsersFailed > 1 ? 's' : '') . " not provisioned:\n";
+                    foreach ($responseUser['data'] as $errorInfo) {
+                        if (
+                            count($errorInfo) !== 2 ||
+                            !is_string($errorInfo[0])
+                        ) {
+                            $messages[] = "(user error info in unexpected format): " . var_export($errorInfo, true);
+                        } else {
+                            $errorDesc = $errorInfo[0];
+
+                            /** @var array{id: string, firstname: string, lastname: string, email: string, title?: string} $userInfo */
+                            $userInfo = $errorInfo[1];
+
+                            $message .= "$errorDesc: {$userInfo['firstname']} {$userInfo['lastname']}, {$userInfo['email']}, userId:{$userInfo['id']}\n";
+                        }
+                    }
+                    $messages[] = $message;
+                }
+
+                $emails = $newUsers->getPropertyValues('email');
             } else {
-                $messages = array_column($responseUser['data'], 'message');
+                $responseCode = $responseUserStatus['code'];
+                if ($responseUserStatus['message'] !== '') {
+                    $messages[] = $responseUserStatus['message'];
+                }
+                // The format of $responseUser['data'] is unknown in this situation, so cannot add it to $messages.
             }
         }
 
-        // gather usernames in response which correspond to user ids
+        // Gather usernames in response that correspond to user ids.
         foreach ($existingUsers as $existingUserId => $existingUserEmail) {
             if (in_array($existingUserId, $userIds)) {
                 $emails[] = $existingUserEmail;
             }
         }
 
-        // course participation
-        if (!empty($courses)) {
-            $courses            = array_map('boolVal', $courses);
-            $responseCourse     = $this->helpRequest->provisionUserParticipation($emails, $courses);
-            $responseCourseCode = $responseCourse['status']['code'];
-            if ($responseCourseCode === 200) {
-                $messages[] = 'Course participation updated successfully.';
+        // Course participation.
+        if (!empty($courses) && !empty($emails)) {
+            $courses = array_map('boolVal', $courses);
+
+            /** @var array{status: array, data: array} $responseCourse */
+            $responseCourse = $this->helpRequest->provisionUserParticipation($emails, $courses);
+
+            /** @var array{code: int, message: string} $responseCourseStatus */
+            $responseCourseStatus = $responseCourse['status'];
+
+            if ($responseCourseStatus['code'] === 200) {
+                $nUsersFailed = count($responseCourse['data']); // Info on failures for specific users will be in $responseUser['data'].
+                $nUsersSucceeded = count($emails) - $nUsersFailed;
+                $messages[] = "$nUsersSucceeded user's course participation updated successfully.";
+                if ($nUsersFailed > 0) {
+                    // Add info on failures for specific users to $messages, so this info will be seen by the user.
+                    // Expect $responseCourse['data'] to contain an array of email addresses.
+                    // See Custom/Help/CourseParticipation/Controller->postFolderAccessBySchool().
+                    $message = "$nUsersFailed user's course participation not updated (see email addresses of those users below):\n";
+                    foreach ($responseCourse['data'] as $emailAddress) {
+                        $message .= " * $emailAddress\n";
+                    }
+                    $messages[] = $message;
+                }
             } else {
-                $responseCode = $responseCourseCode;
-                $messages     = array_merge($messages, array_column($responseCourse['data'], 'message'));
+                $responseCode = $responseCourseStatus['code'];
+                if ($responseCourseStatus['message'] !== '') {
+                    $messages[] = $responseCourseStatus['message'];
+                }
+                // The format of $responseUser['data'] is unknown in this situation, so cannot add it to $messages.
             }
         }
 
-        // Build response
+        // Build response.
         $this->response = $this->responseAsJson(
             [
                 'data' => $messages,

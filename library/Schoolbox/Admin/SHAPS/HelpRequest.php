@@ -17,7 +17,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
-use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -141,7 +140,7 @@ class HelpRequest
         }
 
         // If this is an array, we can assume we got some data back from Help
-        if (\is_array($decoded_response)) {
+        if (is_array($decoded_response)) {
             return $decoded_response;
         }
         // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
@@ -230,7 +229,7 @@ class HelpRequest
      * Provision course participation
      * @param array $usernames
      * @param array $courses
-     * @return array
+     * @return array{data: array, status: array}
      */
     public function provisionUserParticipation(array $usernames, array $courses): array
     {
@@ -243,7 +242,7 @@ class HelpRequest
         $data = [];
 
         try {
-            $this->execute('post', 'courses', ['course' => $coursePayload], ['byUsername' => '1']);
+            $data    = $this->execute('post', 'courses', ['course' => $coursePayload], ['byUsername' => '1']);
             $code    = 200;
             $message = 'OK';
         } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
@@ -253,10 +252,15 @@ class HelpRequest
             if ($e->getResponse()) {
                 try {
                     $data = json_decode($e->getResponse()->getBody()->getContents(), true);
-                    foreach ($data as $key => $emailAddress) {
-                        $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
+                    if (!is_array($data)) {
+                        $code = '500';
+                        $message = 'Unexpected response from help.schoolbox.cloud while provisioning user participation..';
+                    } else {
+                        foreach ($data as $key => $emailAddress) {
+                            $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
+                        }
                     }
-                } catch (\RuntimeException $e) {
+                } catch (\RuntimeException) {
                     // Not much we can do here.
                 }
             }
@@ -265,7 +269,7 @@ class HelpRequest
             $code    = 500;
             $message = 'Internal Server Error';
         }
-        // Build response
+
         return [
             'data'   => $data,
             'status' => [
@@ -279,8 +283,8 @@ class HelpRequest
      * Provision users
      *
      * @param array $users
-     * @return array
-     * @throws InvalidArgumentException                If unable to instantiate a guzzle client
+     * @return array{data: array, status: array}
+     * @throws InvalidArgumentException If unable to instantiate a guzzle client
      */
     public function provisionUsers(array $users): array
     {
@@ -289,7 +293,7 @@ class HelpRequest
         if (!empty($payload)) {
             // Send each user to Help
             try {
-                $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
+                $data    = $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
                 $code    = 200;
                 $message = 'OK';
             } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
@@ -300,17 +304,22 @@ class HelpRequest
                     try {
                         // Build human-readable error message
                         $data = json_decode($e->getResponse()->getBody()->getContents(), true);
-                        foreach ($data as $key => $failedUserData) {
-                            $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
+                        if (!is_array($data)) {
+                            $code = '500';
+                            $message = 'Unexpected response from help.schoolbox.cloud while provisioning users.';
+                        } else {
+                            foreach ($data as $key => $failedUserData) {
+                                $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
+                            }
                         }
-                    } catch (\RuntimeException $e) {
+                    } catch (\RuntimeException) {
                         // Not much we can do here.
                     }
                 }
             } catch (GuzzleException $e) {
                 // any other exception
                 $code    = 500;
-                $message = 'Internal Server Error';
+                $message = $e->getMessage();
             }
         } else {
             // empty payload

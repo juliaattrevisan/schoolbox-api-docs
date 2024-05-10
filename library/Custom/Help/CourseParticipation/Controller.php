@@ -362,16 +362,30 @@ class Controller extends Base
         }
 
         try {
-            // check the server is correctly configured
+            // Check the server is correctly configured (part 1).
             $this->getRoleMapper()->findOneByColumn('name', Handler::DEFAULT_PARTICIPANT_ROLE_NAME);
-            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
         } catch (Mapper\Exception $e) {
-            // if this role doesn't exist, that's *bad* bad
-            // No need to advise a client of the cause of this error.
-            $this->sendGenericStatus(self::STATUS_SERVER_ERROR);
+            // If this role doesn't exist, that's *bad* bad
+            // Advise client of error to speed debugging.
+            $this->sendGenericStatus(
+                self::STATUS_SERVER_ERROR,
+                "Role '" . Handler::DEFAULT_PARTICIPANT_ROLE_NAME . "' does not exist on help.schoolbox.cloud."
+            );
             return;
         }
 
+        try {
+            // Check the server is correctly configured (part 2).
+            $this->getCampusMapper()->findOneByColumn('id', Handler::PARTICIPANT_CAMPUS);
+        } catch (Mapper\Exception $e) {
+            // If this campus doesn't exist, we cannot proceed.
+            // Advise client of error to speed debugging.
+            $this->sendGenericStatus(
+                self::STATUS_SERVER_ERROR,
+                "No campus with ID " . Handler::PARTICIPANT_CAMPUS . " exists on help.schoolbox.cloud."
+            );
+            return;
+        }
 
         // process the payload
         if (empty($this->requestPost['user'])) {
