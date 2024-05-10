@@ -24,36 +24,6 @@
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
-<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
-<script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.dynamicFeedback({
-            onPreDraftCallback: function () {
-            },
-            onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-            },
-            onPrePublishCallback: function () {
-            },
-            onPublishCallback: function (userId) {
-            }
-        });
-    });
-</script>
-
-<form data-feedback-form="{{ participant.user.id }}" method="post" action="">
-    {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-        assessment:  assessment,
-        participant: participant,
-        feedback:    latestFeedback ?? null,
-        markScheme:  assessment.markScheme,
-        limit:       maxMarks,
-        tabIndex:    1,
-        errors:      errors,
-        readonly:    false,
-    } only %}
-</form>
-
 <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
     <h1>Feedback for {{ assessment.title }}</h1>
     <div id="quiz-feedback-container">
@@ -76,3 +46,44 @@
 
 <div class="toast" data-alert data-save-draft></div>
 
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.dynamicFeedback({
+            onPreDraftCallback: function () {
+            },
+            onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+            },
+            onPrePublishCallback: function () {
+            },
+            onPublishCallback: function (userId) {
+            }
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div class="row">
+                {# Quiz always has a Mark Type (it's mandatory) #}
+                <div class="small-12 medium-3 column">
+                    <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+                        <label>{{ locale.grades.proper }}
+                            {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                assessment:  assessment,
+                                participant: participant,
+                                feedback:    latestFeedback ?? null,
+                                markScheme:  assessment.markScheme,
+                                limit:       maxMarks,
+                                tabIndex:    1,
+                                errors:      errors,
+                                readonly:    false,
+                            } only %}
+                        </label>
+                    </form>
+                </div>
+        </section>
+    </div>
+</div>
