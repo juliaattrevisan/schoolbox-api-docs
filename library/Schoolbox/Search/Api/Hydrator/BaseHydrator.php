@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Hydrator;
 
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Url\Uri;
@@ -178,5 +179,48 @@ abstract class BaseHydrator implements IHydrator
     {
         // Override this function if user permissions can render a Hydrator irrelevant to a user.
         return true;
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
+    {
+        return match ($type) {
+            'assessment' => $rosettaStone->translate('assessment', false, true),
+            'assessment.dueWork' => $rosettaStone->translate('dueWork', false, true),
+            'assessment.lessonPlan' => 'Lesson plan',
+            'assessment.project' => $rosettaStone->translate('project', false, true),
+            'assessment.lti' => 'LTI',
+            'assessment.task' => 'Task',
+            'assessment.quiz' => 'Quiz',
+            'badge' => 'Badge',
+            'blog' => 'Blog',
+            'event' => 'Event',
+            'file', 'file.other' => 'File',
+            'file.audio' => 'Audio',
+            'file.document' => 'Document',
+            'file.image' => 'Image',
+            'file.video' => 'Video',
+            'forum' => 'Forum',
+            'link' => 'Link',
+            'news' => $rosettaStone->translate('news', false, true),
+            'page' => 'Page',
+            'page.class' => $rosettaStone->translate('class', false, true),
+            'page.course' => 'Course',
+            'page.homepage' => 'Homepage',
+            'page.unit' => $rosettaStone->translate('unit', false, true),
+            'page.folder' => 'Folder',
+            'page.group' => 'Group',
+            'textbox' => 'Textbox',
+            'tile' => 'Tile',
+            'user' => 'User',
+            'user.guest' => 'Guest',
+            'user.parent' => 'Parent',
+            'user.staff' => 'Staff',
+            'user.student' => 'Student',
+            default => $type,
+        };
     }
 }

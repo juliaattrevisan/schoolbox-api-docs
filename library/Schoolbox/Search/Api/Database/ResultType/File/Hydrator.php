@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\File;
 
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
@@ -41,10 +42,13 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param File\Mapper $fileMapper Used to fetch files for hydration.
-     * @param Access      $access     Used to determine if the current user may view this page.
+     * @param RosettaStone    $rosettaStone Used to translate terminology.
+     * @param File\Mapper     $fileMapper   Used to fetch files for hydration.
+     * @param Access          $access       Used to determine if the current user may view this page.
+     * @param PrefixGenerator $prefixGenerator
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private File\Mapper $fileMapper,
         private Access $access,
         private PrefixGenerator $prefixGenerator
@@ -96,6 +100,7 @@ class Hydrator extends BaseHydrator
                          ->withQuery(http_build_query(['id' => $file->getId()]))
                          ->__toString(),
                     $match->type,
+                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                     $match->relevance,
                     $file->getModifiedAt(),
                     $file->getFolder(),

@@ -103,12 +103,16 @@ class Module extends BaseModule
         // Need an httpRequest.
         $httpRequest = $this->injector->get('httpRequest');
 
+        // Need a rosetta stone to translate terminology.
+        $rosettaStone = $this->injector->get('l10n');
+
         $queryParamBuilders = [
             new Database\Index\QueryParamBuilder(),
         ];
 
         $hydrators = [
             new Database\ResultType\User\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(UserMapper::class),
                 $userNameFormatter,
                 $config,
@@ -116,12 +120,14 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\News\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(NewsMapper::class),
                 $articleResolver,
                 $routeGenerator,
                 $authorizer
             ),
             new Database\ResultType\Page\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
                 $config,
@@ -129,19 +135,23 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\File\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(FileMapper::class),
                 Access::getInstance(),
                 new PrefixGenerator($this->getConfig()),
             ),
             new Database\ResultType\Event\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(UserMapper::class),
                 $mapperFactory->get(FolderMapper::class),
             ),
             new Database\ResultType\Link\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(LinkMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Textbox\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(TextboxMapper::class),
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
@@ -149,16 +159,19 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\Blog\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(BlogMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Tile\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(TileMapper::class),
                 $mapperFactory->get(TileLayoutMapper::class),
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Forum\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(PostMapper::class),
                 $mapperFactory->get(ThreadMapper::class),
                 Access::getInstance(),
@@ -171,6 +184,7 @@ class Module extends BaseModule
             // permission based checks cannot be done here because the logged-in user object is not available here.
             // So instead user permission checks are applied within in the Badge\Hydrator.
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(BadgeMapper::class),
                 new PrefixGenerator($this->getConfig()),
                 $routeGenerator,
@@ -180,6 +194,7 @@ class Module extends BaseModule
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $hydrators[] = new Database\ResultType\Assessment\Hydrator(
+                $rosettaStone,
                 $assessmentMapperProxy,
                 $mapperFactory->get(UserMapper::class),
                 Access::getInstance(),

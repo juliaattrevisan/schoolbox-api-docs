@@ -32,7 +32,8 @@ class FullResult
      *                                              (See /Search/Api/Database/ResultType/Textbox/IndexBuilder.php).
      * @param string                   $title       The title of the search result.
      * @param string                   $url         A link to the search result.
-     * @param string                   $type        The type of search result.
+     * @param string                   $type        The type of the search result.
+     * @param string                   $typeTitle   The type of the search result for display purposes.
      * @param float                    $relevance   The relevance score of the search result.
      * @param Alaress_Date_Format|null $date        The date (if any) of the search result.
      * @param FolderModel|null         $folder      The folder (if any) the search result belongs in.
@@ -59,6 +60,7 @@ class FullResult
         public string $title,
         public string $url,
         public string $type,
+        public string $typeTitle,
         public float $relevance,
         public ?Alaress_Date_Format $date = null,
         public ?FolderModel $folder = null,

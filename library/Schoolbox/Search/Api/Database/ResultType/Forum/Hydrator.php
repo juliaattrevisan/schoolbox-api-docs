@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Forum\Post as PostModel;
@@ -34,14 +35,16 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param PostMapper $postMapper Used to fetch forum posts for hydration.
+     * @param RosettaStone $rosettaStone Used to translate terminology.
+     * @param PostMapper   $postMapper   Used to fetch forum posts for hydration.
      * @param ThreadMapper $threadMapper Used to check whether a thread is a component.
-     * @param Access $access Used to determine if the current user may view this page.
+     * @param Access       $access       Used to determine if the current user may view this page.
      */
     public function __construct(
-        private PostMapper $postMapper,
+        private RosettaStone $rosettaStone,
+        private PostMapper   $postMapper,
         private ThreadMapper $threadMapper,
-        private Access $access,
+        private Access       $access,
     ) {
     }
 
@@ -118,6 +121,7 @@ class Hydrator extends BaseHydrator
                          ->withFragment("{$post->getId()}")
                          ->__toString(),
                     $match->type,
+                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                     $match->relevance,
                     $post->getModified(),
                     $threadFolder,

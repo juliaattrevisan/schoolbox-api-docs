@@ -43,6 +43,7 @@ class FullResultToArray
         return [
             'id'          => $result->id,
             'type'        => $result->type,
+            'typeTitle'   => $result->typeTitle,
             'date'        => $result->date?->toRfc3339String(),
             'url'         => $result->url,
             'title'       => $result->title,

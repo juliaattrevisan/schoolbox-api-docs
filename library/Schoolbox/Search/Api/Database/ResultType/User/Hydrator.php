@@ -16,6 +16,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Eportfolio_Authenticator;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -53,6 +54,7 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
+     * @param RosettaStone  $rosettaStone      Used to translate terminology.
      * @param UserMapper    $userMapper        Used to fetch users for hydration.
      * @param Formatter     $userNameFormatter Used to format a user's name on output.
      * @param IConfigLoader $config            Used for fetching configuration, which controls user search
@@ -61,6 +63,7 @@ class Hydrator extends BaseHydrator
      * @param Authorizer    $authorizer
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private UserMapper $userMapper,
         private User\Formatter\Formatter $userNameFormatter,
         private IConfigLoader $config,
@@ -99,6 +102,7 @@ class Hydrator extends BaseHydrator
                     $this->userNameFormatter->formatObject($user),
                     $user->getRole()->getType() === Role::GUEST ? '' : '/search/user/' . $match->id, // Guest users do not have a profile URL
                     $match->type,
+                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                     $match->relevance,
                     $user->getUpdatedAt(),
                     null,

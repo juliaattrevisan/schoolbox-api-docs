@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Badge\Model as BadgeModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -34,9 +35,14 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param BadgeMapper $badgeMapper Used to fetch badge for hydration.
+     * @param RosettaStone    $rosettaStone Used to translate terminology.
+     * @param BadgeMapper     $badgeMapper  Used to fetch badge for hydration.
+     * @param PrefixGenerator $prefixGenerator
+     * @param Generator       $routeGenerator
+     * @param Authorizer      $authorizer
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private BadgeMapper $badgeMapper,
         private PrefixGenerator $prefixGenerator,
         private Generator $routeGenerator,
@@ -102,6 +108,7 @@ class Hydrator extends BaseHydrator
                     $badge->getName(), // The closest thing to a title for a badge is badge.name.
                     '',  // There is no 'view specific badge' page, so blank string here.
                     $match->type,
+                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                     $match->relevance,
                     $badge->getUpdatedAt(),
                     null, // A badge is not linked to any folder.
