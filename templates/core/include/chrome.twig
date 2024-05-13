@@ -380,7 +380,7 @@
                                 To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
                             </div>
 
-                            <div data-pwa-action="notifBlocked">
+                            <div data-pwa="notifBlocked">
                                 You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
                             </div>
                             <div data-pwa-action="enableNotifPrompt">
@@ -474,7 +474,7 @@
                     // const installDelayCookie = cookieStore.get("installDelayCookie");
                     const installDelayCookie = false;
                     if (installDelayCookie) {
-                        document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                             element.remove();
                         });
                     } else {
@@ -489,12 +489,12 @@
                             // Stash the event so it can be triggered later.
                             window.deferredPrompt = event;
                             // Remove the 'hidden' class from the install button container.
-                            document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                                 element.classList.toggle('hidden', false);
                             });
                         });
 
-                        document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                             element.addEventListener('click', async () => {
                                 {% if config.debug_mode %}
                                 console.log('👍', 'butInstall-clicked');
@@ -515,7 +515,7 @@
                                 // prompt() can only be called once.
                                 window.deferredPrompt = null;
                                 // Hide the install button.
-                                document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                                document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                                     element.classList.toggle('hidden', true);
                                 });
                             });
@@ -550,32 +550,41 @@
                         }
 
                         if (iOS()) {
-                            document.querySelectorAll('[data-pwa-action="#installGoogle"]').forEach( (element)=>{
+                            {% if config.debug_mode %}
+                                console.log('iOS');
+                            {% endif %}
+                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach( (element)=>{
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                                 element.remove();
                             });
                         }
                                 {# if android and the android link exists, show it and hide the rest #}
                         else if (/android/i.test(navigator.userAgent)) {
-                            document.querySelectorAll('[data-pwa-action="#installApple"]').forEach( (element)=>{
+                            {% if config.debug_mode %}
+                                console.log('Android');
+                            {% endif %}
+                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach( (element)=>{
                                 element.remove();
                             });
                             document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                                 element.remove();
                             });
                         } else {
-                            document.querySelectorAll('[data-pwa-action="#installApple"]').forEach( (element)=>{
+                            {% if config.debug_mode %}
+                                console.log('Normal PWA');
+                            {% endif %}
+                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach( (element)=>{
                                 element.remove();
                             });
                             document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="#installGoogle"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach( (element)=>{
                                 element.remove();
                             });
                         }
@@ -583,12 +592,16 @@
                         {# if notifications have been disabled show prompt, and disable allow notif switch #}
                         if (("Notification" in window)) {
                             if (Notification.permission === "granted") {
-                                document.querySelectorAll('[data-pwa-action="#enableNotifPrompt"]').forEach( (element)=>{
+                                document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                     element.remove();
                                 });
-                                document.querySelector("#notifBlocked").classList.toggle('hidden', true);
+                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                    element.classList.toggle('hidden', true);
+                                });
                             } else if (Notification.permission !== "denied") {
-                                document.querySelector("#notifBlocked").classList.toggle('hidden', true);
+                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                    element.classList.toggle('hidden', true);
+                                });
                                 {# wait for toggle change #}
                                 document.querySelector('#enableNotifPrompt')?.addEventListener('click', () => {
                                     if (document.querySelector('#notifOn')) {
@@ -627,7 +640,9 @@
                                                 {#        {% endif %}#}
                                                 {#    });#}
                                             } else if (permission === 'denied') {
-                                                document.querySelector("#notifBlocked").classList.toggle('hidden', false);
+                                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                                    element.classList.toggle('hidden', false);
+                                                });
                                                 {% if config.debug_mode %}
                                                     console.warn('Notification permission denied');
                                                 {% endif %}
