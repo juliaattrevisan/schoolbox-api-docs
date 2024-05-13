@@ -62,38 +62,41 @@
     </div>
     <div class="small-12 island">
         <section class="content">
-            To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.
 
-            {# Insatll PWA if not any of the following:
-                                    config.digistorm_store_link* is not set
-                                    config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
-            #}
-            {#                            {% set installGoogle = config.digistorm_store_link_google %}#}
-            {#                            {% set installApple = config.digistorm_store_link_apple %}#}
-            {% set installGoogle = '#installGoogle' %}
-            {% set installApple = '#installApple' %}
+            <div data-pwa-action="installPWA">
+                To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.
 
-            {% if config.digistorm_store_role ?? [] is empty %}
-                {# All users are redirected to the store link #}
-                {% if installApple is not empty %}
-                    <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
-                {% endif %}
-                {% if installGoogle is not empty %}
-                    <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
-                {% endif %}
-            {% else %}
-                {# ensure the user is in the specified role #}
-                {% if user.role.type in config.digistorm_store_role %}
+                {# Insatll PWA if not any of the following:
+                                        config.digistorm_store_link* is not set
+                                        config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
+                #}
+                {#                            {% set installGoogle = config.digistorm_store_link_google %}#}
+                {#                            {% set installApple = config.digistorm_store_link_apple %}#}
+                {% set installGoogle = '#installGoogle' %}
+                {% set installApple = '#installApple' %}
+
+                {% if config.digistorm_store_role ?? [] is empty %}
+                    {# All users are redirected to the store link #}
                     {% if installApple is not empty %}
                         <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
                     {% endif %}
                     {% if installGoogle is not empty %}
                         <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
                     {% endif %}
+                {% else %}
+                    {# ensure the user is in the specified role #}
+                    {% if user.role.type in config.digistorm_store_role %}
+                        {% if installApple is not empty %}
+                            <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
+                        {% endif %}
+                        {% if installGoogle is not empty %}
+                            <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
-            {% endif %}
 
-            <a data-pwa-action="installPWA" class="button" href="#">Install</a>
+                <a data-pwa-action="installPWA" class="button" href="#">Install</a>
+            </div>
 
             <div data-pwa-iOS="iOSHomePrompt" class="alert-box warning">
                 To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.

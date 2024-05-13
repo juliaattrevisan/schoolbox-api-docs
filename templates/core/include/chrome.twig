@@ -342,39 +342,41 @@
                             <a class="icon-settings" href="{{ routeLookup("messages.configure") }}"></a>
                         </li>
                         <li id="pwaPrompt" class="content">
-                            {# Container for actual install prompts, if not dismissed. #}
-                            <h4>Install Schoolbox web app?</h4>
-                            To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.
-                            {# Insatll PWA if not any of the following:
-                                config.digistorm_store_link* is not set
-                                config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
-                            #}
-{#                            {% set installGoogle = config.digistorm_store_link_google %}#}
-{#                            {% set installApple = config.digistorm_store_link_apple %}#}
-                            {% set installGoogle = '#installGoogle' %}
-                            {% set installApple = '#installApple' %}
+                            <div data-pwa-action="installPWA">
+                                {# Container for actual install prompts, if not dismissed. #}
+                                <h4>Install Schoolbox web app?</h4>
+                                To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.
+                                {# Insatll PWA if not any of the following:
+                                    config.digistorm_store_link* is not set
+                                    config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
+                                #}
+    {#                            {% set installGoogle = config.digistorm_store_link_google %}#}
+    {#                            {% set installApple = config.digistorm_store_link_apple %}#}
+                                {% set installGoogle = '#installGoogle' %}
+                                {% set installApple = '#installApple' %}
 
-                            {% if config.digistorm_store_role ?? [] is empty %}
-                                {# All users are redirected to the store link #}
-                                {% if installApple is not empty %}
-                                    <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
-                                {% endif %}
-                                {% if installGoogle is not empty %}
-                                    <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
-                                {% endif %}
-                            {% else %}
-                                {# ensure the user is in the specified role #}
-                                {% if user.role.type in config.digistorm_store_role %}
+                                {% if config.digistorm_store_role ?? [] is empty %}
+                                    {# All users are redirected to the store link #}
                                     {% if installApple is not empty %}
                                         <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
                                     {% endif %}
                                     {% if installGoogle is not empty %}
                                         <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
                                     {% endif %}
+                                {% else %}
+                                    {# ensure the user is in the specified role #}
+                                    {% if user.role.type in config.digistorm_store_role %}
+                                        {% if installApple is not empty %}
+                                            <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
+                                        {% endif %}
+                                        {% if installGoogle is not empty %}
+                                            <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
+                                        {% endif %}
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
 
-                            <a data-pwa-action="installPWA" class="button" href="#">Install</a>
+                                <a data-pwa-action="installPWA" class="button" href="#">Install</a>
+                            </div>
 
                             <div data-pwa-iOS="iOSHomePrompt" class="alert-box warning">
                                 To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
@@ -478,6 +480,14 @@
                             element.remove();
                         });
                     } else {
+                        {# if PWA was installed and you are accessing it via the PWA #}
+                        if (window.matchMedia('(display-mode: standalone)').matches) {
+                            // If visible, hide the install promotion
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                                element.remove();
+                            });
+                        }
+
                         {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
                         // Initialize deferredPrompt for use later to show browser install prompt.
                         window.addEventListener('beforeinstallprompt', (event) => {
