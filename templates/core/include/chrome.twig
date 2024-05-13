@@ -466,6 +466,54 @@
                     });
 
                     {# js for installing pwa / enabling notifications #}
+                    {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
+                    // Initialize deferredPrompt for use later to show browser install prompt.
+                    window.addEventListener('beforeinstallprompt', (event) => {
+                        // Prevent the mini-infobar from appearing on mobile.
+                        event.preventDefault();
+                        {% if config.debug_mode %}
+                            console.log('👍', 'beforeinstallprompt', event);
+                        {% endif %}
+                        // Stash the event so it can be triggered later.
+                        window.deferredPrompt = event;
+                        // Remove the 'hidden' class from the install button container.
+                        document.querySelector("#installPWA").classList.toggle('hidden', false);
+                    });
+
+                    document.querySelector("#installPWA").addEventListener('click', async () => {
+                        {% if config.debug_mode %}
+                            console.log('👍', 'butInstall-clicked');
+                        {% endif %}
+                        const promptEvent = window.deferredPrompt;
+                        if (!promptEvent) {
+                            // The deferred prompt isn't available.
+                            return;
+                        }
+                        // Show the install prompt.
+                        promptEvent.prompt();
+                        // Log the result
+                        const result = await promptEvent.userChoice;
+                        {% if config.debug_mode %}
+                            console.log('👍', 'userChoice', result);
+                        {% endif %}
+                        // Reset the deferred prompt variable, since
+                        // prompt() can only be called once.
+                        window.deferredPrompt = null;
+                        // Hide the install button.
+                        document.querySelector("#installPWA").classList.toggle('hidden', true);
+                    });
+
+                    window.addEventListener('appinstalled', (event) => {
+                        {% if config.debug_mode %}
+                        console.log('👍', 'appinstalled', event);
+                        {% endif %}
+                        // Clear the deferredPrompt so it can be garbage collected
+                        window.deferredPrompt = null;
+                    });
+
+                    // if install later cookie exists, don't show the div
+
+
                     {# if iOS and the iOS link exists, show it and hide the rest #}
                     function iOS() {
                         return [
@@ -480,11 +528,13 @@
                             || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
                     }
                     if (iOS()) {
-                        document.querySelector("#installApple").remove();
+                        document.querySelector("#installGoogle").remove();
+                        document.querySelector("#installPWA").remove();
                     }
                     {# if android and the android link exists, show it and hide the rest #}
                     else if (/android/i.test(navigator.userAgent)) {
-                        document.querySelector("#installGoogle").remove();
+                        document.querySelector("#installApple").remove();
+                        document.querySelector("#installPWA").remove();
                     } else {
                         document.querySelector("#installApple").remove();
                         document.querySelector("#installGoogle").remove();
