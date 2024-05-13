@@ -500,7 +500,7 @@
                             window.deferredPrompt = event;
                             // Remove the 'hidden' class from the install button container.
                             document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
-                                element.classList.toggle('hidden', false);
+                                element.classList.toggle('display', 'none');
                             });
                         });
 
@@ -526,7 +526,7 @@
                                 window.deferredPrompt = null;
                                 // Hide the install button.
                                 document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
-                                    element.classList.toggle('hidden', true);
+                                    element.classList.toggle('display', 'block');
                                 });
                             });
                         });
@@ -606,15 +606,15 @@
                         {# if notifications have been disabled show prompt, and disable allow notif switch #}
                         if (("Notification" in window)) {
                             if (Notification.permission === "granted") {
-                                document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
-                                    element.remove();
+                                document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                    element.setAttribute('checked', true);
                                 });
                                 document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                    element.classList.toggle('hidden', true);
+                                    element.remove();
                                 });
                             } else if (Notification.permission !== "denied") {
                                 document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                    element.classList.toggle('hidden', true);
+                                    element.classList.toggle('display', 'block');
                                 });
                                 {# wait for toggle change #}
 
@@ -657,7 +657,7 @@
                                                     {#    });#}
                                                 } else if (permission === 'denied') {
                                                     document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                                        element.classList.toggle('hidden', false);
+                                                        element.classList.toggle('display', 'none');
                                                     });
                                                     {% if config.debug_mode %}
                                                     console.warn('Notification permission denied');
@@ -672,7 +672,10 @@
 
                             } else {
                                 document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                    element.toggleAttribute('disabled', true);
+                                    element.classList.toggle('display', 'none');
+                                });
+                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                    element.classList.toggle('display', 'none');
                                 });
                             }
                         }
