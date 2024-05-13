@@ -42,9 +42,9 @@ class Hydrator extends BaseHydrator
      */
     public function __construct(
         private RosettaStone $rosettaStone,
-        private PostMapper   $postMapper,
+        private PostMapper $postMapper,
         private ThreadMapper $threadMapper,
-        private Access       $access,
+        private Access $access,
     ) {
     }
 
