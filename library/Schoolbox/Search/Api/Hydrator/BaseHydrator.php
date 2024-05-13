@@ -182,7 +182,8 @@ abstract class BaseHydrator implements IHydrator
     }
 
     /**
-     * @param string $type
+     * @param string       $type
+     * @param RosettaStone $rosettaStone
      * @return string
      */
     public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
