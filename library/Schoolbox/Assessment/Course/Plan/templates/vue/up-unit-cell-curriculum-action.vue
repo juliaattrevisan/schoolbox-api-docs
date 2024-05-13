@@ -7,16 +7,23 @@
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
-import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
+import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
 
 interface Props {
-    folderId: number; // The folder id to display the nodes for
-    component: CurriculumOverviewComponent; // The component instance id to display the nodes on
+    unit: Unit; // the unit linked to the curriculum cell
+    column: Column; // the column linked to the curriculum cell
 }
 const props = defineProps<Props>();
+let folderNodesStore: ReturnType<typeof useFolderNodesStore>; // the folderNodesStore for the curriculum component, which can be null if no curriculum component is linked yet
 
 const curriculumStore = useUnitPlannerCurriculumStore();
-const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
+const component = window.Vue.ref<CurriculumOverviewComponent | null>(
+    curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column),
+);
+if (component.value !== null) {
+    folderNodesStore = useFolderNodesStore(props.unit.folderId, component.value.componentId);
+}
 
 /**
  * To open the curriculum code mapping modal,
@@ -24,12 +31,15 @@ const folderNodesStore = useFolderNodesStore(props.folderId, props.component.com
  * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
 function onModifySelected() {
-    curriculumStore.openCurriculumSelectorModal(props.folderId, props.component.componentId);
+    curriculumStore.openCurriculumSelectorModal(
+        props.unit.folderId,
+        (component.value as CurriculumOverviewComponent).componentId,
+    );
 }
 </script>
 
 <template>
-    <fn-actions v-if="folderNodesStore().hasLoaded" @modify-selected="onModifySelected" />
+    <fn-actions v-if="component !== null && folderNodesStore().hasLoaded" @modify-selected="onModifySelected" />
 </template>
 
 <style scoped></style>

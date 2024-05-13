@@ -10,6 +10,8 @@ import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculu
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
+import type { CurriculumOverviewComponent } from "../unitPlannerTypes";
+import type { Column } from "../unitPlannerConfig";
 
 export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`, () => {
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
@@ -62,11 +64,30 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         modalStore.open();
     }
 
+    /**
+     * To retrieve the curriculum component id for the column if it's available,
+     * so we can retrieve the correct folderNodesStore and load in the appropriate node tree
+     * @param {CurriculumOverviewComponent[]} components - the components on the unit
+     * @param {Column} column - the column to match
+     * @returns {CurriculumOverviewComponent|null} - the component found or null
+     */
+    function getCurriculumComponent(components: CurriculumOverviewComponent[], column: Column) {
+        // loop through the curriculum components on the unit, matching the component heading to the column label
+        const matchedComponent = components.find(
+            (component) => component.heading.trim() === column.label.trim(), // Ignore trailing or leading whitespace
+        );
+        if (matchedComponent) {
+            return matchedComponent;
+        }
+        return null;
+    }
+
     return {
         init,
         selectorStore,
         startingNodeId,
         selectedDetailsNodeId,
         openCurriculumSelectorModal,
+        getCurriculumComponent,
     };
 });
