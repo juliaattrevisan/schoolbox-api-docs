@@ -159,7 +159,7 @@ class Controller extends Base
         $class = CurriculumOverviewController::class;
         $curriculumnTemplate = [];
         $curriculumnKey = [];
-        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()->getUnitTemplate()->getId(), $class);
+        $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
         foreach ($unitCurricComp as $curricComponent) {
             if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
