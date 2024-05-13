@@ -466,6 +466,31 @@
                     });
 
                     {# js for installing pwa / enabling notifications #}
+                    {# if iOS and the iOS link exists, show it and hide the rest #}
+                    function iOS() {
+                        return [
+                                'iPad Simulator',
+                                'iPhone Simulator',
+                                'iPod Simulator',
+                                'iPad',
+                                'iPhone',
+                                'iPod'
+                            ].includes(navigator.platform)
+                            // iPad on iOS 13 detection
+                            || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+                    }
+                    if (iOS()) {
+                        document.querySelector("#installApple").remove();
+                    }
+                    {# if android and the android link exists, show it and hide the rest #}
+                    else if (/android/i.test(navigator.userAgent)) {
+                        document.querySelector("#installGoogle").remove();
+                    } else {
+                        document.querySelector("#installApple").remove();
+                        document.querySelector("#installGoogle").remove();
+                    }
+
+
                 </script>
                 {% endautoescape %}
             {% endif %}
