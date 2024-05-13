@@ -41,6 +41,11 @@
     color: var(--content-ui-foreground);
 }
 
+/* remove the padding from the right of the questions view */
+.lrn.lrn-author .lrn-author-tab-pane {
+    padding-inline-end: 0;
+}
+
 /* top bar background color */
 .lrn.lrn-author .lrn-author-item-nav {
     background-color: #fff;
@@ -229,7 +234,7 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
 }
 .lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
     background: var(--content-ui-background);
-    border: none;
+    border: none !important;
     color: var(--content-ui-foreground);
     font-size: 1rem;
 }
@@ -522,6 +527,7 @@ span.lrn-qe-i-trash {
     border-right: 1px solid var(--body-background);
 }
 .lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
+    background: none;
     border: 1px solid var(--form-border-color);
     border-radius: 0px;
     color: transparent;
