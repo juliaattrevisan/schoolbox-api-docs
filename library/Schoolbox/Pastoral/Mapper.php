@@ -296,18 +296,6 @@ class Mapper extends BaseMapper
         $model->setType($typeMapper->hydrate($row, 't'));
         $model->setSubType($subtypeMapper->hydrate($row, 'c'));
 
-        // If the private body looks empty, make it really empty
-
-        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate(), "<img><oembed>")))) {
-            $model->setBodyPrivate('');
-        }
-
-        // If the public body looks empty, make it really empty
-
-        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic(), "<img><oembed>")))) {
-            $model->setBodyPublic('');
-        }
-
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $model->setRecordActions($this->getJoinMapper('recordActions')->findByColumn('pastoral_id', $model->getId()));

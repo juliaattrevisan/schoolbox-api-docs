@@ -183,18 +183,6 @@ class Mapper extends BaseMapper
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
 
-        // If the private body looks empty, make it really empty
-
-        if (!$model->getBodyPrivate() || empty(trim(strip_tags($model->getBodyPrivate(), "<img><oembed>")))) {
-            $model->setBodyPrivate('');
-        }
-
-        // If the public body looks empty, make it really empty
-
-        if (!$model->getBodyPublic() || empty(trim(strip_tags($model->getBodyPublic(), "<img><oembed>")))) {
-            $model->setBodyPublic('');
-        }
-
         // Return hydrated model
 
         return $model;
