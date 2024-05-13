@@ -449,7 +449,7 @@ Usage:
                             {% if courseSpec and courseSpec.template.id is not defined %}
                                 <option disabled selected="selected" value="">Please Select</option>
                             {% endif %}
-                            {% if templates.count > 1 or courseSpec and courseSpec.template.id is not defined%}
+                            {% if templates.count > 1 or (courseSpec and courseSpec.template.id is not defined) %}
                                 {% for template in templates %}
                                     {# only render the template if it is not deleted or if it is deleted and being used by the spec #}
                                     {% if not template.isDeleted or courseSpec and courseSpec.template.id ?? null == template.id %}
