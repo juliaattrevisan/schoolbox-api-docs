@@ -467,9 +467,10 @@
 
                     {# js for installing pwa / enabling notifications #}
                     // if install later cookie exists, don't show the div
-                    const installDelayCookie = cookieStore.get("installDelayCookie");
+                    // const installDelayCookie = cookieStore.get("installDelayCookie");
+                    const installDelayCookie = false;
                     if (installDelayCookie) {
-                        // document.querySelector("#pwaPrompt").remove();
+                        document.querySelector("#pwaPrompt").remove();
                     } else {
                         {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
                         // Initialize deferredPrompt for use later to show browser install prompt.
