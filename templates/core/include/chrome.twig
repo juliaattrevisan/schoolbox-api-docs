@@ -350,18 +350,18 @@
                                     config.digistorm_store_link* is not set
                                     config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
                                 #}
-    {#                            {% set installGoogle = config.digistorm_store_link_google %}#}
-    {#                            {% set installApple = config.digistorm_store_link_apple %}#}
-                                {% set installGoogle = '#installGoogle' %}
-                                {% set installApple = '#installApple' %}
+                                {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
+                                {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
+{#                                {% set installGoogle = '#installGoogle' %}#}
+{#                                {% set installApple = '#installApple' %}#}
 
-                                {% if config.digistorm_store_role ?? [] is empty %}
+                                {% if config.digistorm_role_install_prompt ?? [] is empty %}
                                     {# All users are redirected to the store link #}
                                     {% if installApple is not empty %}
-                                        <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
+                                        <a data-pwa-action="installApple" class="button" target="_blank" href="{{ installApple }}">Install</a>
                                     {% endif %}
                                     {% if installGoogle is not empty %}
-                                        <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
+                                        <a data-pwa-action="installGoogle" class="button" target="_blank" href="{{ installGoogle }}">Install</a>
                                     {% endif %}
                                 {% else %}
                                     {# ensure the user is in the specified role #}
