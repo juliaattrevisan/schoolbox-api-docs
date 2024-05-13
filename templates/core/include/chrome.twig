@@ -377,6 +377,10 @@
 
                             <a data-pwa-action="installPWA" class="button" href="#">Install</a>
 
+                            <div data-pwa-iOS="iOSHomePrompt">
+                                To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
+                            </div>
+
                             <div data-pwa-action="notifBlocked">
                                 You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
                             </div>
@@ -557,11 +561,17 @@
                             document.querySelectorAll('[data-pwa-action="#installApple"]').forEach( (element)=>{
                                 element.remove();
                             });
+                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
+                                element.remove();
+                            });
                             document.querySelectorAll('[data-pwa-action="#installPWA"]').forEach( (element)=>{
                                 element.remove();
                             });
                         } else {
                             document.querySelectorAll('[data-pwa-action="#installApple"]').forEach( (element)=>{
+                                element.remove();
+                            });
+                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
                                 element.remove();
                             });
                             document.querySelectorAll('[data-pwa-action="#installGoogle"]').forEach( (element)=>{
