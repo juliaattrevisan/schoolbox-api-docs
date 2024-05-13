@@ -353,10 +353,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             if (AssessmentType::TYPE_QUIZ === $type) {
                 $data['attachzone'] = (new Zone('xmlImport'))
+                    /* XML Imports should have an expiry date so they can be automatically removed
+                     * to save space. While this would be nice to have as a "backup for users" the
+                     * number of times they've asked us for a copy of their own data is basically 0
+                     */
+                    ->setExpiryDate(\Alaress_Date_Format::now()->addHours(1))
                     ->setMulti(false)
                     ->setAttachPrompt('Attach a legacy xml')
                     ->setAttachmentsLabel('')
-                    ->setMimeFilter('text/xml')
+                    ->setMimeFilter('text/xml,application/xml')
                     ->setFilesystemContext('xml')
                     ->getTwigContext();
             }
