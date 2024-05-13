@@ -150,7 +150,7 @@ class Config
             0 => ['&times;', 'Muted'],
             8 => ['D', 'Digest'],
             1 => ['I', 'Instant'],
-            2 => ['M', 'Mobile'],
+            2 => ['M', 'Device'],
             4 => ['E', 'Email'],
         ];
 
