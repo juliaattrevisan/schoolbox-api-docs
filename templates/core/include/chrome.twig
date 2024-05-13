@@ -44,7 +44,6 @@
     <script src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
     <script src="/service-worker.js?v={{ config.site_version }}"></script>
     <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
-    <script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
     {% autoescape 'js' %}
     <script>
 
@@ -601,32 +600,32 @@
 
                                                 // Generate a new token, and store it in Schoolbox's
                                                 // mobile app registration.
-                                                getToken(messaging, {vapidKey: app.webPushPublicKey})
-                                                    .then((currentToken) => {
-                                                        // Post this token to Schoolbox,
-                                                        // registering it for the current user.
-                                                        {% if config.debug_mode %}
-                                                            console.log('Current token: ' + currentToken);
-                                                        {% endif %}
+                                                {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
+                                                {#    .then((currentToken) => {#}
+                                                {#        // Post this token to Schoolbox,#}
+                                                {#        // registering it for the current user.#}
+                                                {#        {% if config.debug_mode %}#}
+                                                {#            console.log('Current token: ' + currentToken);#}
+                                                {#        {% endif %}#}
 
-                                                        // The Firebase app may one day be a separate
-                                                        // service to the other mobile apps: should that
-                                                        // happen, the registration will be pushed to some
-                                                        // other place.
-                                                        // For now, just push it to the Firebase app.
-                                                        let formData = new FormData();
-                                                        formData.append('appId', app.appIdentifier);
-                                                        formData.append('token', currentToken);
-                                                        fetch('/api/register/Firebase', {
-                                                            method: 'POST',
-                                                            body: formData,
-                                                        });
-                                                    })
-                                                    .catch((error) => {
-                                                        {% if config.debug_mode %}
-                                                            console.log('Error on getting token: ' + error);
-                                                        {% endif %}
-                                                    });
+                                                {#        // The Firebase app may one day be a separate#}
+                                                {#        // service to the other mobile apps: should that#}
+                                                {#        // happen, the registration will be pushed to some#}
+                                                {#        // other place.#}
+                                                {#        // For now, just push it to the Firebase app.#}
+                                                {#        let formData = new FormData();#}
+                                                {#        formData.append('appId', app.appIdentifier);#}
+                                                {#        formData.append('token', currentToken);#}
+                                                {#        fetch('/api/register/Firebase', {#}
+                                                {#            method: 'POST',#}
+                                                {#            body: formData,#}
+                                                {#        });#}
+                                                {#    })#}
+                                                {#    .catch((error) => {#}
+                                                {#        {% if config.debug_mode %}#}
+                                                {#            console.log('Error on getting token: ' + error);#}
+                                                {#        {% endif %}#}
+                                                {#    });#}
                                             } else if (permission === 'denied') {
                                                 document.querySelector("#notifBlocked").classList.toggle('hidden', false);
                                                 {% if config.debug_mode %}
@@ -654,5 +653,6 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
 </body>
 </html>
