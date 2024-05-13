@@ -13,6 +13,8 @@
 
 interface Props {
     courseTitle: string;
+    courseId: number;
+    folderId: number;
 }
 const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
@@ -31,6 +33,7 @@ const props = defineProps<Props>();
     <div class="row actions-small-1 actions-medium-2">
         <div class="button-action small-12 columns">
             <h1>Unit Planner - {{ props.courseTitle }}</h1>
+            <sbx-pop-out content-id="unit-dropdown"></sbx-pop-out>
             <!--
             <button
                 class="button icon-add"
@@ -43,6 +46,20 @@ const props = defineProps<Props>();
             -->
         </div>
     </div>
+    <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content  aria-hidden="true">
+        <li>
+            <a :href="`/course/modify/${props.courseId}`" class="icon-modify">Modify Course</a>
+        </li>
+        <li>
+            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Course Homepage</a>
+        </li>
+        <li>
+            <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
+        </li>
+        <li>
+            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar">Course Assessment Calendar</a>
+        </li>
+    </ul>
     <!--
     <Transition!-- @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <up-add-unit v-if="addUnitStore.isOpen" />

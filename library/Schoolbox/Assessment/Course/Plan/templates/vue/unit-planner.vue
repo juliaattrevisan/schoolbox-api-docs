@@ -18,6 +18,7 @@ import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
     courseId: number;
+    folderId: number;
     courseTitle: string;
     units: Unit[];
     activityTypeLocale: ActivityTypeLocale;
@@ -152,7 +153,7 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <up-header :course-title="props.courseTitle" />
+    <up-header :course-title="props.courseTitle" :course-id="store.courseId" :folder-id="props.folderId" />
     <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
         <div class="small-12 island">
