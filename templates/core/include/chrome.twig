@@ -388,7 +388,7 @@
                             <div data-pwa-action="enableNotifPrompt">
                                 <h4>Enable notifications on your device</h4>
                                 <div class="switch">
-                                    <input id="notifOn" type="checkbox">
+                                    <input id="notifOn" data-pwa-action="enableNotif" type="checkbox">
                                     <label for="notifOn">
                                         <span>On</span>
                                         <span>Off</span>
@@ -563,6 +563,10 @@
                             {% if config.debug_mode %}
                                 console.log('iOS');
                             {% endif %}
+                            {# disable Notifications, Need to have the app installed and on the homepage to even think about allowing notifs #}
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                element.toggleAttribute('disabled', true);
+                            });
                             document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach( (element)=>{
                                 element.remove();
                             });
@@ -613,55 +617,63 @@
                                     element.classList.toggle('hidden', true);
                                 });
                                 {# wait for toggle change #}
-                                document.querySelector('#enableNotifPrompt')?.addEventListener('click', () => {
-                                    if (document.querySelector('#notifOn')) {
-                                        window.Notification.requestPermission().then((permission) => {
-                                            if (permission === 'granted') {
-                                                {% if config.debug_mode %}
+
+                                document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
+                                    element?.addEventListener('click', () => {
+                                        if ('on' === element.querySelector('[data-pwa-action="enableNotif"]').value) {
+                                            window.Notification.requestPermission().then((permission) => {
+                                                if (permission === 'granted') {
+                                                    {% if config.debug_mode %}
                                                     console.info('Notification permission granted');
-                                                {% endif %}
+                                                    {% endif %}
 
-                                                // Generate a new token, and store it in Schoolbox's
-                                                // mobile app registration.
-                                                {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
-                                                {#    .then((currentToken) => {#}
-                                                {#        // Post this token to Schoolbox,#}
-                                                {#        // registering it for the current user.#}
-                                                {#        {% if config.debug_mode %}#}
-                                                {#            console.log('Current token: ' + currentToken);#}
-                                                {#        {% endif %}#}
+                                                    // Generate a new token, and store it in Schoolbox's
+                                                    // mobile app registration.
+                                                    {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
+                                                    {#    .then((currentToken) => {#}
+                                                    {#        // Post this token to Schoolbox,#}
+                                                    {#        // registering it for the current user.#}
+                                                    {#        {% if config.debug_mode %}#}
+                                                    {#            console.log('Current token: ' + currentToken);#}
+                                                    {#        {% endif %}#}
 
-                                                {#        // The Firebase app may one day be a separate#}
-                                                {#        // service to the other mobile apps: should that#}
-                                                {#        // happen, the registration will be pushed to some#}
-                                                {#        // other place.#}
-                                                {#        // For now, just push it to the Firebase app.#}
-                                                {#        let formData = new FormData();#}
-                                                {#        formData.append('appId', app.appIdentifier);#}
-                                                {#        formData.append('token', currentToken);#}
-                                                {#        fetch('/api/register/Firebase', {#}
-                                                {#            method: 'POST',#}
-                                                {#            body: formData,#}
-                                                {#        });#}
-                                                {#    })#}
-                                                {#    .catch((error) => {#}
-                                                {#        {% if config.debug_mode %}#}
-                                                {#            console.log('Error on getting token: ' + error);#}
-                                                {#        {% endif %}#}
-                                                {#    });#}
-                                            } else if (permission === 'denied') {
-                                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                                    element.classList.toggle('hidden', false);
-                                                });
-                                                {% if config.debug_mode %}
+                                                    {#        // The Firebase app may one day be a separate#}
+                                                    {#        // service to the other mobile apps: should that#}
+                                                    {#        // happen, the registration will be pushed to some#}
+                                                    {#        // other place.#}
+                                                    {#        // For now, just push it to the Firebase app.#}
+                                                    {#        let formData = new FormData();#}
+                                                    {#        formData.append('appId', app.appIdentifier);#}
+                                                    {#        formData.append('token', currentToken);#}
+                                                    {#        fetch('/api/register/Firebase', {#}
+                                                    {#            method: 'POST',#}
+                                                    {#            body: formData,#}
+                                                    {#        });#}
+                                                    {#    })#}
+                                                    {#    .catch((error) => {#}
+                                                    {#        {% if config.debug_mode %}#}
+                                                    {#            console.log('Error on getting token: ' + error);#}
+                                                    {#        {% endif %}#}
+                                                    {#    });#}
+                                                } else if (permission === 'denied') {
+                                                    document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                                        element.classList.toggle('hidden', false);
+                                                    });
+                                                    {% if config.debug_mode %}
                                                     console.warn('Notification permission denied');
-                                                {% endif %}
-                                            }
-                                        });
-                                    }
+                                                    {% endif %}
+                                                }
+                                            });
+                                        } else {
+                                            {# turn notifications off... #}
+                                        }
+                                    });
                                 });
+
                             } else {
-                                document.querySelector("#notifOn").toggleAttribute('disabled', true);
+                                document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                    element.toggleAttribute('disabled', true);
+                                });
                             }
                         }
                     }
