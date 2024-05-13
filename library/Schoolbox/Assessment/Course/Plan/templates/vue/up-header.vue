@@ -51,13 +51,13 @@ const props = defineProps<Props>();
             <a :href="`/course/modify/${props.courseId}`" class="icon-modify">Modify Course</a>
         </li>
         <li>
-            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Course Homepage</a>
+            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>
         </li>
         <li>
             <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
         </li>
         <li>
-            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar">Course Assessment Calendar</a>
+            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar">Assessment Calendar</a>
         </li>
     </ul>
     <!--
