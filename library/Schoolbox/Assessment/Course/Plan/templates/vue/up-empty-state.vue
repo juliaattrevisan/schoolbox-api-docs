@@ -3,18 +3,22 @@
  * Displayed when there's currently no Units linked to the Course
  */
 
-import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";
+// import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";s
 
-const addUnitStore = useAddUnitStore();
+interface Props {
+    courseId: number;
+}
+const props = defineProps<Props>();
+// const addUnitStore = useAddUnitStore();
 
 /**
  * To show the add unit display
  */
-function onCreateSelected() {
-    if (!addUnitStore.isOpen) {
-        addUnitStore.prompt();
-    }
-}
+// function onCreateSelected() {
+    // if (!addUnitStore.isOpen) {
+    //     addUnitStore.prompt();
+    // }
+// }
 </script>
 
 <template>
@@ -24,7 +28,7 @@ function onCreateSelected() {
                 <i class="icon-unit"></i>
                 <p>
                     This course currently does not have any units. To begin building this course start by
-                    <a href="#create-unit" @click.prevent="onCreateSelected">creating a unit.</a>
+                    <a :href="`/course/modify/${props.courseId}`">creating a unit.</a>
                 </p>
             </div>
         </div>

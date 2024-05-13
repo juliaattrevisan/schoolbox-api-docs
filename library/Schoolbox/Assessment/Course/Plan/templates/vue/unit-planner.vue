@@ -153,7 +153,7 @@ window.Vue.onUnmounted(() => {
 
 <template>
     <up-header :course-title="props.courseTitle" />
-    <up-empty-state v-if="store.units.length === 0" />
+    <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
         <div class="small-12 island">
             <dl ref="tabsEl" class="tabs">
