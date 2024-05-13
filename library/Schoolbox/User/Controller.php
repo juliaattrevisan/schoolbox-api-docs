@@ -55,29 +55,32 @@ class Controller extends Base
     public function impersonate(User $user)
     {
         $currentSession  = $_SESSION;
+        $initialSession  = $_SESSION['initial'] ?? null;
         $previousSession = $_SESSION['previous'] ?? null;
         $sessionHandler  = new \Session();
 
         if ($sessionHandler->create($user->getUsername())) {
-            // Is an impersonating user themselves impersonating another user?
-            // If so: ensure at the end of impersonation, the session gets
-            // switched back to the original user.
-            $_SESSION['previous'] = ($previousSession ?? $currentSession);
+            // Log the session which began impersonation
+            $_SESSION['initial'] ??= $initialSession;
+
+            // Log the current session in the previous
+            $_SESSION['previous'] = $currentSession;
 
             // Who assumed this session?
             // IMO it is always the top-level user
             // (the user who first started impersonating)
-            /** @var User $previousUser */
-            $previousUser = $_SESSION['previous']['user'];
+            /** @var User $initialUser */
+            $initialUser = $_SESSION['initial']['user'];
 
             $logItem = $this->assumeUserLogMapper->createModel()
-                ->setUser($previousUser->getUsername())
+                ->setUser($initialUser->getUsername())
                 ->setAssumed($user->getUsername())
                 ->setIp($_SERVER['REMOTE_ADDR']);
 
             $this->assumeUserLogMapper->save($logItem);
         } else {
-            $_SESSION = $currentSession; //Recover old session
+            // Recover old session
+            $_SESSION = $previousSession;
         }
         $this->response = $this->redirectFound('/');
     }
@@ -90,8 +93,8 @@ class Controller extends Base
      */
     public function recoverSession(): void
     {
-        if (array_key_exists('previous', $_SESSION)) {
-            $user = $_SESSION['previous']['user'] ?? null;
+        if (array_key_exists('initial', $_SESSION)) {
+            $user = $_SESSION['initial']['user'] ?? null;
             if ($user instanceof User) {
                 $session = new \Session();
                 if (!$session->create($user->getUsername())) {
