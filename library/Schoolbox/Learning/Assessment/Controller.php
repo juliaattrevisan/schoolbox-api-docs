@@ -361,7 +361,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     ->setMulti(false)
                     ->setAttachPrompt('Attach a legacy xml')
                     ->setAttachmentsLabel('')
-                    ->setMimeFilter('text/xml')
+                    ->setMimeFilter('text/xml,application/xml')
                     ->setFilesystemContext('xml')
                     ->getTwigContext();
             }
