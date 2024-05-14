@@ -11,7 +11,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const folderNodesStore = useFolderNodesStore(props.folderId, props.componentId); // the folderNodesStore for the curriculum component, which can be null if no curriculum component is linked yet
+const folderNodesStore = useFolderNodesStore(props.folderId, props.componentId); // to only display the action once the folder nodes have loaded
 
 const emit = defineEmits<{
     modifySelected: [];
