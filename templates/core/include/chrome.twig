@@ -473,8 +473,7 @@
 
                     {# js for installing pwa / enabling notifications #}
                     // if install later cookie exists, don't show the div
-                    // const installDelayCookie = cookieStore.get("installDelayCookie");
-                    const installDelayCookie = false;
+                    const installDelayCookie = window.localStorage.getItem("installDelayCookie");
                     if (installDelayCookie) {
                         document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
                             element.remove();
@@ -483,7 +482,7 @@
                         {# if PWA was installed and you are accessing it via the PWA #}
                         if (window.matchMedia('(display-mode: standalone)').matches) {
                             // If visible, hide the install promotion
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                                 element.remove();
                             });
                         }
@@ -499,12 +498,12 @@
                             // Stash the event so it can be triggered later.
                             window.deferredPrompt = event;
                             // Remove the 'hidden' class from the install button container.
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                                 element.classList.toggle('display', 'none');
                             });
                         });
 
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                             element.addEventListener('click', async () => {
                                 {% if config.debug_mode %}
                                 console.log('👍', 'butInstall-clicked');
@@ -525,7 +524,7 @@
                                 // prompt() can only be called once.
                                 window.deferredPrompt = null;
                                 // Hide the install button.
-                                document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                                document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                                     element.classList.toggle('display', 'block');
                                 });
                             });
@@ -541,7 +540,7 @@
 
 
                         document.querySelector('#installDelayPrompt')?.addEventListener('click', () => {
-                            cookieStore.set("installDelayCookie", "installLater");
+                            window.localStorage.setItem("installDelayCookie", "installLater");
 
                         });
 
@@ -561,123 +560,123 @@
 
                         if (iOS()) {
                             {% if config.debug_mode %}
-                                console.log('iOS');
+                            console.log('iOS');
                             {% endif %}
                             {# disable Notifications, Need to have the app installed and on the homepage to even think about allowing notifs #}
-                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach((element) => {
                                 element.toggleAttribute('disabled', true);
                             });
-                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                                 element.remove();
                             });
                         }
                                 {# if android and the android link exists, show it and hide the rest #}
                         else if (/android/i.test(navigator.userAgent)) {
                             {% if config.debug_mode %}
-                                console.log('Android');
+                            console.log('Android');
                             {% endif %}
-                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                                 element.remove();
                             });
                         } else {
                             {% if config.debug_mode %}
-                                console.log('Normal PWA');
+                            console.log('Normal PWA');
                             {% endif %}
-                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
                                 element.remove();
                             });
-                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
                                 element.remove();
                             });
                         }
+                    }
 
-                        {# if notifications have been disabled show prompt, and disable allow notif switch #}
-                        if (("Notification" in window)) {
-                            if (Notification.permission === "granted") {
-                                document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                    element.setAttribute('checked', true);
-                                });
-                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                    element.remove();
-                                });
-                            } else if (Notification.permission !== "denied") {
-                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                    element.classList.toggle('display', 'block');
-                                });
-                                {# wait for toggle change #}
+                    {# if notifications have been disabled show prompt, and disable allow notif switch #}
+                    if (("Notification" in window)) {
+                        if (Notification.permission === "granted") {
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                element.setAttribute('checked', true);
+                            });
+                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                element.remove();
+                            });
+                        } else if (Notification.permission !== "denied") {
+                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                element.classList.toggle('display', 'block');
+                            });
+                            {# wait for toggle change #}
 
-                                document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
-                                    element?.addEventListener('click', () => {
-                                        if ('on' === element.querySelector('[data-pwa-action="enableNotif"]').value) {
-                                            window.Notification.requestPermission().then((permission) => {
-                                                if (permission === 'granted') {
-                                                    {% if config.debug_mode %}
-                                                    console.info('Notification permission granted');
-                                                    {% endif %}
+                            document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
+                                element?.addEventListener('click', () => {
+                                    if ('on' === element.querySelector('[data-pwa-action="enableNotif"]').value) {
+                                        window.Notification.requestPermission().then((permission) => {
+                                            if (permission === 'granted') {
+                                                {% if config.debug_mode %}
+                                                console.info('Notification permission granted');
+                                                {% endif %}
 
-                                                    // Generate a new token, and store it in Schoolbox's
-                                                    // mobile app registration.
-                                                    {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
-                                                    {#    .then((currentToken) => {#}
-                                                    {#        // Post this token to Schoolbox,#}
-                                                    {#        // registering it for the current user.#}
-                                                    {#        {% if config.debug_mode %}#}
-                                                    {#            console.log('Current token: ' + currentToken);#}
-                                                    {#        {% endif %}#}
+                                                // Generate a new token, and store it in Schoolbox's
+                                                // mobile app registration.
+                                                {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
+                                                {#    .then((currentToken) => {#}
+                                                {#        // Post this token to Schoolbox,#}
+                                                {#        // registering it for the current user.#}
+                                                {#        {% if config.debug_mode %}#}
+                                                {#            console.log('Current token: ' + currentToken);#}
+                                                {#        {% endif %}#}
 
-                                                    {#        // The Firebase app may one day be a separate#}
-                                                    {#        // service to the other mobile apps: should that#}
-                                                    {#        // happen, the registration will be pushed to some#}
-                                                    {#        // other place.#}
-                                                    {#        // For now, just push it to the Firebase app.#}
-                                                    {#        let formData = new FormData();#}
-                                                    {#        formData.append('appId', app.appIdentifier);#}
-                                                    {#        formData.append('token', currentToken);#}
-                                                    {#        fetch('/api/register/Firebase', {#}
-                                                    {#            method: 'POST',#}
-                                                    {#            body: formData,#}
-                                                    {#        });#}
-                                                    {#    })#}
-                                                    {#    .catch((error) => {#}
-                                                    {#        {% if config.debug_mode %}#}
-                                                    {#            console.log('Error on getting token: ' + error);#}
-                                                    {#        {% endif %}#}
-                                                    {#    });#}
-                                                } else if (permission === 'denied') {
-                                                    document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                                        element.classList.toggle('display', 'none');
-                                                    });
-                                                    {% if config.debug_mode %}
-                                                    console.warn('Notification permission denied');
-                                                    {% endif %}
-                                                }
-                                            });
-                                        } else {
-                                            {# turn notifications off... #}
-                                        }
-                                    });
+                                                {#        // The Firebase app may one day be a separate#}
+                                                {#        // service to the other mobile apps: should that#}
+                                                {#        // happen, the registration will be pushed to some#}
+                                                {#        // other place.#}
+                                                {#        // For now, just push it to the Firebase app.#}
+                                                {#        let formData = new FormData();#}
+                                                {#        formData.append('appId', app.appIdentifier);#}
+                                                {#        formData.append('token', currentToken);#}
+                                                {#        fetch('/api/register/Firebase', {#}
+                                                {#            method: 'POST',#}
+                                                {#            body: formData,#}
+                                                {#        });#}
+                                                {#    })#}
+                                                {#    .catch((error) => {#}
+                                                {#        {% if config.debug_mode %}#}
+                                                {#            console.log('Error on getting token: ' + error);#}
+                                                {#        {% endif %}#}
+                                                {#    });#}
+                                            } else if (permission === 'denied') {
+                                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                                    element.classList.toggle('display', 'none');
+                                                });
+                                                {% if config.debug_mode %}
+                                                console.warn('Notification permission denied');
+                                                {% endif %}
+                                            }
+                                        });
+                                    } else {
+                                        {# turn notifications off... #}
+                                    }
                                 });
+                            });
 
-                            } else {
-                                document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                    element.classList.toggle('display', 'none');
-                                });
-                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                    element.classList.toggle('display', 'none');
-                                });
-                            }
+                        } else {
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                element.classList.toggle('display', 'none');
+                            });
+                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                element.classList.toggle('display', 'none');
+                            });
                         }
                     }
 
