@@ -35,6 +35,9 @@ window.Vue.watch(
  * To create a new curriculum component, adding it to the relevant units homepage
  */
 async function onCreateSelected() {
+    if (curriculumStore.isProcessing) {
+        return;
+    }
     await curriculumStore.createCurriculumComponent(props.unit, props.column);
 }
 

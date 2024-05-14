@@ -16,6 +16,7 @@ import type { CurriculumOverviewComponent, Unit } from "../unitPlannerTypes";
 import type { Column } from "../unitPlannerConfig";
 
 export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`, () => {
+    const isProcessing = window.Vue.ref(false); // to notify when processing requests
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
     const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
     const modalStore = useModalStore(); // to open the modal
@@ -91,7 +92,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      */
     async function createCurriculumComponent(unit: Unit, column: Column) {
         // unitPlannerStore.toastEl!.activate("Creating component...");
-
+        isProcessing.value = true;
         try {
             const unitPlannerStore = useUnitPlannerStore();
 
@@ -152,10 +153,13 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             // unitPlannerStore.toastEl!.timeout("Curriculum created", true, 2000);
         } catch (error) {
             // unitPlannerStore.toastEl!.timeout(error, false, 2000);
+        } finally {
+            isProcessing.value = false;
         }
     }
 
     return {
+        isProcessing,
         init,
         selectorStore,
         startingNodeId,
