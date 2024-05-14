@@ -88,14 +88,51 @@ class Controller extends Base
 
 
     /**
-     * Return to your previous session, after impersonation
+     * Backwards-compatible alias for recovering to previous session.
      *
      * @api /user/recoverSession
      */
     public function recoverSession(): void
     {
-        if (array_key_exists('initial', $_SESSION)) {
-            $user = $_SESSION['initial']['user'] ?? null;
+        $this->recoverSessionPrevious();
+    }
+
+    /**
+     * Return to your previous session, after impersonation.
+     *
+     * This is the most recent session you impersonated: this could be different
+     * to the initial session, if you have impersonated a user from within
+     * another impersonation.
+     *
+     * @api /user/recoverSession/previous
+     */
+    public function recoverSessionPrevious(): void
+    {
+        $this->recoverSessionInternal('previous');
+    }
+
+    /**
+     * Return to your initial session, after impersonation.
+     *
+     * This is the session you originally logged in with.
+     *
+     * @api /user/recoverSession/initial
+     */
+    public function recoverSessionInitial(): void
+    {
+        $this->recoverSessionInternal('initial');
+    }
+
+    /**
+     * Recover the session found in `$key`.
+     *
+     * @param string $key
+     * @return void
+     */
+    private function recoverSessionInternal(string $key): void
+    {
+        if (array_key_exists($key, $_SESSION)) {
+            $user = $_SESSION[$key]['user'] ?? null;
             if ($user instanceof User) {
                 $session = new \Session();
                 if (!$session->create($user->getUsername())) {
@@ -105,7 +142,6 @@ class Controller extends Base
         }
         $this->response = $this->redirectFound('/');
     }
-
 
     /**
      * Return a json array of parent emails from a folder

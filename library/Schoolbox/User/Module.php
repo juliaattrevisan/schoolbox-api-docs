@@ -83,10 +83,23 @@ class Module extends BaseModule
             $impersonatePreload,
         );
 
+        // Recover session: alias for recovering previous session
         $this->register(
             self::METHOD_GET,
             '/recoverSession',
             'recoverSession',
+            $loggedInPermission,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/recoverSession/previous',
+            'recoverSessionPrevious',
+            $loggedInPermission,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/recoverSession/initial',
+            'recoverSessionInitial',
             $loggedInPermission,
         );
     }
