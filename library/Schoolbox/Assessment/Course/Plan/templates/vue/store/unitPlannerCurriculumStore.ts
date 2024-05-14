@@ -62,7 +62,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             // so the watch above doesn't trigger, setting off an infinite loop
             selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal
         });
-        // get the filter id to open the modal at the correct node, otherwise open at the root
+        // if the Curriculum Tree Filter is set get it to open the modal at the correct node, otherwise open at the root
         const { filter } = folderNodesStore();
         startingNodeId.value = filter !== null ? filter.id : UNSET_ID;
         modalStore.open();
@@ -87,7 +87,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     }
 
     /**
-     * Create a new curriculum overview component for the unit
+     * Create a new curriculum overview component for the unit,
+     * placing the component on units homepage
      * @param {Unit} unit - the unit to create the component for
      * @param {Column} column - the column to create the component for
      */
