@@ -18,6 +18,17 @@ const curriculumStore = useUnitPlannerCurriculumStore();
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
     curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column),
 );
+
+/**
+ * To respond to a new curriculum component being created
+ */
+window.Vue.watch(
+    () => props.unit.curriculum.components,
+    () => {
+        component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
+    },
+    { deep: true },
+);
 </script>
 
 <template>

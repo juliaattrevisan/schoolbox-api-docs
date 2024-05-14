@@ -90,18 +90,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {Column} column - the column to create the textbox for
      */
     async function createCurriculumComponent(unit: Unit, column: Column) {
-        // const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
-        // if (!storeUnit) {
-        //     throw new Error("Unit not found");
-        // }
-
-        // const selectedTextbox = storeUnit.textboxes[column.label];
-        // if (selectedTextbox.id >= 0) {
-        //     return;
-        // }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        // unitPlannerStore.toastEl!.activate("Creating textbox...");
+        // unitPlannerStore.toastEl!.activate("Creating component...");
 
         try {
             const unitPlannerStore = useUnitPlannerStore();
@@ -119,9 +108,10 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
                 },
             });
 
-            // if (!createResponse.ok) {
-            //     throw new Error(await extractErrorMessage(createResponse));
-            // }
+            if (!createResponse.ok) {
+                // throw new Error(await extractErrorMessage(createResponse));
+                return;
+            }
 
             const createResponseJSON = (await createResponse.json()) as { instanceID: number };
 
@@ -146,6 +136,11 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
                 },
             });
 
+            if (!configResponse.ok) {
+                // throw new Error(await extractErrorMessage(createResponse));
+                return;
+            }
+
             const newComponent: CurriculumOverviewComponent = {
                 componentId: createResponseJSON.instanceID,
                 heading: column.label,
@@ -154,20 +149,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             };
             unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
 
-            // update component id in the store
-
-            // if (!configResponse.ok) {
-            //     throw new Error(await extractErrorMessage(configResponse));
-            // }
-
-            // If we just created a textbox, then we need to update the store with the new textbox id
-            // const configResponseJSON = (await configResponse.json()) as { id: number };
-            // storeUnit.textboxes[column.label].id = configResponseJSON.id;
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            // unitPlannerStore.toastEl!.timeout("Textbox created", true, 2000);
+            // unitPlannerStore.toastEl!.timeout("Curriculum created", true, 2000);
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
             // unitPlannerStore.toastEl!.timeout(error, false, 2000);
         }
     }

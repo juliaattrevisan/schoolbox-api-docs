@@ -21,11 +21,21 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
 );
 
 /**
+ * To respond to a new curriculum component being created
+ */
+window.Vue.watch(
+    () => props.unit.curriculum.components,
+    () => {
+        component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
+    },
+    { deep: true },
+);
+
+/**
  * To create a new curriculum component, adding it to the relevant units homepage
  */
 async function onCreateSelected() {
     await curriculumStore.createCurriculumComponent(props.unit, props.column);
-    component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
 }
 
 /**
