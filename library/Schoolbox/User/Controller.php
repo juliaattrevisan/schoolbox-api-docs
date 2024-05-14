@@ -54,22 +54,21 @@ class Controller extends Base
      */
     public function impersonate(User $user)
     {
-        $currentSession  = $_SESSION;
-        $initialSession  = $_SESSION['initial'] ?? null;
-        $previousSession = $_SESSION['previous'] ?? null;
-        $sessionHandler  = new \Session();
+        $currentUser    = $this->getUser();
+        $initialUser    = $this->session->get('initialUser');
+        $sessionHandler = new \Session();
 
         if ($sessionHandler->create($user->getUsername())) {
-            // Log the session which began impersonation
-            $_SESSION['initial'] = ($initialSession ?? $currentSession);
+            // Log the user which began impersonation
+            $this->session->set('initialUser', $initialUser ?? $currentUser);
 
-            // Log the current session in the previous
-            $_SESSION['previous'] = $currentSession;
+            // Log the current user in the previous
+            $this->session->set('previousUser', $currentUser);
 
             // Who assumed this session? IMO it is always the initial user
             // (the user who first started impersonating)
             /** @var User $initialUser */
-            $initialUser = $_SESSION['initial']['user'] ?? $currentSession['user'];
+            $initialUser = $this->session->get('initialUser', $currentUser);
 
             $logItem = $this->assumeUserLogMapper->createModel()
                 ->setUser($initialUser->getUsername())
@@ -81,7 +80,7 @@ class Controller extends Base
             // Recover old session:
             // should do so by creating a new session for previous user, as that
             // is what `recoverSession()` does.
-            $_SESSION = $previousSession;
+            $sessionHandler->create($currentUser->getUsername());
         }
         $this->response = $this->redirectFound('/');
     }
@@ -108,12 +107,13 @@ class Controller extends Base
      */
     public function recoverSessionPrevious(): void
     {
-        // Preserve initial session, also previous session = current session
-        $currentSession = $_SESSION;
-        $initialSession = $_SESSION['initial'] ?? null;
-        $this->recoverSessionInternal('previous');
-        $_SESSION['initial']  = $initialSession;
-        $_SESSION['previous'] = $currentSession;
+        // Preserve initial user, also previous user = current user so that this
+        // session may itself recover its initial and previous user
+        $currentUser = $this->getUser();
+        $initialUser = $this->session->get('initialUser');
+        $this->recoverSessionInternal('previousUser');
+        $this->session->set('initialUser', $initialUser);
+        $this->session->set('previousUser', $currentUser);
     }
 
     /**
@@ -125,7 +125,7 @@ class Controller extends Base
      */
     public function recoverSessionInitial(): void
     {
-        $this->recoverSessionInternal('initial');
+        $this->recoverSessionInternal('initialUser');
     }
 
     /**
@@ -136,13 +136,11 @@ class Controller extends Base
      */
     private function recoverSessionInternal(string $key): void
     {
-        if (array_key_exists($key, $_SESSION)) {
-            $user = $_SESSION[$key]['user'] ?? null;
-            if ($user instanceof User) {
-                $session = new \Session();
-                if (!$session->create($user->getUsername())) {
-                    $session->destroy();
-                }
+        $user = $this->session->get($key);
+        if ($user instanceof User) {
+            $session = new \Session();
+            if (!$session->create($user->getUsername())) {
+                $session->destroy();
             }
         }
         $this->response = $this->redirectFound('/');

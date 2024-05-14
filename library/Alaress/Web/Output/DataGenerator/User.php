@@ -49,15 +49,15 @@ class User implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $initialData  = $this->session->get('initial');
-        $previousData = $this->session->get('previous');
+        $initialUser  = $this->session->get('initialUser');
+        $previousUser = $this->session->get('previousUser');
         $this->session->set('no_header', $this->session->get('no_header') ?: isset($_GET['no_header']));
 
         return [
             'current'        => $this->currentUser,
-            'initial'        => $initialData['user'] ?? null,
-            'previous'       => $previousData['user'] ?? null,
-            'impersonated'   => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousData),
+            'initial'        => $initialUser,
+            'previous'       => $previousUser,
+            'impersonated'   => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousUser),
             'communityLogin' => $this->session->get('communityLogin'),
             'no_header'      => $this->session->get('no_header'),  //Hides top nav header if user session var set
         ];

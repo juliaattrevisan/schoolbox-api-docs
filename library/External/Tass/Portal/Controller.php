@@ -245,6 +245,6 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function isCurrentUserImpersonated(): bool
     {
-        return (new ImpersonationCheck())->isImpersonated($this->getUser(), $this->getSession()->get('previous'));
+        return (new ImpersonationCheck())->isImpersonated($this->getUser(), $this->getSession()->get('previousUser'));
     }
 }
