@@ -35,85 +35,134 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $folderPermFull = new Rule\HasHomepageAccess(UserAccess::ACCESS_FULL, function (array $params = array(), User $user = null) {
-            return $params['folderId'];
-        }, Access::getInstance());
-
-        $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutes(string $basePath)
-    {
-        $this->addGetRoute('impersonate', $basePath, '/switch/{userId}');
-        $this->addGetRoute('recoverSession', $basePath, '/recoverSession');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $folderMapper = $this->getFolderMapper();
-        $errorMapper = $this->getErrorMapper();
-
-        $this->addRoutePreload(
-            $matcher,
-            'impersonate',
-            function ($params) {
-                return array(
-                    'user' => $this->getUserMapper()->findById($params['userId']),
-                );
+        // Parent emails route
+        $folderPermFull = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_FULL,
+            fn (array $params = [], User $user = null) => $params['folderId'],
+            Access::getInstance(),
+        );
+        $folderPreload = function ($params) {
+            try {
+                return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND, $e);
             }
+        };
+        $this->register(
+            self::METHOD_GET,
+            '/parentEmails/folder/{folderId}',
+            'getParentEmailsByFolder',
+            $folderPermFull,
+            $folderPreload,
         );
 
-        // Convert folderId into Folder object
-        $this->addRoutePreload(
-            $matcher,
-            '.*',
-            function ($params) use ($folderMapper, $errorMapper) {
-
-                if (array_key_exists('folderId', $params)) {
-                    try {
-                        $params['folder'] = $folderMapper->findById($params['folderId']);
-                    } catch (MapperException $e) {
-                        throw $errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                    }
-                }
-
-                return $params;
-            }
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this
-            ->addRoutePermission($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                'impersonate',
-                new Rule\Any(
-                    new Rule\Callback(
-                        function ($params, User $user) {
-                            // Do not allow unlinked users to switch
-                            foreach ($user->getLinkedUsers() as $linkedUser) {
-                                if ($params['userId'] == $linkedUser->getId()) {
-                                    return true;
-                                }
-                            }
-                            throw new Unauthorized();
+        // Impersonate and recover routes
+        $loggedInPermission    = new Rule\IsLoggedIn();
+        $impersonatePermission = new Rule\Any(
+            new Rule\Callback(
+                function ($params, User $user) {
+                    // Do not allow unlinked users to switch
+                    foreach ($user->getLinkedUsers() as $linkedUser) {
+                        if ($params['userId'] == $linkedUser->getId()) {
+                            return true;
                         }
-                    ),
-                    new Rule\IsSuperuser()
-                )
-            );
+                    }
+                    throw new Unauthorized();
+                }
+            ),
+            new Rule\IsSuperuser()
+        );
+        $impersonatePreload = fn ($params) => [
+            'user' => $this->getUserMapper()->findById($params['userId']),
+        ];
+        $this->register(
+            self::METHOD_GET,
+            '/switch/{userId}',
+            'impersonate',
+            new Rule\All($loggedInPermission, $impersonatePermission),
+            $impersonatePreload,
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/recoverSession',
+            'recoverSession',
+            $loggedInPermission,
+        );
     }
+
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initRoutes(string $basePath)
+//    {
+//        $this->addGetRoute('impersonate', $basePath, '/switch/{userId}');
+//        $this->addGetRoute('recoverSession', $basePath, '/recoverSession');
+//    }
+//
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initRoutePreloads(PathMatcher $matcher)
+//    {
+//        $folderMapper = $this->getFolderMapper();
+//        $errorMapper = $this->getErrorMapper();
+//
+//        $this->addRoutePreload(
+//            $matcher,
+//            'impersonate',
+//            function ($params) {
+//                return array(
+//                    'user' => $this->getUserMapper()->findById($params['userId']),
+//                );
+//            }
+//        );
+//
+//        // Convert folderId into Folder object
+//        $this->addRoutePreload(
+//            $matcher,
+//            '.*',
+//            function ($params) use ($folderMapper, $errorMapper) {
+//
+//                if (array_key_exists('folderId', $params)) {
+//                    try {
+//                        $params['folder'] = $folderMapper->findById($params['folderId']);
+//                    } catch (MapperException $e) {
+//                        throw $errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+//                    }
+//                }
+//
+//                return $params;
+//            }
+//        );
+//    }
+//
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initRoutePermissions(Authorizer $authorizer)
+//    {
+//        $this
+//            ->addRoutePermission($authorizer, '(impersonate|recoverSession)', new Rule\IsLoggedIn())
+//            ->addRoutePermission(
+//                $authorizer,
+//                'impersonate',
+//                new Rule\Any(
+//                    new Rule\Callback(
+//                        function ($params, User $user) {
+//                            // Do not allow unlinked users to switch
+//                            foreach ($user->getLinkedUsers() as $linkedUser) {
+//                                if ($params['userId'] == $linkedUser->getId()) {
+//                                    return true;
+//                                }
+//                            }
+//                            throw new Unauthorized();
+//                        }
+//                    ),
+//                    new Rule\IsSuperuser()
+//                )
+//            );
+//    }
 
     /**
      * @inheritdoc
