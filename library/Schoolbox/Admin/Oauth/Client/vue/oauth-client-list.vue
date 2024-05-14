@@ -43,6 +43,13 @@ const saveError = window.Vue.ref(null);
 const userSearchQueryParam = window.Vue.ref("");
 const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
 
+const addItemModal = window.Vue.ref<typeof RevealModal | null>(null);
+const itemAddedModal = window.Vue.ref<typeof RevealModal | null>(null);
+const modifyItemModal = window.Vue.ref<typeof RevealModal | null>(null);
+const regenerateItemModal = window.Vue.ref<typeof RevealModal | null>(null);
+const itemRegeneratedModal = window.Vue.ref<typeof RevealModal | null>(null);
+const deleteItemModal = window.Vue.ref<typeof RevealModal | null>(null);
+
 /**
  *
  */
@@ -64,7 +71,7 @@ async function getData() {
 function showAddModal() {
     saveError.value = null;
     addingItem.value = {};
-    // this.$refs.addItemModal.open();
+    addItemModal.value.open();
 }
 
 /**
@@ -84,8 +91,8 @@ async function addItem() {
         if (response.ok) {
             const addedItem = await response.json();
             addingItem.value = addedItem;
-            // this.$refs.addItemModal.close();
-            // this.$refs.itemAddedModal.open();
+            addItemModal.value.close();
+            itemAddedModal.value.open();
             loadedData.value.push({ ...addedItem });
             // this.$refs.toast.timeout("Created", true);
         } else {
@@ -106,7 +113,7 @@ async function addItem() {
 function showModifyModal(item) {
     saveError.value = null;
     modifyingItem.value = { ...item };
-    // this.$refs.modifyItemModal.open();
+    modifyItemModal.value.open();
 }
 
 /**
@@ -124,7 +131,7 @@ async function modifyItem(item) {
             },
         });
         if (response.ok) {
-            // this.$refs.modifyItemModal.close();
+            modifyItemModal.value.close();
             // this.$refs.toast.timeout("Modified", true);
 
             // Replace the existing modified item with the new version
@@ -148,7 +155,7 @@ async function modifyItem(item) {
 function showRegenerateModal(item) {
     saveError.value = null;
     regeneratingItem.value = { ...item };
-    // this.$refs.regenerateItemModal.open();
+    regenerateItemModal.value.open();
 }
 
 /**
@@ -165,8 +172,8 @@ async function regenerateItem(item) {
         });
         if (response.ok) {
             regeneratingItem.value = await response.json();
-            // this.$refs.regenerateItemModal.close();
-            // this.$refs.itemRegeneratedModal.open();
+            regenerateItemModal.value.close();
+            itemRegeneratedModal.value.open();
             // this.$refs.toast.timeout("Regenerated", true);
         } else {
             const error = await response.json();
@@ -185,7 +192,7 @@ async function regenerateItem(item) {
  */
 function showDeleteModal(item) {
     deletingItem.value = { ...item };
-    // this.$refs.deleteItemModal.open();
+    deleteItemModal.value.open();
 }
 
 /**
@@ -196,7 +203,7 @@ async function deleteItem(item) {
         await fetch(item._links.delete, {
             method: "DELETE",
         });
-        // this.$refs.deleteItemModal.close();
+        deleteItemModal.value.close();
         loadedData.value = loadedData.value.filter((v) => v.id !== item.id);
 
         // Show toast
@@ -256,7 +263,7 @@ window.Vue.onMounted(() => {
                         <i class="icon-list"></i>
                         <p>
                             No oAuth clients have been configured.
-                            <a href="#" @click.prevent="$refs.addItemModal.open">Add an oAuth client</a>.
+                            <a href="#" @click.prevent="addItemModal.open">Add an oAuth client</a>.
                         </p>
                     </div>
                 </template>
@@ -369,7 +376,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <a href="#add-item" class="button" @click.prevent="addItem">Add</a>
-                    <a href="#cancel" class="button" @click.prevent="$refs.addItemModal.close">Cancel</a>
+                    <a href="#cancel" class="button" @click.prevent="addItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -400,7 +407,7 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#close" class="button" @click.prevent="$refs.itemAddedModal.close">Close</a>
+                    <a href="#close" class="button" @click.prevent="itemAddedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
@@ -451,7 +458,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <a href="#modify" class="button" @click.prevent="modifyItem(modifyingItem)">Modify</a>
-                    <a href="#cancel" class="button" @click.prevent="$refs.modifyItemModal.close">Cancel</a>
+                    <a href="#cancel" class="button" @click.prevent="modifyItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -485,7 +492,7 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#close" class="button" @click.prevent="$refs.itemRegeneratedModal.close">Close</a>
+                    <a href="#close" class="button" @click.prevent="itemRegeneratedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
@@ -495,7 +502,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <a href="#delete" class="button" @click.prevent="deleteItem(deletingItem)">Delete</a>
-                    <a href="#cancel" class="button" @click.prevent="$refs.deleteItemModal.close">Cancel</a>
+                    <a href="#cancel" class="button" @click.prevent="deleteItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
