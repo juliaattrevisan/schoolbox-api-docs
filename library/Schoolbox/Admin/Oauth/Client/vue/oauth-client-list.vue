@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
@@ -320,23 +321,7 @@ window.Vue.onMounted(() => {
             </div>
         </div>
 
-        <div v-else>
-            <table class="skeleton">
-                <thead>
-                    <tr>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <loading-table v-else />
 
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
