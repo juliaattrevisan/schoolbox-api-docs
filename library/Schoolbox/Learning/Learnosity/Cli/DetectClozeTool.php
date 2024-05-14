@@ -68,7 +68,9 @@ HELP;
          */
         $stack = $this->findCandidates();
 
-        print_r($stack);
+        $analysis = $this->analyse($stack);
+
+        print_r($analysis);
     }
 
 
@@ -137,5 +139,63 @@ HELP;
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Examine the candidate quizzes and see which ones can be repaired or not
+     *
+     * @param array $stack
+     * @return array|array[]
+     */
+    private function analyse(array $stack): array
+    {
+        /* A list of repairable quiz ids
+         */
+        $analysis = [
+            'repairable' => [
+                'ids' => [],
+                'count' => 0
+            ],
+            'inconclusive' => [
+                'ids' => [],
+                'count' => 0
+            ]
+        ];
+
+        /* Inspect for quizzes we can repair automatically
+         * and ones we can't...not sure what we do about them ones.
+         */
+        foreach ($stack as $assessId => $assessData) {
+            $hasCollisions = false;
+
+            foreach ($assessData['questions'] as $discriminator => $questionData) {
+                $collisions = \count($questionData['questionId']);
+
+                /* If this question stimulus was used more than once,
+                 * it's inconclusive w.r.t. repairing it programmatically
+                 */
+                if ($collisions > 1) {
+                    $this->getLogger()->info(sprintf(
+                        'Legacy quiz "%s" (assess_id: %s) has collisions in cloze exercise questions %s; cannot automatically repair.',
+                        $assessData['title'],
+                        $assessId,
+                        implode(', ', $questionData['questionId'])
+                    ));
+
+                    $hasCollisions = true;
+                }
+            }
+
+            if (!$hasCollisions) {
+                $analysis['repairable']['ids'][] = $assessId;
+                $analysis['repairable']['count']++;
+            } else {
+                $analysis['inconclusive']['ids'][] = $assessId;
+                $analysis['inconclusive']['count']++;
+            }
+        }
+
+        return $analysis;
     }
 }
