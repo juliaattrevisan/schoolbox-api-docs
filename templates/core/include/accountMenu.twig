@@ -63,9 +63,7 @@
         {# Impersonable users: show all in the list, except for the previous user #}
         {% if user.current.linkedUsers is not empty %}
         <li class="separator">Switch User</li>
-            {% set previousUser = user.previous ?? null %}
             {% for linkedUser in user.current.linkedUsers %}
-                {% if not previousUser or previousUser.id != linkedUser.id %}
                 <li class="user">
                     <a class="no-pad" href="{{ routeLookup('user.impersonate', {userId: linkedUser.id}) }}" title="Switch to {{ linkedUser.formatName }}">
                         <div class="card small-12">
@@ -75,7 +73,6 @@
                         </div>
                     </a>
                 </li>
-                {% endif %}
             {% endfor %}
         {% endif %}
     </ul>
