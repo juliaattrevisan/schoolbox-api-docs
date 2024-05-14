@@ -44,7 +44,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Creating textbox...");
+        unitPlannerStore.toastEl!.activate("Creating text box...");
 
         try {
             // First create a new component
@@ -92,7 +92,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             storeUnit.textboxes[column.label].id = responseJSON.id;
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Textbox created", true, 2000);
+            unitPlannerStore.toastEl!.timeout("Text box created successfully", true, 2000);
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
             unitPlannerStore.toastEl!.timeout(error, false, 2000);
@@ -117,7 +117,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Saving...");
+        unitPlannerStore.toastEl!.activate("Updating text box...");
 
         try {
             let response = null;
@@ -142,7 +142,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             delete unsavedTextboxes.value[unitId][column.id];
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Save successful", true, 2000);
+            unitPlannerStore.toastEl!.timeout("Text box updated successfully", true, 2000);
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
             unitPlannerStore.toastEl!.timeout(error, false, 2000);

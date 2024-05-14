@@ -151,7 +151,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Saving...");
+        unitPlannerStore.toastEl!.activate("Updating unit order...");
         try {
             const currentSequence = unitPlannerStore.orderedUnits.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -170,7 +170,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             }
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Save successful", true, 2000);
+            unitPlannerStore.toastEl!.timeout("Unit order updated successfully", true, 2000);
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
             unitPlannerStore.toastEl!.timeout(error, false, 2000);

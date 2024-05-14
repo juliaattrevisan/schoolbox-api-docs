@@ -92,7 +92,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {Column} column - the column to create the component for
      */
     async function createComponent(unit: Unit, column: Column) {
-        // unitPlannerStore.toastEl!.activate("Creating component...");
+        // unitPlannerStore.toastEl!.activate("Creating curriculum...");
         try {
             const unitPlannerStore = useUnitPlannerStore();
 
@@ -150,7 +150,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             };
             unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
 
-            // unitPlannerStore.toastEl!.timeout("Curriculum created", true, 2000);
+            // unitPlannerStore.toastEl!.timeout("Curriculum created successfully", true, 2000);
         } catch (error) {
             // unitPlannerStore.toastEl!.timeout(error, false, 2000);
         }
