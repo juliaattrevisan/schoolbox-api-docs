@@ -106,12 +106,18 @@ class Classes implements IStrategy
             $this->toDate
         ));
 
+        $endpoint = sprintf(
+            'TeachingGroups/Jurisdiction/ByDate?startDate=%s&endDate=%s',
+            $this->fromDate->getDatabaseDate(),
+            $this->toDate->getDatabaseDate()
+        );
+
         /* /api/0/TeachingGroups/ByDate is broken and returns no data;
          * We have to use the overly generic /api/0/TeachingGroups/Jurisdiction
          * endpoint instead and manually filter out all the jank we don't need;
          * what a waste
          */
-        $pages = $this->api->retrieveForJurisdiction('GET', 'TeachingGroups/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', $endpoint);
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $class) {
