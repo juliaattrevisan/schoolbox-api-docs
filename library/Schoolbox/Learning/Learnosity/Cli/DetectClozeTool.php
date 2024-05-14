@@ -91,8 +91,36 @@ HELP;
 
         $statement->execute();
 
+        $stack = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            print_r($row);
+            $assessId = $row['assess_id'];
+            $title = $row['title'];
+            $questionId = $row['question_id'];
+            $question = trim((string)$row['question']);
+            $answer = $row['answer'];
+
+            /* Detect if multiple question stimuli functionally collide
+             */
+            $discriminator = sha1($question);
+
+            if (!isset($stack[$assessId])) {
+                $stack[$assessId] = [
+                    'title' => $title,
+                    'questions' => []
+                ];
+            }
+
+            if (!isset($stack[$assessId]['questions'][$discriminator])) {
+                $stack[$assessId]['questions'][$discriminator] = [
+                    'question' => $question,
+                    'collisions' => 0
+                ];
+            } else {
+                $stack[$assessId]['questions'][$discriminator]['collisions']++;
+            }
         }
+
+        print_r($stack);
     }
 }
