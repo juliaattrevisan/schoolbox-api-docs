@@ -99,7 +99,7 @@ class Kernel extends WebKernelAbstract
     public function run()
     {
         $config = $this->di->get('config');
-        if ($config->get('maintenance_mode', false)) {
+        if ($config->get('maintenance_mode')) {
             echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
             die;
         }
