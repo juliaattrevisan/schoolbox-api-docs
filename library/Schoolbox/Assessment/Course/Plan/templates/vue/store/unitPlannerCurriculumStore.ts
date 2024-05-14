@@ -146,6 +146,14 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
                 },
             });
 
+            const newComponent: CurriculumOverviewComponent = {
+                componentId: createResponseJSON.instanceID,
+                heading: column.label,
+                filter: treeFilter,
+                inTemplate: true,
+            };
+            unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
+
             // update component id in the store
 
             // if (!configResponse.ok) {

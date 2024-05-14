@@ -25,6 +25,7 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
  */
 async function onCreateSelected() {
     await curriculumStore.createCurriculumComponent(props.unit, props.column);
+    component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
 }
 
 /**

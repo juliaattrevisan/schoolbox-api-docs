@@ -4,7 +4,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
-import { Unit, UnitTemplate } from "../unitPlannerTypes";
+import { CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -164,6 +164,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         );
     });
 
+    /**
+     * Add a newly created curriculum component to a unit
+     * @param {number} unitId - to find the unit to add the component to
+     * @param {CurriculumOverviewComponent} component - the component to add
+     */
+    function addCurriculumComponent(unitId: number, component: CurriculumOverviewComponent) {
+        const matchedUnit = units.value.find((unit) => unit.id === unitId);
+        if (!matchedUnit) {
+            return;
+        }
+        matchedUnit.curriculum.components.push(component);
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -183,5 +196,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitContentHeights,
         setUnitContentHeight,
         unitRowDisplayHeights,
+        addCurriculumComponent,
     };
 });
