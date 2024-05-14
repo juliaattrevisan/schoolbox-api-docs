@@ -85,6 +85,11 @@ class AttendanceLink implements IAttendanceLink
         \Schoolbox\External\Event\Model $event,
         \Schoolbox\User $user
     ): string {
+        // Only generate links for TASS-created events
+        if ($event->getSource() !== \Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME) {
+            return '';
+        }
+
         /* Get the parts you need
          */
         [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($event->getGuid());
@@ -96,7 +101,12 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-        $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        // Can I build a date? If not silently provide nothing
+        try {
+            $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        } catch (\InvalidArgumentException) {
+            return '';
+        }
 
         /* Only generate links where possible
          */
