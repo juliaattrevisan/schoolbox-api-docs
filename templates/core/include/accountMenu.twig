@@ -31,12 +31,12 @@
 
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
-{% if user.current.linkedUsers is not empty or user.previous  %}
+{% if user.current.linkedUsers is not empty or user.previous or user.initial %}
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
-
+        {# Impersonable users: show all in the list, except for the previous user #}
         {% if user.current.linkedUsers is not empty %}
         <li class="separator">Switch User</li>
-            {% set previousUser = user.previous | default(null) %}
+            {% set previousUser = user.previous ?? null %}
             {% for linkedUser in user.current.linkedUsers %}
                 {% if not previousUser or previousUser.id != linkedUser.id %}
                 <li class="user">
@@ -52,17 +52,30 @@
             {% endfor %}
         {% endif %}
 
-        {% if user.previous %}
+        {% if user.initial or user.previous %}
             <li class="separator">Switch back to User</li>
-            <li class="user">
-                <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                    <div class="card small-12">
-                        {% include 'include/portrait.twig' with {user: user.previous} only %}
-                        <p>{{ user.previous.formatName }}</p>
-                        <p class="meta">{{ user.previous.role.name }}</p>
-                    </div>
-                </a>
-            </li>
+            {% if user.previous %}
+                <li class="user">
+                    <a class="no-pad" href="/user/switch/{{ user.previous.id }}" title="Return to {{ user.previous.formatName }}">
+                        <div class="card small-12">
+                            {% include 'include/portrait.twig' with {user: user.previous} only %}
+                            <p>{{ user.previous.formatName }}</p>
+                            <p class="meta">{{ user.previous.role.name }}</p>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.initial %}
+                <li class="user">
+                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.initial.formatName }}">
+                        <div class="card small-12">
+                            {% include 'include/portrait.twig' with {user: user.initial} only %}
+                            <p>{{ user.initial.formatName }}</p>
+                            <p class="meta">{{ user.initial.role.name }}</p>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
         {% endif %}
     </ul>
 {% endif %}
