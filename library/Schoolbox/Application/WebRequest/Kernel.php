@@ -98,6 +98,12 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
+        $config = $this->di->get('config');
+        if ($config->get('maintenance_mode', false)) {
+            echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
+            die;
+        }
+
         // First get the request object
         /** @var ServerRequestInterface $request */
         $request = $this->di->get('httpRequest');
