@@ -46,4 +46,24 @@ class Controller extends Base
             'url' => $url
         ], 'Civica Attendance');
     }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getKamiInteractiveView(string $encodedUrl): void
+    {
+        //TODO considering the encoded url which could potentially have the / character in the url causing the url to redirect to wrong page
+        $url = base64_decode($encodedUrl);
+
+        //TODO to be optimised with reusable function(?)
+        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($url)) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Kami Interactive View');
+    }
 }
