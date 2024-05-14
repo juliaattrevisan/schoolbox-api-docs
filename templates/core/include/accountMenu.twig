@@ -52,7 +52,7 @@
             {% endfor %}
         {% endif %}
 
-        {% if user.initial or user.previous %}
+        {% if user.previous %}
             <li class="separator">Switch back to User</li>
             {% if user.previous %}
                 <li class="user">
@@ -65,17 +65,19 @@
                     </a>
                 </li>
             {% endif %}
-            {% if user.initial %}
-                <li class="user">
-                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.initial.formatName }}">
-                        <div class="card small-12">
-                            {% include 'include/portrait.twig' with {user: user.initial} only %}
-                            <p>{{ user.initial.formatName }}</p>
-                            <p class="meta">{{ user.initial.role.name }}</p>
-                        </div>
-                    </a>
-                </li>
-            {% endif %}
+        {% endif %}
+
+        {% if user.initial %}
+            <li class="separator">End Impersonation</li>
+            <li class="user">
+                <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.initial.formatName }}">
+                    <div class="card small-12">
+                        {% include 'include/portrait.twig' with {user: user.initial} only %}
+                        <p>{{ user.initial.formatName }}</p>
+                        <p class="meta">{{ user.initial.role.name }}</p>
+                    </div>
+                </a>
+            </li>
         {% endif %}
     </ul>
 {% endif %}

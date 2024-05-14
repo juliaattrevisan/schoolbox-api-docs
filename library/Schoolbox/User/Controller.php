@@ -66,8 +66,7 @@ class Controller extends Base
             // Log the current session in the previous
             $_SESSION['previous'] = $currentSession;
 
-            // Who assumed this session?
-            // IMO it is always the top-level user
+            // Who assumed this session? IMO it is always the initial user
             // (the user who first started impersonating)
             /** @var User $initialUser */
             $initialUser = $_SESSION['initial']['user'] ?? $currentSession['user'];
@@ -79,7 +78,9 @@ class Controller extends Base
 
             $this->assumeUserLogMapper->save($logItem);
         } else {
-            // Recover old session
+            // Recover old session:
+            // should do so by creating a new session for previous user, as that
+            // is what `recoverSession()` does.
             $_SESSION = $previousSession;
         }
         $this->response = $this->redirectFound('/');
