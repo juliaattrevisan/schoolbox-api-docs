@@ -108,7 +108,12 @@ class Controller extends Base
      */
     public function recoverSessionPrevious(): void
     {
+        // Preserve initial session, also previous session = current session
+        $currentSession = $_SESSION;
+        $initialSession = $_SESSION['initial'] ?? null;
         $this->recoverSessionInternal('previous');
+        $_SESSION['initial']  = $initialSession;
+        $_SESSION['previous'] = $currentSession;
     }
 
     /**
