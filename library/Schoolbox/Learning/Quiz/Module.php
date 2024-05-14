@@ -116,7 +116,7 @@ class Module extends RestfulModule
 
         $this->register('POST', "/quiz/attempts/delete", 'postAttemptDelete', $canWrite);
         $this->register('GET', "/quiz/summary/{assessmentId}", 'getQuizSummary', $canModify, $preloadAssessment);
-        $this->register('GET', "/quiz/{assessmentId}/attempts/export", 'getExportAttempts', $canModify);
+        $this->register('GET', "/quiz/{assessmentId}/attempts/export", 'getExportAttempts', $canModify, $preloadAssessment);
         $this->register('POST', "/quiz/legacyQuizImport/{contextType:$contextTypes}/{contextId:\\d+}", 'postLegacyQuizImport', $canWrite, $preloadContext);
     }
 
