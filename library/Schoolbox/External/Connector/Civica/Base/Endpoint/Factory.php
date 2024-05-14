@@ -109,9 +109,9 @@ class Factory
     public function produce(): GenericCollection
     {
         /* Schedule/SUDS Timetable: Date Range
-         * For now, arbitrarily use today until 3 months from now.
+         * For now, arbitrarily use start of this week until 3 months from now.
          */
-        $from = \Alaress_Date_Format::now()->startOfDay();
+        $from = \Alaress_Date_Format::now()->startOfWeek();
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* Spawn an Api instance
