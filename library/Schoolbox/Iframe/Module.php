@@ -38,6 +38,14 @@ class Module extends BaseModule
 
         $this->register('GET', '/civica/attendance/{encodedUrl}', 'getCivicaAttendance', $isStaff);
         $this->register('GET', '/kami/interactive/{encodedUrl}', 'getKamiInteractiveView', $isStaff);
+
+        //TODO to have more specific permission, possibly in persistent with the Paperly API call
+        $isLoggedIn = new Rule\IsLoggedIn();
+
+        $this->register('GET', '/paperly/{encodedUrl}/create_forms', 'getPaperlyCreateForms', $isLoggedIn);
+        $this->register('GET', '/paperly/{encodedUrl}/create_excursions', 'getPaperlyCreateExcursion', $isLoggedIn);
+        $this->register('GET', '/paperly/{encodedUrl}/view_pti', 'getPaperlyViewPti', $isLoggedIn);
+        $this->register('GET', '/paperly/{encodedUrl}/complete_action', 'getPaperlyCompleteAction', $isLoggedIn);
     }
 
 

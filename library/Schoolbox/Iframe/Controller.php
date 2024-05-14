@@ -73,4 +73,56 @@ class Controller extends Base
             'url' => $url
         ], 'Kami Interactive View');
     }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getPaperlyCreateForms(string $encodedUrl): void
+    {
+        $url = $this->decodeAndValidateUrl($encodedUrl);
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Paperly Create Forms');
+    }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getPaperlyCreateExcursion(string $encodedUrl): void
+    {
+        $url = $this->decodeAndValidateUrl($encodedUrl);
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Paperly Create Excursion');
+    }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getPaperlyViewPti(string $encodedUrl): void
+    {
+        $url = $this->decodeAndValidateUrl($encodedUrl);
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Paperly View Pti');
+    }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getPaperlyCompleteAction(string $encodedUrl): void
+    {
+        $url = $this->decodeAndValidateUrl($encodedUrl);
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Paperly Complete Action');
+    }
 }
