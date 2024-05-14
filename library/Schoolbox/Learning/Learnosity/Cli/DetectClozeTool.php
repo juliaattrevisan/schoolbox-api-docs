@@ -66,6 +66,19 @@ HELP;
 
         /* Find all the quizzes that contain a cloze exercise
          */
+        $stack = $this->findCandidates();
+
+        print_r($stack);
+    }
+
+
+    /**
+     * Find all the quizzes that contain cloze questions and keep a count
+     * of how many times identical question text
+     *
+     * @return array
+     */
+    private function findCandidates(): array {
         $query = "
             SELECT
                 assess.assess_id,
@@ -123,6 +136,6 @@ HELP;
             }
         }
 
-        print_r($stack);
+        return $stack;
     }
 }
