@@ -177,7 +177,7 @@ module.exports = {
         emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
         loadLayout: "./www/static/js/masonry/layout/loadLayout.ts",
         courseBuilder: "./library/Schoolbox/Admin/CourseBuilder/templates/vue/courseBuilder.ts",
-        oauthClientList: "./library/Schoolbox/Admin/Oauth/Client/vue/oauthClientList.ts",
+        oauthClientList: "./library/Schoolbox/Admin/Oauth/Client/vue/oauthClientList.js",
 
         //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",
