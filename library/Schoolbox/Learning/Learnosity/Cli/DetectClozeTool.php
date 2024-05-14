@@ -19,6 +19,13 @@ class DetectClozeTool extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+
+    /**
+     * Corresponds to the Fillgap question type in luQuestionType
+     */
+    private const CLOZE_TYPE_ID = 3;
+
+
     /**
      * @var Api
      */
@@ -49,6 +56,43 @@ Usage: detectcloze.php [-vvv]
 
 HELP;
             exit;
+        }
+
+        /* Log the title first lol
+         */
+        $this->getLogger()->info('');
+        $this->getLogger()->info('Learnosity Detect Cloze.');
+        $this->getLogger()->info('');
+
+        /* Find all the quizzes that contain a cloze exercise
+         */
+        $query = "
+            SELECT
+                assess.assess_id,
+                assess.title,
+                assess_section.section_id,
+                assess_question.question_id,
+                assess_question.question,
+                assess_answer.answer
+            FROM assess
+            INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+            INNER JOIN assess_question on assess_question.section_id = assess_section.section_id
+            INNER JOIN assess_answer ON assess_answer.question_id = assess_question.question_id
+            WHERE assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND assess_section.deleted_at IS NULL
+            AND assess_question.deleted_at IS NULL
+            AND assess_question.type_id = :typeId
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepareQuery($query, [
+            'typeId' => self::CLOZE_TYPE_ID
+        ]);
+
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            print_r($row);
         }
     }
 }
