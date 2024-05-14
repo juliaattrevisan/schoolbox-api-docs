@@ -85,6 +85,11 @@ class AttendanceLink implements IAttendanceLink
         \Schoolbox\External\Event\Model $event,
         \Schoolbox\User $user
     ): string {
+        // Only generate links for TASS-created events
+        if ($event->getSource() !== \Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME) {
+            return '';
+        }
+
         /* Get the parts you need
          */
         [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($event->getGuid());
