@@ -68,6 +68,8 @@ HELP;
          */
         $stack = $this->findCandidates();
 
+        /* Inspect the stack for things we can fix and things we can't
+         */
         $analysis = $this->analyse($stack);
 
         print_r($analysis);
