@@ -5,12 +5,13 @@
 
 import { defineStore } from "pinia";
 import { watchIgnorable } from "@vueuse/core";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
-import type { CurriculumOverviewComponent } from "../unitPlannerTypes";
+import type { CurriculumOverviewComponent, Unit } from "../unitPlannerTypes";
 import type { Column } from "../unitPlannerConfig";
 
 export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`, () => {
@@ -82,6 +83,79 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         return null;
     }
 
+    /**
+     * Create a new textbox in the backend if it doesn't exist
+     * @param {Unit} unit - the unit to create the textbox for
+     * @param {Column} column - the column to create the textbox for
+     */
+    async function createCurriculumComponent(unit: Unit, column: Column) {
+        // const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
+        // if (!storeUnit) {
+        //     throw new Error("Unit not found");
+        // }
+
+        // const selectedTextbox = storeUnit.textboxes[column.label];
+        // if (selectedTextbox.id >= 0) {
+        //     return;
+        // }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+        // unitPlannerStore.toastEl!.activate("Creating textbox...");
+
+        try {
+            // First create a new component
+            const createFormData = new FormData();
+            createFormData.append("cid", unit.folderId.toString());
+            createFormData.append("add", "86"); // TODO: Grab this (curriculum overview component definition ID) from the backend instead. See SA-17537
+
+            const createResponse = await fetch("/homepage/configForm.php", {
+                method: "POST",
+                body: createFormData,
+                headers: {
+                    Accept: "application/json",
+                },
+            });
+
+            // if (!createResponse.ok) {
+            //     throw new Error(await extractErrorMessage(createResponse));
+            // }
+
+            const createResponseJSON = (await createResponse.json()) as { instanceID: number };
+
+            const configSearchParams = new URLSearchParams();
+            configSearchParams.append("cid", unit.folderId.toString());
+            configSearchParams.append("type", "config");
+            configSearchParams.append("component", createResponseJSON.instanceID.toString());
+            configSearchParams.append("componentname", column.label);
+            configSearchParams.append("curriculumTreeFilter", "");
+
+            // Then create the component
+            const configResponse = await fetch(`/homepage/configForm.php?${configSearchParams.toString()}`, {
+                method: "POST",
+                // body: configSearchParams,
+                headers: {
+                    Accept: "application/json",
+                },
+            });
+
+            // update component id in the store
+
+            // if (!configResponse.ok) {
+            //     throw new Error(await extractErrorMessage(configResponse));
+            // }
+
+            // If we just created a textbox, then we need to update the store with the new textbox id
+            // const configResponseJSON = (await configResponse.json()) as { id: number };
+            // storeUnit.textboxes[column.label].id = configResponseJSON.id;
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            // unitPlannerStore.toastEl!.timeout("Textbox created", true, 2000);
+        } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
+            // unitPlannerStore.toastEl!.timeout(error, false, 2000);
+        }
+    }
+
     return {
         init,
         selectorStore,
@@ -89,5 +163,6 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         selectedDetailsNodeId,
         openCurriculumSelectorModal,
         getCurriculumComponent,
+        createCurriculumComponent,
     };
 });

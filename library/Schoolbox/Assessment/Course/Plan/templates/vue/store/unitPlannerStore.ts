@@ -4,7 +4,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
-import { Unit } from "../unitPlannerTypes";
+import { Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -16,17 +16,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
+    const template = window.Vue.ref<UnitTemplate | null>(null);
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     /**
      * store any passed through properties
      * @param { number } $courseId - the course ID
      * @param { Unit[] } $units - the units to store
+     * @param { UnitTemplate } $template - the unit template
      * @param { typeof Toast } $toastEl - the toast element
      */
-    function init($courseId: number, $units: Unit[], $toastEl: typeof Toast) {
-        courseId.value = $courseId;
+    function init($units: Unit[], $template: UnitTemplate, $toastEl: typeof Toast) {
         units.value = $units;
+        template.value = $template;
         toastEl.value = $toastEl;
     }
 
@@ -169,6 +171,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         courseId,
         units,
         unitCount,
+        template,
         toastEl,
         dragCurrentUnit,
         dragCurrentUnitNextTick,

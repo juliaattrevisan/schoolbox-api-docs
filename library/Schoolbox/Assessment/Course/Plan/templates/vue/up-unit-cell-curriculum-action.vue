@@ -21,6 +21,13 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
 );
 
 /**
+ * To create a new curriculum component, adding it to the relevant units homepage
+ */
+async function onCreateSelected() {
+    await curriculumStore.createCurriculumComponent(props.unit, props.column);
+}
+
+/**
  * To open the curriculum code mapping modal,
  * ensuring the relevant selected nodes are displayed by
  * passing in the folderId and componentId to target the appropriate folderNodesStore
@@ -34,12 +41,22 @@ function onModifySelected() {
 </script>
 
 <template>
+    <div v-if="component === null" class="component-action">
+        <section>
+            <button @click.prevent="onCreateSelected">Create Curriculum</button>
+        </section>
+    </div>
     <fn-actions
-        v-if="component !== null"
+        v-else
         :folder-id="props.unit.folderId"
         :component-id="component.componentId"
         @modify-selected="onModifySelected"
     />
 </template>
 
-<style scoped></style>
+<style scoped>
+.component-action section {
+    border-bottom: 0;
+    pointer-events: all; /* to allow the button to sit above the overlay */
+}
+</style>
