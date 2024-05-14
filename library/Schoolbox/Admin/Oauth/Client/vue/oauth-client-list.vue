@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
@@ -30,40 +30,40 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const isDataLoaded = ref(false);
-const hasDataLoadError = ref(false);
-const loadedData = ref([]);
-const addingItem = ref({});
-const modifyingItem = ref({});
-const regeneratingItem = ref({});
-const deletingItem = ref({});
-const searchUsers = ref([]);
-const saveError = ref(null);
+const isDataLoaded = window.Vue.ref(false);
+const hasDataLoadError = window.Vue.ref(false);
+const loadedData = window.Vue.ref([]);
+const addingItem = window.Vue.ref({});
+const modifyingItem = window.Vue.ref({});
+const regeneratingItem = window.Vue.ref({});
+const deletingItem = window.Vue.ref({});
+const searchUsers = window.Vue.ref([]);
+const saveError = window.Vue.ref(null);
 
 async function getData() {
     try {
-        const response = await fetch(this.getListEndpoint);
-        this.loadedData = await response.json();
+        const response = await fetch(props.getListEndpoint);
+        loadedData.value = await response.json();
     } catch (error) {
         console.warn(error);
-        this.hasDataLoadError = true; //show load error
+        hasDataLoadError.value = true; // show load error
     } finally {
-        this.isDataLoaded = true; //update the display to show the list
+        isDataLoaded.value = true; // update the display to show the list
     }
 }
 
 function showAddModal() {
-    this.saveError = null;
-    this.addingItem = {};
-    this.$refs.addItemModal.open();
+    saveError.value = null;
+    addingItem.value = {};
+    // this.$refs.addItemModal.open();
 }
 
 async function addItem() {
     try {
-        this.$refs.toast.activate("Creating...");
-        const response = await fetch(this.postItemEndpoint, {
+        // this.$refs.toast.activate("Creating...");
+        const response = await fetch(postItemEndpoint.value, {
             method: "POST",
-            body: JSON.stringify(this.addingItem),
+            body: JSON.stringify(addingItem.value),
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -71,32 +71,32 @@ async function addItem() {
         });
         if (response.ok) {
             const addedItem = await response.json();
-            this.addingItem = addedItem;
-            this.$refs.addItemModal.close();
-            this.$refs.itemAddedModal.open();
-            this.loadedData.push({ ...addedItem });
-            this.$refs.toast.timeout("Created", true);
+            addingItem.value = addedItem;
+            // this.$refs.addItemModal.close();
+            // this.$refs.itemAddedModal.open();
+            loadedData.value.push({ ...addedItem });
+            // this.$refs.toast.timeout("Created", true);
         } else {
             const error = await response.json();
             if (error.title) {
-                this.saveError = error.title;
+                saveError.value = error.title;
             }
-            this.$refs.toast.timeout("Could not create", false);
+            // this.$refs.toast.timeout("Could not create", false);
         }
     } catch (error) {
-        this.$refs.toast.timeout("Could not create", false);
+        // this.$refs.toast.timeout("Could not create", false);
     }
 }
 
 function showModifyModal(item) {
-    this.saveError = null;
-    this.modifyingItem = { ...item };
-    this.$refs.modifyItemModal.open();
+    saveError.value = null;
+    modifyingItem.value = { ...item };
+    // this.$refs.modifyItemModal.open();
 }
 
 async function modifyItem(item) {
     try {
-        this.$refs.toast.activate("Modifying...");
+        // this.$refs.toast.activate("Modifying...");
         const response = await fetch(item._links.patch, {
             method: "PATCH",
             body: JSON.stringify(item),
@@ -106,33 +106,33 @@ async function modifyItem(item) {
             },
         });
         if (response.ok) {
-            this.$refs.modifyItemModal.close();
-            this.$refs.toast.timeout("Modified", true);
+            // this.$refs.modifyItemModal.close();
+            // this.$refs.toast.timeout("Modified", true);
 
             // Replace the existing modified item with the new version
             const modifiedItem = await response.json();
-            this.loadedData = this.loadedData.map((v) => (v.id === modifiedItem.id ? modifiedItem : v));
+            loadedData.value = loadedData.value.map((v) => (v.id === modifiedItem.id ? modifiedItem : v));
         } else {
             const error = await response.json();
             if (error.title) {
-                this.saveError = error.title;
+                saveError.value = error.title;
             }
-            this.$refs.toast.timeout("Could not modify", false);
+            // this.$refs.toast.timeout("Could not modify", false);
         }
     } catch (error) {
-        this.$refs.toast.timeout("Could not modify", false);
+        // this.$refs.toast.timeout("Could not modify", false);
     }
 }
 
 function showRegenerateModal(item) {
-    this.saveError = null;
-    this.regeneratingItem = { ...item };
-    this.$refs.regenerateItemModal.open();
+    saveError.value = null;
+    regeneratingItem.value = { ...item };
+    // this.$refs.regenerateItemModal.open();
 }
 
 async function regenerateItem(item) {
     try {
-        this.$refs.toast.activate("Regenerating...");
+        // this.$refs.toast.activate("Regenerating...");
         const response = await fetch(item._links.regenerate, {
             method: "POST",
             headers: {
@@ -140,25 +140,25 @@ async function regenerateItem(item) {
             },
         });
         if (response.ok) {
-            this.regeneratingItem = await response.json();
-            this.$refs.regenerateItemModal.close();
-            this.$refs.itemRegeneratedModal.open();
-            this.$refs.toast.timeout("Regenerated", true);
+            regeneratingItem.value = await response.json();
+            // this.$refs.regenerateItemModal.close();
+            // this.$refs.itemRegeneratedModal.open();
+            // this.$refs.toast.timeout("Regenerated", true);
         } else {
             const error = await response.json();
             if (error.title) {
-                this.saveError = error.title;
+                saveError.value = error.title;
             }
-            this.$refs.toast.timeout("Could not regenerate", false);
+            // this.$refs.toast.timeout("Could not regenerate", false);
         }
     } catch (error) {
-        this.$refs.toast.timeout("Could not regenerate", false);
+        // this.$refs.toast.timeout("Could not regenerate", false);
     }
 }
 
 function showDeleteModal(item) {
-    this.deletingItem = { ...item };
-    this.$refs.deleteItemModal.open();
+    deletingItem.value = { ...item };
+    // this.$refs.deleteItemModal.open();
 }
 
 async function deleteItem(item) {
@@ -166,8 +166,8 @@ async function deleteItem(item) {
         await fetch(item._links.delete, {
             method: "DELETE",
         });
-        this.$refs.deleteItemModal.close();
-        this.loadedData = this.loadedData.filter((v) => v.id !== item.id);
+        // this.$refs.deleteItemModal.close();
+        loadedData.value = loadedData.value.filter((v) => v.id !== item.id);
 
         // Show toast
     } catch (error) {
