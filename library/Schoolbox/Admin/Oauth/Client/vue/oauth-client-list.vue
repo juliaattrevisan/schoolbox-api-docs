@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import debounce from "lodash/debounce";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import vSelect from "vue-select";
-import debounce from "lodash/debounce";
-import "vue-select/dist/vue-select.css";
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
+import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 
 vSelect.props.components.default = () => ({ Deselect });
@@ -230,15 +230,14 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
     const searchParams = userSearchAdditionalParams.value;
     searchParams[userSearchQueryParam.value] = query;
     searchUrl.search = new URLSearchParams(searchParams);
-    console.log(searchUrl);
     // const response = await fetch(searchUrl);
     // const responseJson = await response.json();
     // searchUsers.value = responseJson.data;
     // loading(false);
     fetch(searchUrl)
         .then((response) => response.json())
-        .then((data) => {
-            searchUsers.value = data;
+        .then((jsonResponse) => {
+            searchUsers.value = jsonResponse.data;
         })
         .finally(() => {
             loading(false);
@@ -249,6 +248,9 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
         });
 }, SEARCH_RESULT_RETRIEVE_DELAY);
 
+/**
+ * Load the oauth client config list
+ */
 window.Vue.onMounted(() => {
     void getData();
 });
@@ -276,7 +278,7 @@ window.Vue.onMounted(() => {
                             <th>Client Credentials User</th>
                             <th>&nbsp;</th>
                         </tr>
-                        <tr v-for="row in loadedData">
+                        <tr v-for="row in loadedData" :key="row.clientId">
                             <td>{{ row.name }}</td>
                             <td>{{ row.redirectUri }}</td>
                             <td>{{ row.clientId }}</td>
