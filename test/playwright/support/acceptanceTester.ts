@@ -1,3 +1,5 @@
+import { spawn } from "child_process";
+import { existsSync } from "fs";
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
@@ -44,7 +46,7 @@ export class AcceptanceTester {
      * @param { string } fullname - The full name of the user to impersonate
      */
     async impersonate(fullname: string) {
-        this.isGoingTo("impersonate a user by the name of " + fullname);
+        this.isGoingTo(`impersonate a user by the name of ${fullname}`);
         await this.logout();
         await this.loginAsAdmin();
         await this.page.getByTestId("profile-drop").click();
@@ -73,17 +75,6 @@ export class AcceptanceTester {
         }
     }
 
-    //     /**
-    //  * Fill in CKEditor 5
-    //  * @param $elementId
-    //  * @param $content
-    //  * @throws Exception
-    //  */
-    //     public function fillCkEditorById($elementId, $content): void
-    //     {
-    //         $this->executeJS(sprintf('window.sbProps.editors["%s"].setData("<p>%s</p>");', $elementId, $content));
-    //     }
-
     /**
      * Fill in CKEditor5 based on its ID
      * @param { string } editorId - The ID of the CKEditor5 instance
@@ -109,6 +100,53 @@ export class AcceptanceTester {
         const editorId = await locator.getAttribute("id");
         expect(editorId).not.toBeNull();
         await this.fillCKEditorById(editorId as string, content);
+    }
+
+    /**
+     * Executes a shell command and returns the result.
+     * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command via `vagrant ssh -c '...'`
+     * @param { string } command - The command to execute.
+     * @returns { Promise<string> } The stdout from the command.
+     * @throws { Error } If the command fails.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    async runShellCommand(command: string): Promise<string> {
+        // Try to run in vagrant if the schoolbox directory does not exist
+        if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {
+            const vagrantCommand = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
+            return this.runShellCommand(vagrantCommand);
+        }
+
+        return new Promise((resolve, reject) => {
+            const parts = command.split(" ");
+            const cmd = parts[0];
+            const args = parts.slice(1);
+
+            const child = spawn(cmd, args, { shell: true });
+
+            let output = ""; // This will collect all the stdout
+
+            // Handle stdout data
+            child.stdout.on("data", (data: string) => {
+                process.stdout.write(data);
+                output += data.toString();
+            });
+
+            // Handle stderr data
+            child.stderr.on("data", (data: string) => {
+                process.stdout.write(data);
+                output += data.toString();
+            });
+
+            // Handle completion
+            child.on("close", (code) => {
+                if (code === 0) {
+                    resolve(output);
+                } else {
+                    reject(new Error(`Command failed with exit code ${code}`));
+                }
+            });
+        });
     }
 
     /**
