@@ -11,6 +11,7 @@ import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculu
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
+import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { CurriculumOverviewComponent, Unit } from "../unitPlannerTypes";
 import type { Column } from "../unitPlannerConfig";
 
@@ -103,6 +104,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         // unitPlannerStore.toastEl!.activate("Creating textbox...");
 
         try {
+            const unitPlannerStore = useUnitPlannerStore();
+
             // First create a new component
             const createFormData = new FormData();
             createFormData.append("cid", unit.folderId.toString());
@@ -122,17 +125,22 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
             const createResponseJSON = (await createResponse.json()) as { instanceID: number };
 
+            // get the filter id for the component if it's available based on the matching the component heading to column label
+            // to open the modal at the correct node
+            const treeFilter = unitPlannerStore.template?.curriculum.find(
+                (component) => component.heading === column.label,
+            )?.filter;
+
             const configSearchParams = new URLSearchParams();
             configSearchParams.append("cid", unit.folderId.toString());
             configSearchParams.append("type", "config");
             configSearchParams.append("component", createResponseJSON.instanceID.toString());
             configSearchParams.append("componentname", column.label);
-            configSearchParams.append("curriculumTreeFilter", "");
+            configSearchParams.append("curriculumTreeFilter", treeFilter ? treeFilter.id.toString() : "");
 
             // Then create the component
             const configResponse = await fetch(`/homepage/configForm.php?${configSearchParams.toString()}`, {
                 method: "POST",
-                // body: configSearchParams,
                 headers: {
                     Accept: "application/json",
                 },
