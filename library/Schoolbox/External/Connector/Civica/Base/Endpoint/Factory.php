@@ -51,7 +51,7 @@ class Factory
      * Get timetable classes up to this far into the future
      * Measured in months, defaults to 6 months
      */
-    private const TO = 6;
+    private const TO = 3;
 
 
     /**
@@ -109,8 +109,9 @@ class Factory
     public function produce(): GenericCollection
     {
         /* Schedule/SUDS Timetable: Date Range
+         * For now, arbitrarily use today until 3 months from now.
          */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+        $from = \Alaress_Date_Format::now()->startOfDay();
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* Spawn an Api instance
