@@ -214,7 +214,7 @@ class Classes implements IStrategy
                     $class['className']
                 ));
 
-                return;
+                continue;
             }
 
             /* Event ended in the past; ignore it
@@ -226,7 +226,7 @@ class Classes implements IStrategy
                     $class['className']
                 ));
 
-                return;
+                continue;
             }
 
             /* Save sis_event record
