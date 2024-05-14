@@ -176,7 +176,6 @@ export class AssessmentForm {
      * @param { string } description - The description to set
      */
     async setDescription(description: string) {
-        // await this.page.getByTestId(AssessmentForm.SELECTOR_DESCRIPTION).fill(description);
         const descriptionTextarea = this.page.getByTestId(AssessmentForm.SELECTOR_DESCRIPTION);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }

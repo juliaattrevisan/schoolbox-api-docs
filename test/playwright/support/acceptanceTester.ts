@@ -81,12 +81,25 @@ export class AcceptanceTester {
      * @param { string } content - The content to fill the editor with
      */
     async fillCKEditorById(editorId: string, content: string) {
-        await this.page.evaluate(
-            ([_editorId, _content]) => {
-                window.sbProps.editors[_editorId].setData(`<p>${_content}</p>`);
+        // Wait for the editor to be ready
+        await this.page.waitForFunction(
+            ([_editorId]) => {
+                return window.sbProps.editors[_editorId] !== undefined;
             },
-            [editorId, content],
+            [editorId],
         );
+
+        // Focus the editor, and clear all content
+        await this.page.evaluate(
+            ([_editorId]) => {
+                window.sbProps.editors[_editorId].focus();
+                window.sbProps.editors[_editorId].setData("");
+            },
+            [editorId],
+        );
+
+        // Fill the editor
+        await this.page.keyboard.type(content);
     }
 
     /**

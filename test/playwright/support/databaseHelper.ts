@@ -37,12 +37,29 @@ export class DatabaseHelper {
         const criteriaKeys = Object.keys(criteria);
         const criteriaValues = Object.values(criteria);
 
-        const whereBinding = criteriaKeys.map((key) => `${key} = ?`).join(" AND ");
+        const whereBinding = criteriaKeys
+            .map((key) => {
+                const value = criteria[key];
+                // Check for NULL specifically to handle IS NULL and IS NOT NULL
+                if (value === null) {
+                    return `${key} IS NULL`;
+                }
+                if (value === "NOT NULL") {
+                    return `${key} IS NOT NULL`;
+                }
+                // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
+                if (key.includes(" ")) return `${key} ?`;
+                return `${key} = ?`;
+            })
+            .join(" AND ");
         const whereClause = criteriaKeys.length > 0 ? `WHERE ${whereBinding}` : "";
+
+        // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
+        const valuesBinding = criteriaValues.filter((value) => value !== null && value !== "NOT NULL");
 
         const [results] = await this.pool.execute<RowDataPacket[]>(
             `SELECT ${columns} FROM ${table} ${whereClause}`,
-            criteriaValues,
+            valuesBinding,
         );
         return results;
     }
@@ -85,11 +102,22 @@ export class DatabaseHelper {
     async updateInDatabase(table: string, data: DataPairs, criteria: DataPairs = {}): Promise<void> {
         const dataKeys = Object.keys(data).map((key) => `${key} = ?`);
         const criteriaKeys = Object.keys(criteria).map((key) => {
+            const value = criteria[key];
+            // Check for NULL specifically to handle IS NULL and IS NOT NULL
+            if (value === null) {
+                return `${key} IS NULL`;
+            }
+            if (value === "NOT NULL") {
+                return `${key} IS NOT NULL`;
+            }
             // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
             if (key.includes(" ")) return `${key} ?`;
             return `${key} = ?`;
         });
-        const values = [...Object.values(data), ...Object.values(criteria)];
+        const values = [
+            ...Object.values(data),
+            ...Object.values(criteria).filter((value) => value !== null && value !== "NOT NULL"),
+        ];
 
         await this.pool.execute(
             `UPDATE ${table} SET ${dataKeys.join(", ")} WHERE ${criteriaKeys.join(" AND ")}`,
