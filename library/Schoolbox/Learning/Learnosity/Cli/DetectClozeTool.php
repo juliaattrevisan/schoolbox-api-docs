@@ -114,10 +114,12 @@ HELP;
             if (!isset($stack[$assessId]['questions'][$discriminator])) {
                 $stack[$assessId]['questions'][$discriminator] = [
                     'question' => $question,
-                    'collisions' => 0
+                    'questionId' => [$questionId],
                 ];
             } else {
-                $stack[$assessId]['questions'][$discriminator]['collisions']++;
+                /* Add it to the list of colliding questions
+                 */
+                $stack[$assessId]['questions'][$discriminator]['questionId'][] = $questionId;
             }
         }
 
