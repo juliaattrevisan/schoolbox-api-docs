@@ -40,11 +40,11 @@ class Factory
     public const SOURCE_NAME = 'suds_civica';
 
 
-    /**
-     * Get timetable classes occurring this far in the past
-     * Measured in months, defaults to -1 month
-     */
-    private const FROM = -1;
+//    /**
+//     * Get timetable classes occurring this far in the past
+//     * Measured in months, defaults to -1 month
+//     */
+//    private const FROM = -1;
 
 
     /**
