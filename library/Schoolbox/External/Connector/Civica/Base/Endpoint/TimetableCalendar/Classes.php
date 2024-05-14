@@ -103,7 +103,7 @@ class Classes implements IStrategy
         $this->log->debug(sprintf(
             'Processing lessons between %s and %s',
             $this->fromDate,
-            $this->toDate
+            $this->toDate,
         ));
 
         /* /api/0/TeachingGroups/ByDate is broken and returns no data;
@@ -111,7 +111,10 @@ class Classes implements IStrategy
          * endpoint instead and manually filter out all the jank we don't need;
          * what a waste
          */
-        $pages = $this->api->retrieveForJurisdiction('GET', 'TeachingGroups/Jurisdiction');
+        $pages = $this->api->retrieveForJurisdiction('GET', 'TeachingGroups/Jurisdiction/ByDate', [
+            'startDate' => $this->fromDate->getDatabaseDate(),
+            'endDate' => $this->toDate->getDatabaseDate()
+        ]);
 
         foreach ($pages as $page) {
             foreach ($page['values'] as $class) {
@@ -214,7 +217,7 @@ class Classes implements IStrategy
                     $class['className']
                 ));
 
-                return;
+                continue;
             }
 
             /* Event ended in the past; ignore it
@@ -226,7 +229,7 @@ class Classes implements IStrategy
                     $class['className']
                 ));
 
-                return;
+                continue;
             }
 
             /* Save sis_event record
