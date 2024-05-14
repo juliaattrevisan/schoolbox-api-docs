@@ -38,7 +38,7 @@
             <li class="separator">Switch back to User</li>
             {% if user.previous and user.previous.id != (user.initial.id ?? null) %}
                 <li class="user">
-                    <a class="no-pad" href="/user/switch/{{ user.previous.id }}" title="Return to {{ user.previous.formatName }}">
+                    <a class="no-pad" href="{{ routeLookup('user.recoverSessionPrevious') }}" title="Return to {{ user.previous.formatName }}">
                         <div class="card small-12">
                             {% include 'include/portrait.twig' with {user: user.previous} only %}
                             <p>{{ user.previous.formatName }}</p>
@@ -49,7 +49,7 @@
             {% endif %}
             {% if user.initial %}
                 <li class="user">
-                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.initial.formatName }}">
+                    <a class="no-pad" href="{{ routeLookup('user.recoverSessionInitial') }}" title="Return to {{ user.initial.formatName }}">
                         <div class="card small-12">
                             {% include 'include/portrait.twig' with {user: user.initial} only %}
                             <p>{{ user.initial.formatName }}</p>
@@ -67,7 +67,7 @@
             {% for linkedUser in user.current.linkedUsers %}
                 {% if not previousUser or previousUser.id != linkedUser.id %}
                 <li class="user">
-                    <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                    <a class="no-pad" href="{{ routeLookup('user.impersonate', {userId: linkedUser.id}) }}" title="Switch to {{ linkedUser.formatName }}">
                         <div class="card small-12">
                             {% include 'include/portrait.twig' with {user: linkedUser} only %}
                             <p>{{ linkedUser.formatName }}</p>
