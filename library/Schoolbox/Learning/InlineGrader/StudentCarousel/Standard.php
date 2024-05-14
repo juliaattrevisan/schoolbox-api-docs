@@ -141,7 +141,7 @@ class Standard
                     <div class=\"card small-10\">
                         <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" alt=\"View Profile\" />
                         <p>{$fullname}</p>
-                        <span class=\"label status {$css}\">{$label}</span>
+                        <span class=\"label status {$css}\" data-test=\"assessment-student-carousel-statusLabel-{$currentParticipant->getUser()->getId()}\">{$label}</span>
                     </div>
                 </div>
             ";

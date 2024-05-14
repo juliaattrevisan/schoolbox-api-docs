@@ -84,7 +84,11 @@ export class DatabaseHelper {
      */
     async updateInDatabase(table: string, data: DataPairs, criteria: DataPairs = {}): Promise<void> {
         const dataKeys = Object.keys(data).map((key) => `${key} = ?`);
-        const criteriaKeys = Object.keys(criteria).map((key) => `${key} = ?`);
+        const criteriaKeys = Object.keys(criteria).map((key) => {
+            // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
+            if (key.includes(" ")) return `${key} ?`;
+            return `${key} = ?`;
+        });
         const values = [...Object.values(data), ...Object.values(criteria)];
 
         await this.pool.execute(

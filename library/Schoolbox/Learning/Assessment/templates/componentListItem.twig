@@ -39,7 +39,7 @@
     {% if isActionRoutes %}
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% apply spaceless %}
-                {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
+                {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}">View Status</a></li>{% endif %}
                 {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
 
                 {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
