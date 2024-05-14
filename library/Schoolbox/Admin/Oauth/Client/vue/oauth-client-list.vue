@@ -340,20 +340,20 @@ window.Vue.onMounted(() => {
 
         <reveal-modal ref="addItemModal">
             <h2>Add oAuth Client</h2>
-            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
+            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <label for="addItem-name" class="required">Name</label>
             <p class="meta">
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
                 whether they wish to share their details.
             </p>
-            <input id="addItem-name" required v-model="addingItem.name" />
+            <input id="addItem-name" v-model="addingItem.name" required />
 
             <label for="addItem-redirectUri" class="required">Redirect URI</label>
             <p class="meta">
                 When the user approves a request to share details, where should they be redirected to? (This URI must be
                 able to process an oAuth authorization code.)
             </p>
-            <input id="addItem-redirectUri" required v-model="addingItem.redirectUri" />
+            <input id="addItem-redirectUri" v-model="addingItem.redirectUri" required />
 
             <label for="addItem-clientCredentialsUser">Client Credentials User</label>
             <p class="meta">
@@ -362,6 +362,9 @@ window.Vue.onMounted(() => {
                 client may not use client credentials requests.
             </p>
             <v-select
+                v-model="addingItem.clientCredentialsUser"
+                label="fullName"
+                placeholder="Search for user, or leave empty for no user"
                 input-id="addItem-clientCredentialsUser"
                 :options="searchUsers"
                 class="schoolbox-vue-selectize"
@@ -369,9 +372,6 @@ window.Vue.onMounted(() => {
                 :clear-search-on-select="true"
                 :close-on-select="true"
                 @search="onUserSearch"
-                label="fullName"
-                placeholder="Search for user, or leave empty for no user"
-                v-model="addingItem.clientCredentialsUser"
             >
                 <template #option="option">
                     <span class="d-center">{{ option.fullName }}</span>
@@ -383,8 +383,8 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="addItem" href="#">Add</a>
-                    <a class="button" @click.prevent="$refs.addItemModal.close" href="#">Cancel</a>
+                    <a href="#add-item" class="button" @click.prevent="addItem">Add</a>
+                    <a href="#cancel" class="button" @click.prevent="$refs.addItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -392,16 +392,16 @@ window.Vue.onMounted(() => {
         <reveal-modal ref="itemAddedModal">
             <h2>oAuth Client Added</h2>
             <label for="itemAdded-name">Name</label>
-            <input id="itemAdded-name" readonly v-model="addingItem.name" />
+            <input id="itemAdded-name" v-model="addingItem.name" readonly />
 
             <label for="itemAdded-redirectUri">Redirect URI</label>
-            <input id="itemAdded-redirectUri" readonly v-model="addingItem.redirectUri" />
+            <input id="itemAdded-redirectUri" v-model="addingItem.redirectUri" readonly />
 
             <label for="itemAdded-clientId">Client ID</label>
-            <input id="itemAdded-clientId" readonly v-model="addingItem.clientId" />
+            <input id="itemAdded-clientId" v-model="addingItem.clientId" readonly />
 
             <label for="itemAdded-clientSecret">Client Secret</label>
-            <input id="itemAdded-clientSecret" readonly v-model="addingItem.clientSecret" />
+            <input id="itemAdded-clientSecret" v-model="addingItem.clientSecret" readonly />
 
             <label for="itemAdded-clientCredentialsUser">Client Credentials User</label>
             <select id="itemAdded-clientCredentialsUser" readonly>
@@ -415,27 +415,27 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="$refs.itemAddedModal.close" href="#">Close</a>
+                    <a href="#close" class="button" @click.prevent="$refs.itemAddedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
 
         <reveal-modal ref="modifyItemModal">
             <h2>Modify oAuth Client</h2>
-            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
+            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <label for="modifyItem-name" class="required">Name</label>
             <p class="meta">
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
                 whether they wish to share their details.
             </p>
-            <input id="modifyItem-name" required v-model="modifyingItem.name" />
+            <input id="modifyItem-name" v-model="modifyingItem.name" required />
 
             <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
             <p class="meta">
                 When the user approves a request to share details, where should they be redirected to? (This URI must be
                 able to process an oAuth authorization code.)
             </p>
-            <input id="modifyItem-redirectUri" required v-model="modifyingItem.redirectUri" />
+            <input id="modifyItem-redirectUri" v-model="modifyingItem.redirectUri" required />
 
             <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
             <p class="meta">
@@ -444,6 +444,9 @@ window.Vue.onMounted(() => {
                 client may not use client credentials requests.
             </p>
             <v-select
+                v-model="modifyingItem.clientCredentialsUser"
+                label="fullName"
+                placeholder="Search for user, or leave empty for no user"
                 input-id="modifyItem-clientCredentialsUser"
                 :options="searchUsers"
                 class="schoolbox-vue-selectize"
@@ -451,9 +454,6 @@ window.Vue.onMounted(() => {
                 :clear-search-on-select="true"
                 :close-on-select="true"
                 @search="onUserSearch"
-                label="fullName"
-                placeholder="Search for user, or leave empty for no user"
-                v-model="modifyingItem.clientCredentialsUser"
             >
                 <template #option="option">
                     <span class="d-center">{{ option.fullName }}</span>
@@ -465,8 +465,8 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="modifyItem(modifyingItem)" href="#">Modify</a>
-                    <a class="button" @click.prevent="$refs.modifyItemModal.close" href="#">Cancel</a>
+                    <a href="#modify" class="button" @click.prevent="modifyItem(modifyingItem)">Modify</a>
+                    <a href="#cancel" class="button" @click.prevent="$refs.modifyItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -480,8 +480,10 @@ window.Vue.onMounted(() => {
             </div>
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="regenerateItem(regeneratingItem)" href="#">Regenerate</a>
-                    <a class="button" @click.prevent="$refs.regenerateItemModal.close" href="#">Cancel</a>
+                    <a href="#regenerate" class="button" @click.prevent="regenerateItem(regeneratingItem)"
+                        >Regenerate</a
+                    >
+                    <a href="#cancel" class="button" @click.prevent="$refs.regenerateItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
@@ -490,7 +492,7 @@ window.Vue.onMounted(() => {
             <h2>Client Secret for oAuth Client {{ regeneratingItem.name }} Regenerated</h2>
 
             <label for="itemRegenerated-clientSecret">Client Secret</label>
-            <input id="itemRegenerated-clientSecret" readonly v-model="regeneratingItem.clientSecret" />
+            <input id="itemRegenerated-clientSecret" v-model="regeneratingItem.clientSecret" readonly />
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
@@ -498,7 +500,7 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="$refs.itemRegeneratedModal.close" href="#">Close</a>
+                    <a href="#close" class="button" @click.prevent="$refs.itemRegeneratedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
@@ -507,8 +509,8 @@ window.Vue.onMounted(() => {
             <h2>Delete oAuth Client {{ deletingItem.name }}?</h2>
             <div class="component-action">
                 <section>
-                    <a class="button" @click.prevent="deleteItem(deletingItem)" href="#">Delete</a>
-                    <a class="button" @click.prevent="$refs.deleteItemModal.close" href="#">Cancel</a>
+                    <a href="#delete" class="button" @click.prevent="deleteItem(deletingItem)">Delete</a>
+                    <a href="#cancel" class="button" @click.prevent="$refs.deleteItemModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
