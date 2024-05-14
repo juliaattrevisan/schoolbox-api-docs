@@ -104,7 +104,7 @@ class Kernel extends WebKernelAbstract
             die;
         }
 
-        // First get the request object
+        // First get the request object.
         /** @var ServerRequestInterface $request */
         $request = $this->di->get('httpRequest');
 
