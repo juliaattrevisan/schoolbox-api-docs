@@ -16,7 +16,7 @@ interface Props {
     getListEndpoint: string; // The endpoint for fetching the list of items.
     postItemEndpoint: string; // The endpoint for posting a new item to.
     userSearchEndpoint: string; // The endpoint to which user search requests are submitted.
-    userSearchQueryParam: string; // The query string parameter to submit the user search parameter within, when performing a user search.
+    // userSearchQueryParam: string; // The query string parameter to submit the user search parameter within, when performing a user search.
     // userSearchAdditionalParams: {
     //         // Any additional query string parameters to submit to the user
     //         // search endpoint.
@@ -39,7 +39,12 @@ const regeneratingItem = window.Vue.ref({});
 const deletingItem = window.Vue.ref({});
 const searchUsers = window.Vue.ref([]);
 const saveError = window.Vue.ref(null);
+const userSearchQueryParam = window.Vue.ref("");
+const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
 
+/**
+ *
+ */
 async function getData() {
     try {
         const response = await fetch(props.getListEndpoint);
@@ -52,16 +57,22 @@ async function getData() {
     }
 }
 
+/**
+ *
+ */
 function showAddModal() {
     saveError.value = null;
     addingItem.value = {};
     // this.$refs.addItemModal.open();
 }
 
+/**
+ *
+ */
 async function addItem() {
     try {
         // this.$refs.toast.activate("Creating...");
-        const response = await fetch(postItemEndpoint.value, {
+        const response = await fetch(props.postItemEndpoint, {
             method: "POST",
             body: JSON.stringify(addingItem.value),
             headers: {
@@ -88,12 +99,18 @@ async function addItem() {
     }
 }
 
+/**
+ *
+ */
 function showModifyModal(item) {
     saveError.value = null;
     modifyingItem.value = { ...item };
     // this.$refs.modifyItemModal.open();
 }
 
+/**
+ *
+ */
 async function modifyItem(item) {
     try {
         // this.$refs.toast.activate("Modifying...");
@@ -124,12 +141,18 @@ async function modifyItem(item) {
     }
 }
 
+/**
+ *
+ */
 function showRegenerateModal(item) {
     saveError.value = null;
     regeneratingItem.value = { ...item };
     // this.$refs.regenerateItemModal.open();
 }
 
+/**
+ *
+ */
 async function regenerateItem(item) {
     try {
         // this.$refs.toast.activate("Regenerating...");
@@ -156,11 +179,17 @@ async function regenerateItem(item) {
     }
 }
 
+/**
+ *
+ */
 function showDeleteModal(item) {
     deletingItem.value = { ...item };
     // this.$refs.deleteItemModal.open();
 }
 
+/**
+ *
+ */
 async function deleteItem(item) {
     try {
         await fetch(item._links.delete, {
@@ -177,31 +206,40 @@ async function deleteItem(item) {
 
 /**
  * Search callback for the user selectize.
- *
  * This method is debounced so that the search doesn't trigger until
  * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
  * milliseconds.
- *
- * @param {String}   query   The search string
- * @param {Function} loading A function to call when the loading state
- *                           changes (accepts a Boolean)
+ * @param {string} query -The search string
+ * @param {Function} loading - A function to call when the loading state changes (accepts a Boolean)
  */
-// onUserSearch: debounce(async function (query, loading) {
-//     if (query.length < 3) {
-//         return;
-//     }
-//     loading(true);
+const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => void) => {
+    if (query.length < 3) {
+        return;
+    }
+    loading(true);
 
-//     let searchUrl = new URL(this.userSearchEndpoint, window.location),
-//         searchParams = this.userSearchAdditionalParams;
-//     searchParams[this.userSearchQueryParam] = query;
-//     searchUrl.search = new URLSearchParams(searchParams);
-//     console.log(searchUrl);
-//     const response = await fetch(searchUrl);
-//     const responseJson = await response.json();
-//     this.searchUsers = responseJson.data;
-//     loading(false);
-// }, SEARCH_RESULT_RETRIEVE_DELAY),
+    const searchUrl = new URL(props.userSearchEndpoint, window.location);
+    const searchParams = userSearchAdditionalParams.value;
+    searchParams[userSearchQueryParam.value] = query;
+    searchUrl.search = new URLSearchParams(searchParams);
+    console.log(searchUrl);
+    // const response = await fetch(searchUrl);
+    // const responseJson = await response.json();
+    // searchUsers.value = responseJson.data;
+    // loading(false);
+    fetch(searchUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            searchUsers.value = data;
+        })
+        .finally(() => {
+            loading(false);
+        })
+        .catch(() => {
+            // console.warn(error);
+            // hasLoadError.value = true;
+        });
+}, SEARCH_RESULT_RETRIEVE_DELAY);
 
 window.Vue.onMounted(() => {
     void getData();
