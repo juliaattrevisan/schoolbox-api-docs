@@ -101,7 +101,12 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-        $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        // Can I build a date? If not silently provide nothing
+        try {
+            $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        } catch (\InvalidArgumentException) {
+            return '';
+        }
 
         /* Only generate links where possible
          */
