@@ -61,7 +61,7 @@ class Controller extends Base
 
         if ($sessionHandler->create($user->getUsername())) {
             // Log the session which began impersonation
-            $_SESSION['initial'] ??= $initialSession;
+            $_SESSION['initial'] ??= $currentSession;
 
             // Log the current session in the previous
             $_SESSION['previous'] = $currentSession;
@@ -70,7 +70,7 @@ class Controller extends Base
             // IMO it is always the top-level user
             // (the user who first started impersonating)
             /** @var User $initialUser */
-            $initialUser = $_SESSION['initial']['user'];
+            $initialUser = $initialSession['user'] ?? $currentSession['user'];
 
             $logItem = $this->assumeUserLogMapper->createModel()
                 ->setUser($initialUser->getUsername())
