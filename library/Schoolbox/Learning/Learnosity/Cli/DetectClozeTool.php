@@ -85,6 +85,7 @@ HELP;
             SELECT
                 assess.assess_id,
                 assess.title,
+                assess.learnosity_reference,
                 assess_section.section_id,
                 assess_question.question_id,
                 assess_question.question,
@@ -111,6 +112,7 @@ HELP;
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $assessId = $row['assess_id'];
             $title = $row['title'];
+            $learnosityReference = $row['learnosity_reference'];
             $questionId = $row['question_id'];
             $question = trim((string)$row['question']);
             $answer = $row['answer'];
@@ -122,6 +124,7 @@ HELP;
             if (!isset($stack[$assessId])) {
                 $stack[$assessId] = [
                     'title' => $title,
+                    'learnosity_reference' => $learnosityReference,
                     'questions' => []
                 ];
             }
@@ -187,11 +190,14 @@ HELP;
                 }
             }
 
+            /* A set of (assess id, learnosity reference) tuples for ones we can fix,
+             * and ones we can't.
+             */
             if (!$hasCollisions) {
-                $analysis['repairable']['ids'][] = $assessId;
+                $analysis['repairable']['ids'][$assessId] = $assessData['learnosity_reference'];
                 $analysis['repairable']['count']++;
             } else {
-                $analysis['inconclusive']['ids'][] = $assessId;
+                $analysis['inconclusive']['ids'][$assessId] = $assessData['learnosity_reference'];
                 $analysis['inconclusive']['count']++;
             }
         }
