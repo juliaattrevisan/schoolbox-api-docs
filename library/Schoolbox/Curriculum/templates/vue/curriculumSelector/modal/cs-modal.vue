@@ -45,9 +45,7 @@ const selectedNodeDetails = window.Vue.ref(getEmptyNode());
  */
 window.Vue.onMounted(() => {
     modalStore.isSingleSelect = props.isSingleSelect;
-    if (props.startingNodeId !== UNSET_ID) {
-        modalViewNodesStore.toStartingNodeId(props.startingNodeId);
-    }
+    void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
 });
 
 /**
@@ -64,15 +62,12 @@ window.Vue.watch(
 );
 
 /**
- *
+ * To update the starting node id to start the modal on
  */
 window.Vue.watch(
     () => props.startingNodeId,
     () => {
-        if (props.startingNodeId !== UNSET_ID) {
-            modalViewNodesStore.reset();
-            void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
-        }
+        void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
     },
 );
 

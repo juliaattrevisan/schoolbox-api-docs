@@ -20,7 +20,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
     const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
     const modalStore = useModalStore(); // to open the modal
-    const startingNodeId = window.Vue.ref<number | undefined>(undefined); // to open the modal at a specific node
+    const startingNodeId = window.Vue.ref<number>(UNSET_ID); // to open the modal at a specific node
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
     let currentFolderId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
     let currentComponentId: number | null = null; // to target the appropriate folderNodesStore.selectedNodes when updating via the curriculum modal
@@ -63,7 +63,9 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             // so the watch above doesn't trigger, setting off an infinite loop
             selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal
         });
-        startingNodeId.value = folderNodesStore().filter ? folderNodesStore().filter?.id : undefined;
+        // get the filter id to open the modal at the correct node, otherwise open at the root
+        const { filter } = folderNodesStore();
+        startingNodeId.value = filter !== null ? filter.id : UNSET_ID;
         modalStore.open();
     }
 
