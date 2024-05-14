@@ -49,8 +49,8 @@ class User implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $initialUser  = $this->session->get('initialUser');
-        $previousUser = $this->session->get('previousUser');
+        $initialUser  = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
+        $previousUser = $this->session->get(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER);
         $this->session->set('no_header', $this->session->get('no_header') ?: isset($_GET['no_header']));
 
         return [

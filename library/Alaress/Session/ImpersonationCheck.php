@@ -17,6 +17,13 @@ use Schoolbox\User;
 class ImpersonationCheck
 {
     /**
+     * Session keys for storing the initial and previous users in the
+     * impersonation chain.
+     */
+    public const SESSION_KEY_INITIAL_USER = 'initialUser';
+    public const SESSION_KEY_PREVIOUS_USER = 'previousUser';
+
+    /**
      * Returns whether the current session is an impersonation of another user.
      *
      * Merely switching to a linked user is not considered impersonation.

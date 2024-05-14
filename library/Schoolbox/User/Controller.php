@@ -8,6 +8,7 @@
 
 namespace Schoolbox\User;
 
+use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -55,20 +56,20 @@ class Controller extends Base
     public function impersonate(User $user)
     {
         $currentUser    = $this->getUser();
-        $initialUser    = $this->session->get('initialUser');
+        $initialUser    = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $sessionHandler = new \Session();
 
         if ($sessionHandler->create($user->getUsername())) {
             // Log the user which began impersonation
-            $this->session->set('initialUser', $initialUser ?? $currentUser);
+            $this->session->set(ImpersonationCheck::SESSION_KEY_INITIAL_USER, $initialUser ?? $currentUser);
 
             // Log the current user in the previous
-            $this->session->set('previousUser', $currentUser);
+            $this->session->set(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER, $currentUser);
 
             // Who assumed this session? IMO it is always the initial user
             // (the user who first started impersonating)
             /** @var User $initialUser */
-            $initialUser = $this->session->get('initialUser', $currentUser);
+            $initialUser = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER, $currentUser);
 
             $logItem = $this->assumeUserLogMapper->createModel()
                 ->setUser($initialUser->getUsername())
@@ -110,10 +111,10 @@ class Controller extends Base
         // Preserve initial user, also previous user = current user so that this
         // session may itself recover its initial and previous user
         $currentUser = $this->getUser();
-        $initialUser = $this->session->get('initialUser');
-        $this->recoverSessionInternal('previousUser');
-        $this->session->set('initialUser', $initialUser);
-        $this->session->set('previousUser', $currentUser);
+        $initialUser = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
+        $this->recoverSessionInternal(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER);
+        $this->session->set(ImpersonationCheck::SESSION_KEY_INITIAL_USER, $initialUser);
+        $this->session->set(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER, $currentUser);
     }
 
     /**
@@ -125,7 +126,7 @@ class Controller extends Base
      */
     public function recoverSessionInitial(): void
     {
-        $this->recoverSessionInternal('initialUser');
+        $this->recoverSessionInternal(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
     }
 
     /**
