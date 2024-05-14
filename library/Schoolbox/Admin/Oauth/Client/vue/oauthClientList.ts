@@ -1,10 +1,7 @@
-import { createPinia } from "pinia";
-import OauthClientList from "./oauth-client-list";
+import OauthClientList from "./oauth-client-list.vue";
 
 window.Vue.createApp({
     components: {
         OauthClientList,
     },
-})
-    .use(createPinia())
-    .mount("#oauth-client-list");
+}).mount("#oauth-client-list");
