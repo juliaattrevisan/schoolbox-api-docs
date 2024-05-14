@@ -193,11 +193,16 @@ HELP;
             /* A set of (assess id, learnosity reference) tuples for ones we can fix,
              * and ones we can't.
              */
+            $tuple = [
+                'title' => $assessData['title'],
+                'learnosity_reference' => $assessData['learnosity_reference'],
+            ];
+
             if (!$hasCollisions) {
-                $analysis['repairable']['ids'][$assessId] = $assessData['learnosity_reference'];
+                $analysis['repairable']['ids'][$assessId] = $tuple;
                 $analysis['repairable']['count']++;
             } else {
-                $analysis['inconclusive']['ids'][$assessId] = $assessData['learnosity_reference'];
+                $analysis['inconclusive']['ids'][$assessId] = $tuple;
                 $analysis['inconclusive']['count']++;
             }
         }
