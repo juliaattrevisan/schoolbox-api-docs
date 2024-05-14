@@ -17,8 +17,9 @@ const props = defineProps<Props>();
 
 const curriculumStore = useUnitPlannerCurriculumStore();
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column),
+    curriculumStore.getComponent(props.unit.curriculum.components, props.column),
 );
+const isCreating = window.Vue.ref(false);
 
 /**
  * To respond to a new curriculum component being created
@@ -26,19 +27,30 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
 window.Vue.watch(
     () => props.unit.curriculum.components,
     () => {
-        component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
+        component.value = curriculumStore.getComponent(props.unit.curriculum.components, props.column);
     },
     { deep: true },
 );
 
 /**
+ * To display the appropriate text for the create button
+ * @returns {string} The text to display on the create button
+ */
+const createText = window.Vue.computed(() => {
+    return isCreating.value ? "Creating..." : "Create Curriculum";
+});
+
+/**
  * To create a new curriculum component, adding it to the relevant units homepage
  */
 async function onCreateSelected() {
-    if (curriculumStore.isProcessing) {
+    if (isCreating.value) {
         return;
     }
-    await curriculumStore.createCurriculumComponent(props.unit, props.column);
+    isCreating.value = true;
+    await curriculumStore.createComponent(props.unit, props.column);
+    await window.Vue.nextTick();
+    isCreating.value = false;
 }
 
 /**
@@ -57,7 +69,7 @@ function onModifySelected() {
 <template>
     <div v-if="component === null" class="component-action">
         <section>
-            <button @click.prevent="onCreateSelected">Create Curriculum</button>
+            <button @click.prevent="onCreateSelected">{{ createText }}</button>
         </section>
     </div>
     <fn-actions

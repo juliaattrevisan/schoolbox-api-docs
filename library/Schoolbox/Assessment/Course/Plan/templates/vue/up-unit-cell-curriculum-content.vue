@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 
 const curriculumStore = useUnitPlannerCurriculumStore();
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
-    curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column),
+    curriculumStore.getComponent(props.unit.curriculum.components, props.column),
 );
 
 /**
@@ -25,7 +25,7 @@ const component = window.Vue.ref<CurriculumOverviewComponent | null>(
 window.Vue.watch(
     () => props.unit.curriculum.components,
     () => {
-        component.value = curriculumStore.getCurriculumComponent(props.unit.curriculum.components, props.column);
+        component.value = curriculumStore.getComponent(props.unit.curriculum.components, props.column);
     },
     { deep: true },
 );
