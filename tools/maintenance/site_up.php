@@ -16,13 +16,12 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $dbc = $this->getDatabaseInternal();
-        $log = $this->getLogger();
         $success = $dbc->execute('UPDATE config SET value = 0 WHERE name = "maintenance_mode"');
 
         if ($success) {
-            $log->info('Maintenance mode disabled.');
+            echo "Maintenance mode disabled.\n";
         } else {
-            $log->info('Maintenance mode could not be disabled.');
+            echo "Maintenance mode could not be disabled.\n";
         }
     }
 };

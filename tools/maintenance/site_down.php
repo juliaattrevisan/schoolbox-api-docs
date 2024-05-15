@@ -16,14 +16,13 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $dbc = $this->getDatabaseInternal();
-        $log = $this->getLogger();
         $success = $dbc->execute('UPDATE config SET value = 1 WHERE name = "maintenance_mode"');
 
         # IMPORTANT - IF YOU CHANGE THIS FILE, YOU MUST PORT THE SAME LOGICAL CHANGE TO debian/preinst
         if ($success) {
-            $log->info('Maintenance mode enabled.');
+            echo "Maintenance mode enabled.\n";
         } else {
-            $log->info('Maintenance mode could not be enabled.');
+            echo "Maintenance mode could not be enabled.\n";
         }
     }
 };
