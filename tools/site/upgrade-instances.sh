@@ -170,9 +170,9 @@ function upgrade_instances(){
 
     # if output contains 'Maintenance mode enabled'...
     if [[ output == *"Maintenance mode enabled"* ]]; then
-      echo " * instance $i is offline"
+      log " * instance $i is offline"
     else
-      echo " * PROBLEM: Could not take instance $i offline. Exiting."
+      error " * Could not take instance $i offline. Exiting."
       exit 1;
     fi
   }
@@ -243,9 +243,9 @@ function upgrade_instances(){
     output = INSTANCE_ID="$i" "$site_root"/site_up.sh
     # if output contains 'Maintenance mode enabled'...
     if [[ output == *"Maintenance mode disabled"* ]]; then
-      echo "Instance $i is back online"
+      log "Instance $i is back online"
     else
-      echo "PROBLEM: Could not bring instance $i back online. Continuing."
+      error "Could not bring instance $i back online. Continuing." >> "$instance_log_file" 2>&1
     fi
   } &
   done
