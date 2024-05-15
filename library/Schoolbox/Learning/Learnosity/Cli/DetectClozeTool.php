@@ -64,9 +64,16 @@ HELP;
         $this->getLogger()->info('Learnosity Detect Cloze.');
         $this->getLogger()->info('');
 
+        /* Initialise dependencies
+         * Note: we don't have access to $_SERVER superglobal here
+         */
+        $server = (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
+        $serverName = $server->getHost();
+        $domain = (string)$server;
+
         /* Find all the quizzes that contain a cloze exercise
          */
-        $stack = $this->findCandidates();
+        $stack = $this->findCandidates($domain);
 
         /* Inspect the stack for things we can fix and things we can't
          */
@@ -80,9 +87,10 @@ HELP;
      * Find all the quizzes that contain cloze questions and keep a count
      * of how many times identical question text
      *
+     * @param string $domain
      * @return array
      */
-    private function findCandidates(): array {
+    private function findCandidates(string $domain): array {
         $query = "
             SELECT
                 assess.assess_id,
@@ -116,7 +124,7 @@ HELP;
             $title = $row['title'];
             $learnosityReference = $row['learnosity_reference'];
             $questionId = $row['question_id'];
-            $question = trim((string)$row['question']);
+            $question = (string)$row['question'];
             $answer = $row['answer'];
 
             /* Detect if multiple question stimuli functionally collide
@@ -133,7 +141,10 @@ HELP;
 
             if (!isset($stack[$assessId]['questions'][$discriminator])) {
                 $stack[$assessId]['questions'][$discriminator] = [
-                    'question' => $question,
+                    'question' => [
+                        'original' => $question,
+                        'learnosity_stimulus' => $this->produceQuestionText($question)
+                    ],
                     'questionId' => [$questionId],
                 ];
             } else {
@@ -210,5 +221,19 @@ HELP;
         }
 
         return $analysis;
+    }
+
+
+    /**
+     * Prepares an arbitrary question richtext $question contents
+     *    * negates attacks
+     *    * replaces relative urls with absolute urls
+     *
+     * @param string $question
+     * @return string
+     */
+    protected function produceQuestionText(string $question): string
+    {
+        return \Scrub::htmlAbsoluteUri($question, $this->domain);
     }
 }
