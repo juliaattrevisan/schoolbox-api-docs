@@ -23,6 +23,20 @@ class DetectClozeTool extends CliTool\App
 
 
     /**
+     * Show the analysis of quizzes to find out how many are conclusive
+     * and how many aren't
+     */
+    private const OPT_LONG_ANALYSIS = 'analysis';
+
+
+    /**
+     * Show payloads that would potentially repair conclusively-broken cloze exercises
+     * Use --perform to actually do the deed
+     */
+    private const OPT_LONG_REPAIR = 'repair';
+
+
+    /**
      * @var Api
      */
     private Api $api;
@@ -45,6 +59,8 @@ class DetectClozeTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_ANALYSIS,
+            self::OPT_LONG_REPAIR,
         ];
     }
 
@@ -59,7 +75,7 @@ Find out how many legacy quizzes contain cloze exercise questions (fillgap)
 because we mis-imported them at the start of 2024 during the mega migration.
 These will have used the wrong regex to parse answers.
 
-Usage: detectcloze.php [-vvv]
+Usage: detectcloze.php [--analyse] [--repair] [--perform] [-vvv]
 
 
 HELP;
@@ -87,11 +103,15 @@ HELP;
 
         /* Inspect the stack for things we can fix and things we can't
          */
-        $analysis = $this->analyse($stack);
+        if ($this->getOpt(self::OPT_LONG_ANALYSIS)) {
+            print_r($this->analyse($stack));
+        }
 
         /* Inspect the stack for possible repair payloads
         */
-        $this->repair($stack);
+        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+            $this->repair($stack);
+        }
     }
 
 
@@ -287,11 +307,31 @@ HELP;
                 /* Only repair questions that could be conslusively repaired
                  * Ignore uncertainties
                  */
-                if (1 === \count($questionData['questionId'])) {
-                    print_r($questionData['answer']['repair']);
+                if (1 !== \count($questionData['questionId'])) {
+                    continue;
+                }
 
-                    /* TODO if ($this->>perform()) { ...send payloads ... }
+                /* Perform Mode tells learnosity to get fixed up
+                 * TODO actual update
+                 */
+                if ($this->perform()) {
+                    $this->getLogger()->info('sending to learnosity');
+
+                    /* Find the learnosity quiz for $assessData['learnosity_reference']
                      */
+
+                    /* Iterate through all the items
+                     */
+
+                    /* Find the Item tha contains a question whose text matches
+                     * predicted_learnosity_stimulus
+                     */
+
+                    /* Update it with the repair payload
+                     */
+
+                } else {
+                    print_r($questionData['answer']['repair']);
                 }
             }
         }
