@@ -14,6 +14,7 @@ use ErrorException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
@@ -261,12 +262,25 @@ class Kernel extends CliKernelAbstract
 
 
     /**
+     * @param ConfigLoader $config
+     * @return void
+     */
+    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    {
+        if ($config->get('maintenance_mode')) {
+            echo "Service is unavailable because maintenance mode is enabled.\n";
+            die;
+        }
+    }
+
+
+    /**
      * @inheritDoc
      * @throws \Throwable
      */
     protected function postInstallDependencies(): void
     {
-        self::dieGracefullyIfInMaintenanceMode($this->di->get('config'), true);
+        self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
         $this->initRoutes();
         $this->initModules();
     }
