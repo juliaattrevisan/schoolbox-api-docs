@@ -264,11 +264,15 @@ abstract class Kernel
      * @param ConfigLoader $config
      * @return void
      */
-    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config, bool $cliMode = false): void
     {
         if ($config->get('maintenance_mode')) {
-            header('HTTP/1.1 503 Service Unavailable', true, 503);
-            echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
+            if ($cliMode) {
+                echo "Service unavailable\n";
+            } else {
+                header('HTTP/1.1 503 Service Unavailable', true, 503);
+                echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
+            }
             die;
         }
     }
