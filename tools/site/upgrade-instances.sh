@@ -163,16 +163,16 @@ function update_schoolbox_update_error_fact_file(){
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
 
-  log "Taking all instances offline..."
+  log "Taking all instances offline (by enabling maintenance mode)..."
   for i in $instance_list; do
   {
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh)
 
     # if output contains 'Maintenance mode enabled'...
     if [[ "$output" == *"Maintenance mode enabled"* ]]; then
-      log " * instance '$i' is offline"
+      log " * $output"
     else
-      error " * Could not take instance '$i' offline. Exiting."
+      error " * Unexpected output when trying to enable maintenance mode for instance '$i'.  Exiting."
       exit 1;
     fi
   }
@@ -242,11 +242,12 @@ function upgrade_instances(){
 
     # Bring instance back online.
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh)
+    echo "$output"
     # if output contains 'Maintenance mode disabled'...
     if [[ "$output" == *"Maintenance mode disabled"* ]]; then
       log "Instance '$i' is back online"
     else
-      error "Could not bring instance '$i' back online. Continuing." >> "$instance_log_file"
+      error "Unexpected output when trying to disable maintenance mode for instance '$i'.  Continuing." >> "$instance_log_file"
     fi
   } &
   done

@@ -17,7 +17,7 @@ output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "U
 
 if [[ "$output" == '' ]]; then
   # IMPORTANT: The string output here is checked for in upgrade-instances.sh.
-  echo "Maintenance mode enabled."
+  echo "Maintenance mode enabled for instance '$instanceId'."
 else
-  echo "Could not enable maintenance mode."
+  echo "Could not enable maintenance mode for instance '$instanceId'."
 fi
