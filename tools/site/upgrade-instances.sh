@@ -260,14 +260,6 @@ function restart_php_fpm(){
   service "$(systemctl -a  --plain --state=active | grep -Eo 'php.+fpm')" reload         # Ensure web requests use upgraded code
 }
 
-function remove_maintenance_page(){
-  # TODO, this will have no effect on cloud
-  if service nginx status >/dev/null 2>&1; then
-    "$site_root"/tools/maintenance/site_up.sh
-  fi
-}
-
-
 function restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
     log "---restarting daemons on primary host---";
@@ -346,7 +338,6 @@ function main() {
   upgrade_instances
   update_schoolbox_update_error_fact_file
   restart_php_fpm
-  remove_maintenance_page
   restart_daemons
   rebuild_cron_jobs
   reload_binding_cache
