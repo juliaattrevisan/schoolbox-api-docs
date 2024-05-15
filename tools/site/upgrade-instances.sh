@@ -169,7 +169,7 @@ function upgrade_instances(){
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh)
 
     # if output contains 'Maintenance mode enabled'...
-    if [[ $output == *"Maintenance mode enabled"* ]]; then
+    if [[ "$output" == *"Maintenance mode enabled"* ]]; then
       log " * instance $i is offline"
     else
       error " * Could not take instance $i offline. Exiting."
@@ -177,7 +177,7 @@ function upgrade_instances(){
     fi
   }
   done
-  log "Done"
+  log "All instances are offline."
 
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
@@ -243,7 +243,7 @@ function upgrade_instances(){
     # Bring instance back online.
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh)
     # if output contains 'Maintenance mode enabled'...
-    if [[ $output == *"Maintenance mode disabled"* ]]; then
+    if [[ "$output" == *"Maintenance mode disabled"* ]]; then
       log "Instance $i is back online"
     else
       error "Could not bring instance $i back online. Continuing." >> "$instance_log_file" 2>&1
