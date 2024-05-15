@@ -9,6 +9,8 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
+use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Fillgap;
 
 /**
  * Detect legacy quizzes containing cloze exercises.
@@ -21,15 +23,21 @@ class DetectClozeTool extends CliTool\App
 
 
     /**
-     * Corresponds to the Fillgap question type in luQuestionType
-     */
-    private const CLOZE_TYPE_ID = 3;
-
-
-    /**
      * @var Api
      */
     private Api $api;
+
+
+    /**
+     * @var string
+     */
+    private string $domain;
+
+
+    /**
+     * @var InlineImageConverter
+     */
+    private InlineImageConverter $inlineImageConverter;
 
 
     /** @inheritdoc */
@@ -69,17 +77,21 @@ HELP;
          */
         $server = (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
         $serverName = $server->getHost();
-        $domain = (string)$server;
+        $this->domain = (string)$server;
+
+        $this->inlineImageConverter = new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger());
 
         /* Find all the quizzes that contain a cloze exercise
          */
-        $stack = $this->findCandidates($domain);
+        $stack = $this->findCandidates();
 
         /* Inspect the stack for things we can fix and things we can't
          */
         $analysis = $this->analyse($stack);
 
-        print_r($analysis);
+        /* Inspect the stack for possible repair payloads
+        */
+        $this->repair($stack);
     }
 
 
@@ -87,10 +99,10 @@ HELP;
      * Find all the quizzes that contain cloze questions and keep a count
      * of how many times identical question text
      *
-     * @param string $domain
      * @return array
+     * @throws \DOMException
      */
-    private function findCandidates(string $domain): array {
+    private function findCandidates(): array {
         $query = "
             SELECT
                 assess.assess_id,
@@ -99,6 +111,7 @@ HELP;
                 assess_section.section_id,
                 assess_question.question_id,
                 assess_question.question,
+                assess_question.marks,
                 assess_answer.answer
             FROM assess
             INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
@@ -112,7 +125,7 @@ HELP;
         ";
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query, [
-            'typeId' => self::CLOZE_TYPE_ID
+            'typeId' => Fillgap::QUESTION_TYPE_ID
         ]);
 
         $statement->execute();
@@ -124,8 +137,22 @@ HELP;
             $title = $row['title'];
             $learnosityReference = $row['learnosity_reference'];
             $questionId = $row['question_id'];
-            $question = (string)$row['question'];
             $answer = $row['answer'];
+            $marks = $row['marks'];
+
+            try {
+                $question = $this->inlineImageConverter->convert((string)$row['question']);
+            } catch (\RuntimeException $e) {
+                /* This question has busted html
+                 * Skip it quietly
+                 */
+                $this->getLogger()->warning(sprintf(
+                   'question_id %s has unparseable html - it might be truncated; skipping',
+                   $row['question_id']
+               ));
+
+                continue;
+            }
 
             /* Detect if multiple question stimuli functionally collide
              */
@@ -139,13 +166,35 @@ HELP;
                 ];
             }
 
+            /* Emulate what we would have done during the mass migration:
+             * Apply an inline image conversion for base64-embedded data and purify it.
+             * That's what we would have sent to learnosity as the question's contents.
+             */
             if (!isset($stack[$assessId]['questions'][$discriminator])) {
                 $stack[$assessId]['questions'][$discriminator] = [
-                    'question' => [
-                        'original' => $question,
-                        'learnosity_stimulus' => $this->produceQuestionText($question)
-                    ],
                     'questionId' => [$questionId],
+                    'question' => [
+                        /* The original question's contents in Legacy Quiz
+                         */
+                        'original' => $question,
+                        /* This is what we would have sent to learnosity itself during the mega migration
+                         */
+                        'predicted_learnosity_stimulus' => $this->produceQuestionText($question),
+                    ],
+                    'answer' => [
+                        'original' => $answer,
+                        /* This is a repair payload that we could potentially use
+                         */
+                        'repair' => (new Fillgap($this->domain))->convert([
+                            'question' => $question,
+                            'marks' => $marks,
+                            '_answers' => [
+                                [
+                                    'answer' => $answer
+                                ]
+                            ]
+                        ])
+                    ],
                 ];
             } else {
                 /* Add it to the list of colliding questions
@@ -221,6 +270,31 @@ HELP;
         }
 
         return $analysis;
+    }
+
+
+    /**
+     * Attempt an in-situ repair with suggested payload
+     * (only works for conclusive cloze exercises)
+     *
+     * @param array $stack
+     * @return void
+     */
+    private function repair(array $stack): void
+    {
+        foreach ($stack as $assessId => $assessData) {
+            foreach ($assessData['questions'] as $discriminator => $questionData) {
+                /* Only repair questions that could be conslusively repaired
+                 * Ignore uncertainties
+                 */
+                if (1 === \count($questionData['questionId'])) {
+                    print_r($questionData['answer']['repair']);
+
+                    /* TODO if ($this->>perform()) { ...send payloads ... }
+                     */
+                }
+            }
+        }
     }
 
 
