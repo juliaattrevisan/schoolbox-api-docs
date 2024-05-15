@@ -264,7 +264,7 @@ abstract class Kernel
      * @param ConfigLoader $config
      * @return void
      */
-    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    protected static function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
     {
         if ($config->get('maintenance_mode')) {
             if ($cliMode) {

@@ -265,7 +265,7 @@ class Kernel extends CliKernelAbstract
      * @param ConfigLoader $config
      * @return void
      */
-    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    protected static function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
     {
         if ($config->get('maintenance_mode')) {
             echo "Service is unavailable because maintenance mode is enabled.\n";
