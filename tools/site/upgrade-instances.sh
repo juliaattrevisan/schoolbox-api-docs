@@ -169,8 +169,6 @@ function upgrade_instances(){
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh)
 
     # if output contains 'Maintenance mode enabled'...
-    echo "output: $output"
-    exit 1
     if [[ $output == *"Maintenance mode enabled"* ]]; then
       log " * instance $i is offline"
     else
