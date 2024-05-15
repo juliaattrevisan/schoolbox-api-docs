@@ -122,7 +122,7 @@ function parse_global_vars(){
   fi
   for i in $instance_list; do
     if ! INSTANCE_ID=$i schoolbox-read-instances --option INSTANCE_ID; then
-      error "instance id $i is invalid!"
+      error "instance id '$i' is invalid!"
       exit 1;
     fi
   done
@@ -185,7 +185,7 @@ function upgrade_instances(){
     # Ensure instance's log file's directory exists
     mkdir -p /var/log/schoolbox/"$i"
     instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
-    log "upgrade starting for instance $i - logging to $instance_log_file";
+    log "Upgrade starting for instance '$i' - logging to $instance_log_file";
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -238,7 +238,7 @@ function upgrade_instances(){
         fi
       fi
     fi
-    log "Upgrade complete for instance $i";
+    log "Upgrade complete for instance '$i'";
 
     # Bring instance back online.
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh)
