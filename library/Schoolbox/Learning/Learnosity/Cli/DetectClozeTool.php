@@ -37,6 +37,14 @@ class DetectClozeTool extends CliTool\App
 
 
     /**
+     * --assessment
+     *
+     * Update a particular quiz from the schoolbox.assessment table
+     */
+    private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
+
+
+    /**
      * @var Api
      */
     private Api $api;
@@ -61,6 +69,7 @@ class DetectClozeTool extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_ANALYSIS,
             self::OPT_LONG_REPAIR,
+            self::OPT_LONG_ASSESSMENT_ID
         ];
     }
 
@@ -99,7 +108,15 @@ HELP;
 
         /* Find all the quizzes that contain a cloze exercise
          */
-        $stack = $this->findCandidates();
+        $assessmentId = $this->getOpt(self::OPT_LONG_ASSESSMENT_ID);
+
+        if ('' !== (string)$assessmentId) {
+            $assessmentId = (int)$assessmentId;
+        }
+
+        /* Get some facts about candidates or, if specified, a particular assessment
+         */
+        $stack = $this->findCandidates($assessmentId);
 
         /* Inspect the stack for things we can fix and things we can't
          */
@@ -119,15 +136,17 @@ HELP;
      * Find all the quizzes that contain cloze questions and keep a count
      * of how many times identical question text
      *
+     * @param int|null $assessmentId
      * @return array
      * @throws \DOMException
      */
-    private function findCandidates(): array {
+    private function findCandidates(?int $assessmentId): array {
         $query = "
             SELECT
                 assess.assess_id,
                 assess.title,
                 assess.learnosity_reference,
+                assess.assessment_id,
                 assess_section.section_id,
                 assess_question.question_id,
                 assess_question.question,
@@ -144,9 +163,19 @@ HELP;
             AND assess_question.type_id = :typeId
         ";
 
-        $statement = $this->getDatabaseInternal()->prepareQuery($query, [
+        $params = [
             'typeId' => Fillgap::QUESTION_TYPE_ID
-        ]);
+        ];
+
+        /* Optionally filter to a particular assessment id
+         */
+        if ($assessmentId) {
+            $query .= " AND assess.assessment_id = :assessmentId";
+
+            $params['assessmentId'] = $assessmentId;
+        }
+
+        $statement = $this->getDatabaseInternal()->prepareQuery($query, $params);
 
         $statement->execute();
 
@@ -155,6 +184,7 @@ HELP;
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $assessId = $row['assess_id'];
             $title = $row['title'];
+            $assessmentId = $row['assessment_id'];
             $learnosityReference = $row['learnosity_reference'];
             $questionId = $row['question_id'];
             $answer = $row['answer'];
@@ -181,6 +211,7 @@ HELP;
             if (!isset($stack[$assessId])) {
                 $stack[$assessId] = [
                     'title' => $title,
+                    'assessment_id' => $assessmentId,
                     'learnosity_reference' => $learnosityReference,
                     'questions' => []
                 ];
