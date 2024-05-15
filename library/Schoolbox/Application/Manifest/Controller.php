@@ -146,6 +146,8 @@ class Controller extends Base
      */
     public function getOffline(): void
     {
+        // Don't store to the history
+        $this->setAllowBackToTheFuture(false);
         $this->response = $this->responseFromTemplateUnthemed('@manifest/offline.twig', []);
     }
 
