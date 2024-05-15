@@ -11,8 +11,8 @@
             config.digistorm_store_link* is not set
             config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
         #}
-        {% set installGoogle = config.digistorm_google_play_store_link %}
-        {% set installApple = config.digistorm_apple_app_store_link %}
+        {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
+        {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
 
         {% if config.digistorm_role_install_prompt ?? [] is empty %}
             {# All users are redirected to the store link #}
