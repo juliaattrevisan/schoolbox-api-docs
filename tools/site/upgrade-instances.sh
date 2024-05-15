@@ -176,6 +176,7 @@ function upgrade_instances(){
       exit 1;
     fi
   }
+  done
   log "Done"
 
   log "Starting SQL updates for all instances in parallel"
