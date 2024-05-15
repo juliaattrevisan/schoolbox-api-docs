@@ -12,7 +12,7 @@ sql_pass=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_passw
 sql_host=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_host);
 sql_schema=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_db);
 
-# MySQL will return nothing on success.
+# MySQL will return something on error, and nothing on success.
 output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "UPDATE config SET value=1 WHERE name='maintenance_mode'" 2>&1)
 
 if [[ "$output" == '' ]]; then
@@ -20,5 +20,4 @@ if [[ "$output" == '' ]]; then
   echo "Maintenance mode enabled."
 else
   echo "Could not enable maintenance mode."
-echo "output: $output"
 fi
