@@ -213,8 +213,6 @@ class Controller extends Base
                 ? $sessionUser->getUsername()
                 : $this->requestPost->get('token');
             if (!empty($token)) {
-                $now = Alaress_Date_Format::now();
-
                 try {
                     $registry = $this->registryMapper->findByTokenAndProviderForUser(
                         $sessionUser->getId(),
