@@ -422,6 +422,7 @@
                     {# js for installing pwa / enabling notifications #}
                     // if install later cookie exists, don't show the div
                     const installDelayCookie = window.localStorage.getItem("installDelayCookie");
+                    let deviceId = 'Browser';
                     if (installDelayCookie) {
                         document.querySelector('#installDelayPrompt')?.remove();
                         document.querySelector('#pwaPrompt').remove();
@@ -507,6 +508,7 @@
                     }
 
                     if (iOS()) {
+                        deviceId = 'iOS';
                         {% if config.debug_mode %}
                         console.log('iOS');
                         {% endif %}
@@ -523,6 +525,7 @@
                     }
                             {# if android and the android link exists, show it and hide the rest #}
                     else if (/android/i.test(navigator.userAgent)) {
+                        deviceId = 'Android';
                         {% if config.debug_mode %}
                         console.log('Android');
                         {% endif %}
@@ -573,7 +576,14 @@
                                                 {% if config.debug_mode %}
                                                 console.info('Notification permission granted');
                                                 {% endif %}
-
+                                                document.dispatchEvent(
+                                                    new CustomEvent("PWA_NOTIFICATION_ALLOW", {
+                                                        detail: {
+                                                            debug: {{ config.debug_mode }},
+                                                            deviceId: deviceId,
+                                                        },
+                                                    }),
+                                                );
                                                 // Generate a new token, and store it in Schoolbox's
                                                 // mobile app registration.
                                                 {#getToken(messaging, {vapidKey: app.webPushPublicKey})#}
