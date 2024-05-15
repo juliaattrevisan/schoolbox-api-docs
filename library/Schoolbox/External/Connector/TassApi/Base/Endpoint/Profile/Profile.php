@@ -59,7 +59,14 @@ class Profile implements IStrategy
     /**
      * One of these five fields will appear in general_details area depending on your tass installation
      */
-    private const STUDIES_CODE_POSSIBILITIES = ['lui_number', 'bos_number', 'vsn_number', 'tqa_number', 'wa_student_number'];
+    private const STUDIES_CODE_POSSIBILITIES = [
+        'lui_number',           // Queensland
+        'vsn_number',           // Victoria
+        'tqa_number',           // Tasmania
+        'wa_student_number',    // Western Australia
+        'bos_number',           // New South Wales, in some installations
+        'nesa_id'               // New South Wales, in some installations
+    ];
 
 
     /**
