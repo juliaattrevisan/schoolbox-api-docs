@@ -40,11 +40,11 @@ VALUES
 
     (
         'digistorm_role_install_prompt',
-        'Staff,Parents,Students',
+        'Staff,Parent,Student',
         'Digistorm Role Install Prompt',
         'Selecting one or more roles to redirect to the user to install that Digistorm app. If none are selected, will prompt for all',
         (SELECT id FROM lu_config_field WHERE `field` = 'multiSelect'),
-        'Staff:Parents:Students',
+        'Staff:Parent:Student',
         (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
         'true',
         'false',
