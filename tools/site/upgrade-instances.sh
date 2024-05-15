@@ -172,7 +172,7 @@ function upgrade_instances(){
     if [[ "$output" == *"Maintenance mode enabled"* ]]; then
       log " * instance '$i' is offline"
     else
-      error " * Could not take instance $i offline. Exiting."
+      error " * Could not take instance '$i' offline. Exiting."
       exit 1;
     fi
   }
@@ -246,7 +246,7 @@ function upgrade_instances(){
     if [[ "$output" == *"Maintenance mode disabled"* ]]; then
       log "Instance '$i' is back online"
     else
-      error "Could not bring instance $i back online. Continuing." >> "$instance_log_file" 2>&1
+      error "Could not bring instance '$i' back online. Continuing." >> "$instance_log_file" 2>&1
     fi
   } &
   done
