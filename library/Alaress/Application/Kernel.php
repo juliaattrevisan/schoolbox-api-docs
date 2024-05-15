@@ -261,11 +261,25 @@ abstract class Kernel
     }
 
     /**
+     * @param ConfigLoader $config
+     * @return void
+     */
+    static protected function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    {
+        if ($config->get('maintenance_mode')) {
+            header('HTTP/1.1 503 Service Unavailable', true, 503);
+            echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
+            die;
+        }
+    }
+
+    /**
      * Called after DI services are registered.
      */
     protected function postInstallDependencies(): void
     {
         $config = new ConfigLoader();
+        self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
     }
 

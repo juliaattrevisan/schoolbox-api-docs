@@ -289,7 +289,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function postInstallDependencies(): void
     {
-        parent::postInstallDependencies();
+        parent::postInstallDependencies(); // Check for maintenance mode is done in here.
 
         // initialise session
         /** @var Session $session */

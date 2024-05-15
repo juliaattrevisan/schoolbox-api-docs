@@ -501,7 +501,7 @@ class Kernel extends WebKernelAbstract
      */
     protected function postInstallDependencies(): void
     {
-        parent::postInstallDependencies();
+        parent::postInstallDependencies(); // Check for maintenance mode is done in here.
 
         $this->initRoutes();
         $this->initModules();
