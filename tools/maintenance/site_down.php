@@ -18,7 +18,7 @@ $app = new class extends CliTool\App {
         $dbc = $this->getDatabaseInternal();
         $success = $dbc->execute('UPDATE config SET value = 1 WHERE name = "maintenance_mode"');
 
-        # IMPORTANT - IF YOU CHANGE THIS FILE, YOU MUST PORT THE SAME LOGICAL CHANGE TO debian/preinst
+        # IMPORTANT - IF YOU CHANGE THIS FILE, YOU MUST PORT THE SAME LOGICAL CHANGE TO upgrade-instances.sh
         if ($success) {
             echo "Maintenance mode enabled.\n";
         } else {
