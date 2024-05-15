@@ -12,10 +12,11 @@ sql_pass=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_passw
 sql_host=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_host);
 sql_schema=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_db);
 
-# MySQL will return something on error, and nothing on success.
+# On success, MySQL will output nothing, and exit with status code 0.
 output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "UPDATE config SET value=1 WHERE name='maintenance_mode'" 2>&1)
+statusCode=$?
 
-if [[ "$output" == '' ]]; then
+if [[ "$output" == '' && statusCode -eq 0 ]]; then
   # IMPORTANT: The string output here is checked for in upgrade-instances.sh.
   echo "Maintenance mode enabled for instance '$instanceId'."
 else
