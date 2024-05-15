@@ -163,6 +163,21 @@ function update_schoolbox_update_error_fact_file(){
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
 
+  log "Taking all instances offline..."
+  for i in $instance_list; do
+  {
+    output = INSTANCE_ID="$i" "$site_root"/site_down.sh
+
+    # if output contains 'Maintenance mode enabled'...
+    if [[ output == *"Maintenance mode enabled"* ]]; then
+      echo " * instance $i is offline"
+    else
+      echo " * PROBLEM: Could not take instance $i offline. Exiting."
+      exit 1;
+    fi
+  }
+  log "Done"
+
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
   {
@@ -222,7 +237,16 @@ function upgrade_instances(){
         fi
       fi
     fi
-    log "upgrade complete for instance $i";
+    log "Upgrade complete for instance $i";
+
+    # Bring instance back online.
+    output = INSTANCE_ID="$i" "$site_root"/site_up.sh
+    # if output contains 'Maintenance mode enabled'...
+    if [[ output == *"Maintenance mode disabled"* ]]; then
+      echo "Instance $i is back online"
+    else
+      echo "PROBLEM: Could not bring instance $i back online. Continuing."
+    fi
   } &
   done
   # Wait for all child instance upgrades to complete
