@@ -623,6 +623,13 @@
                                         });
                                     } else {
                                         {# turn notifications off... #}
+                                        document.dispatchEvent(
+                                            new CustomEvent("PWA_NOTIFICATION_DENY", {
+                                                detail: {
+                                                    debug: {{ config.debug_mode }},
+                                                },
+                                            }),
+                                        );
                                     }
                                 });
                             });
