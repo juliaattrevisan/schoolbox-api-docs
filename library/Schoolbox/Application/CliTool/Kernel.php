@@ -266,7 +266,7 @@ class Kernel extends CliKernelAbstract
      */
     protected function postInstallDependencies(): void
     {
-        self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
+        self::dieGracefullyIfInMaintenanceMode($this->di->get('config'), true);
         $this->initRoutes();
         $this->initModules();
     }
