@@ -46,16 +46,6 @@ case "$1" in
             echo "Finished backing up instances" | tee -a /var/log/schoolbox/upgrade.log
         fi
 
-        # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
-        if [ -L /usr/share/schoolbox/www/conf ]; then
-            echo "Converting conf link to dir..." | tee -a /var/log/schoolbox/upgrade.log;
-            temp_file=$(mktemp)
-            mv /usr/share/schoolbox/www/conf/conf.php "$temp_file"
-            rm /usr/share/schoolbox/www/conf
-            mkdir /usr/share/schoolbox/www/conf
-            mv "$temp_file" /usr/share/schoolbox/www/conf/conf.php
-        fi
-
         # Is nginx local? TODO Add cloud support.
         if service nginx status >/dev/null 2>&1; then
             echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
