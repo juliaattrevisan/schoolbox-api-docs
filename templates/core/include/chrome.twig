@@ -342,7 +342,7 @@
                             <a class="icon-settings" href="{{ routeLookup("messages.configure") }}"></a>
                         </li>
                         <li id="pwaPrompt" class="content">
-                            {% include '@messages/pwa.twig' with { notifButton : 'notifOn' } %}
+                            {% include '@messages/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
                             <a id="installDelayPrompt" href="#">Later</a>
                         </li>
                         <li>
@@ -423,132 +423,131 @@
                     // if install later cookie exists, don't show the div
                     const installDelayCookie = window.localStorage.getItem("installDelayCookie");
                     if (installDelayCookie) {
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach( (element)=>{
+                        document.querySelector('#installDelayPrompt')?.remove();
+                        document.querySelector('#pwaPrompt').remove();
+                }
+                    {# if PWA was installed and you are accessing it via the PWA #}
+                    if (window.matchMedia('(display-mode: standalone)').matches) {
+                        // If visible, hide the install promotion
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                            element.remove();
+                        });
+                    }
+
+                    {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
+                    // Initialize deferredPrompt for use later to show browser install prompt.
+                    window.addEventListener('beforeinstallprompt', (event) => {
+                        // Prevent the mini-infobar from appearing on mobile.
+                        event.preventDefault();
+                        {% if config.debug_mode %}
+                        console.log('👍', 'beforeinstallprompt', event);
+                        {% endif %}
+                        // Stash the event so it can be triggered later.
+                        window.deferredPrompt = event;
+                        // Remove the 'hidden' class from the install button container.
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                            element.classList.toggle('display', 'none');
+                        });
+                    });
+
+                    document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                        element.addEventListener('click', async () => {
+                            {% if config.debug_mode %}
+                            console.log('👍', 'butInstall-clicked');
+                            {% endif %}
+                            const promptEvent = window.deferredPrompt;
+                            if (!promptEvent) {
+                                // The deferred prompt isn't available.
+                                return;
+                            }
+                            // Show the install prompt.
+                            promptEvent.prompt();
+                            // Log the result
+                            const result = await promptEvent.userChoice;
+                            {% if config.debug_mode %}
+                            console.log('👍', 'userChoice', result);
+                            {% endif %}
+                            // Reset the deferred prompt variable, since
+                            // prompt() can only be called once.
+                            window.deferredPrompt = null;
+                            // Hide the install button.
+                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                                element.classList.toggle('display', 'block');
+                            });
+                        });
+                    });
+
+                    window.addEventListener('appinstalled', (event) => {
+                        {% if config.debug_mode %}
+                        console.log('👍', 'appinstalled', event);
+                        {% endif %}
+                        // Clear the deferredPrompt so it can be garbage collected
+                        window.deferredPrompt = null;
+                    });
+
+
+                    document.querySelector('#installDelayPrompt')?.addEventListener('click', () => {
+                        window.localStorage.setItem("installDelayCookie", "installLater");
+                        document.querySelector('#pwaPrompt').remove();
+                        document.querySelector('#installDelayPrompt')?.remove();
+                    });
+
+                    {# if iOS and the iOS link exists, show it and hide the rest #}
+                    function iOS() {
+                        return [
+                                'iPad Simulator',
+                                'iPhone Simulator',
+                                'iPod Simulator',
+                                'iPad',
+                                'iPhone',
+                                'iPod'
+                            ].includes(navigator.platform)
+                            // iPad on iOS 13 detection
+                            || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+                    }
+
+                    if (iOS()) {
+                        {% if config.debug_mode %}
+                        console.log('iOS');
+                        {% endif %}
+                        {# disable Notifications, Need to have the app installed and on the homepage to even think about allowing notifs #}
+                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach((element) => {
+                            element.toggleAttribute('disabled', true);
+                        });
+                        document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                            element.remove();
+                        });
+                    }
+                            {# if android and the android link exists, show it and hide the rest #}
+                    else if (/android/i.test(navigator.userAgent)) {
+                        {% if config.debug_mode %}
+                        console.log('Android');
+                        {% endif %}
+                        document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
                             element.remove();
                         });
                     } else {
-                        {# if PWA was installed and you are accessing it via the PWA #}
-                        if (window.matchMedia('(display-mode: standalone)').matches) {
-                            // If visible, hide the install promotion
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.remove();
-                            });
-                        }
-
-                        {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
-                        // Initialize deferredPrompt for use later to show browser install prompt.
-                        window.addEventListener('beforeinstallprompt', (event) => {
-                            // Prevent the mini-infobar from appearing on mobile.
-                            event.preventDefault();
-                            {% if config.debug_mode %}
-                            console.log('👍', 'beforeinstallprompt', event);
-                            {% endif %}
-                            // Stash the event so it can be triggered later.
-                            window.deferredPrompt = event;
-                            // Remove the 'hidden' class from the install button container.
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.classList.toggle('display', 'none');
-                            });
+                        {% if config.debug_mode %}
+                        console.log('Normal PWA');
+                        {% endif %}
+                        document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
+                            element.remove();
                         });
-
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                            element.addEventListener('click', async () => {
-                                {% if config.debug_mode %}
-                                console.log('👍', 'butInstall-clicked');
-                                {% endif %}
-                                const promptEvent = window.deferredPrompt;
-                                if (!promptEvent) {
-                                    // The deferred prompt isn't available.
-                                    return;
-                                }
-                                // Show the install prompt.
-                                promptEvent.prompt();
-                                // Log the result
-                                const result = await promptEvent.userChoice;
-                                {% if config.debug_mode %}
-                                console.log('👍', 'userChoice', result);
-                                {% endif %}
-                                // Reset the deferred prompt variable, since
-                                // prompt() can only be called once.
-                                window.deferredPrompt = null;
-                                // Hide the install button.
-                                document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                    element.classList.toggle('display', 'block');
-                                });
-                            });
+                        document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
+                            element.remove();
                         });
-
-                        window.addEventListener('appinstalled', (event) => {
-                            {% if config.debug_mode %}
-                            console.log('👍', 'appinstalled', event);
-                            {% endif %}
-                            // Clear the deferredPrompt so it can be garbage collected
-                            window.deferredPrompt = null;
+                        document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
+                            element.remove();
                         });
-
-
-                        document.querySelector('#installDelayPrompt')?.addEventListener('click', () => {
-                            window.localStorage.setItem("installDelayCookie", "installLater");
-
-                        });
-
-                        {# if iOS and the iOS link exists, show it and hide the rest #}
-                        function iOS() {
-                            return [
-                                    'iPad Simulator',
-                                    'iPhone Simulator',
-                                    'iPod Simulator',
-                                    'iPad',
-                                    'iPhone',
-                                    'iPod'
-                                ].includes(navigator.platform)
-                                // iPad on iOS 13 detection
-                                || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-                        }
-
-                        if (iOS()) {
-                            {% if config.debug_mode %}
-                            console.log('iOS');
-                            {% endif %}
-                            {# disable Notifications, Need to have the app installed and on the homepage to even think about allowing notifs #}
-                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach((element) => {
-                                element.toggleAttribute('disabled', true);
-                            });
-                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
-                                element.remove();
-                            });
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.remove();
-                            });
-                        }
-                                {# if android and the android link exists, show it and hide the rest #}
-                        else if (/android/i.test(navigator.userAgent)) {
-                            {% if config.debug_mode %}
-                            console.log('Android');
-                            {% endif %}
-                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
-                                element.remove();
-                            });
-                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
-                                element.remove();
-                            });
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.remove();
-                            });
-                        } else {
-                            {% if config.debug_mode %}
-                            console.log('Normal PWA');
-                            {% endif %}
-                            document.querySelectorAll('[data-pwa-action="installApple"]').forEach((element) => {
-                                element.remove();
-                            });
-                            document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
-                                element.remove();
-                            });
-                            document.querySelectorAll('[data-pwa-action="installGoogle"]').forEach((element) => {
-                                element.remove();
-                            });
-                        }
                     }
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
