@@ -1,6 +1,5 @@
 import { initializeApp } from '@firebase/app';
-import { getMessaging, getToken, onMessage } from '@firebase/messaging';
-import {EditorEvent} from "@js/editor/event/editorEvent";
+import { getMessaging, getToken, deleteToken, onMessage } from '@firebase/messaging';
 
 window.sbProps.firebaseApps.forEach((app) => {
     if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
@@ -103,6 +102,9 @@ function denyNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, {vapidKey: app.webPushPublicKey})
                 .then((currentToken) => {
+                    //delete the token from firebase
+                    deleteToken(messaging)
+
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
