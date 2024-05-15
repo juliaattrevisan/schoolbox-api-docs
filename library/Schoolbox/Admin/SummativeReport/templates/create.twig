@@ -374,6 +374,11 @@
                                         <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
                                         <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
                                     </li>
+                                    <li>
+                                        <input name="summary[classCode]" type="hidden" value="0" />
+                                        <input id="report-summary-show-class-code" name="summary[classCode]" type="checkbox" value="1" {% if options.summary.classCode ?? true %}checked="checked"{% endif %} />
+                                        <label for="report-summary-show-class-code" class="checkbox-label">Show class code</label>
+                                    </li>
                                 </ul>
                             </fieldset>
                         </div>
@@ -455,6 +460,11 @@
                                     <input name="class[cohort]" type="hidden" value="0" />
                                     <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
                                     <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                                </li>
+                                <li>
+                                    <input name="class[classCode]" type="hidden" value="0" />
+                                    <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
+                                    <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
                                 </li>
                             </ul>
                         </fieldset>

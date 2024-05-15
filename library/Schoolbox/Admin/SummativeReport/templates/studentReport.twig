@@ -539,7 +539,11 @@
                 <div class="folder-title">
                     <div class="left">
                         {% block summaryFolderTitle %}
-                            <h4>{{ folder.title }}</h4>
+                            {% if summaryOptions.classCode is not defined or summaryOptions.classCode %}
+                                <h4>{{ folder.title }}</h4>
+                            {% else %}
+                                <h4>{{ folder.name }}</h4>
+                            {% endif %}
                         {% endblock %}
                     </div>
 
@@ -581,7 +585,11 @@
             <div class="folder-title class-page summative-content">
                 <div class="left">
                     {% block classFolderTitle %}
-                        <h4>{{ folder.title }}</h4>
+                        {% if classOptions.classCode is not defined or classOptions.classCode %}
+                            <h4>{{ folder.title }}</h4>
+                        {% else %}
+                            <h4>{{ folder.name }}</h4>
+                        {% endif %}
                     {% endblock %}
                     {% for teacher in folder.teachers %}
                         <div class="card compact">
