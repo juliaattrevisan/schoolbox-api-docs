@@ -46,23 +46,6 @@ case "$1" in
             echo "Finished backing up instances" | tee -a /var/log/schoolbox/upgrade.log
         fi
 
-        # Is nginx local? TODO Add cloud support.
-        if service nginx status >/dev/null 2>&1; then
-            echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
-            output = `/usr/share/schoolbox/site_down.sh`
-
-            # if output contains 'Maintenance mode enabled'...
-            if [[ output == *"Maintenance mode enabled"* ]]; then
-                echo 'Schoolbox maintenance mode is enabled, so Schoolbox is offline.' | tee -a /var/log/schoolbox/upgrade.log;
-            else
-                echo 'Could not enable maintenance mode. Exiting.' | tee -a /var/log/schoolbox/upgrade.log;
-                exit 1;
-            fi
-
-            # Production servers use 'open_file_cache', need to reload to detect file change
-            nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
-        fi
-
         # Stop all schoolbox daemons (supports both old+new single/multi instance style)
         for daemon in socketd digestd routed scheduled belld; do
             for service in $(systemctl --plain --no-legend | grep -E "schoolbox*.*$daemon.*service" | awk '{print $1}'); do
