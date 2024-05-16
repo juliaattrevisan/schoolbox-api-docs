@@ -24,26 +24,6 @@ class DetectClozeTool extends CliTool\App
 
 
     /**
-     * Show candidate stack, mostly for devs.
-     */
-    private const OPT_LONG_STACK = 'stack';
-
-
-//    /**
-//     * Show the analysis of quizzes to find out how many are conclusive
-//     * and how many aren't
-//     */
-//    private const OPT_LONG_ANALYSIS = 'analysis';
-
-
-    /**
-     * Show payloads that would potentially repair conclusively-broken cloze exercises
-     * Use --perform to actually do the deed
-     */
-    private const OPT_LONG_REPAIR = 'repair';
-
-
-    /**
      * --assessment
      *
      * Update a particular quiz from the schoolbox.assessment table
@@ -74,8 +54,6 @@ class DetectClozeTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_STACK,
-            self::OPT_LONG_REPAIR,
             self::OPT_LONG_ASSESSMENT_ID
         ];
     }
@@ -91,7 +69,7 @@ Find out how many legacy quizzes contain cloze exercise questions (fillgap)
 because we mis-imported them at the start of 2024 during the mega migration.
 These will have used the wrong regex to parse answers.
 
-Usage: detectcloze.php [--analyse] [--repair] [--perform] [-vvv]
+Usage: detectcloze.php [--perform] [-vvv]
 
 
 HELP;
@@ -125,15 +103,9 @@ HELP;
          */
         $stack = $this->findCandidates($assessmentId);
 
-        if ($this->getOpt(self::OPT_LONG_STACK)) {
-            print_r($stack);
-        }
-
         /* Inspect the stack for possible repair payloads
         */
-        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
-            $this->repair($stack);
-        }
+        $this->repair($stack);
     }
 
 
@@ -273,41 +245,36 @@ HELP;
     {
         foreach ($stack as $assessId => $assessData) {
             foreach ($assessData['questions'] as $questionId => $questionData) {
+                /* Find the learnosity quiz for $assessData['learnosity_reference']
+                 */
+                $this->getLogger()->debug(sprintf(
+                    'Looking for learnosity reference %s',
+                    $assessData['learnosity_reference']
+                ));
 
+                /* Iterate through all the items
+                 *
+                 * Find the Item tha contains a question whose text matches predicted_learnosity_stimulus,
+                 * and whose answer options match the broken answer ones we sent previously
+                 */
+                $this->getLogger()->debug(sprintf(
+                   'Traversing...',
+                ));
 
-
-
+                /* At this point you should have a Question node that we can update and re-send back to
+                 * Learnosity in situ; construct api call to do that
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Updating question %s in learnosity',
+                    '',
+                ));
 
                 /* Perform Mode tells learnosity to get fixed up
                  * TODO actual update
                  */
                 if ($this->perform()) {
-                    $this->getLogger()->info('sending to learnosity');
-
-                    /* Find the learnosity quiz for $assessData['learnosity_reference']
-                     */
-                    $this->getLogger()->debug(sprintf(
-                        'Looking for learnosity reference %s',
-                        $assessData['learnosity_reference']
-                    ));
-
-                    /* Iterate through all the items
-                     *
-                     * Find the Item tha contains a question whose text matches
-                     * predicted_learnosity_stimulus
-                     */
-                    $this->getLogger()->debug(sprintf(
-                        'Traversing...',
-                    ));
-
-                    /* Update it with the repair payload
-                     */
-                    $this->getLogger()->debug(sprintf(
-                        'Performing update of question %s',
-                        implode(', ', $questionData['questionId'])
-                    ));
                 } else {
-                    print_r($questionData['answer']['repair']);
+                    print_r($stack);
                 }
             }
         }
