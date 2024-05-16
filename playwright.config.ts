@@ -16,7 +16,7 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: [
-        ["html", { outputFolder: "./test/playwright/_output/html/" }],
+        ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
         ["list", { printSteps: true }],
     ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -25,10 +25,19 @@ export default defineConfig({
         baseURL: "https://vagrant.dev.schoolbox.cloud",
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: "on-first-retry",
+        trace: "retain-on-failure",
 
         /* Use data-test="" as a custom test id attribute. */
         testIdAttribute: "data-test",
+
+        /* Take a screenshot whenever a test fails. */
+        screenshot: "only-on-failure",
+
+        /* Retain the video recordings for failed tests. */
+        video: "retain-on-failure",
+
+        /* Set viewport size */
+        viewport: { width: 1920, height: 1080 },
     },
 
     /* Configure projects for major browsers */
