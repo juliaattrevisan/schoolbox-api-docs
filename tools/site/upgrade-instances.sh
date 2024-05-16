@@ -242,10 +242,9 @@ function upgrade_instances(){
 
     # Bring instance back online.
     output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh)
-    echo "$output"
     # if output contains 'Maintenance mode disabled'...
     if [[ "$output" == *"Maintenance mode disabled"* ]]; then
-      log "Instance '$i' is back online"
+      log "$output"
     else
       error "Unexpected output when trying to disable maintenance mode for instance '$i'.  Continuing." >> "$instance_log_file"
     fi
