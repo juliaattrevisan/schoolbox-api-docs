@@ -310,14 +310,19 @@ class QueueSorter implements FilterInterface
     {
         try {
             $queue->push($instance);
-        } catch (RateLimitException $e) {
-            // Too many attempts already: just throw the exception
-            // (May not be able to throw, as this is happening asynchronously)
+        } catch (RateLimitException) {
+            // Too many attempts already: log and give up
             if ($this->jitter->tooManyAttempts($attemptNum + 1)) {
-                throw $e;
+                $this->log->warning(
+                    sprintf(
+                        'Queue could not be pushed to after %d attempts: message has not been delivered',
+                        $attemptNum,
+                    )
+                );
+                return;
             }
 
-            //
+            // Otherwise add it to the timer
             $wait = $this->jitter->calculateJitter($attemptNum);
             $this->log->notice(
                 sprintf('Queue is likely rate-limited: waiting %d ms before trying again', $wait)
@@ -326,7 +331,6 @@ class QueueSorter implements FilterInterface
                 $wait / 1000,
                 fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
             );
-            return;
         }
     }
 }
