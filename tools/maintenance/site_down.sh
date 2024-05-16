@@ -19,6 +19,8 @@ statusCode=$?
 if [[ "$output" == '' && statusCode -eq 0 ]]; then
   # IMPORTANT: The string output here is checked for in upgrade-instances.sh.
   echo "Maintenance mode enabled for instance '$instanceId'."
+  exit 0
 else
   echo "Could not enable maintenance mode for instance '$instanceId'."
+  exit 1
 fi
