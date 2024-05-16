@@ -324,6 +324,18 @@ HELP;
                 $assessData['learnosity_reference']
             ));
 
+            /* Skip quizzes that have nothing to do
+             */
+            if (!\count($assessData['questions'])) {
+                $this->getLogger()->info(sprintf(
+                    '(%s/%s) No cloze exercises questions to fix; skipping',
+                    $i,
+                    $numQuizzes,
+                ));
+
+                continue;
+            }
+
             /* Find the learnosity items used in $assessData['learnosity_reference']
              * Annoyingly you need the references, then fetch those separately
              *
