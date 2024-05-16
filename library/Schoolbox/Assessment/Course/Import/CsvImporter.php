@@ -89,7 +89,14 @@ class CsvImporter
          */
         $missingColumns = $csv->listMissingColumns();
         if (!empty($missingColumns)) {
-            throw new SchoolboxException('Unable to do a bulk upload', 0, null, 400, "You've missed adding these columns in the CSV file: " . implode(', ', $missingColumns) . ". You must also ensure that each character in the required columns in your CSV file is case-sensitive and must use the correct spelling.");
+            throw new SchoolboxException(
+                'Unable to do a bulk upload',
+                0,
+                null,
+                400,
+                "You've missed adding these columns in the CSV file: " .
+                implode(', ', $missingColumns) . "."
+            );
         }
 
         // [unit_spec_id][class_folder_id]['open_date']
