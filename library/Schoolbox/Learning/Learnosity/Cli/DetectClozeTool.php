@@ -115,6 +115,8 @@ HELP;
         /* Inspect the stack for possible repair payloads
          */
         $this->repair($stack);
+
+        $this->getLogger()->info('');
     }
 
 
@@ -266,9 +268,10 @@ HELP;
         }
 
         /* Perform Mode tells learnosity to get fixed up
-         * TODO actual update
          */
         foreach ($stack as $assessId => $assessData) {
+            $this->getLogger()->info('');
+
             $this->getLogger()->info(sprintf(
                 'Processing "%s" (assess_id: %s, assessment_id: %s) with learnosity_reference %s',
                 $assessData['title'],
@@ -288,8 +291,10 @@ HELP;
             );
 
             foreach ($assessData['questions'] as $questionId => $questionData) {
+                $found = false;
+
                 $this->getLogger()->debug(sprintf(
-                   'Traversing learnosity quiz for something that matches this question...',
+                    'Traversing learnosity quiz for something that matches this question...',
                 ));
 
                 /* Iterate through all the items
@@ -299,21 +304,48 @@ HELP;
                  */
                 foreach ($learnosityItems as $learnosityItem) {
                     foreach ($learnosityItem['questions'] as $learnosityQuestion) {
-                        if ($this->matches($questionData, $learnosityQuestion)) {
-                            /* At this point you should have a Question node that we can update and re-send back to
-                             * Learnosity in situ; construct api call to do that
-                             */
-                            $this->getLogger()->info(sprintf(
-                                'Found matching question in learnosity; updating question ref %s',
-                                $learnosityQuestion['data'][0]['reference'],
-                            ));
-
-                            /* TODO actual update
-                             */
-                            print_r($questionData);
-                            print_r($learnosityQuestion);
+                        /* Not a matching thing? Keep looking
+                         */
+                        if (!$this->matches($questionData, $learnosityQuestion)) {
+                            continue;
                         }
+
+                        /* At this point you should have a Question node that we can update and re-send back to
+                         * Learnosity in situ; construct api call to do that
+                         */
+                        $this->getLogger()->info(sprintf(
+                            'Found matching question in learnosity; updating question ref %s (question_id: %s)',
+                            $learnosityQuestion['data'][0]['reference'],
+                            $questionId
+                        ));
+
+                        /* Update to use the correct answer template and options
+                         */
+                        $questionPayload = $learnosityQuestion['data'][0];
+                        $questionPayload['data']['template'] = $questionData['answer']['repair']['template'];
+                        $questionPayload['data']['validation']['valid_response']['value'] = $questionData['answer']['repair']['validation']['valid_response']['value'];
+
+                        /* Perform update in learnosity
+                         */
+//                        $this->api->dataSetRequest('/itembank/questions', [
+//                            'questions' => [
+//                                $questionPayload
+//                            ]
+//                        ]);
+
+                        $this->getLogger()->debug('Update request complete.');
+
+                        $found = true;
                     }
+                }
+
+                /* For some reason we never found a match; something in learnosit yhas changed
+                 */
+                if (!$found) {
+                    $this->getLogger()->warning(sprintf(
+                        'No learnosity equivalent found for question_id %s',
+                        $questionId
+                    ));
                 }
             }
         }
