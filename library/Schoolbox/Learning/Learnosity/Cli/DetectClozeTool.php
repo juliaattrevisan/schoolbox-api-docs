@@ -117,6 +117,8 @@ HELP;
         $this->repair($stack);
 
         $this->getLogger()->info('');
+        $this->getLogger()->info('Done.');
+        $this->getLogger()->info('');
     }
 
 
