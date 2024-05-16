@@ -30,12 +30,13 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 class QueueSorter implements FilterInterface
 {
     /**
-     * @param FilterInterface                 $filter
-     * @param LoggerInterface                 $log
-     * @param MessageList\IPublicationFactory $listFactory
-     * @param RoutePermissionMapper           $permMapper
-     * @param LoopInterface                   $loop
-     * @param IJitter                         $jitter
+     * @param FilterInterface                 $filter      Required for validating if a message can be sorted by this?
+     * @param LoggerInterface                 $log         Logger
+     * @param MessageList\IPublicationFactory $listFactory Required for building queues.
+     * @param RoutePermissionMapper           $permMapper  Required for determining a message instance's routing levels.
+     * @param LoopInterface                   $loop        Required for retry if rate limited.
+     * @param IJitter $jitter                              Required for calculating time until retry:
+     *                                                     expected to return a number of milliseconds to wait.
      */
     public function __construct(
         private FilterInterface $filter,
