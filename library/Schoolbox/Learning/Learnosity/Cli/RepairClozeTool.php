@@ -70,7 +70,18 @@ Find out how many legacy quizzes contain cloze exercise questions (fillgap)
 because we mis-imported them at the start of 2024 during the mega migration.
 These will have used the wrong regex to parse answers.
 
-Usage: detectcloze.php [--perform] [-vvv]
+Using planning mode will show you a dump of the data we accumulated and some
+developer data structures are shown on the cli, allowing you to manually
+inspect what we're finding.
+
+Using perform mode will actually execute mutations in learnosity, and it won't
+show you the developer data structs. You should use this mode most of the time.
+
+Note that repeatedly using this tool on the same data set will eventually result
+in it telling you about "no matching questions found" - that's because you've
+fixed them in learnosity and they can no longer be found in a broken state.
+
+Usage: repaircloze.php [--perform] [-vvv]
 
 
 HELP;
