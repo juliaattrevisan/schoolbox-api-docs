@@ -111,4 +111,4 @@ HELP;
     }
 };
 
-(new CliTool\Kernel($app))->runApp();
+(new CliTool\Kernel($app, [], true))->runApp();

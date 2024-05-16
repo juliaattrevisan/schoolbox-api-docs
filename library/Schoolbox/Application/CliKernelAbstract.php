@@ -66,10 +66,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct(?int $minLogLevel)
+    public function __construct(?int $minLogLevel, bool $bypassMaintenanceModeCheck = false)
     {
         $this->minLogLevel = $minLogLevel;
-        parent::__construct();
+        parent::__construct($bypassMaintenanceModeCheck);
     }
 
 

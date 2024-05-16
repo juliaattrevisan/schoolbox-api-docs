@@ -227,7 +227,7 @@ abstract class Kernel
      * @throws InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct()
+    public function __construct(bool $bypassMaintenanceModeCheck = false)
     {
         $this->di              = (new Di\ContainerBuilder())->newInstance();
         $this->shutdownHandler = new ShutdownHandler();
@@ -237,7 +237,7 @@ abstract class Kernel
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies($this->di);
-        $this->postInstallDependencies();
+        $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
     }
 
@@ -276,9 +276,14 @@ abstract class Kernel
     /**
      * Called after DI services are registered.
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
         $config = new ConfigLoader();
+
+        if ($bypassMaintenanceModeCheck) {
+            throw new InvalidArgumentException('The check for maintenance mode may not be bypassed in the Application/Kernel.');
+        }
+
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
     }

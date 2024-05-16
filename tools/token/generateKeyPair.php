@@ -165,4 +165,4 @@ $options = [
 ];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();

@@ -82,11 +82,11 @@ class Kernel extends CliKernelAbstract
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
      */
-    public function __construct(App $app, array $options = [])
+    public function __construct(App $app, array $options = [], bool $bypassMaintenanceModeCheck = false)
     {
         $this->parseCommandLineOptions($app);
 
-        parent::__construct($options[self::OPTION_LEVEL] ?? null);
+        parent::__construct($options[self::OPTION_LEVEL] ?? null, $bypassMaintenanceModeCheck);
 
         $this->validateOptions($options);
         $this->app = $app;
@@ -278,9 +278,12 @@ class Kernel extends CliKernelAbstract
      * @inheritDoc
      * @throws \Throwable
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
+        if (!$bypassMaintenanceModeCheck) {
+            self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
+        }
+
         $this->initRoutes();
         $this->initModules();
     }
