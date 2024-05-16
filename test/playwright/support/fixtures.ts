@@ -3,12 +3,14 @@
  * https://playwright.dev/docs/test-fixtures
  */
 import { test as base } from "@playwright/test";
+import { BaseTester } from "@schoolboxTest/playwright/support/baseTester";
 import { AcceptanceTester } from "@schoolboxTest/playwright/support/acceptanceTester";
 import { DatabaseHelper } from "@schoolboxTest/playwright/support/databaseHelper";
 
 type Fixtures = {
-    tester: AcceptanceTester;
     db: DatabaseHelper;
+    tester: AcceptanceTester;
+    baseTester: BaseTester;
 };
 
 export const test = base.extend<Fixtures>({
@@ -24,6 +26,11 @@ export const test = base.extend<Fixtures>({
     tester: ({ page }, use) => {
         const tester = new AcceptanceTester(page);
         return use(tester);
+    },
+    // eslint-disable-next-line no-empty-pattern -- Playwright requires first argument to follow the pattern
+    baseTester: async ({}, use) => {
+        const baseTester = new BaseTester();
+        return use(baseTester);
     },
 });
 

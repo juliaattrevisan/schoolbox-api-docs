@@ -9,8 +9,8 @@ test.describe("Learning Moment Photo Tests", () => {
     /**
      * Deleting data is about to start so it does not get impacted by other tests already executed
      */
-    test.beforeAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at so data does not impact the tests");
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at so data does not impact the tests");
         await db.updateInDatabase(
             "evidence",
             { deleted_at: "2022-01-15 11:22:34" },
@@ -177,9 +177,11 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.verifyShareLearningMomentLinkExists();
     });
 
-    test.afterAll(async ({ tester, db }) => {
+    test.afterAll(async ({ baseTester, db }) => {
         // Soft-delete data to not interfere with other tests
-        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
         await db.updateInDatabase(
             "evidence",
             { deleted_at: "2022-01-15 11:22:34" },

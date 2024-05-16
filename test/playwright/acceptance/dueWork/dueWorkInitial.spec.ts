@@ -318,9 +318,9 @@ test.describe("Initial Due Work functionality tests", () => {
         await tester.logout();
     });
 
-    test.afterAll(async ({ tester, db }) => {
+    test.afterAll(async ({ baseTester, db }) => {
         // Soft-delete data to not interfere with other tests
-        tester.isGoingTo(
+        baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does not impact next suite of tests",
         );
 
