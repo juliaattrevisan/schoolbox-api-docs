@@ -11,8 +11,7 @@ namespace Alaress\Async\Notification\Cloud\Digistorm;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
 use Alaress\Async\Notification\Notification;
-use Alaress\Jitter\Jitter;
-use Alaress\Random\FloatGenerator;
+use Alaress\Async\Notification\Cloud\RateLimitException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
@@ -39,17 +38,6 @@ class Service extends AbstractService
         'platform' => 'schoolbox',
         'module'   => 'messages',
     ];
-
-    /**
-     * How many attempts may be made to send the message before we give up?
-     */
-    private const MAX_ATTEMPTS = 15;
-
-    /**
-     * The amount of time (in milliseconds) to wait for at first when
-     * re-attempting to send a message.
-     */
-    private const ATTEMPT_BASE_TIMEOUT = 2500;
 
     /**
      * API key for the service
@@ -103,65 +91,48 @@ class Service extends AbstractService
         $payload['ids']     = $tokens;
 
         // need a HTTP client (should this be injected?)
-        $client     = new Client();
-        $attemptNum = 0;
-        $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
-        while (!$jitter->tooManyAttempts($attemptNum)) {
-            $this->getLog()->debug(sprintf('Attempting to send notification: attempt %d', $attemptNum + 1));
-            try {
-                $response = $client->post(
-                    self::BASE_URL,
-                    [
-                        RequestOptions::BODY    => json_encode($payload),
-                        RequestOptions::HEADERS => $headers,
-                    ]
-                );
+        $client = new Client();
+        try {
+            $response = $client->post(
+                self::BASE_URL,
+                [
+                    RequestOptions::BODY    => json_encode($payload),
+                    RequestOptions::HEADERS => $headers,
+                ]
+            );
 
-                // Check the response: maybe not all IDs exist?
-                // That might be an issue worth checking?
-                $responseContent = json_decode($response->getBody()->getContents(), true);
-                $errors          = $responseContent['errors'] ?? [];
-                if (is_iterable($errors)) {
-                    foreach ($errors as $error) {
-                        $this->getLog()->notice(
-                            sprintf(
-                                'Possible error response: %s: %s',
-                                $error['description'] ?? '',
-                                $error['id'] ?? '',
-                            )
-                        );
-                    }
-                }
-                return true;
-            } catch (GuzzleException $e) {
-                $responseCode = $e->getCode();
-                if ($responseCode === 401) {
-                    // your API key is bad: don't try to do anything else
-                    $this->getLog()->error('Received response code 401: this means the API key is incorrect');
-                    throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                // Some error other than rate-limit? raise an error
-                if ($responseCode !== 429) {
-                    $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
-                    return false;
+            // Check the response: maybe not all IDs exist?
+            // That might be an issue worth checking?
+            $responseContent = json_decode($response->getBody()->getContents(), true);
+            $errors          = $responseContent['errors'] ?? [];
+            if (is_iterable($errors)) {
+                foreach ($errors as $error) {
+                    $this->getLog()->notice(
+                        sprintf(
+                            'Possible error response: %s: %s',
+                            $error['description'] ?? '',
+                            $error['id'] ?? '',
+                        )
+                    );
                 }
             }
-
-            if (!$jitter->tooManyAttempts($attemptNum + 1)) {
-                $wait = (int)$jitter->calculateJitter($attemptNum);
-                $this->getLog()->notice(
-                    sprintf('Notification service is likely rate-limited: waiting %d ms before trying again', $wait)
-                );
-                usleep($wait * 1000);
+            return true;
+        } catch (GuzzleException $e) {
+            $responseCode = $e->getCode();
+            if ($responseCode === 401) {
+                // your API key is bad: don't try to do anything else
+                $this->getLog()->error('Received response code 401: this means the API key is incorrect');
+                throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
             }
-            $attemptNum++;
+
+            // Some error other than rate-limit? raise an error
+            if ($responseCode !== 429) {
+                $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
+                return false;
+            }
+
+            // Throw a rate limit exception for later handling
+            throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
         }
-
-        // Too many attempts: log something
-        // (In practice, this ought never happen as we've been very generous
-        //  with the number of attempts)
-        $this->getLog()->warning(sprintf('Notification not sent after %d attempts!', self::MAX_ATTEMPTS));
-        return false;
     }
 }

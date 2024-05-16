@@ -9,7 +9,11 @@
 
 namespace Schoolbox\Realtime\Routing;
 
+use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\QueueInterface;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
@@ -26,6 +30,17 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class QueueSorter implements FilterInterface
 {
+    /**
+     * How many attempts may be made to push to a queue before we give up?
+     */
+    private const MAX_ATTEMPTS = 15;
+
+    /**
+     * The amount of time (in milliseconds) to wait for at first when
+     * re-attempting to push to a queue.
+     */
+    private const ATTEMPT_BASE_TIMEOUT = 2500;
+
     /**
      * @param FilterInterface                 $filter
      * @param LoggerInterface                 $log
@@ -114,22 +129,22 @@ class QueueSorter implements FilterInterface
             try {
                 switch ($level) {
                     case RoutePermission::DIGEST:
-                        $this->listFactory->digest($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->digest($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::INSTANT:
-                        $this->listFactory->instant($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->instant($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::PUSH:
-                        $this->listFactory->mobile($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->mobile($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::EMAIL:
-                        $this->listFactory->email($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->email($userId), $instance);
                         $processed = true;
                         break;
 
@@ -291,5 +306,34 @@ class QueueSorter implements FilterInterface
         }
 
         return $intent;
+    }
+
+    /**
+     * Push to a queue, with retry on rate-limit.
+     *
+     * @param QueueInterface $queue
+     * @param Instance       $instance
+     * @param int            $attemptNum
+     * @return void
+     */
+    private function pushToQueue(QueueInterface $queue, Instance $instance, int $attemptNum = 0): void
+    {
+        $jitter = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
+        try {
+            $queue->push($instance);
+        } catch (RateLimitException $e) {
+            if (!$jitter->tooManyAttempts($attemptNum + 1)) {
+                $wait = (int)$jitter->calculateJitter($attemptNum);
+                $this->log->notice(
+                    sprintf('Queue is likely rate-limited: waiting %d ms before trying again', $wait)
+                );
+                $this->loop->addTimer(
+                    $wait / 1000,
+                    fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
+                );
+                return;
+            }
+            throw $e;
+        }
     }
 }
