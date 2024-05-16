@@ -186,7 +186,7 @@ HELP;
                  * Skip it quietly
                  */
                 $this->getLogger()->warning(sprintf(
-                   'question_id %s has unparseable html - it might be truncated; skipping',
+                   'Preparation: question_id %s has unparseable html - it might be truncated; skipping',
                    $row['question_id']
                ));
 
@@ -208,6 +208,43 @@ HELP;
              * Apply an inline image conversion for base64-embedded data and purify it.
              * That's what we would have sent to learnosity as the question's contents.
              */
+            $brokenPayload = (new BrokenFillgap($this->domain))->convert([
+                'question' => $question,
+                'marks' => $marks,
+                '_answers' => [
+                    [
+                        'answer' => $answer
+                    ]
+                ]
+            ]);
+
+            /* This is what it *should* have been
+             */
+            $repairPayload = (new Fillgap($this->domain))->convert([
+                'question' => $question,
+                'marks' => $marks,
+                '_answers' => [
+                    [
+                        'answer' => $answer
+                    ]
+                ]
+            ]);
+
+            /* Stack them up if the $brokenPayload's answer is different to the $repairPayload's answer.
+             * If they are already the same, there's nothing that would change. This happens for some simple
+             * cases, but not for more complex ones.
+             */
+            if ($brokenPayload['validation']['valid_response']['value'] === $repairPayload['validation']['valid_response']['value']) {
+                $this->getLogger()->info(sprintf(
+                    'Preparation: Question %s would result in no changes; broken payload is the same as repair payload; skipping',
+                    $questionId
+                ));
+
+                continue;
+            }
+
+            /* Otherwise, we'd actually make a difference trying to repair this question
+             */
             $stack[$assessId]['questions'][$questionId] = [
                 'question' => [
                     /* The original question's contents in Legacy Quiz
@@ -220,26 +257,10 @@ HELP;
                 'answer' => [
                     /* This is the broken answer we sent to learnosity
                      */
-                    'broken' => (new BrokenFillgap($this->domain))->convert([
-                        'question' => $question,
-                        'marks' => $marks,
-                        '_answers' => [
-                            [
-                            'answer' => $answer
-                            ]
-                        ]
-                    ]),
+                    'broken' => $brokenPayload,
                     /* This is a repair payload that we could potentially use
                      */
-                    'repair' => (new Fillgap($this->domain))->convert([
-                        'question' => $question,
-                        'marks' => $marks,
-                        '_answers' => [
-                            [
-                                'answer' => $answer
-                            ]
-                        ]
-                    ])
+                    'repair' => $repairPayload
                 ],
             ];
         }
