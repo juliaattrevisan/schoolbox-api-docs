@@ -350,17 +350,26 @@ HELP;
 
                     /* Find the learnosity quiz for $assessData['learnosity_reference']
                      */
+                    $this->getLogger()->debug(sprintf(
+                        'Looking for learnosity reference %s',
+                        $assessData['learnosity_reference']
+                    ));
 
                     /* Iterate through all the items
-                     */
-
-                    /* Find the Item tha contains a question whose text matches
+                     *
+                     * Find the Item tha contains a question whose text matches
                      * predicted_learnosity_stimulus
                      */
+                    $this->getLogger()->debug(sprintf(
+                        'Traversing...',
+                    ));
 
                     /* Update it with the repair payload
                      */
-
+                    $this->getLogger()->debug(sprintf(
+                        'Performing update of question %s',
+                        implode(', ', $questionData['questionId'])
+                    ));
                 } else {
                     print_r($questionData['answer']['repair']);
                 }
