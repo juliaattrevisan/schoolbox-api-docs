@@ -24,6 +24,27 @@ class Controller extends Base
     {
     }
 
+    /**
+     * Decode URL and validate to see if the url is safe to load
+     *
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     * @return string
+     */
+    private function decodeAndValidateUrl(string $encodedUrl): string
+    {
+        //TODO considering the encoded url which could potentially have the / character in the url causing the url to redirect to wrong page
+        $url = base64_decode($encodedUrl);
+
+        /* $url isn't safe; exit
+         */
+        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($url)) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
+        return $url;
+    }
 
     /**
      * Load an iframe with the specified url
@@ -34,16 +55,22 @@ class Controller extends Base
      */
     public function getCivicaAttendance(string $encodedUrl): void
     {
-        $url = base64_decode($encodedUrl);
-
-        /* $url isn't safe; exit
-         */
-        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($url)) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
-
+        $url = $this->decodeAndValidateUrl($encodedUrl);
         $this->response = $this->responseFromTemplate('@iframe/index.twig', [
             'url' => $url
         ], 'Civica Attendance');
+    }
+
+    /**
+     * @param string $encodedUrl
+     * @throws Exception
+     * @throws Error
+     */
+    public function getKamiInteractiveView(string $encodedUrl): void
+    {
+        $url = $this->decodeAndValidateUrl($encodedUrl);
+        $this->response = $this->responseFromTemplate('@iframe/index.twig', [
+            'url' => $url
+        ], 'Kami Interactive View');
     }
 }
