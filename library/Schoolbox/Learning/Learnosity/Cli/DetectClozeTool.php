@@ -337,7 +337,11 @@ HELP;
     {
         $ref = $learnosityQuestion['question']['data'][0]['data'];
 
+        /* The stimulus text must match
+         */
         if ($questionData['question']['predicted_learnosity_stimulus'] === $ref['stimulus']) {
+            /* The original answer template we built must also match
+             */
             if ($questionData['answer']['broken']['template'] === $ref['template']) {
                 /* The broken answers we would have sent during the mega migration
                  */
@@ -347,8 +351,8 @@ HELP;
                  */
                 $learnosityAnswers = $ref['validation']['valid_response']['value'];
 
-                /* Compare with learnosity
-                 * TODO Check correctness of both order and contents
+                /* The broken answer contents must match what learnosity knows;
+                 * Compare with learnosity and check correctness of both order and contents; must match exactly
                  */
                 if ($brokenAnswers === $learnosityAnswers) {
                     return true;
