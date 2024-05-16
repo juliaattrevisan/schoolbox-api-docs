@@ -313,6 +313,11 @@ class Controller extends BaseController
         // fetch the field metadata to join and clean the data
         $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
 
+        // resort user records so they display similar to within iSAMS
+        usort($userRecords, function ($a, $b) {
+            return $b['id'] <=> $a['id'];
+        });
+
         $out = [];
         $knownFields = [];
         // loop through each record
