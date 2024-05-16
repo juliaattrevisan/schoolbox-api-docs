@@ -240,11 +240,10 @@ fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
 output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh)
-# if output contains 'Maintenance mode enabled'...
-if [[ "$output" == *"Maintenance mode enabled"* ]]; then
+if [[ "$output" == "Maintenance mode enabled for instance 'vagrantx'." ]]; then
   echo "$output"
 else
-  error "Unexpected output when trying to enable maintenance mode for instance '$i'.  Exiting."
+  error "Unexpected output when trying to enable maintenance.  Exiting."
   exit 1;
 fi
 
@@ -439,12 +438,11 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-output=$(INSTANCE_ID="$instance_id_env_var" "$SITE_ROOT"/tools/maintenance/site_up.sh)
-# if output contains 'Maintenance mode disabled'...
-if [[ "$output" == *"Maintenance mode disabled"* ]]; then
+output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh)
+if [[ "$output" == "Maintenance mode disabled for instance 'vagrantx'." ]]; then
   echo "$output"
 else
-  error "Unexpected output when trying to disable maintenance mode for instance '$i'.  Continuing."
+  error "Unexpected output when trying to disable maintenance mode.  Continuing."
 fi
 
 # call custom provisioning
