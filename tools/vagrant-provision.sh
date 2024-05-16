@@ -239,11 +239,10 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh)
-if [[ "$output" == "Maintenance mode enabled for instance 'vagrantx'." ]]; then
-  echo "$output"
+if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh -eq 0 ; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode enabled on instance 'vagrantx'."
 else
-  error "Unexpected output when trying to enable maintenance mode.  Exiting."
+  echo "[SB][`date +%Y-%m-%d\ %X`] Could not enable maintenance mode on instance 'vagrantx'.  Exiting."
   exit 1;
 fi
 
@@ -438,11 +437,10 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh)
-if [[ "$output" == "Maintenance mode disabled for instance 'vagrantx'." ]]; then
-  echo "$output"
+if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Maintenance mode disabled on instance 'vagrantx'."
 else
-  error "Unexpected output when trying to disable maintenance mode.  Continuing."
+  echo "[SB][`date +%Y-%m-%d\ %X`] Could not disable maintenance mode on instance 'vagrantx'.  Continuing."
 fi
 
 # call custom provisioning

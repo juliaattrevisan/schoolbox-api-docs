@@ -166,11 +166,10 @@ function upgrade_instances(){
   log "Taking all instances offline (by enabling maintenance mode)..."
   for i in $instance_list; do
   {
-    output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh)
-    if [[ "$output" == "Maintenance mode enabled for instance '$i'." ]]; then
-      log " * $output"
+    if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
+      log "Maintenance mode enabled on instance '$i'."
     else
-      error " * Unexpected output when trying to enable maintenance mode for instance '$i'.  Exiting."
+      log "Could not enable maintenance mode on instance '$i'.  Exiting."
       exit 1;
     fi
   }
@@ -239,11 +238,10 @@ function upgrade_instances(){
     log "Upgrade complete for instance '$i'";
 
     # Bring instance back online.
-    output=$(INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh)
-    if [[ "$output" == "Maintenance mode disabled for instance '$i'." ]]; then
-      log "$output"
+    if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then
+      log "Maintenance mode disabled on instance '$i'."
     else
-      error "Unexpected output when trying to disable maintenance mode for instance '$i'.  Continuing." >> "$instance_log_file"
+      log "Could not disable maintenance mode on instance '$i'.  Continuing."
     fi
   } &
   done

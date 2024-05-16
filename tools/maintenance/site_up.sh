@@ -17,10 +17,8 @@ output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "U
 statusCode=$?
 
 if [[ "$output" == '' && statusCode -eq 0 ]]; then
-  # IMPORTANT: The string output here is checked for in upgrade-instances.sh.
-  echo "Maintenance mode disabled for instance '$instanceId'."
   exit 0
 else
-  echo "Could not disable maintenance mode for instance '$instanceId'."
+  echo "Could not disable maintenance mode for instance '$instanceId' due to error: $output"
   exit 1
 fi

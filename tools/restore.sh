@@ -751,12 +751,11 @@ if ! mysqldump --single-transaction --allow-keywords --default-character-set=utf
 fi
 
 ## Put up maintenance page
-output=$(INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_down.sh)
-if [[ "$output" == "Maintenance mode enabled for instance '$destination_instance_id'." ]]; then
-  log "$output"
+if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_down.sh -eq 0 ; then
+  log "Maintenance mode enabled on instance '$destination_instance_id'."
 else
-  error "Unexpected output when trying to enable maintenance mode for instance '$destination_instance_id'.  Exiting."
-  exit 1
+  log "Could not enable maintenance mode on instance '$destination_instance_id'.  Exiting."
+  exit 1;
 fi
 
 ## Remove crons
@@ -781,12 +780,10 @@ if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sou
 fi
 
 ## Remove maintenance page
-#/usr/share/schoolbox/tools/maintenance/site_up.sh
-output=$(INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_up.sh)
-if [[ "$output" == "Maintenance mode disabled for instance '$destination_instance_id'." ]]; then
-  log "$output"
+if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_up.sh -eq 0 ; then
+  log "Maintenance mode disabled on instance '$destination_instance_id'."
 else
-  error "Unexpected output when trying to disable maintenance mode for instance '$destination_instance_id'.  Continuing."
+  log "Could not disable maintenance mode on instance '$destination_instance_id'.  Continuing."
 fi
 
 # Recompress if restoring from local backup that was originally compressed
