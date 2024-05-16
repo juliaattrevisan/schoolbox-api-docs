@@ -304,7 +304,7 @@ HELP;
                              * Learnosity in situ; construct api call to do that
                              */
                             $this->getLogger()->info(sprintf(
-                                'Found matching question in learnosity; updating %s',
+                                'Found matching question in learnosity; updating question ref %s',
                                 $learnosityQuestion['data'][0]['reference'],
                             ));
 
@@ -335,7 +335,7 @@ HELP;
      */
     private function matches(array $questionData, array $learnosityQuestion): bool
     {
-        $ref = $learnosityQuestion['question']['data'][0]['data'];
+        $ref = $learnosityQuestion['data'][0]['data'];
 
         /* The stimulus text must match
          */
