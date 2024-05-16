@@ -172,13 +172,14 @@ window.Vue.onUnmounted(() => {
                     v-if="dragStore.routeFolderSequence"
                     ref="draggableEl"
                     class="sortable-holder"
+                    data-test="unit-row-drag-handle"
                     :class="{ isDragging: store.dragCurrentUnit === props.unit }"
                 ></div>
 
                 <div>
                     <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
                     <div>
-                        <a :href="props.unit.homepage">
+                        <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`">
                             <strong>{{ props.unit.title }}</strong>
                         </a>
                         <ul>
