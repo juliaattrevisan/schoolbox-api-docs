@@ -130,7 +130,8 @@ HELP;
      * @return array
      * @throws \DOMException
      */
-    private function findCandidates(?int $assessmentId): array {
+    private function findCandidates(?int $assessmentId): array
+    {
         $query = "
             SELECT
                 assess.assess_id,
@@ -188,9 +189,9 @@ HELP;
                  * Skip it quietly
                  */
                 $this->getLogger()->warning(sprintf(
-                   'Preparation: question_id %s has unparseable html - it might be truncated; skipping',
-                   $row['question_id']
-               ));
+                    'Preparation: question_id %s has unparseable html - it might be truncated; skipping',
+                    $row['question_id']
+                ));
 
                 continue;
             }
