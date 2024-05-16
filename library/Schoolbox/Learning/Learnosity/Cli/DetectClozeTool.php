@@ -75,7 +75,6 @@ class DetectClozeTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_STACK,
-//            self::OPT_LONG_ANALYSIS,
             self::OPT_LONG_REPAIR,
             self::OPT_LONG_ASSESSMENT_ID
         ];
@@ -129,12 +128,6 @@ HELP;
         if ($this->getOpt(self::OPT_LONG_STACK)) {
             print_r($stack);
         }
-
-//        /* Inspect the stack for things we can fix and things we can't
-//         */
-//        if ($this->getOpt(self::OPT_LONG_ANALYSIS)) {
-//            print_r($this->analyse($stack));
-//        }
 
         /* Inspect the stack for possible repair payloads
         */
@@ -276,72 +269,6 @@ HELP;
 
         return $stack;
     }
-
-
-//    /**
-//     * Examine the candidate quizzes and see which ones can be repaired or not
-//     *
-//     * @param array $stack
-//     * @return array|array[]
-//     */
-//    private function analyse(array $stack): array
-//    {
-//        /* A list of repairable quiz ids
-//         */
-//        $analysis = [
-//            'repairable' => [
-//                'ids' => [],
-//                'count' => 0
-//            ],
-//            'inconclusive' => [
-//                'ids' => [],
-//                'count' => 0
-//            ]
-//        ];
-//
-//        /* Inspect for quizzes we can repair automatically
-//         * and ones we can't...not sure what we do about them ones.
-//         */
-//        foreach ($stack as $assessId => $assessData) {
-//            $hasCollisions = false;
-//
-//            foreach ($assessData['questions'] as $discriminator => $questionData) {
-//                $collisions = \count($questionData['questionId']);
-//
-//                /* If this question stimulus was used more than once,
-//                 * it's inconclusive w.r.t. repairing it programmatically
-//                 */
-//                if ($collisions > 1) {
-//                    $this->getLogger()->info(sprintf(
-//                        'Legacy quiz "%s" (assess_id: %s) has collisions in cloze exercise questions %s; cannot automatically repair.',
-//                        $assessData['title'],
-//                        $assessId,
-//                        implode(', ', $questionData['questionId'])
-//                    ));
-//
-//                    $hasCollisions = true;
-//                }
-//            }
-//
-//            /* A set of (assess id, learnosity reference) tuples for ones we can fix,
-//             * and ones we can't.
-//             */
-//            $tuple = [
-//                'title' => $assessData['title'],
-//                'learnosity_reference' => $assessData['learnosity_reference'],
-//            ];
-//
-//            if (!$hasCollisions) {
-//                $analysis['repairable']['ids'][$assessId] = $tuple;
-//                $analysis['repairable']['count']++;
-//            } else {
-//                $analysis['inconclusive']['ids'][$assessId] = $tuple;
-//                $analysis['inconclusive']['count']++;
-//            }
-//        }
-//
-//        return $analysis;
-//    }
 
 
     /**
