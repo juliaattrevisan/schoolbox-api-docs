@@ -267,13 +267,22 @@ HELP;
             return;
         }
 
+        /* Maintain a counter, for user experience
+         */
+        $i = 0;
+        $numQuizzes = \count($stack);
+
         /* Perform Mode tells learnosity to get fixed up
          */
         foreach ($stack as $assessId => $assessData) {
+            $i++;
+
             $this->getLogger()->info('');
 
             $this->getLogger()->info(sprintf(
-                'Processing "%s" (assess_id: %s, assessment_id: %s) with learnosity_reference %s',
+                '(%s/%s) Processing "%s" (assess_id: %s, assessment_id: %s) with learnosity_reference %s',
+                $i,
+                $numQuizzes,
                 $assessData['title'],
                 $assessId,
                 $assessData['assessment_id'],
@@ -290,11 +299,21 @@ HELP;
                 (new BrokenFillgap($this->domain))->getLearnosityEquivalent()
             );
 
+            /* Maintain a counter for questions
+             */
+            $j = 0;
+            $numQuestions = \count($assessData['questions']);
+
             foreach ($assessData['questions'] as $questionId => $questionData) {
+                $j++;
                 $found = false;
 
                 $this->getLogger()->debug(sprintf(
-                    'Traversing learnosity quiz for something that matches this question...',
+                    '(%s/%s) [%s/%s] Traversing learnosity quiz for something that matches this question...',
+                    $i,
+                    $numQuizzes,
+                    $j,
+                    $numQuestions
                 ));
 
                 /* Iterate through all the items
@@ -314,7 +333,11 @@ HELP;
                          * Learnosity in situ; construct api call to do that
                          */
                         $this->getLogger()->info(sprintf(
-                            'Found matching question in learnosity; updating question ref %s (question_id: %s)',
+                            '(%s/%s) [%s/%s] Found matching question in learnosity; updating question ref %s (question_id: %s)',
+                            $i,
+                            $numQuizzes,
+                            $j,
+                            $numQuestions,
                             $learnosityQuestion['data'][0]['reference'],
                             $questionId
                         ));
@@ -333,7 +356,13 @@ HELP;
 //                            ]
 //                        ]);
 
-                        $this->getLogger()->debug('Update request complete.');
+                        $this->getLogger()->debug(sprintf(
+                            '(%s/%s) [%s/%s] Update request complete.',
+                            $i,
+                            $numQuizzes,
+                            $j,
+                            $numQuestions
+                        ));
 
                         $found = true;
                     }
@@ -343,7 +372,11 @@ HELP;
                  */
                 if (!$found) {
                     $this->getLogger()->warning(sprintf(
-                        'No learnosity equivalent found for question_id %s',
+                        '(%s/%s) [%s/%s] No learnosity equivalent found for question_id %s',
+                        $i,
+                        $numQuizzes,
+                        $j,
+                        $numQuestions,
                         $questionId
                     ));
                 }
