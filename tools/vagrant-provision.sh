@@ -243,7 +243,7 @@ output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh)
 if [[ "$output" == "Maintenance mode enabled for instance 'vagrantx'." ]]; then
   echo "$output"
 else
-  error "Unexpected output when trying to enable maintenance.  Exiting."
+  error "Unexpected output when trying to enable maintenance mode.  Exiting."
   exit 1;
 fi
 
