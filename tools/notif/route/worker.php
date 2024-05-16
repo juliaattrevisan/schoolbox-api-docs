@@ -8,6 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -60,7 +62,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $routePermMapper,
         $instance,
         $filesystemProxy,
-        $emailFactory
+        $emailFactory,
+        new Jitter(new FloatGenerator(), maxAttempts: 15, baseTimeout: 2500),
     ))->build($loop, INSTANCE_ID);
 });
 

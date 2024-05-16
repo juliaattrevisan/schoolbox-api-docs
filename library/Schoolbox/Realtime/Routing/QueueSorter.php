@@ -12,8 +12,7 @@ namespace Schoolbox\Realtime\Routing;
 use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Queue\QueueInterface;
-use Alaress\Jitter\Jitter;
-use Alaress\Random\FloatGenerator;
+use Alaress\Jitter\IJitter;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
@@ -31,22 +30,12 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 class QueueSorter implements FilterInterface
 {
     /**
-     * How many attempts may be made to push to a queue before we give up?
-     */
-    private const MAX_ATTEMPTS = 15;
-
-    /**
-     * The amount of time (in milliseconds) to wait for at first when
-     * re-attempting to push to a queue.
-     */
-    private const ATTEMPT_BASE_TIMEOUT = 2500;
-
-    /**
      * @param FilterInterface                 $filter
      * @param LoggerInterface                 $log
      * @param MessageList\IPublicationFactory $listFactory
      * @param RoutePermissionMapper           $permMapper
      * @param LoopInterface                   $loop
+     * @param IJitter                         $jitter
      */
     public function __construct(
         private FilterInterface $filter,
@@ -54,6 +43,7 @@ class QueueSorter implements FilterInterface
         private MessageList\IPublicationFactory $listFactory,
         private RoutePermissionMapper $permMapper,
         private LoopInterface $loop,
+        private IJitter $jitter,
     ) {
     }
 
@@ -318,22 +308,25 @@ class QueueSorter implements FilterInterface
      */
     private function pushToQueue(QueueInterface $queue, Instance $instance, int $attemptNum = 0): void
     {
-        $jitter = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         try {
             $queue->push($instance);
         } catch (RateLimitException $e) {
-            if (!$jitter->tooManyAttempts($attemptNum + 1)) {
-                $wait = (int)$jitter->calculateJitter($attemptNum);
-                $this->log->notice(
-                    sprintf('Queue is likely rate-limited: waiting %d ms before trying again', $wait)
-                );
-                $this->loop->addTimer(
-                    $wait / 1000,
-                    fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
-                );
-                return;
+            // Too many attempts already: just throw the exception
+            // (May not be able to throw, as this is happening asynchronously)
+            if ($this->jitter->tooManyAttempts($attemptNum + 1)) {
+                throw $e;
             }
-            throw $e;
+
+            //
+            $wait = $this->jitter->calculateJitter($attemptNum);
+            $this->log->notice(
+                sprintf('Queue is likely rate-limited: waiting %d ms before trying again', $wait)
+            );
+            $this->loop->addTimer(
+                $wait / 1000,
+                fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
+            );
+            return;
         }
     }
 }
