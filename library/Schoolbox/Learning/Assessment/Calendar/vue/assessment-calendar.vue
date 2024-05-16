@@ -1022,6 +1022,10 @@ export default {
     border: 0 !important;
 }
 
+.fc-event {
+    margin-bottom: 1px;
+}
+
 .fc-event .fc-title,
 .fc-event .fc-title:hover {
     color: #fff !important;
