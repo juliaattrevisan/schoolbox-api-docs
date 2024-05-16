@@ -84,9 +84,6 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
   exit 1;
 fi
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-"$SITE_ROOT"/tools/maintenance/site_down.sh;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
@@ -239,6 +236,16 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config ups_groups_enabled "'1'"; then
   error "Unable to install instance. Exiting."
   exit 1
+fi
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
+output=$(INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_down.sh)
+# if output contains 'Maintenance mode enabled'...
+if [[ "$output" == *"Maintenance mode enabled"* ]]; then
+  echo "$output"
+else
+  error "Unexpected output when trying to enable maintenance mode for instance '$i'.  Exiting."
+  exit 1;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
@@ -432,7 +439,13 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-"$SITE_ROOT"/tools/maintenance/site_up.sh;
+output=$(INSTANCE_ID="$instance_id_env_var" "$SITE_ROOT"/tools/maintenance/site_up.sh)
+# if output contains 'Maintenance mode disabled'...
+if [[ "$output" == *"Maintenance mode disabled"* ]]; then
+  echo "$output"
+else
+  error "Unexpected output when trying to disable maintenance mode for instance '$i'.  Continuing."
+fi
 
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];
