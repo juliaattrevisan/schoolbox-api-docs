@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Cli\DetectCloze\BrokenFillgap;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Fillgap;
 
@@ -23,10 +24,16 @@ class DetectClozeTool extends CliTool\App
 
 
     /**
-     * Show the analysis of quizzes to find out how many are conclusive
-     * and how many aren't
+     * Show candidate stack, mostly for devs.
      */
-    private const OPT_LONG_ANALYSIS = 'analysis';
+    private const OPT_LONG_STACK = 'stack';
+
+
+//    /**
+//     * Show the analysis of quizzes to find out how many are conclusive
+//     * and how many aren't
+//     */
+//    private const OPT_LONG_ANALYSIS = 'analysis';
 
 
     /**
@@ -67,7 +74,8 @@ class DetectClozeTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_ANALYSIS,
+            self::OPT_LONG_STACK,
+//            self::OPT_LONG_ANALYSIS,
             self::OPT_LONG_REPAIR,
             self::OPT_LONG_ASSESSMENT_ID
         ];
@@ -118,11 +126,15 @@ HELP;
          */
         $stack = $this->findCandidates($assessmentId);
 
-        /* Inspect the stack for things we can fix and things we can't
-         */
-        if ($this->getOpt(self::OPT_LONG_ANALYSIS)) {
-            print_r($this->analyse($stack));
+        if ($this->getOpt(self::OPT_LONG_STACK)) {
+            print_r($stack);
         }
+
+//        /* Inspect the stack for things we can fix and things we can't
+//         */
+//        if ($this->getOpt(self::OPT_LONG_ANALYSIS)) {
+//            print_r($this->analyse($stack));
+//        }
 
         /* Inspect the stack for possible repair payloads
         */
@@ -233,7 +245,15 @@ HELP;
                         'predicted_learnosity_stimulus' => $this->produceQuestionText($question),
                     ],
                     'answer' => [
-                        'original' => $answer,
+                        'broken' => (new BrokenFillgap($this->domain))->convert([
+                            'question' => $question,
+                            'marks' => $marks,
+                            '_answers' => [
+                                [
+                                'answer' => $answer
+                                ]
+                            ]
+                        ]),
                         /* This is a repair payload that we could potentially use
                          */
                         'repair' => (new Fillgap($this->domain))->convert([
@@ -258,70 +278,70 @@ HELP;
     }
 
 
-    /**
-     * Examine the candidate quizzes and see which ones can be repaired or not
-     *
-     * @param array $stack
-     * @return array|array[]
-     */
-    private function analyse(array $stack): array
-    {
-        /* A list of repairable quiz ids
-         */
-        $analysis = [
-            'repairable' => [
-                'ids' => [],
-                'count' => 0
-            ],
-            'inconclusive' => [
-                'ids' => [],
-                'count' => 0
-            ]
-        ];
-
-        /* Inspect for quizzes we can repair automatically
-         * and ones we can't...not sure what we do about them ones.
-         */
-        foreach ($stack as $assessId => $assessData) {
-            $hasCollisions = false;
-
-            foreach ($assessData['questions'] as $discriminator => $questionData) {
-                $collisions = \count($questionData['questionId']);
-
-                /* If this question stimulus was used more than once,
-                 * it's inconclusive w.r.t. repairing it programmatically
-                 */
-                if ($collisions > 1) {
-                    $this->getLogger()->info(sprintf(
-                        'Legacy quiz "%s" (assess_id: %s) has collisions in cloze exercise questions %s; cannot automatically repair.',
-                        $assessData['title'],
-                        $assessId,
-                        implode(', ', $questionData['questionId'])
-                    ));
-
-                    $hasCollisions = true;
-                }
-            }
-
-            /* A set of (assess id, learnosity reference) tuples for ones we can fix,
-             * and ones we can't.
-             */
-            $tuple = [
-                'title' => $assessData['title'],
-                'learnosity_reference' => $assessData['learnosity_reference'],
-            ];
-
-            if (!$hasCollisions) {
-                $analysis['repairable']['ids'][$assessId] = $tuple;
-                $analysis['repairable']['count']++;
-            } else {
-                $analysis['inconclusive']['ids'][$assessId] = $tuple;
-                $analysis['inconclusive']['count']++;
-            }
-        }
-
-        return $analysis;
-    }
+//    /**
+//     * Examine the candidate quizzes and see which ones can be repaired or not
+//     *
+//     * @param array $stack
+//     * @return array|array[]
+//     */
+//    private function analyse(array $stack): array
+//    {
+//        /* A list of repairable quiz ids
+//         */
+//        $analysis = [
+//            'repairable' => [
+//                'ids' => [],
+//                'count' => 0
+//            ],
+//            'inconclusive' => [
+//                'ids' => [],
+//                'count' => 0
+//            ]
+//        ];
+//
+//        /* Inspect for quizzes we can repair automatically
+//         * and ones we can't...not sure what we do about them ones.
+//         */
+//        foreach ($stack as $assessId => $assessData) {
+//            $hasCollisions = false;
+//
+//            foreach ($assessData['questions'] as $discriminator => $questionData) {
+//                $collisions = \count($questionData['questionId']);
+//
+//                /* If this question stimulus was used more than once,
+//                 * it's inconclusive w.r.t. repairing it programmatically
+//                 */
+//                if ($collisions > 1) {
+//                    $this->getLogger()->info(sprintf(
+//                        'Legacy quiz "%s" (assess_id: %s) has collisions in cloze exercise questions %s; cannot automatically repair.',
+//                        $assessData['title'],
+//                        $assessId,
+//                        implode(', ', $questionData['questionId'])
+//                    ));
+//
+//                    $hasCollisions = true;
+//                }
+//            }
+//
+//            /* A set of (assess id, learnosity reference) tuples for ones we can fix,
+//             * and ones we can't.
+//             */
+//            $tuple = [
+//                'title' => $assessData['title'],
+//                'learnosity_reference' => $assessData['learnosity_reference'],
+//            ];
+//
+//            if (!$hasCollisions) {
+//                $analysis['repairable']['ids'][$assessId] = $tuple;
+//                $analysis['repairable']['count']++;
+//            } else {
+//                $analysis['inconclusive']['ids'][$assessId] = $tuple;
+//                $analysis['inconclusive']['count']++;
+//            }
+//        }
+//
+//        return $analysis;
+//    }
 
 
     /**
