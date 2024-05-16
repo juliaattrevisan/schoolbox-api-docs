@@ -89,6 +89,14 @@ HELP;
         $serverName = $server->getHost();
         $this->domain = (string)$server;
 
+        $this->api = new Api(
+            $serverName,
+            $this->getConfig()->get('learnosity_version'),
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger()
+        );
+
         $this->inlineImageConverter = new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger());
 
         /* Find all the quizzes that contain a cloze exercise
@@ -138,6 +146,7 @@ HELP;
             AND assess_section.deleted_at IS NULL
             AND assess_question.deleted_at IS NULL
             AND assess_question.type_id = :typeId
+            ORDER BY assess.assess_id DESC
         ";
 
         $params = [
@@ -153,9 +162,10 @@ HELP;
         }
 
         $statement = $this->getDatabaseInternal()->prepareQuery($query, $params);
-
         $statement->execute();
 
+        /* Start compiling some info from legacy quiz data
+         */
         $stack = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -181,6 +191,8 @@ HELP;
                 continue;
             }
 
+            /* Group questions by their parent quiz
+             */
             if (!isset($stack[$assessId])) {
                 $stack[$assessId] = [
                     'title' => $title,
@@ -244,6 +256,7 @@ HELP;
     private function repair(array $stack): void
     {
         foreach ($stack as $assessId => $assessData) {
+
             foreach ($assessData['questions'] as $questionId => $questionData) {
                 /* Find the learnosity quiz for $assessData['learnosity_reference']
                  */
