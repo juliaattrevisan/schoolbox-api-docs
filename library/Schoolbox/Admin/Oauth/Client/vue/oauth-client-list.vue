@@ -33,22 +33,22 @@ const props = defineProps<Props>();
 
 const isDataLoaded = window.Vue.ref(false);
 const hasDataLoadError = window.Vue.ref(false);
-const loadedData = window.Vue.ref<OAuthClient[]>([]);
-const addingItem = window.Vue.ref({});
-const modifyingItem = window.Vue.ref({});
-const regeneratingItem = window.Vue.ref({});
-const deletingItem = window.Vue.ref({});
+const clientList = window.Vue.ref<OAuthClient[]>([]);
+const addingClient = window.Vue.ref<OAuthClient | null>(null);
+const modifyingClient = window.Vue.ref<OAuthClient | null>(null);
+const regeneratingClient = window.Vue.ref<OAuthClient | null>(null);
+const deletingClient = window.Vue.ref<OAuthClient | null>(null);
 const searchUsers = window.Vue.ref([]);
 const saveError = window.Vue.ref(null);
 const userSearchQueryParam = window.Vue.ref("");
 const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
 
-const addItemModal = window.Vue.ref<typeof RevealModal | null>(null);
-const itemAddedModal = window.Vue.ref<typeof RevealModal | null>(null);
-const modifyItemModal = window.Vue.ref<typeof RevealModal | null>(null);
-const regenerateItemModal = window.Vue.ref<typeof RevealModal | null>(null);
-const itemRegeneratedModal = window.Vue.ref<typeof RevealModal | null>(null);
-const deleteItemModal = window.Vue.ref<typeof RevealModal | null>(null);
+const addClientModal = window.Vue.ref<typeof RevealModal | null>(null);
+const clientAddedModal = window.Vue.ref<typeof RevealModal | null>(null);
+const modifyClientModal = window.Vue.ref<typeof RevealModal | null>(null);
+const regenerateClientModal = window.Vue.ref<typeof RevealModal | null>(null);
+const clientRegeneratedModal = window.Vue.ref<typeof RevealModal | null>(null);
+const deleteClientModal = window.Vue.ref<typeof RevealModal | null>(null);
 
 /**
  *
@@ -56,7 +56,7 @@ const deleteItemModal = window.Vue.ref<typeof RevealModal | null>(null);
 async function getData() {
     try {
         const response = await fetch(props.getListEndpoint);
-        loadedData.value = (await response.json()) as OAuthClient[];
+        clientList.value = (await response.json()) as OAuthClient[];
     } catch (error) {
         console.warn(error);
         hasDataLoadError.value = true; // show load error
@@ -70,30 +70,30 @@ async function getData() {
  */
 function showAddModal() {
     saveError.value = null;
-    addingItem.value = {};
-    addItemModal.value.open();
+    addingClient.value = null;
+    addClientModal.value.open();
 }
 
 /**
- *
+ * Add another 0Authclient
  */
-async function addItem() {
+async function addClient() {
     try {
         // this.$refs.toast.activate("Creating...");
         const response = await fetch(props.postItemEndpoint, {
             method: "POST",
-            body: JSON.stringify(addingItem.value),
+            body: JSON.stringify(addingClient.value),
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
         });
         if (response.ok) {
-            const addedItem = await response.json();
-            addingItem.value = addedItem;
-            addItemModal.value.close();
-            itemAddedModal.value.open();
-            loadedData.value.push({ ...addedItem });
+            const newClient = (await response.json()) as OAuthClient;
+            addingClient.value = newClient;
+            addClientModal.value.close();
+            clientAddedModal.value.open();
+            clientList.value.push({ ...newClient });
             // this.$refs.toast.timeout("Created", true);
         } else {
             const error = await response.json();
@@ -110,33 +110,33 @@ async function addItem() {
 /**
  *
  */
-function showModifyModal(item) {
+function showModifyModal(client: OAuthClient) {
     saveError.value = null;
-    modifyingItem.value = { ...item };
-    modifyItemModal.value.open();
+    modifyingClient.value = { ...client };
+    modifyClientModal.value.open();
 }
 
 /**
  *
  */
-async function modifyItem(item) {
+async function modifyItem(client: OAuthClient) {
     try {
         // this.$refs.toast.activate("Modifying...");
-        const response = await fetch(item._links.patch, {
+        const response = await fetch(client._links.patch, {
             method: "PATCH",
-            body: JSON.stringify(item),
+            body: JSON.stringify(client),
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
         });
         if (response.ok) {
-            modifyItemModal.value.close();
+            modifyClientModal.value.close();
             // this.$refs.toast.timeout("Modified", true);
 
-            // Replace the existing modified item with the new version
-            const modifiedItem = await response.json();
-            loadedData.value = loadedData.value.map((v) => (v.id === modifiedItem.id ? modifiedItem : v));
+            // Replace the existing modified client with the new version
+            const modifiedClient = (await response.json()) as OAuthClient;
+            clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
         } else {
             const error = await response.json();
             if (error.title) {
@@ -152,28 +152,28 @@ async function modifyItem(item) {
 /**
  *
  */
-function showRegenerateModal(item) {
+function showRegenerateModal(client: OAuthClient) {
     saveError.value = null;
-    regeneratingItem.value = { ...item };
-    regenerateItemModal.value.open();
+    regeneratingClient.value = { ...client };
+    regenerateClientModal.value.open();
 }
 
 /**
  *
  */
-async function regenerateItem(item) {
+async function regenerateClient(client: OAuthClient) {
     try {
         // this.$refs.toast.activate("Regenerating...");
-        const response = await fetch(item._links.regenerate, {
+        const response = await fetch(client._links.regenerate, {
             method: "POST",
             headers: {
                 Accept: "application/json",
             },
         });
         if (response.ok) {
-            regeneratingItem.value = await response.json();
-            regenerateItemModal.value.close();
-            itemRegeneratedModal.value.open();
+            regeneratingClient.value = (await response.json()) as OAuthClient;
+            regenerateClientModal.value.close();
+            clientRegeneratedModal.value.open();
             // this.$refs.toast.timeout("Regenerated", true);
         } else {
             const error = await response.json();
@@ -190,21 +190,21 @@ async function regenerateItem(item) {
 /**
  *
  */
-function showDeleteModal(item) {
-    deletingItem.value = { ...item };
-    deleteItemModal.value.open();
+function showDeleteModal(client: OAuthClient) {
+    deletingClient.value = { ...client };
+    deleteClientModal.value.open();
 }
 
 /**
  *
  */
-async function deleteItem(item) {
+async function deleteClient(client: OAuthClient) {
     try {
-        await fetch(item._links.delete, {
+        await fetch(client._links.delete, {
             method: "DELETE",
         });
-        deleteItemModal.value.close();
-        loadedData.value = loadedData.value.filter((v) => v.id !== item.id);
+        deleteClientModal.value.close();
+        clientList.value = clientList.value.filter((c) => c.id !== client.id);
 
         // Show toast
     } catch (error) {
@@ -260,12 +260,12 @@ window.Vue.onMounted(() => {
     <div>
         <div v-if="isDataLoaded">
             <div class="small-12 island">
-                <template v-if="loadedData.length === 0">
+                <template v-if="clientList.length === 0">
                     <div id="listEmptyState" class="empty-state">
                         <i class="icon-list"></i>
                         <p>
                             No oAuth clients have been configured.
-                            <a href="#" @click.prevent="addItemModal.open">Add an oAuth client</a>.
+                            <a href="#" @click.prevent="addClientModal.open">Add an oAuth client</a>.
                         </p>
                     </div>
                 </template>
@@ -278,7 +278,7 @@ window.Vue.onMounted(() => {
                             <th>Client Credentials User</th>
                             <th>&nbsp;</th>
                         </tr>
-                        <tr v-for="row in loadedData" :key="row.clientId">
+                        <tr v-for="row in clientList" :key="row.clientId">
                             <td>{{ row.name }}</td>
                             <td>{{ row.redirectUri }}</td>
                             <td>{{ row.clientId }}</td>
@@ -332,34 +332,34 @@ window.Vue.onMounted(() => {
 
         <loading-table v-else />
 
-        <reveal-modal ref="addItemModal">
+        <reveal-modal ref="addClientModal">
             <h2>Add oAuth Client</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
-            <label for="addItem-name" class="required">Name</label>
+            <label for="addClient-name" class="required">Name</label>
             <p class="meta">
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
                 whether they wish to share their details.
             </p>
-            <input id="addItem-name" v-model="addingItem.name" required />
+            <input id="addClient-name" v-model="addingClient.name" required />
 
-            <label for="addItem-redirectUri" class="required">Redirect URI</label>
+            <label for="addClient-redirectUri" class="required">Redirect URI</label>
             <p class="meta">
                 When the user approves a request to share details, where should they be redirected to? (This URI must be
                 able to process an oAuth authorization code.)
             </p>
-            <input id="addItem-redirectUri" v-model="addingItem.redirectUri" required />
+            <input id="addClient-redirectUri" v-model="addingClient.redirectUri" required />
 
-            <label for="addItem-clientCredentialsUser">Client Credentials User</label>
+            <label for="addClient-clientCredentialsUser">Client Credentials User</label>
             <p class="meta">
                 Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance,
                 without interaction by an actual user) will be authenticated as this user; if no user is set here, this
                 client may not use client credentials requests.
             </p>
             <v-select
-                v-model="addingItem.clientCredentialsUser"
+                v-model="addingClient.clientCredentialsUser"
                 label="fullName"
                 placeholder="Search for user, or leave empty for no user"
-                input-id="addItem-clientCredentialsUser"
+                input-id="addClient-clientCredentialsUser"
                 :options="searchUsers"
                 class="schoolbox-vue-selectize"
                 :clear-search-on-blur="() => true"
@@ -377,29 +377,31 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#add-item" class="button" @click.prevent="addItem">Add</a>
-                    <a href="#cancel" class="button" @click.prevent="addItemModal.close">Cancel</a>
+                    <a href="#add-item" class="button" @click.prevent="addClient">Add</a>
+                    <a href="#cancel" class="button" @click.prevent="addClientModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="itemAddedModal">
+        <reveal-modal ref="clientAddedModal">
             <h2>oAuth Client Added</h2>
             <label for="itemAdded-name">Name</label>
-            <input id="itemAdded-name" v-model="addingItem.name" readonly />
+            <input id="itemAdded-name" v-model="addingClient.name" readonly />
 
             <label for="itemAdded-redirectUri">Redirect URI</label>
-            <input id="itemAdded-redirectUri" v-model="addingItem.redirectUri" readonly />
+            <input id="itemAdded-redirectUri" v-model="addingClient.redirectUri" readonly />
 
             <label for="itemAdded-clientId">Client ID</label>
-            <input id="itemAdded-clientId" v-model="addingItem.clientId" readonly />
+            <input id="itemAdded-clientId" v-model="addingClient.clientId" readonly />
 
             <label for="itemAdded-clientSecret">Client Secret</label>
-            <input id="itemAdded-clientSecret" v-model="addingItem.clientSecret" readonly />
+            <input id="itemAdded-clientSecret" v-model="addingClient.clientSecret" readonly />
 
             <label for="itemAdded-clientCredentialsUser">Client Credentials User</label>
             <select id="itemAdded-clientCredentialsUser" readonly>
-                <option v-if="addingItem.clientCredentialsUser">{{ addingItem.clientCredentialsUser.fullName }}</option>
+                <option v-if="addingClient.clientCredentialsUser">
+                    {{ addingClient.clientCredentialsUser.fullName }}
+                </option>
                 <option v-else>No user</option>
             </select>
 
@@ -409,12 +411,12 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#close" class="button" @click.prevent="itemAddedModal.close">Close</a>
+                    <a href="#close" class="button" @click.prevent="clientAddedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="modifyItemModal">
+        <reveal-modal ref="modifyClientModal">
             <h2>Modify oAuth Client</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <label for="modifyItem-name" class="required">Name</label>
@@ -422,14 +424,14 @@ window.Vue.onMounted(() => {
                 A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
                 whether they wish to share their details.
             </p>
-            <input id="modifyItem-name" v-model="modifyingItem.name" required />
+            <input id="modifyItem-name" v-model="modifyingClient.name" required />
 
             <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
             <p class="meta">
                 When the user approves a request to share details, where should they be redirected to? (This URI must be
                 able to process an oAuth authorization code.)
             </p>
-            <input id="modifyItem-redirectUri" v-model="modifyingItem.redirectUri" required />
+            <input id="modifyItem-redirectUri" v-model="modifyingClient.redirectUri" required />
 
             <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
             <p class="meta">
@@ -438,7 +440,7 @@ window.Vue.onMounted(() => {
                 client may not use client credentials requests.
             </p>
             <v-select
-                v-model="modifyingItem.clientCredentialsUser"
+                v-model="modifyingClient.clientCredentialsUser"
                 label="fullName"
                 placeholder="Search for user, or leave empty for no user"
                 input-id="modifyItem-clientCredentialsUser"
@@ -459,34 +461,34 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#modify" class="button" @click.prevent="modifyItem(modifyingItem)">Modify</a>
-                    <a href="#cancel" class="button" @click.prevent="modifyItemModal.close">Cancel</a>
+                    <a href="#modify" class="button" @click.prevent="modifyItem(modifyingClient)">Modify</a>
+                    <a href="#cancel" class="button" @click.prevent="modifyClientModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="regenerateItemModal">
-            <h2>Regenerate Client Secret for oAuth Client {{ regeneratingItem.name }}?</h2>
-            <div data-alert="" class="alert-box alert" v-if="saveError">{{ saveError }}</div>
+        <reveal-modal ref="regenerateClientModal">
+            <h2>Regenerate Client Secret for oAuth Client {{ regeneratingClient.name }}?</h2>
+            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <div data-alert="" class="alert-box warning">
                 Regenerating this client&rsquo;s secret will invalidate the configuration of this Schoolbox instance as
                 an oAuth Provider within the client application: it will need to be updated with the regenerated secret.
             </div>
             <div class="component-action">
                 <section>
-                    <a href="#regenerate" class="button" @click.prevent="regenerateItem(regeneratingItem)"
+                    <a href="#regenerate" class="button" @click.prevent="regenerateClient(regeneratingClient)"
                         >Regenerate</a
                     >
-                    <a href="#cancel" class="button" @click.prevent="$refs.regenerateItemModal.close">Cancel</a>
+                    <a href="#cancel" class="button" @click.prevent="regenerateClientModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="itemRegeneratedModal">
-            <h2>Client Secret for oAuth Client {{ regeneratingItem.name }} Regenerated</h2>
+        <reveal-modal ref="clientRegeneratedModal">
+            <h2>Client Secret for oAuth Client {{ regeneratingClient.name }} Regenerated</h2>
 
             <label for="itemRegenerated-clientSecret">Client Secret</label>
-            <input id="itemRegenerated-clientSecret" v-model="regeneratingItem.clientSecret" readonly />
+            <input id="itemRegenerated-clientSecret" v-model="regeneratingClient.clientSecret" readonly />
 
             <div data-alert="" class="alert-box warning">
                 You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
@@ -494,17 +496,17 @@ window.Vue.onMounted(() => {
 
             <div class="component-action">
                 <section>
-                    <a href="#close" class="button" @click.prevent="itemRegeneratedModal.close">Close</a>
+                    <a href="#close" class="button" @click.prevent="clientRegeneratedModal.close">Close</a>
                 </section>
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="deleteItemModal">
-            <h2>Delete oAuth Client {{ deletingItem.name }}?</h2>
+        <reveal-modal ref="deleteClientModal">
+            <h2>Delete oAuth Client {{ deletingClient.name }}?</h2>
             <div class="component-action">
                 <section>
-                    <a href="#delete" class="button" @click.prevent="deleteItem(deletingItem)">Delete</a>
-                    <a href="#cancel" class="button" @click.prevent="deleteItemModal.close">Cancel</a>
+                    <a href="#delete" class="button" @click.prevent="deleteClient(deletingClient)">Delete</a>
+                    <a href="#cancel" class="button" @click.prevent="deleteClientModal.close">Cancel</a>
                 </section>
             </div>
         </reveal-modal>
