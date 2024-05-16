@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Learnosity\Cli;
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Cli\DetectCloze\BrokenFillgap;
@@ -146,7 +147,6 @@ HELP;
             AND assess_section.deleted_at IS NULL
             AND assess_question.deleted_at IS NULL
             AND assess_question.type_id = :typeId
-            ORDER BY assess.assess_id DESC
         ";
 
         $params = [
@@ -252,26 +252,49 @@ HELP;
      *
      * @param array $stack
      * @return void
+     * @throws \JsonException
+     * @throws ValidationException
      */
     private function repair(array $stack): void
     {
+        /* Planning Mode reveals candidate stack to stdout
+         */
+        if (!$this->perform()) {
+            print_r($stack);
+
+            return;
+        }
+
+        /* Perform Mode tells learnosity to get fixed up
+         * TODO actual update
+         */
         foreach ($stack as $assessId => $assessData) {
+            $this->getLogger()->info(sprintf(
+                'Processing "%s" (assess_id: %s, assessment_id: %s) with learnosity_reference %s',
+                $assessData['title'],
+                $assessId,
+                $assessData['assessment_id'],
+                $assessData['learnosity_reference']
+            ));
+
+            /* Find the learnosity items used in $assessData['learnosity_reference']
+             * Annoyingly you need the references, then fetch those separately
+             *
+             * In this case, a set of cloze exercises found in learnosity's data
+             */
+            $items = $this->findItems(
+                $this->findItemReferences($assessData['learnosity_reference']),
+                (new BrokenFillgap($this->domain))->getLearnosityEquivalent()
+            );
 
             foreach ($assessData['questions'] as $questionId => $questionData) {
-                /* Find the learnosity quiz for $assessData['learnosity_reference']
-                 */
-                $this->getLogger()->debug(sprintf(
-                    'Looking for learnosity reference %s',
-                    $assessData['learnosity_reference']
-                ));
-
                 /* Iterate through all the items
                  *
                  * Find the Item tha contains a question whose text matches predicted_learnosity_stimulus,
                  * and whose answer options match the broken answer ones we sent previously
                  */
                 $this->getLogger()->debug(sprintf(
-                   'Traversing...',
+                   'Traversing learnosity quiz for something that matches this question...',
                 ));
 
                 /* At this point you should have a Question node that we can update and re-send back to
@@ -281,16 +304,85 @@ HELP;
                     'Updating question %s in learnosity',
                     '',
                 ));
+            }
+        }
+    }
 
-                /* Perform Mode tells learnosity to get fixed up
-                 * TODO actual update
-                 */
-                if ($this->perform()) {
-                } else {
-                    print_r($stack);
+
+    /**
+     * Find all the item references used by a particular quiz
+     *
+     * @param string $learnosityReference
+     * @return array|null
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function findItemReferences(string $learnosityReference): ?array
+    {
+        $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $learnosityReference
+            ]
+        ])['data'][0]['data']['items'] ?? null;
+
+        /* Can't find any items? Just leave
+         */
+        if (null === $itemReferences) {
+            $this->getLogger()->info(sprintf(
+                'No items found for learnosity_reference %s; skipping',
+                $learnosityReference
+            ));
+
+            return null;
+        }
+
+        /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+         * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+         */
+        if (is_array($itemReferences[0])) {
+            /* Forcibly mutate this, because learnosity insanity
+             */
+            $itemReferenceList = array_column($itemReferences, 'id');
+        } else {
+            /* Presume it was a list of reference strings already
+             */
+            $itemReferenceList = $itemReferences;
+        }
+
+        return $itemReferenceList;
+    }
+
+
+    /**
+     * Find actual item nodes from learnsity, coresponding to the iddentifiers in $itemReferenceList
+     * We only return questions of type $questionType
+     *
+     * @param array  $itemReferenceList
+     * @param string $questionType
+     * @return array
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function findItems(array $itemReferenceList, string $questionType): array
+    {
+        $stack = [];
+
+        $items = $this->api->dataGetRequest('/itembank/items', [
+            'references' => $itemReferenceList
+        ])['data'] ?? [];
+
+        /* Filter the result to only clozetext question types
+         * to save some mem and traversal
+         */
+        foreach ($items as $item) {
+            foreach ($item['questions'] as $question) {
+                if ($questionType === $question['type']) {
+                    $stack[] = $item;
                 }
             }
         }
+
+        return $stack;
     }
 
 
