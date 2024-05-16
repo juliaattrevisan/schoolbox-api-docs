@@ -113,7 +113,7 @@ HELP;
         $stack = $this->findCandidates($assessmentId);
 
         /* Inspect the stack for possible repair payloads
-        */
+         */
         $this->repair($stack);
     }
 
@@ -282,30 +282,81 @@ HELP;
              *
              * In this case, a set of cloze exercises found in learnosity's data
              */
-            $items = $this->findItems(
+            $learnosityItems = $this->findItems(
                 $this->findItemReferences($assessData['learnosity_reference']),
                 (new BrokenFillgap($this->domain))->getLearnosityEquivalent()
             );
 
             foreach ($assessData['questions'] as $questionId => $questionData) {
+                $this->getLogger()->debug(sprintf(
+                   'Traversing learnosity quiz for something that matches this question...',
+                ));
+
                 /* Iterate through all the items
                  *
                  * Find the Item tha contains a question whose text matches predicted_learnosity_stimulus,
                  * and whose answer options match the broken answer ones we sent previously
                  */
-                $this->getLogger()->debug(sprintf(
-                   'Traversing learnosity quiz for something that matches this question...',
-                ));
+                foreach ($learnosityItems as $learnosityItem) {
+                    foreach ($learnosityItem['questions'] as $learnosityQuestion) {
+                        if ($this->matches($questionData, $learnosityQuestion)) {
+                            /* At this point you should have a Question node that we can update and re-send back to
+                             * Learnosity in situ; construct api call to do that
+                             */
+                            $this->getLogger()->info(sprintf(
+                                'Found matching question in learnosity; updating %s',
+                                $learnosityQuestion['data'][0]['reference'],
+                            ));
 
-                /* At this point you should have a Question node that we can update and re-send back to
-                 * Learnosity in situ; construct api call to do that
-                 */
-                $this->getLogger()->info(sprintf(
-                    'Updating question %s in learnosity',
-                    '',
-                ));
+                            /* TODO actual update
+                             */
+                            print_r($questionData);
+                            print_r($learnosityQuestion);
+                        }
+                    }
+                }
             }
         }
+    }
+
+
+    /**
+     * Perform both checks to maximise chances of finding the correct question to repair:
+     *     - Question stimulus text matches the one in learnosity
+     *     - The broken answer template matches the one in learnosity
+     *     - The broken answer options matches the ones in learnosity
+     *
+     * The fulfilment of these three criteria should be enough to indicate that this legacy question
+     * matches the one in learnosity, and we can probably proceed with a blind repair
+     *
+     * It dodges around these user behaviours after the fact:
+     *     - Fixed the question manually by changing it themselves
+     *     - Reordering the question
+     */
+    private function matches(array $questionData, array $learnosityQuestion): bool
+    {
+        $ref = $learnosityQuestion['question']['data'][0]['data'];
+
+        if ($questionData['question']['predicted_learnosity_stimulus'] === $ref['stimulus']) {
+            if ($questionData['answer']['broken']['template'] === $ref['template']) {
+                /* The broken answers we would have sent during the mega migration
+                 */
+                $brokenAnswers = $questionData['answer']['broken']['validation']['valid_response']['value'];
+
+                /* The answers learnosity knows about; a user may have changed these since mega migration
+                 */
+                $learnosityAnswers = $ref['validation']['valid_response']['value'];
+
+                /* Compare with learnosity
+                 * TODO Check correctness of both order and contents
+                 */
+                if ($brokenAnswers === $learnosityAnswers) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -375,8 +426,16 @@ HELP;
          * to save some mem and traversal
          */
         foreach ($items as $item) {
-            foreach ($item['questions'] as $question) {
+            foreach ($item['questions'] as &$question) {
                 if ($questionType === $question['type']) {
+                    /* Find more info about this particular question and shank it back into the item itself
+                     */
+                    $question = $this->api->dataGetRequest('/itembank/questions', [
+                        'references' => [
+                            $question['reference']
+                        ]
+                    ]);
+
                     $stack[] = $item;
                 }
             }
