@@ -209,10 +209,6 @@ HELP;
                 continue;
             }
 
-            /* Detect if multiple question stimuli functionally collide
-             */
-            $discriminator = sha1($question);
-
             if (!isset($stack[$assessId])) {
                 $stack[$assessId] = [
                     'title' => $title,
@@ -226,45 +222,40 @@ HELP;
              * Apply an inline image conversion for base64-embedded data and purify it.
              * That's what we would have sent to learnosity as the question's contents.
              */
-            if (!isset($stack[$assessId]['questions'][$discriminator])) {
-                $stack[$assessId]['questions'][$discriminator] = [
-                    'questionId' => [$questionId],
-                    'question' => [
-                        /* The original question's contents in Legacy Quiz
-                         */
-                        'original' => $question,
-                        /* This is what we would have sent to learnosity itself during the mega migration
-                         */
-                        'predicted_learnosity_stimulus' => $this->produceQuestionText($question),
-                    ],
-                    'answer' => [
-                        'broken' => (new BrokenFillgap($this->domain))->convert([
-                            'question' => $question,
-                            'marks' => $marks,
-                            '_answers' => [
-                                [
+            $stack[$assessId]['questions'][$questionId] = [
+                'question' => [
+                    /* The original question's contents in Legacy Quiz
+                     */
+                    'original' => $question,
+                    /* This is what we would have sent to learnosity itself during the mega migration
+                     */
+                    'predicted_learnosity_stimulus' => $this->produceQuestionText($question),
+                ],
+                'answer' => [
+                    /* This is the broken answer we sent to learnosity
+                     */
+                    'broken' => (new BrokenFillgap($this->domain))->convert([
+                        'question' => $question,
+                        'marks' => $marks,
+                        '_answers' => [
+                            [
+                            'answer' => $answer
+                            ]
+                        ]
+                    ]),
+                    /* This is a repair payload that we could potentially use
+                     */
+                    'repair' => (new Fillgap($this->domain))->convert([
+                        'question' => $question,
+                        'marks' => $marks,
+                        '_answers' => [
+                            [
                                 'answer' => $answer
-                                ]
                             ]
-                        ]),
-                        /* This is a repair payload that we could potentially use
-                         */
-                        'repair' => (new Fillgap($this->domain))->convert([
-                            'question' => $question,
-                            'marks' => $marks,
-                            '_answers' => [
-                                [
-                                    'answer' => $answer
-                                ]
-                            ]
-                        ])
-                    ],
-                ];
-            } else {
-                /* Add it to the list of colliding questions
-                 */
-                $stack[$assessId]['questions'][$discriminator]['questionId'][] = $questionId;
-            }
+                        ]
+                    ])
+                ],
+            ];
         }
 
         return $stack;
@@ -281,13 +272,11 @@ HELP;
     private function repair(array $stack): void
     {
         foreach ($stack as $assessId => $assessData) {
-            foreach ($assessData['questions'] as $discriminator => $questionData) {
-                /* Only repair questions that could be conslusively repaired
-                 * Ignore uncertainties
-                 */
-                if (1 !== \count($questionData['questionId'])) {
-                    continue;
-                }
+            foreach ($assessData['questions'] as $questionId => $questionData) {
+
+
+
+
 
                 /* Perform Mode tells learnosity to get fixed up
                  * TODO actual update
