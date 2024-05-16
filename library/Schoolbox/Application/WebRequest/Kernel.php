@@ -499,9 +499,9 @@ class Kernel extends WebKernelAbstract
      * @inheritDoc
      * @throws \Throwable
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        parent::postInstallDependencies(); // Check for maintenance mode is done in here.
+        parent::postInstallDependencies($bypassMaintenanceModeCheck); // Check for maintenance mode is done in here.
 
         $this->initRoutes();
         $this->initModules();
