@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new \Schoolbox\Learning\Learnosity\Cli\DetectClozeTool();
+$app = new \Schoolbox\Learning\Learnosity\Cli\RepairClozeTool();
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *

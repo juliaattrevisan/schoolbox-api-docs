@@ -18,7 +18,7 @@ use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Fillgap;
  * Detect legacy quizzes containing cloze exercises.
  * These are known to have imported incorrectly at the start of 2024.
  */
-class DetectClozeTool extends CliTool\App
+class RepairClozeTool extends CliTool\App
 {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -80,7 +80,7 @@ HELP;
         /* Log the title first lol
          */
         $this->getLogger()->info('');
-        $this->getLogger()->info('Learnosity Detect Cloze.');
+        $this->getLogger()->info('Learnosity Repair Cloze Exercises (Fillgap) from mega migration for 23.1');
         $this->getLogger()->info('');
 
         /* Initialise dependencies
