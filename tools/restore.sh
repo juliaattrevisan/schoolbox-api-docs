@@ -752,9 +752,9 @@ fi
 
 ## Put up maintenance page
 if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_down.sh -eq 0 ; then
-  log "Maintenance mode enabled on instance '$destination_instance_id'."
+  echo "Maintenance mode enabled on instance '$destination_instance_id'."
 else
-  log "Could not enable maintenance mode on instance '$destination_instance_id'.  Exiting."
+  echo "Could not enable maintenance mode on instance '$destination_instance_id'.  Exiting."
   exit 1;
 fi
 
@@ -781,9 +781,9 @@ fi
 
 ## Remove maintenance page
 if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_up.sh -eq 0 ; then
-  log "Maintenance mode disabled on instance '$destination_instance_id'."
+  echo "Maintenance mode disabled on instance '$destination_instance_id'."
 else
-  log "Could not disable maintenance mode on instance '$destination_instance_id'.  Continuing."
+  echo "Could not disable maintenance mode on instance '$destination_instance_id'.  Continuing."
 fi
 
 # Recompress if restoring from local backup that was originally compressed
