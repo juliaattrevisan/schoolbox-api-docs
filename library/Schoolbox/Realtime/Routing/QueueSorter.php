@@ -14,6 +14,7 @@ use Exception;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
@@ -30,12 +31,14 @@ class QueueSorter implements FilterInterface
      * @param LoggerInterface                 $log
      * @param MessageList\IPublicationFactory $listFactory
      * @param RoutePermissionMapper           $permMapper
+     * @param LoopInterface                   $loop
      */
     public function __construct(
         private FilterInterface $filter,
         private LoggerInterface $log,
         private MessageList\IPublicationFactory $listFactory,
-        private RoutePermissionMapper $permMapper
+        private RoutePermissionMapper $permMapper,
+        private LoopInterface $loop,
     ) {
     }
 

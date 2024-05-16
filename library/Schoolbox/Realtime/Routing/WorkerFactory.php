@@ -22,7 +22,6 @@ use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Routing\Filter;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
@@ -112,7 +111,7 @@ class WorkerFactory
         $filter = (new Filter\FilterFactory($listFactory, $this->conf))->build();
 
         // setup a sorter
-        $sorter = new QueueSorter($filter, $this->log, $listFactory, $this->routePermMapper);
+        $sorter = new QueueSorter($filter, $this->log, $listFactory, $this->routePermMapper, $loop);
 
         // use the route strat
         $strat = new Routing\DispatchStrategy();
