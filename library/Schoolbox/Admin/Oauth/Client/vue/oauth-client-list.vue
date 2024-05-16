@@ -6,11 +6,11 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
+import type { OAuthClient } from "../js/types/OAuthClient";
 
 vSelect.props.components.default = () => ({ Deselect });
 
-// The number of milliseconds to wait between the user's input and a search for
-// users.
+// The number of milliseconds to wait between the user's input and a search for users.
 const SEARCH_RESULT_RETRIEVE_DELAY = 350;
 
 interface Props {
@@ -33,7 +33,7 @@ const props = defineProps<Props>();
 
 const isDataLoaded = window.Vue.ref(false);
 const hasDataLoadError = window.Vue.ref(false);
-const loadedData = window.Vue.ref([]);
+const loadedData = window.Vue.ref<OAuthClient[]>([]);
 const addingItem = window.Vue.ref({});
 const modifyingItem = window.Vue.ref({});
 const regeneratingItem = window.Vue.ref({});
@@ -56,7 +56,7 @@ const deleteItemModal = window.Vue.ref<typeof RevealModal | null>(null);
 async function getData() {
     try {
         const response = await fetch(props.getListEndpoint);
-        loadedData.value = await response.json();
+        loadedData.value = (await response.json()) as OAuthClient[];
     } catch (error) {
         console.warn(error);
         hasDataLoadError.value = true; // show load error
