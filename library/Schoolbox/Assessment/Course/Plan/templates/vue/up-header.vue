@@ -20,6 +20,14 @@ const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
 
 /**
+ * To be able to return to the unit planner after modifying the course
+ * @returns {string} - The base64 encoded return url
+ */
+const returnUrl = window.Vue.computed(() => {
+    return window.btoa(window.location.pathname);
+});
+
+/**
  * To show the add unit display
  */
 // function onCreateSelected() {
@@ -46,9 +54,9 @@ const props = defineProps<Props>();
             -->
         </div>
     </div>
-    <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content  aria-hidden="true">
+    <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
         <li>
-            <a :href="`/course/modify/${props.courseId}`" class="icon-modify">Modify Course</a>
+            <a :href="`/course/modify/${props.courseId}?returnUrl=${returnUrl}`" class="icon-modify">Modify Course</a>
         </li>
         <li>
             <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>
@@ -57,7 +65,9 @@ const props = defineProps<Props>();
             <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
         </li>
         <li>
-            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar">Assessment Calendar</a>
+            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar"
+                >Assessment Calendar</a
+            >
         </li>
     </ul>
     <!--
