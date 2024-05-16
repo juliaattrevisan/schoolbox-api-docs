@@ -20,7 +20,7 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-$this->setFile(TEMPLATE_content, 'messages.html');
+$this->setFile(TEMPLATE_content, 'notifications.html');
 
 $this->setBlock(TEMPLATE_content, 'no_messages', 'no_messages_block');
 $this->setBlock(TEMPLATE_content, 'days', 'days_block');
@@ -29,7 +29,7 @@ $this->setBlock('day', 'events', 'events_block');
 $this->setBlock('events', 'event', 'event_block');
 $this->setBlock('event', 'abstract', 'abstract_block');
 
-$this->setTitle('All Messages');
+$this->setTitle('All Notifications');
 
 $factory = new ListFactory(INSTANCE_ID, Redis::getStorageClientInstance());
 
