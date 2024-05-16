@@ -22,8 +22,6 @@ test.describe("Learning Moment Photo Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    // This test is not implemented yet, using to demonstrate tester.runShellCommand
-
     test("Learning Moment Photo", async ({ tester, page }) => {
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await page.goto(LearningMomentsPage.getStudentProfilePage(25));
