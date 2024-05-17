@@ -4,11 +4,11 @@ import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import type { OAuthClient } from "../js/types/OAuthClient";
-import { gt } from "lodash";
 
 vSelect.props.components.default = () => ({ Deselect });
 
@@ -327,16 +327,7 @@ window.Vue.onMounted(() => {
             </div>
         </div>
 
-        <div v-else-if="hasDataLoadError">
-            <div class="small-12 island">
-                <section class="content">
-                    <div data-alert class="alert-box alert">
-                        Sorry, we are currently unable to load this List data. Please contact Schoolbox Support it the
-                        problem persists.
-                    </div>
-                </section>
-            </div>
-        </div>
+        <data-load-error v-else-if="hasDataLoadError" data-title="client list" />
 
         <loading-table v-else />
 
@@ -424,7 +415,7 @@ window.Vue.onMounted(() => {
             </div>
         </reveal-modal>
 
-        <!-- <reveal-modal ref="modifyClientModal">
+        <reveal-modal ref="modifyClientModal">
             <h2>Modify oAuth Client</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <label for="modifyItem-name" class="required">Name</label>
@@ -473,9 +464,9 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="modifyClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal> -->
+        </reveal-modal>
 
-        <!-- <reveal-modal ref="regenerateClientModal">
+        <reveal-modal ref="regenerateClientModal">
             <h2>Regenerate Client Secret for oAuth Client {{ regeneratingClient.name }}?</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <div data-alert="" class="alert-box warning">
@@ -490,9 +481,9 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="regenerateClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal> -->
+        </reveal-modal>
 
-        <!-- <reveal-modal ref="clientRegeneratedModal">
+        <reveal-modal ref="clientRegeneratedModal">
             <h2>Client Secret for oAuth Client {{ regeneratingClient.name }} Regenerated</h2>
 
             <label for="itemRegenerated-clientSecret">Client Secret</label>
@@ -507,9 +498,9 @@ window.Vue.onMounted(() => {
                     <a href="#close" class="button" @click.prevent="clientRegeneratedModal.close">Close</a>
                 </section>
             </div>
-        </reveal-modal> -->
+        </reveal-modal>
 
-        <!-- <reveal-modal ref="deleteClientModal">
+        <reveal-modal ref="deleteClientModal">
             <h2>Delete oAuth Client {{ deletingClient.name }}?</h2>
             <div class="component-action">
                 <section>
@@ -517,7 +508,7 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="deleteClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal> -->
+        </reveal-modal>
 
         <toast ref="toast"></toast>
     </div>
