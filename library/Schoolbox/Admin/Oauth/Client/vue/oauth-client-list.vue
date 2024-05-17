@@ -292,18 +292,21 @@ window.Vue.onMounted(() => {
                                     href="#modify"
                                     class="icon-modify no-text"
                                     title="Modify this client"
+                                    aria-label="Modify this client"
                                     @click.prevent="showModifyModal(row)"
                                 ></a>
                                 <a
                                     href="#regenerate"
                                     class="icon-refresh no-text"
                                     title="Regenerate this client&rsquo;s secret"
+                                    aria-label="Regenerate this client&rsquo;s secret"
                                     @click.prevent="showRegenerateModal(row)"
                                 ></a>
                                 <a
                                     href="#delete"
                                     class="icon-delete no-text"
                                     title="Delete this client"
+                                    aria-label="Delete this client"
                                     @click.prevent="showDeleteModal(row)"
                                 ></a>
                             </nav>
