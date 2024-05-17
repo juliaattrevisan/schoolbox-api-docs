@@ -43,6 +43,9 @@
                 itemTimeFormat: "LLLL",
                 itemTextEmphasis: "b",
 
+                // have we run the auto notification reader (auto dismiss notif)
+                autoReadNotif: false,
+
                 // dictionary values
 
                 dictItemOthers: "others",
@@ -177,6 +180,11 @@
 
                 clearInterval(ii);
                 ii = setInterval(updateRelativeTimes, 9000);
+
+                // if we haven't run this yet, then auto read the messages
+                if (!settings.autoReadNotif) {
+                    self.autoUnread();
+                }
             }
 
             /**
@@ -361,6 +369,33 @@
 
                 // TODO use this somehow
             };
+
+
+            this.autoUnread = function (data) {
+                if (settings.debug) {
+                    console.log("auto unread called.");
+                }
+                // On page load, if the href matches the exact string in one of the unread notifications, we should mark that as read
+                const href = document.location.toString().replace(document.location.origin, '');
+                document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
+                    if (!settings.autoReadNotif) {
+                        // no page found yet, keep looping
+                        if (element.getAttribute('href') === href) {
+                            // get parent where we could mark as read
+                            let message = element.closest("[data-msgitem]");
+                            // if this is unread, mark as read, and exit
+                            if ('unread' === message.dataset.status) {
+                                if (settings.debug) {
+                                    console.log("found message to mark as read.");
+                                }
+                                var msgId = message.getAttribute('id').split("-")[1];
+                                send({ack: msgId})
+                                settings.autoReadNotif = true;
+                            }
+                        }
+                    }
+                });
+            }
 
             /**
              * Socket Event

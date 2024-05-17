@@ -392,7 +392,8 @@
                         $('#msgs').notifier({
                             unread:   Number('{{ ws.unread }}'),
                             maxstack: Number('{{ ws.stackLimit }}'),
-                            itemTimeFormat: dateDisplayFormats.dayjsDatetime
+                            itemTimeFormat: dateDisplayFormats.dayjsDatetime,
+                            debug: Boolean({{ config.debug_mode }})
                         });
 
                         $('#alert-dialog').on('click', 'a.action', function (e) {
