@@ -8,6 +8,7 @@ import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import type { OAuthClient } from "../js/types/OAuthClient";
+import { gt } from "lodash";
 
 vSelect.props.components.default = () => ({ Deselect });
 
@@ -52,7 +53,7 @@ const clientRegeneratedModal = window.Vue.ref<typeof RevealModal | null>(null);
 const deleteClientModal = window.Vue.ref<typeof RevealModal | null>(null);
 
 /**
- *
+ * Fetch the current list of clients from the server.
  */
 async function getData() {
     try {
@@ -67,7 +68,7 @@ async function getData() {
 }
 
 /**
- *
+ * Show the add modal
  */
 function showAddModal() {
     saveError.value = null;
@@ -94,7 +95,7 @@ async function addClient() {
             addingClient.value = newClient;
             addClientModal.value.close();
             clientAddedModal.value.open();
-            clientList.value.push({ ...newClient });
+            clientList.value = [...clientList.value, newClient];
             // this.$refs.toast.timeout("Created", true);
         } else {
             const error = await response.json();
@@ -109,7 +110,8 @@ async function addClient() {
 }
 
 /**
- *
+ * Show the modify modal
+ * @param {OAuthClient} client - The client to modify
  */
 function showModifyModal(client: OAuthClient) {
     saveError.value = null;
@@ -118,7 +120,8 @@ function showModifyModal(client: OAuthClient) {
 }
 
 /**
- *
+ * Modify an existing client
+ * @param {OAuthClient} client - The client to modify
  */
 async function modifyItem(client: OAuthClient) {
     try {
@@ -151,7 +154,8 @@ async function modifyItem(client: OAuthClient) {
 }
 
 /**
- *
+ * Show the regenerate modal
+ * @param {OAuthClient} client - The client to regenerate
  */
 function showRegenerateModal(client: OAuthClient) {
     saveError.value = null;
@@ -160,7 +164,8 @@ function showRegenerateModal(client: OAuthClient) {
 }
 
 /**
- *
+ * Regenerate the client secret
+ * @param {OAuthClient} client - The client to regenerate
  */
 async function regenerateClient(client: OAuthClient) {
     try {
@@ -189,7 +194,8 @@ async function regenerateClient(client: OAuthClient) {
 }
 
 /**
- *
+ * Show the delete modal
+ * @param {OAuthClient} client - The client to delete
  */
 function showDeleteModal(client: OAuthClient) {
     deletingClient.value = { ...client };
@@ -197,7 +203,8 @@ function showDeleteModal(client: OAuthClient) {
 }
 
 /**
- *
+ * Delete a client
+ * @param {OAuthClient} client - The client to delete
  */
 async function deleteClient(client: OAuthClient) {
     try {
@@ -417,7 +424,7 @@ window.Vue.onMounted(() => {
             </div>
         </reveal-modal>
 
-        <reveal-modal ref="modifyClientModal">
+        <!-- <reveal-modal ref="modifyClientModal">
             <h2>Modify oAuth Client</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <label for="modifyItem-name" class="required">Name</label>
@@ -466,9 +473,9 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="modifyClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal>
+        </reveal-modal> -->
 
-        <reveal-modal ref="regenerateClientModal">
+        <!-- <reveal-modal ref="regenerateClientModal">
             <h2>Regenerate Client Secret for oAuth Client {{ regeneratingClient.name }}?</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
             <div data-alert="" class="alert-box warning">
@@ -483,9 +490,9 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="regenerateClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal>
+        </reveal-modal> -->
 
-        <reveal-modal ref="clientRegeneratedModal">
+        <!-- <reveal-modal ref="clientRegeneratedModal">
             <h2>Client Secret for oAuth Client {{ regeneratingClient.name }} Regenerated</h2>
 
             <label for="itemRegenerated-clientSecret">Client Secret</label>
@@ -500,9 +507,9 @@ window.Vue.onMounted(() => {
                     <a href="#close" class="button" @click.prevent="clientRegeneratedModal.close">Close</a>
                 </section>
             </div>
-        </reveal-modal>
+        </reveal-modal> -->
 
-        <reveal-modal ref="deleteClientModal">
+        <!-- <reveal-modal ref="deleteClientModal">
             <h2>Delete oAuth Client {{ deletingClient.name }}?</h2>
             <div class="component-action">
                 <section>
@@ -510,7 +517,7 @@ window.Vue.onMounted(() => {
                     <a href="#cancel" class="button" @click.prevent="deleteClientModal.close">Cancel</a>
                 </section>
             </div>
-        </reveal-modal>
+        </reveal-modal> -->
 
         <toast ref="toast"></toast>
     </div>
