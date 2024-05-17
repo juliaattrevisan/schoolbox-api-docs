@@ -729,9 +729,9 @@ class Controller extends Base\Base
             ]);
         } else {
             // respond to synchronous POST with redirect
-            $returnUrlEncoded = $this->requestPost['returnUrl'];
+            $returnUrlEncoded = $this->requestPost['returnUrl'] ?? '';
 
-            if ($returnUrlEncoded !== null) {
+            if ($returnUrlEncoded !== '') {
                 $returnUrl = Redirect::decode($returnUrlEncoded);
             } else {
                 // If no return URL supplied, redirect to course list page
