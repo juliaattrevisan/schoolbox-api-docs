@@ -122,7 +122,7 @@ class PayloadCache
 
         /* Files that could potentially exist in storage at any given time
          */
-        foreach($this->scheduled as $lissMethodName => $data) {
+        foreach ($this->scheduled as $lissMethodName => $data) {
             if (\count($data['sources'])) {
                 return true;
             }
