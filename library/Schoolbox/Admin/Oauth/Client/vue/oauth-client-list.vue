@@ -296,25 +296,27 @@ window.Vue.onMounted(() => {
                                 }}</a>
                                 <em v-else>No user</em>
                             </td>
-                            <td>
-                                <a
-                                    href="#"
-                                    class="icon-modify"
-                                    title="Modify this client"
-                                    @click.prevent="showModifyModal(row)"
-                                ></a>
-                                <a
-                                    href="#"
-                                    class="icon-refresh"
-                                    title="Regenerate this client&rsquo;s secret"
-                                    @click.prevent="showRegenerateModal(row)"
-                                ></a>
-                                <a
-                                    href="#"
-                                    class="icon-delete"
-                                    title="Delete this client"
-                                    @click.prevent="showDeleteModal(row)"
-                                ></a>
+                            <td class="actions-small-2">
+                                <nav>
+                                    <a
+                                        href="#modify"
+                                        class="icon-modify no-text"
+                                        title="Modify this client"
+                                        @click.prevent="showModifyModal(row)"
+                                    ></a>
+                                    <a
+                                        href="#regenerate"
+                                        class="icon-refresh no-text"
+                                        title="Regenerate this client&rsquo;s secret"
+                                        @click.prevent="showRegenerateModal(row)"
+                                    ></a>
+                                    <a
+                                        href="#delete"
+                                        class="icon-delete no-text"
+                                        title="Delete this client"
+                                        @click.prevent="showDeleteModal(row)"
+                                    ></a>
+                                </nav>
                             </td>
                         </tr>
                     </table>
