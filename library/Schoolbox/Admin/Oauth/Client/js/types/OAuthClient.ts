@@ -29,3 +29,36 @@ export type OAuthClient = {
         regenerate: string;
     };
 };
+
+/**
+ * Return an empty OAuth client object
+ * @returns {OAuthClient} an empty OAuth client object
+ */
+export function getEmptyOAuthClient() {
+    return {
+        id: 0,
+        name: "",
+        clientId: "",
+        redirectUri: "",
+        clientCredentialsUser: {
+            id: 0,
+            _links: {
+                profile: "",
+                avatar: "",
+            },
+            title: "",
+            firstName: "",
+            preferredName: "",
+            pronoun: "",
+            lastName: "",
+            fullName: "",
+            isDeleted: false,
+        },
+        _links: {
+            put: "",
+            patch: "",
+            delete: "",
+            regenerate: "",
+        },
+    };
+}

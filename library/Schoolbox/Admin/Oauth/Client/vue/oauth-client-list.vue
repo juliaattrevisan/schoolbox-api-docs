@@ -6,6 +6,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import type { OAuthClient } from "../js/types/OAuthClient";
 
 vSelect.props.components.default = () => ({ Deselect });
@@ -34,10 +35,10 @@ const props = defineProps<Props>();
 const isDataLoaded = window.Vue.ref(false);
 const hasDataLoadError = window.Vue.ref(false);
 const clientList = window.Vue.ref<OAuthClient[]>([]);
-const addingClient = window.Vue.ref<OAuthClient | null>(null);
-const modifyingClient = window.Vue.ref<OAuthClient | null>(null);
-const regeneratingClient = window.Vue.ref<OAuthClient | null>(null);
-const deletingClient = window.Vue.ref<OAuthClient | null>(null);
+const addingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
+const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
+const regeneratingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
+const deletingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const searchUsers = window.Vue.ref([]);
 const saveError = window.Vue.ref(null);
 const userSearchQueryParam = window.Vue.ref("");
@@ -70,7 +71,7 @@ async function getData() {
  */
 function showAddModal() {
     saveError.value = null;
-    addingClient.value = null;
+    addingClient.value = getEmptyOAuthClient();
     addClientModal.value.open();
 }
 
