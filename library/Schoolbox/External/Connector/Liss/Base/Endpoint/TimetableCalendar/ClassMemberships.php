@@ -82,10 +82,6 @@ class ClassMemberships implements IStrategy
         $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
-        if (null === $payloads) {
-            return;
-        }
-
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
                 '(%s) publishClassMemberships: processing request',

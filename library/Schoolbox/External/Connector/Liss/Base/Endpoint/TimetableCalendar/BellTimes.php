@@ -85,10 +85,6 @@ class BellTimes implements IStrategy
         $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_BELLTIMES);
 
-        if (null === $payloads) {
-            return;
-        }
-
         foreach ($payloads as $source => $payload) {
             /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
              * It turns out schools have multiple cycles of varying day lengths

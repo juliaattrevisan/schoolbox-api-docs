@@ -113,10 +113,6 @@ class DailyData implements IStrategy
         $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
-        if (null === $payloads) {
-            return;
-        }
-
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
                 '(%s) publishDailyData: processing request',

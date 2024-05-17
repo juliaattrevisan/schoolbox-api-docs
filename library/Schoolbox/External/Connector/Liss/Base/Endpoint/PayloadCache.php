@@ -134,10 +134,10 @@ class PayloadCache
      * as Most Recent Liss Input Payloads.
      *
      * @param string $lissMethodName
-     * @return null|array
+     * @return array
      * @throws FilesystemException
      */
-    public function load(string $lissMethodName): ?array
+    public function load(string $lissMethodName): array
     {
         /* TODO Potentially generate $scheduled just once and inject its result everywhere,
          *  saving you rebuilding this list for each strat just to get a subset

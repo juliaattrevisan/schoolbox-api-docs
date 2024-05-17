@@ -70,10 +70,6 @@ class Classes implements IStrategy
         $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
             ->load(PayloadCache::PAYLOAD_CLASSES);
 
-        if (null === $payloads) {
-            return;
-        }
-
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
                 '(%s) publishClasses: processing request',
