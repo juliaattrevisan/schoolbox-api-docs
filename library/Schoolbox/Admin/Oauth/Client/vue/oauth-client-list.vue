@@ -12,24 +12,12 @@ import type { OAuthClient } from "../js/types/OAuthClient";
 
 vSelect.props.components.default = () => ({ Deselect });
 
-// The number of milliseconds to wait between the user's input and a search for users.
-const SEARCH_RESULT_RETRIEVE_DELAY = 350;
+const SEARCH_RESULT_RETRIEVE_DELAY = 350; // The number of milliseconds to wait between the user's input and a search for users.
 
 interface Props {
     getListEndpoint: string; // The endpoint for fetching the list of items.
     postItemEndpoint: string; // The endpoint for posting a new item to.
     userSearchEndpoint: string; // The endpoint to which user search requests are submitted.
-    // userSearchQueryParam: string; // The query string parameter to submit the user search parameter within, when performing a user search.
-    // userSearchAdditionalParams: {
-    //         // Any additional query string parameters to submit to the user
-    //         // search endpoint.
-    //         //
-    //         // By default, this user search show staff users only.
-    //         type: Object,
-    //         default: () => {
-    //             return { filter: JSON.stringify({ roleType: "staff" }) };
-    //         },
-    //     },
 }
 const props = defineProps<Props>();
 
@@ -284,7 +272,7 @@ window.Vue.onMounted(() => {
                             <th>Redirect URI</th>
                             <th>Client ID</th>
                             <th>Client Credentials User</th>
-                            <th>&nbsp;</th>
+                            <th class="text-right">Actions</th>
                         </tr>
                         <tr v-for="row in clientList" :key="row.clientId">
                             <td>{{ row.name }}</td>
