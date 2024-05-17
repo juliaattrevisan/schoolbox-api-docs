@@ -293,7 +293,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(`${SELECTOR_ASSESSMENT_FEEDBACK_MARK_INPUT}-${studentId}`).fill("65");
 
-        tester.isGoingTo("publish feedback for the submission");
+        tester.isGoingTo("publish feedback for the submission and expect to be redirected to the status page");
         await page.getByTestId(SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
         await expect(page.getByTestId(SELECTOR_ASSESSMENT_STATUS_META_TITLE)).toHaveText("Status of Test Due Work");
 
@@ -302,8 +302,13 @@ test.describe("Initial Due Work functionality tests", () => {
 
         // this if-clause is due to an intermittent issue SA-14676
         if (await page.getByTestId(SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).isVisible()) {
-            tester.isGoingTo("publish feedback for the submission");
+            tester.isGoingTo("try publish again, as the button is still visible due to an intermittent issue SA-14676");
+            tester.isGoingTo("publish feedback for the submission and expect to be redirected to the status page");
             await page.getByTestId(SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
+            await expect(page.getByTestId(SELECTOR_ASSESSMENT_STATUS_META_TITLE)).toHaveText("Status of Test Due Work");
+
+            tester.isGoingTo("navigate back to the feedback page");
+            await page.goto(studentWeAreMarkingUrl);
         }
 
         tester.isGoingTo("check if the assessment status is reviewed");
@@ -314,25 +319,25 @@ test.describe("Initial Due Work functionality tests", () => {
 
     // TODO: Continue implementing the rest of the tests from codeception
 
-    test.afterEach(async ({ tester }) => {
-        await tester.logout();
-    });
+    // test.afterEach(async ({ tester }) => {
+    //     await tester.logout();
+    // });
 
-    test.afterAll(async ({ baseTester, db }) => {
-        // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does not impact next suite of tests",
-        );
+    // test.afterAll(async ({ baseTester, db }) => {
+    //     // Soft-delete data to not interfere with other tests
+    //     baseTester.isGoingTo(
+    //         "update delete_at for the data created in this test so it does not impact next suite of tests",
+    //     );
 
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "name LIKE": "Test Class Homepage%" },
-        );
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "title LIKE": "Test Due Work%" },
-        );
-    });
+    //     await db.updateInDatabase(
+    //         "folder",
+    //         { deleted_at: "2022-01-15 11:12:34" },
+    //         { "name LIKE": "Test Class Homepage%" },
+    //     );
+    //     await db.updateInDatabase(
+    //         "assessment",
+    //         { deleted_at: "2022-01-15 11:12:34" },
+    //         { "title LIKE": "Test Due Work%" },
+    //     );
+    // });
 });
