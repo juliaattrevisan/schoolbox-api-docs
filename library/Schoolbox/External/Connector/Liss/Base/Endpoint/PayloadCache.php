@@ -50,6 +50,15 @@ class PayloadCache
 
 
     /**
+     * A list of payloads that would be used in scheduled import.
+     * It uses the PayloadList to generate this, remembering its result to save repeatedly generating it
+     *
+     * @var array|null
+     */
+    private ?array $scheduled = null;
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $storageMapper
@@ -104,23 +113,17 @@ class PayloadCache
      */
     public function hasPayloads(): bool
     {
+        /* Potentially generate $scheduled just once and inject its result everywhere,
+         * saving you rebuilding this list for each strat just to get a subset
+         */
+        if (null === $this->scheduled) {
+            $this->scheduled = (new PayloadList($this->storageMapper))->generate()['scheduled'];
+        }
+
         /* Files that could potentially exist in storage at any given time
          */
-        foreach (self::PAYLOAD_ALL as $lissMethodName) {
-            $filename = sprintf(
-                '%s%s%s%s',
-                Factory::SOURCE_NAME,
-                PayloadFilename::SEPARATOR,
-                $lissMethodName,
-                PayloadFilename::SEPARATOR
-            ) . '%';
-
-            $pb = $this->storageMapper->getPredicateBuilder()
-                ->like('filename', $filename);
-
-            $files = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
-
-            if ($files->count() > 0) {
+        foreach($this->scheduled as $lissMethodName => $data) {
+            if (\count($data['sources'])) {
                 return true;
             }
         }
@@ -139,14 +142,16 @@ class PayloadCache
      */
     public function load(string $lissMethodName): array
     {
-        /* TODO Potentially generate $scheduled just once and inject its result everywhere,
-         *  saving you rebuilding this list for each strat just to get a subset
+        /* Potentially generate $scheduled just once and inject its result everywhere,
+         * saving you rebuilding this list for each strat just to get a subset
          */
-        $sources = (new PayloadList($this->storageMapper))->generate()['scheduled'][$lissMethodName]['sources'];
+        if (null === $this->scheduled) {
+            $this->scheduled = (new PayloadList($this->storageMapper))->generate()['scheduled'];
+        }
 
         $stack = [];
 
-        foreach ($sources as $sourceName => $file) {
+        foreach ($this->scheduled[$lissMethodName]['sources'] as $sourceName => $file) {
             $this->logger->debug(sprintf(
                 'Processing liss payload %s from storage, using source "%s"',
                 $file->getFilename(),

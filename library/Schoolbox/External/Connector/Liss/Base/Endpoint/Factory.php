@@ -95,7 +95,9 @@ class Factory
         /* Check if there are any liss payloads available:
          * If not, nothing to do. No trabajo
          */
-        if (!(new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->hasPayloads()) {
+        $payloadCache = new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log);
+
+        if (!$payloadCache->hasPayloads()) {
             return new GenericCollection(IStrategy::class);
         }
 
