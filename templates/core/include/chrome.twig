@@ -507,8 +507,16 @@
                             || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
                     }
 
-                    if (iOS() && {{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}}) {
+                    /** define device ID
+                     * if different to a desktop browser
+                     */
+                    if (iOS()) {
                         deviceId = 'iOS';
+                    } else if (/android/i.test(navigator.userAgent)) {
+                        deviceId = 'Android';
+                    }
+
+                    if (iOS() && {{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}}) {
                         {% if config.debug_mode %}
                         console.log('iOS');
                         {% endif %}
@@ -525,8 +533,6 @@
                     }
                             {# if android and the android link exists, show it and hide the rest #}
                     else if (/android/i.test(navigator.userAgent && {{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }})) {
-                        debugger;
-                        deviceId = 'Android';
                         {% if config.debug_mode %}
                         console.log('Android');
                         {% endif %}
