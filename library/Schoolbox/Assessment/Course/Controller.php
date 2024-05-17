@@ -729,7 +729,16 @@ class Controller extends Base\Base
             ]);
         } else {
             // respond to synchronous POST with redirect
-            $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('course.courseList'));
+            $returnUrlEncoded = $this->requestPost['returnUrl'];
+
+            if ($returnUrlEncoded !== null) {
+                $returnUrl = Redirect::decode($returnUrlEncoded);
+            } else {
+                // If no return URL supplied, redirect to course list page
+                $returnUrl = $this->getRouteIfAuthorized('course.courseList');
+            }
+
+            $this->response = $this->redirectAfterPost($returnUrl);
         }
     }
 
