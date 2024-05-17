@@ -18,8 +18,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Mapper;
 
 /**
  * Class ClassMemberships
@@ -49,16 +47,14 @@ class ClassMemberships implements IStrategy
      *
      * @param LoggerInterface $log
      * @param bool $perform
-     * @param FilesystemProxy $filesystemProxy
-     * @param Mapper $storageMapper
+     * @param PayloadCache $payloadCache
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private PayloadCache $payloadCache,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper
     ) {
@@ -79,8 +75,7 @@ class ClassMemberships implements IStrategy
     {
         /* Load data from the previously-saved liss payload
          */
-        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
-            ->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
+        $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(

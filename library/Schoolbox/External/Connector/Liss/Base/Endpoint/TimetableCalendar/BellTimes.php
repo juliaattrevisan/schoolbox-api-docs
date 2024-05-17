@@ -18,8 +18,6 @@ use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Mapper;
 
 /**
  * Class BellTimes
@@ -53,15 +51,13 @@ class BellTimes implements IStrategy
      *
      * @param LoggerInterface $log Logs the things that happened, in a text file
      * @param bool $perform
-     * @param FilesystemProxy $filesystemProxy
-     * @param Mapper $storageMapper
+     * @param PayloadCache $payloadCache
      * @param TimetablePeriodMapper $periodMapper
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private PayloadCache $payloadCache,
         private TimetablePeriodMapper $periodMapper
     ) {
     }
@@ -82,8 +78,7 @@ class BellTimes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
-            ->load(PayloadCache::PAYLOAD_BELLTIMES);
+        $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_BELLTIMES);
 
         foreach ($payloads as $source => $payload) {
             /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period

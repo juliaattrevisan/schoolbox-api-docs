@@ -18,8 +18,6 @@ use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Mapper;
 
 /**
  * Class Timetable
@@ -42,8 +40,7 @@ class Timetable implements IStrategy
      * @param LoggerInterface $log Logs the things that happened, in a text file
      * @param bool $perform
      * @param string $teacherIdentifier
-     * @param FilesystemProxy $filesystemProxy
-     * @param Mapper $storageMapper
+     * @param PayloadCache $payloadCache
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassPeriodMapper $classPeriodMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
@@ -52,8 +49,7 @@ class Timetable implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private string $teacherIdentifier,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private PayloadCache $payloadCache,
         private ClassEntryMapper $classEntryMapper,
         private ClassPeriodMapper $classPeriodMapper,
         private TimetablePeriodMapper $timetablePeriodMapper
@@ -75,8 +71,7 @@ class Timetable implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
-            ->load(PayloadCache::PAYLOAD_TIMETABLE);
+        $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_TIMETABLE);
 
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(

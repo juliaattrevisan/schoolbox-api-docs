@@ -22,7 +22,6 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class DailyData
@@ -68,8 +67,7 @@ class DailyData implements IStrategy
      * @param string $defaultType A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param array $exclusions A csv list of event types that we should skip
      * @param string $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param FilesystemProxy $filesystemProxy
-     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param PayloadCache $payloadCache
      * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper $classEntryMapper
@@ -81,8 +79,7 @@ class DailyData implements IStrategy
         private string $defaultType,
         private array $exclusions,
         private string $teacherIdentifier,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private PayloadCache $payloadCache,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
@@ -110,8 +107,7 @@ class DailyData implements IStrategy
 
         /* Load data from the previously-saved liss payload
          */
-        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
-            ->load(PayloadCache::PAYLOAD_DAILY_DATA);
+        $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_DAILY_DATA);
 
         foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
