@@ -39,36 +39,28 @@ class PayloadList
 
         $lissPayloads = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
 
+        /* Sources is a set of (source name, storage model) tuples
+         */
         $scheduled = [
             PayloadCache::PAYLOAD_DAILY_DATA => [
                 'title' => 'Daily Data',
-                'sources' => [
-                    PayloadCache::DEFAULT_SOURCE_NAME => null
-                ]
+                'sources' => []
             ],
             PayloadCache::PAYLOAD_BELLTIMES => [
                 'title' => 'Bell Times',
-                'sources' => [
-                    PayloadCache::DEFAULT_SOURCE_NAME => null
-                ]
+                'sources' => []
             ],
             PayloadCache::PAYLOAD_CLASSES => [
                 'title' => 'Classes',
-                'sources' => [
-                    PayloadCache::DEFAULT_SOURCE_NAME => null
-                ]
+                'sources' => []
             ],
             PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS => [
                 'title' => 'Class Memberships',
-                'sources' => [
-                    PayloadCache::DEFAULT_SOURCE_NAME => null
-                ]
+                'sources' => []
             ],
             PayloadCache::PAYLOAD_TIMETABLE => [
                 'title' => 'Timetable',
-                'sources' => [
-                    PayloadCache::DEFAULT_SOURCE_NAME => null
-                ]
+                'sources' => []
             ]
         ];
 
