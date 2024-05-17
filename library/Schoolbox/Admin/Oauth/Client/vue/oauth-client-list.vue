@@ -7,6 +7,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import type { OAuthClient } from "../js/types/OAuthClient";
 
@@ -29,7 +30,7 @@ const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const regeneratingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const deletingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const searchUsers = window.Vue.ref([]);
-const saveError = window.Vue.ref(null);
+const saveError = window.Vue.ref<string | null>(null);
 const userSearchQueryParam = window.Vue.ref("");
 const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
 
@@ -65,7 +66,7 @@ function showAddModal() {
 }
 
 /**
- * Add another 0Authclient
+ * Add another 0AuthClient
  */
 async function addClient() {
     try {
@@ -86,10 +87,7 @@ async function addClient() {
             clientList.value = [...clientList.value, newClient];
             // this.$refs.toast.timeout("Created", true);
         } else {
-            const error = await response.json();
-            if (error.title) {
-                saveError.value = error.title;
-            }
+            saveError.value = await extractErrorMessage(response);
             // this.$refs.toast.timeout("Could not create", false);
         }
     } catch (error) {
@@ -130,10 +128,7 @@ async function modifyItem(client: OAuthClient) {
             const modifiedClient = (await response.json()) as OAuthClient;
             clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
         } else {
-            const error = await response.json();
-            if (error.title) {
-                saveError.value = error.title;
-            }
+            saveError.value = await extractErrorMessage(response);
             // this.$refs.toast.timeout("Could not modify", false);
         }
     } catch (error) {
@@ -170,10 +165,7 @@ async function regenerateClient(client: OAuthClient) {
             clientRegeneratedModal.value.open();
             // this.$refs.toast.timeout("Regenerated", true);
         } else {
-            const error = await response.json();
-            if (error.title) {
-                saveError.value = error.title;
-            }
+            saveError.value = await extractErrorMessage(response);
             // this.$refs.toast.timeout("Could not regenerate", false);
         }
     } catch (error) {
