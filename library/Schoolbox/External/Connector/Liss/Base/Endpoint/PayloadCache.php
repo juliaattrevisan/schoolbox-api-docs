@@ -130,50 +130,23 @@ class PayloadCache
 
 
     /**
-     * Loads a previously-stored liss payload from the cache
+     * Loads a previously-stored liss payload from the cache, using the same list of files
+     * as Most Recent Liss Input Payloads.
      *
      * @param string $lissMethodName
      * @return null|array
      * @throws FilesystemException
-     * @throws InvalidColumnException
      */
     public function load(string $lissMethodName): ?array
     {
-        $filename = sprintf(
-            '%s%s%s%s',
-            Factory::SOURCE_NAME,
-            PayloadFilename::SEPARATOR,
-            $lissMethodName,
-            PayloadFilename::SEPARATOR
-        );
-
-        $pb = $this->storageMapper->getPredicateBuilder()
-            ->like('filename', "{$filename}%");
-
-        $files = $this->storageMapper->findByPredicates($pb)->sortBy('filename', 'desc');
-
-        /* No file found; no trabajo
-         * Just return null and skip processing elsewhere
+        /* TODO Potentially generate $scheduled just once and inject its result everywhere,
+         *  saving you rebuilding this list for each strat just to get a subset
          */
-        if (!$files->count()) {
-            $this->logger->debug(sprintf(
-                'No %s liss payloads found in storage.',
-                $lissMethodName
-            ));
+        $sources = (new PayloadList($this->storageMapper))->generate()['scheduled'][$lissMethodName]['sources'];
 
-            return null;
-        }
-
-        /* Could return multiple files concerning $name if you had multiple sources
-         * (Redlands)
-         */
         $stack = [];
 
-        foreach ($files as $file) {
-            $sourceName = (new PayloadFilename())->decode($file->getFilename())['sourceName'];
-
-            /* Announce which file we're consuming
-             */
+        foreach ($sources as $sourceName => $file) {
             $this->logger->debug(sprintf(
                 'Processing liss payload %s from storage, using source "%s"',
                 $file->getFilename(),
