@@ -426,7 +426,7 @@
                     if (installDelayCookie) {
                         document.querySelector('#installDelayPrompt')?.remove();
                         document.querySelector('#pwaPrompt').remove();
-                }
+                    }
                     {# if PWA was installed and you are accessing it via the PWA #}
                     if (window.matchMedia('(display-mode: standalone)').matches) {
                         // If visible, hide the install promotion
@@ -507,7 +507,7 @@
                             || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
                     }
 
-                    if (iOS()) {
+                    if (iOS() && {{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}}) {
                         deviceId = 'iOS';
                         {% if config.debug_mode %}
                         console.log('iOS');
@@ -524,7 +524,8 @@
                         });
                     }
                             {# if android and the android link exists, show it and hide the rest #}
-                    else if (/android/i.test(navigator.userAgent)) {
+                    else if (/android/i.test(navigator.userAgent && {{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }})) {
+                        debugger;
                         deviceId = 'Android';
                         {% if config.debug_mode %}
                         console.log('Android');
