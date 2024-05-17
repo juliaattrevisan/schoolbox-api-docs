@@ -14,6 +14,8 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
     /* Retry on CI only */
     retries: process.env.CI ? 2 : 0,
+    /* Timeout a test if it takes longer than 5 minutes - Value is in milliseconds */
+    timeout: 5 * 60 * 1000,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: [
         ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
