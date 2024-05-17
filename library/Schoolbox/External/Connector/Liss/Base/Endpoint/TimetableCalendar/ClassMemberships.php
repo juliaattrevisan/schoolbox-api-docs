@@ -77,10 +77,14 @@ class ClassMemberships implements IStrategy
          */
         $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_CLASS_MEMBERSHIPS);
 
-        foreach ($payloads as $source => $payload) {
+        foreach ($payloads as $source => $struct) {
+            $filename = $struct['filename'];
+            $payload = $struct['payload'];
+
             $this->log->info(sprintf(
-                '(%s) publishClassMemberships: processing request',
-                $source
+                '(%s) publishClassMemberships: processing request from %s',
+                $source,
+                $filename
             ));
 
             $classMemberships = $payload->getParam(1)->me['array'];

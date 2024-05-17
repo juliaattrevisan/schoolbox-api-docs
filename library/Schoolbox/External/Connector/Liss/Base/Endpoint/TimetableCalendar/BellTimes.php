@@ -80,15 +80,19 @@ class BellTimes implements IStrategy
          */
         $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_BELLTIMES);
 
-        foreach ($payloads as $source => $payload) {
+        foreach ($payloads as $source => $struct) {
+            $filename = $struct['filename'];
+            $payload = $struct['payload'];
+
             /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
              * It turns out schools have multiple cycles of varying day lengths
              */
             $lookup = [];
 
             $this->log->info(sprintf(
-                '(%s) publishBellTimes: processing request',
-                $source
+                '(%s) publishBellTimes: processing request from %s',
+                $source,
+                $filename
             ));
 
             $allData = $payload->getParam(2)->me['array'];

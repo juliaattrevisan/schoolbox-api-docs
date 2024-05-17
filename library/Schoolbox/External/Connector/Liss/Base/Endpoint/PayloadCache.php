@@ -165,7 +165,10 @@ class PayloadCache
                 'allowed_classes' => true
             ]);
 
-            $stack[$sourceName] = $mockMessage;
+            $stack[$sourceName] = [
+                'filename' => $file->getFilename(),
+                'payload' => $mockMessage
+            ];
         }
 
         return $stack;

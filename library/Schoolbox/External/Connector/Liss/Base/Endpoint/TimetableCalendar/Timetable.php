@@ -73,10 +73,14 @@ class Timetable implements IStrategy
          */
         $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_TIMETABLE);
 
-        foreach ($payloads as $source => $payload) {
+        foreach ($payloads as $source => $struct) {
+            $filename = $struct['filename'];
+            $payload = $struct['payload'];
+
             $this->log->info(sprintf(
-                '(%s) publishTimetable: processing request',
+                '(%s) publishTimetable: processing request from %s',
                 $source,
+                $filename
             ));
 
             /* Truncate everything before re-adding
