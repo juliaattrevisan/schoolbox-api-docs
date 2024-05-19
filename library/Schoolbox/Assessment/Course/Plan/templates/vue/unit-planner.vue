@@ -10,11 +10,16 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
+import UpHeader from "./up-header.vue";
+import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
 
 interface Props {
+    courseId: number;
+    folderId: number;
+    courseTitle: string;
     units: Unit[];
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
@@ -101,8 +106,24 @@ window.Vue.watch(
     { once: true },
 );
 
+// Scroll to the bottom of the container when a new unit is added to ensure it's visible
+window.Vue.watch(
+    () => store.unitCount,
+    (newCount, oldCount) => {
+        window.Vue.nextTick()
+            .then(() => {
+                if (newCount > oldCount && unitPlannerContainerEl.value) {
+                    unitPlannerContainerEl.value.scrollTop = unitPlannerContainerEl.value.scrollHeight;
+                }
+            })
+            .catch(() => {
+                // noop
+            });
+    },
+);
+
 window.Vue.onMounted(() => {
-    store.init(props.units, toastEl.value!);
+    store.init(props.courseId, props.units, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
     dragStore.init(
         props.routeFolderSequence,
@@ -114,6 +135,7 @@ window.Vue.onMounted(() => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
     resizeObserver.value.observe(document.querySelector("#container")!);
+    resizeObserver.value.observe(document.querySelector("#unit-planner-container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateContainerHeight();
@@ -131,72 +153,77 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <dl ref="tabsEl" class="tabs">
-        <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
-            <a @click="selectedTab = tab">{{ tab.label }}</a>
-        </dd>
-    </dl>
-    <div
-        ref="unitPlannerContainerEl"
-        class="scrollable"
-        :style="{
-            height: containerHeight + 'px',
-            '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
-            '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
-        }"
-    >
-        <div id="unitplanner-dropdown-container">
-            <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
-                The specific placement of this element ensures that the dropdowns are still contained within the table -->
-        </div>
-        <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
-            <div id="unit-planner-sortable-container"></div>
-            <div ref="headerRowEl" class="grid-row header-row">
-                <div
-                    v-for="column in selectedTab.columns"
-                    :key="column.id"
-                    class="fixed-top"
-                    :class="{ 'fixed-left': column.fixedLeft }"
-                >
-                    {{ column.label }}
-                </div>
-            </div>
-
+    <up-header :course-title="props.courseTitle" :course-id="store.courseId" :folder-id="props.folderId" />
+    <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
+    <div v-else class="row">
+        <div class="small-12 island">
+            <dl ref="tabsEl" class="tabs">
+                <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
+                    <a @click="selectedTab = tab">{{ tab.label }}</a>
+                </dd>
+            </dl>
             <div
-                v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
-                :key="unit.id"
-                ref="unitElements"
-                class="grid-row unit-row"
-            >
-                <up-unit-cell
-                    v-for="column in selectedTab.columns"
-                    :key="column.id"
-                    :unit="unit"
-                    :column="column"
-                    :is-sortable-placeholder="false"
-                />
-            </div>
-
-            <div
-                class="unit-planner-sortable-placeholder grid-row"
+                ref="unitPlannerContainerEl"
+                class="scrollable"
                 :style="{
-                    display: dragStore.isDragging ? 'grid' : 'none',
-                    top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                    height: containerHeight + 'px',
+                    '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
+                    '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
                 }"
             >
-                <template v-if="store.dragCurrentUnit">
-                    <up-unit-cell
-                        v-for="column in selectedTab.columns"
-                        :key="column.id"
-                        :unit="store.dragCurrentUnit"
-                        :column="column"
-                        :is-sortable-placeholder="true"
-                    />
-                </template>
+                <div id="unitplanner-dropdown-container">
+                    <!-- Dropdowns that need to escape a content container's overflow:hidden target this with [data-dropdown-move-to]
+                The specific placement of this element ensures that the dropdowns are still contained within the table -->
+                </div>
+                <div class="unit-planner" v-bind="{ 'data-sortable': props.routeFolderSequence ? '' : undefined }">
+                    <div id="unit-planner-sortable-container"></div>
+                    <div ref="headerRowEl" class="grid-row header-row">
+                        <div
+                            v-for="column in selectedTab.columns"
+                            :key="column.id"
+                            class="fixed-top"
+                            :class="{ 'fixed-left': column.fixedLeft }"
+                        >
+                            {{ column.label }}
+                        </div>
+                    </div>
+
+                    <div
+                        v-for="unit in dragStore.isDragging ? dragStore.dragOrderedUnits : store.orderedUnits"
+                        :key="unit.id"
+                        ref="unitElements"
+                        class="grid-row unit-row"
+                    >
+                        <up-unit-cell
+                            v-for="column in selectedTab.columns"
+                            :key="column.id"
+                            :unit="unit"
+                            :column="column"
+                            :is-sortable-placeholder="false"
+                        />
+                    </div>
+
+                    <div
+                        class="unit-planner-sortable-placeholder grid-row"
+                        :style="{
+                            display: dragStore.isDragging ? 'grid' : 'none',
+                            top: `calc(${dragStore.dragPlaceholderY}px + var(--UnitPlannerTableHeaderHeight))`,
+                        }"
+                    >
+                        <template v-if="store.dragCurrentUnit">
+                            <up-unit-cell
+                                v-for="column in selectedTab.columns"
+                                :key="column.id"
+                                :unit="store.dragCurrentUnit"
+                                :column="column"
+                                :is-sortable-placeholder="true"
+                            />
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
     <activities-list-delete-modal />
     <up-curriculum />
     <toast ref="toastEl"></toast>

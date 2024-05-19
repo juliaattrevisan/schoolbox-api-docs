@@ -120,14 +120,13 @@ Usage:
             </li>
         {% endif %}
 
-        <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
-
         {# Check if you have WRITE access into the Course Folder's homepage
          # If you do, provide a Modify link so you can edit its contents
          # Otherwise, omit the link entirely
          #}
         {% if folderAccess[courseSpec.folder.id] ?? false %}
-        <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
+            <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
+            <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
         {% endif %}
 
         {# Course delete: standard folder delete -#}

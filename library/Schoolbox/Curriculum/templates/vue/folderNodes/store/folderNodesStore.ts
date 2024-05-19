@@ -6,8 +6,7 @@
  */
 
 import { defineStore } from "pinia";
-import { ToastEvent } from "@schoolboxVue/components/toast/sbxToastEvent";
-import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 
@@ -40,11 +39,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          */
         async function pushChanges() {
             try {
-                document.dispatchEvent(
-                    new CustomEvent(ToastEvent.ACTIVATE, {
-                        detail: { text: "Saving..." } as ToastActivateEventDetail,
-                    }),
-                );
+                activate("Saving...");
                 isProcessing.value = true;
                 const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
                     method: "POST",
@@ -56,11 +51,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
-                    document.dispatchEvent(
-                        new CustomEvent(ToastEvent.TIMEOUT, {
-                            detail: { text: "Curriculum updated" } as ToastTimeoutEventDetail,
-                        }),
-                    );
+                    timeout({ text: "Curriculum updated" });
                     document.dispatchEvent(
                         new CustomEvent(FOLDER_NODES_UPDATED, {
                             detail: {
@@ -73,18 +64,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                     );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
-                    document.dispatchEvent(
-                        new CustomEvent(ToastEvent.TIMEOUT, {
-                            detail: { text: responseText.title, isSuccess: false } as ToastTimeoutEventDetail,
-                        }),
-                    );
+                    timeout({ text: responseText.title, isSuccess: false });
                 }
             } catch (error) {
-                document.dispatchEvent(
-                    new CustomEvent(ToastEvent.TIMEOUT, {
-                        detail: { text: "There was an unexpected error", isSuccess: false } as ToastTimeoutEventDetail,
-                    }),
-                );
+                timeout({ text: "There was an unexpected error", isSuccess: false });
             } finally {
                 isProcessing.value = false;
             }

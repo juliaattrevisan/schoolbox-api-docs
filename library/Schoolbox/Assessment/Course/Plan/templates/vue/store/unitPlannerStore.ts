@@ -13,15 +13,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unexpandedUnitHeight: number = 300; // The default unexpanded height of a unit, in px
     const dragUnitHeight: number = 80; // The height of a unit when it is being dragged, in px
 
+    const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
+    const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
     const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     /**
      * store any passed through properties
+     * @param { number } $courseId - the course ID
      * @param { Unit[] } $units - the units to store
      * @param { typeof Toast } $toastEl - the toast element
      */
-    function init($units: Unit[], $toastEl: typeof Toast) {
+    function init($courseId: number, $units: Unit[], $toastEl: typeof Toast) {
+        courseId.value = $courseId;
         units.value = $units;
         toastEl.value = $toastEl;
     }
@@ -162,7 +166,9 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         init,
         unexpandedUnitHeight,
         dragUnitHeight,
+        courseId,
         units,
+        unitCount,
         toastEl,
         dragCurrentUnit,
         dragCurrentUnitNextTick,

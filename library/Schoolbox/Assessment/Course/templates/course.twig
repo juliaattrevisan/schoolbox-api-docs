@@ -408,6 +408,7 @@ Usage:
 <div class="row">
     <div class="small-12 island" id="main-course">
         <form method="post" action="{{ routeLookup('course.updateCourse', {id: courseSpec ? courseSpec.id : 0}) }}" id="update-course-form" class="mage">
+            <input type="hidden" name="returnUrl" value="{{ RETURN_URL.previous.encoded }}">
             <section>
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
