@@ -2,6 +2,7 @@
 import debounce from "lodash/debounce";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
@@ -54,7 +55,6 @@ async function getData() {
         const response = await fetch(props.getListEndpoint);
         clientList.value = (await response.json()) as OAuthClient[];
     } catch (error) {
-        console.warn(error);
         hasDataLoadError.value = true; // show load error
     } finally {
         isDataLoading.value = false; // update the display to show the list
@@ -76,7 +76,7 @@ function showAddModal() {
  */
 async function addClient() {
     try {
-        // this.$refs.toast.activate("Creating...");
+        activate("Adding...");
         const response = await fetch(props.postItemEndpoint, {
             method: "POST",
             body: JSON.stringify(addingClient.value),
@@ -90,13 +90,13 @@ async function addClient() {
             addingClient.value = newClient;
             currentAction.value = ActionType.ADDED;
             clientList.value = [...clientList.value, newClient];
-            // this.$refs.toast.timeout("Created", true);
+            timeout({ text: "Client added successfully" });
         } else {
             saveError.value = await extractErrorMessage(response);
-            // this.$refs.toast.timeout("Could not create", false);
+            timeout({ text: "Client couldn't be added", isSuccess: false });
         }
     } catch (error) {
-        // this.$refs.toast.timeout("Could not create", false);
+        timeout({ text: "Client couldn't be added", isSuccess: false });
     }
 }
 
@@ -117,10 +117,10 @@ function showModifyModal(client: OAuthClient) {
  */
 async function modifyItem(client: OAuthClient) {
     try {
-        // this.$refs.toast.activate("Modifying...");
         if (!client._links?.patch) {
             throw new Error("No patch link found for client");
         }
+        activate("Modifying...");
         const response = await fetch(client._links?.patch, {
             method: "PATCH",
             body: JSON.stringify(client),
@@ -131,16 +131,16 @@ async function modifyItem(client: OAuthClient) {
         });
         if (response.ok) {
             actionModal.value.close();
-            // this.$refs.toast.timeout("Modified", true);
+            timeout({ text: "Client modified successfully" });
             // Replace the existing modified client with the new version
             const modifiedClient = (await response.json()) as OAuthClient;
             clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
         } else {
             saveError.value = await extractErrorMessage(response);
-            // this.$refs.toast.timeout("Could not modify", false);
+            timeout({ text: "Client couldn't be modified", isSuccess: false });
         }
     } catch (error) {
-        // this.$refs.toast.timeout("Could not modify", false);
+        timeout({ text: "Client couldn't be modified", isSuccess: false });
     }
 }
 
@@ -161,10 +161,10 @@ function showRegenerateModal(client: OAuthClient) {
  */
 async function regenerateClient(client: OAuthClient) {
     try {
-        // this.$refs.toast.activate("Regenerating...");
         if (!client._links?.regenerate) {
             throw new Error("No patch link found for client");
         }
+        activate("Regenerating...");
         const response = await fetch(client._links.regenerate, {
             method: "POST",
             headers: {
@@ -174,13 +174,13 @@ async function regenerateClient(client: OAuthClient) {
         if (response.ok) {
             regeneratingClient.value = (await response.json()) as OAuthClient;
             currentAction.value = ActionType.REGENERATED;
-            // this.$refs.toast.timeout("Regenerated", true);
+            timeout({ text: "Client regenerated successfully" });
         } else {
             saveError.value = await extractErrorMessage(response);
-            // this.$refs.toast.timeout("Could not regenerate", false);
+            timeout({ text: "Client couldn't be regenerated", isSuccess: false });
         }
     } catch (error) {
-        // this.$refs.toast.timeout("Could not regenerate", false);
+        timeout({ text: "Client couldn't be regenerated", isSuccess: false });
     }
 }
 
@@ -203,20 +203,20 @@ async function deleteClient(client: OAuthClient) {
         if (!client._links?.delete) {
             throw new Error("No patch link found for client");
         }
+        activate("Deleting...");
         const response = await fetch(client._links.delete, {
             method: "DELETE",
         });
         if (response.ok) {
             actionModal.value.close();
             clientList.value = clientList.value.filter((c) => c.id !== client.id);
-            // this.$refs.toast.timeout("deleted", false);
+            timeout({ text: "Client deleted successfully" });
         } else {
             saveError.value = await extractErrorMessage(response);
-            // this.$refs.toast.timeout("Could not delete", false);
+            timeout({ text: "Client couldn't be deleted", isSuccess: false });
         }
-        // Show toast
     } catch (error) {
-        // this.$refs.toast.timeout("Could not delete", false);
+        timeout({ text: "Client couldn't be deleted", isSuccess: false });
     }
 }
 
@@ -233,7 +233,6 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
         return;
     }
     loading(true);
-
     const searchUrl = new URL(props.userSearchEndpoint, window.location);
     const searchParams = userSearchAdditionalParams.value;
     searchParams[userSearchQueryParam.value] = query;
@@ -262,9 +261,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <loading-table v-if="isDataLoading" />
-
     <data-load-error v-else-if="hasDataLoadError" data-title="client list" />
-
     <div v-else>
         <div class="small-12 island">
             <template v-if="clientList.length === 0">
@@ -330,7 +327,6 @@ window.Vue.onMounted(() => {
             </template>
         </div>
     </div>
-
     <reveal-modal ref="actionModal">
         <template v-if="currentAction === ActionType.ADD">
             <h2>Add oAuth Client</h2>
@@ -366,10 +362,10 @@ window.Vue.onMounted(() => {
                 @search="onUserSearch"
             >
                 <template #option="option">
-                    <span class="d-center">{{ option.fullName }}</span>
+                    <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
                 </template>
                 <template #selected-option="option">
-                    <span class="selected d-center">{{ option.fullName }}</span>
+                    <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
                 </template>
             </v-select>
             <div class="component-action">
@@ -490,6 +486,4 @@ window.Vue.onMounted(() => {
             </div>
         </template>
     </reveal-modal>
-
-    <toast ref="toast"></toast>
 </template>

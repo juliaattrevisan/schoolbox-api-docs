@@ -5,6 +5,7 @@ export type OAuthClient = {
     id?: number;
     name: string;
     clientId?: string;
+    clientSecret?: string;
     redirectUri: string; // When the user approves a request to share details, where should they be redirected to?
     clientCredentialsUser?: {
         // Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user;
