@@ -137,10 +137,82 @@ class Mapper extends AbstractCourseMapper
     {
         $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
 
+        // Hydrate course implementation folders so that class codes will be available.
+        $folderIds = $courseImpls->map(fn($courseImpl) => $courseImpl->getFolder()->getId());
+        $folders = $this->getJoinMapper('folder')->findByColumn('id', $folderIds);
+        foreach ($courseImpls as $courseImpl) {
+            $courseImpl->setFolder($folders->getBy('id', $courseImpl->getFolder()->getId()));
+        }
+
         if ($loadUnits) {
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
         }
+
         return $courseImpls;
+    }
+
+    /**
+     * Return a data structure like the following:
+     *
+     * Example return value: [
+     *     23 => // courseImplId
+     *     [
+     *         80 => // folderId
+     *         [
+     *             4883, // componentInstanceIds referring to Course Outline components
+     *             4884, //
+     *         ]
+     *     ]
+     * ]
+     *
+     * The multi-level data structure is used because each course implementation can be implemented in multiple folders,
+     * each of which can have multiple course outline components linking to that course implementation.
+     *
+     * Note that in practice a folder should never have multiple course outline components linking to the same course
+     * implementation, but since the database schema allows it, the data structure returned by this function must also
+     * allow it.
+     *
+     * @param array $courseImplIds
+     * @return array<int, array<int, array<int>>> See more detailed description above.
+     */
+    public function getCourseOutlineComponentIdsStruct(array $courseImplIds): array
+    {
+        $rows = $this->getDatabase()->executeQuery(
+            'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId, f.id AS folderId
+            FROM component_definition cd
+            JOIN component_instance ci ON (ci.component_definition_id=cd.id)
+            JOIN folder f ON f.id=ci.identifier
+            JOIN component_config_definition ccd_importedCourse ON (
+                ccd_importedCourse.component_definition_id = cd.id AND
+                ccd_importedCourse.key = "importedCourse"
+            )
+            LEFT JOIN component_config_instance cci_importedCourse ON (
+                cci_importedCourse.component_config_definition_id=ccd_importedCourse.id AND
+                cci_importedCourse.component_instance_id=ci.id
+            )
+            WHERE cd.`class` = "Schoolbox\\\Learning\\\Assessment\\\Component\\\Homepage\\\Outline\\\Controller"
+            AND ci.module="homepage"
+            AND ' . (
+                count($courseImplIds) > 0
+                ? 'cci_importedCourse.value IN (' . implode(',', array_map('intval', $courseImplIds)) . ')'
+                : 'FALSE'
+            )
+        )->fetchAll();
+
+        $componentIdsStruct = [];
+        foreach ($rows as $row) {
+            $courseImplId = $row['courseImplId'];
+            $folderId = $row['folderId'];
+            if (!array_key_exists($courseImplId, $componentIdsStruct)) {
+                $componentIdsStruct[$courseImplId] = [];
+            }
+            if (!array_key_exists($folderId, $componentIdsStruct[$courseImplId])) {
+                $componentIdsStruct[$courseImplId][$folderId] = [];
+            }
+            $componentIdsStruct[$courseImplId][$folderId][] = $row['componentInstanceId'];
+        }
+
+        return $componentIdsStruct;
     }
 
     /**

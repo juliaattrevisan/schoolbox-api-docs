@@ -39,7 +39,6 @@ class Model extends AbstractCourse
      */
     private $unitImplementations;
 
-
     /**
      * Constructor
      *
@@ -68,7 +67,6 @@ class Model extends AbstractCourse
         return $this;
     }
 
-
     /**
      * @return Unit\Model[]|GenericCollection
      */
@@ -76,7 +74,6 @@ class Model extends AbstractCourse
     {
         return $this->unitImplementations;
     }
-
 
     /**
      * @param Unit\Model[]|GenericCollection $unitImplementations

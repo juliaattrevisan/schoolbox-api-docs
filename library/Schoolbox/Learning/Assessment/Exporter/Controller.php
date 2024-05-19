@@ -150,7 +150,7 @@ class Controller extends BaseController
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
         // Filter out historical classes (no class code, no group).
-        $courseImpls->filter(
+        $courseImpls = $courseImpls->filter(
             function (CourseImplementation\Model $courseImpl) {
                 return !($courseImpl->getFolder()->getCodeString() === '' && $courseImpl->getFolder()->getGroup() === null);
             }
@@ -181,11 +181,17 @@ class Controller extends BaseController
             return strnatcasecmp($a->getFolder()->getTitle(), $b->getFolder()->getTitle());
         });
 
+        // Get info on related course outline components.
+        $courseOutlineComponentIdsStruct = $this->courseImplementationMapper->getCourseOutlineComponentIdsStruct(
+            $courseImpls->map(fn($courseImpl) => $courseImpl->getId())->getAll()
+        );
+
         $data = [
             'unitSpec'                          => $unitSpec,
             'returnUrl'                         => $this->requestQuery->get(Redirect::RETURN_URL, ''),
             'returnUrlName'                     => Redirect::RETURN_URL,
             'courseImplsInWhichUnitNotImported' => $courseImplsInWhichUnitNotImported,
+            'courseOutlineComponentIdsStruct'   => $courseOutlineComponentIdsStruct,
             'folderWritePerms'                  => $this->buildFolderWritePermissionsForUnit($courseImpls),
             'breadcrumbs'                       => [
                 ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
