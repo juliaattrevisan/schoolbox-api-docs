@@ -77,6 +77,14 @@ class Controller extends Base
         $cursor = (int)$this->requestQuery->get('cursor', null);
         $limit = (int)$this->requestQuery->get('limit', 5);
 
+        if ($limit <= 0) {
+            $problem = (new ApiProblem('Limit should be a positive integer'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return; //exit early if the limit is either 0 or a negative value
+        }
+
         if (null === $filter) {
             $problem = (new ApiProblem('Filter must not be blank'))
                 ->setStatus(401)
