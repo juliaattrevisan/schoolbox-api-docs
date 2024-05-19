@@ -344,4 +344,22 @@ class Reader implements \Iterator
         $this->fill_down = $fill_down;
         return $this;
     }
+
+    /**
+     *  Find the missing required columns from the csv file.
+     *
+     * @return array
+     */
+    public function listMissingColumns()
+    {
+        //Early exit if there are no required columns
+        if (empty($this->getExpectedColumnList())) {
+            return [];
+        }
+        $columnList = $this->loadRow();
+
+        //Making sure the list is returned to the top
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
+        return array_diff($this->getExpectedColumnList(), $columnList);
+    }
 }

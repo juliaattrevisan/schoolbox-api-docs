@@ -19,6 +19,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class CsvImporter
 {
@@ -62,7 +63,41 @@ class CsvImporter
     {
         $this->folderMapper->getDatabase()->beginTransaction();
 
-        $csv = (new Reader($resourceStream))->setLoadFromFirst(true);
+        $csv = (new Reader($resourceStream))->setLoadFromFirst(true)
+                                            ->setExpectedColumnList(
+                                                [
+                                                    'Unit Open Date',
+                                                    'Unit Close Date',
+                                                    'Assessment Due Date',
+                                                    'Assessment ID',
+                                                    'Assessment Publish Date',
+                                                    'Assessment Open Date',
+                                                    'Assessment Late Date',
+                                                    'Owner User ID',
+                                                    'Class Code',
+                                                    'Unit Folder ID',
+                                                ]
+                                            );
+
+        /**
+         * This is the cheapest option to complete the SA-17154 ticket, there exists a renewed version of
+         * Reader (ie. Profile/Reader.php), that could potentially be used to replace the current Reader
+         * but replacing the current reader will require a lot more effort and to deal with possible edge cases,
+         * also potentially outside the scope of the ticket.
+         *
+         * TODO replace the current Reader with the refined version of Reader by Steve
+         */
+        $missingColumns = $csv->listMissingColumns();
+        if (!empty($missingColumns)) {
+            throw new SchoolboxException(
+                'Unable to do a bulk upload',
+                0,
+                null,
+                400,
+                "You've missed adding these columns in the CSV file: " .
+                implode(', ', $missingColumns) . "."
+            );
+        }
 
         // [unit_spec_id][class_folder_id]['open_date']
         // [unit_spec_id][class_folder_id]['close_date']
