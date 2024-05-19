@@ -17,24 +17,29 @@ use Schoolbox\User;
 class ImpersonationCheck
 {
     /**
+     * Session keys for storing the initial and previous users in the
+     * impersonation chain.
+     */
+    public const SESSION_KEY_INITIAL_USER = 'initialUser';
+    public const SESSION_KEY_PREVIOUS_USER = 'previousUser';
+
+    /**
      * Returns whether the current session is an impersonation of another user.
      *
      * Merely switching to a linked user is not considered impersonation.
      *
-     * @param User       $currentUser
-     * @param array|null $previous
+     * @param User      $currentUser
+     * @param User|null $previous
      * @return bool
      */
-    public function isImpersonated(User $currentUser, ?array $previous): bool
+    public function isImpersonated(User $currentUser, ?User $previous): bool
     {
         if (!$previous) {
             return false;
         }
-        // We need to distinguish between switching to a linked vs non-linked user
-        /** @var User $previousUser */
-        $previousUser = $previous['user'];
 
-        foreach ($previousUser->getLinkedUsers() as $linkedUser) {
+        // We need to distinguish between switching to a linked vs non-linked user
+        foreach ($previous->getLinkedUsers() as $linkedUser) {
             if ((int)$linkedUser->getId() === (int)$currentUser->getId()) {
                 // User has merely switched to a linked account, this does not constitute 'impersonation'
                 return false;

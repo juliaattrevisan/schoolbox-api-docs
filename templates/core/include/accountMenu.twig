@@ -31,16 +31,41 @@
 
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
-{% if user.current.linkedUsers is not empty or user.previous  %}
+{% if user.current.linkedUsers is not empty or user.previous or user.initial %}
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
-        <li class="separator">Switch User</li>
-
-        {% set previousUser = user.previous | default(null) %}
-        {% if user.current.linkedUsers is not empty %}
-            {% for linkedUser in user.current.linkedUsers %}
-                {% if not previousUser or previousUser.id != linkedUser.id %}
+        {# Users to switch back to #}
+        {% if user.initial or user.previous %}
+            <li class="separator">Return To User</li>
+            {% if user.previous and user.previous.id != (user.initial.id ?? null) %}
                 <li class="user">
-                    <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                    <a class="no-pad" href="{{ routeLookup('user.recoverSessionPrevious') }}" title="Return to {{ user.previous.formatName }}">
+                        <div class="card small-12">
+                            {% include 'include/portrait.twig' with {user: user.previous} only %}
+                            <p>{{ user.previous.formatName }}</p>
+                            <p class="meta">{{ user.previous.role.name }}</p>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
+            {% if user.initial %}
+                <li class="user">
+                    <a class="no-pad" href="{{ routeLookup('user.recoverSessionInitial') }}" title="Return to {{ user.initial.formatName }}">
+                        <div class="card small-12">
+                            {% include 'include/portrait.twig' with {user: user.initial} only %}
+                            <p>{{ user.initial.formatName }}</p>
+                            <p class="meta">{{ user.initial.role.name }}</p>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
+        {% endif %}
+
+        {# Impersonable users: show all in the list, except for the previous user #}
+        {% if user.current.linkedUsers is not empty %}
+        <li class="separator">Switch User</li>
+            {% for linkedUser in user.current.linkedUsers %}
+                <li class="user">
+                    <a class="no-pad" href="{{ routeLookup('user.impersonate', {userId: linkedUser.id}) }}" title="Switch to {{ linkedUser.formatName }}">
                         <div class="card small-12">
                             {% include 'include/portrait.twig' with {user: linkedUser} only %}
                             <p>{{ linkedUser.formatName }}</p>
@@ -48,20 +73,7 @@
                         </div>
                     </a>
                 </li>
-                {% endif %}
             {% endfor %}
-        {% endif %}
-
-        {% if previousUser %}
-            <li class="user">
-                <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                    <div class="card small-12">
-                        {% include 'include/portrait.twig' with {user: user.previous} only %}
-                        <p>{{ user.previous.formatName }}</p>
-                        <p class="meta">{{ user.previous.role.name }}</p>
-                    </div>
-                </a>
-            </li>
         {% endif %}
     </ul>
 {% endif %}
