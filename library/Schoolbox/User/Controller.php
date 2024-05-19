@@ -10,10 +10,7 @@ namespace Schoolbox\User;
 
 use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Role;
 use Schoolbox\User;
 use User\Logger;
 use External_User;
@@ -25,21 +22,14 @@ class Controller extends Base
      */
     protected $userAccessMapper;
 
-    /**
-     * @var External_User
-     */
-    private $externalHandler;
-
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
     public function __construct(
         UserAccessMapper $userAccessMapper,
-        External_User $externalHandler,
         Logger\Mapper $assumeUserLogMapper
     ) {
         $this->userAccessMapper    = $userAccessMapper;
-        $this->externalHandler     = $externalHandler;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
     }
 
@@ -145,43 +135,5 @@ class Controller extends Base
             }
         }
         $this->response = $this->redirectFound('/');
-    }
-
-    /**
-     * Return a json array of parent emails from a folder
-     * This will include parents directly in the group, and parents of students in the group
-     *
-     * Known inconsistency: this will return user emails from the SIS for parents of students in the group,
-     * and Schoolbox emails for the parents directly in the group
-     * This is intended functionality based on our standard of using the SIS when we only know the student, and using Schoolbox when we know the parent
-     *
-     * @param FolderModel $folder
-     */
-    public function getParentEmailsByFolder($folder)
-    {
-        $parentEmails = [];
-        $studentIds = [];
-
-        // Get list of members in the folder
-        $members = $this->userAccessMapper->findUsersInCategory($folder);
-
-        // Loop through members, storing emails for parents, and ids for students (for use later)
-        foreach ($members as $member) {
-            if ($member->getRole()->getType() == Role::PARENT) {
-                $parentEmails[] = $member->getEmail();
-            } elseif ($member->getRole()->getType() == Role::STUDENT) {
-                $studentIds[] = $member->getExternalId();
-            }
-        }
-
-        // Use the student ids to grab an array of parent emails and add it to $parentEmails
-        $parentEmails = array_merge($parentEmails, $this->externalHandler->getParentEmails($studentIds) ?: []);
-
-        /* $parentEmails as accumulated from two independent sources so dedupe them again
-         */
-        $parentEmails = (new TupleStack())->normaliseValues($parentEmails);
-
-        // Return a json encoded array :)
-        $this->response = $this->responseAsJson($parentEmails);
     }
 }

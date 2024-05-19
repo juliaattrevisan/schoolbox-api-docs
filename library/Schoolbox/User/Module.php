@@ -10,14 +10,9 @@
 
 namespace Schoolbox\User;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Router\PathMatcher;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -35,28 +30,6 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        // Parent emails route: AFAICT this is unused, no references to the
-        // controller method name nor its path exist.
-        $folderPermFull = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_FULL,
-            fn (array $params = [], User $user = null) => $params['folderId'],
-            Access::getInstance(),
-        );
-        $folderPreload = function ($params) {
-            try {
-                return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND, $e);
-            }
-        };
-        $this->register(
-            self::METHOD_GET,
-            '/parentEmails/folder/{folderId}',
-            'getParentEmailsByFolder',
-            $folderPermFull,
-            $folderPreload,
-        );
-
         // Impersonate and recover routes
         $loggedInPermission    = new Rule\IsLoggedIn();
         $impersonatePermission = new Rule\Any(
@@ -112,7 +85,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
-            $this->injector->get('externalUser'),
             $this->getMapperFactory()->get(Logger\Mapper::class)
         );
     }
