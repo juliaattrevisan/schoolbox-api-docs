@@ -35,7 +35,7 @@
     <ul id="switch-user{{ mobileSuffix }}" class="switch-user{{ mobileSuffix }}">
         {# Users to switch back to #}
         {% if user.initial or user.previous %}
-            <li class="separator">Switch back to User</li>
+            <li class="separator">Return To User</li>
             {% if user.previous and user.previous.id != (user.initial.id ?? null) %}
                 <li class="user">
                     <a class="no-pad" href="{{ routeLookup('user.recoverSessionPrevious') }}" title="Return to {{ user.previous.formatName }}">
