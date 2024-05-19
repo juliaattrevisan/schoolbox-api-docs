@@ -118,7 +118,10 @@ function showModifyModal(client: OAuthClient) {
 async function modifyItem(client: OAuthClient) {
     try {
         // this.$refs.toast.activate("Modifying...");
-        const response = await fetch(client._links.patch, {
+        if (!client._links?.patch) {
+            throw new Error("No patch link found for client");
+        }
+        const response = await fetch(client._links?.patch, {
             method: "PATCH",
             body: JSON.stringify(client),
             headers: {
@@ -159,6 +162,9 @@ function showRegenerateModal(client: OAuthClient) {
 async function regenerateClient(client: OAuthClient) {
     try {
         // this.$refs.toast.activate("Regenerating...");
+        if (!client._links?.regenerate) {
+            throw new Error("No patch link found for client");
+        }
         const response = await fetch(client._links.regenerate, {
             method: "POST",
             headers: {
@@ -194,6 +200,9 @@ function showDeleteModal(client: OAuthClient) {
  */
 async function deleteClient(client: OAuthClient) {
     try {
+        if (!client._links?.delete) {
+            throw new Error("No patch link found for client");
+        }
         const response = await fetch(client._links.delete, {
             method: "DELETE",
         });
