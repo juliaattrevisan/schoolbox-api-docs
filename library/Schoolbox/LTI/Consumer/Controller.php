@@ -521,7 +521,7 @@ class Controller extends Base
         $launch_params = [];
 
         foreach ($launch_data_keys as $key) {
-            array_push($launch_params, $key . "=" . rawurlencode($launch_data[$key]));
+            $launch_params[] = $key . "=" . rawurlencode($launch_data[$key] ?? "");
         }
 
         $base_string = "POST&" . urlencode($embedUrl ?? $provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
