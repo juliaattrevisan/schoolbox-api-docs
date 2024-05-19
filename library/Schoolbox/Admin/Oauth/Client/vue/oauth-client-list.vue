@@ -7,7 +7,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
@@ -43,9 +42,8 @@ const searchUsers = window.Vue.ref<VueSelectOption>([]);
 const saveError = window.Vue.ref<string | null>(null);
 const userSearchQueryParam = window.Vue.ref("");
 const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
-
 const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
-const actionModal = window.Vue.ref<typeof RevealModal | null>(null);
+const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 
 /**
  * Fetch the current list of clients from the server.
@@ -68,7 +66,10 @@ function showAddModal() {
     saveError.value = null;
     addingClient.value = getEmptyOAuthClient();
     currentAction.value = ActionType.ADD;
-    actionModal.value.open();
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.open();
+    }
 }
 
 /**
@@ -108,7 +109,10 @@ function showModifyModal(client: OAuthClient) {
     saveError.value = null;
     modifyingClient.value = { ...client };
     currentAction.value = ActionType.MODIFY;
-    actionModal.value.open();
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.open();
+    }
 }
 
 /**
@@ -130,11 +134,14 @@ async function modifyItem(client: OAuthClient) {
             },
         });
         if (response.ok) {
-            actionModal.value.close();
             timeout({ text: "Client modified successfully" });
             // Replace the existing modified client with the new version
             const modifiedClient = (await response.json()) as OAuthClient;
             clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
+            if (modalEl.value) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+                modalEl.value.close();
+            }
         } else {
             saveError.value = await extractErrorMessage(response);
             timeout({ text: "Client couldn't be modified", isSuccess: false });
@@ -152,7 +159,10 @@ function showRegenerateModal(client: OAuthClient) {
     saveError.value = null;
     regeneratingClient.value = { ...client };
     currentAction.value = ActionType.REGENERATE;
-    actionModal.value.open();
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.open();
+    }
 }
 
 /**
@@ -191,7 +201,10 @@ async function regenerateClient(client: OAuthClient) {
 function showDeleteModal(client: OAuthClient) {
     deletingClient.value = { ...client };
     currentAction.value = ActionType.DELETE;
-    actionModal.value.open();
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.open();
+    }
 }
 
 /**
@@ -208,9 +221,12 @@ async function deleteClient(client: OAuthClient) {
             method: "DELETE",
         });
         if (response.ok) {
-            actionModal.value.close();
             clientList.value = clientList.value.filter((c) => c.id !== client.id);
             timeout({ text: "Client deleted successfully" });
+            if (modalEl.value) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+                modalEl.value.close();
+            }
         } else {
             saveError.value = await extractErrorMessage(response);
             timeout({ text: "Client couldn't be deleted", isSuccess: false });
@@ -250,6 +266,16 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
             loading(false);
         });
 }, SEARCH_RESULT_RETRIEVE_DELAY);
+
+/**
+ * Close the modal
+ */
+function closeModal() {
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.close();
+    }
+}
 
 /**
  * Load the oauth client config list
@@ -327,7 +353,7 @@ window.Vue.onMounted(() => {
             </template>
         </div>
     </div>
-    <reveal-modal ref="actionModal">
+    <reveal-modal ref="modalEl">
         <template v-if="currentAction === ActionType.ADD">
             <h2>Add oAuth Client</h2>
             <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
@@ -371,7 +397,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <button @click.prevent="addClient">Add</button>
-                    <button @click.prevent="actionModal.close">Cancel</button>
+                    <button @click.prevent="closeModal">Cancel</button>
                 </section>
             </div>
         </template>
@@ -397,7 +423,7 @@ window.Vue.onMounted(() => {
             </div>
             <div class="component-action">
                 <section>
-                    <button @click.prevent="actionModal.close">Close</button>
+                    <button @click.prevent="closeModal">Close</button>
                 </section>
             </div>
         </template>
@@ -436,16 +462,16 @@ window.Vue.onMounted(() => {
                 @search="onUserSearch"
             >
                 <template #option="option">
-                    <span class="d-center">{{ option.fullName }}</span>
+                    <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
                 </template>
                 <template #selected-option="option">
-                    <span class="selected d-center">{{ option.fullName }}</span>
+                    <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
                 </template>
             </v-select>
             <div class="component-action">
                 <section>
                     <button @click.prevent="modifyItem(modifyingClient)">Modify</button>
-                    <button @click.prevent="actionModal.close">Cancel</button>
+                    <button @click.prevent="closeModal">Cancel</button>
                 </section>
             </div>
         </template>
@@ -459,7 +485,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <button @click.prevent="regenerateClient(regeneratingClient)">Regenerate</button>
-                    <button @click.prevent="actionModal.close">Cancel</button>
+                    <button @click.prevent="closeModal">Cancel</button>
                 </section>
             </div>
         </template>
@@ -472,7 +498,7 @@ window.Vue.onMounted(() => {
             </div>
             <div class="component-action">
                 <section>
-                    <button @click.prevent="actionModal.close">Close</button>
+                    <button @click.prevent="closeModal">Close</button>
                 </section>
             </div>
         </template>
@@ -481,7 +507,7 @@ window.Vue.onMounted(() => {
             <div class="component-action">
                 <section>
                     <button @click.prevent="deleteClient(deletingClient)">Delete</button>
-                    <button @click.prevent="actionModal.close">Cancel</button>
+                    <button @click.prevent="closeModal">Cancel</button>
                 </section>
             </div>
         </template>
