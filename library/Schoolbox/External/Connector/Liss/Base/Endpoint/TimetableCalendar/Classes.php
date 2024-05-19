@@ -16,8 +16,6 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadCache;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Mapper;
 
 /**
  * Class Classes
@@ -39,15 +37,13 @@ class Classes implements IStrategy
      *
      * @param LoggerInterface $log Logs the things that happened, in a text file
      * @param bool $perform
-     * @param FilesystemProxy $filesystemProxy
-     * @param Mapper $storageMapper
+     * @param PayloadCache $payloadCache
      * @param ClassEntryMapper $classEntryMapper
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
-        private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private PayloadCache $payloadCache,
         private ClassEntryMapper $classEntryMapper
     ) {
     }
@@ -67,17 +63,16 @@ class Classes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $payloads = (new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))
-            ->load(PayloadCache::PAYLOAD_CLASSES);
+        $payloads = $this->payloadCache->load(PayloadCache::PAYLOAD_CLASSES);
 
-        if (null === $payloads) {
-            return;
-        }
+        foreach ($payloads as $source => $struct) {
+            $filename = $struct['filename'];
+            $payload = $struct['payload'];
 
-        foreach ($payloads as $source => $payload) {
             $this->log->info(sprintf(
-                '(%s) publishClasses: processing request',
+                '(%s) publishClasses: processing request from %s',
                 $source,
+                $filename
             ));
 
             /* Truncate everything before re-adding

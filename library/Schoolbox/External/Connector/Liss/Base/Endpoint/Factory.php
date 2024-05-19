@@ -95,7 +95,9 @@ class Factory
         /* Check if there are any liss payloads available:
          * If not, nothing to do. No trabajo
          */
-        if (!(new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log))->hasPayloads()) {
+        $payloadCache = new PayloadCache($this->storageMapper, $this->filesystemProxy, $this->log);
+
+        if (!$payloadCache->hasPayloads()) {
             return new GenericCollection(IStrategy::class);
         }
 
@@ -134,8 +136,7 @@ class Factory
             $this->defaultType,
             $exclusions,
             $this->teacherIdentifier,
-            $this->filesystemProxy,
-            $this->storageMapper,
+            $payloadCache,
             $this->eventMapper,
             $this->overridesMapper,
             $this->classEntryMapper,
@@ -144,22 +145,19 @@ class Factory
         ->add(new TimetableCalendar\BellTimes(
             $this->log,
             $this->perform,
-            $this->filesystemProxy,
-            $this->storageMapper,
+            $payloadCache,
             $this->periodMapper
         ))
         ->add(new TimetableCalendar\Classes(
             $this->log,
             $this->perform,
-            $this->filesystemProxy,
-            $this->storageMapper,
+            $payloadCache,
             $this->classEntryMapper
         ))
         ->add(new TimetableCalendar\ClassMemberships(
             $this->log,
             $this->perform,
-            $this->filesystemProxy,
-            $this->storageMapper,
+            $payloadCache,
             $this->classEntryMapper,
             $this->classInvolvementMapper
         ))
@@ -167,8 +165,7 @@ class Factory
             $this->log,
             $this->perform,
             $this->teacherIdentifier,
-            $this->filesystemProxy,
-            $this->storageMapper,
+            $payloadCache,
             $this->classEntryMapper,
             $this->classPeriodMapper,
             $this->periodMapper
