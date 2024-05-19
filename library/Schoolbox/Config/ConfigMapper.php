@@ -238,6 +238,10 @@ class ConfigMapper extends Mapper
     public const NAME_INSTANCE_REGISTRY_URL = 'instance_registry_url';
     public const NAME_START_OF_SCHOOL_YEAR  = 'start_of_school_year';
 
+    public const NAME_DIGISTORM_APPLE_APP_STORE_LINK = 'digistorm_apple_app_store_link';
+    public const NAME_DIGISTORM_GOOGLE_PLAY_STORE_LINK = 'digistorm_google_play_store_link';
+    public const NAME_DIGISTORM_ROLE_INSTALL_PROMPT = 'digistorm_role_install_prompt';
+
     /**
      * Skin Config Fields
      */
