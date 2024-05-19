@@ -339,7 +339,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Unit planner link should show for both Unit and Course pages.
-        if ($lmsEnabled && ($isCoursePage || $isUnitPage)) {
+        if ($lmsEnabled && ($isCoursePage || $isUnitPage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $unitPlannerLink = null;
             if ($isUnitPage) {
                 $unitPlannerLink = $this->getRouteGenerator()->generate('coursePlan.getPlan', ['id' => $this->getContext()->getUnitSpecification()->getCourse()->getId()]);
