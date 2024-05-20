@@ -226,7 +226,6 @@ window.Vue.onUnmounted(() => {
     </div>
     <activities-list-delete-modal />
     <up-curriculum />
-    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped lang="scss">
