@@ -411,11 +411,13 @@ HELP;
 
                         /* Perform update in learnosity
                          */
-                        $this->api->dataSetRequest('/itembank/questions', [
-                            'questions' => [
-                                $questionPayload
-                            ]
-                        ]);
+                        if ($this->perform()) {
+                            $this->api->dataSetRequest('/itembank/questions', [
+                                'questions' => [
+                                    $questionPayload
+                                ]
+                            ]);
+                        }
 
                         $this->getLogger()->debug(sprintf(
                             '(%s/%s) [%s/%s] Update request complete.',
