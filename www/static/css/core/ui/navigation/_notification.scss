@@ -50,7 +50,7 @@ $allow-notification-stash: $xlarge-up;
 
     &[data-unread="0"] {
         ul.off-canvas-list {
-            label {
+            #notification-toggle-full {
                 background: $notification-header-background;
                 // DONE just use --navigation-foreground instead of contrast-bg
                 color: $navigation-foreground;
@@ -72,7 +72,7 @@ $allow-notification-stash: $xlarge-up;
             }
         }
     }
-    ul.off-canvas-list label {
+    ul.off-canvas-list #notification-toggle-full {
         height: $tabbar-height;
         line-height: $tabbar-height;
         padding: 0 0 0 1rem;

@@ -20,7 +20,9 @@
     > input,
     > button,
     > label,
-    > ul {
+    > div,
+    > ul,
+    > p:last-of-type {
         margin: 0 !important;
     }
 }

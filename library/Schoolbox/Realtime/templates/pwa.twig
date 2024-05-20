@@ -3,9 +3,9 @@
     config: ConfigMapper to git and grab the settings from admin > 3rd Party
     notifButton: string identifier for the checkbox/toggle for allow notifications to display correctly when there are multiple on the page
 #}
-<div data-pwa-page="{{ pwaPage }}">
-    <div data-pwa-action="installPWA">
-        To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.
+<div class="l-flex-col l-gap-m f-no-margins" data-pwa-page="{{ pwaPage }}">
+    <div class="l-flex-col l-gap-s f-no-margins" data-pwa-action="installPWA">
+        <p>To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.</p>
 
         {# Insatll PWA if not any of the following:
             config.digistorm_store_link* is not set
@@ -44,7 +44,7 @@
     <div data-pwa="notifBlocked" class="alert-box warning">
         You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
     </div>
-    <div data-pwa-action="enableNotifPrompt">
+    <div class="l-flex-row l-gap-m l-flex--justify-space l-flex--no-wrap" data-pwa-action="enableNotifPrompt">
         <h4>Enable notifications on your device</h4>
         <div class="switch">
             <input id="{{ notifButton }}" data-pwa-action="enableNotif" type="checkbox">
