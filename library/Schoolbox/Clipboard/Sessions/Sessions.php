@@ -457,7 +457,7 @@ class Sessions implements IStrategy
                              * "This may not be ideal for Schoolbox currently and for now it may be best to
                              * just not display those specific custom fields." -- Clipboard James, May 20
                              */
-                            if ((null === $value) || is_scalar($value)) {
+                            if (is_scalar($value) && ('' !== trim((string)$value))) {
                                 $customFields[] = sprintf(
                                     self::ADDITIONAL_FIELDS_TUPLE,
                                     $label,
