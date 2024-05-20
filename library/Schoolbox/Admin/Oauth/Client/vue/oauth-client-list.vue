@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * To manage clients for oAuth
+ * Displays a list of clients, allows adding, modifying, regenerating, and deleting clients.
+ */
+
 import debounce from "lodash/debounce";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
