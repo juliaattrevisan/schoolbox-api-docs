@@ -38,10 +38,9 @@ const addingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const regeneratingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const deletingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
-const searchUsers = window.Vue.ref<VueSelectOption>([]);
+const searchUsers = window.Vue.ref<VueSelectOption[]>([]);
 const saveError = window.Vue.ref<string | null>(null);
-const userSearchQueryParam = window.Vue.ref("");
-const userSearchAdditionalParams = window.Vue.ref({ filter: JSON.stringify({ roleType: "staff" }) });
+const userSearchAdditionalParams = { filter: JSON.stringify({ roleType: "staff" }) };
 const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 
@@ -239,8 +238,7 @@ async function deleteClient(client: OAuthClient) {
 /**
  * Search callback for the user selectize.
  * This method is debounced so that the search doesn't trigger until
- * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
- * milliseconds.
+ * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY` milliseconds.
  * @param {string} query -The search string
  * @param {Function} loading - A function to call when the loading state changes (accepts a Boolean)
  */
@@ -249,18 +247,16 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
         return;
     }
     loading(true);
-    const searchUrl = new URL(props.userSearchEndpoint, window.location);
-    const searchParams = userSearchAdditionalParams.value;
-    searchParams[userSearchQueryParam.value] = query;
-    searchUrl.search = new URLSearchParams(searchParams);
+    const searchUrl = new URL(props.userSearchEndpoint, window.location.href);
+    const searchParams = userSearchAdditionalParams;
+    searchUrl.search = new URLSearchParams(searchParams).toString();
     fetch(searchUrl)
         .then((response) => response.json())
         .then((jsonResponse) => {
-            searchUsers.value = (jsonResponse as VueSelectData).data as VueSelectOption;
+            searchUsers.value = (jsonResponse as VueSelectData).data as { fullName: string }[];
         })
-        .catch((error) => {
-            // console.warn(error);
-            // hasLoadError.value = true;
+        .catch(() => {
+            timeout({ text: "An unexpected error occurred", isSuccess: false });
         })
         .finally(() => {
             loading(false);
