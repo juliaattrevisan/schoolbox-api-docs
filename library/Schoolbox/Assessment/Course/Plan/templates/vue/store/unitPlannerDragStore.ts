@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { Unit } from "../unitPlannerTypes";
 import { useUnitPlannerStore } from "./unitPlannerStore";
@@ -150,8 +151,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             return; // User does not have access to resequence
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Updating unit order...");
+        activate("Updating unit order...");
         try {
             const currentSequence = unitPlannerStore.orderedUnits.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -169,11 +169,9 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
                 throw new Error(await extractErrorMessage(response));
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Unit order updated successfully", true, 2000);
+            timeout({ text: "Unit order updated successfully" });
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout(error, false, 2000);
+            timeout({ text: error as string, isSuccess: false });
         }
     }
 

@@ -123,7 +123,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.units, props.template, toastEl.value!);
+    store.init(props.courseId, props.units, props.template, toastEl.value!);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
     dragStore.init(
         props.routeFolderSequence,

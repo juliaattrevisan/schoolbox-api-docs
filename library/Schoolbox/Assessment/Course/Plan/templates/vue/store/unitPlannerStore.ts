@@ -26,7 +26,8 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * @param { UnitTemplate } $template - the unit template
      * @param { typeof Toast } $toastEl - the toast element
      */
-    function init($units: Unit[], $template: UnitTemplate, $toastEl: typeof Toast) {
+    function init($courseId: number, $units: Unit[], $template: UnitTemplate, $toastEl: typeof Toast) {
+        courseId.value = $courseId;
         units.value = $units;
         template.value = $template;
         toastEl.value = $toastEl;

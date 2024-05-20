@@ -12,12 +12,20 @@ const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
 
 /**
+ * To be able to return to the unit planner after modifying the course
+ * @returns {string} - The base64 encoded return url
+ */
+const returnUrl = window.Vue.computed(() => {
+    return window.btoa(window.location.pathname);
+});
+
+/**
  * To show the add unit display
  */
 // function onCreateSelected() {
-    // if (!addUnitStore.isOpen) {
-    //     addUnitStore.prompt();
-    // }
+// if (!addUnitStore.isOpen) {
+//     addUnitStore.prompt();
+// }
 // }
 </script>
 
@@ -28,7 +36,7 @@ const props = defineProps<Props>();
                 <i class="icon-unit"></i>
                 <p>
                     This course currently does not have any units. To begin building this course start by
-                    <a :href="`/course/modify/${props.courseId}`">creating a unit.</a>
+                    <a :href="`/course/modify/${props.courseId}?returnUrl=${returnUrl}`">creating a unit.</a>
                 </p>
             </div>
         </div>
