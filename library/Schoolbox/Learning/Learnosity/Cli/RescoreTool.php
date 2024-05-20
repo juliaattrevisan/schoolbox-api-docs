@@ -67,7 +67,7 @@ tool, which lets you specify a particular quiz whose attempts you want to update
 It uses an assessment's learnosity_reference for a quiz whose attempts you want to rescore.
 
 Usage: rescore.php --assessment=... [-vvv] [--perform]
-
+Ex.    rescore.php --assessment=656 -vvv --perform
 
 HELP;
             exit;
@@ -149,6 +149,18 @@ HELP;
 
         foreach ($attempts as $attempt) {
             $this->getLogger()->info('');
+
+            /* Legacy attempts might not have a learnosity reference;
+             * skip those and keep going (this happens in vagrants)
+             */
+            if ('' === trim((string)$attempt->getLearnosityReference())) {
+                $this->getLogger()->info(sprintf(
+                    'Attempt %s does not have a learnosity reference; skipping',
+                    $attempt->getId()
+                ));
+
+                continue;
+            }
 
             $this->getLogger()->info(sprintf(
                 'Preparing attempt %s (%s) for rescoring',
