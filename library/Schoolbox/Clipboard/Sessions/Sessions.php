@@ -443,13 +443,31 @@ class Sessions implements IStrategy
 
                             /* If there's a meaningful value, stack it up
                              * Otherwise ignore it
+                             *
+                             * Clipboard can send non-strings like arrays and objects here, which is odd.
+                             * Can't do much with those, so skip them. The current state of this implementation
+                             * is that they could potentially send you an array of clipboard-specific ids
+                             * which is mostly useless to us at the moment; those are the only known non-string
+                             * datatypes that clipboard is intending to send for now.
+                             *
+                             * Clipboard themselves recommended against processing these arrays of clipboard
+                             * ids...the sis probably doesn't even know about it:
+                             *
+                             * https://alaress.slack.com/archives/C01CQG1SCF4/p1715928707969979
+                             * "This may not be ideal for Schoolbox currently and for now it may be best to
+                             * just not display those specific custom fields." -- Clipboard James, May 20
                              */
-                            if ('' !== trim((string)$value)) {
+                            if ((null === $value) || is_scalar($value)) {
                                 $customFields[] = sprintf(
                                     self::ADDITIONAL_FIELDS_TUPLE,
                                     $label,
                                     $value
                                 );
+                            } else {
+                                $this->log->debug(sprintf(
+                                    'Skipping custom field metadata for "%s"; not a scalar data type',
+                                    $label,
+                                ));
                             }
                         }
 
