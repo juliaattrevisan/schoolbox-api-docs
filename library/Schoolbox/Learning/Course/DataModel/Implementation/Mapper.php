@@ -181,7 +181,10 @@ class Mapper extends AbstractCourseMapper
             'SELECT cci_importedCourse.value AS courseImplId, ci.id AS componentInstanceId, f.id AS folderId
             FROM component_definition cd
             JOIN component_instance ci ON (ci.component_definition_id=cd.id)
-            JOIN folder f ON f.id=ci.identifier
+            JOIN folder f ON (
+                f.id=ci.identifier AND
+                f.deleted_at IS NULL
+            )
             JOIN component_config_definition ccd_importedCourse ON (
                 ccd_importedCourse.component_definition_id = cd.id AND
                 ccd_importedCourse.key = "importedCourse"
