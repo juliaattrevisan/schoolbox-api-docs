@@ -537,11 +537,11 @@ window.Vue.onMounted(() => {
         </template>
         <template v-else-if="currentAction === ActionType.REGENERATED">
             <h2>Client Secret for oAuth Client {{ regeneratingClient.name }} Regenerated</h2>
-            <label for="itemRegenerated-clientSecret">Client Secret</label>
-            <input id="itemRegenerated-clientSecret" v-model="regeneratingClient.clientSecret" readonly />
             <div class="alert-box warning">
                 You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
             </div>
+            <label for="itemRegenerated-clientSecret" class="required">Client Secret</label>
+            <input id="itemRegenerated-clientSecret" v-model="regeneratingClient.clientSecret" readonly />
             <div class="component-action">
                 <section>
                     <button @click.prevent="closeModal">Close</button>
