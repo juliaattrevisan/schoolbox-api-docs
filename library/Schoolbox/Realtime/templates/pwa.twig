@@ -24,7 +24,7 @@
             {% endif %}
         {% else %}
             {# ensure the user is in the specified role #}
-            {% if user.role.type | capitalize in config.digistorm_role_install_prompt %}
+            {% if USER.role.type | capitalize in config.digistorm_role_install_prompt %}
                 {% if installApple is not empty %}
                     <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
                 {% endif %}
