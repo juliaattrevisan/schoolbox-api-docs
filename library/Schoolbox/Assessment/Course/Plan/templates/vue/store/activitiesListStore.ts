@@ -30,7 +30,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
                 return; // User does not have access to resequence
             }
 
-            activate("Updating...");
+            activate("Saving...");
             try {
                 const formData = new FormData();
                 newActivityIDSequence.forEach((activityID) => {
@@ -49,7 +49,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
                     throw new Error(await extractErrorMessage(response));
                 }
 
-                timeout({ text: "Activity order updated successfully" });
+                timeout({ text: "Activity order saving successfully" });
             } catch (error) {
                 timeout({ text: error as string, isSuccess: false });
             }

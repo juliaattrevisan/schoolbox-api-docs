@@ -15,7 +15,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
-    const template = window.Vue.ref<UnitTemplate | null>(null);
+    const template = window.Vue.ref<UnitTemplate | null>(null); // the course framework template that units are linked to
 
     /**
      * store any passed through properties

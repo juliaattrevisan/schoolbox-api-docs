@@ -5,7 +5,8 @@
 
 import { defineStore } from "pinia";
 import { watchIgnorable } from "@vueuse/core";
-// import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
@@ -93,7 +94,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {Column} column - the column to create the component for
      */
     async function createComponent(unit: Unit, column: Column) {
-        // unitPlannerStore.toastEl!.activate("Creating curriculum...");
+        activate("Creating curriculum...");
         try {
             const unitPlannerStore = useUnitPlannerStore();
 
@@ -111,8 +112,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             });
 
             if (!createResponse.ok) {
-                // throw new Error(await extractErrorMessage(createResponse));
-                return;
+                throw new Error(await extractErrorMessage(createResponse));
             }
 
             const createResponseJSON = (await createResponse.json()) as { instanceID: number };
@@ -139,8 +139,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             });
 
             if (!configResponse.ok) {
-                // throw new Error(await extractErrorMessage(createResponse));
-                return;
+                throw new Error(await extractErrorMessage(createResponse));
             }
 
             const newComponent: CurriculumOverviewComponent = {
@@ -151,9 +150,9 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             };
             unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
 
-            // unitPlannerStore.toastEl!.timeout("Curriculum created successfully", true, 2000);
+            timeout({ text: "Curriculum created successfully" });
         } catch (error) {
-            // unitPlannerStore.toastEl!.timeout(error, false, 2000);
+            timeout({ text: error as string, isSuccess: false });
         }
     }
 

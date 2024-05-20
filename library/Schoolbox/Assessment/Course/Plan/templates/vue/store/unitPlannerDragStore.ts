@@ -151,7 +151,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             return; // User does not have access to resequence
         }
 
-        activate("Saving unit order...");
+        activate("Saving...");
         try {
             const currentSequence = unitPlannerStore.orderedUnits.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {

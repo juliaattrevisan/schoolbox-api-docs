@@ -24,7 +24,7 @@ interface Props {
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
-    template: UnitTemplate;
+    template: UnitTemplate; // the course framework template that units are linked to
 }
 
 const props = defineProps<Props>();
