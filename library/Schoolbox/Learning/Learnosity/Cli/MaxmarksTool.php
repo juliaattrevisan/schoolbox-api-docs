@@ -194,6 +194,18 @@ HELP;
                         ]
                     ])['data'][0];
 
+                    /* If the max_score value was already set, don't change anything;
+                     * the user might have done something here.
+                     */
+                    if (isset($question['data']['validation']['max_score'])) {
+                        $this->getLogger()->debug(sprintf(
+                            'max_score was already set for question %s; skipping',
+                            $question['reference']
+                        ));
+
+                        continue;
+                    }
+
                     /* Assign max_score to be the same as validation.valid_response.score
                      * ...because learnosity reasons
                      */
