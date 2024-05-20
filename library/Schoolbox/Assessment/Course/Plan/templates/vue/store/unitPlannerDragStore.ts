@@ -151,7 +151,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             return; // User does not have access to resequence
         }
 
-        activate("Updating unit order...");
+        activate("Saving unit order...");
         try {
             const currentSequence = unitPlannerStore.orderedUnits.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -169,7 +169,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
                 throw new Error(await extractErrorMessage(response));
             }
 
-            timeout({ text: "Unit order updated successfully" });
+            timeout({ text: "Unit order saved successfully" });
         } catch (error) {
             timeout({ text: error as string, isSuccess: false });
         }
