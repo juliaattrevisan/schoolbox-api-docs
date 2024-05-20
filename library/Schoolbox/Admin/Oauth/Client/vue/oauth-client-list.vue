@@ -33,6 +33,7 @@ const props = defineProps<Props>();
 
 const isDataLoading = window.Vue.ref(true);
 const hasDataLoadError = window.Vue.ref(false);
+const isProcessing = window.Vue.ref(false);
 const clientList = window.Vue.ref<OAuthClient[]>([]);
 const addingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
@@ -43,6 +44,8 @@ const saveError = window.Vue.ref<string | null>(null);
 const userSearchAdditionalParams = { filter: JSON.stringify({ roleType: "staff" }) };
 const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
+const hasNoName = window.Vue.ref(false);
+const hasNoRedirect = window.Vue.ref(false);
 
 /**
  * Fetch the current list of clients from the server.
@@ -72,9 +75,34 @@ function showAddModal() {
 }
 
 /**
+ * Close the modal
+ */
+function closeModal() {
+    if (modalEl.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
+        modalEl.value.close();
+    }
+    hasNoName.value = false;
+    hasNoRedirect.value = false;
+}
+
+/**
  * Add another 0AuthClient
  */
 async function addClient() {
+    if (isProcessing.value) {
+        return;
+    }
+    if (addingClient.value.name === "") {
+        hasNoName.value = true;
+        return;
+    }
+    if (addingClient.value.redirectUri === "") {
+        hasNoRedirect.value = true;
+        return;
+    }
+    hasNoName.value = false;
+    hasNoRedirect.value = false;
     try {
         activate("Adding...");
         const response = await fetch(props.postItemEndpoint, {
@@ -119,6 +147,19 @@ function showModifyModal(client: OAuthClient) {
  * @param {OAuthClient} client - The client to modify
  */
 async function modifyItem(client: OAuthClient) {
+    if (isProcessing.value) {
+        return;
+    }
+    if (client.name === "") {
+        hasNoName.value = true;
+        return;
+    }
+    if (client.redirectUri === "") {
+        hasNoRedirect.value = true;
+        return;
+    }
+    hasNoName.value = false;
+    hasNoRedirect.value = false;
     try {
         if (!client._links?.patch) {
             throw new Error("No patch link found for client");
@@ -137,10 +178,7 @@ async function modifyItem(client: OAuthClient) {
             // Replace the existing modified client with the new version
             const modifiedClient = (await response.json()) as OAuthClient;
             clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
-            if (modalEl.value) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
-                modalEl.value.close();
-            }
+            closeModal();
         } else {
             saveError.value = await extractErrorMessage(response);
             timeout({ text: "Client couldn't be modified", isSuccess: false });
@@ -169,6 +207,9 @@ function showRegenerateModal(client: OAuthClient) {
  * @param {OAuthClient} client - The client to regenerate
  */
 async function regenerateClient(client: OAuthClient) {
+    if (isProcessing.value) {
+        return;
+    }
     try {
         if (!client._links?.regenerate) {
             throw new Error("No patch link found for client");
@@ -211,6 +252,9 @@ function showDeleteModal(client: OAuthClient) {
  * @param {OAuthClient} client - The client to delete
  */
 async function deleteClient(client: OAuthClient) {
+    if (isProcessing.value) {
+        return;
+    }
     try {
         if (!client._links?.delete) {
             throw new Error("No patch link found for client");
@@ -222,10 +266,7 @@ async function deleteClient(client: OAuthClient) {
         if (response.ok) {
             clientList.value = clientList.value.filter((c) => c.id !== client.id);
             timeout({ text: "Client deleted successfully" });
-            if (modalEl.value) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
-                modalEl.value.close();
-            }
+            closeModal();
         } else {
             saveError.value = await extractErrorMessage(response);
             timeout({ text: "Client couldn't be deleted", isSuccess: false });
@@ -262,16 +303,6 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
             loading(false);
         });
 }, SEARCH_RESULT_RETRIEVE_DELAY);
-
-/**
- * Close the modal
- */
-function closeModal() {
-    if (modalEl.value) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
-        modalEl.value.close();
-    }
-}
 
 /**
  * Load the oauth client config list
@@ -352,44 +383,54 @@ window.Vue.onMounted(() => {
     <reveal-modal ref="modalEl">
         <template v-if="currentAction === ActionType.ADD">
             <h2>Add oAuth Client</h2>
-            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
-            <label for="addClient-name" class="required">Name</label>
-            <p class="meta">
-                A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
-                whether they wish to share their details.
-            </p>
-            <input id="addClient-name" v-model="addingClient.name" required />
-            <label for="addClient-redirectUri" class="required">Redirect URI</label>
-            <p class="meta">
-                When the user approves a request to share details, where should they be redirected to? (This URI must be
-                able to process an oAuth authorization code.)
-            </p>
-            <input id="addClient-redirectUri" v-model="addingClient.redirectUri" required />
-            <label for="addClient-clientCredentialsUser">Client Credentials User</label>
-            <p class="meta">
-                Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance,
-                without interaction by an actual user) will be authenticated as this user; if no user is set here, this
-                client may not use client credentials requests.
-            </p>
-            <v-select
-                v-model="addingClient.clientCredentialsUser"
-                label="fullName"
-                placeholder="Search for user, or leave empty for no user"
-                input-id="addClient-clientCredentialsUser"
-                :options="searchUsers"
-                class="schoolbox-vue-selectize"
-                :clear-search-on-blur="() => true"
-                :clear-search-on-select="true"
-                :close-on-select="true"
-                @search="onUserSearch"
-            >
-                <template #option="option">
-                    <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
-                </template>
-                <template #selected-option="option">
-                    <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                </template>
-            </v-select>
+            <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
+            <div class="l-flex-col l-gap-m">
+                <div class="f-no-margins">
+                    <label for="addClient-name" class="required">Name</label>
+                    <p class="meta">
+                        A unique name for this client: this name will be displayed to a Schoolbox user when they are
+                        asked whether they wish to share their details.
+                    </p>
+                    <input id="addClient-name" v-model="addingClient.name" required />
+                    <label v-if="hasNoName" class="error">Please enter a Name</label>
+                </div>
+                <div class="f-no-margins">
+                    <label for="addClient-redirectUri" class="required">Redirect URI</label>
+                    <p class="meta">
+                        When the user approves a request to share details, where should they be redirected to? (This URI
+                        must be able to process an oAuth authorization code.)
+                    </p>
+                    <input id="addClient-redirectUri" v-model="addingClient.redirectUri" required />
+                    <label v-if="hasNoRedirect" class="error">Please enter a Redirect URI</label>
+                </div>
+                <div class="f-no-margins">
+                    <label for="addClient-clientCredentialsUser">Client Credentials User</label>
+                    <p class="meta">
+                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
+                        instance, without interaction by an actual user) will be authenticated as this user; if no user
+                        is set here, this client may not use client credentials requests.
+                    </p>
+                    <v-select
+                        v-model="addingClient.clientCredentialsUser"
+                        label="fullName"
+                        placeholder="Search for user, or leave empty for no user"
+                        input-id="addClient-clientCredentialsUser"
+                        :options="searchUsers"
+                        class="schoolbox-vue-selectize"
+                        :clear-search-on-blur="() => true"
+                        :clear-search-on-select="true"
+                        :close-on-select="true"
+                        @search="onUserSearch"
+                    >
+                        <template #option="option">
+                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        </template>
+                        <template #selected-option="option">
+                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        </template>
+                    </v-select>
+                </div>
+            </div>
             <div class="component-action">
                 <section>
                     <button @click.prevent="addClient">Add</button>
@@ -399,13 +440,16 @@ window.Vue.onMounted(() => {
         </template>
         <template v-else-if="currentAction === ActionType.ADDED">
             <h2>oAuth Client Added</h2>
+            <div class="alert-box warning">
+                You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
+            </div>
             <label for="itemAdded-name">Name</label>
             <input id="itemAdded-name" v-model="addingClient.name" readonly />
             <label for="itemAdded-redirectUri">Redirect URI</label>
             <input id="itemAdded-redirectUri" v-model="addingClient.redirectUri" readonly />
             <label for="itemAdded-clientId">Client ID</label>
             <input id="itemAdded-clientId" v-model="addingClient.clientId" readonly />
-            <label for="itemAdded-clientSecret">Client Secret</label>
+            <label for="itemAdded-clientSecret" class="required">Client Secret</label>
             <input id="itemAdded-clientSecret" v-model="addingClient.clientSecret" readonly />
             <label for="itemAdded-clientCredentialsUser">Client Credentials User</label>
             <select id="itemAdded-clientCredentialsUser" readonly>
@@ -414,9 +458,6 @@ window.Vue.onMounted(() => {
                 </option>
                 <option v-else>No user</option>
             </select>
-            <div data-alert="" class="alert-box warning">
-                You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
-            </div>
             <div class="component-action">
                 <section>
                     <button @click.prevent="closeModal">Close</button>
@@ -425,45 +466,54 @@ window.Vue.onMounted(() => {
         </template>
         <template v-else-if="currentAction === ActionType.MODIFY">
             <h2>Modify oAuth Client</h2>
-            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
-            <label for="modifyItem-name" class="required">Name</label>
-            <p class="meta">
-                A unique name for this client: this name will be displayed to a Schoolbox user when they are asked
-                whether they wish to share their details.
-            </p>
-            <input id="modifyItem-name" v-model="modifyingClient.name" required />
-            <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
-            <p class="meta">
-                When the user approves a request to share details, where should they be redirected to? (This URI must be
-                able to process an oAuth authorization code.)
-            </p>
-            <input id="modifyItem-redirectUri" v-model="modifyingClient.redirectUri" required />
-
-            <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
-            <p class="meta">
-                Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance,
-                without interaction by an actual user) will be authenticated as this user; if no user is set here, this
-                client may not use client credentials requests.
-            </p>
-            <v-select
-                v-model="modifyingClient.clientCredentialsUser"
-                label="fullName"
-                placeholder="Search for user, or leave empty for no user"
-                input-id="modifyItem-clientCredentialsUser"
-                :options="searchUsers"
-                class="schoolbox-vue-selectize"
-                :clear-search-on-blur="() => true"
-                :clear-search-on-select="true"
-                :close-on-select="true"
-                @search="onUserSearch"
-            >
-                <template #option="option">
-                    <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
-                </template>
-                <template #selected-option="option">
-                    <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                </template>
-            </v-select>
+            <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
+            <div class="l-flex-col l-gap-m">
+                <div class="f-no-margins">
+                    <label for="modifyItem-name" class="required">Name</label>
+                    <p class="meta">
+                        A unique name for this client: this name will be displayed to a Schoolbox user when they are
+                        asked whether they wish to share their details.
+                    </p>
+                    <input id="modifyItem-name" v-model="modifyingClient.name" required />
+                    <label v-if="hasNoName" class="error">Please enter a Name</label>
+                </div>
+                <div class="f-no-margins">
+                    <label for="modifyItem-redirectUri" class="required">Redirect URI</label>
+                    <p class="meta">
+                        When the user approves a request to share details, where should they be redirected to? (This URI
+                        must be able to process an oAuth authorization code.)
+                    </p>
+                    <input id="modifyItem-redirectUri" v-model="modifyingClient.redirectUri" required />
+                    <label v-if="hasNoRedirect" class="error">Please enter a Redirect URI</label>
+                </div>
+                <div class="f-no-margins">
+                    <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
+                    <p class="meta">
+                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
+                        instance, without interaction by an actual user) will be authenticated as this user; if no user
+                        is set here, this client may not use client credentials requests.
+                    </p>
+                    <v-select
+                        v-model="modifyingClient.clientCredentialsUser"
+                        label="fullName"
+                        placeholder="Search for user, or leave empty for no user"
+                        input-id="modifyItem-clientCredentialsUser"
+                        :options="searchUsers"
+                        class="schoolbox-vue-selectize"
+                        :clear-search-on-blur="() => true"
+                        :clear-search-on-select="true"
+                        :close-on-select="true"
+                        @search="onUserSearch"
+                    >
+                        <template #option="option">
+                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        </template>
+                        <template #selected-option="option">
+                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        </template>
+                    </v-select>
+                </div>
+            </div>
             <div class="component-action">
                 <section>
                     <button @click.prevent="modifyItem(modifyingClient)">Modify</button>
@@ -473,8 +523,8 @@ window.Vue.onMounted(() => {
         </template>
         <template v-else-if="currentAction === ActionType.REGENERATE">
             <h2>Regenerate Client Secret for oAuth Client {{ regeneratingClient.name }}?</h2>
-            <div v-if="saveError" data-alert="" class="alert-box alert">{{ saveError }}</div>
-            <div data-alert="" class="alert-box warning">
+            <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
+            <div class="alert-box warning">
                 Regenerating this client&rsquo;s secret will invalidate the configuration of this Schoolbox instance as
                 an oAuth Provider within the client application: it will need to be updated with the regenerated secret.
             </div>
@@ -489,7 +539,7 @@ window.Vue.onMounted(() => {
             <h2>Client Secret for oAuth Client {{ regeneratingClient.name }} Regenerated</h2>
             <label for="itemRegenerated-clientSecret">Client Secret</label>
             <input id="itemRegenerated-clientSecret" v-model="regeneratingClient.clientSecret" readonly />
-            <div data-alert="" class="alert-box warning">
+            <div class="alert-box warning">
                 You must copy and store the client secret: it will no longer be retrievable after closing this dialog.
             </div>
             <div class="component-action">
