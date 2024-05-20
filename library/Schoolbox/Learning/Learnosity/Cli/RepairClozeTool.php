@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Cli\DetectCloze\BrokenFillgap;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Fillgap;
@@ -30,6 +31,14 @@ class RepairClozeTool extends CliTool\App
      * Update a particular quiz from the schoolbox.assessment table
      */
     private const OPT_LONG_ASSESSMENT_ID = 'assessment:';
+
+
+    /**
+     * --blueprint
+     *
+     * Show the payload we intend to send to learnosity land
+     */
+    private const OPT_LONG_BLUEPRINT = 'blueprint';
 
 
     /**
@@ -55,7 +64,8 @@ class RepairClozeTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_ASSESSMENT_ID
+            self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_BLUEPRINT
         ];
     }
 
@@ -70,18 +80,21 @@ Find out how many legacy quizzes contain cloze exercise questions (fillgap)
 because we mis-imported them at the start of 2024 during the mega migration.
 These will have used the wrong regex to parse answers.
 
-Using planning mode will show you a dump of the data we accumulated and some
+Using --blueprint will show you a dump of the data we accumulated and some
 developer data structures are shown on the cli, allowing you to manually
-inspect what we're finding.
+inspect what we're finding. It won't try to do any repairs if you use this.
 
 Using perform mode will actually execute mutations in learnosity, and it won't
 show you the developer data structs. You should use this mode most of the time.
+
+You can also use the --assessment option to limit this to only examining one
+particular assessment at a time.
 
 Note that repeatedly using this tool on the same data set will eventually result
 in it telling you about "no matching questions found" - that's because you've
 fixed them in learnosity and they can no longer be found in a broken state.
 
-Usage: repaircloze.php [--perform] [-vvv]
+Usage: repaircloze.php [--blueprint] [--assessment=...] [--perform] [-vvv]
 
 
 HELP;
@@ -122,6 +135,14 @@ HELP;
         /* Get some facts about candidates or, if specified, a particular assessment
          */
         $stack = $this->findCandidates($assessmentId);
+
+        /* --blueprint option reveals candidate stack to stdout
+         */
+        if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
+            print_r($stack);
+
+            exit();
+        }
 
         /* Inspect the stack for possible repair payloads
          */
@@ -289,19 +310,12 @@ HELP;
      *
      * @param array $stack
      * @return void
-     * @throws \JsonException
      * @throws ValidationException
+     * @throws \JsonException
+     * @throws ApiException
      */
     private function repair(array $stack): void
     {
-        /* Planning Mode reveals candidate stack to stdout
-         */
-        if (!$this->perform()) {
-            print_r($stack);
-
-            return;
-        }
-
         /* Maintain a counter, for user experience
          */
         $i = 0;
