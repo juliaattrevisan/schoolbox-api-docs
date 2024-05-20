@@ -28,7 +28,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
@@ -123,8 +122,8 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.courseId, props.units, props.template, toastEl.value!);
-    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
+    store.init(props.courseId, props.units, props.template);
+    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.

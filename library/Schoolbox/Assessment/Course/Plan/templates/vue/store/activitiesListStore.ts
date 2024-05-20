@@ -1,12 +1,10 @@
 import { defineStore } from "pinia";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
-import { useActivitiesListGlobalStore } from "./activitiesListGlobalStore";
 
 export const useActivitiesListStore = (activitiesListStoreId: string) =>
     defineStore(`activitiesListStore/${activitiesListStoreId}`, () => {
-        const globalStore = useActivitiesListGlobalStore();
-
         const routes = window.Vue.ref<ActivitiesListRoutes>({
             create: null,
             reorder: null,
@@ -32,8 +30,7 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
                 return; // User does not have access to resequence
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            globalStore.toastEl!.activate("Saving...");
+            activate("Updating...");
             try {
                 const formData = new FormData();
                 newActivityIDSequence.forEach((activityID) => {
@@ -52,11 +49,9 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
                     throw new Error(await extractErrorMessage(response));
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-                globalStore.toastEl!.timeout("Save successful", true, 2000);
+                timeout({ text: "Activity order updated successfully" });
             } catch (error) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-                globalStore.toastEl!.timeout(error, false, 2000);
+                timeout({ text: error as string, isSuccess: false });
             }
         }
 
