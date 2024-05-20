@@ -219,9 +219,11 @@ window.Vue.onUnmounted(() => {
                 :rubric-capabilities="props.unit.rubricCapabilities"
             />
 
-            <template v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW">
-                <up-unit-cell-curriculum-content :unit="props.unit" :column="props.column" />
-            </template>
+            <up-unit-cell-curriculum-content
+                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                :unit="props.unit"
+                :column="props.column"
+            />
         </div>
 
         <div class="content-container-fixed">

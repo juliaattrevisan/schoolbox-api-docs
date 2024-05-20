@@ -117,7 +117,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
             const createResponseJSON = (await createResponse.json()) as { instanceID: number };
 
-            // get the filter id for the component if it's available based on the matching the component heading to column label
+            // get the filter id for the component if it's available based on matching the component heading to column label
             // to open the modal at the correct node
             const treeFilter = unitPlannerStore.template?.curriculum.find(
                 (component) => component.heading === column.label,
