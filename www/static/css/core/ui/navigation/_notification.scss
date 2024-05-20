@@ -111,6 +111,19 @@ $allow-notification-stash: $xlarge-up;
         }
     }
 
+    // the link to open the notification settings
+    .settings-button {
+        color: $white;
+        height: 2.5rem;
+        padding: 0.5rem;
+        position: absolute;
+        right: 0.5rem;
+        top: 0;
+        transform: translateY(40%);
+        width: 2rem;
+        z-index: calc(var(--depth-default) + 1); // Safari will not see the icon without this
+    }
+
     /* The button that allows you to view your notifications
      * Says "No Messages" or "Connecting"
      *
