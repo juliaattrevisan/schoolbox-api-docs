@@ -150,9 +150,10 @@ class Controller extends BaseController
         $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
 
         // Filter out historical classes (no class code, no group).
+        // Also filter out course implementations in deleted folders.
         $courseImpls = $courseImpls->filter(
             function (CourseImplementation\Model $courseImpl) {
-                return !($courseImpl->getFolder()->getCodeString() === '' && $courseImpl->getFolder()->getGroup() === null);
+                return !($courseImpl->getFolder()?->getCodeString() === '' && $courseImpl->getFolder()->getGroup() === null);
             }
         );
 
