@@ -134,7 +134,7 @@
                     <input id="worksheet" type="checkbox" name="worksheet">
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
-                    <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' %} </div>
+                    <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} %} </div>
                 </li>
                 <li>
                     <input id="allow-offline" type="checkbox" name="allow-offline">

@@ -255,6 +255,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // To be able to view the current student policy if enabling within the submission type
         $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
+        $data['attachzoneWorksheet'] = (new Zone('worksheet'))
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a worksheet')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('application/pdf')
+            ->setFilesystemContext('worksheet')
+            ->getTwigContext();
+
         /* A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
