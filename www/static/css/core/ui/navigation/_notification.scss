@@ -188,4 +188,7 @@ $allow-notification-stash: $xlarge-up;
     #installDelayPrompt {
         padding: 0; // remove the padding that's linked to all ul.off-canvas-list li a, as we don't need it here
     }
+    .notifOn {
+        font-size: 0.8125rem; // keep it consistent with existing labels
+    }
 }
