@@ -251,7 +251,7 @@
                             <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                             <section data-namespace="{{ ns[namespace.id].slug }}">
                                 {% for source in namespace.sources %}
-                                    {% include '@messages/source.twig' with { source: source } %}
+                                    {% include '@notifications/source.twig' with { source: source } %}
                                 {% endfor %}
                             </section>
                             {% endif %}
@@ -270,7 +270,7 @@
 <div id="slider-modal" class="reveal-modal" data-reveal></div>
 
 <div id="legend-modal" class="reveal-modal" data-reveal>
-    {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
+    {% include '@notifications/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
 
     <a class="close-reveal-modal">&#215;</a>
 </div>

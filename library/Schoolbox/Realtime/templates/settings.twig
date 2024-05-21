@@ -50,7 +50,7 @@
         <h1>Notification Settings</h1>
     </div>
 </div>
-<form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings" class="row">
+<form method="post" action="{{ routeLookup('notifications.saveConfig') }}" id="msg-settings" class="row">
     <div class="small-12 columns">
         <div class="row actions-small-1">
             <div class="list-item">
@@ -82,7 +82,7 @@
                                 <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
                                 <div class="actions-small-6" data-source="{{ source.id }}">
                                     <nav>
-                                        {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                                        {% include '@notifications/options.twig' with { mode: 'p', role: source } %}
                                     </nav>
                                 </div>
                             </li>
@@ -97,7 +97,7 @@
 </form>
 
 <div id="legend-modal" class="reveal-modal" data-reveal>
-    {% include '@messages/legend.twig' with { who: 'you' } %}
+    {% include '@notifications/legend.twig' with { who: 'you' } %}
 
     <a class="close-reveal-modal">&#215;</a>
 </div>

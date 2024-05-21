@@ -20,6 +20,6 @@ class Settings implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $messagesModule = new Realtime\Module($di);
-        $messagesModule->registerModule('/settings/messages');
+        $messagesModule->registerModule('/settings/notifications');
     }
 }
