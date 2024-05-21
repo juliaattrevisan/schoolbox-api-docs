@@ -97,7 +97,12 @@ function onModalClosed() {
         @map-selected="onModifySelected"
     />
     <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
-    <fn-actions v-if="!props.isReadOnly && store().hasNodes" @modify-selected="onModifySelected" />
+    <fn-actions
+        v-if="!props.isReadOnly && store().hasNodes"
+        :folder-id="props.folderId"
+        :component-id="props.componentInstanceId"
+        @modify-selected="onModifySelected"
+    />
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />

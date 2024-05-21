@@ -7,6 +7,7 @@
  * The relevant code has been commented out for now as it may be added in the future however.
  */
 
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 // import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 // import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";
 // import UpAddUnit from "./up-add-unit.vue";
@@ -18,14 +19,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
-
-/**
- * To be able to return to the unit planner after modifying the course
- * @returns {string} - The base64 encoded return url
- */
-const returnUrl = window.Vue.computed(() => {
-    return window.btoa(window.location.pathname);
-});
 
 /**
  * To show the add unit display
@@ -56,7 +49,7 @@ const returnUrl = window.Vue.computed(() => {
     </div>
     <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
         <li>
-            <a :href="`/course/modify/${props.courseId}?returnUrl=${returnUrl}`" class="icon-modify">Modify Course</a>
+            <a :href="`/course/modify/${props.courseId}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
         </li>
         <li>
             <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>

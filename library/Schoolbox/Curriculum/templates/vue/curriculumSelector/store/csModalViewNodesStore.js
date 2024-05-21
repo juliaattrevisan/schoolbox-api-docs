@@ -5,7 +5,7 @@
 
 import { defineStore } from "pinia";
 import { useNodesStore } from "./csNodesStore";
-import { findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSearchStore } from "./csModalSearchStore";
 
 export const DIRECTION = {
@@ -175,6 +175,12 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
         async toStartingNodeId(id) {
             this.hasStartingNode = true;
             this.startingNodeId = id;
+            // if the id is unset, we just reset and return
+            this.reset();
+            if (id === UNSET_ID) {
+                return;
+            }
+            // otherwise we load the node at which we start
             await useNodesStore().loadId(this.startingNodeId);
         },
     },

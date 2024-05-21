@@ -24,11 +24,10 @@ interface Props {
     activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
-    template: UnitTemplate;
+    template: UnitTemplate; // the course framework template that units are linked to
 }
 
 const props = defineProps<Props>();
-const toastEl = window.Vue.ref<typeof Toast>();
 const store = useUnitPlannerStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
@@ -123,8 +122,8 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.courseId, props.units, toastEl.value!);
-    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled, toastEl.value!);
+    store.init(props.courseId, props.units, props.template);
+    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
@@ -226,7 +225,6 @@ window.Vue.onUnmounted(() => {
     </div>
     <activities-list-delete-modal />
     <up-curriculum />
-    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped lang="scss">

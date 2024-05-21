@@ -103,23 +103,6 @@ function onContentClicked(event: MouseEvent) {
     }
 }
 
-/**
- * To retrieve the curriculum component id for the column if it's available,
- * so we can retrieve the correct folderNodesStore and load in the appropriate node tree
- * @returns {CurriculumOverviewComponent|null} - the component found or null
- */
-function getCurriculumComponent() {
-    // loop through the curriculum components on the unit, matching the component heading to the column label
-    const matchedComponent = props.unit.curriculum.components.find(
-        (component) => component.heading.trim() === props.column.label.trim(), // Ignore trailing or leading whitespace
-    );
-    if (matchedComponent) {
-        return matchedComponent;
-    }
-    return null;
-}
-
-const curriculumComponent = getCurriculumComponent();
 const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
 /**
@@ -237,11 +220,9 @@ window.Vue.onUnmounted(() => {
             />
 
             <up-unit-cell-curriculum-content
-                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
-                :selected-nodes="props.unit.curriculum.selectedNodes"
-                :nodes="props.unit.curriculum.nodes ?? []"
-                :folder-id="props.unit.folderId"
-                :component="curriculumComponent"
+                v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                :unit="props.unit"
+                :column="props.column"
             />
         </div>
 
@@ -270,9 +251,9 @@ window.Vue.onUnmounted(() => {
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
                 <up-unit-cell-curriculum-action
-                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW && curriculumComponent !== null"
-                    :folder-id="props.unit.folderId"
-                    :component="curriculumComponent"
+                    v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                    :unit="props.unit"
+                    :column="props.column"
                 />
             </div>
         </div>

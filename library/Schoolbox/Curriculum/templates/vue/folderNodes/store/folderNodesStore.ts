@@ -39,7 +39,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          */
         async function pushChanges() {
             try {
-                activate("Saving...");
+                activate("Updating...");
                 isProcessing.value = true;
                 const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
                     method: "POST",
@@ -51,7 +51,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
-                    timeout({ text: "Curriculum updated" });
+                    timeout({ text: "Curriculum updated successfully" });
                     document.dispatchEvent(
                         new CustomEvent(FOLDER_NODES_UPDATED, {
                             detail: {
