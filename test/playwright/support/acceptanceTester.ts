@@ -61,6 +61,10 @@ export class AcceptanceTester extends BaseTester {
         const accountContent = this.page.getByTestId("account-content");
         await accountContent.getByText(fullname).click();
 
+        const loginPage = new LoginPage(this.page);
+        await loginPage.verifyLoginSuccess();
+        await loginPage.verifyCurrentUserIs(fullname);
+
         await this.skipWhatsNewTour();
     }
 

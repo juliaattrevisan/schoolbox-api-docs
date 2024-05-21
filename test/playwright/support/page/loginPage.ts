@@ -16,6 +16,7 @@ export class LoginPage {
      */
     async goto() {
         await this.page.goto(LoginPage.LOGIN_URL);
+        await this.page.waitForLoadState("load");
     }
 
     /**
@@ -30,6 +31,14 @@ export class LoginPage {
      */
     async verifyLogoutSuccess() {
         await expect(this.page.getByTestId("login-submit")).toBeVisible();
+    }
+
+    /**
+     * Verify the name of the currently logged in user
+     * @param { string } fullname - The full name of the user to verify
+     */
+    async verifyCurrentUserIs(fullname: string) {
+        await expect(this.page.getByTestId("profile-drop")).toHaveText(fullname);
     }
 
     /**
@@ -57,7 +66,13 @@ export class LoginPage {
      * Verify that the user is currently logged in
      */
     async verifyLoginSuccess() {
-        await expect(this.page.getByText("News Headlines")).toBeVisible();
+        // Ensure the page and JavaScript has fully loaded and is ready for interaction
+        // An issue was found where the profile drop was not clickable for around 400ms
+        //  after the page loaded as miscellaneous.js had not created the event listeners yet
+        await this.page.getByTestId("profile-drop").waitFor({ state: "visible" });
+        await this.page.waitForLoadState("load");
+
+        await expect(this.page.getByTestId("profile-drop")).toBeVisible();
     }
 
     /**
