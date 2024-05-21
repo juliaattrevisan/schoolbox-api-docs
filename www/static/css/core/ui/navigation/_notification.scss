@@ -179,3 +179,13 @@ $allow-notification-stash: $xlarge-up;
         }
     }
 }
+
+#pwaPrompt {
+    background: white; // to ensure the pwa prompt is visible if the skin config has a different var(--off-canvas-background);
+    .alert-box.warning {
+        padding-right: 0.875rem; // reduce the padding that allows the close button to be visible, as we don't have it here
+    }
+    #installDelayPrompt {
+        padding: 0; // remove the padding that's linked to all ul.off-canvas-list li a, as we don't need it here
+    }
+}
