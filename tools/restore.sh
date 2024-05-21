@@ -45,11 +45,8 @@ readonly PRESERVED_CONFIG=(
   # Learnosity
   "learnosity_consumer_key" "learnosity_consumer_secret" "learnosity_version"
 
-  # Maintenance mode
-  "maintenance_mode"
-
   # Others
-  "xml_dir" "file_dir"  "api_key" "schooldata_import_frequency"
+  "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
 );
 
 readonly DISABLED_CONFIG=(
