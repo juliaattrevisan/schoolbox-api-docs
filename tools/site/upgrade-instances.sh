@@ -166,11 +166,16 @@ function upgrade_instances(){
   log "Taking all instances offline (by enabling maintenance mode)..."
   for i in $instance_list; do
   {
-    if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
-      log "Maintenance mode enabled on instance '$i'."
+    # Note site_down runs an SQL UPDATE, so it only makes sense to call site_down on the primary host (only primary hosts have databases).
+    if [[ $is_primary_host == '1' ]]; then
+      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
+        log "Maintenance mode enabled on instance '$i'."
+      else
+        log "Could not enable maintenance mode on instance '$i'.  Exiting."
+        exit 1;
+      fi
     else
-      log "Could not enable maintenance mode on instance '$i'.  Exiting."
-      exit 1;
+      log "Not enabling maintenance mode because not primary host."
     fi
   }
   done
@@ -238,10 +243,14 @@ function upgrade_instances(){
     log "Upgrade complete for instance '$i'";
 
     # Bring instance back online.
-    if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then
-      log "Maintenance mode disabled on instance '$i'."
+    # Note site_up runs an SQL UPDATE, so it only makes sense to call site_up on the primary host (only primary hosts have databases).
+    if [[ $is_primary_host == '1' ]]; then
+      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then log "Maintenance mode disabled on instance '$i'."
+      else
+        log "Could not disable maintenance mode on instance '$i'.  Continuing."
+      fi
     else
-      log "Could not disable maintenance mode on instance '$i'.  Continuing."
+      log "Not disabling maintenance mode because not primary host."
     fi
   } &
   done
