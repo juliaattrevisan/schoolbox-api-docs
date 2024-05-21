@@ -252,6 +252,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        // To be able to view the current student policy if enabling within the submission type
+        $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
         /* A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
