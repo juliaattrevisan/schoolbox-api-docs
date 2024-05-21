@@ -606,7 +606,7 @@ class Acceptance extends \Codeception\Module
     public function assertNotifExists($notif)
     {
         $i = $this->getWebDriverModule();
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->see($notif);
     }
 
@@ -617,7 +617,7 @@ class Acceptance extends \Codeception\Module
     public function assertNotifNotExists($notif)
     {
         $i = $this->getWebDriverModule();
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->dontSee($notif);
     }
 

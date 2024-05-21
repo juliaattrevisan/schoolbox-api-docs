@@ -39,10 +39,10 @@ Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric
 Admin,Configure terms,https://vagrant.dev.schoolbox.cloud/adminv2/terms
 Admin,Bulk Course Import, https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport
 Admin,Configure course builder,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder
-Admin,Setup notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages
-Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure
-Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student
-Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps
+Admin,Setup notifications,https://vagrant.dev.schoolbox.cloud/adminv2/notifications
+Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure
+Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student
+Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps
 Admin,System Settings 3rd Party Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services
 Admin,System Settings AI Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI
 Admin,System Settings Debugging,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging
@@ -57,7 +57,7 @@ Admin,System Settings Proxy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/
 Admin,System Settings SAML,https://vagrant.dev.schoolbox.cloud/adminv2/setting/SAML
 Admin,System Settings Security,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security
 Admin,System Settings Site,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Site
-Admin,Review registered push apps,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush
+Admin,Review registered push apps,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/puush
 Admin,Review role list,https://vagrant.dev.schoolbox.cloud/adminv2/lists
 Admin,Lists Badge Category,https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category
 Admin,Review house list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house
@@ -140,7 +140,7 @@ CMS,Manage groups I am in,https://vagrant.dev.schoolbox.cloud/groups#groups-im-i
 CMS,Manage groups I can join,https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join
 CMS,Manage groups pending membership,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership
 CMS,Manage my links,https://vagrant.dev.schoolbox.cloud/cms/myLinks
-CMS,Manage my message settings,https://vagrant.dev.schoolbox.cloud/settings/messages
+CMS,Manage my notification settings,https://vagrant.dev.schoolbox.cloud/settings/notifications
 CMS,View user profile,https://vagrant.dev.schoolbox.cloud/search/user/1
 CMS,View homepage statistics,https://vagrant.dev.schoolbox.cloud/homepage/153
 CMS,Get homepage RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158
@@ -212,7 +212,7 @@ News,View saved news,https://vagrant.dev.schoolbox.cloud/news/saved
 News,View news archive,https://vagrant.dev.schoolbox.cloud/news/archive
 News,Read news,https://vagrant.dev.schoolbox.cloud/news
 News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
-Notifications,View all notifications,https://vagrant.dev.schoolbox.cloud/messages
+Notifications,View all notifications,https://vagrant.dev.schoolbox.cloud/notifications
 Fixtures,Go to fixtures,https://vagrant.dev.schoolbox.cloud/fixtures
 Fixtures,See all seasons,https://vagrant.dev.schoolbox.cloud/fixtures/seasons
 Fixtures,Change a seacon,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit

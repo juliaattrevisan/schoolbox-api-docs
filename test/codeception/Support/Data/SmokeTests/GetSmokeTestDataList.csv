@@ -162,22 +162,22 @@ Admin,"Configure course builder",Superuser,https://vagrant.dev.schoolbox.cloud/a
 Admin,"Configure course builder",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
 Admin,"Configure course builder",Student,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
 Admin,"Configure course builder",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
-Admin,"Setup notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages,200
-Admin,"Setup notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages,401
-Admin,"Setup notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages,401
-Admin,"Setup notifications",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/messages,401
-Admin,"Configure notification delivery",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,200
-Admin,"Configure notification delivery",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,401
-Admin,"Configure notification delivery",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,401
-Admin,"Configure notification delivery",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure,401
-Admin,"Configure student notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,200
-Admin,"Configure student notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,401
-Admin,"Configure student notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,401
-Admin,"Configure student notifications",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student,401
-Admin,"Configure push providers",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,200
-Admin,"Configure push providers",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,401
-Admin,"Configure push providers",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,401
-Admin,"Configure push providers",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps,401
+Admin,"Setup notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/notifications,200
+Admin,"Setup notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/notifications,401
+Admin,"Setup notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/notifications,401
+Admin,"Setup notifications",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/notifications,401
+Admin,"Configure notification delivery",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure,200
+Admin,"Configure notification delivery",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure,401
+Admin,"Configure notification delivery",Student,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure,401
+Admin,"Configure notification delivery",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure,401
+Admin,"Configure student notifications",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student,200
+Admin,"Configure student notifications",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student,401
+Admin,"Configure student notifications",Student,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student,401
+Admin,"Configure student notifications",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/configure/student,401
+Admin,"Configure push providers",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps,200
+Admin,"Configure push providers",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps,401
+Admin,"Configure push providers",Student,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps,401
+Admin,"Configure push providers",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/apps,401
 Admin,"System Settings 3rd Party Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,200
 Admin,"System Settings 3rd Party Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
@@ -234,10 +234,10 @@ Admin,"System Settings Site",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"System Settings Site",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Site,401
 Admin,"System Settings Site",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Site,401
 Admin,"System Settings Site",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Site,401
-Admin,"Review registered push apps",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,200
-Admin,"Review registered push apps",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,401
-Admin,"Review registered push apps",Student,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,401
-Admin,"Review registered push apps",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush,401
+Admin,"Review registered push apps",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/puush,200
+Admin,"Review registered push apps",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/puush,401
+Admin,"Review registered push apps",Student,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/puush,401
+Admin,"Review registered push apps",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/notifications/puush,401
 Admin,"Review role list",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists,200
 Admin,"Review role list",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists,401
 Admin,"Review role list",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists,401
@@ -565,15 +565,15 @@ CMS,"Manage groups I can join",Parent,https://vagrant.dev.schoolbox.cloud/groups
 CMS,"Manage groups pending membership",Superuser,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership,200
 CMS,"Manage groups pending membership",Teacher,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership,200
 CMS,"Manage groups pending membership",Student,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership,200
-CMS,"MManage groups pending membership",Parent,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership,200
+CMS,"Manage groups pending membership",Parent,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership,200
 CMS,"Manage my links",Superuser,https://vagrant.dev.schoolbox.cloud/cms/myLinks,200
 CMS,"Manage my links",Teacher,https://vagrant.dev.schoolbox.cloud/cms/myLinks,200
 CMS,"Manage my links",Student,https://vagrant.dev.schoolbox.cloud/cms/myLinks,200
 CMS,"Manage my links",Parent,https://vagrant.dev.schoolbox.cloud/cms/myLinks,200
-CMS,"Manage my message settings",Superuser,https://vagrant.dev.schoolbox.cloud/settings/messages,200
-CMS,"Manage my message settings",Teacher,https://vagrant.dev.schoolbox.cloud/settings/messages,200
-CMS,"Manage my message settings",Student,https://vagrant.dev.schoolbox.cloud/settings/messages,200
-CMS,"Manage my message settings",Parent,https://vagrant.dev.schoolbox.cloud/settings/messages,200
+CMS,"Manage my notification settings",Superuser,https://vagrant.dev.schoolbox.cloud/settings/notifications,200
+CMS,"Manage my notification settings",Teacher,https://vagrant.dev.schoolbox.cloud/settings/notifications,200
+CMS,"Manage my notification settings",Student,https://vagrant.dev.schoolbox.cloud/settings/notifications,200
+CMS,"Manage my notification settings",Parent,https://vagrant.dev.schoolbox.cloud/settings/notifications,200
 CMS,"View user profile",Superuser,https://vagrant.dev.schoolbox.cloud/search/user/1,200
 CMS,"View user profile",Teacher,https://vagrant.dev.schoolbox.cloud/search/user/1,200
 CMS,"View user profile",Student,https://vagrant.dev.schoolbox.cloud/search/user/1,200
@@ -831,10 +831,10 @@ News,"Load news feed on news page",Teacher,https://vagrant.dev.schoolbox.cloud/n
 News,"Load news feed on news page",Student,https://vagrant.dev.schoolbox.cloud/news/lists/feed,200
 News,"Load news feed on news page",Parent,https://vagrant.dev.schoolbox.cloud/news/lists/feed,200
 News,"Load news feed on news page","News Moderator",https://vagrant.dev.schoolbox.cloud/news/lists/feed,200
-Notifications,"View all notifications",Superuser,https://vagrant.dev.schoolbox.cloud/messages,200
-Notifications,"View all notifications",Teacher,https://vagrant.dev.schoolbox.cloud/messages,200
-Notifications,"View all notifications",Student,https://vagrant.dev.schoolbox.cloud/messages,200
-Notifications,"View all notifications",Parent,https://vagrant.dev.schoolbox.cloud/messages,200
+Notifications,"View all notifications",Superuser,https://vagrant.dev.schoolbox.cloud/notifications,200
+Notifications,"View all notifications",Teacher,https://vagrant.dev.schoolbox.cloud/notifications,200
+Notifications,"View all notifications",Student,https://vagrant.dev.schoolbox.cloud/notifications,200
+Notifications,"View all notifications",Parent,https://vagrant.dev.schoolbox.cloud/notifications,200
 News,"View created by me",Superuser,https://vagrant.dev.schoolbox.cloud/news/me,200
 News,"View created by me",Teacher,https://vagrant.dev.schoolbox.cloud/news/me,200
 News,"View created by me",Student,https://vagrant.dev.schoolbox.cloud/news/me,200
