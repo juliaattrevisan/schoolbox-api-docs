@@ -131,10 +131,10 @@
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
                 <li>
-                    <input id="worksheet" type="checkbox" name="worksheet" onclick="showDropzone()">
+                    <input id="worksheet" type="checkbox" name="worksheet">
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
-                    <div id="dropzone" style="display:none">  {% include 'sub/attachzone.twig' %} </div>
+                    <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' %} </div>
                 </li>
                 <li>
                     <input id="allow-offline" type="checkbox" name="allow-offline">
@@ -324,21 +324,15 @@
     });
 
     /*
-    * Show the dropzone when checkbox is checked
+    * To show the dropzone when checkbox is checked
     */
-    function showDropzone() {
-        // Get the checkbox
-        var worksheet = document.getElementById("worksheet");
-        // Get the div
-        var div = document.getElementById("dropzone");
-
-        // If the checkbox is checked, display the div
-        if (worksheet.checked == true){
-            div.style.display = "block";
-        } else {
-            div.style.display = "none";
-        }
+    function onWorksheetChange(event) {
+        worksheetDropdzone.style.display = worksheet.checked ? "block" : "none";
     }
+    const worksheetCheckbox = document.getElementById("worksheet");
+    const worksheetDropdzone = document.getElementById("worksheetDropzone");
+    worksheetCheckbox.addEventListener("change", onWorksheetChange);
+
 </script>
 
 {# ----------------------------------------------------------- #}
