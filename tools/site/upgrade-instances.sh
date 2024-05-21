@@ -245,7 +245,8 @@ function upgrade_instances(){
     # Bring instance back online.
     # Note site_up runs an SQL UPDATE, so it only makes sense to call site_up on the primary host (only primary hosts have databases).
     if [[ $is_primary_host == '1' ]]; then
-      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then log "Maintenance mode disabled on instance '$i'."
+      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then
+        log "Maintenance mode disabled on instance '$i'."
       else
         log "Could not disable maintenance mode on instance '$i'.  Continuing."
       fi
