@@ -27,6 +27,15 @@ test.describe("Login functionality tests", () => {
         expect(count).toBe(0);
     });
 
+    test("impersonate a user via the account drop", async ({ tester }) => {
+        const fullname = "Jack Coles";
+        await tester.impersonate(fullname);
+        await loginPage.verifyLoginSuccess();
+
+        tester.isGoingTo("verify that the correct user was impersonated");
+        await loginPage.verifyCurrentUserIs(fullname);
+    });
+
     test.afterEach(async () => {
         await loginPage.logout();
         await loginPage.verifyLogoutSuccess();
