@@ -151,6 +151,7 @@
                     <label for="files" class="checkbox-label">Files</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
                 </li>
+                {% if lmsStudentPolicy | length %}
                 <li>
                     <input id="declaration" type="checkbox" name="declaration">
                     <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
@@ -162,6 +163,7 @@
                         <a class="close-reveal-modal" aria-label="Close">×</a>
                     </div>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </div>
