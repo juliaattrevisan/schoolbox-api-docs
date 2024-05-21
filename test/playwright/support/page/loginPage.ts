@@ -38,7 +38,8 @@ export class LoginPage {
      * @param { string } fullname - The full name of the user to verify
      */
     async verifyCurrentUserIs(fullname: string) {
-        await expect(this.page.getByTestId("profile-drop")).toHaveText(fullname);
+        const fullNameMatch = new RegExp(`^.*${fullname}.*$`);
+        await expect(this.page.getByTestId("profile-drop")).toHaveAttribute("title", fullNameMatch);
     }
 
     /**
