@@ -53,6 +53,7 @@ use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
+use LogicException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -278,10 +279,14 @@ abstract class Kernel
      */
     protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        $config = new ConfigLoader();
-
         if ($bypassMaintenanceModeCheck) {
             throw new InvalidArgumentException('The check for maintenance mode may not be bypassed in the Application/Kernel.');
+        }
+
+        try {
+            $config = $this->di->get('config');
+        } catch (Di\Exception\ServiceNotFound $e) {
+            throw new LogicException("The 'config' dependency should have been installed.");
         }
 
         self::dieGracefullyIfInMaintenanceMode($config);
