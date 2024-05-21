@@ -131,7 +131,7 @@
                  */
                 // url with extra parameters
                 dialog.foundation('reveal', 'open', {
-                    url: '/adminv2/messages/configure/custom',
+                    url: '/adminv2/notifications/configure/custom',
                     data: data
                 });
 
@@ -239,7 +239,7 @@
                     <ul class="sub-nav">
                         {% for i, filter in filters.options %}
                             <li class="{% if filters.selected == i %}active{% endif %}">
-                                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
+                                <a href="/adminv2/notifications/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
                             </li>
                         {% endfor %}
                     </ul>

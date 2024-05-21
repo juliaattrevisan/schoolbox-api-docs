@@ -16,7 +16,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-    SitePage::localRedir('/adminv2/messages/preview/digest');
+    SitePage::localRedir('/adminv2/notifications/preview/digest');
 }
 
 if (!$_SESSION['user']->isSuperuser()) {
@@ -26,7 +26,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 /** @var SitePage $this */
 
 if (empty($this->arg[0])) {
-    $this->localRedir('/adminv2/messages/preview/digest');
+    $this->localRedir('/adminv2/notifications/preview/digest');
 }
 
 /** @var IConfigLoader $config */

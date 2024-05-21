@@ -176,7 +176,7 @@ class Controller extends BaseController
     /**
      * Show list of apps.
      *
-     * @api GET /adminv2/messages/apps
+     * @api GET /adminv2/notifications/apps
      *
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
@@ -195,38 +195,38 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent'    => $this->routeGenerator->generate('adminMessages.getApps'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.getApps')),
+            'pageCurrent'    => $this->routeGenerator->generate('adminNotifications.getApps'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.getApps')),
             'apps'           => $apps,
             'attachzones'    => $zones,
             'providers'      => [
                 MobileApp\Registry::PROVIDER_APPLE     => [
-                    'template'    => '@adminMessages/providers/APNS/entity.twig',
+                    'template'    => '@adminNotifications/providers/APNS/entity.twig',
                     'description' => 'Apple Push Notification Service'
                 ],
                 MobileApp\Registry::PROVIDER_GOOGLE    => [
-                    'template'    => '@adminMessages/providers/GCM/entity.twig',
+                    'template'    => '@adminNotifications/providers/GCM/entity.twig',
                     'description' => 'Google Cloud Messaging',
                 ],
                 MobileApp\Registry::PROVIDER_DIGISTORM => [
-                    'template'    => '@adminMessages/providers/Digistorm/entity.twig',
+                    'template'    => '@adminNotifications/providers/Digistorm/entity.twig',
                     'description' => 'Digistorm',
                 ],
                 MobileApp\Registry::PROVIDER_FIREBASE => [
-                    'template'    => '@adminMessages/providers/Firebase/entity.twig',
+                    'template'    => '@adminNotifications/providers/Firebase/entity.twig',
                     'description' => 'Firebase',
                 ],
             ],
         ];
 
-        $this->response = $this->responseFromTemplate('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps');
+        $this->response = $this->responseFromTemplate('@adminNotifications/apps.twig', $data, 'Admin > Messages > Apps');
     }
 
 
     /**
      * Get the create app form.
      *
-     * @api GET /adminv2/messages/apps/new
+     * @api GET /adminv2/notifications/apps/new
      */
     public function getCreateAppForm()
     {
@@ -234,20 +234,20 @@ class Controller extends BaseController
         $data     = ['provider' => $provider];
         switch ($provider) {
             case MobileApp\Registry::PROVIDER_APPLE:
-                $template           = '@adminMessages/providers/APNS/create.twig';
+                $template           = '@adminNotifications/providers/APNS/create.twig';
                 $data['attachzone'] = (new Zone('apns'))->getTwigContext();
                 break;
 
             case MobileApp\Registry::PROVIDER_GOOGLE:
-                $template = '@adminMessages/providers/GCM/create.twig';
+                $template = '@adminNotifications/providers/GCM/create.twig';
                 break;
 
             case MobileApp\Registry::PROVIDER_DIGISTORM:
-                $template = '@adminMessages/providers/Digistorm/create.twig';
+                $template = '@adminNotifications/providers/Digistorm/create.twig';
                 break;
 
             case MobileApp\Registry::PROVIDER_FIREBASE:
-                $template = '@adminMessages/providers/Firebase/create.twig';
+                $template = '@adminNotifications/providers/Firebase/create.twig';
                 break;
 
             default:
@@ -262,7 +262,7 @@ class Controller extends BaseController
     /**
      * Create or modify an app.
      *
-     * @api POST /adminv2/messages/apps
+     * @api POST /adminv2/notifications/apps
      *
      * @throws \Alaress\Web\Controller\Exception
      */
@@ -373,14 +373,14 @@ class Controller extends BaseController
             return;
         }
 
-        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('adminNotifications.getApps'));
     }
 
 
     /**
      * Shows the message configuration form
      *
-     * @api   GET /adminv2/messages/configure{/roletype}
+     * @api   GET /adminv2/notifications/configure{/roletype}
      * @since 150
      *
      * @param string $roletype
@@ -440,10 +440,10 @@ class Controller extends BaseController
         //Filtering out $config display further in Twig. Is there a more elegant solution?
 
         $this->response = $this->responseFromTemplate(
-            '@adminMessages/configure.twig',
+            '@adminNotifications/configure.twig',
             [
-                'pageCurrent' => $this->routeGenerator->generate('adminMessages.configure'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.configure')),
+                'pageCurrent' => $this->routeGenerator->generate('adminNotifications.configure'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.configure')),
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -456,7 +456,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   GET /adminv2/messages/configure/custom
+     * @api   GET /adminv2/notifications/configure/custom
      * @since 150
      */
     public function customConfig()
@@ -487,7 +487,7 @@ class Controller extends BaseController
         $ns = $this->getNsMapper()->findById($source->getNamespace()->getId());
 
         $this->response = $this->responseFromTemplateUnthemed(
-            '@adminMessages/custom-config.twig',
+            '@adminNotifications/custom-config.twig',
             [
                 'ns'        => [$ns->getId() => $ns],
                 'namespace' => ['id' => $ns->getId()],
@@ -504,7 +504,7 @@ class Controller extends BaseController
     /**
      * Note: roletype is actually ignored...
      *
-     * @api   POST /adminv2/messages/configure{/roletype}
+     * @api   POST /adminv2/notifications/configure{/roletype}
      * @since 155
      */
     public function saveConfig()
@@ -571,12 +571,12 @@ class Controller extends BaseController
         );
 
         $content = [
-            'template' => '@adminMessages/puush.twig',
+            'template' => '@adminNotifications/puush.twig',
             'data'     => [
                 'liveMessage'    => $liveMessage,
-                'pageCurrent'    => $this->routeGenerator->generate('adminMessages.testPush'),
+                'pageCurrent'    => $this->routeGenerator->generate('adminNotifications.testPush'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))
-                    ->generateBreadcrumbs($this->routeGenerator->generate('adminMessages.testPush')),
+                    ->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.testPush')),
             ],
         ];
 
@@ -616,7 +616,7 @@ class Controller extends BaseController
     /**
      * Deletes notification provider, and user registrations for that provider.
      *
-     * @api POST /adminv2/messages/apps/delete
+     * @api POST /adminv2/notifications/apps/delete
      *
      * @throws \Alaress\Web\Controller\Exception
      */

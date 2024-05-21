@@ -81,7 +81,7 @@ set iconClassnames = {
             e.preventDefault();
             $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
 
-            $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
+            $.post('/adminv2/notifications/configure', $(this).serialize(), function (data) {
                 customiserCallback(data);
                 $('#slider-modal').foundation('reveal', 'close');
             });
