@@ -11,10 +11,10 @@ import { Draggable } from "gsap/Draggable";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
-import type { Unit, CurriculumOverviewComponent } from "./unitPlannerTypes";
+import type { Unit } from "./unitPlannerTypes";
 import RubricCapabilities from "./rubric-capabilities.vue";
-import TextboxContent from "./textbox-content.vue";
-import TextboxAction from "./textbox-action.vue";
+import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
+import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
 import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
@@ -71,9 +71,11 @@ function updateContentHeight() {
     }
 }
 
-// Provide access to exposed focusEditor from the TextboxContent component
+// Provide access to exposed focusEditor from the UpUnitCellTextboxContent component
 // Only relevant when props.column.type === ColumnType.OVERVIEW
-const textboxContentComponent = window.Vue.ref<(typeof TextboxContent & { focusEditor: () => void }) | null>(null);
+const textboxContentComponent = window.Vue.ref<(typeof UpUnitCellTextboxContent & { focusEditor: () => void }) | null>(
+    null,
+);
 
 /**
  * When the content is clicked
@@ -198,7 +200,7 @@ window.Vue.onUnmounted(() => {
                 </div>
             </template>
 
-            <textbox-content
+            <up-unit-cell-textbox-content
                 v-else-if="props.column.type === ColumnType.OVERVIEW"
                 ref="textboxContentComponent"
                 :unit="props.unit"
@@ -241,7 +243,7 @@ window.Vue.onUnmounted(() => {
             </div>
 
             <div ref="componentActionEl">
-                <textbox-action
+                <up-unit-cell-textbox-action
                     v-if="props.column.type === ColumnType.OVERVIEW"
                     :unit="props.unit"
                     :column="props.column"
