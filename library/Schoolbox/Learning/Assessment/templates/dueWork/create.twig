@@ -126,7 +126,7 @@
             </div>
         </div>
     </div>
-    <div class="row" id="submission">
+    <div class="row" id="submissionType">
         <div class="small-12 columns">
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
@@ -286,12 +286,12 @@
             if ($(element).val() < 1) {
                 $('#open').hide();
                 $('#close').hide();
-                $('#submission').hide();
+                $('#submissionType').hide();
             }
             else {
                 $('#open').show();
                 $('#close').show();
-                $('#submission').show();
+                $('#submissionType').show();
             }
         }
 
