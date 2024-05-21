@@ -219,7 +219,7 @@ class Controller extends BaseController
             ],
         ];
 
-        $this->response = $this->responseFromTemplate('@adminNotifications/apps.twig', $data, 'Admin > Messages > Apps');
+        $this->response = $this->responseFromTemplate('@adminNotifications/apps.twig', $data, 'Admin > Notifications > Apps');
     }
 
 
