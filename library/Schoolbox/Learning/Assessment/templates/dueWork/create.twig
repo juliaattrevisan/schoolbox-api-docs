@@ -126,6 +126,44 @@
             </div>
         </div>
     </div>
+    <div class="row" id="submission">
+        <div class="small-12 columns">
+            <label class="required">Select the type of submission allowed:</label>
+            <ul class="option-list">
+                <li>
+                    <input id="worksheet" type="checkbox" name="worksheet" onclick="showDropzone()">
+                    <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
+                    <div id="dropzone" style="display:none">  {% include 'sub/attachzone.twig' %} </div>
+                </li>
+                <li>
+                    <input id="allow-offline" type="checkbox" name="allow-offline">
+                    <label for="allow-offline" class="checkbox-label">Allow Offline</label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work offline to acknowledge that it has been completed.">?</span>
+                </li>
+                <li>
+                    <input id="text-editor" type="checkbox" name="text-editor">
+                    <label for="text-editor" class="checkbox-label">Text Editor</label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type directly into the editor, and add or edit their due work content.">?</span>
+                </li>
+                <li>
+                    <input id="files" type="checkbox" name="files">
+                    <label for="files" class="checkbox-label">Files</label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
+                </li>
+                <li>
+                    <input id="declaration" type="checkbox" name="declaration">
+                    <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
+                    </br><aside class="meta l-mar-xl--left"><a class="link" data-reveal-id="simple">View Authenticity Declaration Terms</a></aside>
+                    <div data-reveal="" id="simple" class="reveal-modal" aria-hidden="true" style="display: none; top: 100px; opacity: 1; visibility: hidden;">
+                        <h2>Authenticity Declaration Terms</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
     {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
     {% if context.baseContext is not unitSpecification %}
         {% include '@learningAssessment/fragments/dates.twig' %}
@@ -239,7 +277,7 @@
         }));
 
         /**
-         * Decide which date fields to show, depending on
+         * Decide which fields to show, depending on
          * Accept Online Submissions value
          *
          * @param element
@@ -248,10 +286,12 @@
             if ($(element).val() < 1) {
                 $('#open').hide();
                 $('#close').hide();
+                $('#submission').hide();
             }
             else {
                 $('#open').show();
                 $('#close').show();
+                $('#submission').show();
             }
         }
 
@@ -279,6 +319,23 @@
             }
         });
     });
+
+    /*
+    * Show the dropzone when checkbox is checked
+    */
+    function showDropzone() {
+        // Get the checkbox
+        var worksheet = document.getElementById("worksheet");
+        // Get the div
+        var div = document.getElementById("dropzone");
+
+        // If the checkbox is checked, display the div
+        if (worksheet.checked == true){
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
+    }
 </script>
 
 {# ----------------------------------------------------------- #}
