@@ -498,6 +498,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'username' => '',
             'validCommRule' => false,
         ];
 
@@ -522,6 +523,12 @@ class Family
          * $family['students'] node
          */
         $person['students'] = $family['students'];
+
+        /* Assign a username, which we can presume to be person_num for now
+         * We've never assigned any other username before, so this is as good as any
+         * Made for KCC
+         */
+        $person['username'] = $family[$node]['person_num'];
 
         /* Index each parent by their externalId
          *
@@ -575,6 +582,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'username' => '',
             'validCommRule' => false,
         ];
 
@@ -586,6 +594,12 @@ class Family
          * $family['students'] node
          */
         $person['students'] = $family['students'];
+
+        /* Assign a username, which we can presume to be person_num for now
+         * We've never assigned any other username before, so this is as good as any
+         * Made for KCC
+         */
+        $person['username'] = $family[$node]['person_num'];
 
         /* Index each parent by their externalId
          *

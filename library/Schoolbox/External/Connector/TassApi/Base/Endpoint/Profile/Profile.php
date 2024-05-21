@@ -689,6 +689,7 @@ class Profile implements IStrategy
         $phoneWork = trim((string)$parent['work']);
         $relationship = trim((string)$parent['relationship']);
         $title = '';
+        $username = trim((string)$parent['username']);
 
         /* A shortcut for convenience in logging
          * (Sometimes people don't have all the parts of their name; odd but ok)
@@ -752,7 +753,8 @@ class Profile implements IStrategy
             ->setPhoneHome($phoneHome)
             ->setPhoneWork($phoneWork)
             ->setMobile($phoneMobile)
-            ->setEmail($email);
+            ->setEmail($email)
+            ->setUsername($username);
 
         /* Log it
          */
