@@ -319,25 +319,25 @@ test.describe("Initial Due Work functionality tests", () => {
 
     // TODO: Continue implementing the rest of the tests from codeception
 
-    // test.afterEach(async ({ tester }) => {
-    //     await tester.logout();
-    // });
+    test.afterEach(async ({ tester }) => {
+        await tester.logout();
+    });
 
-    // test.afterAll(async ({ baseTester, db }) => {
-    //     // Soft-delete data to not interfere with other tests
-    //     baseTester.isGoingTo(
-    //         "update delete_at for the data created in this test so it does not impact next suite of tests",
-    //     );
+    test.afterAll(async ({ baseTester, db }) => {
+        // Soft-delete data to not interfere with other tests
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does not impact next suite of tests",
+        );
 
-    //     await db.updateInDatabase(
-    //         "folder",
-    //         { deleted_at: "2022-01-15 11:12:34" },
-    //         { "name LIKE": "Test Class Homepage%" },
-    //     );
-    //     await db.updateInDatabase(
-    //         "assessment",
-    //         { deleted_at: "2022-01-15 11:12:34" },
-    //         { "title LIKE": "Test Due Work%" },
-    //     );
-    // });
+        await db.updateInDatabase(
+            "folder",
+            { deleted_at: "2022-01-15 11:12:34" },
+            { "name LIKE": "Test Class Homepage%" },
+        );
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:12:34" },
+            { "title LIKE": "Test Due Work%" },
+        );
+    });
 });
