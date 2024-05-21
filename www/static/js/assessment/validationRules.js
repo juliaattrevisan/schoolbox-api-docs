@@ -19,6 +19,14 @@ var validateOptions = {
             number: true,
             min: 0,
         },
+        "submissionOptions[]": {
+            require_from_group: {
+                param: [1, "[data-type-group]"], // ensure at least one option that has data-type-group is selected
+                depends: function () { // only validate if accept online submissions is not none
+                    return document.getElementById("acceptOnline").value !== "0";
+                },
+            },
+        },
     },
     errorPlacement: function (error, element) {
         var $element = $(element);
@@ -43,6 +51,9 @@ var validateOptions = {
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
         useRubric: {
             require_from_group: "You must have at least one selected indicator if using a rubric",
+        },
+        "submissionOptions[]": {
+            require_from_group: "Please select at least one option",
         },
     },
 };
