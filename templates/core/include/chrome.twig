@@ -569,9 +569,17 @@
                             document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
                                 element.remove();
                             });
-                        } else if (Notification.permission !== "denied") {
+                        } else if (Notification.permission === "denied") {
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                element.classList.toggle('display', 'none');
+                            });
                             document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
                                 element.classList.toggle('display', 'block');
+                            });
+
+                        } else {
+                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                element.classList.toggle('display', 'none');
                             });
                             {# wait for toggle change #}
 
@@ -612,14 +620,6 @@
                                         );
                                     }
                                 });
-                            });
-
-                        } else {
-                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                element.classList.toggle('display', 'none');
-                            });
-                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                element.classList.toggle('display', 'none');
                             });
                         }
                     }
