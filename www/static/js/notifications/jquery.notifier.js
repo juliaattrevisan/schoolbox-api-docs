@@ -384,8 +384,8 @@
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
                         // no page found yet, keep looping
-                        let elmHref = new URL(element.getAttribute('href')).pathname;
-                        if (elmHref === href) {
+                        let elmHref = new URL(element.getAttribute('href'), window.location.href);
+                        if (elmHref.pathname === href) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
                             // if this is unread, mark as read, and exit
