@@ -25,8 +25,7 @@ $kernel = new Daemon\Kernel(
     'Binding Calculator',
     [
         Daemon\Kernel::OPTION_APP_LONG_OPTS => ['userId:', 'instance:'],
-    ],
-    true
+    ]
 );
 
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {

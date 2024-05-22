@@ -44,7 +44,6 @@ $kernel = new CliTool\Kernel(
             return null;
         }
     },
-    [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
-    true
+    [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO]
 );
 $kernel->runApp();
