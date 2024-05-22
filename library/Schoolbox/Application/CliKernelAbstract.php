@@ -74,6 +74,21 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
+     * @inheritDoc
+     * @throws \Throwable
+     */
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
+    {
+        if (!$bypassMaintenanceModeCheck) {
+            self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
+        }
+
+        $this->initRoutes();
+        $this->initModules();
+    }
+
+
+    /**
      * Returns this kernel's logger, creating a default logger if not already set
      *
      * @return LoggerInterface

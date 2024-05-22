@@ -262,21 +262,6 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @inheritDoc
-     * @throws \Throwable
-     */
-    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
-    {
-        if (!$bypassMaintenanceModeCheck) {
-            self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
-        }
-
-        $this->initRoutes();
-        $this->initModules();
-    }
-
-
-    /**
      * Parses the command line options, and splits into distinct sets to be used by the Kernel and App respectively.
      *
      * /tool.php -vvv -p -x=abc -x
