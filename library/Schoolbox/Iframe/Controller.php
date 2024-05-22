@@ -73,5 +73,4 @@ class Controller extends Base
             'url' => $url
         ], 'Kami Interactive View');
     }
-
 }
