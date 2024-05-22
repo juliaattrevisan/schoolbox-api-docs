@@ -146,6 +146,7 @@ class RepairBrokenTool extends CliTool\App
          * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
          */
         $app = new ImporterTool();
+        $app->setAssessmentId($assessmentId);
         $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
         (new CliTool\Kernel($app, $options))->runApp();
@@ -266,14 +267,6 @@ HELP;
                 }
             }
         } else {
-            /**
-             * just scanning for possible broken quizzes (no repair available currently...)
-             */
-            if ($this->getOpt(self::OPT_LONG_REPAIR)) {
-                $this->getLogger()->error("Unable to bulk repair, either scan for issues, or repair a single");
-                exit;
-            }
-
             $brokenQuizzes = 0;
             // find all learnosity references
             $query = $this->getDatabaseInternal()->executeQuery(
@@ -322,12 +315,16 @@ HELP;
 
                         // in future we may be auto repairing the broken learnosity quizzes, this continue is here to ensure we don't repair learnosity only quizzes
                     } else {
-                        $this->getLogger()->notice(
-                            sprintf(
-                                "This quiz may be repaired by running this command with the flags: `--repair --assessment=%d`",
-                                $row['assessment_id'],
-                            )
-                        );
+                        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+                            $this->repair((string)$row['assessment_id'], $row['title']);
+                        } else {
+                            $this->getLogger()->notice(
+                                sprintf(
+                                    "This quiz may be repaired by running this command with the flags: `--repair --assessment=%d`",
+                                    $row['assessment_id'],
+                                )
+                            );
+                        }
                     }
 
                     // this is where we would auto repair the quizzes (not something that we want to do just yet)

@@ -296,6 +296,11 @@ class ImporterTool extends CliTool\App
      */
     private string $sizeStrat;
 
+    /**
+     * Storage for the cli passed assessment id, or if calling from a separate class, set the assessment ID from there.
+     */
+    private ?string $assessmentId = null;
+
 
     /**
      * Some meaningful stats to show at the end of the import
@@ -394,9 +399,15 @@ HELP;
             return;
         }
 
+        /* store a temp assessmentID, if we are using one, either from the cli params, or via a setAssessmentId function
+         */
+        $this->assessmentId = $this->assessmentId ?: $this->getOpt(self::OPT_LONG_ASSESSMENT_ID);
+
+        $this->getLogger()->debug("ass: " . print_r($this->assessmentId, true));
+
         /* Check mandatory args first
          */
-        if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES) && !$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
+        if (!$this->getOpt(self::OPT_LONG_IMPORT_SMALL_QUIZZES) && !$this->getOpt(self::OPT_LONG_IMPORT_LARGE_QUIZZES) && !$this->assessmentId) {
             $this->getLogger()->info(sprintf(
                 'Please select either --%s or --%s quiz sizes to import, or specify an assessment id using --assessment',
                 self::OPT_LONG_IMPORT_SMALL_QUIZZES,
@@ -488,7 +499,7 @@ HELP;
          * If so, find out whether we should use a distributed payload,
          * overriding whether you specified --small or --large params
          */
-        $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+        $assessmentId = trim((string)$this->assessmentId);
 
         if ('' !== $assessmentId) {
             $this->sizeStratStatement = $this->getDatabaseInternal()->prepare(self::QUERY_DETECT_SIZE);
@@ -539,7 +550,7 @@ HELP;
          *
          * TODO Maybe expand this to include a set of assessmentIds.
          */
-        $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+        $assessmentId = trim((string)$this->assessmentId);
 
         if ('' === $assessmentId) {
             /* Get everything
@@ -1366,5 +1377,16 @@ HELP;
     public function getRequiredProcessUser(): ?string
     {
         return self::WEB_PROCESS_USER;
+    }
+
+    /**
+     * Set the assessment ID, as if we were running this manually on the cli
+     *
+     * @param string $assessmentId
+     * @return void
+     */
+    public function setAssessmentId(string $assessmentId)
+    {
+        $this->assessmentId = $assessmentId;
     }
 }
