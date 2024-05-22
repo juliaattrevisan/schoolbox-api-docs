@@ -36,7 +36,7 @@ $this->setFile(TEMPLATE_content, '/adminv2/notifications/index.html');
     ->generatePhplib($this, '/adminv2/notifications')
     ->generateBreadcrumbsHtml($this, '/adminv2/notifications');
 
-$this->setTitle('Admin - Messages');
+$this->setTitle('Admin - Notifications');
 
 $this->setBlock(TEMPLATE_content, 'digest_time_step', 'digest_time_step_block');
 $this->setBlock(TEMPLATE_content, 'global_online', 'global_online_block');
