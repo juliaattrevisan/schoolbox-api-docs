@@ -19,7 +19,7 @@ use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
-    protected $basename = 'messages';
+    protected $basename = 'notifications';
 
     /**
      * @param string $basePath
@@ -28,6 +28,9 @@ class Module extends BaseModule
     {
         $this->addGetRoute('configure', $basePath, '');
         $this->addPostRoute('saveConfig', $basePath, '');
+
+        // redirect old paths
+        $this->addGetRoute('redirect', '/settings/messages', '');
     }
 
 

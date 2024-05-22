@@ -20,7 +20,7 @@ use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {
-    protected $basename = 'adminMessages';
+    protected $basename = 'adminNotifications';
 
 
     /**
@@ -62,7 +62,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
 //        $matcher->add(
-//            '/^adminMessages\\.configure$/',
+//            '/^adminNotifications\\.configure$/',
 //            function ($params) {
 //                return [ '' ];
 //            }

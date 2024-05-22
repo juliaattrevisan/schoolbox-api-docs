@@ -15,7 +15,7 @@ use Schoolbox\IConfigLoader;
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-    SitePage::localRedir('/adminv2/messages');
+    SitePage::localRedir('/adminv2/notifications');
 }
 
 
@@ -25,18 +25,18 @@ if (!$_SESSION['user']->isSuperuser()) {
 
 /** @var SitePage $this */
 
-if (in_array($this->arg[0] ?? false, array('enable','disable'))) {
-    $this->localRedir('/adminv2/messages/indexForm.php?enabled=' . $this->arg[0]);
+if (in_array($this->arg[0] ?? false, array('enable', 'disable'))) {
+    $this->localRedir('/adminv2/notifications/indexForm.php?enabled=' . $this->arg[0]);
 }
 
-$this->setFile(TEMPLATE_content, '/adminv2/messages/index.html');
+$this->setFile(TEMPLATE_content, '/adminv2/notifications/index.html');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, '/adminv2/messages')
-    ->generateBreadcrumbsHtml($this, '/adminv2/messages');
+    ->generatePhplib($this, '/adminv2/notifications')
+    ->generateBreadcrumbsHtml($this, '/adminv2/notifications');
 
-$this->setTitle('Admin - Messages');
+$this->setTitle('Admin - Notifications');
 
 $this->setBlock(TEMPLATE_content, 'digest_time_step', 'digest_time_step_block');
 $this->setBlock(TEMPLATE_content, 'global_online', 'global_online_block');

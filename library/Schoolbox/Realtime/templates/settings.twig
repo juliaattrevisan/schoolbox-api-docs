@@ -47,15 +47,15 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Message Settings</h1>
+        <h1>Notification Settings</h1>
     </div>
 </div>
-<form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings" class="row">
+<form method="post" action="{{ routeLookup('notifications.saveConfig') }}" id="msg-settings" class="row">
     <div class="small-12 columns">
         <div class="row actions-small-1">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">Messages</h2>
+                    <h2 class="subheader">Notifications</h2>
                 </div>
             </div>
             <nav>
@@ -66,7 +66,7 @@
     <div class="small-12 columns">
         <div class="alert-box no-margin">
             <p>
-                Customise when and how you receive messages.
+                Customise when and how you receive notifications.
                 <em>Options that are unavailable have been disabled by your system administrator.</em>
             </p>
         </div>
@@ -74,7 +74,7 @@
     <div class="small-12 island">
         {% for namespace in msgConfig %}
             {% if ns[namespace.id] is defined %}
-                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
+                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} notifications when&hellip;</h3>
                 <section>
                     <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}
@@ -82,7 +82,7 @@
                                 <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
                                 <div class="actions-small-6" data-source="{{ source.id }}">
                                     <nav>
-                                        {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                                        {% include '@notifications/options.twig' with { mode: 'p', role: source } %}
                                     </nav>
                                 </div>
                             </li>
@@ -97,7 +97,7 @@
 </form>
 
 <div id="legend-modal" class="reveal-modal" data-reveal>
-    {% include '@messages/legend.twig' with { who: 'you' } %}
+    {% include '@notifications/legend.twig' with { who: 'you' } %}
 
     <a class="close-reveal-modal">&#215;</a>
 </div>

@@ -51,9 +51,9 @@
                 dictItemOthers: "others",
                 dictItemAnd: "and",
                 dictFooterSeeAll: "See All",
-                dictFooterNoMessages: "No Messages",
+                dictFooterNoMessages: "No Notifications",
             },
-            options
+            options,
         );
 
         var backoff = 0;
@@ -86,7 +86,7 @@
                 if (attemptReconnect && backoff < settings.maxRetry) {
                     jitter = parseInt(
                         Math.random() *
-                            Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout)
+                            Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout),
                     );
 
                     if (settings.debug) {

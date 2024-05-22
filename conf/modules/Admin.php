@@ -99,8 +99,8 @@ class Admin extends ModuleLoader
         // News
         $this->loadModule($di, \Schoolbox\Admin\News\Policy\Module::class, '/adminv2/news');
 
-        // Messages
-        $this->loadModule($di, \Schoolbox\Realtime\Admin\Module::class, '/adminv2/messages');
+        // Notifications
+        $this->loadModule($di, \Schoolbox\Realtime\Admin\Module::class, '/adminv2/notifications');
 
         // Filters
         $this->loadModule($di, FilterModule::class, '/adminv2/filters');

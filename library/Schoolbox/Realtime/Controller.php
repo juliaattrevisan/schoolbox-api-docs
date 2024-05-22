@@ -206,7 +206,7 @@ class Controller extends BaseController
     /**
      * Shows the message configuration form
      *
-     * @api   GET /settings/messages
+     * @api   GET /settings/notifications
      * @since 150
      */
     public function configure()
@@ -263,7 +263,7 @@ class Controller extends BaseController
                                ->getAll();
 
         $this->response = $this->responseFromTemplate(
-            '@messages/settings.twig',
+            '@notifications/settings.twig',
             [
                 'ns'        => $ns,
                 'sources'   => $sources,
@@ -272,13 +272,13 @@ class Controller extends BaseController
                 'mobile'    => $mobile,
                 'msgConfig' => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ],
-            'Message Settings',
+            'Notification Settings',
         );
     }
 
 
     /**
-     * @api   POST /settings/messages
+     * @api   POST /settings/notifications
      * @since 150
      */
     public function saveConfig()
@@ -301,7 +301,17 @@ class Controller extends BaseController
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson($conf);
         } else {
-            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('messages.configure'));
+            $this->response = $this->redirectAfterPost($this->routeGenerator->generate('notifications.configure'));
         }
+    }
+
+    /**
+     * Redirect old path to new
+     * /settings/messages -> /settings/notifications
+     */
+    public function redirect(): void
+    {
+        $route = $this->routeGenerator->generate('notifications.configure');
+        $this->response = $this->redirectFound($route);
     }
 }

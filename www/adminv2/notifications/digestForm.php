@@ -11,14 +11,14 @@
 use Alaress\Redis;
 
 if (isset($this)) {
-    SitePage::localRedir('/adminv2/messages');
+    SitePage::localRedir('/adminv2/notifications');
 }
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 if (empty($_POST)) {
-    SitePage::localRedir('/adminv2/messages');
+    SitePage::localRedir('/adminv2/notifications');
 }
 
 if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {
@@ -54,4 +54,4 @@ $redis->publish("digestd.$instance.reload", '');
 // advise schedule daemon to reload as well
 $redis->publish("scheduled.$instance.reload", '');
 
-SitePage::localRedir('/adminv2/messages');
+SitePage::localRedir('/adminv2/notifications');
