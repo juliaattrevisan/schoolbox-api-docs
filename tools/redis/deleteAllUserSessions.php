@@ -44,4 +44,4 @@ $app = new class extends CliTool\App
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
+(new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG], true))->runApp();

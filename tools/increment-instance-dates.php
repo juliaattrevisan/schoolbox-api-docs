@@ -313,5 +313,5 @@ $app = new class extends CliTool\App {
     }
 };
 
-$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO], true);
 $kernel->runApp();
