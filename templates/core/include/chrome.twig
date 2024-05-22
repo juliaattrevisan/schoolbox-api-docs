@@ -585,40 +585,37 @@
 
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
                                 element?.addEventListener('click', () => {
-                                    if ('on' === element.querySelector('[data-pwa-action="enableNotif"]').value) {
-                                        window.Notification.requestPermission().then((permission) => {
-                                            if (permission === 'granted') {
-                                                {% if config.debug_mode %}
-                                                console.info('Notification permission granted');
-                                                {% endif %}
+                                    window.Notification.requestPermission().then((permission) => {
+                                        if (permission === 'granted') {
+                                            {% if config.debug_mode %}
+                                            console.info('Notification permission granted');
+                                            {% endif %}
 
-                                                document.dispatchEvent(
-                                                    new CustomEvent("PWA_NOTIFICATION_ALLOW", {
-                                                        detail: {
-                                                            debug: {{ config.debug_mode }},
-                                                            deviceId: deviceId,
-                                                        },
-                                                    }),
-                                                );
-                                            } else if (permission === 'denied') {
-                                                document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                                    element.classList.toggle('display', 'none');
-                                                });
-                                                {% if config.debug_mode %}
-                                                console.warn('Notification permission denied');
-                                                {% endif %}
-                                            }
-                                        });
-                                    } else {
-                                        {# turn notifications off... #}
-                                        document.dispatchEvent(
-                                            new CustomEvent("PWA_NOTIFICATION_DENY", {
-                                                detail: {
-                                                    debug: {{ config.debug_mode }},
-                                                },
-                                            }),
-                                        );
-                                    }
+                                            document.dispatchEvent(
+                                                new CustomEvent("PWA_NOTIFICATION_ALLOW", {
+                                                    detail: {
+                                                        debug: {{ config.debug_mode }},
+                                                        deviceId: deviceId,
+                                                    },
+                                                }),
+                                            );
+                                        } else if (permission === 'denied') {
+                                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                                element.classList.toggle('display', 'none');
+                                            });
+                                            {% if config.debug_mode %}
+                                            console.warn('Notification permission denied');
+                                            {% endif %}
+                                            {# turn notifications off... #}
+                                            document.dispatchEvent(
+                                                new CustomEvent("PWA_NOTIFICATION_DENY", {
+                                                    detail: {
+                                                        debug: {{ config.debug_mode }},
+                                                    },
+                                                }),
+                                            );
+                                        }
+                                    });
                                 });
                             });
                         }
