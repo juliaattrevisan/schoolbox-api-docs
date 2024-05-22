@@ -107,7 +107,7 @@ class Kernel extends CliKernelAbstract
         error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->name = $name;
 
-        $this->loop = $this->di->values['react.loop'] = Loop::get();
+        $this->loop = $this->di->get('react.loop');
 
         foreach (posix_getrlimit() as $key => $value) {
             [$strength, $attr] = explode(' ', $key);
@@ -467,7 +467,7 @@ EOL;
                 ],
             )
         );
-
+        $di->set('react.loop', $di->lazy(Loop::get(...)));
         return $di;
     }
 }

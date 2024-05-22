@@ -81,7 +81,7 @@ set_error_handler(
 
 // now move onto stuff in rabbit
 /** @var LoopInterface $loop */
-$loop  = $kernel->getDependencyInjector()->values['react.loop'];
+$loop  = $kernel->getDependencyInjector()->get('react.loop');
 
 /** @var IClient $stomp */
 $stomp = $kernel->getDependencyInjector()->get('stomp');
