@@ -375,12 +375,17 @@
                 if (settings.debug) {
                     console.log("auto unread called.");
                 }
-                // On page load, if the href matches the exact string in one of the unread notifications, we should mark that as read
-                const href = document.location.toString().replace(document.location.origin, '');
+                /* On page load, if the url path matches the path of the unread notifications, we should mark that as read
+                 *
+                 * originally this matched the exact notif href, but some of those have specific tabs, or references  / anchors,
+                 * that are not navigated to when using the interface. so we need to match on path instead.
+                 */
+                const href = document.location.pathname;
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
                         // no page found yet, keep looping
-                        if (element.getAttribute('href') === href) {
+                        let elmHref = new URL(element.getAttribute('href')).pathname;
+                        if (elmHref === href) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
                             // if this is unread, mark as read, and exit
