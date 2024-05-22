@@ -53,6 +53,7 @@ use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
+use LogicException;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -227,7 +228,7 @@ abstract class Kernel
      * @throws InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct()
+    public function __construct(bool $bypassMaintenanceModeCheck = false)
     {
         $this->di              = (new Di\ContainerBuilder())->newInstance();
         $this->shutdownHandler = new ShutdownHandler();
@@ -237,7 +238,7 @@ abstract class Kernel
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies($this->di);
-        $this->postInstallDependencies();
+        $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
     }
 
@@ -261,11 +262,34 @@ abstract class Kernel
     }
 
     /**
+     * @param ConfigLoader $config
+     * @return void
+     */
+    protected static function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    {
+        if ($config->get('maintenance_mode')) {
+            header('HTTP/1.1 503 Service Unavailable', true, 503);
+            echo file_get_contents(SITE_root . '/templates/core/error/503-maintenance.html');
+            die;
+        }
+    }
+
+    /**
      * Called after DI services are registered.
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        $config = new ConfigLoader();
+        if ($bypassMaintenanceModeCheck) {
+            throw new InvalidArgumentException('The check for maintenance mode may not be bypassed in the Application/Kernel.');
+        }
+
+        try {
+            $config = $this->di->get('config');
+        } catch (Di\Exception\ServiceNotFound $e) {
+            throw new LogicException("The 'config' dependency should have been installed.");
+        }
+
+        self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
     }
 

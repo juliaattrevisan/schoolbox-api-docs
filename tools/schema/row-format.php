@@ -13,5 +13,6 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new RepairRowFormat(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+// Note this script needs to bypass the maintenance mode check because it is run from upgrade-instances.sh.
+$kernel = new CliTool\Kernel(new RepairRowFormat(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO], true);
 $kernel->runApp();

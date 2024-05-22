@@ -98,7 +98,7 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
-        // First get the request object
+        // First get the request object.
         /** @var ServerRequestInterface $request */
         $request = $this->di->get('httpRequest');
 
@@ -499,9 +499,9 @@ class Kernel extends WebKernelAbstract
      * @inheritDoc
      * @throws \Throwable
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        parent::postInstallDependencies();
+        parent::postInstallDependencies($bypassMaintenanceModeCheck); // Check for maintenance mode is done in here.
 
         $this->initRoutes();
         $this->initModules();

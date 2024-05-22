@@ -111,4 +111,5 @@ HELP;
     }
 };
 
-(new CliTool\Kernel($app))->runApp();
+// Note this script needs to bypass the maintenance mode check because it is run from upgrade-instances.sh.
+(new CliTool\Kernel($app, [], true))->runApp();

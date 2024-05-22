@@ -42,11 +42,11 @@ readonly PRESERVED_CONFIG=(
   # DR S3 backups
   "aws_s3_dr_backup_enabled" "aws_s3_dr_backup_visibility" "aws_s3_dr_sync_status"
 
- # Learnosity
+  # Learnosity
   "learnosity_consumer_key" "learnosity_consumer_secret" "learnosity_version"
 
   # Others
-  "xml_dir" "file_dir"  "api_key" "schooldata_import_frequency"
+  "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
 );
 
 readonly DISABLED_CONFIG=(
@@ -751,7 +751,12 @@ if ! mysqldump --single-transaction --allow-keywords --default-character-set=utf
 fi
 
 ## Put up maintenance page
-/usr/share/schoolbox/tools/maintenance/site_down.sh
+if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_down.sh -eq 0 ; then
+  echo "Maintenance mode enabled on instance '$destination_instance_id'."
+else
+  echo "Could not enable maintenance mode on instance '$destination_instance_id'.  Exiting."
+  exit 1;
+fi
 
 ## Remove crons
 rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
@@ -775,8 +780,11 @@ if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sou
 fi
 
 ## Remove maintenance page
-/usr/share/schoolbox/tools/maintenance/site_up.sh
-
+if INSTANCE_ID="$destination_instance_id" "$instdir"/tools/maintenance/site_up.sh -eq 0 ; then
+  echo "Maintenance mode disabled on instance '$destination_instance_id'."
+else
+  echo "Could not disable maintenance mode on instance '$destination_instance_id'.  Continuing."
+fi
 
 # Recompress if restoring from local backup that was originally compressed
 if [[ "$gzipdb" == "1" ]] && [[ "$sourceloc" = '[L]' ]]; then

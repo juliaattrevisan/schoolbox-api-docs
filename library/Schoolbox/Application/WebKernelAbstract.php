@@ -287,9 +287,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * @noinspection PhpDocMissingThrowsInspection the session management object
      *                                             will always be in DI
      */
-    protected function postInstallDependencies(): void
+    protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
-        parent::postInstallDependencies();
+        parent::postInstallDependencies($bypassMaintenanceModeCheck); // Check for maintenance mode is done in here.
 
         // initialise session
         /** @var Session $session */
