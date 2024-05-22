@@ -665,6 +665,15 @@ class Controller extends Base
         ]);
 
         $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $existingAttempt);
+
+        if ($existingAttempt->getLearnosityStatus() === Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING) {
+            $attemptEvaluator = $this->buildAttemptEvaluator();
+            $attemptEvaluator->poll(
+                $this->getUser(),
+                $assessment,
+                $existingAttempt,
+            );
+        }
     }
 
 
@@ -688,9 +697,12 @@ class Controller extends Base
         $hasMarkVisibility = $assessment->isFeedbackVisibleToUser($student);
         $initOptions = null;
 
-        /* Only load a report if mark visibility is set to include students
+        /* Only load a report if:
+         * * mark visibility is set to include students
+         * * the attempt has been scored (either by a teacher or automatically)
          */
-        if ($hasMarkVisibility) {
+        $isAttemptScored = $attempt->getMark() !== null;
+        if ($hasMarkVisibility && $isAttemptScored) {
             $payload = [
                 'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
                 'reports' => [
@@ -734,6 +746,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'initOptions' => $initOptions,
             'attempt' => $attempt,
+            'isMarkVisible' => $hasMarkVisibility,
             'returnUrl' => (
                 empty($returnUrlEncoded) ?
                 "/homepage/{$assessment->getBaseContext()->getFolder()->getId()}" :
@@ -1862,7 +1875,7 @@ class Controller extends Base
         } catch (SourceAssociationException $e) {
             // Not able to be associated?
             // Set destination as unprocessable, save and rethrow exception
-            $destination->setLearnosityJobStatus(QuizDomainObject::LEARNOSITY_JOB_STATUS_UNPROCESSABLE);
+            $destination->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE);
             $this->assessmentDataSource->save($destination, $this->getUser());
             throw $e;
         }
@@ -1904,13 +1917,47 @@ class Controller extends Base
         // possibly an API problem?
         $jobStatus    = $assessment->getLearnosityJobStatus();
         $responseCode = match ($jobStatus) {
-            Quiz::LEARNOSITY_JOB_STATUS_COMPLETED => 200,
-            Quiz::LEARNOSITY_JOB_STATUS_PENDING, Quiz::LEARNOSITY_JOB_STATUS_PROCESSING => 202,
+            Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
+            Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
                 // including failure
             default => 400,
         };
         $this->response = $this
             ->responseAsJson(['jobStatus' => $jobStatus])
+            ->withStatus($responseCode);
+    }
+
+    /**
+     * Callback for polling the status of a Learnosity attempt.
+     *
+     * @api   POST /learning/learnosity/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/poll
+     * @since 23.1
+     *
+     * @param QuizDomainObject $assessment
+     * @param User             $student
+     * @param Model            $attempt
+     * @return void
+     */
+    public function postPollQuizAttemptStatus(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $this->helper->processAttemptCompletion($this->attemptMapper, $assessment, $attempt);
+
+        // Respond with code:
+        // * 200 if complete
+        // * 202 if still processing (this tells polling process to try again)
+        // * 400 if failed
+        $status       = $attempt->getLearnosityStatus();
+        $responseCode = match ($status) {
+            Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
+            Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
+            // including failure
+            default => 400,
+        };
+        $this->response = $this
+            ->responseAsJson(['status' => $status])
             ->withStatus($responseCode);
     }
 
@@ -2156,6 +2203,23 @@ class Controller extends Base
             $this->messageFactory,
             $this->messageProducer,
             new TagFactory($this->getConfigLoader()->get('site_school_code')),
+        );
+    }
+
+    /**
+     * Build assessment attempt evaluator upon request, because it cannot be
+     * built in the constructor.
+     *
+     * @return Api\AttemptEvaluator
+     */
+    private function buildAttemptEvaluator(): Api\AttemptEvaluator
+    {
+        return new Api\AttemptEvaluator(
+            (new Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->httpFactory,
+            $this->routeGenerator,
+            $this->messageFactory,
+            $this->messageProducer,
         );
     }
 }

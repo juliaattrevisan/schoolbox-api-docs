@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
@@ -45,27 +45,6 @@ class Model extends AbstractAssessment
      * @var int
      */
     const DURATION_UNLIMITED = 0;
-
-
-    /**
-     * Possible statuses for the Learnosity job for duplicating this quiz's
-     * content from another quiz.
-     * * PENDING: the Learnosity job hasn't started yet; it must be started and
-     *   set to PROCESSING
-     * * PROCESSING: the Learnosity job is currently running; its status must be
-     *   checked and set to either COMPLETED or FAILED
-     * * COMPLETED: the Learnosity job ran successfully, and the content has
-     *   been duplicated
-     * * FAILED: the Learnosity job did not run successfully; its status may be
-     *   set back to PENDING to try again
-     * * UNPROCESSABLE: the Learnosity job either could not start, or it has
-     *   been determined it will never run successfully
-     */
-    public const LEARNOSITY_JOB_STATUS_PENDING = 'pending';
-    public const LEARNOSITY_JOB_STATUS_PROCESSING = 'processing';
-    public const LEARNOSITY_JOB_STATUS_COMPLETED = 'completed';
-    public const LEARNOSITY_JOB_STATUS_FAILED = 'failed';
-    public const LEARNOSITY_JOB_STATUS_UNPROCESSABLE = 'unprocessable';
 
 
     /**
@@ -398,7 +377,7 @@ class Model extends AbstractAssessment
         // Is there a duplication job? If so block until completed
         if ($this->getLearnosityJobReference()) {
             $jobStatus = $this->getLearnosityJobStatus();
-            if ($jobStatus === self::LEARNOSITY_JOB_STATUS_FAILED) {
+            if ($jobStatus === Helper::LEARNOSITY_PROCESS_STATUS_FAILED) {
                 throw new RuntimeException(
                     sprintf(
                         'Assessment %s duplication process has failed; please contact support',
@@ -406,7 +385,7 @@ class Model extends AbstractAssessment
                     )
                 );
             }
-            if ($jobStatus !== self::LEARNOSITY_JOB_STATUS_COMPLETED) {
+            if ($jobStatus !== Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
                 throw new RuntimeException(
                     sprintf(
                         'Assessment %s duplication process has not yet completed; try again later',

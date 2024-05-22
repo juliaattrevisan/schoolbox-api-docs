@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
+use Schoolbox\Learning\Learnosity\Helper;
 
 /**
  * CLI tool for polling quizzes in the processing status.
@@ -35,7 +36,7 @@ class PollProcessingTool extends BaseTool
      */
     protected function getTargetedQuizStatus(): string
     {
-        return QuizDomainModel::LEARNOSITY_JOB_STATUS_PROCESSING;
+        return Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING;
     }
 
     /**
@@ -62,19 +63,19 @@ class PollProcessingTool extends BaseTool
             $this->duplicator->pollQuizStatus($quiz);
             $newStatus = $quiz->getLearnosityJobStatus();
             match ($newStatus) {
-                QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED => $this->getLogger()->info(
+                Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => $this->getLogger()->info(
                     sprintf('Assessment #%d successfully processed', $quiz->getId())
                 ),
-                QuizDomainModel::LEARNOSITY_JOB_STATUS_PROCESSING => $this->getLogger()->info(
+                Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => $this->getLogger()->info(
                     sprintf('Assessment #%d still processing', $quiz->getId())
                 ),
-                QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED => $this->getLogger()->warning(
+                Helper::LEARNOSITY_PROCESS_STATUS_FAILED => $this->getLogger()->warning(
                     sprintf('Assessment #%d processing failed', $quiz->getId())
                 ),
-                QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE => $this->getLogger()->warning(
+                Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE => $this->getLogger()->warning(
                     sprintf('Assessment #%d has been determined to be unprocessable', $quiz->getId())
                 ),
-                QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING => $this->getLogger()->warning(
+                Helper::LEARNOSITY_PROCESS_STATUS_PENDING => $this->getLogger()->warning(
                     sprintf('Assessment #%d somehow pending: should be impossible', $quiz->getId())
                 ),
                 default => $this->getLogger()->warning(

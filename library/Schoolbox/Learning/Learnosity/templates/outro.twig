@@ -1,11 +1,14 @@
 {##
  # Complete an attempt
  #
- # @param IAssessable $assessment      Our schoolbgox quiz instance
- # @param array $breadcrumbs           A context trail at the top of the screeen
- # @param string|array $initOptions    Learnosity API initialisation object
+ # @param IAssessable   $assessment    Our schoolbgox quiz instance
+ # @param array         $breadcrumbs   A context trail at the top of the screeen
+ # @param string|array  $initOptions   Learnosity API initialisation object:
+ #                                     will not be set if the assessment is not yet scored by either Learnosity or a
+ #                                     teacher, or the user cannot view the mark.
  # @param Attempt/Model $attempt       An attempt instance
- # @param string $returnUrl            A redirect back to a place from whence you came.
+ # @param string        $returnUrl     A redirect back to a place from whence you came.
+ # @param bool          $isMarkVisible Can the user which attemped the quiz view its mark?
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -24,20 +27,32 @@
         {%  endif %}
 
         {# Mark Visibility might prevent students from seeing this report #}
-        {% if initOptions %}
-            <h2 class="subheader">Result Summary</h2>
-            <section class="content">
-                <p>
-                    <em>This mark is unconfirmed and may change following teacher review.</em>
-                </p>
-                <p class="grade no-pad">
-                    <span>{{ attempt.mark }} ({{ attempt.normalisedMark|number_format(2) }}%)</span>
-                </p>
-            </section>
+        {% if isMarkVisible %}
+            {% if initOptions %}
+                <h2 class="subheader">Result Summary</h2>
+                <section class="content">
+                    {% if not attempt.reviewed %}
+                    <p><em>This mark is unconfirmed and may change following teacher review.</em></p>
+                    {% endif %}
+                    <p class="grade no-pad">
+                        <span>{{ attempt.mark }} ({{ attempt.normalisedMark|number_format(2) }}%)</span>
+                    </p>
+                </section>
 
-            <section id="schoolbox-result-container" class="content">
-                <div id="schoolbox-result-1"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
-            </section>
+                <section id="schoolbox-result-container" class="content">
+                    <div id="schoolbox-result-1"></div> {# Learnosity report - search for id attribute to find config code in controller. #}
+                </section>
+            {% else %}
+                <h2 class="subheader">Result Summary</h2>
+                <section class="content">
+                    <p>
+                        <em>
+                            Your mark is still being calculated; please check this quiz later.
+                            Once calculated, it may still change following teacher review.
+                        </em>
+                    </p>
+                </section>
+            {% endif %}
         {% endif %}
 
         {# This is exactly how it used to be
@@ -50,7 +65,7 @@
 </div>
 
 {# Mark Visibility might prevent students from seeing this report #}
-{% if initOptions %}
+{% if isMarkVisible and initOptions %}
     {% autoescape 'js' %}
     <script>
         const reportsAppCallback = {

@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
@@ -230,7 +231,7 @@ abstract class BaseTool extends CliTool\App
     /**
      * Which quiz status does this tool target?
      *
-     * @return QuizDomainModel::LEARNOSITY_JOB_STATUS_*
+     * @return Helper::LEARNOSITY_PROCESS_STATUS_*
      */
     abstract protected function getTargetedQuizStatus(): string;
 

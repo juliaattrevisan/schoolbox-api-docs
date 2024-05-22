@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Learning\Learnosity\Helper;
 
 class Model extends AbstractResponse
 {
@@ -64,6 +65,18 @@ class Model extends AbstractResponse
      * @var string|null
      */
     private ?string $learnosityReference = null;
+
+    /**
+     * The status of the Learnosity score calculation.
+     *
+     * @var Helper::LEARNOSITY_PROCESS_STATUS_*|null
+     */
+    private ?string $learnosityStatus = null;
+
+    /**
+     * The number of times the Learnosity score calculation has been polled.
+     */
+    private ?int $learnosityPollCount = null;
 
     /**
      * @return Alaress_Date_Format|null
@@ -189,6 +202,42 @@ class Model extends AbstractResponse
     public function setLearnosityReference(?string $learnosityReference): self
     {
         $this->learnosityReference = $learnosityReference;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityStatus(): ?string
+    {
+        return $this->learnosityStatus;
+    }
+
+    /**
+     * @param string|null $learnosityStatus
+     * @return $this
+     */
+    public function setLearnosityStatus(?string $learnosityStatus): self
+    {
+        $this->learnosityStatus = $learnosityStatus;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLearnosityPollCount(): ?int
+    {
+        return $this->learnosityPollCount;
+    }
+
+    /**
+     * @param int|null $learnosityPollCount
+     * @return $this
+     */
+    public function setLearnosityPollCount(?int $learnosityPollCount): self
+    {
+        $this->learnosityPollCount = $learnosityPollCount;
         return $this;
     }
 }
