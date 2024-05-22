@@ -19,6 +19,7 @@ use RangeException;
 use RuntimeException;
 use Monolog;
 use Alaress\Lumberjack;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Deprecation\Registry;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
@@ -70,6 +71,19 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     {
         $this->minLogLevel = $minLogLevel;
         parent::__construct($bypassMaintenanceModeCheck);
+    }
+
+
+    /**
+     * @param ConfigLoader $config
+     * @return void
+     */
+    protected static function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
+    {
+        if ($config->get('maintenance_mode')) {
+            echo "Exiting because this instance is in maintenance mode.\n";
+            exit(0); // Exit with error code 0 to indicate that the script did not complete normally.
+        }
     }
 
 
