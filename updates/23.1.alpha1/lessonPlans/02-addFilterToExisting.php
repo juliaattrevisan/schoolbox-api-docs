@@ -63,5 +63,6 @@ $app = new class extends CliTool\App
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel(
     $app,
-    [Schoolbox\Application\CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]
+    [Schoolbox\Application\CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG],
+    true
 ))->runApp();

@@ -200,4 +200,4 @@ HELP;
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();

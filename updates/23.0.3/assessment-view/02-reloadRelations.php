@@ -23,4 +23,4 @@ $app     = new Reloader();
 $options = [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO, CliKernelAbstract::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Kernel($app, $options))->runApp(true);
+(new Kernel($app, $options, true))->runApp(true);
