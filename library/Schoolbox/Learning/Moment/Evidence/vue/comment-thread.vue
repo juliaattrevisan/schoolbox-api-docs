@@ -285,12 +285,16 @@ export default {
                             <nav>
                                 <a
                                     v-if="comment._links.delete.auth"
-                                    @click.prevent="showDeleteModal(index)"
                                     class="icon-delete"
                                     title="Delete comment"
+                                    data-test="learning-moment-evidence-delete-comment"
+                                    @click.prevent="showDeleteModal(index)"
                                 />
                             </nav>
-                            <media-article v-html="comment.content"></media-article>
+                            <media-article
+                                data-test="learning-moment-evidence-comment-thread-comment"
+                                v-html="comment.content"
+                            ></media-article>
                         </li>
                     </ul>
                     <template
@@ -309,7 +313,11 @@ export default {
                     <p>Are you sure you want to delete this comment?</p>
                     <ul class="flex-list buttons">
                         <li>
-                            <button @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">
+                            <button
+                                @click.prevent="deleteComment(commentIndexToDelete)"
+                                class="button submit"
+                                data-test="learning-moment-evidence-delete-comment-confirm"
+                            >
                                 Delete
                             </button>
                         </li>

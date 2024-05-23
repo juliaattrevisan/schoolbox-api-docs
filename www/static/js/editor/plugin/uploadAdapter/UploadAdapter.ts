@@ -5,7 +5,7 @@
  */
 
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Editor } from "@js/editor/types/editorTypes";
 import type { FileLoader } from "@ckeditor/ckeditor5-upload/src/filerepository";
 
 export default class UploadAdapter {
@@ -115,7 +115,7 @@ export default class UploadAdapter {
                     this.initRequest();
                     this.initListeners(resolve, reject, file);
                     this.sendRequest(file);
-                })
+                }),
         );
     }
 

@@ -192,6 +192,8 @@ window.Vue.onUnmounted(() => {
                         :key="unit.id"
                         ref="unitElements"
                         class="grid-row unit-row"
+                        :data-test="`unit-row-${unit.id}`"
+                        :data-test-unit-id="unit.id"
                     >
                         <up-unit-cell
                             v-for="column in selectedTab.columns"

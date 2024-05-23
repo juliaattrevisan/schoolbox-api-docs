@@ -24,7 +24,7 @@ window.Vue.watch(
         if (hasLoadedOk) {
             initFoundation();
         }
-    }
+    },
 );
 
 /**

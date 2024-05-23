@@ -33,7 +33,7 @@
     {% block formInputBodyMeta %}
         {{ parent() }}
     {% endblock formInputBodyMeta %}
-    <textarea name="body" id="evidence-body">{{ isCreate ? '' : evidence.body | purify }}</textarea>
+    <textarea name="body" id="evidence-body" data-test="learning-moment-evidence-media-description-textarea">{{ isCreate ? '' : evidence.body | purify }}</textarea>
 {% endblock formInputBody %}
 
 {% block formJs %}

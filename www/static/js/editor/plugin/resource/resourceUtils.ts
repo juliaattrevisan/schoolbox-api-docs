@@ -2,8 +2,7 @@
  * Various utility functions/helpers for the resource plugins
  */
 
-import type { EditorConfig } from "@js/editor/types/editorTypes";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Editor, EditorConfig } from "@js/editor/types/editorTypes";
 import type { Element } from "@ckeditor/ckeditor5-engine";
 import { getWithoutExtension } from "@js/util/fileUtils";
 
@@ -159,7 +158,7 @@ function getAudioSrc(resource: Resource, config: EditorConfig) {
 function getAudioThumb(config: EditorConfig) {
     return getURL(
         `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
-        config
+        config,
     );
 }
 
@@ -341,14 +340,14 @@ export function addResource(editor: Editor, resource: Resource) {
         const image = imageUtils.insertImage(
             getAttributes(resource, config),
             editor.model.document.selection.getFirstPosition(),
-            "imageInline"
+            "imageInline",
         ) as Element;
         writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
         if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
             editor.model.insertContent(
-                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config))
+                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config)),
             );
         }
     });

@@ -29,6 +29,7 @@
         maxlength="{{ maxLength }}"
         value="{{ humanReadableMark }}"
         title="{{ inputTitle }}"
+        data-test="assessment-feedback-mark-input-{{ participant.user.id }}"
         data-mark-input
         data-combobox
         {% if readonly %}readonly{% endif %}

@@ -10,6 +10,7 @@
                 <input type="submit"
                         {% if inputName %}name="{{ inputName }}"{% endif %}
                         {% if mageNext %}data-mage-next="{{ mageNext }}"{% endif %}
+                        data-test="assessment-form-button-submit-{{ inputValue }}"
                         data-mage-working="{{ mageWorking ?: 'Working...' }}"
                         {% if formmethod %}formmethod="{{ formmethod }}"{% endif %}
                         {% if formaction %}formaction="{{ formaction }}"{% endif %}

@@ -5,7 +5,7 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Editor } from "@js/editor/types/editorTypes";
 
 declare global {
     interface Window {

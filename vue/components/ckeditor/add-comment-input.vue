@@ -114,7 +114,7 @@ export default {
                             targetElements: [`#comment-${this.uniqueId}`],
                             toolbar: "comment",
                         },
-                    })
+                    }),
                 );
             } catch (error) {
                 this.isCKEditorLoading = false;
@@ -169,12 +169,17 @@ export default {
             {{ getAddCommentButtonText }}
         </button>
         <div :style="getStyles">
-            <textarea :id="`comment-${uniqueId}`" ref="comment"></textarea>
+            <textarea
+                :id="`comment-${uniqueId}`"
+                ref="comment"
+                :data-test="`ckeditor-add-comment-textarea-${uniqueId}`"
+            ></textarea>
             <button
                 :id="`submit-for-comment-${uniqueId}`"
                 class="button submit"
-                @click="postComment"
                 :disabled="isPostCommentDisabled"
+                :data-test="`ckeditor-add-comment-input-submit-for-comment-${uniqueId}`"
+                @click="postComment"
             >
                 {{ getPostCommentButtonText }}
             </button>

@@ -188,7 +188,7 @@ window.Vue.watch(
             //to clear the current selection
             tableEl.value.resetSelectedRows();
         }
-    }
+    },
 );
 
 /*****************************************************************
@@ -213,7 +213,7 @@ window.Vue.watch(
         }
         dispatchFilterEvent(selectedFilter.join()); //to just get the single filter as a string
         updateSelectedMembers();
-    }
+    },
 );
 
 /**
@@ -256,7 +256,7 @@ function updateSelectedMembers() {
 
 <template>
     <div class="row">
-        <div class="small-12 island">
+        <div class="small-12 island" data-test="manage-group-current-members">
             <h2 class="subheader">Current Members</h2>
             <div v-if="membersStore.hasNoGroupAdmins" class="alert-box warning">
                 Please note, this group currently has no Group Admins.

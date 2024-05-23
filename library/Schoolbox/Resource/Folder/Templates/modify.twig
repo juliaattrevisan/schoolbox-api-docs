@@ -295,13 +295,13 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="name" class="required">Folder Name</label>
-                        <input type="text" id="name" name="name" maxlength="100" size="40" value="{{ folder.getName }}" required />
+                        <input type="text" id="name" name="name" data-test="folder-form-input-name" maxlength="100" size="40" value="{{ folder.getName }}" required />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Homepage Template
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you would like a homepage associated with this folder select a basic layout to get started with">?</span>
-                            <select data-template name="template">
+                            <select data-template name="template" data-test="folder-form-select-template">
 
                                 {# Display homepage templates with special case for 'No Homepage' #}
 
@@ -403,11 +403,11 @@
                                     </td>
                                     <td>
                                         <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if (rolePermissions[role.getId] ?? deny) == read %}checked{% endif %} />
-                                        <label class="radio-label" for="groupRead{{ role.getId }}"></label>
+                                        <label class="radio-label" for="groupRead{{ role.getId }}" data-test="folder-form-radio-access-group-read-{{ role.getId }}"></label>
                                     </td>
                                     <td>
                                         <input type="radio" name="group[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2" {% if (rolePermissions[role.getId] ?? deny) == write %}checked{% endif %} />
-                                        <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
+                                        <label class="radio-label" for="groupWrite{{ role.getId }}" data-test="folder-form-radio-access-group-write-{{ role.getId }}"></label>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -504,7 +504,7 @@
             </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="submit" value="{{ action }} Folder" />
+                    <input type="submit" value="{{ action }} Folder" data-test="folder-form-submit" />
                 </div>
             </div>
         </form>

@@ -95,6 +95,8 @@ window.Vue.onMounted(() => {
         v-if="state !== STATE_HIDDEN"
         :class="{ pop: !hidden, toast: true, alert: state === STATE_FAILED, success: state === STATE_DONE }"
         :style="{ opacity: 1 }"
+        data-test="toast"
+        :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
     </div>

@@ -19,7 +19,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ title }} {{ assessment.title }}</h1>
+            <h1 data-test="assessment-response-meta-title">{{ title }} {{ assessment.title }}</h1>
             <ul class="meta">
                 <li class="icon-calendar">{{ dueDate.forParticipant(participant) }}</li>
                 <li class="icon-due-work"><a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>

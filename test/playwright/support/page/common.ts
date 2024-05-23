@@ -1,0 +1,229 @@
+import { Page } from "@playwright/test";
+
+export class Common {
+    private page: Page;
+
+    // sales data
+    static readonly USER_JACKCOLES = "Mr Jack Coles";
+
+    static readonly USER_ID_JACKCOLES = 22;
+
+    static readonly USER_LOUISASMITH = "Louisa Smith";
+
+    static readonly USER_ID_LOUISASMITH = 55;
+
+    static readonly USER_JAMALALI = "Jamal Ali";
+
+    static readonly USER_ID_JAMALALI = 60;
+
+    static readonly CLASS_9AENG = "9A English";
+
+    static readonly CLASS_ID_9AENG = 83;
+
+    static readonly CLASS_ID_DEMO2 = 106;
+
+    // TODO: Replace following with data-test selectors where possible
+
+    /**
+     * Content element selector. This is where most of Schoolbox's dynamic
+     * content goes.
+     */
+    static readonly SELECTOR_CONTENT = "#content";
+
+    /**
+     * Footer selector. This is where the copyright, policy,
+     * version number and support link go.
+     */
+    static readonly SELECTOR_FOOTER = "#footer";
+
+    /**
+     * Top menu selector. This is where the configurable top menu items go.
+     */
+    static readonly SELECTOR_TOP_MENU = "#top-menu";
+
+    /**
+     * Search icon selector
+     */
+    static readonly SEARCH_ICON = "button.icon-search.no-text";
+
+    /**
+     * Search field selector; used as a text input for site searches.
+     */
+    static readonly SELECTOR_SEARCH = "#search-field";
+
+    /**
+     * Side menu selector; this is where the configurable side menu items go,
+     * as well as the current user's groups, classes and links.
+     *
+     * (for some reason, this has no ID?)
+     */
+    static readonly SELECTOR_SIDEBAR = ".left-off-canvas-menu";
+
+    /**
+     * Notification center selector; this is where new notifications go.
+     */
+    static readonly SELECTOR_NOTIFICATIONS = "#msgs";
+
+    /**
+     * Date format as used in form inputs.
+     *
+     * This should match `config.date_local`; you can set it if you want.
+     */
+    static readonly FORMAT_INPUT_DATE = "d/m/Y";
+
+    /**
+     * Time format as used in form inputs.
+     *
+     * This should match `config.date_time`; you can set it if you want.
+     */
+
+    static readonly FORMAT_INPUT_TIME = "g:ia";
+
+    /**
+     * Date+time format as used in form inputs.
+     */
+    static readonly FORMAT_INPUT_DATETIME = `${Common.FORMAT_INPUT_DATE} ${Common.FORMAT_INPUT_TIME}`;
+
+    /**
+     * modify button on pages like news feed, pastoral record
+     */
+    static readonly ICON_MODIFY_PAGES = "a.icon-modify.no-text";
+
+    /**
+     * confirm button on modal dialogs
+     */
+    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "a#confirm-dialog-confirm-button";
+
+    /**
+     * cancel button on modal dialogs
+     */
+    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL = "a#confirm-dialog-cancel-button";
+
+    /**
+     * close x button on modal dialogs
+     */
+    static readonly SELECTOR_CLOSE_BUTTON_MODAL = "a.close-reveal-modal";
+
+    /**
+     * add a comment element for learning moments, news, pastoral records
+     */
+    static readonly ADD_COMMENT_BUTTON = "button.show-ckeditor-button";
+
+    /**
+     * submit buttons for comment fields for learning moments, news, pastoral records
+     */
+    static readonly COMMENT_SUBMIT_BUTTON = "button[class=button submit]";
+
+    /**
+     * delete button on modal dialogs
+     */
+    static readonly MODAL_DELETE_BUTTON = "button.button.submit";
+
+    constructor(page: Page) {
+        this.page = page;
+    }
+
+    /**
+     * Generate a random string of text
+     * @param { number } length - the length of the string to generate
+     * @returns { string } - the generated string
+     */
+    static genText(length: number): string {
+        const characters = "abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+";
+        let randomString = "";
+        for (let i = 0; i < length; i += 1) {
+            if (length > 8 && Math.floor(Math.random() * 7) === 5) {
+                randomString += " ";
+                i += 1;
+            }
+            randomString += characters[Math.floor(Math.random() * characters.length)];
+        }
+        return randomString;
+    }
+
+    /**
+     * Changes a full name to a surname-first format
+     * @param { string } fullname - the full name to change
+     * @returns { string } - the surname-first name
+     */
+    static surnameFirst(fullname: string): string {
+        const name = fullname.replace("Mr", "").replace("Mrs", "");
+        const parts = name.split(" ");
+        return `${parts[1]}, ${parts[0]}`;
+    }
+
+    /**
+     * search by typing a text in the search bar
+     * @param { string } text - the text to search
+     */
+    async search(text: string) {
+        await this.page.locator(Common.SEARCH_ICON).click();
+        await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
+        await this.page.locator(Common.SEARCH_ICON).click();
+    }
+
+    /**
+     * click a checkbox in the search results:
+     * all, file, folder, textbox
+     * @param { string } type - the type of search result to click
+     */
+    async clickSearchTypeCheckbox(type: string) {
+        await this.page.locator(`label[for="${type}"]`).click();
+    }
+
+    /**
+     * clicks the submit button by locating the last element in the page
+     */
+    async clickSubmitButton() {
+        await this.page.locator("a.button.submit").last().click();
+    }
+
+    /**
+     * clicks the confirm button on the dialogs
+     */
+    async clickConfirmButton() {
+        await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
+    }
+
+    /**
+     * clicks the cancel button on the dialogs
+     */
+    async clickCancelButton() {
+        await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL).click();
+    }
+
+    /**
+     * clicks the close x button on the dialogs
+     */
+    async closeModal() {
+        await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).last().click();
+    }
+
+    /**
+     * click add a comment for learning moments, news, pastoral records etc
+     */
+    async clickAddComment() {
+        await this.page.locator(Common.ADD_COMMENT_BUTTON).first().click();
+    }
+
+    /**
+     * click post comment for learning moments, news, pastoral care records
+     */
+    async clickSubmitComment() {
+        await this.page.locator(Common.COMMENT_SUBMIT_BUTTON).first().click();
+    }
+
+    /**
+     * click the last element to confirm deletion in a modal dialog
+     */
+    async clickModalDeleteButton() {
+        await this.page.locator(Common.MODAL_DELETE_BUTTON).last().click();
+    }
+
+    /**
+     * click the icon modify page
+     */
+    async clickIconModifyPage() {
+        await this.page.locator(Common.ICON_MODIFY_PAGES).click();
+    }
+}

@@ -171,7 +171,7 @@ export default {
 
             // Flatten grouped evidence into an array
             let groupedEvidence = Object.values(groupedEvidenceByDate).sort((a, b) =>
-                a.date.isBefore(b.date) ? 1 : -1
+                a.date.isBefore(b.date) ? 1 : -1,
             );
 
             // Ensure that each evidence within the group is sorted
@@ -462,6 +462,7 @@ export default {
                                 title="Share Learning"
                                 class="learning icon-share"
                                 data-reveal-id="shareLearningMoment"
+                                data-test="learning-moment-evidence-share"
                                 ><span>Share Learning</span></a
                             >
                         </template>
@@ -617,13 +618,13 @@ export default {
                                                     :title="
                                                         formatDate(
                                                             evidence.object.createdAt,
-                                                            dateDisplayFormats.dayjsDatetime
+                                                            dateDisplayFormats.dayjsDatetime,
                                                         )
                                                     "
                                                     >{{
                                                         formatDate(
                                                             evidence.object.createdAt,
-                                                            dateDisplayFormats.dayjsTime
+                                                            dateDisplayFormats.dayjsTime,
                                                         )
                                                     }}</time
                                                 >
@@ -649,15 +650,17 @@ export default {
                                                     "
                                                     class="icon-modify"
                                                     title="Modify"
+                                                    :data-test="`learning-moment-evidence-popout-option-modify-${evidence.object.id}`"
                                                     >Modify</a
                                                 >
                                             </li>
                                             <li>
                                                 <a
-                                                    @click.prevent="showDeleteModal(evidence)"
                                                     v-if="evidence.object._links.delete"
                                                     class="icon-delete"
                                                     title="Delete"
+                                                    :data-test="`learning-moment-evidence-delete-${evidence.object.id}`"
+                                                    @click.prevent="showDeleteModal(evidence)"
                                                     >Delete</a
                                                 >
                                             </li>
@@ -670,12 +673,16 @@ export default {
                                             <storage
                                                 :storage="evidence.object.storage"
                                                 :filename="evidence.object.filename"
+                                                data-test="learning-moment-evidence-media"
                                             ></storage>
                                         </article>
 
                                         <!-- Display evidence body, with media players initialised -->
                                         <media-article v-if="evidence.object.body">
-                                            <div v-html="evidence.object.body" />
+                                            <div
+                                                data-test="learning-moment-evidence-body"
+                                                v-html="evidence.object.body"
+                                            />
                                         </media-article>
 
                                         <!-- Display curriculum codes and tags -->
@@ -745,14 +752,14 @@ export default {
                                                     :title="
                                                         formatDate(
                                                             evidence.object.awardedAt,
-                                                            dateDisplayFormats.dayjsDatetime
+                                                            dateDisplayFormats.dayjsDatetime,
                                                         )
                                                     "
                                                 >
                                                     {{
                                                         formatDate(
                                                             evidence.object.awardedAt,
-                                                            dateDisplayFormats.dayjsTime
+                                                            dateDisplayFormats.dayjsTime,
                                                         )
                                                     }}
                                                 </time>
@@ -783,14 +790,14 @@ export default {
                                                     :title="
                                                         formatDate(
                                                             evidence.object.publishedAt,
-                                                            dateDisplayFormats.dayjsDatetime
+                                                            dateDisplayFormats.dayjsDatetime,
                                                         )
                                                     "
                                                 >
                                                     {{
                                                         formatDate(
                                                             evidence.object.publishedAt,
-                                                            dateDisplayFormats.dayjsTime
+                                                            dateDisplayFormats.dayjsTime,
                                                         )
                                                     }}
                                                 </time>
@@ -969,9 +976,10 @@ export default {
             <ul class="flex-list buttons">
                 <li>
                     <a
-                        @click.prevent="deleteEvidence(currentlyDeletingEvidence)"
                         id="confirm-delete-learning-moment"
                         class="button submit"
+                        data-test="learning-moment-evidence-delete-confirm"
+                        @click.prevent="deleteEvidence(currentlyDeletingEvidence)"
                         >Delete</a
                     >
                 </li>

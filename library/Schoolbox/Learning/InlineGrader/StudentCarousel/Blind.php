@@ -186,7 +186,7 @@ class Blind
                             <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
                         </div>
                         <p class=\"blind\" >{$fullname}</p>
-                        <span class=\"label status {$css}\">{$label}</span>
+                        <span class=\"label status {$css}\" data-test=\"assessment-student-carousel-statusLabel-{$currentParticipant->getUser()->getId()}\">{$label}</span>
                     </div>
                 </div>
             ";

@@ -19,7 +19,12 @@
                 <ul id="header-options" class="f-dropdown" data-dropdown-content>
                     <li>
                         {% if user.enabled %}
-                            <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
+                            <a
+                                href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
+                                class="icon-staff-students"
+                                title="Login as user"
+                                data-test="admin-user-modify-impersonate"
+                            >Impersonate</a>
                         {% else %}
                             <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
                         {% endif %}

@@ -1,3 +1,6 @@
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+
 /**
  * The different types of editors that can be used
  */
@@ -32,3 +35,5 @@ export interface EditorConfig {
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
 }
+
+export type Editor = ClassicEditor | InlineEditor;
