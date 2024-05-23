@@ -93,7 +93,7 @@ test.describe("Unit Planner Tests", () => {
             newUnitOrder.indexOf(romeoUnitId.toString()),
         );
 
-        await expect(page.getByTestId("toast")).toHaveClass(/success/);
+        await expect(page.getByTestId("toast")).toHaveAttribute("data-test-is-success", "true");
 
         await page.reload();
 
