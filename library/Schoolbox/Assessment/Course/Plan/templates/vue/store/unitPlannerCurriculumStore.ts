@@ -56,6 +56,11 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {number} componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
+        // if we are just opening up the same modal, just open it
+        if (folderId === currentFolderId && componentId === currentComponentId) {
+            modalStore.open();
+            return;
+        }
         currentFolderId = folderId;
         currentComponentId = componentId;
         const folderNodesStore = useFolderNodesStore(folderId, componentId);
