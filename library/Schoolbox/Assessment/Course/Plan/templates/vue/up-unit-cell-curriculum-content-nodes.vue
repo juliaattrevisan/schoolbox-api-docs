@@ -9,6 +9,7 @@ import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
 
@@ -20,6 +21,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const unitPlannerStore = useUnitPlannerStore(); // to allow us to reflect our changes in back into unit planner store
 const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
 
@@ -46,6 +48,21 @@ const { ignoreUpdates } = watchIgnorable(
             });
         }
     },
+);
+
+/**
+ * To keep the unit planner's selected nodes in sync with the folder nodes
+ * when the folder nodes are updated
+ */
+window.Vue.watch(
+    () => folderNodesStore().selectedNodes,
+    () => {
+        const storeUnit = unitPlannerStore.units.find((unit) => unit.folderId === props.folderId);
+        if (storeUnit) {
+            storeUnit.curriculum.selectedNodes = folderNodesStore().selectedNodes;
+        }
+    },
+    { deep: true },
 );
 
 /**

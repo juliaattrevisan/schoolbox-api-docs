@@ -41,6 +41,18 @@ const createText = window.Vue.computed(() => {
 });
 
 /**
+ * To open the curriculum code mapping modal,
+ * ensuring the relevant selected nodes are displayed by
+ * passing in the folderId and componentId to target the appropriate folderNodesStore
+ */
+function onModifySelected() {
+    curriculumStore.openCurriculumSelectorModal(
+        props.unit.folderId,
+        (component.value as CurriculumOverviewComponent).componentId,
+    );
+}
+
+/**
  * To create a new curriculum component, adding it to the relevant units homepage
  */
 async function onCreateSelected() {
@@ -51,18 +63,11 @@ async function onCreateSelected() {
     await curriculumStore.createComponent(props.unit, props.column);
     await window.Vue.nextTick();
     isCreating.value = false;
-}
 
-/**
- * To open the curriculum code mapping modal,
- * ensuring the relevant selected nodes are displayed by
- * passing in the folderId and componentId to target the appropriate folderNodesStore
- */
-function onModifySelected() {
-    curriculumStore.openCurriculumSelectorModal(
-        props.unit.folderId,
-        (component.value as CurriculumOverviewComponent).componentId,
-    );
+    // Open the curriculum selector modal after creating the component
+    // This avoids the need to click the modify button again to open the modal,
+    // as the user has effectively already indicated they want to modify the selected nodes
+    onModifySelected();
 }
 </script>
 

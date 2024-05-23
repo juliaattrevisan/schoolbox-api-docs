@@ -10,6 +10,7 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column } from "./unitPlannerConfig";
 import { Unit } from "./unitPlannerTypes";
+import UpUnitCellTextboxContentEmpty from "./up-unit-cell-textbox-empty.vue";
 
 interface Props {
     unit: Unit;
