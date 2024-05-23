@@ -496,9 +496,12 @@ HELP;
         $this->getLogger()->info('');
 
         /* Find out if a particular assessment was chosen.
-         * If so, find out whether we should use a distributed payload,
+         * If specifying an assessment, find out whether we should use a distributed payload,
          * overriding whether you specified --small or --large params
+         *
+         * TODO Maybe expand this to include a set of assessmentIds.
          */
+
         $assessmentId = trim((string)$this->assessmentId);
 
         if ('' !== $assessmentId) {
@@ -547,11 +550,7 @@ HELP;
         /* Obtain data set.
          * If --assessment was specified, find its subobject and work with that.
          * Otherwise collect the whole set of non-deleted quizzes via a custom query.
-         *
-         * TODO Maybe expand this to include a set of assessmentIds.
          */
-        $assessmentId = trim((string)$this->assessmentId);
-
         if ('' === $assessmentId) {
             /* Get everything
              */
