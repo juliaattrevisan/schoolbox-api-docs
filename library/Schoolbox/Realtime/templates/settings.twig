@@ -55,6 +55,21 @@
         <div class="row actions-small-1">
             <div class="list-item">
                 <div class="small-12 columns">
+                    <h2 class="subheader">Setup Schoolbox web app</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="small-12 island">
+        <section class="content">
+            {% include '@messages/pwa.twig' with { notifButton : 'notifOnSettings', pwaPage: 'settings' } %}
+            <b>Note:</b> If you want to receive push notifications on multiple devices, you must install the Schoolbox web app on all your devices.
+        </section>
+    </div>
+    <div class="small-12 columns">
+        <div class="row actions-small-1">
+            <div class="list-item">
+                <div class="small-12 columns">
                     <h2 class="subheader">Notifications</h2>
                 </div>
             </div>

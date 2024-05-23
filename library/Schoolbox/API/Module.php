@@ -25,6 +25,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $this->register('POST', '/register/{provider}', 'register');
+        $this->register('DELETE', '/register/{provider}', 'delete');
         $this->register('POST', '/session', 'initSession');
         $this->register('GET', '/session', 'initSessionFromQueryString');
     }

@@ -50,7 +50,7 @@ $allow-notification-stash: $xlarge-up;
 
     &[data-unread="0"] {
         ul.off-canvas-list {
-            label {
+            #notification-toggle-full {
                 background: $notification-header-background;
                 // DONE just use --navigation-foreground instead of contrast-bg
                 color: $navigation-foreground;
@@ -72,7 +72,7 @@ $allow-notification-stash: $xlarge-up;
             }
         }
     }
-    ul.off-canvas-list label {
+    ul.off-canvas-list #notification-toggle-full {
         height: $tabbar-height;
         line-height: $tabbar-height;
         padding: 0 0 0 1rem;
@@ -109,6 +109,19 @@ $allow-notification-stash: $xlarge-up;
                 color: $navigation-foreground;
             }
         }
+    }
+
+    // the link to open the notification settings
+    .settings-button {
+        color: $white;
+        height: 2.5rem;
+        padding: 0.5rem;
+        position: absolute;
+        right: 0.5rem;
+        top: 0;
+        transform: translateY(40%);
+        width: 2rem;
+        z-index: calc(var(--depth-default) + 1); // Safari will not see the icon without this
     }
 
     /* The button that allows you to view your notifications
@@ -164,5 +177,18 @@ $allow-notification-stash: $xlarge-up;
         .right-menu-dock::after {
             content: "\e913"; //.icon-pin
         }
+    }
+}
+
+#pwaPrompt {
+    background: white; // to ensure the pwa prompt is visible if the skin config has a different var(--off-canvas-background);
+    .alert-box.warning {
+        padding-right: 0.875rem; // reduce the padding that allows the close button to be visible, as we don't have it here
+    }
+    #installDelayPrompt {
+        padding: 0; // remove the padding that's linked to all ul.off-canvas-list li a, as we don't need it here
+    }
+    .notifOn {
+        font-size: 0.8125rem; // keep it consistent with existing labels
     }
 }

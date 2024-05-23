@@ -1,0 +1,57 @@
+{#
+    pwaPage: string to define where this was included, if in chrome (messages sidebar) or in the notifications setting page
+    config: ConfigMapper to git and grab the settings from admin > 3rd Party
+    notifButton: string identifier for the checkbox/toggle for allow notifications to display correctly when there are multiple on the page
+#}
+<div class="l-flex-col l-gap-m f-no-margins" data-pwa-page="{{ pwaPage }}">
+    <div class="l-flex-col l-gap-s f-no-margins" data-pwa-action="installPWA">
+        <p>To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.</p>
+
+        {# Insatll PWA if not any of the following:
+            config.digistorm_store_link* is not set
+            config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
+        #}
+        {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
+        {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
+
+        {% if config.digistorm_role_install_prompt ?? [] is empty %}
+            {# All users are redirected to the store link #}
+            {% if installApple is not empty %}
+                <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
+            {% endif %}
+            {% if installGoogle is not empty %}
+                <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
+            {% endif %}
+        {% else %}
+            {# ensure the user is in the specified role #}
+            {% if USER.role.type | capitalize in config.digistorm_role_install_prompt %}
+                {% if installApple is not empty %}
+                    <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
+                {% endif %}
+                {% if installGoogle is not empty %}
+                    <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        <a data-pwa-action="installPWA" class="button" href="#">Install</a>
+    </div>
+
+    <div data-pwa-iOS="iOSHomePrompt" class="alert-box warning">
+        To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
+    </div>
+
+    <div data-pwa="notifBlocked" class="alert-box warning">
+        You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
+    </div>
+    <div class="" data-pwa-action="enableNotifPrompt">
+        <label class="{{ notifButton }}" for="{{ notifButton }}">Enable notifications on your device</label>
+        <div class="switch">
+            <input id="{{ notifButton }}" data-pwa-action="enableNotif" type="checkbox">
+            <label for="{{ notifButton }}">
+                <span>On</span>
+                <span>Off</span>
+            </label>
+        </div>
+    </div>
+</div>

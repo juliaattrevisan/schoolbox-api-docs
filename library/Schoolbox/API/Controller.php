@@ -172,6 +172,64 @@ class Controller extends Base
         }
     }
 
+    /**
+     * Authenticates a user via either a username+password or JWT, and then
+     * removes their app token.
+     *
+     * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
+     * @api          DELETE /api/register/{provider}
+     * @since        24.0
+     *
+     * @param string $provider
+     */
+    public function delete(string $provider): void
+    {
+        $providers = [
+            Registry::PROVIDER_APPLE,
+            Registry::PROVIDER_GOOGLE,
+            Registry::PROVIDER_DIGISTORM,
+            Registry::PROVIDER_FIREBASE,
+        ];
+
+        // check the provider is valid
+        if (!in_array($provider, $providers, true)) {
+            $this->response = $this->responseAsJson(
+                "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
+            )->withStatus(400);
+            return;
+        }
+
+        // Authenticate, and if so register app
+        // (For now, don't allow a query string JWT when registering)
+        // If Firebase: just use whoever's logged in at this time
+        $sessionUser = $provider === Registry::PROVIDER_FIREBASE
+            ? $this->getUser()
+            : $this->authenticate(false);
+        if ($sessionUser) {
+            // For Digistorm: token is always the user's username
+            // Otherwise: token may be absent or blank, in which case we don't
+            // store anything in the registry
+            $token = $provider === Registry::PROVIDER_DIGISTORM
+                ? $sessionUser->getUsername()
+                : $this->requestPost->get('token');
+            if (!empty($token)) {
+                try {
+                    $registry = $this->registryMapper->findByTokenAndProviderForUser(
+                        $sessionUser->getId(),
+                        $token,
+                        $provider
+                    );
+                    $this->registryMapper->delete($registry);
+                    $this->response = $this->responseAsJson('Successfully deleted registration')->withStatus(201);
+                    return;
+                } catch (MapperException $e) {
+                    $this->response = $this->responseAsJson('Unable to find app registration')->withStatus(400);
+                    return;
+                }
+            }
+        }
+        $this->response = $this->responseAsJson('We should have done something before this...')->withStatus(400);
+    }
 
     /**
      * API endpoint for initializing a session based on a username/password or
