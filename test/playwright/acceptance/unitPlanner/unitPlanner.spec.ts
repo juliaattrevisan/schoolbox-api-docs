@@ -1,4 +1,4 @@
-import { test, expect } from "@schoolboxTest/playwright/support/fixtures";
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 
 test.describe("Unit Planner Tests", () => {
     test.beforeEach(async ({ tester, page }) => {

@@ -3,7 +3,7 @@
  * search by passing filters(news), search by creator, search by passing dates,
  * view search results by passing filters in the URL
  */
-import { test } from "@schoolboxTest/playwright/support/fixtures";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 import { SearchPage } from "@schoolboxTest/playwright/support/page/search/searchPage";
 
 test.describe("Search functionality tests", () => {

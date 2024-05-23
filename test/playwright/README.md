@@ -177,7 +177,7 @@ We keep these page objects in the `test/playwright/support/page` directory, and 
 You can find an example of a page object in `test/playwright/support/page/LoginPage.ts`. \
 Rewriting the previous test now, as well as adding an additional test, we get:
 ```ts
-import { test, expect } from "@schoolboxTest/playwright/support/fixtures";
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
 
 test.describe("Login functionality tests", () => {
@@ -237,25 +237,26 @@ When reading the test, it is now clear that the test is entering a known valid k
 
 This can be especially helpful in much longer tests, where we may start to lose track of why the test is taking specific actions.
 
-#### Fixtures
+#### Integrations (Playwright Fixtures)
 
 You'll notice that in the above example, a `tester` was added to the test function.
 
-Playwright allows us to add [fixtures](https://playwright.dev/docs/test-fixtures) to our tests, which can provide additional functionality and helper methods to our tests, without having to duplicate code.
+Playwright allows us to add [fixtures](https://playwright.dev/docs/test-fixtures) to our tests, which can provide additional functionality and helper methods to our tests, without having to duplicate code. \
+We have named these **"integrations"** instead to avoid confusion with our own Fixture system.
 
 In the above example, `tester` is a custom fixture, from `acceptanceTester.ts`, which provides various methods used across many tests. This includes things like logging in, impersonating a user, filling in a CKEditor, or other common actions like the isGoingTo() method.
 
-The available fixtures are defined in `fixtures.ts`, and can be added to any test by adding them to the test function parameters.
+The available integrations are defined in `integrations.ts`, and can be added to any test by adding them to the test function parameters.
 
-**Custom fixtures:**
-We have a few custom fixtures, these are:
+**Custom integrations:**
+We have a few custom integrations, these are:
 - `db` - Provides access to the database for the test
 - `tester` - Provides common test actions that require access to the page object. Has all methods of `baseTester`
 - `baseTester` - Provides common test actions, but does not require access to the page object
 
 `baseTester` allows you to perform actions while not in the right context for a page, such as inside the `afterAll` hook.
 
-These fixtures can be passed in like any [built-in fixture](https://playwright.dev/docs/test-fixtures), for example, if we wanted access to the database:
+These integrations can be passed in like any [built-in integration](https://playwright.dev/docs/test-fixtures), for example, if we wanted access to the database:
 ```ts
 // ...
 test("login with an invalid username and password", async ({ tester, db }) => {

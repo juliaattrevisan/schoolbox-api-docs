@@ -7,7 +7,7 @@ import { BaseTester } from "@schoolboxTest/playwright/support/baseTester";
  * AcceptanceTester class to provide common functionality for acceptance tests
  *
  * Requires a Page object to interact with the browser, so this cannot be used in contexts such as .beforeAll or .afterAll
- *  as the Page and Context fixtures are created on a per-test basis and not available in those hooks
+ *  as the Page and Context integrations are created on a per-test basis and not available in those hooks
  * @param { Page } page - The Playwright Page object to interact with the browser
  */
 export class AcceptanceTester extends BaseTester {

@@ -2,7 +2,7 @@
  * This test creates due work activities, deletes a due work activity, the student views the activity, submits it in person,
  * the teacher views and marks the submission, the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
  */
-import { test, expect } from "@schoolboxTest/playwright/support/fixtures";
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import { AssessmentForm } from "@schoolboxTest/playwright/support/page/dueWork/assessmentForm";
 
 // TODO: Move selectors into relevant support page files

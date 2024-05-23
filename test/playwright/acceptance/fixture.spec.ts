@@ -1,7 +1,7 @@
 /**
  * This test creates and modify fixtures and ensure the notification is sent according to the match date/time
  */
-import { test } from "@schoolboxTest/playwright/support/fixtures";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 
 test.describe("Fixture tests", () => {
     test.beforeEach(async ({ tester }) => {
