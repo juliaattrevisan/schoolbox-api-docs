@@ -114,6 +114,12 @@ const textboxContentComponent = window.Vue.ref<(typeof UpUnitCellTextboxContent 
     null,
 );
 
+// Provide access to exposed createTextbox from the UpUnitCellTextboxAction component
+// Only relevant when props.column.type === ColumnType.OVERVIEW
+const textboxActionComponent = window.Vue.ref<(typeof UpUnitCellTextboxAction & { createTextbox: () => void }) | null>(
+    null,
+);
+
 /**
  * When the content is clicked
  * @param {MouseEvent} event - the click event
@@ -284,6 +290,7 @@ window.Vue.onUnmounted(() => {
                     :unit="props.unit"
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"
+                    @create-clicked="textboxActionComponent?.onCreateClicked"
                 />
                 <activities-list-empty v-else-if="props.column.type === ColumnType.ACTIVITIES" />
                 <up-unit-cell-rubricCapabilities-empty
@@ -300,6 +307,7 @@ window.Vue.onUnmounted(() => {
             <div ref="componentActionEl">
                 <up-unit-cell-textbox-action
                     v-if="props.column.type === ColumnType.OVERVIEW"
+                    ref="textboxActionComponent"
                     :unit="props.unit"
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"

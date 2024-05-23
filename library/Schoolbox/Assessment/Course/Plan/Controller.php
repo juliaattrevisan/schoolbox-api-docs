@@ -223,6 +223,7 @@ class Controller extends Base
             // This saves needing to manipulate the initial data on the frontend on the first mount
             $textboxTemplate[] = [
                 'heading' => $heading,
+                'emptyStateMessage' => $textboxComponent->getConfigByKey('emptyStateMessage')->getValue(),
             ];
             $textboxKey[] = strtolower($heading);
         }
