@@ -28,8 +28,17 @@ test.describe("Login functionality tests", () => {
     });
 
     test("impersonate a user via the account drop", async ({ tester }) => {
-        const fullname = "Jack Coles";
+        const fullname = "Mr Jack Coles";
         await tester.impersonate(fullname);
+        await loginPage.verifyLoginSuccess();
+
+        tester.isGoingTo("verify that the correct user was impersonated");
+        await loginPage.verifyCurrentUserIs(fullname);
+    });
+
+    test("impersonate a user via the modify user page", async ({ tester }) => {
+        const fullname = "Mr Jack Coles";
+        await tester.impersonateViaModifyUserPage(fullname);
         await loginPage.verifyLoginSuccess();
 
         tester.isGoingTo("verify that the correct user was impersonated");

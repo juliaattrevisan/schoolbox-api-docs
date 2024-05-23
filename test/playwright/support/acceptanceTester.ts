@@ -76,6 +76,43 @@ export class AcceptanceTester extends BaseTester {
     }
 
     /**
+     * Impersonate a user via the modify screen by passing their title and fullname
+     * @param { string } fullname - The full name of the user to impersonate
+     */
+    async impersonateViaModifyUserPage(fullname: string) {
+        this.isGoingTo(`impersonate a user by the name of ${fullname}`);
+        await this.logout();
+        await this.loginAsAdmin();
+
+        await this.searchForUser(fullname);
+        await this.page.getByTestId("user-profile-modify").click();
+
+        this.isGoingTo("click the options button and impersonate the user");
+        await this.page.getByTestId("sbx-pop-out-header-options-button").click();
+        await this.page.getByTestId("admin-user-modify-impersonate").click();
+
+        const loginPage = new LoginPage(this.page);
+        await loginPage.verifyLoginSuccess();
+        await loginPage.verifyCurrentUserIs(fullname);
+
+        await this.skipWhatsNewTour();
+    }
+
+    /**
+     * Search for a user using the search bar
+     * @param { string } fullname - The full name of the user to search for
+     */
+    async searchForUser(fullname: string) {
+        this.isGoingTo(`search for a user by the name of ${fullname}`);
+        await this.page.getByTestId("search-input-button").click();
+        await this.page.getByTestId("search-input-field").fill(fullname);
+        await this.page.getByTestId(`header-search-user-result-link-${fullname}`).click();
+
+        this.isGoingTo("expect to be redirected to the user profile page");
+        await expect(this.page.getByTestId("user-profile-name")).toHaveText(fullname);
+    }
+
+    /**
      * Skip the "What's New" tour if it exists
      */
     async skipWhatsNewTour() {
