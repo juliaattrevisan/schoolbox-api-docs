@@ -4,7 +4,6 @@
  */
 import type { Ref } from "vue";
 import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
