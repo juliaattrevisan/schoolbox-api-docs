@@ -14,15 +14,15 @@ import { Column, ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
-import RubricCapabilities from "./rubric-capabilities.vue";
-import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubricCapabilities-action.vue";
-import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubricCapabilities-empty.vue";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
 import ActivitiesListEmpty from "./activities-list-empty.vue";
+import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubricCapabilities-content.vue";
+import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubricCapabilities-action.vue";
+import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubricCapabilities-empty.vue";
 import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
 import UpUnitCellCurriculumAction from "./up-unit-cell-curriculum-action.vue";
 import UpUnitCellCurriculumEmpty from "./up-unit-cell-curriculum-empty.vue";
@@ -260,7 +260,7 @@ window.Vue.onUnmounted(() => {
                 @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
             />
 
-            <rubric-capabilities
+            <up-unit-cell-rubricCapabilities-content
                 v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                 :rubric-capabilities="props.unit.rubricCapabilities"
             />
