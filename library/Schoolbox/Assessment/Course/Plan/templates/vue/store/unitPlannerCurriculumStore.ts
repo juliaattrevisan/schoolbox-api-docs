@@ -56,6 +56,11 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {number} componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
+        const folderNodesStore = useFolderNodesStore(folderId, componentId);
+        ignoreUpdates(() => {
+            // so the watch above doesn't trigger, setting off an infinite loop
+            selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal
+        });
         // if we are just opening up the same modal, just open it
         if (folderId === currentFolderId && componentId === currentComponentId) {
             modalStore.open();
@@ -63,14 +68,10 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         }
         currentFolderId = folderId;
         currentComponentId = componentId;
-        const folderNodesStore = useFolderNodesStore(folderId, componentId);
-        ignoreUpdates(() => {
-            // so the watch above doesn't trigger, setting off an infinite loop
-            selectedNodesStore.update(folderNodesStore().selectedNodes); // update to latest selected nodes prior to opening the modal
-        });
         // if the Curriculum Tree Filter is set get it to open the modal at the correct node, otherwise open at the root
         const { filter } = folderNodesStore();
         startingNodeId.value = filter !== null ? filter.id : UNSET_ID;
+        modalStore.toStartingNodeId(startingNodeId.value);
         modalStore.open();
     }
 
