@@ -62,16 +62,6 @@ window.Vue.watch(
 );
 
 /**
- * To update the starting node id to start the modal on
- */
-window.Vue.watch(
-    () => props.startingNodeId,
-    () => {
-        void modalViewNodesStore.toStartingNodeId(props.startingNodeId);
-    },
-);
-
-/**
  * when the badge-detail is closed, we need to reset the selected badge,
  * otherwise we can't re-open the same badge
  *

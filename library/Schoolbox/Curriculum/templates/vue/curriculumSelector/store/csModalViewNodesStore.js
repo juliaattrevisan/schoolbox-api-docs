@@ -172,7 +172,7 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
          *
          * @param { number } id - id of the Node to move to
          */
-        async toStartingNodeId(id) {
+        async toStartingNodeId(id = UNSET_ID) {
             this.hasStartingNode = true;
             this.startingNodeId = id;
             // if the id is unset, we just reset and return

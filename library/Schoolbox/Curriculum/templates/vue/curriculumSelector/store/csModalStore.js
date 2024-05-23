@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import { useModalSelectedNodesStore } from "./csModalSelectedNodesStore";
+import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
 export const useModalStore = defineStore(`csModal`, {
     state: () => ({
@@ -20,6 +21,13 @@ export const useModalStore = defineStore(`csModal`, {
         open() {
             useModalSelectedNodesStore().refresh(); //ensure current selections are reflected in the new modal session
             this.isOpen = true;
+        },
+
+        /**
+         * to move to a specific node in the modal
+         */
+        toStartingNodeId(id) {
+            useModalViewNodesStore().toStartingNodeId(id);
         },
 
         /**
