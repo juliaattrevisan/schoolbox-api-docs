@@ -234,17 +234,12 @@ class CSV extends AbstractCSV
             $dataFound = false;
 
             if ($assessment instanceof Project) {
-                if (
-                    $assessment->hasPublishedFeedback($participant) ||
-                    ($showDrafts && $assessment->hasPendingDraftAuthoritativeFeedback($participant))
-                ) {
-                    // For projects, there is no feedback, so get data from other places.
-                    $suffix = $assessment->isReviewComplete($participant) ? '' : self::DRAFT_SUFFIX;
-                    $humanReadableMark = $participant->getHumanReadableMark(!$showDrafts);
-                    $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
-                    $comment = '';
-                    $dataFound = true;
-                }
+                // For projects, there is no feedback, so get data from other places.
+                $suffix = $assessment->isReviewComplete($participant) ? '' : ($showDrafts ? self::DRAFT_SUFFIX: '');
+                $humanReadableMark = $participant->getHumanReadableMark(!$showDrafts);
+                $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
+                $comment = '';
+                $dataFound = true;
             } else {
                 // For non-projects, all the data is in the feedback.
                 $feedback = $participant->getAuthoritativeFeedback(!$showDrafts);
