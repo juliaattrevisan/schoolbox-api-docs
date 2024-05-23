@@ -562,7 +562,6 @@
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
                     if (("Notification" in window)) {
-                        console.info(Notification.permission);
                         if (Notification.permission === "granted") {
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('checked', true);
@@ -589,7 +588,6 @@
 
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
                             element?.addEventListener('click', () => {
-                                console.info('enable notif clicked')
                                 Notification.requestPermission().then((permission) => {
                                     if (permission === 'granted') {
                                         document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
