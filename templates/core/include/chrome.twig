@@ -342,7 +342,7 @@
                             <a class="icon-settings settings-button" href="{{ routeLookup("messages.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"></a>
                         </li>
                         <li id="pwaPrompt" class="content">
-                            {% include '@messages/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
+                            {% include '@notifications/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
                             <a id="installDelayPrompt" href="#">Later</a>
                         </li>
                         <li>
