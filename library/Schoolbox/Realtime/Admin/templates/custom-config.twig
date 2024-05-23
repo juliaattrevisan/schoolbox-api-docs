@@ -81,7 +81,7 @@ set iconClassnames = {
             e.preventDefault();
             $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
 
-            $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
+            $.post('/adminv2/notifications/configure', $(this).serialize(), function (data) {
                 customiserCallback(data);
                 $('#slider-modal').foundation('reveal', 'close');
             });
@@ -96,7 +96,7 @@ set iconClassnames = {
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <h4>Send a message when {{ source.description }}.</h4>
+                        <h4>Send a notification when {{ source.description }}.</h4>
                         <p class="meta" data-summary>Sends to {{ role.name }}</p>
                     </div>
                 </fieldset>
@@ -136,7 +136,7 @@ set iconClassnames = {
                         </p>
                         <ul class="permission-list" id="adv-selection" data-roles data-digest-settings data-settings>
                             <li data-role="{{ role.id }}">
-                                {% include '@messages/options.twig' with { mode: 'def' } %}
+                                {% include '@notifications/options.twig' with { mode: 'def' } %}
                             </li>
                         </ul>
                     </div>

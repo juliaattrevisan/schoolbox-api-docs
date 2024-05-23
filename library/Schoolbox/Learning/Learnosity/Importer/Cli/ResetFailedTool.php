@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -39,7 +40,7 @@ class ResetFailedTool extends BaseTool
      */
     protected function getTargetedQuizStatus(): string
     {
-        return QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED;
+        return Helper::LEARNOSITY_PROCESS_STATUS_FAILED;
     }
 
     /**
@@ -54,7 +55,7 @@ class ResetFailedTool extends BaseTool
     {
         if ($this->perform()) {
             $quiz
-                ->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING)
+                ->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_PENDING)
                 ->setLearnosityJobReference(null);
             $this->assessmentDataSource->save($quiz, $quiz->getCreator());
         }

@@ -2,9 +2,8 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { Column } from "../unitPlannerConfig";
-import { Unit } from "../unitPlannerTypes";
+import { CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -16,18 +15,18 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const courseId = window.Vue.ref(0);
     const units = window.Vue.ref<Unit[]>([]);
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
-    const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
+    const template = window.Vue.ref<UnitTemplate | null>(null); // the course framework template that units are linked to
 
     /**
      * store any passed through properties
      * @param { number } $courseId - the course ID
      * @param { Unit[] } $units - the units to store
-     * @param { typeof Toast } $toastEl - the toast element
+     * @param { UnitTemplate } $template - the unit template
      */
-    function init($courseId: number, $units: Unit[], $toastEl: typeof Toast) {
+    function init($courseId: number, $units: Unit[], $template: UnitTemplate) {
         courseId.value = $courseId;
         units.value = $units;
-        toastEl.value = $toastEl;
+        template.value = $template;
     }
 
     const orderedUnits = window.Vue.computed<Unit[]>(() => {
@@ -162,6 +161,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         );
     });
 
+    /**
+     * Add a newly created curriculum component to a unit
+     * @param {number} unitId - to find the unit to add the component to
+     * @param {CurriculumOverviewComponent} component - the component to add
+     */
+    function addCurriculumComponent(unitId: number, component: CurriculumOverviewComponent) {
+        const matchedUnit = units.value.find((unit) => unit.id === unitId);
+        if (!matchedUnit) {
+            return;
+        }
+        matchedUnit.curriculum.components.push(component);
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -169,7 +181,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         courseId,
         units,
         unitCount,
-        toastEl,
+        template,
         dragCurrentUnit,
         dragCurrentUnitNextTick,
         orderedUnits,
@@ -180,5 +192,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitContentHeights,
         setUnitContentHeight,
         unitRowDisplayHeights,
+        addCurriculumComponent,
     };
 });

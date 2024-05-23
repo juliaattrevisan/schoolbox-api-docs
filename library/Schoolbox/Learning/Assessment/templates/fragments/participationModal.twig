@@ -12,7 +12,7 @@
             <div class="columns small-12">
                 <label>
                     Plan Name
-                    <input type="text" name="plan-name" id="plan-name" maxlength="256">
+                    <input type="text" name="plan-name" id="plan-name" data-test="participation-plan-customise-modal-input-name" maxlength="256">
                 </label>
 
 
@@ -66,6 +66,7 @@
                                     type="text"
                                     name="plan-due-date"
                                     id="plan-due-date"
+                                    data-test="participation-plan-customise-modal-input-due-date"
                                     data-datepicker
                                     data-datepicker-time
                                     data-datepicker-format="datetime"
@@ -107,8 +108,7 @@
 
                 <input type="hidden" name="plan-id" id="plan-id">
 
-                <input type="submit" value="Save">
-                
+                <input type="submit" value="Save" data-test="participation-plan-form-button-save">
             </div>
         </section>
     </form>

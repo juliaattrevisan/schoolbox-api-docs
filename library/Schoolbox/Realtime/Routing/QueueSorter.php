@@ -9,11 +9,15 @@
 
 namespace Schoolbox\Realtime\Routing;
 
+use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\QueueInterface;
+use Alaress\Jitter\IJitter;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
@@ -26,16 +30,21 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 class QueueSorter implements FilterInterface
 {
     /**
-     * @param FilterInterface                 $filter
-     * @param LoggerInterface                 $log
-     * @param MessageList\IPublicationFactory $listFactory
-     * @param RoutePermissionMapper           $permMapper
+     * @param FilterInterface                 $filter      Required for validating if a message can be sorted by this?
+     * @param LoggerInterface                 $log         Logger
+     * @param MessageList\IPublicationFactory $listFactory Required for building queues.
+     * @param RoutePermissionMapper           $permMapper  Required for determining a message instance's routing levels.
+     * @param LoopInterface                   $loop        Required for retry if rate limited.
+     * @param IJitter $jitter                              Required for calculating time until retry:
+     *                                                     expected to return a number of milliseconds to wait.
      */
     public function __construct(
         private FilterInterface $filter,
         private LoggerInterface $log,
         private MessageList\IPublicationFactory $listFactory,
-        private RoutePermissionMapper $permMapper
+        private RoutePermissionMapper $permMapper,
+        private LoopInterface $loop,
+        private IJitter $jitter,
     ) {
     }
 
@@ -111,22 +120,22 @@ class QueueSorter implements FilterInterface
             try {
                 switch ($level) {
                     case RoutePermission::DIGEST:
-                        $this->listFactory->digest($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->digest($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::INSTANT:
-                        $this->listFactory->instant($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->instant($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::PUSH:
-                        $this->listFactory->mobile($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->mobile($userId), $instance);
                         $processed = true;
                         break;
 
                     case RoutePermission::EMAIL:
-                        $this->listFactory->email($userId)->push($instance);
+                        $this->pushToQueue($this->listFactory->email($userId), $instance);
                         $processed = true;
                         break;
 
@@ -288,5 +297,41 @@ class QueueSorter implements FilterInterface
         }
 
         return $intent;
+    }
+
+    /**
+     * Push to a queue, with retry on rate-limit.
+     *
+     * @param QueueInterface $queue
+     * @param Instance       $instance
+     * @param int            $attemptNum
+     * @return void
+     */
+    private function pushToQueue(QueueInterface $queue, Instance $instance, int $attemptNum = 0): void
+    {
+        try {
+            $queue->push($instance);
+        } catch (RateLimitException) {
+            // Too many attempts already: log and give up
+            if ($this->jitter->tooManyAttempts($attemptNum + 1)) {
+                $this->log->warning(
+                    sprintf(
+                        'Queue could not be pushed to after %d attempts: message has not been delivered',
+                        $attemptNum,
+                    )
+                );
+                return;
+            }
+
+            // Otherwise add it to the timer
+            $wait = $this->jitter->calculateJitter($attemptNum);
+            $this->log->notice(
+                sprintf('Queue is likely rate-limited: waiting %d ms before trying again', $wait)
+            );
+            $this->loop->addTimer(
+                $wait / 1000,
+                fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
+            );
+        }
     }
 }

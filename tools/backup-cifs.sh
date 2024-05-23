@@ -6,7 +6,7 @@
 #
 # Usage:
 #       To be run nightly via crontab as root
-# 
+#
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
@@ -191,7 +191,7 @@ then
 
 	# Backup SQL
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of MySQL DB" >> $logfile;
-	mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
+	mysqldump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
 	if [ $? -ne 0 ];
 	then
 		echo -e "Error: SQL Backup Failed" >> $logfile;
@@ -199,7 +199,7 @@ then
 		then
 			echo  $? >> $logfile;
 		fi
-		
+
 	fi
 
 	# Backup redis db

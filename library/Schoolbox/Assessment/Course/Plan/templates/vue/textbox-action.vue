@@ -80,13 +80,32 @@ function onSaveClicked() {
             </button>
 
             <button v-if="isContentSaving" class="button">Saving...</button>
-            <button v-else-if="isCreatingTextbox" class="button">Creating Textbox...</button>
-            <button v-else-if="!textboxIsCreated" class="button" @click="onCreateClicked">Create Textbox</button>
-            <button v-else-if="contentIsSaved && !contentIsFocused" class="button" @click="onModifyClicked">
+            <button v-else-if="isCreatingTextbox" class="button">Creating...</button>
+            <button
+                v-else-if="!textboxIsCreated"
+                class="button"
+                :data-test="`unit-planner-textbox-action-create-${props.unit.id}-${props.column.id}`"
+                @click="onCreateClicked"
+            >
+                Create Text box
+            </button>
+            <button
+                v-else-if="contentIsSaved && !contentIsFocused"
+                class="button"
+                :data-test="`unit-planner-textbox-action-modify-${props.unit.id}-${props.column.id}`"
+                @click="onModifyClicked"
+            >
                 Modify
             </button>
             <!-- Use mouse down as clicking this will remove focus from the content, and cause it to collapse. -->
-            <button v-else class="button" @mousedown="onSaveClicked">Save</button>
+            <button
+                v-else
+                class="button"
+                :data-test="`unit-planner-textbox-action-save-${props.unit.id}-${props.column.id}`"
+                @mousedown="onSaveClicked"
+            >
+                Save
+            </button>
         </section>
     </div>
 </template>

@@ -138,12 +138,12 @@
                     </div>
                 </div>
                 <div class="small-12 column">
-                    <p id="error-msg" class="alert-box alert">{{ error }}</p>
+                    <p id="error-msg" data-test="login-error-msg" class="alert-box alert">{{ error }}</p>
                 </div>
                 {# Only show default login fields if Site settings allow it #}
                 <div class="small-12 column" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login>
-                    <input type="text" name="username" id="username" placeholder="Username" />
-                    <input type="password" name="password" id="password" placeholder="Password" />
+                    <input type="text" name="username" id="username" data-test="login-username" placeholder="Username" />
+                    <input type="password" name="password" id="password" data-test="login-password" placeholder="Password" />
                 </div>
             </div>
             <div class="row collapse">
@@ -172,14 +172,21 @@
 
                     {% if config.session_remember %}
                     <div class="small-12 column">
-                        <input id="rememberme" type="checkbox" name="rememberme" value="1" />
+                        <input id="rememberme" data-test="login-rememberme" type="checkbox" name="rememberme" value="1" />
                         <label for="rememberme">Remember me</label>
                     </div>
                     {% endif %}
                 {% endif %}
                 <div class="small-12 column login-links">
                     {# Only show default login fields if Site settings allow it #}
-                    <input type="submit" name="Submit" value="Login" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login />
+                    <input
+                        type="submit"
+                        name="Submit"
+                        value="Login"
+                        {% if not config.show_default_login %}style="display:none"{% endif %}
+                        data-test="login-submit"
+                        data-default-login
+                    />
 
                     {% if config.show_default_login %}
                         {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}

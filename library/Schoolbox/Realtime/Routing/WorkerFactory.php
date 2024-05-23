@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime\Routing;
 
+use Alaress\Jitter\IJitter;
 use Alaress\WorkerCrew\Worker\PipeWriter;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -22,7 +23,6 @@ use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Realtime\Routing\Filter;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
@@ -72,7 +72,8 @@ class WorkerFactory
         RoutePermissionMapper $routePermMapper,
         Schoolbox\Instance $instance,
         private FilesystemProxy $filesystemProxy,
-        EmailFactory $emailFactory
+        EmailFactory $emailFactory,
+        private IJitter $jitter,
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -112,7 +113,7 @@ class WorkerFactory
         $filter = (new Filter\FilterFactory($listFactory, $this->conf))->build();
 
         // setup a sorter
-        $sorter = new QueueSorter($filter, $this->log, $listFactory, $this->routePermMapper);
+        $sorter = new QueueSorter($filter, $this->log, $listFactory, $this->routePermMapper, $loop, $this->jitter);
 
         // use the route strat
         $strat = new Routing\DispatchStrategy();

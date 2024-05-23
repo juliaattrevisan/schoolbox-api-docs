@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -92,11 +93,11 @@ class Mapper extends BaseMapper
             null,
             [
                 null,
-                Model::LEARNOSITY_JOB_STATUS_PENDING,
-                Model::LEARNOSITY_JOB_STATUS_PROCESSING,
-                Model::LEARNOSITY_JOB_STATUS_COMPLETED,
-                Model::LEARNOSITY_JOB_STATUS_FAILED,
-                Model::LEARNOSITY_JOB_STATUS_UNPROCESSABLE,
+                Helper::LEARNOSITY_PROCESS_STATUS_PENDING,
+                Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+                Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED,
+                Helper::LEARNOSITY_PROCESS_STATUS_FAILED,
+                Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE,
             ],
         );
         $this->uses('learnosity_job_attempt_count', self::TYPE_INTEGER);

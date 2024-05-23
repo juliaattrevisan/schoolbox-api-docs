@@ -122,7 +122,7 @@ function parse_global_vars(){
   fi
   for i in $instance_list; do
     if ! INSTANCE_ID=$i schoolbox-read-instances --option INSTANCE_ID; then
-      error "instance id $i is invalid!"
+      error "instance id '$i' is invalid!"
       exit 1;
     fi
   done
@@ -163,13 +163,31 @@ function update_schoolbox_update_error_fact_file(){
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
 
+  log "Taking all instances offline (by enabling maintenance mode)..."
+  for i in $instance_list; do
+  {
+    # Note site_down runs an SQL UPDATE, so it only makes sense to call site_down on the primary host (only primary hosts have databases).
+    if [[ $is_primary_host == '1' ]]; then
+      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
+        log "Maintenance mode enabled on instance '$i'."
+      else
+        log "Could not enable maintenance mode on instance '$i'.  Exiting."
+        exit 1;
+      fi
+    else
+      log "Not enabling maintenance mode because not primary host."
+    fi
+  }
+  done
+  log "All instances are offline."
+
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
   {
     # Ensure instance's log file's directory exists
     mkdir -p /var/log/schoolbox/"$i"
     instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
-    log "upgrade starting for instance $i - logging to $instance_log_file";
+    log "Upgrade starting for instance '$i' - logging to $instance_log_file";
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -222,7 +240,19 @@ function upgrade_instances(){
         fi
       fi
     fi
-    log "upgrade complete for instance $i";
+    log "Upgrade complete for instance '$i'";
+
+    # Bring instance back online.
+    # Note site_up runs an SQL UPDATE, so it only makes sense to call site_up on the primary host (only primary hosts have databases).
+    if [[ $is_primary_host == '1' ]]; then
+      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_up.sh -eq 0 ; then
+        log "Maintenance mode disabled on instance '$i'."
+      else
+        log "Could not disable maintenance mode on instance '$i'.  Continuing."
+      fi
+    else
+      log "Not disabling maintenance mode because not primary host."
+    fi
   } &
   done
   # Wait for all child instance upgrades to complete
@@ -235,14 +265,6 @@ function restart_php_fpm(){
   log "Reloading php-fpm ..."
   service "$(systemctl -a  --plain --state=active | grep -Eo 'php.+fpm')" reload         # Ensure web requests use upgraded code
 }
-
-function remove_maintenance_page(){
-  # TODO, this will have no effect on cloud
-  if service nginx status >/dev/null 2>&1; then
-    "$site_root"/tools/maintenance/site_up.sh
-  fi
-}
-
 
 function restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
@@ -322,7 +344,6 @@ function main() {
   upgrade_instances
   update_schoolbox_update_error_fact_file
   restart_php_fpm
-  remove_maintenance_page
   restart_daemons
   rebuild_cron_jobs
   reload_binding_cache

@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Cli;
 use Interop\Queue\Exception as InteropQueueException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -38,7 +39,7 @@ class RestartPendingTool extends BaseTool
      */
     protected function getTargetedQuizStatus(): string
     {
-        return QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING;
+        return Helper::LEARNOSITY_PROCESS_STATUS_PENDING;
     }
 
     /**
@@ -100,7 +101,7 @@ class RestartPendingTool extends BaseTool
                 )
             );
             if ($this->perform()) {
-                $quiz->setLearnosityJobStatus(QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE);
+                $quiz->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE);
                 $this->assessmentDataSource->save($quiz, $quiz->getCreator());
             }
         } catch (InteropQueueException $e) {

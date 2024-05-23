@@ -46,7 +46,7 @@
                         <!-- BEGIN global_online -->
                         <div class="component-action">
                             <section>
-                                <a href="/adminv2/messages/configure" class="button">Configure Settings</a>
+                                <a href="/adminv2/notifications/configure" class="button">Configure Settings</a>
                             </section>
                         </div>
                         <!-- END global_online -->
@@ -63,7 +63,7 @@
                         </div>
                         <div class="component-action">
                             <section>
-                                <a href="/adminv2/messages/preview/instant" class="button" data-preview>Preview Instant</a><a href="/adminv2/messages/preview/digest" class="button" data-preview>Preview Digest</a>
+                                <a href="/adminv2/notifications/preview/instant" class="button" data-preview>Preview Instant</a><a href="/adminv2/notifications/preview/digest" class="button" data-preview>Preview Digest</a>
                             </section>
                         </div>
                     </section>
@@ -75,9 +75,9 @@
                     <section class="content">
                         <!-- BEGIN push_online -->
                         <ul>
-                            <li><a href="/adminv2/messages/apps">Configure push provider apps</a></li>
+                            <li><a href="/adminv2/notifications/apps">Configure push provider apps</a></li>
                             <li><a href="/adminv2/oauth">Configure oAuth providers</a></li>
-                            <li><a href="/adminv2/messages/puush">Review user app registrations</a></li>
+                            <li><a href="/adminv2/notifications/puush">Review user app registrations</a></li>
                         </ul>
                         <!-- END push_online -->
                         <!-- BEGIN push_offline -->
@@ -92,7 +92,7 @@
             <h2 class="subheader">Adjust Digest Schedules</h2>
 
             <!-- BEGIN digest_online -->
-            <form method="post" action="/adminv2/messages/digestForm.php">
+            <form method="post" action="/adminv2/notifications/digestForm.php">
                 <section>
                     <p class="content">You can modify which roles receive digest emails at which frequencies:</p>
 
@@ -139,4 +139,3 @@
         </div>
     </div>
 </div>
-

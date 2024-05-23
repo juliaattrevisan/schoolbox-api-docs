@@ -96,9 +96,9 @@
         var buttons = $();
 
         if (settings.hasConfirmButton) {
-            var okayButton = $('<a href="#" class="button submit" id="confirm-dialog-confirm-button" />').text(
-                settings.confirmLabel
-            );
+            var okayButton = $(
+                '<a href="#" class="button submit" id="confirm-dialog-confirm-button" data-test="confirm-dialog-confirm-button" />',
+            ).text(settings.confirmLabel);
 
             buttons.add(okayButton);
 
@@ -121,7 +121,7 @@
          */
         if (settings.hasCancelButton) {
             var cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button" />').text(
-                settings.cancelLabel
+                settings.cancelLabel,
             );
 
             buttons.add(cancelButton);

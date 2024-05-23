@@ -17,6 +17,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -80,7 +81,7 @@ class Duplicator
     public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
         // Return early if this is not a pending job
-        if ($destination->getLearnosityJobStatus() !== QuizDomainModel::LEARNOSITY_JOB_STATUS_PENDING) {
+        if ($destination->getLearnosityJobStatus() !== Helper::LEARNOSITY_PROCESS_STATUS_PENDING) {
             return $destination->getLearnosityJobReference();
         }
 
@@ -162,7 +163,7 @@ class Duplicator
                     [
                         $newLearnosityReference,
                         $learnosityJobReference,
-                        QuizDomainModel::LEARNOSITY_JOB_STATUS_PROCESSING,
+                        Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING,
                         $source->getId(),
                         $destination->getId(),
                     ],
@@ -221,7 +222,7 @@ class Duplicator
     {
         // Already complete or failed: don't bother re-checking
         $jobStatus = $quiz->getLearnosityJobStatus();
-        if ($jobStatus === QuizDomainModel::LEARNOSITY_JOB_STATUS_PROCESSING) {
+        if ($jobStatus === Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING) {
             // Check the API for this job's status
             $learnosityJobResponse = $this->api->dataGetRequest(
                 '/jobs',
@@ -236,7 +237,7 @@ class Duplicator
             if ($learnosityJobStatus === Api::JOB_STATUS_COMPLETED) {
                 $setTags      = true;
                 $updateStatus = true;
-                $jobStatus    = QuizDomainModel::LEARNOSITY_JOB_STATUS_COMPLETED;
+                $jobStatus    = Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED;
             } elseif ($learnosityJobStatus === Api::JOB_STATUS_HALTED) {
                 // TODO determine if this can be set to FAILED or UNPROCESSABLE
                 // There may be some status code which marks the job as
@@ -245,8 +246,8 @@ class Duplicator
                 // Just mark as unprocessable after enough failures.
                 $updateStatus = true;
                 $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
-                    ? QuizDomainModel::LEARNOSITY_JOB_STATUS_UNPROCESSABLE
-                    : QuizDomainModel::LEARNOSITY_JOB_STATUS_FAILED
+                    ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
+                    : Helper::LEARNOSITY_PROCESS_STATUS_FAILED
                 ;
             }
 

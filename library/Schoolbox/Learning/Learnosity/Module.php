@@ -200,6 +200,15 @@ class Module extends BaseModule
             $preloadAssessment,
         );
 
+        // Async callback for polling a quiz attempt's status
+        $this->register(
+            self::METHOD_POST,
+            '/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/poll',
+            'postPollQuizAttemptStatus',
+            $learnerCanComplete,
+            $preloadAttempt,
+        );
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);

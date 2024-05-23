@@ -8,10 +8,10 @@
 {% endblock studentMessage %}
 
 {% block teacherMessage %}
-    <a href="{{ createRouteType }}">Create {{ locale.dueWork }}</a>
+    <a href="{{ createRouteType }}" data-test="component-dueWork-empty-create-button">Create {{ locale.dueWork }}</a>
     that is not a part of your course to assess your students.
 {% endblock teacherMessage %}
 
 {% block createButton %}
-    <a href="{{ createRouteType }}" class="button">Create {{ locale.dueWork.proper }}</a>
+    <a href="{{ createRouteType }}" class="button" data-test="component-dueWork-create-button">Create {{ locale.dueWork.proper }}</a>
 {% endblock createButton %}

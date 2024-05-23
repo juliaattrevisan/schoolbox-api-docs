@@ -2,8 +2,7 @@
  * Once the editor has been created, we can add in any additional setup required
  */
 
-import type { Editor } from "@ckeditor/ckeditor5-core";
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { Editor, EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import { injectScript, isScriptAdded, isScriptLoaded, getScriptElement } from "@js/util/domUtils";
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 

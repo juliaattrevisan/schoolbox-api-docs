@@ -3,65 +3,42 @@
  * To display a curriculum overview component within the unit planner
  */
 
-import { watchIgnorable } from "@vueuse/core";
-import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
-import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
-import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
-import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
-import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
+import UpUnitCellCurriculumContentNodes from "./up-unit-cell-curriculum-content-nodes.vue";
+import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
 
 interface Props {
-    nodes: Node[]; // The nodes to display
-    selectedNodes: Node[]; // The selected nodes
-    folderId: number; // The folder id to display the nodes for
-    component: CurriculumOverviewComponent; // The component instance id to display the nodes on
+    unit: Unit; // the unit linked to the curriculum cell
+    column: Column; // the column linked to the curriculum cell
 }
 const props = defineProps<Props>();
 
 const curriculumStore = useUnitPlannerCurriculumStore();
-const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
+const component = window.Vue.ref<CurriculumOverviewComponent | null>(
+    curriculumStore.getComponent(props.unit.curriculum.components, props.column),
+);
 
 /**
- * To open the curriculum details modal when a node code is selected
+ * To respond to a new curriculum component being created
  */
 window.Vue.watch(
-    () => folderNodesStore().selectedDetailsNodeId,
+    () => props.unit.curriculum.components,
     () => {
-        curriculumStore.selectedDetailsNodeId = folderNodesStore().selectedDetailsNodeId;
+        component.value = curriculumStore.getComponent(props.unit.curriculum.components, props.column);
     },
+    { deep: true },
 );
-
-/**
- * So we can unset the selected details node id
- * so the same node can be opened again if desired
- */
-const { ignoreUpdates } = watchIgnorable(
-    () => curriculumStore.selectedDetailsNodeId,
-    () => {
-        if (curriculumStore.selectedDetailsNodeId !== UNSET_ID) {
-            ignoreUpdates(() => {
-                folderNodesStore().selectedDetailsNodeId = UNSET_ID;
-            });
-        }
-    },
-);
-
-/**
- * To ensure the entire node tree can be displayed within the unit cell
- */
-window.Vue.onMounted(async () => {
-    if (!folderNodesStore().hasLoaded) {
-        await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
-    }
-});
 </script>
 
 <template>
-    <div v-if="!folderNodesStore().hasLoaded" class="loader"></div>
-    <fn-list v-else :folder-id="props.folderId" :component-instance-id="props.component.componentId" :is-small="true" />
-    <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.component.componentId" />
+    <up-unit-cell-curriculum-content-nodes
+        v-if="component !== null"
+        :selected-nodes="props.unit.curriculum.selectedNodes"
+        :nodes="props.unit.curriculum.nodes ?? []"
+        :folder-id="props.unit.folderId"
+        :component="component"
+    />
 </template>
 
 <style scoped></style>

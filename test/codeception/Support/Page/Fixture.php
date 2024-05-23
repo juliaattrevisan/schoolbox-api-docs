@@ -186,12 +186,12 @@ class Fixture
     {
         $i = $this->tester;
         $i->amGoingTo('As Admin, check notification is not presented');
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->wait(2);
         $i->dontSee($notif);
         $i->amGoingTo('As Jana Reed, check notification is presented');
         $i->impersonateViaModifyUserPage('Ms Jana Reed');
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->wait(2);
         $i->see($notif);
         $i->logout();
@@ -207,12 +207,12 @@ class Fixture
     {
         $i = $this->tester;
         $i->amGoingTo('As Admin, check notification is not presented');
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->wait(2);
         $i->dontSee($notif);
         $i->amGoingTo('As Jana Reed, check notification is not presented');
         $i->impersonateViaModifyUserPage('Ms Jana Reed');
-        $i->amOnPage('/messages');
+        $i->amOnPage('/notifications');
         $i->wait(2);
         $i->dontSee($notif);
         $i->logout();

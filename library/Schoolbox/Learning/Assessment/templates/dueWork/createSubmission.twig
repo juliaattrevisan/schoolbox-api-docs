@@ -376,7 +376,7 @@ Data:
                             <div class="content">
                                 {# Submitted my own work checkbox #}
                                 <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
-                                <label for="editor-submittedInPerson" class="checkbox-label">
+                                <label for="editor-submittedInPerson" class="checkbox-label" data-test="assessment-submission-create-submittedInPerson">
                                     {% if isSubmitOnBehalfOf %}
                                         {{ student.givenName }} has submitted their work in person
                                     {% else %}
@@ -450,7 +450,8 @@ Data:
 
             <input type="submit"
                    value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
-                   data-action-save />
+                   data-action-save
+                   data-test="assessment-submission-create-submit" />
 
             <div class="toast" data-alert data-save-draft></div>
 

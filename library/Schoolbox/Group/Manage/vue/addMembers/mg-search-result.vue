@@ -67,7 +67,7 @@ function onSelected() {
     <button class="search-result" @click.prevent="onSelected">
         <div class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
-            <label :for="`checkbox-${result.id}`"></label>
+            <label :for="`checkbox-${result.id}`" :data-test="`manage-group-search-result-${result.id}`"></label>
         </div>
         <div>
             <span v-html="highlightNameSearch"></span>

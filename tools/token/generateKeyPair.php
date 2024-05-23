@@ -165,4 +165,5 @@ $options = [
 ];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+// Note this script needs to bypass the maintenance mode check because it is run from upgrade-instances.sh.
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();

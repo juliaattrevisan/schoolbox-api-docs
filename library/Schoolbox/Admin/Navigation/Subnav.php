@@ -605,30 +605,30 @@ class Subnav
                 'children'    => [],
                 'description' => 'Configure moderation and default values when posting and modifying news.',
             ],
-            '/adminv2/messages'                       => [
+            '/adminv2/notifications'                       => [
                 'name'       => 'Notifications',
                 'visible'    => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                 'searchable' => true,
                 'children'   => [
-                    '/adminv2/messages'           => [
+                    '/adminv2/notifications'           => [
                         'name'        => 'Home',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
                         'description' => 'Preview emailed notifications, and set a schedule for the sending of digest notifications.',
                     ],
-                    '/adminv2/messages/apps'      => [
+                    '/adminv2/notifications/apps'      => [
                         'name'        => 'Delivery Providers',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_MOBILE_PUSH_NOTIF_ENABLED),
                         'children'    => [],
                         'description' => 'Configure and review how push notifications are delivered to mobile phones.',
                     ],
-                    '/adminv2/messages/puush'     => [
+                    '/adminv2/notifications/puush'     => [
                         'name'        => 'Mobile App Registrations',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_MOBILE_PUSH_NOTIF_ENABLED),
                         'children'    => [],
                         'description' => 'Review the list of mobile devices that have registered to receive notifications.',
                     ],
-                    '/adminv2/messages/configure' => [
+                    '/adminv2/notifications/configure' => [
                         'name'        => 'Settings',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
@@ -736,28 +736,28 @@ class Subnav
                     '/adminv2/import/profile'            => [
                         'name'        => 'User Profiles',
                         'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
-                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
                         'name'        => 'Timetable Structure',
                         'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
-                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable'          => [
                         'name'        => 'Timetable',
                         'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
-                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
                         'name'        => 'Timetable Enrolment',
                         'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
-                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import the students and teachers in classes via CSV.',
                     ],

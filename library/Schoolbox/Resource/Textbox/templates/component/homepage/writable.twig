@@ -26,6 +26,7 @@
     <div class="content" data-textbox-exists>
         <article data-content
                  data-textbox-heading="{{ textbox.heading }}"
+                 data-test="component-textbox-{{ component.instance.id }}"
                  id="textBoxBody-{{ component.instance.id}}-{{ textbox.id }}" data-textbox-id="{{textbox.id}}">{{ textbox.body | purify }}</article>
     </div>
 

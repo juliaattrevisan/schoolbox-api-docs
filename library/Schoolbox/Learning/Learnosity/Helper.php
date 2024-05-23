@@ -49,11 +49,65 @@ class Helper
 
 
     /**
+     * Possible attempt statuses.
+     *
+     * @see https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#scores
+     */
+
+    /**
      * Attempt Status is sometimes Incomplete when students don't conclude
-     * their own attempts officially
+     * their own attempts officially.
      */
     public const LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE = 'Incomplete';
 
+    /**
+     * The attempt has been scored.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_COMPLETED = 'Completed';
+
+    /**
+     * The attempt has been discarded: not sure how this happens, but it is
+     * documented within Learnosity's API.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_DISCARDED = 'Discarded';
+
+    /**
+     * Attempt Status is sometimes Pending Scoring when Learnosity hasn't
+     * marked the attempt yet: in this case, set up a callback to mark this item
+     * later.
+     */
+    public const LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING = 'Pending Scoring';
+
+
+    /**
+     * Possible statuses for something in Schoolbox which is reliant upon
+     * Learnosity having run a process and returned a result.
+     * * PENDING: Learnosity hasn't started its process yet; it must be started,
+     *   and will then be set to PROCESSING
+     * * PROCESSING: Learnosity is currently running the process; its status
+     *   must be checked and set to either COMPLETED or FAILED
+     * * COMPLETED: the Learnosity process ran successfully
+     * * FAILED: the Learnosity process did not run successfully; its status may
+     *   be set back to PENDING to try again
+     * * UNPROCESSABLE: the Learnosity process either could not start, or it has
+     *   been determined it will never run successfully
+     *
+     * Possible Learnosity processes:
+     * * duplicating a quiz: this involves creating a Learnosity job
+     * * auto-marking: this involves sending marks to Learnosity and possibly
+     *   waiting for Learnosity to complete said job
+     */
+    public const LEARNOSITY_PROCESS_STATUS_PENDING = 'pending';
+    public const LEARNOSITY_PROCESS_STATUS_PROCESSING = 'processing';
+    public const LEARNOSITY_PROCESS_STATUS_COMPLETED = 'completed';
+    public const LEARNOSITY_PROCESS_STATUS_FAILED = 'failed';
+    public const LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE = 'unprocessable';
+
+    /**
+     * The default number of times the quiz attempt may be polled for completion
+     * before being marked as failed.
+     */
+    public const LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS = 10;
 
     /**
      * The configuration used for the regions to show in the Learnosity player
@@ -356,7 +410,12 @@ class Helper
 
 
     /**
-     * Process the completion of an attempt by retrieving the score and updating the attempt.
+     * Process whether an attempt has been completed, by retrieving its score
+     * from Learnosity and checking that score's status.
+     *
+     * If Learnosity reports that the score's status is
+     * `self::LEARNOSITY_PROCESS_STATUS_COMPLETED`: set the score from
+     * Learnosity into `$existingAttempt`.
      *
      * Uses the (learnosityReference, attemptId) tuple so you can't
      * randomly shut down some other dude's attempt; knowing their
@@ -378,6 +437,23 @@ class Helper
         QuizDomainModel $assessment,
         Model $existingAttempt
     ): void {
+        // Has this already been reviewed or marked?
+        // If so, mark this as complete and don't query Learnosity:
+        // the quiz attempt can already be considered as marked.
+        if ($existingAttempt->getReviewed() || $existingAttempt->getMark() !== null) {
+            $existingAttempt->setLearnosityStatus(self::LEARNOSITY_PROCESS_STATUS_COMPLETED);
+            $attemptMapper->save($existingAttempt);
+            return;
+        }
+
+        // Has the attempt already failed to mark too many times?
+        // Mark it as failed and don't query Learnosity.
+        if ($existingAttempt->getLearnosityPollCount() >= self::LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS) {
+            $existingAttempt->setLearnosityStatus(self::LEARNOSITY_PROCESS_STATUS_FAILED);
+            $attemptMapper->save($existingAttempt);
+            return;
+        }
+
         $student = $existingAttempt->getUser();
 
         $payload = [
@@ -406,39 +482,48 @@ class Helper
             throw new \UnexpectedValueException('Empty result payload for attempt.');
         }
 
-        /* Find out if this attempt was in Incomplete status
-         * Users don't always officially conclude their attempts
-         */
-//        if (Helper::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE === $result['data'][0]['status']) {
-//            /* FIXME Need to load their Session, then complete it on their behalf,
-//             *  then reload their $result like we originally tried...but how?
-//             *  There's no endpoint to update a Session's status...
-//             */
-//        }
+        // Set status depending on the result from Learnosity.
+        // If still pending scoring or incomplete:
+        // set it to processing, that will act as a signal to set up a poll.
+        $status = match ($result['data'][0]['status']) {
+            self::LEARNOSITY_ATTEMPT_STATUS_COMPLETED       => self::LEARNOSITY_PROCESS_STATUS_COMPLETED,
+            self::LEARNOSITY_ATTEMPT_STATUS_PENDING_SCORING => self::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+            self::LEARNOSITY_ATTEMPT_STATUS_DISCARDED       => self::LEARNOSITY_PROCESS_STATUS_FAILED,
+            self::LEARNOSITY_ATTEMPT_STATUS_INCOMPLETE      => self::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+            default                                         => null,
+        };
+        $existingAttempt
+            ->setLearnosityStatus($status)
+            ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
+        ;
 
-        /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $resultData = $result['data'][0];
-        $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
 
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
+        // If the process hasn't completed yet: don't set mark
+        if ($status === self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
+            /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
+             * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+             */
+            $resultData = $result['data'][0];
+            $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
 
-        /* Fabricate an IResponse instance for existing mark scheme
-         *
-         * Note that $existingResponse might well be null for broken data somehow,
-         * but we have no means to recover from that...and it shouldn't really
-         * occur naturally
-         */
-        $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+            $mark = $sanitisedScore['score'];
+            $maxMark = $sanitisedScore['max_score'];
 
-        // TODO What kind of error should we present to users? It's asynchronous
-        if (null === $existingResponse) {
-            return;
+            /* Fabricate an IResponse instance for existing mark scheme
+             *
+             * Note that $existingResponse might well be null for broken data somehow,
+             * but we have no means to recover from that...and it shouldn't really
+             * occur naturally
+             */
+            $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+
+            // TODO What kind of error should we present to users? It's asynchronous
+            if (null === $existingResponse) {
+                return;
+            }
+
+            $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
         }
-
-        $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, $mark, $maxMark);
 
         /* The finish time might already have been set if their timer elapsed;
          * If it did, just use that datetime. Otherwise, you'll be recording

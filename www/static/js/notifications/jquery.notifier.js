@@ -43,14 +43,17 @@
                 itemTimeFormat: "LLLL",
                 itemTextEmphasis: "b",
 
+                // have we run the auto notification reader (auto dismiss notif)
+                autoReadNotif: false,
+
                 // dictionary values
 
                 dictItemOthers: "others",
                 dictItemAnd: "and",
                 dictFooterSeeAll: "See All",
-                dictFooterNoMessages: "No Messages",
+                dictFooterNoMessages: "No Notifications",
             },
-            options
+            options,
         );
 
         var backoff = 0;
@@ -83,7 +86,7 @@
                 if (attemptReconnect && backoff < settings.maxRetry) {
                     jitter = parseInt(
                         Math.random() *
-                            Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout)
+                            Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout),
                     );
 
                     if (settings.debug) {
@@ -177,6 +180,11 @@
 
                 clearInterval(ii);
                 ii = setInterval(updateRelativeTimes, 9000);
+
+                // if we haven't run this yet, then auto read the messages
+                if (!settings.autoReadNotif) {
+                    self.autoUnread();
+                }
             }
 
             /**
@@ -361,6 +369,38 @@
 
                 // TODO use this somehow
             };
+
+
+            this.autoUnread = function (data) {
+                if (settings.debug) {
+                    console.log("auto unread called.");
+                }
+                /* On page load, if the url path matches the path of the unread notifications, we should mark that as read
+                 *
+                 * originally this matched the exact notif href, but some of those have specific tabs, or references  / anchors,
+                 * that are not navigated to when using the interface. so we need to match on path instead.
+                 */
+                const href = document.location.pathname;
+                document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
+                    if (!settings.autoReadNotif) {
+                        // no page found yet, keep looping
+                        let elmHref = new URL(element.getAttribute('href'), window.location.href);
+                        if (elmHref.pathname === href) {
+                            // get parent where we could mark as read
+                            let message = element.closest("[data-msgitem]");
+                            // if this is unread, mark as read, and exit
+                            if ('unread' === message.dataset.status) {
+                                if (settings.debug) {
+                                    console.log("found message to mark as read.");
+                                }
+                                var msgId = message.getAttribute('id').split("-")[1];
+                                send({ack: msgId})
+                                settings.autoReadNotif = true;
+                            }
+                        }
+                    }
+                });
+            }
 
             /**
              * Socket Event

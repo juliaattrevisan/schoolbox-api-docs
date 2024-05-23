@@ -84,8 +84,9 @@ export default {
 <template>
     <transition name="fade" :duration="{ enter: fadeDuration, leave: fadeDuration }">
         <div
-            ref="toast"
             v-if="!isHidden"
+            ref="toast"
+            data-test="toast"
             :class="{ pop: !hidden, toast: true, alert: isFailed, success: isDone }"
             :style="{ opacity: 1 }"
         >

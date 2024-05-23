@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
@@ -43,8 +44,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Creating textbox...");
+        activate("Creating text box...");
 
         try {
             // First create a new component
@@ -91,11 +91,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             const responseJSON = (await response.json()) as { id: number };
             storeUnit.textboxes[column.label].id = responseJSON.id;
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Textbox created", true, 2000);
+            timeout({ text: "Text box created successfully" });
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout(error, false, 2000);
+            timeout({ text: error as string, isSuccess: false });
         }
     }
 
@@ -116,8 +114,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        unitPlannerStore.toastEl!.activate("Saving...");
+        activate("Saving...");
 
         try {
             let response = null;
@@ -141,11 +138,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             storeUnit.textboxes[column.label].body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout("Save successful", true, 2000);
+            timeout({ text: "Text box saved successfully" });
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            unitPlannerStore.toastEl!.timeout(error, false, 2000);
+            timeout({ text: error as string, isSuccess: false });
         }
     }
 

@@ -1,34 +1,24 @@
 #!/usr/bin/env bash
 # Simple script to place schoolbox into maintenance mode.
-# 1. Ensures maintenance file is present
-# 2. Reloads nginx config to detect the presence of the file
-# IMPORTANT - IF YOU CHANGE THIS FILE, YOU MUST PORT THE SAME LOGICAL CHANGE TO debian/preinst
 
-# Check we're running as root
-if [[ "$EUID" -ne 0 ]]
-  then echo "Please run as root, aborting"
-  exit
+instanceId=${INSTANCE_ID:-0}
+
+if [[ "$instanceId" == '0' ]]; then
+  echo 'INSTANCE_ID not set.'
 fi
 
-echo 'Taking Schoolbox offline...';
+sql_user=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_user);
+sql_pass=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_passwd);
+sql_host=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_host);
+sql_schema=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_db);
 
-# Get this file's directory, and derive the maintenance filename relatively from it
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-maintenanceFileName="$DIR/../../.maintenance";
+# On success, MySQL will output nothing, and exit with status code 0.
+output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "UPDATE config SET value=1 WHERE name='maintenance_mode'" 2>&1)
+statusCode=$?
 
-# Does maintenance file already exist
-echo "Checking for maintenance file '$maintenanceFileName'..."
-if [[ -f ${maintenanceFileName} ]]; then
-  echo "Maintenance file already present.";
+if [[ "$output" == '' && statusCode -eq 0 ]]; then
+  exit 0
 else
-  echo "Maintenance file not present, creating...";
-  touch ${maintenanceFileName};
-  if [[ $? != 0 ]]; then
-    echo "Unable to create maintenance file, exiting";
-    exit 1;
-  fi;
-  echo "Maintenance file created at '$maintenanceFileName'";
-fi;
-
-# Production servers use 'open_file_cache', need to reload to detect file change
-nginx -s reload
+  echo "Could not enable maintenance mode for instance '$instanceId' due to error: $output"
+  exit 1
+fi

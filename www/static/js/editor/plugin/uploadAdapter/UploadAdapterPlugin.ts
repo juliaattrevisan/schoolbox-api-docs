@@ -4,7 +4,7 @@
  */
 
 import UploadAdapter from "@js/editor/plugin/uploadAdapter/UploadAdapter";
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Editor } from "@js/editor/types/editorTypes";
 
 /**
  * Add our custom upload adapter

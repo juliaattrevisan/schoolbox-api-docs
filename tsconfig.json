@@ -13,7 +13,8 @@
             "@schoolboxAssessment/*": ["library/Schoolbox/Assessment/*"],
             "@schoolboxLearnosity/*": ["library/Schoolbox/Learning/Learnosity/templates/*"],
             "@schoolboxVue/*": ["vue/*"],
-            "@js/*": ["www/static/js/*"]
+            "@schoolboxTest/*": ["test/*"],
+            "@js/*": ["www/static/js/*"],
         },
         "skipLibCheck": true, // Skip type checking of declaration file:  https://www.typescriptlang.org/tsconfig#skipLibCheck
         "strict": true, // The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness.
@@ -41,5 +42,7 @@
         "types/**/*",
         "vue/**/*",
         "www/static/js/**/*",
+        "test/playwright/**/*",
+        "playwright.config.ts",
     ]
 }

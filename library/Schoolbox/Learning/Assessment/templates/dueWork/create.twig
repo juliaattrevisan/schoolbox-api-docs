@@ -18,7 +18,7 @@
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
+    <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
 
     <div class="row">
 
@@ -68,7 +68,7 @@
     </div>
 
     <label for="assessment-description">Description</label>
-    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
 
     {% include 'sub/attachzone.twig' %}
 
@@ -88,7 +88,7 @@
     <div class="row">
         <div class="medium-6 columns">
             <label for="acceptOnline">Accepts Online Submissions?</label>
-            <select name="acceptOnline" id="acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
+            <select name="acceptOnline" id="acceptOnline" data-test="assessment-form-select-acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
                 {% set options = {
                     0: 'None',
                     1: 'Single',

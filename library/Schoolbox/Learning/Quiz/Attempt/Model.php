@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Quiz\Attempt;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -93,6 +94,18 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     private ?string $learnosityReference = null;
+
+    /**
+     * The status of the Learnosity score calculation.
+     *
+     * @var Helper::LEARNOSITY_PROCESS_STATUS_*|null
+     */
+    private ?string $learnosityStatus = null;
+
+    /**
+     * The number of times the Learnosity score calculation has been polled.
+     */
+    private ?int $learnosityPollCount = null;
 
     /**
      * Is this deleted?
@@ -421,6 +434,42 @@ class Model implements ISoftDeletable
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLearnosityStatus(): ?string
+    {
+        return $this->learnosityStatus;
+    }
+
+    /**
+     * @param string|null $learnosityStatus
+     * @return $this
+     */
+    public function setLearnosityStatus(?string $learnosityStatus): self
+    {
+        $this->learnosityStatus = $learnosityStatus;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLearnosityPollCount(): ?int
+    {
+        return $this->learnosityPollCount;
+    }
+
+    /**
+     * @param int|null $learnosityPollCount
+     * @return $this
+     */
+    public function setLearnosityPollCount(?int $learnosityPollCount): self
+    {
+        $this->learnosityPollCount = $learnosityPollCount;
         return $this;
     }
 }

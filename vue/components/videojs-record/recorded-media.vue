@@ -304,6 +304,7 @@ export default {
                 ref="deleteButton"
                 v-if="!hasError"
                 @click.prevent="onDeleteRecordingSelected"
+                data-test="videojs-record-delete-button"
                 class="button icon-delete delete-button"
                 title="Delete recording"
             ></a>
@@ -319,7 +320,13 @@ export default {
         >
             <p>Are you sure you wish to delete the current {{ currentRecordingType }}?</p>
             <div class="modal-actions">
-                <button class="submit" @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
+                <button
+                    class="submit"
+                    @click.prevent="onConfirmDeleteRecordingSelected"
+                    data-test="videojs-record-delete-button-confirm"
+                >
+                    Confirm
+                </button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
             </div>
         </over-media-modal>

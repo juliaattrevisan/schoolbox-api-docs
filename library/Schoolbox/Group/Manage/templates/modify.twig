@@ -1,6 +1,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
-<div id="manage-group-container">
+<div id="manage-group-container" data-test="manage-group-container">
     <manage-group
             show-setting="{{ showSetting }}"
             group-staff-only="{{ config.group_staff_only }}"

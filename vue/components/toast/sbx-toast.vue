@@ -14,8 +14,8 @@ const STATE_PENDING = "pending";
 const STATE_DONE = "done";
 const STATE_FAILED = "failed";
 
-const DEFAULT_FADE_DURATION = 2000;
-const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 2000;
+const DEFAULT_FADE_DURATION = 3000;
+const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
 const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
 const text = window.Vue.ref("");
@@ -95,6 +95,8 @@ window.Vue.onMounted(() => {
         v-if="state !== STATE_HIDDEN"
         :class="{ pop: !hidden, toast: true, alert: state === STATE_FAILED, success: state === STATE_DONE }"
         :style="{ opacity: 1 }"
+        data-test="toast"
+        :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
     </div>

@@ -233,7 +233,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     position: fixed;
     right: -999px; //ensure doesn't interfere while inactive
     text-align: center;
-    z-index: var(--depth-pop-over);
+    z-index: var(--depth-toast);
     transition: opacity 0.3s;
     &.pop {
         right: 1rem;
