@@ -46,6 +46,16 @@ class RepairBrokenTool extends CliTool\App
      */
     private array $learnosityActivity = [];
 
+    /**
+     * helper to not memory leak multiple importer classes when bulk repairing
+     */
+    private ?ImporterTool $importerTool = null;
+
+    /**
+     * helper to not memory leak multiple cli apps when bulk repairing
+     */
+    private ?CliTool\Kernel $importerApp = null;
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -142,14 +152,17 @@ class RepairBrokenTool extends CliTool\App
         }
 
         /**
-         * spawn the original learnosity importer tool (rather than re build its functionality)
+         * use the original learnosity importer tool (rather than re build its functionality)
          * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
          */
-        $app = new ImporterTool();
-        $app->setAssessmentId($assessmentId);
+        $this->importerTool->setAssessmentId($assessmentId);
         $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
-        (new CliTool\Kernel($app, $options))->runApp();
+        // if we don't have a importerApp spawned, spawn that now, so we don't keep spawning every time
+        if (null === $this->importerApp) {
+            $this->importerApp = new CliTool\Kernel($this->importerTool, $options);
+        }
+        $this->importerApp->runApp();
 
         // wait for learnosity to persist the data to where it needs to be
         // just set a random number (15sec may be enough..)
@@ -219,6 +232,11 @@ HELP;
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger(),
         );
+
+        // if repairing, spawn the repair app and cache that.
+        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+            $this->importerTool = new ImporterTool();
+        }
 
         // if assessment (no search)
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
