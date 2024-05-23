@@ -82,7 +82,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     {
         if ($config->get('maintenance_mode')) {
             echo "Exiting because this instance is in maintenance mode.\n";
-            exit(0); // Exit with error code 0 to indicate that the script did not complete normally.
+            exit(self::EXIT_STATUS_APP_ERROR);
         }
     }
 
