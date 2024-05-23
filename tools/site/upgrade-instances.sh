@@ -202,7 +202,7 @@ function upgrade_instances(){
 
     if [[ $is_primary_host == '1' ]]; then
     {
-      echo "running update"
+      echo "Running update scripts."
       INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh
       # Ensure instance has JWT keys deployed. TODO, should be run once only on install, not on upgrade
       INSTANCE_ID="$i" php "$site_root"/tools/token/generateKeyPair.php --quiet
