@@ -163,23 +163,24 @@ function update_schoolbox_update_error_fact_file(){
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
 
-  log "Taking all instances offline (by enabling maintenance mode)..."
-  for i in $instance_list; do
-  {
-    # Note site_down runs an SQL UPDATE, so it only makes sense to call site_down on the primary host (only primary hosts have databases).
-    if [[ $is_primary_host == '1' ]]; then
-      if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
-        log "Maintenance mode enabled on instance '$i'."
-      else
-        log "Could not enable maintenance mode on instance '$i'.  Exiting."
-        exit 1;
-      fi
-    else
-      log "Not enabling maintenance mode because not primary host."
-    fi
-  }
-  done
-  log "All instances are offline."
+  if [[ $is_primary_host == '1' ]]; then
+    # Note site_down runs an SQL UPDATE, so it only makes sense to call site_down on the primary host.
+    # (databases exist on the primary host only).
+    log "This is the primary host, so taking all instances offline (by enabling maintenance mode)..."
+    for i in $instance_list; do
+    {
+        if INSTANCE_ID="$i" "$site_root"/tools/maintenance/site_down.sh -eq 0 ; then
+          log "Maintenance mode enabled on instance '$i'."
+        else
+          log "Could not enable maintenance mode on instance '$i'.  Exiting."
+          exit 1;
+        fi
+    }
+    done
+    log "All instances are offline."
+  else
+    log "Not enabling maintenance mode because not primary host."
+  fi
 
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
