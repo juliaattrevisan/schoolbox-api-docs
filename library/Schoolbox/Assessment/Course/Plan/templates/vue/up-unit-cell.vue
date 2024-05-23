@@ -15,6 +15,7 @@ import type { Unit } from "./unitPlannerTypes";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 import RubricCapabilities from "./rubric-capabilities.vue";
+import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubricCapabilities-action.vue";
 import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubricCapabilities-empty.vue";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
@@ -288,7 +289,6 @@ window.Vue.onUnmounted(() => {
                 <up-unit-cell-rubricCapabilities-empty
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                     :unit="props.unit"
-                    :column="props.column"
                 />
                 <up-unit-cell-curriculum-empty
                     v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
@@ -307,6 +307,10 @@ window.Vue.onUnmounted(() => {
                 <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
+                />
+                <up-unit-cell-rubricCapabilities-action
+                    v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
+                    :unit="props.unit"
                 />
                 <up-unit-cell-curriculum-action
                     v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
