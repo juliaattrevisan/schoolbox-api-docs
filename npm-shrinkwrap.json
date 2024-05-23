@@ -118,7 +118,8 @@
         "@types/jest": "~29.5.12",
         "@types/jquery": "~3.5.29",
         "@types/jqueryui": "~1.12.21",
-        "@types/node": "^20.12.10",
+        "@types/node": "~20.12.10",
+        "@types/vue-select": "~3.16.8",
         "@typescript-eslint/eslint-plugin": "~6.21.0",
         "@typescript-eslint/parser": "~6.21.0",
         "@vue/test-utils": "~2.4.4",
@@ -9397,6 +9398,56 @@
       "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz",
       "integrity": "sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==",
       "dev": true
+    },
+    "node_modules/@types/vue-select": {
+      "version": "3.16.8",
+      "resolved": "https://registry.npmjs.org/@types/vue-select/-/vue-select-3.16.8.tgz",
+      "integrity": "sha512-ZBovlBrWf/wnPqCmMw24ryIC7ghQLfIBmkl1qssqBGONdx7yOmi/GLwtPxll/6UwXWGNWMeokleOgVAZPis+Ag==",
+      "dev": true,
+      "dependencies": {
+        "vue": "^2.0.0"
+      }
+    },
+    "node_modules/@types/vue-select/node_modules/@vue/compiler-sfc": {
+      "version": "2.7.16",
+      "resolved": "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-2.7.16.tgz",
+      "integrity": "sha512-KWhJ9k5nXuNtygPU7+t1rX6baZeqOYLEforUPjgNDBnLicfHCoi48H87Q8XyLZOrNNsmhuwKqtpDQWjEFe6Ekg==",
+      "dev": true,
+      "dependencies": {
+        "@babel/parser": "^7.23.5",
+        "postcss": "^8.4.14",
+        "source-map": "^0.6.1"
+      },
+      "optionalDependencies": {
+        "prettier": "^1.18.2 || ^2.0.0"
+      }
+    },
+    "node_modules/@types/vue-select/node_modules/prettier": {
+      "version": "2.8.8",
+      "resolved": "https://registry.npmjs.org/prettier/-/prettier-2.8.8.tgz",
+      "integrity": "sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==",
+      "dev": true,
+      "optional": true,
+      "bin": {
+        "prettier": "bin-prettier.js"
+      },
+      "engines": {
+        "node": ">=10.13.0"
+      },
+      "funding": {
+        "url": "https://github.com/prettier/prettier?sponsor=1"
+      }
+    },
+    "node_modules/@types/vue-select/node_modules/vue": {
+      "version": "2.7.16",
+      "resolved": "https://registry.npmjs.org/vue/-/vue-2.7.16.tgz",
+      "integrity": "sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw==",
+      "deprecated": "Vue 2 has reached EOL and is no longer actively maintained. See https://v2.vuejs.org/eol/ for more details.",
+      "dev": true,
+      "dependencies": {
+        "@vue/compiler-sfc": "2.7.16",
+        "csstype": "^3.1.0"
+      }
     },
     "node_modules/@types/web-bluetooth": {
       "version": "0.0.20",
@@ -36622,6 +36673,46 @@
       "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz",
       "integrity": "sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==",
       "dev": true
+    },
+    "@types/vue-select": {
+      "version": "3.16.8",
+      "resolved": "https://registry.npmjs.org/@types/vue-select/-/vue-select-3.16.8.tgz",
+      "integrity": "sha512-ZBovlBrWf/wnPqCmMw24ryIC7ghQLfIBmkl1qssqBGONdx7yOmi/GLwtPxll/6UwXWGNWMeokleOgVAZPis+Ag==",
+      "dev": true,
+      "requires": {
+        "vue": "^2.0.0"
+      },
+      "dependencies": {
+        "@vue/compiler-sfc": {
+          "version": "2.7.16",
+          "resolved": "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-2.7.16.tgz",
+          "integrity": "sha512-KWhJ9k5nXuNtygPU7+t1rX6baZeqOYLEforUPjgNDBnLicfHCoi48H87Q8XyLZOrNNsmhuwKqtpDQWjEFe6Ekg==",
+          "dev": true,
+          "requires": {
+            "@babel/parser": "^7.23.5",
+            "postcss": "^8.4.14",
+            "prettier": "^1.18.2 || ^2.0.0",
+            "source-map": "^0.6.1"
+          }
+        },
+        "prettier": {
+          "version": "2.8.8",
+          "resolved": "https://registry.npmjs.org/prettier/-/prettier-2.8.8.tgz",
+          "integrity": "sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==",
+          "dev": true,
+          "optional": true
+        },
+        "vue": {
+          "version": "2.7.16",
+          "resolved": "https://registry.npmjs.org/vue/-/vue-2.7.16.tgz",
+          "integrity": "sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw==",
+          "dev": true,
+          "requires": {
+            "@vue/compiler-sfc": "2.7.16",
+            "csstype": "^3.1.0"
+          }
+        }
+      }
     },
     "@types/web-bluetooth": {
       "version": "0.0.20",
