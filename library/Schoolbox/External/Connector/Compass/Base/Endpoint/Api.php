@@ -80,7 +80,7 @@ class Api implements IApi
          */
         $this->host = rtrim($host, '/') . '/';
 
-        $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($this->host, $apiKey, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
