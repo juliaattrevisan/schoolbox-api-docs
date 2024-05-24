@@ -10,6 +10,7 @@ namespace Schoolbox\Paperly;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Iframe\Validator;
 use Twig\Error\Error;
 
 class Controller extends Base
@@ -80,6 +81,24 @@ class Controller extends Base
     }
 
     /**
+     * Checking whether the iframe url is valid
+     *
+     * @param string $iframeUrl
+     * @throws Exception
+     * @throws Error
+     */
+    private function validatingIframeEndpoints($iframeUrl) : void
+    {
+        if (null === $iframeUrl) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($iframeUrl)) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+    }
+
+    /**
      * Get a list of Paperly links to redirect to the matching iframes
      *
      * Returns data as JSON
@@ -92,7 +111,7 @@ class Controller extends Base
 
         foreach ($this->paperlyPayload['features'] as $feature) {
             $key = array_keys($feature)[0];
-            $paperlyLinks['features'][$key] = "/paperly/view/" . strtolower($key);
+            $paperlyLinks['features'][][$key] = "/paperly/view/" . strtolower($key);
         }
 
         $upcomingActions = [];
@@ -126,9 +145,7 @@ class Controller extends Base
             }
         }
 
-        if (null === $iframeUrl) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
+        $this->validatingIframeEndpoints($iframeUrl);
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
             'url' => $iframeUrl
@@ -146,9 +163,7 @@ class Controller extends Base
     {
         $iframeUrl = $this->paperlyPayload['upcoming'][$order]['url'] ?? null;
 
-        if (null === $iframeUrl) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
+        $this->validatingIframeEndpoints($iframeUrl);
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
             'url' => $iframeUrl
