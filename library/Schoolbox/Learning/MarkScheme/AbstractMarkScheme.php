@@ -27,6 +27,24 @@ abstract class AbstractMarkScheme implements IMarkScheme
 
 
     /**
+     * The twig file that represents a subclass of AbstractMarkScheme
+     * These are found in the MarkScheme/templates folder and correspond exactly
+     *
+     * @var string
+     */
+    protected string $template = '';
+
+
+    /**
+     * @return string
+     */
+    public function getTemplate(): string
+    {
+        return $this->template;
+    }
+
+
+    /**
      * Get this Mark Scheme instance's name
      *
      * @return string

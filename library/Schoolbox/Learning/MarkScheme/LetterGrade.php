@@ -20,6 +20,15 @@ class LetterGrade extends AbstractMarkScheme
 
     const TITLE = 'Letter Grade';
 
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = 'LetterGrade';
+
+
     /** @var GradeGroup */
     private $gradeGroup;
 

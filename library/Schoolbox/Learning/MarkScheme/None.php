@@ -23,6 +23,15 @@ class None extends AbstractMarkScheme
      */
     const QUANTITATIVE = false;
 
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = '';
+
+
     /**
      * @inheritdoc
      */

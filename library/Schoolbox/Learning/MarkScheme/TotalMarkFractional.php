@@ -35,6 +35,14 @@ class TotalMarkFractional extends TotalMarkAbstract
 
 
     /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = 'TotalMarkFractional';
+
+
+    /**
      * @inheritdoc
      */
     public function __construct($totalMark = null)

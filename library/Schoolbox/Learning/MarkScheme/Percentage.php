@@ -25,6 +25,15 @@ class Percentage extends AbstractMarkScheme
      */
     const QUANTITATIVE = true;
 
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = 'Percentage';
+
+
     /**
      * @inheritdoc
      * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
