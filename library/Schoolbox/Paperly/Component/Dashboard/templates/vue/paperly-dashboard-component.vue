@@ -8,9 +8,14 @@
 import { timeout } from "@js/util/jsUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import { payload } from "./tempPayload";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
+
+interface Props {
+    getPaperlyViewEndpoint: string //The endpoint for fetching the list of Paperly items and its iframe urls
+}
+
+const props = defineProps<Props>();
 
 const tempPayload = window.Vue.ref<PaperlyPayload | undefined>();
 const viewMore = window.Vue.ref(false); // to show all upcoming tasks, only show the first three by default
@@ -23,14 +28,9 @@ const hasLoadError = window.Vue.ref(false); // to show an error message if the p
 async function loadPayload() {
     try {
         isProcessing.value = true;
-        const response = await fetch(`/api/curriculum/`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch(props.getPaperlyViewEndpoint);
         if (response.ok) {
-            // const payload = (await response.json()) as PaperlyPayload;
-            tempPayload.value = payload;
+            tempPayload.value = (await response.json()) as PaperlyPayload;
         } else {
             hasLoadError.value = true;
         }
