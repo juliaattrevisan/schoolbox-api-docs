@@ -77,23 +77,26 @@ class Controller extends Base
         }';
         $this->paperlyPayload = json_decode($this->dummyPayload, true);
 
-        //TODO optimizing the process and adding caching to the payload
+        //TODO optimizing the process and adding caching(?) to the payload
     }
 
     /**
      * Checking whether the iframe url is valid
      *
-     * @param string $iframeUrl
+     * @param null|string $iframeUrl
      * @throws Exception
      * @throws Error
      */
-    private function validatingIframeEndpoints($iframeUrl) : void
+    private function validatingIframeEndpoints(null|string $iframeUrl): void
     {
+        //Checking if the target endpoint exists
         if (null === $iframeUrl) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
+        //Making sure the url is safe to load in the iframe from payload
         if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($iframeUrl)) {
+            //TODO error message might not accurately telling the user it's missing the url in the safe list
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
