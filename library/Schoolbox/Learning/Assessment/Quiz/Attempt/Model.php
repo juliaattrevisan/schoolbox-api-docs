@@ -78,6 +78,15 @@ class Model extends AbstractResponse
      */
     private ?int $learnosityPollCount = null;
 
+
+    /**
+     * The Overall Comment for an attempt
+     *
+     * @var string|null
+     */
+    private ?string $comment = null;
+
+
     /**
      * @return Alaress_Date_Format|null
      */
@@ -238,6 +247,27 @@ class Model extends AbstractResponse
     public function setLearnosityPollCount(?int $learnosityPollCount): self
     {
         $this->learnosityPollCount = $learnosityPollCount;
+        return $this;
+    }
+
+
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+
+    /**
+     * @param string|null $comment
+     * @return $this
+     */
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
         return $this;
     }
 }

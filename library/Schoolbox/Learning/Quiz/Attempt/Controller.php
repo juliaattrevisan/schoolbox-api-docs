@@ -63,18 +63,27 @@ class Controller extends Base
              */
             $attempt = $this->attemptMapper->findById($postData['responseId']);
         } else {
-            /* Create a whole new random attempt with some defaults
+            /* Find the most recent attempt/feedback and amend that, if it exists;
+             * it sounds really weird, but it's because the feedback and the submission
+             * are in the same table and model.
+             */
+            $attempt = $assessment->getParticipant($student)->findMostRecentSubmittedResponse();
+
+            /* If a feedback didn't already exist,
+             * create a whole new random attempt with some defaults
+             *
              * TODO make defaults editable via Attempt Editor
              */
-            $quiz = $this->getQuizForAssessmentId($assessment->getId());
+            if (null === $attempt) {
+                $quiz = $this->getQuizForAssessmentId($assessment->getId());
 
-            $attempt = $this->attemptMapper->createModel()
-                ->setQuiz($quiz)
-                ->setUser($student)
-                ->setStart(\Alaress_Date_Format::now())
-                ->setFinish(\Alaress_Date_Format::now());
+                $attempt = $this->attemptMapper->createModel()
+                    ->setQuiz($quiz)
+                    ->setUser($student)
+                    ->setStart(\Alaress_Date_Format::now())
+                    ->setFinish(\Alaress_Date_Format::now());
+            }
         }
-
 
         /* Assign the maximum available marks based on what's potentially available
          * TODO check what happens with other mark schemes
