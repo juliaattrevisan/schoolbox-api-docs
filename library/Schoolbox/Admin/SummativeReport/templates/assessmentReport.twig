@@ -40,7 +40,7 @@
                 <div>
                     {% set grade = assessment.humanReadableMark(participant, true) %}
                     {% if "1" == options.workType[assessment.workType.id].grades and grade %}
-                        <p class="grade break-word">{{ grade }}</p>
+                        <p class="grade">{{ grade }}</p>
                     {% endif %}
                 </div>
             {% endif %}

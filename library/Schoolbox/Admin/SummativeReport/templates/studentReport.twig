@@ -187,6 +187,7 @@
      *
      * Allot 8rem for it, and right-align it so it
      * lines up with the right edge of the page.
+     * break-word prevent word break on grade area
      */
     .grade {
         font-size: 1.5rem;
@@ -196,6 +197,7 @@
         padding-right: 0.75rem;
         min-width: 8rem;
         text-align: right;
+        overflow-wrap: break-word;
     }
 
     /* Comments, if provided, are generally plaintext but could be ckeditor stuff
@@ -419,11 +421,6 @@
     /* Make the first letter uppercase... */
     .summative-graph-type::first-letter {
         text-transform: uppercase;
-    }
-
-    /* Prevent word break on grade area */
-    .break-word{
-        overflow-wrap: break-word;
     }
 
     /* Apply measured margins to report. You can adjust those to suit
