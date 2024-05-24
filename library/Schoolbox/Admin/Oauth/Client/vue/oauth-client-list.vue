@@ -117,7 +117,6 @@ async function addClient() {
     }
     if (addingClient.value.redirectUri === "") {
         hasNoRedirect.value = true;
-        return;
     }
     if (hasNoName.value || hasNoRedirect.value) {
         return;
@@ -180,8 +179,7 @@ async function modifyItem(client: OAuthClient) {
     if (hasNoName.value || hasNoRedirect.value) {
         return;
     }
-    hasNoName.value = false;
-    hasNoRedirect.value = false;
+    resetValidationChecks();
     try {
         if (!client._links?.patch) {
             throw new Error("No patch link found for client");
