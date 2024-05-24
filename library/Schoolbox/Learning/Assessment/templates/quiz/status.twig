@@ -281,7 +281,7 @@
                              # lookup for each person, and in the absence of an attempt, ask Learnosity for
                              # what's available at the moment.
                              #}
-                            {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                                 assessment:  assessment,
                                 participant: participant,
                                 feedback:    latestFeedback,

@@ -2,7 +2,7 @@
     {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
 </h2>
 
-{% set gradable = selfAssess and 'none' != markSchemeName | lower %}
+{% set gradable = selfAssess and '' != assessment.markScheme.template %}
 
 {% set rubricText = ''  %}
 {% set selfAssessText = '' %}
@@ -46,7 +46,7 @@
     {% if gradable %}
         <div class="small-12 medium-3 column">
             <label>{{ locale.grades.proper }}
-                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                     participant: participant,
                     feedback: feedback,
                     markScheme: assessment.markScheme,

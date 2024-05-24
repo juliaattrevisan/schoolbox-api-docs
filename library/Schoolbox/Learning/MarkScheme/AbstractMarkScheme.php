@@ -45,18 +45,6 @@ abstract class AbstractMarkScheme implements IMarkScheme
 
 
     /**
-     * Get this Mark Scheme instance's name
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        $c = get_class($this);
-        return substr($c, strrpos($c, '\\') + 1);
-    }
-
-
-    /**
      * Bounds checks a normalised mark
      *
      * @param float $normalisedMark

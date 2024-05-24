@@ -239,7 +239,6 @@ class Controller extends Base
             'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->requestQuery->get('hash'),
-            'markSchemeName' => $assessment->getMarkScheme()->getName(),
 
             /* The Student Carousel is the selectize thing that cycles between the currently
              * selected student and the previous/next students participating in the assessment

@@ -71,7 +71,7 @@
                 <div class="small-12 medium-3 column">
                     <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
                         <label>{{ locale.grades.proper }}
-                            {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                                 assessment:  assessment,
                                 participant: participant,
                                 feedback:    latestFeedback ?? null,

@@ -1028,7 +1028,6 @@ class Controller extends Base
              */
             'participant' => $assessment->getParticipant($student),
             'feedback' => $attempt,
-            'markSchemeName' => $assessment->getMarkScheme()->getName(),
             'maxMarks' => $attempt->getMaxMark(),
             'errors' => $this->stateMapper->listDisplayValues(),
         ], sprintf(

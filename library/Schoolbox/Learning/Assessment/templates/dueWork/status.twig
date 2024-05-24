@@ -7,7 +7,6 @@
      - statusPending:    a string representing the 'pending'    state
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
-     - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
      - selfAssess:        bool            Is this being viewed in a self assessment context?
@@ -104,7 +103,7 @@
     {% endset %}
 
     {% set inputNo = 1 %}
-    {% if 'none' == markSchemeName | lower %}
+    {% if '' == assessment.markScheme.template %}
         {% set inputsPerFeedback = 2 %}
     {% else %}
         {% set inputsPerFeedback = 3 %}
@@ -150,10 +149,10 @@
                 <input type="hidden" name="responseId" value="{{ response.id ?? '' }}"/>
 
                 <div class="row">
-                    {% if 'none' != markSchemeName | lower %}
+                    {% if '' != assessment.markScheme.template %}
                         <div class="small-12 medium-3 column">
                             <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                                     participant: participant,
                                     feedback:    participant.findMostRecentInstructorGivenFeedback,
                                     markScheme:  assessment.markScheme,
@@ -173,7 +172,7 @@
                         </div>
 
                     {% endif %}
-                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                    <div class="small-12{% if '' != assessment.markScheme.template %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
                             feedback:       participant.findMostRecentInstructorGivenFeedback,
                             participant:    participant,
@@ -184,7 +183,7 @@
                             blindMode:      false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
-                        {% if 'none' == markSchemeName | lower %}
+                        {% if '' != assessment.markScheme.template %}
                             {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 participant: participant,
