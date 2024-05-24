@@ -76,6 +76,7 @@ class Controller extends Base
              * If that exists, recycle it; otherwise spawn a new one altogether.
              */
             if (null !== $response) {
+
                 $attempt = $this->attemptMapper->findById($response->getId());
             } else {
                 /* If a feedback didn't already exist,
@@ -109,6 +110,13 @@ class Controller extends Base
          */
         $mark = trim((string)$postData['mark']);
 
+        /* Default values
+         * Note that $mark might be empty string at this point:
+         * this occurs when you add a comment before the grade, in the Quiz Quickmark screen
+         */
+        $normalisedMark = null;
+        $humanReadableMark = null;
+
         /* Apparently this is how you detect a Submission State: an exception is thrown
          * trying to interpret it as one of the Mark Schemes. No wonder it was classified
          * as the $errors var. Wild!
@@ -119,13 +127,15 @@ class Controller extends Base
             $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark($mark);
             $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
         } catch (\InvalidArgumentException $e) {
-            /* If it's a Submission State, save the text as the human readable mark
-             * and derive its normalised mark from the uh Lists in admin
-             */
-            $code = $this->stateMapper->findOneByColumn('display_as', $mark);
+            if ('' !== $mark) {
+                /* If it's a Submission State, save the text as the human readable mark
+                 * and derive its normalised mark from the uh Lists in admin
+                 */
+                $code = $this->stateMapper->findOneByColumn('display_as', $mark);
 
-            $normalisedMark = $code->getNormaliseAs();
-            $humanReadableMark = $mark;
+                $normalisedMark = $code->getNormaliseAs();
+                $humanReadableMark = $mark;
+            }
         }
 
         /* Update the deets and save it
