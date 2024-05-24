@@ -1,6 +1,7 @@
 <div id='component-{{ componentInstanceId }}' data-component>
     <div id="paperly-dashboard-component-container">
         <paperly-dashboard-component
+            get-paperly-view-endpoint="{{ routeLookup('paperly.getPaperlyLinks') }}"
         />
     </div>
 </div>
