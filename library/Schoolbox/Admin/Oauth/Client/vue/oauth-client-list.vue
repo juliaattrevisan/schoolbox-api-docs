@@ -80,6 +80,14 @@ function showAddModal() {
 }
 
 /**
+ * To hide any error messages that may be displayed
+ */
+function resetValidationChecks () {
+    hasNoName.value = false;
+    hasNoRedirect.value = false;
+}
+
+/**
  * Close the modal
  */
 function closeModal() {
@@ -87,27 +95,34 @@ function closeModal() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
         modalEl.value.close();
     }
-    hasNoName.value = false;
-    hasNoRedirect.value = false;
+}
+
+/**
+ * When the modal is closed
+ */
+function onModalClosed () {
+    resetValidationChecks();
 }
 
 /**
  * Add another 0AuthClient
  */
 async function addClient() {
+    resetValidationChecks();
     if (isProcessing.value) {
         return;
     }
     if (addingClient.value.name === "") {
         hasNoName.value = true;
-        return;
     }
     if (addingClient.value.redirectUri === "") {
         hasNoRedirect.value = true;
         return;
     }
-    hasNoName.value = false;
-    hasNoRedirect.value = false;
+    if (hasNoName.value || hasNoRedirect.value) {
+        return;
+    }
+    resetValidationChecks();
     try {
         activate("Adding...");
         const response = await fetch(props.postItemEndpoint, {
@@ -152,15 +167,17 @@ function showModifyModal(client: OAuthClient) {
  * @param {OAuthClient} client - The client to modify
  */
 async function modifyItem(client: OAuthClient) {
+    resetValidationChecks();
     if (isProcessing.value) {
         return;
     }
     if (client.name === "") {
         hasNoName.value = true;
-        return;
     }
     if (client.redirectUri === "") {
         hasNoRedirect.value = true;
+    }
+    if (hasNoName.value || hasNoRedirect.value) {
         return;
     }
     hasNoName.value = false;
@@ -385,7 +402,7 @@ window.Vue.onMounted(() => {
             </template>
         </div>
     </div>
-    <reveal-modal ref="modalEl">
+    <reveal-modal ref="modalEl" @closed="onModalClosed">
         <template v-if="currentAction === ActionType.ADD">
             <h2>Add oAuth Client</h2>
             <div v-if="saveError" class="alert-box alert">{{ saveError }}</div>
