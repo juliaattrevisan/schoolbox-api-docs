@@ -27,9 +27,18 @@ class Controller extends Base
 
         $this->dummyPayload = '{
             "features": [
-                { "Forms": "https://url/to/iframe/create_forms" },
-                { "Excursions": "https://url/to/iframe/create_excursions" },
-                { "PTI": "https://url/to/iframe/view_pti" }
+                {
+                    "title": "Forms",
+                    "url": "https://url/to/iframe/create_forms"
+                },
+                {
+                    "title": "Excursions",
+                    "url": "https://url/to/iframe/create_excursions"
+                },
+                {
+                    "title": "Parent Teacher Interview",
+                    "url": "https://url/to/iframe/view_pti"
+                }
             ],
             "upcoming": [
                 {
@@ -113,8 +122,9 @@ class Controller extends Base
         $paperlyLinks = [];
 
         foreach ($this->paperlyPayload['features'] as $feature) {
-            $key = array_keys($feature)[0];
-            $paperlyLinks['features'][][$key] = "/paperly/view/" . strtolower($key);
+            $featureTitle = $feature['title'];
+            $paperlyLinks['features'][][$featureTitle] =
+                "/paperly/view/" . str_replace(' ', '-', strtolower($featureTitle));
         }
 
         $upcomingActions = [];
@@ -139,11 +149,11 @@ class Controller extends Base
 
         $iframeUrl = null;
 
-        foreach ($this->paperlyPayload['features'] as $feat) {
-            $validFeature = array_keys($feat)[0];
+        $featureTitle = ucwords(str_replace('-', ' ', $feature));
 
-            if (strtolower($validFeature) === $feature) {
-                $iframeUrl = $feat[$validFeature];
+        foreach ($this->paperlyPayload['features'] as $feat) {
+            if ($feat['title'] === $featureTitle) {
+                $iframeUrl = $feat['url'];
                 break; //Exit early if the feature matched
             }
         }
@@ -152,7 +162,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
             'url' => $iframeUrl
-        ], "Paperly " . ucwords($feature));
+        ], "Paperly " . $featureTitle);
     }
 
     /**
