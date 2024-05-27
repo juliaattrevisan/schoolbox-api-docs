@@ -211,7 +211,8 @@ window.Vue.onBeforeUnmount(async () => {
                             :id="`customise-score-${props.question.response.learnosityReference}`"
                             ref="scoreEl"
                             v-model="score"
-                            type="number"
+                            type="text"
+                            inputmode="numeric"
                             min="0"
                             :max="props.question.response.maxScore"
                         />
