@@ -134,7 +134,6 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\File\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(FileMapper::class),
                 Access::getInstance(),
                 new PrefixGenerator($this->getConfig()),
@@ -177,7 +176,6 @@ class Module extends BaseModule
             // permission based checks cannot be done here because the logged-in user object is not available here.
             // So instead user permission checks are applied within in the Badge\Hydrator.
             $hydrators[] = new Database\ResultType\Badge\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(BadgeMapper::class),
                 new PrefixGenerator($this->getConfig()),
                 $routeGenerator,
