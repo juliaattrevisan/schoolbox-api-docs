@@ -22,8 +22,21 @@ var validateOptions = {
         "submissionOptions[]": {
             require_from_group: {
                 param: [1, "[data-type-group]"], // ensure at least one option that has data-type-group is selected
-                depends: function () { // only validate if accept online submissions is not none
+                depends: function () {
+                    // only validate if accept online submissions is not none
                     return document.getElementById("acceptOnline").value !== "0";
+                },
+            },
+        },
+        "worksheet-file": {
+            required: {
+                depends: function () {
+                    // only validate if the worksheet option is selected and then no files have been attached
+                    return (
+                        document.getElementById("worksheet").checked &&
+                        document.getElementById("worksheet-zone").querySelector("[data-dz-previews]").children
+                            .length === 0
+                    );
                 },
             },
         },
@@ -55,6 +68,7 @@ var validateOptions = {
         "submissionOptions[]": {
             require_from_group: "Please select at least one option",
         },
+        "worksheet-file": "Please attach a worksheet file",
     },
 };
 
