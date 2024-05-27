@@ -130,6 +130,7 @@
         <div class="small-12 columns">
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
+                {% if kami_enabled %}
                 <li>
                     <input id="worksheet" type="checkbox" name="submissionOptions[]" value="submissionOptions-worksheet" data-type-group>
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
@@ -137,6 +138,7 @@
                     <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
                 </li>
+                {% endif %}
                 <li>
                     <input id="allow-offline" type="checkbox" name="submissionOptions[]" value="submissionOptions-allow-offline" data-type-group>
                     <label for="allow-offline" class="checkbox-label">Allow Offline</label>
@@ -324,6 +326,7 @@
         });
     });
 
+    {% if kami_enabled %}
     /*
     * To show the dropzone when checkbox is checked
     */
@@ -333,7 +336,7 @@
     const worksheetCheckbox = document.getElementById("worksheet");
     const worksheetDropdzone = document.getElementById("worksheetDropzone");
     worksheetCheckbox.addEventListener("change", onWorksheetChange);
-
+    {% endif %}
 </script>
 
 {# ----------------------------------------------------------- #}
