@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Hydrator;
 
 use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Url\Uri;
