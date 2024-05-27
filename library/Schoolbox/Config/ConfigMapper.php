@@ -286,6 +286,10 @@ class ConfigMapper extends Mapper
     public const NAME_REPORT_STAFF_DIRECTORY_ENABLED = 'staff_directory_enabled';
     public const NAME_BACKUP_DIR = 'backup_dir';
 
+    /* Maintenance mode
+     */
+    public const NAME_MAINTENANCE_MODE = 'maintenance_mode';
+
     /**
      * Isams specific
      */
