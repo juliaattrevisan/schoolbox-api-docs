@@ -137,7 +137,7 @@ class Hydrator extends BaseHydrator
                         ->withQuery(http_build_query(['ref' => 'search']))
                         ->__toString(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    $this->rosettaStone->translate('news', false, true),
                     $match->relevance,
                     $article->getPublishAt(),
                     null,

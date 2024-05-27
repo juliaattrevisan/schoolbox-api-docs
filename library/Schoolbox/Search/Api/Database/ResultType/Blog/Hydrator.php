@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as Blog;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Cursor\RawResult;
@@ -32,12 +31,10 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param RosettaStone $rosettaStone Used to translate terminology.
-     * @param BlogMapper   $blogMapper
-     * @param Access       $access
+     * @param BlogMapper $blogMapper
+     * @param Access     $access
      */
     public function __construct(
-        private RosettaStone $rosettaStone,
         private BlogMapper $blogMapper,
         private Access $access
     ) {
@@ -86,7 +83,7 @@ class Hydrator extends BaseHydrator
                          ->withPath("/blog/{$blog->getId()}")
                          ->__toString(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    'Blog',
                     $match->relevance,
                     $blog->getCreatedAt(),
                     $blog->getFolder(),

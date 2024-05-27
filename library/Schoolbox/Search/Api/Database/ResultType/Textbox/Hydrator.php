@@ -16,7 +16,6 @@ use Component_Config_ShowComponentTitle;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use InvalidArgumentException;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -46,7 +45,6 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param RosettaStone  $rosettaStone  Used to translate terminology.
      * @param TextboxMapper $textboxMapper Used to fetch textboxes for hydration.
      * @param FolderMapper  $folderMapper  Used to fetch the folder to which a textbox belongs.
      * @param Access        $access        Used to determine if the current user may view this page.
@@ -54,7 +52,6 @@ class Hydrator extends BaseHydrator
      * @param Authorizer    $authorizer
      */
     public function __construct(
-        private RosettaStone $rosettaStone,
         private TextboxMapper $textboxMapper,
         private FolderMapper $folderMapper,
         private Access $access,
@@ -170,7 +167,7 @@ class Hydrator extends BaseHydrator
                          ->withFragment("textbox-" . $textbox->getId())
                          ->__toString(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    'Textbox',
                     $match->relevance,
                     $textbox->getUpdatedAt(),
                     $textboxRootFolder,
@@ -215,7 +212,7 @@ class Hydrator extends BaseHydrator
                     ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
                     ->__toString(),
                 $match->type,
-                $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                'Textbox',
                 $match->relevance,
                 $textbox->getUpdatedAt(),
                 $textboxFolder,

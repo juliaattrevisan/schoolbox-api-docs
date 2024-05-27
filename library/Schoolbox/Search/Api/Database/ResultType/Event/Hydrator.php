@@ -11,7 +11,6 @@ namespace Schoolbox\Search\Api\Database\ResultType\Event;
 
 use Calendar;
 use Calendar\Event\Type\Day\Event as DayEvent;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -32,12 +31,10 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param RosettaStone $rosettaStone Used to translate terminology.
      * @param UserMapper   $userMapper
      * @param FolderMapper $folderMapper
      */
     public function __construct(
-        private RosettaStone $rosettaStone,
         private UserMapper $userMapper,
         private FolderMapper $folderMapper,
     ) {
@@ -93,7 +90,7 @@ class Hydrator extends BaseHydrator
                          ->withPath($event->getPath())
                          ->__toString(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    'Event',
                     $match->relevance,
                     $event->getStartTime(),
                     // TODO: is this correct?

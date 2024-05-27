@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Link as LinkModel;
@@ -33,12 +32,10 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param RosettaStone $rosettaStone Used to translate terminology.
      * @param LinkMapper   $linkMapper   Used to fetch links for hydration.
      * @param Access       $access       Used to determine if the current user may view this page.
      */
     public function __construct(
-        private RosettaStone $rosettaStone,
         private LinkMapper $linkMapper,
         private Access $access,
     ) {
@@ -83,7 +80,7 @@ class Hydrator extends BaseHydrator
                     $link->getDescription(), // The closest thing to a title for a link is link.description.
                     $link->getUrl(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    'Link',
                     $match->relevance,
                     $link->getModified(),
                     $link->getFolder(),

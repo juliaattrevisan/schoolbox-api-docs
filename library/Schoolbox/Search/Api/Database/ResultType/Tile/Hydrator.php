@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -36,14 +35,12 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param RosettaStone     $rosettaStone     Used to translate terminology.
      * @param TileMapper       $tileMapper       Used to fetch tiles for hydration.
      * @param TileLayoutMapper $tileLayoutMapper Used to fetch tileLayouts to help with tile hydration.
      * @param FolderMapper     $folderMapper     Used to fetch folders to help with tile hydration.
      * @param Access           $access           Used to determine if the current user may view this page.
      */
     public function __construct(
-        private RosettaStone $rosettaStone,
         private TileMapper $tileMapper,
         private TileLayoutMapper $tileLayoutMapper,
         private FolderMapper $folderMapper,
@@ -115,7 +112,7 @@ class Hydrator extends BaseHydrator
                     $titleText,
                     $tile->getLink(),
                     $match->type,
-                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
+                    'Tile',
                     $match->relevance,
                     $tile->getModifiedAt(),
                     $tileFolder,

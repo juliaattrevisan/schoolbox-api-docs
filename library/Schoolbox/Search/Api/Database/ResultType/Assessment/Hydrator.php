@@ -379,4 +379,23 @@ class Hydrator extends BaseHydrator
 
         return $links;
     }
+
+    /**
+     * @param string       $type
+     * @param RosettaStone $rosettaStone
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
+    {
+        return match ($type) {
+            'assessment' => $rosettaStone->translate('assessment', false, true),
+            'assessment.dueWork' => $rosettaStone->translate('dueWork', false, true),
+            'assessment.lessonPlan' => 'Lesson plan',
+            'assessment.project' => $rosettaStone->translate('project', false, true),
+            'assessment.lti' => 'LTI',
+            'assessment.task' => 'Task',
+            'assessment.quiz' => 'Quiz',
+            default => $type,
+        };
+    }
 }

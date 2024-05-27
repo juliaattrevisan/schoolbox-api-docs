@@ -112,7 +112,6 @@ class Module extends BaseModule
 
         $hydrators = [
             new Database\ResultType\User\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(UserMapper::class),
                 $userNameFormatter,
                 $config,
@@ -141,17 +140,14 @@ class Module extends BaseModule
                 new PrefixGenerator($this->getConfig()),
             ),
             new Database\ResultType\Event\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(UserMapper::class),
                 $mapperFactory->get(FolderMapper::class),
             ),
             new Database\ResultType\Link\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(LinkMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Textbox\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(TextboxMapper::class),
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
@@ -159,19 +155,16 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\Blog\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(BlogMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Tile\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(TileMapper::class),
                 $mapperFactory->get(TileLayoutMapper::class),
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
             ),
             new Database\ResultType\Forum\Hydrator(
-                $rosettaStone,
                 $mapperFactory->get(PostMapper::class),
                 $mapperFactory->get(ThreadMapper::class),
                 Access::getInstance(),

@@ -226,8 +226,32 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-
-
         return $links;
+    }
+
+    /**
+     * @param string       $type
+     * @param RosettaStone $rosettaStone
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
+    {
+        return match ($type) {
+            'page' => 'Page',
+            'page.class' => $rosettaStone->translate('class', false, true),
+            'page.course' => 'Course',
+            'page.homepage' => 'Homepage',
+            'page.unit' => $rosettaStone->translate('unit', false, true),
+            'page.folder' => 'Folder',
+            'page.group' => 'Group',
+            'textbox' => 'Textbox',
+            'tile' => 'Tile',
+            'user' => 'User',
+            'user.guest' => 'Guest',
+            'user.parent' => 'Parent',
+            'user.staff' => 'Staff',
+            'user.student' => 'Student',
+            default => $type,
+        };
     }
 }
