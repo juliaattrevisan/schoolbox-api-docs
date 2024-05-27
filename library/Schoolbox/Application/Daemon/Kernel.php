@@ -96,12 +96,12 @@ class Kernel extends CliKernelAbstract
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct(string $name, array $options = [])
+    public function __construct(string $name, array $options = [], $bypassMaintenanceModeCheck = false)
     {
         $this->validateOptions($options);
         $this->parseCommandLineOpts($options);
 
-        parent::__construct($options[self::OPTION_LEVEL] ?? null);
+        parent::__construct($options[self::OPTION_LEVEL] ?? null, $bypassMaintenanceModeCheck);
 
         pcntl_signal(SIGCHLD, SIG_IGN);
         error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);

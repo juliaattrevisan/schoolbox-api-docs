@@ -12,5 +12,5 @@ use Schoolbox\Tour\Import;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new Import(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+$kernel = new CliTool\Kernel(new Import(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO], true);
 $kernel->runApp();

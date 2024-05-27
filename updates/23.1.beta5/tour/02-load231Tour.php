@@ -31,4 +31,4 @@ $app = new class extends CliTool\App {
     }
 };
 
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, [], true))->runApp();

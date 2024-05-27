@@ -11,7 +11,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * Copies ETHERPAD_HOST config from file to instance database
  */
 $app = new class extends CliTool\App {
-
     public function run(): void
     {
         $tourMapper = \Schoolbox\Tour\Mapper::getInstance();
@@ -21,4 +20,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, [], true))->runApp();

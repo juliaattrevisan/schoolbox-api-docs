@@ -15,5 +15,5 @@ use Schoolbox\Admin\Plan\Plan;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new Plan(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+$kernel = new CliTool\Kernel(new Plan(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO], true);
 $kernel->runApp();

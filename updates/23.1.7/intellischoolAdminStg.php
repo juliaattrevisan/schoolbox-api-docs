@@ -28,4 +28,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO]))->runApp();
+(new CliTool\Kernel($app, [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO], true))->runApp();

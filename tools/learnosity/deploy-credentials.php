@@ -13,4 +13,4 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new \Schoolbox\Learning\Learnosity\Credentials\PopulatorTool();
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, []))->runApp();

@@ -47,7 +47,7 @@ $buildLogger = function () use ($limits, $threshold) {
 };
 
 try {
-    $kernel = new \Schoolbox\Application\Daemon\Kernel('System Check');
+    $kernel = new \Schoolbox\Application\Daemon\Kernel('System Check', [], true);
 
     /** @var Logger $d */
     $d = $buildLogger();

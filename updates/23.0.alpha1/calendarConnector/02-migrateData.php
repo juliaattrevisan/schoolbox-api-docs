@@ -110,7 +110,7 @@ HELP;
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, [], true))->runApp();
 
 // Functions. //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
