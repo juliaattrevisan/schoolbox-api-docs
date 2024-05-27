@@ -259,7 +259,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png')
+            ->setMimeFilter('.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png,.pages,.key,.numbers')
             ->setFilesystemContext('worksheet')
             ->getTwigContext();
 
