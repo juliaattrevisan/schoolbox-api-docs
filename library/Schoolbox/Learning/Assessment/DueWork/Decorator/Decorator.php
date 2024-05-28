@@ -254,5 +254,12 @@ class Decorator implements DecoratorInterface
         $assessment->setEnableText($this->getEnableText());
         $assessment->setEnableFiles($this->getEnableFiles());
         $assessment->setEnablePolicy($this->getEnablePolicy());
+
+        if ($this->getKamiFile()) {
+            // Rebuild worksheet files list
+            $factory = new CollectorFactory();
+            $attachments = $factory->build([$this->getKamiFile()])->getAll();
+            $assessment->setKamiFile($attachments[0]->getHash());
+        }
     }
 }

@@ -265,6 +265,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setAttachmentsLabel('')
             ->setMimeFilter('.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png,.pages,.key,.numbers')
             ->setFilesystemContext('worksheet')
+            ->setFileVar('worksheet')
             ->getTwigContext();
 
         /* A list of lesson plans
@@ -476,9 +477,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
             ->setMimeFilter('.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png')
-            ->setFilesystemContext('worksheet');
+            ->setFilesystemContext('worksheet')
+            ->setFileVar('worksheet');
         if ($assessment->getKamiFile()) {
-            $zone->attachFiles([$assessment->getKamiFile()]);
+            $zone = $zone->attachFiles([$assessment->getKamiFile()]);
         }
         $data['attachzoneWorksheet'] = $zone->getTwigContext();
 
