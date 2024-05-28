@@ -41,11 +41,11 @@ class Api
         /*
          * If Paperly not set, throws out warning
          */
-        if ('' === (string)$apiKey || '' === (string)$apiHost) {
+        if ('' === (string)$this->apiKey || '' === (string)$this->apiHost) {
             throw new DomainException('Paperly is not configured; please check settings');
         }
-        $this->paperlyUser = $user;
-        $this->client = $this->initClient($apiHost, $apiKey);
+        $this->paperlyUser = $this->user;
+        $this->client = $this->initClient($this->apiHost, $this->apiKey);
     }
     /**
      * Set up Guzzle client

@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Application\Exception\Exception;
+use RuntimeException;
 use Schoolbox\Iframe\Validator;
 use Twig\Error\Error;
 use Crell\ApiProblem\ApiProblem;
@@ -49,6 +50,7 @@ class Controller extends Base
      * Get Paperly payload from the API call
      *
      * @return array
+     * @throws RuntimeException
      * @throws \JsonException
      */
     private function getPaperlyPayload(): array
@@ -82,7 +84,7 @@ class Controller extends Base
 
         try {
             $paperlyPayload = $this->getPaperlyPayload();
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $problem = (new ApiProblem('Paperly endpoint is not working.'))
                 ->setStatus(400)
                 ->asArray();
