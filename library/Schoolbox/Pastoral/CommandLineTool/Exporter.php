@@ -78,9 +78,9 @@ class Exporter extends CliTool\App
         $log = $this->getLogger();
 
         if ($this->perform()) {
-            $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
+            $log->notice('Running in perform mode (-p): changes will be written to database');
         } else {
-            $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
+            $log->notice('Running in dry-run mode: use -p to write changes to database');
         }
 
         // Only process if pastoral docman writeback is actually enabled in config
@@ -107,7 +107,7 @@ class Exporter extends CliTool\App
             $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
         }
 
-        // Retrieve all pastoral records and re-save
+        // Retrieve all pastoral records (according to params) and re-save
         $repairOnly = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         $log->info('Finding pastoral records to export...');
         $pb = $pastoralMapper->getPredicateBuilder();
@@ -127,14 +127,14 @@ class Exporter extends CliTool\App
         }
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
-            $this->getLogger()->info(
+            $log->info(
                 sprintf('* filtered to records created on or after: "%s"', $fromDate->toRfc3339String()),
             );
             $pb = $pb->greaterThanOrEqualTo('created_at', $fromDate->getDatabase());
         }
         $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
         if ($toDate) {
-            $this->getLogger()->info(
+            $log->info(
                 sprintf('* filtered to records created on or before: "%s"', $toDate->toRfc3339String()),
             );
             $pb = $pb->lessThanOrEqualTo('created_at', $toDate->getDatabase());
