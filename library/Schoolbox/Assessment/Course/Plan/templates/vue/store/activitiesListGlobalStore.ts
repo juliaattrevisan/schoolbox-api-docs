@@ -9,6 +9,10 @@ export const useActivitiesListGlobalStore = defineStore(`activitiesListGlobalSto
         dueWork: {
             proper: "Due Work",
         },
+        activity: {
+            singular: "activity",
+            plural: "activities",
+        },
     });
     const ltiAssessmentsEnabled = window.Vue.ref<boolean>(false);
 

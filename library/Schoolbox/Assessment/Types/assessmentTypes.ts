@@ -36,6 +36,10 @@ export type ActivityTypeLocale = {
     dueWork: {
         proper: string;
     };
+    activity: {
+        singular: string;
+        plural: string;
+    };
 };
 
 export type ActivitiesListRoutes = {
