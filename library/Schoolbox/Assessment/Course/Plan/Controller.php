@@ -240,33 +240,28 @@ class Controller extends Base
             $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
         }
 
-        // Locales required to translate the activity types
-        // - typed in @schoolboxAssessment/Types/assessmentTypes.ts
-        $activityTypeLocale = [
-            'project' => [
-                'proper' => $this->rosettaStone->translate('project', false, true),
-            ],
-            'dueWork' => [
-                'proper' => $this->rosettaStone->translate('dueWork', false, true),
-            ],
-            'activity' => [
-                'singular' => $this->rosettaStone->translate('activity', false, false),
-                'plural' => $this->rosettaStone->translate('activity', true, false),
-            ]
+        // Locales required to translate terms in the activities list components
+        $activityComponentLocales = [
+            $this->rosettaStone->__get('project')->toArray(),
+            $this->rosettaStone->__get('dueWork')->toArray(),
+            $this->rosettaStone->__get('activity')->toArray(),
         ];
 
-        // Locales required to translate rubric capabilities
-        // - typed in @schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes.ts
-        $rubricCapabilitiesLocale = [
-            'singular' => $this->rosettaStone->translate('rubricGroup', false, false),
-            'plural' => $this->rosettaStone->translate('rubricGroup', true, false),
+        // Locales required to translate terms in the rubric capability list components
+        $rubricCapabilityComponentLocales = [
+            $this->rosettaStone->__get('rubricGroup')->toArray(),
+        ];
+
+        // All locales required by the unit planner (compile the above together)
+        $unitPlannerLocales = [
+            ...$activityComponentLocales,
+            ...$rubricCapabilityComponentLocales,
         ];
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'activityTypeLocale' => $activityTypeLocale,
-            'rubricCapabilitiesLocale' => $rubricCapabilitiesLocale,
+            'unitPlannerLocales' => $unitPlannerLocales,
             'template'  => [
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumnTemplate,

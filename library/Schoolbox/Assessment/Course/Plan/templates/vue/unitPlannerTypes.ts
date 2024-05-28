@@ -5,11 +5,6 @@ export type Assessment = {
     id: number;
 };
 
-export type RubricCapabilitiesLocale = {
-    singular: string;
-    plural: string;
-};
-
 export type RubricCapability = {
     id: number;
     name: string;

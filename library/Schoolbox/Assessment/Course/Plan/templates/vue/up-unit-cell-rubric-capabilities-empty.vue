@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
@@ -8,15 +7,16 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const store = useUnitPlannerStore();
+
+const rubricGroupLocale = window.sbProps.l10n.get("rubricGroup");
 </script>
 
 <template>
     <i class="icon-criteria"></i>
     <p>
-        No rubric {{ store.rubricCapabilitiesLocale?.plural ?? "capabilities" }} have been added to this unit yet,
+        No rubric {{ rubricGroupLocale.plural() }} have been added to this unit yet,
         <a :href="getReturnUrl(`/rubric/manager/${props.unit.folderId}`)">
-            start by adding rubric {{ store.rubricCapabilitiesLocale?.plural ?? "capabilities" }}</a
+            start by adding rubric {{ rubricGroupLocale.plural() }}</a
         >
     </p>
 </template>

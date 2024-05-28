@@ -1,8 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const activityLocale = window.sbProps.l10n.get("activity");
+</script>
 
 <template>
     <i class="icon-criteria"></i>
-    <p>No Learning Activities have been added to this unit yet</p>
+    <p>No {{ activityLocale.singular() }} have been added to this unit yet</p>
 </template>
 
 <style scoped></style>

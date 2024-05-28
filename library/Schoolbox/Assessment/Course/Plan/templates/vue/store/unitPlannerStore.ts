@@ -3,7 +3,7 @@ import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import { Column } from "../unitPlannerConfig";
-import { CurriculumOverviewComponent, Unit, UnitTemplate, RubricCapabilitiesLocale } from "../unitPlannerTypes";
+import { CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -16,25 +16,17 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const units = window.Vue.ref<Unit[]>([]);
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
     const template = window.Vue.ref<UnitTemplate | null>(null); // the course framework template that units are linked to
-    const rubricCapabilitiesLocale = window.Vue.ref<RubricCapabilitiesLocale | null>(null); // the rubric capabilities locale
 
     /**
      * store any passed through properties
      * @param { number } $courseId - the course ID
      * @param { Unit[] } $units - the units to store
      * @param { UnitTemplate } $template - the unit template
-     * @param { RubricCapabilitiesLocale } $rubricCapabilitiesLocale - the rubric capabilities locale
      */
-    function init(
-        $courseId: number,
-        $units: Unit[],
-        $template: UnitTemplate,
-        $rubricCapabilitiesLocale: RubricCapabilitiesLocale,
-    ) {
+    function init($courseId: number, $units: Unit[], $template: UnitTemplate) {
         courseId.value = $courseId;
         units.value = $units;
         template.value = $template;
-        rubricCapabilitiesLocale.value = $rubricCapabilitiesLocale;
     }
 
     const orderedUnits = window.Vue.computed<Unit[]>(() => {
@@ -190,7 +182,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         units,
         unitCount,
         template,
-        rubricCapabilitiesLocale,
         dragCurrentUnit,
         dragCurrentUnitNextTick,
         orderedUnits,

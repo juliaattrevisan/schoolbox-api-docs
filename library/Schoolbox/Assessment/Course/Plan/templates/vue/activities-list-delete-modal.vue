@@ -5,10 +5,8 @@
  * One instance of <activities-list-delete-modal /> should be available on the page if an activities list is present
  */
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
-import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useActivitiesListDeleteModalStore } from "./store/activitiesListDeleteModalStore";
 
-const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const activitiesListDeleteModalStore = useActivitiesListDeleteModalStore();
 
 /**
@@ -23,6 +21,8 @@ const deleteButtonText = window.Vue.computed(() =>
  * To prevent the user from moving away from the modal while processing is taking place
  */
 const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore.isProcessing);
+
+const activityLocale = window.sbProps.l10n.get("activity");
 </script>
 
 <template>
@@ -35,8 +35,8 @@ const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore
             <h2>Please Confirm</h2>
             <p>
                 Are you sure you wish to delete this
-                {{ activitiesListGlobalStore.locale.activity.singular }}? You will be unable to import this
-                {{ activitiesListGlobalStore.locale.activity.singular }}
+                {{ activityLocale.singular() }}? You will be unable to import this
+                {{ activityLocale.singular() }}
                 into classes.
             </p>
             <ul class="flex-list">

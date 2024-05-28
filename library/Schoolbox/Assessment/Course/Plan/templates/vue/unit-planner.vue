@@ -3,11 +3,10 @@
  * The main component for the unit planner
  */
 import type { Ref } from "vue";
-import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import type { Unit, UnitTemplate, RubricCapabilitiesLocale } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpEmptyState from "./up-empty-state.vue";
@@ -20,8 +19,6 @@ interface Props {
     folderId: number;
     courseTitle: string;
     units: Unit[];
-    activityTypeLocale: ActivityTypeLocale;
-    rubricCapabilitiesLocale: RubricCapabilitiesLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
@@ -122,8 +119,8 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.courseId, props.units, props.template, props.rubricCapabilitiesLocale);
-    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled);
+    store.init(props.courseId, props.units, props.template);
+    activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.
