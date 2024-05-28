@@ -51,6 +51,11 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
+     * @param bool         $kamiInteractive
+     * @param bool         $enableOffline
+     * @param bool         $enableText
+     * @param bool         $enableFiles
+     * @param bool         $enablePolicy
      * @param DueWork|null $original
      */
     public function __construct(
@@ -63,6 +68,11 @@ class CourseManagedDecorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
+        bool $kamiInteractive,
+        bool $enableOffline,
+        bool $enableText,
+        bool $enableFiles,
+        bool $enablePolicy,
         ?DueWork $original
     ) {
         $this->setMarkType($markType);
@@ -74,6 +84,11 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
+        $this->setKamiInteractive($kamiInteractive);
+        $this->setEnableOffline($enableOffline);
+        $this->setEnableText($enableText);
+        $this->setEnableFiles($enableFiles);
+        $this->setEnablePolicy($enablePolicy);
         $this->original = $original;
     }
 

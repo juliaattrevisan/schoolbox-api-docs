@@ -63,6 +63,11 @@ class Decorator implements DecoratorInterface
      * @param array        $attachedFiles
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
+     * @param bool         $kamiInteractive
+     * @param bool         $enableOffline
+     * @param bool         $enableText
+     * @param bool         $enableFiles
+     * @param bool         $enablePolicy
      * @param DueWork|null $original
      */
     public function __construct(
@@ -78,6 +83,11 @@ class Decorator implements DecoratorInterface
         array $attachedFiles,
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
+        bool $kamiInteractive,
+        bool $enableOffline,
+        bool $enableText,
+        bool $enableFiles,
+        bool $enablePolicy,
         ?DueWork $original
     ) {
         $this->setAcceptOnline($acceptOnline);
@@ -92,6 +102,11 @@ class Decorator implements DecoratorInterface
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
+        $this->setKamiInteractive($kamiInteractive);
+        $this->setEnableOffline($enableOffline);
+        $this->setEnableText($enableText);
+        $this->setEnableFiles($enableFiles);
+        $this->setEnablePolicy($enablePolicy);
         $this->original = $original;
     }
 
@@ -229,5 +244,11 @@ class Decorator implements DecoratorInterface
         /* Similarity Check
          */
         $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
+
+        $assessment->setKamiInteractive($this->getKamiInteractive());
+        $assessment->setEnableOffline($this->getEnableOffline());
+        $assessment->setEnableText($this->getEnableText());
+        $assessment->setEnableFiles($this->getEnableFiles());
+        $assessment->setEnablePolicy($this->getEnablePolicy());
     }
 }

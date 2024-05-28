@@ -402,6 +402,11 @@ class Factory
                     $this->getMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
+                    $this->getKamiInteractive(),
+                    $this->getEnableOffline(),
+                    $this->getEnableText(),
+                    $this->getEnableFiles(),
+                    $this->getEnablePolicy(),
                     $originalDueWork
                 );
             } else {
@@ -418,7 +423,12 @@ class Factory
                     $this->getAttachedFiles(),
                     $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
-                    $originalDueWork
+                    $this->getKamiInteractive(),
+                    $this->getEnableOffline(),
+                    $this->getEnableText(),
+                    $this->getEnableFiles(),
+                    $this->getEnablePolicy(),
+                    $originalDueWork,
                 );
             }
         } elseif ($assessment instanceof Task) {
