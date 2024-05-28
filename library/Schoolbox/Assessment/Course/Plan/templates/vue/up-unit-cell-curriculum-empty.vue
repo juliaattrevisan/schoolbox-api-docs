@@ -72,8 +72,8 @@ async function onMapSelected() {
 <template>
     <i class="icon-curriculum"></i>
     <p>
-        <a @click.prevent="onMapSelected">Map curriculum codes</a> to your course or unit page to display a list of all
-        of the curriculum codes and matching skill descriptors covered in this area of the curriculum.
+        <a @click.prevent="onMapSelected">Select the curriculum codes</a>
+        that you intend to cover in this area of the curriculum
     </p>
 </template>
 
