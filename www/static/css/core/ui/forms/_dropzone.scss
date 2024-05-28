@@ -104,7 +104,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 .dragging {
     .dropzone.overlay {
         opacity: 1;
-        z-index: calc(var(--depth-default) + 1);
+        z-index: 2;
 
         transition: opacity $attachzone-overlay-duration $attachzone-overlay-timing;
     }
@@ -143,10 +143,9 @@ section > .dropzone-wrap {
         margin: 0;
         opacity: 0;
         display: block;
-        z-index: calc(var(--depth-default) - 2);
+        z-index: -1;
 
-        transition:
-            opacity $attachzone-overlay-duration $attachzone-overlay-timing,
+        transition: opacity $attachzone-overlay-duration $attachzone-overlay-timing,
             z-index 0s $attachzone-overlay-duration linear;
     }
 }
@@ -208,8 +207,7 @@ ul.az-error-list {
 
     > li {
         clear: none;
-        transition:
-            color $attachzone-overlay-duration $attachzone-overlay-timing,
+        transition: color $attachzone-overlay-duration $attachzone-overlay-timing,
             opacity $attachzone-duration-half $attachzone-overlay-timing,
             min-height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
             height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
@@ -493,11 +491,8 @@ ul.az-error-list {
     background-repeat: no-repeat;
     display: table;
     color: $attachzone-resting-color;
-    transition:
-        background-color 360ms $attachzone-overlay-timing,
-        border-color 360ms $attachzone-overlay-timing,
-        color 360ms $attachzone-overlay-timing,
-        height 360ms $attachzone-overlay-timing 360ms;
+    transition: background-color 360ms $attachzone-overlay-timing, border-color 360ms $attachzone-overlay-timing,
+        color 360ms $attachzone-overlay-timing, height 360ms $attachzone-overlay-timing 360ms;
     &:hover {
         border-color: $attachzone-hover-color;
         background-color: $attachzone-hover-background;
