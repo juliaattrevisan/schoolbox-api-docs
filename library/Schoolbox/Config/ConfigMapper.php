@@ -242,6 +242,9 @@ class ConfigMapper extends Mapper
     public const NAME_DIGISTORM_GOOGLE_PLAY_STORE_LINK = 'digistorm_google_play_store_link';
     public const NAME_DIGISTORM_ROLE_INSTALL_PROMPT = 'digistorm_role_install_prompt';
 
+    public const NAME_PAPERLY_API_HOSTNAME = 'paperly_iframe_api_host';
+    public const NAME_PAPERLY_API_KEY = 'paperly_iframe_api_key';
+
     /**
      * Skin Config Fields
      */
