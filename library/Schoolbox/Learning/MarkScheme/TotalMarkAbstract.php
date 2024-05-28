@@ -61,9 +61,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param float|null     $normalisedMark
      * @param IResponse|null $response
      * @return string|null
-     * @throws RangeException If normalised mark is outside valid range
      * @throws \DomainException If unable to derive a denominator
-     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
@@ -159,7 +157,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             return null;
         }
 
-        $floatVal = round(floatval($matches[1]), AbstractMarkScheme::PRECISION);
+        $floatVal = round((float)$matches[1], AbstractMarkScheme::PRECISION);
         return sprintf("%s / %s", $floatVal, $denominator);
     }
 

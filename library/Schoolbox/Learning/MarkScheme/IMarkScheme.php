@@ -23,7 +23,8 @@ interface IMarkScheme
 
 
     /**
-     * Get this Mark Scheme instance's name
+     * Get this Mark Scheme instance's template filename (without file extension)
+     * since it's included in twig land somewhere else
      *
      * @return string
      */

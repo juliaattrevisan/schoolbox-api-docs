@@ -37,8 +37,6 @@ class Percentage extends AbstractMarkScheme
 
     /**
      * @inheritdoc
-     * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
-     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
@@ -71,7 +69,7 @@ class Percentage extends AbstractMarkScheme
             throw new InvalidArgumentException("Unable to parse percentage value: $humanReadableMark");
         }
 
-        $floatVal = floatval($matches[1]);
+        $floatVal = (float)$matches[1];
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }
