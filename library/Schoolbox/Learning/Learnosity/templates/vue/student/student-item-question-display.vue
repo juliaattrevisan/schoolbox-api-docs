@@ -211,9 +211,8 @@ window.Vue.onBeforeUnmount(async () => {
                             :id="`customise-score-${props.question.response.learnosityReference}`"
                             ref="scoreEl"
                             v-model="score"
-                            type="number"
-                            min="0"
-                            :max="props.question.response.maxScore"
+                            type="text"
+                            inputmode="numeric"
                         />
                     </template>
                     <div class="save-container l-grid">
