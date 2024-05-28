@@ -124,14 +124,12 @@ class Exporter extends CliTool\App
         $nPastoralRecordIds = count($pastoralRecordIds);
         $log->info("Beginning export of $nPastoralRecordIds pastoral records...");
 
-        $builder = $pastoralMapper->getPredicateBuilder();
-
+        // Start exporting in batches
         $failedPastoralIds = [];
-        $nRecordsExported = 0;
-
-        $repairOnly = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
+        $nRecordsExported  = 0;
+        $repairOnly        = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
-            foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
+            foreach ($pastoralMapper->findByColumn('id', $batchOfPastoralRecordIds) as $pastoralRecord) {
                 if ($repairOnly) {
                     $log->debug("Repair-only mode is on: checking if pastoral record exists in external before syncing");
                     if (!$externalPastoral->exists($pastoralRecord)) {
