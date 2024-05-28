@@ -432,6 +432,13 @@ class Module extends BaseModule
                 /* Assessment must be in a living (unarchived) academic period
                  */
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                /* Obey mark visibility setting
+                 */
+                new Rule\Callback(function (array $params, User $currentUser) {
+                    if (!$params['assessment']->isFeedbackVisibleToUser($currentUser)) {
+                        throw new \Alaress\Authorizer\Failure\Unauthorized('Feedback is not allowed by mark visibility.');
+                    }
+                }),
                 /* Otherwise, you have to be an instructor
                  * or a student that adheres all the non-instructor criteria
                  */
