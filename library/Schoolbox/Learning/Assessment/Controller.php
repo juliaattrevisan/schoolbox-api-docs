@@ -263,6 +263,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setFilesystemContext('worksheet')
             ->getTwigContext();
 
+        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+
         /* A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
