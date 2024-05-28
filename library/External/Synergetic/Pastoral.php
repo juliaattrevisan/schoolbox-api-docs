@@ -581,10 +581,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
-        // Get insert/update query based on the absence/presence of an external ID on the pastoral record
-
-        $isCreate = empty($pastoral->getExternalId());
-
+        // Get insert/update query based on:
+        // * the absence/presence of an external ID on the pastoral record
+        // * if it exists, verify the record actually exists: if it doesn't,
+        //   recreate it
+        $isCreate = empty($pastoral->getExternalId()) || !$this->checkPastoralRecordExists($pastoral->getExternalId());
         if ($isCreate) {
             $query = "
                 INSERT INTO tPastoralCare (
@@ -622,11 +623,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 )
             ";
         } else {
-            // Don't try to update anything if the pastoral record cannot be found in synergetic
-            if (!$this->checkPastoralRecordExists($pastoral->getExternalId())) {
-                return false;
-            }
-
             $query = "
                 UPDATE      tPastoralCare
                 SET         ID = :studentExternalId,
