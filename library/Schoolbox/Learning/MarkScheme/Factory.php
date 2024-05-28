@@ -35,7 +35,7 @@ class Factory
      *
      * @var string[]
      */
-    private static $markTypesProject = [
+    private static array $markTypesProject = [
         MarkType::TYPE_NONE    => None::TITLE,
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
@@ -47,7 +47,7 @@ class Factory
      *
      * @var string[]
      */
-    private static $markTypesDueWork = [
+    private static array $markTypesDueWork = [
         MarkType::TYPE_NONE    => None::TITLE,
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
@@ -60,7 +60,7 @@ class Factory
      *
      * @var string[]
      */
-    private static $markTypesTask = [
+    private static array $markTypesTask = [
         MarkType::TYPE_COMPLETION => Completion::TITLE,
     ];
 
@@ -70,7 +70,7 @@ class Factory
      *
      * @var string[]
      */
-    private static $markTypesQuiz = [
+    private static array $markTypesQuiz = [
         MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
         MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
@@ -83,7 +83,7 @@ class Factory
      *
      * @var string[]
      */
-    private static $markTypesLtiAssessment = [
+    private static array $markTypesLtiAssessment = [
         MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
     ];
 
@@ -97,15 +97,9 @@ class Factory
 
 
     /**
-     * @var Group\Mapper
+     * @var Group\Mapper|null
      */
-    private $gradeLevelGroupMapper;
-
-
-    /**
-     * @var IConfigLoader|null
-     */
-    private $config;
+    private ?Group\Mapper $gradeLevelGroupMapper;
 
 
     /**
@@ -113,9 +107,8 @@ class Factory
      *
      * @param IConfigLoader|null $config
      */
-    public function __construct(?IConfigLoader $config = null)
+    public function __construct(private ?IConfigLoader $config = null)
     {
-        $this->config = $config;
     }
 
 
@@ -166,7 +159,7 @@ class Factory
     /**
      * @param Task $task
      * @throws DomainException if MarkType is invalid for Tasks
-     * @return Completion
+     * @return Completion|null
      */
     protected function spawnForTask(Task $task): ?Completion
     {
@@ -181,9 +174,10 @@ class Factory
 
     /**
      * @param Quiz $quiz
+     * @return IMarkScheme
      * @throws DomainException
      */
-    protected function spawnForQuiz(Quiz $quiz)
+    protected function spawnForQuiz(Quiz $quiz): IMarkScheme
     {
         switch ($quiz->getMarkType()->getId()) {
             case MarkType::TYPE_TOTAL:
@@ -205,7 +199,7 @@ class Factory
      * @throws RangeException
      * @throws DomainException
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null): IMarkScheme
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -228,9 +222,8 @@ class Factory
      * @param LtiAssessment $ltiAssessment
      * @return IMarkScheme
      * @throws RangeException
-     * @throws DomainException
      */
-    protected function spawnForLtiAssessment(LtiAssessment $ltiAssessment)
+    protected function spawnForLtiAssessment(LtiAssessment $ltiAssessment): IMarkScheme
     {
         return new TotalMarkFractional($ltiAssessment->getLineItemScoreMaximum());
     }
