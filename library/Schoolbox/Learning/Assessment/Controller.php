@@ -472,6 +472,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // To be able to view the current student policy if enabling within the submission type
         $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
+        // To determine whether to display the interactive worksheet option
+        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+
         $zone = (new Zone('worksheet'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
