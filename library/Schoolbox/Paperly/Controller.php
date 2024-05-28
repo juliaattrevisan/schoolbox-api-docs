@@ -75,7 +75,9 @@ class Controller extends Base
      */
     public function getPaperlyLinks(): void
     {
-        $paperlyLinks = [];
+        $paperlyLinks = [
+            'features' => []
+        ];
 
         $paperlyPayload = $this->getPaperlyPayload();
 
