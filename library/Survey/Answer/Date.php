@@ -292,11 +292,11 @@ class Survey_Answer_Date extends Evaluation_Answer_Date
             return null;
         }
         try {
-            $dateObject = Alaress_Date_Format::newDatabaseDate($date);
+            $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } catch (InvalidArgumentException $e) {
             return null;
         }
-        return $dateObject->getLocal();
+        return $dateObject->getLocalShort();
     }
 
     /**
@@ -315,6 +315,6 @@ class Survey_Answer_Date extends Evaluation_Answer_Date
         } catch (InvalidArgumentException $e) {
             $dateObject = null;
         }
-        return $dateObject?->toRfc3339String();
+        return $dateObject?->getDatabaseDate();
     }
 }
