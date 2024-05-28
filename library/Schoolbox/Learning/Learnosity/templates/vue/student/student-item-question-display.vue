@@ -213,8 +213,6 @@ window.Vue.onBeforeUnmount(async () => {
                             v-model="score"
                             type="text"
                             inputmode="numeric"
-                            min="0"
-                            :max="props.question.response.maxScore"
                         />
                     </template>
                     <div class="save-container l-grid">
