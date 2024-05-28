@@ -187,7 +187,7 @@ Data:
 
         /* Spawn editors
          */
-        document.getElementById("editor-body").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
+        document.getElementById("editor-body")?.addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
         function onDefaultEditorCreated(event) {
             initAutosave(event.detail.sourceElement);
             autosavePresubmit(event.detail.sourceElement);
@@ -294,7 +294,7 @@ Data:
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
                 $('#editor-body').attr('disabled', true);
-                if (window.sbProps.editors['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                if (window.sbProps.editors['editor-body']?.getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
                     $('#submit-warning').hide('slow');
