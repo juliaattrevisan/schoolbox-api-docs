@@ -88,8 +88,8 @@ const upcoming = window.Vue.computed(() => {
                     >Excursions</a
                 >
             </li>
-            <li v-if="paperlyPayload?.features.find((item) => 'PTI' in item)">
-                <a class="icon-paperly-pti" :href="paperlyPayload.features.find((item) => 'PTI' in item)?.PTI ?? ''"
+            <li v-if="paperlyPayload?.features.find((item) => 'Parent Teacher Interview' in item)">
+                <a class="icon-paperly-pti" :href="paperlyPayload.features.find((item) => 'Parent Teacher Interview' in item)?.['Parent Teacher Interview'] ?? ''"
                     >Parent/Teacher Interview</a
                 >
             </li>
