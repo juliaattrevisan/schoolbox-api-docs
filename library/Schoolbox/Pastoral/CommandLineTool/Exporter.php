@@ -130,29 +130,27 @@ class Exporter extends CliTool\App
         $repairOnly        = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByColumn('id', $batchOfPastoralRecordIds) as $pastoralRecord) {
-                if ($repairOnly) {
-                    $log->debug("Repair-only mode is on: checking if pastoral record exists in external before syncing");
-                    if (!$externalPastoral->exists($pastoralRecord)) {
-                        if ($pastoralRecord->getExternalId()) {
-                            $log->debug(
-                                sprintf(
-                                    "Pastoral record #%d is already synced (external ID: %s) and does not need repair: skipping",
-                                    $pastoralRecord->getId(),
-                                    $pastoralRecord->getExternalId(),
-                                )
-                            );
-                        } else {
-                            $log->debug(
-                                sprintf(
-                                    "Pastoral record #%d is not yet synced: skipping",
-                                    $pastoralRecord->getId(),
-                                )
-                            );
-                        }
-                        continue;
+                // Bail if repair-only and the record doesn't exist yet
+                if ($repairOnly && !$externalPastoral->exists($pastoralRecord)) {
+                    if ($pastoralRecord->getExternalId()) {
+                        $log->debug(
+                            sprintf(
+                                "Repair-only mode is on, and pastoral record #%d does not need repair: skipping",
+                                $pastoralRecord->getId(),
+                            )
+                        );
+                    } else {
+                        $log->debug(
+                            sprintf(
+                                "Repair-only mode is on, and pastoral record #%d is not yet synced: skipping",
+                                $pastoralRecord->getId(),
+                            )
+                        );
                     }
+                    continue;
                 }
 
+                // Otherwise sync
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 if ($this->perform()) {
                     try {
