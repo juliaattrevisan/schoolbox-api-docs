@@ -17,7 +17,7 @@ class Survey_Answer_Date extends Evaluation_Answer_Date
      *
      * @var string
      */
-    protected $plugin = 'evaluationDate';
+    protected $plugin = 'evaluationDateTime';
 
     /**
      * @var string
