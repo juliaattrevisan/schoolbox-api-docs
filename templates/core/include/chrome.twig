@@ -648,6 +648,17 @@
                                 });
                             });
                         });
+                    } else {
+                        // No Notifications, don't even give the option
+                        document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
+                            element.remove();
+                        });
                     }
 
                 </script>
