@@ -27,7 +27,7 @@ interface IMarkScheme
      *
      * @return string
      */
-    public function getName(): string;
+    public function getTemplate(): string;
 
 
     /**
