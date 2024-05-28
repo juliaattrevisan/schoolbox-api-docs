@@ -40,7 +40,7 @@ class Percentage extends AbstractMarkScheme
      * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
      * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -59,9 +59,9 @@ class Percentage extends AbstractMarkScheme
      * @param IResponse|null $response
      * @throws InvalidArgumentException If cannot parse a float
      * @throws RangeException if parsed value is outside valid range
-     * @return float
+     * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         // Cannot merely use floatval(), as that returns 0 on failed parsing.
 

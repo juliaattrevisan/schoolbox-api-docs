@@ -36,7 +36,7 @@ class None extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         return null;
     }
@@ -46,9 +46,9 @@ class None extends AbstractMarkScheme
      *
      * @param string         $humanReadableMark
      * @param IResponse|null $response
-     * @return null
+     * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         return null;
     }

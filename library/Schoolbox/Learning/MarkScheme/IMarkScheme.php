@@ -63,7 +63,7 @@ interface IMarkScheme
      * @param IResponse|null $response          The response we wish to get the mark from
      * @return string|null
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null);
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string;
 
     /**
      * Returns a float from 0 to 100.0 inclusive.
@@ -74,7 +74,7 @@ interface IMarkScheme
      * @param IResponse|null $response          Most recent submitted response
      * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null);
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float;
 
     /**
      * Converts a value submitted from the form into a standardised

@@ -57,7 +57,7 @@ class LetterGrade extends AbstractMarkScheme
      * @throws \RangeException If $normalisedMark is outside 0.0 to 100.0
      * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -88,11 +88,11 @@ class LetterGrade extends AbstractMarkScheme
      * @throws InvalidArgumentException if unable to locate corresponding GradeLevel
      * @return float
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
             if ($gradeLevel->getCaption() == $humanReadableMark) {
-                return floatval($gradeLevel->getRawGrade());
+                return (float)$gradeLevel->getRawGrade();
             }
         }
 

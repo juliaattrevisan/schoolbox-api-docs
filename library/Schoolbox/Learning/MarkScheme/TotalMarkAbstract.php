@@ -65,7 +65,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @throws \DomainException If unable to derive a denominator
      * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -112,7 +112,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @throws RangeException If evaluated normalised mark is below 0 or above 100
      * @throws \DomainException If unable to derive a denominator
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';
