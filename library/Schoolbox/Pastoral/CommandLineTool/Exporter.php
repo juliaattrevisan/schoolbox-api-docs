@@ -42,6 +42,9 @@ class Exporter extends CliTool\App
     // --to: only import records created on or after this date.
     private const OPT_LONG_TO = 'to:';
 
+    // --id: only import these record IDs
+    private const OPT_LONG_ID = 'id:';
+
     /**
      * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
      */
@@ -64,6 +67,7 @@ class Exporter extends CliTool\App
             self::OPT_LONG_REPAIR_ONLY,
             self::OPT_LONG_FROM,
             self::OPT_LONG_TO,
+            self::OPT_LONG_ID,
         ];
     }
 
@@ -244,6 +248,11 @@ OPTIONS
     $yellow-p, --perform$white
         Actually export records: otherwise, only output records which would be exported.
 
+    $yellow--id=ID,ID2,...$white
+        If provided, only export these record IDs.
+
+        This may be provided as either a comma-separated list, or multiple times, to export multiple records.
+
     $yellow--unexported-only$white
         If provided, only attempt to export records which have been not yet been exported to the external pastoral care system.
 
@@ -289,6 +298,18 @@ HELP;
             $log->info('* filtered to unexported records only');
             $pb = $pb->isNull('external_id');
         }
+
+        // IDs provided? Comma-separate each provided ID param, then merge them
+        // into a single list.
+        $ids = $this->getOpt(self::OPT_LONG_ID);
+        if (isset($ids)) {
+            $ids = array_merge(...array_map(fn ($id) => explode(',', $id), (array)$ids));
+            $log->info(
+                sprintf('* filtered to record IDs: %s', implode(',', $ids)),
+            );
+            $pb = $pb->in('id', $ids);
+        }
+
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
             $log->info(
