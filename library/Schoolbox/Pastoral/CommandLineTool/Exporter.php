@@ -108,7 +108,30 @@ class Exporter extends CliTool\App
 
         // Retrieve all pastoral records and re-save
         $log->info('Finding pastoral records to export...');
-        $pastoralRecordIds = $pastoralMapper->findAllIds(['deleted' => false]);
+        $pb = $pastoralMapper->getPredicateBuilder();
+        if ($this->getOpt(self::OPT_LONG_UNEXPORTED_ONLY)) {
+            $log->info('* filtered to unexported records only');
+            $pb = $pb->any(
+                $pastoralMapper->getPredicateBuilder()
+                    ->isNull('external_id')
+                    ->equals('external_id', '')
+            );
+        }
+        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+        if ($fromDate) {
+            $this->getLogger()->info(
+                sprintf('* filtered to records created on or after: "%s"', $fromDate->toRfc3339String()),
+            );
+            $pb = $pb->greaterThanOrEqualTo('created_at', $fromDate->getDatabase());
+        }
+        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        if ($toDate) {
+            $this->getLogger()->info(
+                sprintf('* filtered to records created on or before: "%s"', $toDate->toRfc3339String()),
+            );
+            $pb = $pb->lessThanOrEqualTo('created_at', $toDate->getDatabase());
+        }
+        $pastoralRecordIds  = $pastoralMapper->findIdsByPredicates($pb, ['deleted' => false]);
         $nPastoralRecordIds = count($pastoralRecordIds);
         $log->info("Beginning export of $nPastoralRecordIds pastoral records...");
 
