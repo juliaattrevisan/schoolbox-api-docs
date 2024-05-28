@@ -28,20 +28,20 @@ class Api
     /**
      * Constructor.
      *
-     * @param   string  $apiHost
-     * @param   string  $apiKey
+     * @param   null|string  $apiHost
+     * @param   null|string  $apiKey
      * @param   User    $user
      * @throws  DomainException
      */
     public function __construct(
-        private string $apiHost,
-        #[SensitiveParameter] private string $apiKey,
+        private ?string $apiHost,
+        #[SensitiveParameter] private ?string $apiKey,
         private User $user
     ) {
         /*
          * If Paperly not set, throws out warning
          */
-        if ('' === $apiKey || '' === $apiHost) {
+        if ('' === (string)$apiKey || '' === (string)$apiHost) {
             throw new DomainException('Paperly is not configured; please check settings');
         }
         $this->paperlyUser = $user;
@@ -93,13 +93,14 @@ class Api
         $response = null;
         $failed = 0;
 
+        $paperlyAPIEndpoint = sprintf(
+            self::PAPERLY_API_VIEW_IFRAME,
+            $this->paperlyUser->getId(),
+            $this->paperlyUser->getRole()->isStaff() ? 'teacher' : $this->paperlyUser->getRole()->getType()
+        );
+
         while ($failed < self::MAX_RETRY) {
             try {
-                $paperlyAPIEndpoint = sprintf(
-                    self::PAPERLY_API_VIEW_IFRAME,
-                    $this->paperlyUser->getId(),
-                    $this->paperlyUser->getRole()->isStaff() ? 'teacher' : $this->paperlyUser->getRole()->getType()
-                );
                 $response = $this->client->request('GET', $paperlyAPIEndpoint);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $failed++;
@@ -123,7 +124,7 @@ class Api
             throw new RuntimeException(
                 sprintf(
                     'Bad endpoint %s: %s %s after %s retries.',
-                    $endpoint,
+                    $paperlyAPIEndpoint,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     self::MAX_RETRY
