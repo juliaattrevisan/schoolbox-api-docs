@@ -252,6 +252,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        // To be able to view the current student policy if enabling within the submission type
+        $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+        // To determine whether to display the interactive worksheet option
+        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+
+        // To be able to add a file to use as the worksheet
+        $data['attachzoneWorksheet'] = (new Zone('worksheet'))
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a worksheet')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png,.pages,.key,.numbers')
+            ->setFilesystemContext('worksheet')
+            ->getTwigContext();
+
         /* A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
@@ -452,6 +467,21 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isMutable' => $courseManagedFields->isMutable(),
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
+
+        // To be able to view the current student policy if enabling within the submission type
+        $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+        // To determine whether to display the interactive worksheet option
+        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+
+        // To be able to add a file to use as the worksheet
+        $data['attachzoneWorksheet'] = (new Zone('worksheet'))
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a worksheet')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png,.pages,.key,.numbers')
+            ->setFilesystemContext('worksheet')
+            ->getTwigContext();
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
