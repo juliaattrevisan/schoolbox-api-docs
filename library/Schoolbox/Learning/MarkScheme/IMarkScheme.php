@@ -40,7 +40,7 @@ interface IMarkScheme
      *
      * @return bool
      */
-    public function isQuantitative();
+    public function isQuantitative(): bool;
 
     /**
      * Is this mark scheme qualitative?
@@ -52,7 +52,7 @@ interface IMarkScheme
      *
      * @return bool
      */
-    public function isQualitative();
+    public function isQualitative(): bool;
 
     /**
      * Returns a string representation of a mark.
@@ -104,7 +104,7 @@ interface IMarkScheme
      *
      * @return string
      */
-    public static function getTitle();
+    public static function getTitle(): string;
 
     /**
      * Generates a context for this mark scheme.

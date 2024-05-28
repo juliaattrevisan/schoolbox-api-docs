@@ -105,7 +105,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return string
      */
-    public static function getTitle()
+    public static function getTitle(): string
     {
         return static::TITLE;
     }
@@ -113,7 +113,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return bool
      */
-    public function isQuantitative()
+    public function isQuantitative(): bool
     {
         return static::QUANTITATIVE;
     }
@@ -121,7 +121,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return bool
      */
-    public function isQualitative()
+    public function isQualitative(): bool
     {
         return !static::QUANTITATIVE;
     }
