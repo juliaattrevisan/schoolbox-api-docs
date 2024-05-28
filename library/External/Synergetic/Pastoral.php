@@ -583,7 +583,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // * the absence/presence of an external ID on the pastoral record
         // * if it exists, verify the record actually exists: if it doesn't,
         //   recreate it
-        $isCreate = empty($pastoral->getExternalId()) || !$this->checkPastoralRecordExists($pastoral->getExternalId());
+        $isCreate = empty($pastoral->getExternalId()) || !$this->exists($pastoral);
         if ($isCreate) {
             $query = "
                 INSERT INTO tPastoralCare (
@@ -748,7 +748,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         foreach ($access as $accessRecord) {
             $user = $accessRecord->getUser();
             if ($user instanceof User) {
-                if ($this->isExternalIdValid($user->getExternalId()) && $this->checkPastoralRecordExists($pastoral->getExternalId())) {
+                if ($this->isExternalIdValid($user->getExternalId()) && $this->exists($pastoral)) {
                     $query = "
                         INSERT INTO PastoralCareContacts
                         (
@@ -904,11 +904,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * @param int|null $externalId
-     * @return boolean
+     * @inheritdoc
      */
-    private function checkPastoralRecordExists(?int $externalId): bool
+    public function exists(Pastoral $pastoral): bool
     {
+        $externalId = $pastoral->getExternalId();
         if (is_null($externalId)) {
             return false;
         }
@@ -999,7 +999,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Can only do this if the pastoral record exists in synergetic, and has an external ID
         if (
-            !$this->checkPastoralRecordExists($pastoral->getExternalId())
+            !$this->exists($pastoral)
             || !$this->isExternalIdValid($pastoral->getExternalId())
             || !$this->isExternalIdValid($owner->getExternalId())
         ) {

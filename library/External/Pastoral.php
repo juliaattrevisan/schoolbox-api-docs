@@ -66,6 +66,14 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
+    public function exists(Pastoral\Model $pastoral): bool
+    {
+        return $this->database->exists($pastoral);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function createComment(Pastoral\Comment\Model $comment): bool
     {
         return $this->database->createComment($comment);
