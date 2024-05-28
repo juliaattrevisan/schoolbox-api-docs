@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\CommandLineTool;
 
 use External_Offline_Pastoral;
 use External_Pastoral;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
@@ -107,15 +108,22 @@ class Exporter extends CliTool\App
         }
 
         // Retrieve all pastoral records and re-save
+        $repairOnly = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         $log->info('Finding pastoral records to export...');
         $pb = $pastoralMapper->getPredicateBuilder();
         if ($this->getOpt(self::OPT_LONG_UNEXPORTED_ONLY)) {
             $log->info('* filtered to unexported records only');
-            $pb = $pb->any(
-                $pastoralMapper->getPredicateBuilder()
-                    ->isNull('external_id')
-                    ->equals('external_id', '')
-            );
+            $pb = $pb->isNull('external_id');
+            if ($repairOnly) {
+                $log->error(
+                    sprintf(
+                        '%s and %s options are mutually exclusive: exiting',
+                        self::OPT_LONG_REPAIR_ONLY,
+                        self::OPT_LONG_UNEXPORTED_ONLY,
+                    )
+                );
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
         }
         $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
         if ($fromDate) {
@@ -142,6 +150,29 @@ class Exporter extends CliTool\App
 
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
+                if ($repairOnly) {
+                    $log->debug("Repair-only mode is on: checking if pastoral record exists in external before syncing");
+                    if (!$externalPastoral->exists($pastoralRecord)) {
+                        if ($pastoralRecord->getExternalId()) {
+                            $log->debug(
+                                sprintf(
+                                    "Pastoral record #%d is already synced (external ID: %s) and does not need repair: skipping",
+                                    $pastoralRecord->getId(),
+                                    $pastoralRecord->getExternalId(),
+                                )
+                            );
+                        } else {
+                            $log->debug(
+                                sprintf(
+                                    "Pastoral record #%d is not yet synced: skipping",
+                                    $pastoralRecord->getId(),
+                                )
+                            );
+                        }
+                        continue;
+                    }
+                }
+
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 if ($this->perform()) {
                     try {
