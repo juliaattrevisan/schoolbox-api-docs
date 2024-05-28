@@ -437,7 +437,7 @@
                     {# if PWA was installed and you are accessing it via the PWA #}
                     if (window.matchMedia('(display-mode: standalone)').matches) {
                         // If visible, hide the install promotion
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                        document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
                             element.remove();
                         });
                     }
@@ -453,7 +453,7 @@
                         // Stash the event so it can be triggered later.
                         window.deferredPrompt = event;
                         // Remove the 'hidden' class from the install button container.
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                        document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
                             element.classList.toggle('display', 'none');
                         });
                     });
@@ -523,7 +523,11 @@
                         deviceId = 'Android';
                     }
 
-                    if (iOS() && Boolean({{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}})) {
+                    if (
+                        iOS() &&
+                        Boolean({{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}}) &&
+                        Boolean({{ ((USER.role.type | capitalize) in config.digistorm_role_install_prompt) ? true : false }})
+                    ) {
                         {% if config.debug_mode %}
                         console.log('iOS');
                         {% endif %}
@@ -539,7 +543,11 @@
                         });
                     }
                             {# if android and the android link exists, show it and hide the rest #}
-                    else if (/android/i.test(navigator.userAgent && Boolean({{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }}))) {
+                    else if (
+                            /android/i.test(navigator.userAgent) &&
+                            Boolean({{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }}) &&
+                            Boolean({{ ((USER.role.type | capitalize) in config.digistorm_role_install_prompt) ? true : false }})
+                        ) {
                         {% if config.debug_mode %}
                         console.log('Android');
                         {% endif %}
