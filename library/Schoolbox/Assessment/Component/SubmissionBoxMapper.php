@@ -58,6 +58,11 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('late_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
+        $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
+        $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
+        $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
+        $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
+        $this->uses('enable_policy', self::TYPE_BOOLEAN, null, 'enablePolicy');
         $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);

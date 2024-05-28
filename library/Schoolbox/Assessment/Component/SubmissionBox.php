@@ -120,6 +120,31 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $accept_multiple;
 
     /**
+     * @var bool
+     */
+    protected bool $kamiInteractive;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableOffline;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableText;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableFiles;
+
+    /**
+     * @var bool
+     */
+    protected bool $enablePolicy;
+
+    /**
      * @var Alaress_Date_Format
      */
     protected $created;
@@ -899,5 +924,95 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         $this->capabilityGradeGroup = $capabilityGradeGroup;
         return $this;
+    }
+
+    /**
+     * @param bool $kamiInteractive
+     * @return $this
+     */
+    public function setKamiInteractive(bool $kamiInteractive): self
+    {
+        $this->kamiInteractive = $kamiInteractive;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getKamiInteractive(): bool
+    {
+        return $this->kamiInteractive;
+    }
+
+    /**
+     * @param bool $enableOffline
+     * @return $this
+     */
+    public function setEnableOffline(bool $enableOffline): self
+    {
+        $this->enableOffline = $enableOffline;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableOffline(): bool
+    {
+        return $this->enableOffline;
+    }
+
+    /**
+     * @param bool $enableText
+     * @return $this
+     */
+    public function setEnableText(bool $enableText): self
+    {
+        $this->enableText = $enableText;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableText(): bool
+    {
+        return $this->enableText;
+    }
+
+    /**
+     * @param bool $enableFiles
+     * @return $this
+     */
+    public function setEnableFiles(bool $enableFiles): self
+    {
+        $this->enableFiles = $enableFiles;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableFiles(): bool
+    {
+        return $this->enableFiles;
+    }
+
+    /**
+     * @param bool $enablePolicy
+     * @return $this
+     */
+    public function setEnablePolicy(bool $enablePolicy): self
+    {
+        $this->enablePolicy = $enablePolicy;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnablePolicy(): bool
+    {
+        return $this->enablePolicy;
     }
 }
