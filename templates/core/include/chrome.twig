@@ -339,7 +339,7 @@
                                 data-title-undock="{{ undockNotifsTitle }}"
                             ></a>
                             <label id="notification-toggle-full">Notifications</label>
-                            <a class="icon-settings settings-button" href="{{ routeLookup("messages.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"></a>
+                            <a class="icon-settings settings-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"></a>
                         </li>
                         <li id="pwaPrompt" class="content">
                             {% include '@notifications/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
