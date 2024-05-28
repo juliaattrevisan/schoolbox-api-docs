@@ -122,27 +122,27 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * @var bool
      */
-    protected bool $kamiInteractive;
+    protected bool $kamiInteractive = false;
 
     /**
      * @var bool
      */
-    protected bool $enableOffline;
+    protected bool $enableOffline = false;
 
     /**
      * @var bool
      */
-    protected bool $enableText;
+    protected bool $enableText = false;
 
     /**
      * @var bool
      */
-    protected bool $enableFiles;
+    protected bool $enableFiles = false;
 
     /**
      * @var bool
      */
-    protected bool $enablePolicy;
+    protected bool $enablePolicy = false;
 
     /**
      * @var Alaress_Date_Format
