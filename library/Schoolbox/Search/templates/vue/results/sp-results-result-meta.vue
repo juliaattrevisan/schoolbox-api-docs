@@ -45,7 +45,7 @@ function getDateLong() {
     <span v-else-if="props.result.type === ResultTypes.EVENT" class="meta"
         >{{ props.result.typeTitle }} | {{ getDateLong() }}</span
     >
-    <span v-else-if="props.result.context.length !== 0 && !props.isSubResult" class="meta"
+    <span v-else-if="props.result.context?.length !== 0 && !props.isSubResult" class="meta"
         >{{ props.result.typeTitle }} |
         <template v-for="(context, index) in props.result.context" :key="context.id"
             ><a :href="context._links.view">{{ context.title }}</a
