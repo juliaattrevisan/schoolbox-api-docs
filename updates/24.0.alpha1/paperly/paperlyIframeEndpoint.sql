@@ -5,8 +5,8 @@ VALUES
     (
          'paperly_iframe_api_host',
          NULL,
-         'Paperly API URL',
-         'The Paperly url to access the API.',
+         'Paperly API Host',
+         'The Paperly host to access the API.',
          (SELECT id FROM lu_config_field WHERE `field` = 'input'),
          '',
          (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
