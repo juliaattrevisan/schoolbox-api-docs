@@ -112,7 +112,12 @@ class Api
 
             if ($response->getStatusCode() === 200) {
                 try {
-                    return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                    return json_decode(
+                        $response->getBody()->getContents(),
+                        true,
+                        512,
+                        JSON_THROW_ON_ERROR
+                    );
                 } catch (JsonException $e) {
                     //In case the return is a bad JSON payload try to call the API again
                 }
