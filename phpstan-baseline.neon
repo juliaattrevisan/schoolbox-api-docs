@@ -4491,19 +4491,9 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/AbstractMarkScheme.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Completion\\:\\:getNormalisedMark\\(\\) should return null but returns float\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/MarkScheme/Completion.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\MarkType will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\LetterGrade\\:\\:getHumanReadableMark\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/LetterGrade.php
 
 		-
 			message: "#^If condition is always false\\.$#"
