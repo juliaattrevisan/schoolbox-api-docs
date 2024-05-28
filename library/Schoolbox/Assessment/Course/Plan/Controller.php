@@ -241,6 +241,7 @@ class Controller extends Base
         }
 
         // Locales required to translate the activity types
+        // - typed in @schoolboxAssessment/Types/assessmentTypes.ts
         $activityTypeLocale = [
             'project' => [
                 'proper' => $this->rosettaStone->translate('project', false, true),
@@ -248,12 +249,24 @@ class Controller extends Base
             'dueWork' => [
                 'proper' => $this->rosettaStone->translate('dueWork', false, true),
             ],
+            'activity' => [
+                'singular' => $this->rosettaStone->translate('activity', false, false),
+                'plural' => $this->rosettaStone->translate('activity', true, false),
+            ]
+        ];
+
+        // Locales required to translate rubric capabilities
+        // - typed in @schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes.ts
+        $rubricCapabilitiesLocale = [
+            'singular' => $this->rosettaStone->translate('rubricGroup', false, false),
+            'plural' => $this->rosettaStone->translate('rubricGroup', true, false),
         ];
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
             'activityTypeLocale' => $activityTypeLocale,
+            'rubricCapabilitiesLocale' => $rubricCapabilitiesLocale,
             'template'  => [
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumnTemplate,

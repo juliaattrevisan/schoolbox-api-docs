@@ -7,7 +7,7 @@ import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTy
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import type { Unit, UnitTemplate } from "./unitPlannerTypes";
+import type { Unit, UnitTemplate, RubricCapabilitiesLocale } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpEmptyState from "./up-empty-state.vue";
@@ -21,6 +21,7 @@ interface Props {
     courseTitle: string;
     units: Unit[];
     activityTypeLocale: ActivityTypeLocale;
+    rubricCapabilitiesLocale: RubricCapabilitiesLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
@@ -121,7 +122,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.courseId, props.units, props.template);
+    store.init(props.courseId, props.units, props.template, props.rubricCapabilitiesLocale);
     activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,

@@ -7,6 +7,7 @@
         :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
         :units="{{ units |json_encode }}"
         :activity-type-locale="{{ activityTypeLocale |json_encode }}"
+        :rubric-capabilities-locale="{{ rubricCapabilitiesLocale |json_encode }}"
         :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
         :template="{{ template |json_encode }}"
     ></unit-planner>
