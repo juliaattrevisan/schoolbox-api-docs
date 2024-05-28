@@ -4496,11 +4496,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Completion.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Factory.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\MarkType will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Factory.php
