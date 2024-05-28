@@ -56,6 +56,12 @@ HELP;
 
         $log = $this->getLogger();
 
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->getLogger()->notice('Running in dry-run mode: use -p to write changes to database');
+        }
+
         // Only process if pastoral docman writeback is actually enabled in config
         if (!$this->getConfig()->get("external_pastoral")) {
             $log->warning('Pastoral external is disabled, exiting...');
@@ -94,21 +100,22 @@ HELP;
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
-                try {
-                    $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
-                } catch (\Exception $e) {
-                    $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
-                    $failedPastoralIds[] = $pastoralRecord->getId();
-                    continue;
-                }
+                if ($this->perform()) {
+                    try {
+                        $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
+                    } catch (\Exception $e) {
+                        $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                        $failedPastoralIds[] = $pastoralRecord->getId();
+                        continue;
+                    }
 
-                if (!$syncSucceeded) {
-                    $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
-                    $failedPastoralIds[] = $pastoralRecord->getId();
-                    continue;
+                    if (!$syncSucceeded) {
+                        $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                        $failedPastoralIds[] = $pastoralRecord->getId();
+                        continue;
+                    }
+                    $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
                 }
-
-                $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
 
                 $nRecordsExported++;
 
@@ -129,13 +136,15 @@ HELP;
                             sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
                         );
 
-                        // Only re-sync if it's not already in the Q
-                        $queueCount = $pastoralUploadQueueMapper->countByColumnList([
-                            'pastoral_id' => $pastoralRecord->getId(),
-                            'hash'        => $attachment->getStorage()->getHash(),
-                        ]);
-                        if ($queueCount === 0) {
-                            $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                        if ($this->perform()) {
+                            // Only re-sync if it's not already in the Q
+                            $queueCount = $pastoralUploadQueueMapper->countByColumnList([
+                                'pastoral_id' => $pastoralRecord->getId(),
+                                'hash'        => $attachment->getStorage()->getHash(),
+                            ]);
+                            if ($queueCount === 0) {
+                                $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                            }
                         }
                     }
                 }
