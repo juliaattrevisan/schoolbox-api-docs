@@ -20,9 +20,9 @@ import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
 import ActivitiesListContent from "./activities-list-content.vue";
 import ActivitiesListAction from "./activities-list-action.vue";
 import ActivitiesListEmpty from "./activities-list-empty.vue";
-import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubricCapabilities-content.vue";
-import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubricCapabilities-action.vue";
-import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubricCapabilities-empty.vue";
+import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubric-capabilities-content.vue";
+import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubric-capabilities-action.vue";
+import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubric-capabilities-empty.vue";
 import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
 import UpUnitCellCurriculumAction from "./up-unit-cell-curriculum-action.vue";
 import UpUnitCellCurriculumEmpty from "./up-unit-cell-curriculum-empty.vue";
@@ -293,7 +293,7 @@ window.Vue.onUnmounted(() => {
                     @create-clicked="textboxActionComponent?.onCreateClicked"
                 />
                 <activities-list-empty v-else-if="props.column.type === ColumnType.ACTIVITIES" />
-                <up-unit-cell-rubricCapabilities-empty
+                <up-unit-cell-rubric-capabilities-empty
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                     :unit="props.unit"
                 />
@@ -316,7 +316,7 @@ window.Vue.onUnmounted(() => {
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
-                <up-unit-cell-rubricCapabilities-action
+                <up-unit-cell-rubric-capabilities-action
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                     :unit="props.unit"
                 />
