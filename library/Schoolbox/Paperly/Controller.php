@@ -8,116 +8,62 @@
 namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
-use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Iframe\Validator;
 use Twig\Error\Error;
-use Alaress\Codec\Json\Base64;
 
 class Controller extends Base
 {
-    private string $paperlyHostName;
-    private string $dummyPayload;
-    private array $paperlyPayload;
-    private Base64 $base64Codec;
-
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(private ErrorMapper $errorMapper)
     {
-        //TODO replace with the Paperly hostname
-        $this->paperlyHostName = "https://url";
-
-        $this->base64Codec = new Base64();
-
-        //TODO replace with real payloads once we have it
-
-        $this->dummyPayload = '{
-            "features": [
-                {
-                    "title": "Forms",
-                    "url": "https://url/to/iframe/create_forms"
-                },
-                {
-                    "title": "Excursions",
-                    "url": "https://url/to/iframe/create_excursions"
-                },
-                {
-                    "title": "Parent Teacher Interview",
-                    "url": "https://url/to/iframe/view_pti"
-                }
-            ],
-            "upcoming": [
-                {
-                    "title": "Approve Field Trip: Visit to Science Museum",
-                    "status": "Pending Approval",
-                    "due": "2024-04-15T08:30:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Permission Slip: School Play Performance",
-                    "status": "Pending Approval",
-                    "due": "2024-04-17T10:15:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Parent-Teacher Conference Sign-Up",
-                    "due": "2024-04-20T12:45:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Approve Budget: Annual School Dance",
-                    "status": "Pending Approval",
-                    "due": "2024-04-22T09:00:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Review Curriculum Proposal: New Language Program",
-                    "status": "Pending Approval",
-                    "due": "2024-04-25T13:30:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Teacher Workshop Attendance Form",
-                    "status": "Pending Approval",
-                    "due": "2024-04-27T11:45:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Approve Student Council Budget Proposal",
-                    "status": "Pending Approval",
-                    "due": "2024-04-30T14:20:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                }
-            ]
-        }';
-        $this->paperlyPayload = json_decode($this->dummyPayload, true);
     }
 
     /**
-     * Prepare routes for paperly iframe
+     * Checking whether the iframe url is valid
      *
-     * @param   array $paperlyLink
-     * @return  string
-     * @throws  RouteNotFound
+     * @param null|string $iframeUrl
+     * @throws Exception
+     * @throws Error
      */
-    private function preparePaperlyRoute($paperlyLink): string
+    private function validatingIframeEndpoints(null|string $iframeUrl): void
     {
-        $parsedUrl = parse_url($paperlyLink['url']);
+        //Checking if the target endpoint exists
+        if (null === $iframeUrl) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
 
-        $link = $this->base64Codec->encode(
-            [
-                'pageTitle' => $paperlyLink['title'],
-                'url' => $parsedUrl['path'] . (isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '')
-            ]
+        //Making sure the url is safe to load in the iframe from payload
+        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($iframeUrl)) {
+            //TODO error message might not accurately telling the user it's missing the url in the safe list
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+    }
+
+    /**
+     * Get Paperly payload from the API call
+     *
+     * @return array
+     * @throws \JsonException
+     */
+    private function getPaperlyPayload(): array
+    {
+        $api = new Api(
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_HOSTNAME),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_KEY),
+            $this->getUser()
         );
 
-        return $this->routeGenerator
-            ->generate(
-                'paperly.getPaperlyViewIframe',
-                [
-                    'encodedUrl' => urlencode($link)
-                ]
-            );
+        /**
+         * Currently the Paperly endpoint is called everytime function runs, might potentially hit rate limit
+         */
+        $paperlyPayload = $api->retrievePaperlyIframeView();
+
+        return $paperlyPayload;
     }
 
     /**
@@ -126,19 +72,22 @@ class Controller extends Base
      * Returns data as JSON
      *
      * @api     GET /paperly/viewPaperly
-     * @throws  RouteNotFound
      */
     public function getPaperlyLinks(): void
     {
         $paperlyLinks = [];
 
-        foreach ($this->paperlyPayload['features'] as $feature) {
-            $paperlyLinks['features'][][$feature['title']] = $this->preparePaperlyRoute($feature);
+        $paperlyPayload = $this->getPaperlyPayload();
+
+        foreach ($paperlyPayload['features'] as $feature) {
+            $featureTitle = $feature['title'];
+            $paperlyLinks['features'][][$featureTitle] =
+                "/paperly/view/" . str_replace(' ', '-', strtolower($featureTitle));
         }
 
         $upcomingActions = [];
-        foreach ($this->paperlyPayload['upcoming'] as $order => $upcoming) {
-            $upcoming['url'] = $this->preparePaperlyRoute($upcoming);
+        foreach ($paperlyPayload['upcoming'] as $order => $upcoming) {
+            $upcoming['url'] = "/paperly/action/$order";
             $upcomingActions[$order] = $upcoming;
         }
         $paperlyLinks['upcoming'] = $upcomingActions;
@@ -147,22 +96,51 @@ class Controller extends Base
     }
 
     /**
-     * Load an iframe for Paperly
+     * Load an iframe for Paperly feature
      *
-     * @param string $encodedUrl
+     * @param string $feature
+     * @throws Exception
      * @throws Error
      */
-    public function getPaperlyViewIframe(string $encodedUrl): void
+    public function getPaperlyViewIframe(string $feature): void
     {
-        $path = $this->base64Codec->decode(urldecode($encodedUrl));
+
+        $iframeUrl = null;
+        $paperlyPayload = $this->getPaperlyPayload();
+
+        $featureTitle = ucwords(str_replace('-', ' ', $feature));
+
+        foreach ($paperlyPayload['features'] as $feat) {
+            if ($feat['title'] === $featureTitle) {
+                $iframeUrl = $feat['url'];
+                break; //Exit early if the feature matched
+            }
+        }
+
+        $this->validatingIframeEndpoints($iframeUrl);
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            //Removing trailing forward slash on hostname
-            'url' => preg_replace(
-                '/(?<!:)\/\//',
-                '/',
-                $this->paperlyHostName . $path['url']
-            )
-        ], "Paperly " . $path['pageTitle']);
+            'url' => $iframeUrl
+        ], "Paperly " . $featureTitle);
+    }
+
+    /**
+     * Load an iframe for Paperly action
+     *
+     * @param int $order
+     * @throws Exception
+     * @throws Error
+     */
+    public function getPaperlyActionIframe(int $order): void
+    {
+        $paperlyPayload = $this->getPaperlyPayload();
+
+        $iframeUrl = $paperlyPayload['upcoming'][$order]['url'] ?? null;
+
+        $this->validatingIframeEndpoints($iframeUrl);
+
+        $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
+            'url' => $iframeUrl
+        ], 'Paperly Actions');
     }
 }
