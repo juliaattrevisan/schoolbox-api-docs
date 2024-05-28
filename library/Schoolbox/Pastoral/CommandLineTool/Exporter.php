@@ -26,6 +26,10 @@ class Exporter extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    // --fix-missing: only fix records which have an external ID in Schoolbox,
+    // but do not exist in the external pastoral care system.
+    private const OPT_LONG_FIX_MISSING = 'fix-missing';
+
     /**
      * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
      */
@@ -36,6 +40,7 @@ class Exporter extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_FIX_MISSING,
         ];
     }
 

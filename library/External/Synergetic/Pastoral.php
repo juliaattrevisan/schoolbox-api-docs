@@ -577,9 +577,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function syncPastoral(Pastoral $pastoral, bool $prependTitle = false): bool
     {
-        if (!$this->isExternalCodeValid($pastoral)) {
-            return false;
-        }
+        $this->assertExternalCodeValid($pastoral);
 
         // Get insert/update query based on:
         // * the absence/presence of an external ID on the pastoral record
@@ -922,13 +920,34 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /**
      * Checks whether external code of types are valid
+     *
      * @param Pastoral $pastoral
-     * @return bool
+     * @return void
+     * @throws ExternalException if any of these things are not valid:
+     *                           * record's student's external ID
+     *                           * record's owner's external ID
+     *                           * record's type or subtype
      */
-    private function isExternalCodeValid(Pastoral $pastoral)
+    private function assertExternalCodeValid(Pastoral $pastoral)
     {
         if (!$this->isExternalIdValid($pastoral->getStudent()->getExternalId())) {
-            return false;
+            throw new ExternalException(
+                sprintf(
+                    'Pastoral record %d student external ID "%s" is invalid',
+                    $pastoral->getId(),
+                    $pastoral->getStudent()->getExternalId(),
+                )
+            );
+        }
+
+        if (!$this->isExternalIdValid($pastoral->getOwner()->getExternalId())) {
+            throw new ExternalException(
+                sprintf(
+                    'Pastoral record %d owner external ID "%s" is invalid',
+                    $pastoral->getId(),
+                    $pastoral->getStudent()->getExternalId(),
+                )
+            );
         }
 
         if (
@@ -936,7 +955,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             && !empty($pastoral->getType()->getExternalCode())
             && !array_key_exists($pastoral->getType()->getExternalCode(), $this->getTypeList())
         ) {
-            return false;
+            throw new ExternalException(
+                sprintf(
+                    'Pastoral record %d type code "%s" is invalid',
+                    $pastoral->getId(),
+                    $pastoral->getType()->getExternalCode(),
+                )
+            );
         }
 
         if (
@@ -944,10 +969,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             && !empty($pastoral->getSubType()->getExternalCode())
             && !array_key_exists($pastoral->getSubType()->getExternalCode(), $this->getSubTypeList())
         ) {
-            return false;
+            throw new ExternalException(
+                sprintf(
+                    'Pastoral record %d sub-type code "%s" is invalid',
+                    $pastoral->getId(),
+                    $pastoral->getSubType()->getExternalCode(),
+                )
+            );
         }
-
-        return true;
     }
 
     // Comment synchronization
