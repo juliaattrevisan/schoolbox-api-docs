@@ -205,10 +205,10 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     /**
      * @return float
      */
-    abstract protected function getGranularityNumerator();
+    abstract protected function getGranularityNumerator(): float;
 
     /**
      * @return float
      */
-    abstract protected function getGranularityDenominator();
+    abstract protected function getGranularityDenominator(): float;
 }

@@ -88,7 +88,7 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * @return float
      */
-    protected function getGranularityNumerator()
+    protected function getGranularityNumerator(): float
     {
         return self::GRANULARITY_NUMERATOR;
     }
@@ -96,7 +96,7 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * @return float
      */
-    protected function getGranularityDenominator()
+    protected function getGranularityDenominator(): float
     {
         return self::GRANULARITY_DENOMINATOR;
     }
