@@ -77,6 +77,18 @@ class Exporter extends CliTool\App
 
         $log = $this->getLogger();
 
+        // Exit if mutually exclusive options are provided
+        if ($this->getOpt(self::OPT_LONG_REPAIR_ONLY) && $this->getOpt(self::OPT_LONG_UNEXPORTED_ONLY)) {
+            $log->error(
+                sprintf(
+                    '%s and %s options are mutually exclusive: exiting',
+                    self::OPT_LONG_REPAIR_ONLY,
+                    self::OPT_LONG_UNEXPORTED_ONLY,
+                )
+            );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
         if ($this->perform()) {
             $log->notice('Running in perform mode (-p): changes will be written to database');
         } else {
@@ -100,7 +112,7 @@ class Exporter extends CliTool\App
             $log->info('The current external db does not support pastoral exports; nothing will persist.');
         }
 
-        $externalPastoralUpload    = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
+        $externalPastoralUpload = $this->getConfig()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD);
         if ($externalPastoralUpload) {
             $log->info('Pastoral external attachment upload is enabled');
         } else {
@@ -108,38 +120,7 @@ class Exporter extends CliTool\App
         }
 
         // Retrieve all pastoral records (according to params) and re-save
-        $repairOnly = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
-        $log->info('Finding pastoral records to export...');
-        $pb = $pastoralMapper->getPredicateBuilder();
-        if ($this->getOpt(self::OPT_LONG_UNEXPORTED_ONLY)) {
-            $log->info('* filtered to unexported records only');
-            $pb = $pb->isNull('external_id');
-            if ($repairOnly) {
-                $log->error(
-                    sprintf(
-                        '%s and %s options are mutually exclusive: exiting',
-                        self::OPT_LONG_REPAIR_ONLY,
-                        self::OPT_LONG_UNEXPORTED_ONLY,
-                    )
-                );
-                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-            }
-        }
-        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
-        if ($fromDate) {
-            $log->info(
-                sprintf('* filtered to records created on or after: "%s"', $fromDate->toRfc3339String()),
-            );
-            $pb = $pb->greaterThanOrEqualTo('created_at', $fromDate->getDatabase());
-        }
-        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
-        if ($toDate) {
-            $log->info(
-                sprintf('* filtered to records created on or before: "%s"', $toDate->toRfc3339String()),
-            );
-            $pb = $pb->lessThanOrEqualTo('created_at', $toDate->getDatabase());
-        }
-        $pastoralRecordIds  = $pastoralMapper->findIdsByPredicates($pb, ['deleted' => false]);
+        $pastoralRecordIds  = $this->findPastoralRecordIds($pastoralMapper);
         $nPastoralRecordIds = count($pastoralRecordIds);
         $log->info("Beginning export of $nPastoralRecordIds pastoral records...");
 
@@ -148,6 +129,7 @@ class Exporter extends CliTool\App
         $failedPastoralIds = [];
         $nRecordsExported = 0;
 
+        $repairOnly = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByPredicates($builder->in('id', $batchOfPastoralRecordIds)) as $pastoralRecord) {
                 if ($repairOnly) {
@@ -294,5 +276,37 @@ OPTIONS
 
 
 HELP;
+    }
+
+    /**
+     * Find pastoral record IDs to import according to command-line options.
+     *
+     * @param PastoralMapper $pastoralMapper
+     * @return array
+     */
+    private function findPastoralRecordIds(PastoralMapper $pastoralMapper): array
+    {
+        $log = $this->getLogger();
+        $log->info('Finding pastoral records to export...');
+        $pb = $pastoralMapper->getPredicateBuilder();
+        if ($this->getOpt(self::OPT_LONG_UNEXPORTED_ONLY)) {
+            $log->info('* filtered to unexported records only');
+            $pb = $pb->isNull('external_id');
+        }
+        $fromDate = $this->buildDate($this->getOpt(self::OPT_LONG_FROM));
+        if ($fromDate) {
+            $log->info(
+                sprintf('* filtered to records created on or after: "%s"', $fromDate->toRfc3339String()),
+            );
+            $pb = $pb->greaterThanOrEqualTo('created_at', $fromDate->getDatabase());
+        }
+        $toDate = $this->buildDate($this->getOpt(self::OPT_LONG_TO));
+        if ($toDate) {
+            $log->info(
+                sprintf('* filtered to records created on or before: "%s"', $toDate->toRfc3339String()),
+            );
+            $pb = $pb->lessThanOrEqualTo('created_at', $toDate->getDatabase());
+        }
+        return $pastoralMapper->findIdsByPredicates($pb, ['deleted' => false]);
     }
 }
