@@ -145,8 +145,8 @@ Data:
                 return true;
             }
             let inlineLen = window.sbProps.editors['editor-body']?.getData().length,
-                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
-            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson').prop('checked'));
+                filesLen  = $('#files-zone').data('plugin_resourceAttach')?.dropzone.getAcceptedFiles().length;
+            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson')?.prop('checked'));
         };
 
         /**
