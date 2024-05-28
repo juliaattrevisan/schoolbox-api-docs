@@ -13,6 +13,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Iframe\Validator;
 use Twig\Error\Error;
+use Crell\ApiProblem\ApiProblem;
 
 class Controller extends Base
 {
@@ -79,8 +80,21 @@ class Controller extends Base
             'features' => []
         ];
 
-        $paperlyPayload = $this->getPaperlyPayload();
-
+        try {
+            $paperlyPayload = $this->getPaperlyPayload();
+        } catch (\RuntimeException $e) {
+            $problem = (new ApiProblem('Paperly endpoint is not working.'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
         foreach ($paperlyPayload['features'] as $feature) {
             $featureTitle = $feature['title'];
             $paperlyLinks['features'][][$featureTitle] =
