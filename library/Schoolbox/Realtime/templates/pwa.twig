@@ -17,19 +17,19 @@
         {% if config.digistorm_role_install_prompt ?? [] is empty %}
             {# All users are redirected to the store link #}
             {% if installApple is not empty %}
-                <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install Apple</a>
+                <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
             {% endif %}
             {% if installGoogle is not empty %}
-                <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install Google</a>
+                <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
             {% endif %}
         {% else %}
             {# ensure the user is in the specified role #}
             {% if (USER.role.type | capitalize) in config.digistorm_role_install_prompt %}
                 {% if installApple is not empty %}
-                    <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install Apple</a>
+                    <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
                 {% endif %}
                 {% if installGoogle is not empty %}
-                    <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install Google</a>
+                    <a data-pwa-action="installGoogle" class="button" href="{{ installGoogle }}">Install</a>
                 {% endif %}
             {% endif %}
         {% endif %}
