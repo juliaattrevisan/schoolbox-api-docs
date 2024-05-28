@@ -59,7 +59,7 @@ class Survey_Answer_Date extends Evaluation_Answer_Date
         $existing      = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $currentAnswer = $this->getByQuestionID($question_id);
         if ($existing['response']) {
-            $answer = $this->hydrateDate($existing['response'] ?? null) ?? '';
+            $answer = $this->hydrateDate($existing['response']) ?? '';
             $page->setVar(
                 [
                     'QUESTION_ID'     => $question_id,
