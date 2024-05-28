@@ -207,10 +207,33 @@ class Factory
         $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
-        $this->setKamiInteractive(trim($post['kamiInteractive'] ?? '') === 'on');
-        $this->setEnableOffline(trim($post['enableOffline'] ?? '') === 'on');
-        $this->setEnableText(trim($post['enableText'] ?? '') === 'on');
-        $this->setEnableFiles(trim($post['enableFiles'] ?? '') === 'on');
+
+        /**
+         * new due work checks, this is an array, so we can use frontend validation to confirm if we have selected at least one of these options...
+         * firstly clear all the values, and set TRUE to only those that are set.
+         */
+        $this->setKamiInteractive(false);
+        $this->setEnableOffline(false);
+        $this->setEnableText(false);
+        $this->setEnableFiles(false);
+        foreach ($post['submissionOptions'] as $subOption) {
+            $value = trim($subOption ?? '');
+            switch ($value) {
+                case 'kamiInteractive':
+                    $this->setKamiInteractive(true);
+                    break;
+                case 'enableOffline':
+                    $this->setEnableOffline(true);
+                    break;
+                case 'enableText':
+                    $this->setEnableText(true);
+                    break;
+                case 'enableFiles':
+                    $this->setEnableFiles(true);
+                    break;
+            }
+        }
+
         $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));

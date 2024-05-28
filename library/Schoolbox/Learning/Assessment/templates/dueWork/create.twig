@@ -132,7 +132,7 @@
             <ul class="option-list">
                 {% if kami_enabled %}
                 <li>
-                    <input id="worksheet" type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="kamiInteractive" value="on" data-type-group>
+                    <input id="worksheet" type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="submissionOptions[]" value="kamiInteractive" data-type-group>
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
                     <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} %} </div>
@@ -140,17 +140,17 @@
                 </li>
                 {% endif %}
                 <li>
-                    <input id="allow-offline" type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="enableOffline" value="on" data-type-group>
+                    <input id="allow-offline" type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="submissionOptions[]" value="enableOffline" data-type-group>
                     <label for="allow-offline" class="checkbox-label">Allow Offline</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work offline to acknowledge that it has been completed.">?</span>
                 </li>
                 <li>
-                    <input id="text-editor" type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="enableText" value="on" data-type-group>
+                    <input id="text-editor" type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="submissionOptions[]" value="enableText" data-type-group>
                     <label for="text-editor" class="checkbox-label">Text Editor</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type directly into the editor, and add or edit their due work content.">?</span>
                 </li>
                 <li>
-                    <input id="files" type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="enableFiles" value="on" data-type-group>
+                    <input id="files" type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="submissionOptions[]" value="enableFiles" data-type-group>
                     <label for="files" class="checkbox-label">Files</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
                 </li>
