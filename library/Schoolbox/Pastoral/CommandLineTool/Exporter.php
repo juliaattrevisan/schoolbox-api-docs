@@ -23,12 +23,23 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
  */
 class Exporter extends CliTool\App
 {
-    // --help: print help
+    // -h, --help: print help
+    private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP = 'help';
 
-    // --fix-missing: only fix records which have an external ID in Schoolbox,
+    // --unexported-only: only sync records which do not have an external ID in
+    // Schoolbox yet.
+    private const OPT_LONG_UNEXPORTED_ONLY = 'unexported-only';
+
+    // --repair-only: only sync records which have an external ID in Schoolbox,
     // but do not exist in the external pastoral care system.
-    private const OPT_LONG_FIX_MISSING = 'fix-missing';
+    private const OPT_LONG_REPAIR_ONLY = 'repair-only';
+
+    // --from: only import records created on or after this date.
+    private const OPT_LONG_FROM = 'from:';
+
+    // --to: only import records created on or after this date.
+    private const OPT_LONG_TO = 'to:';
 
     /**
      * Number of pastoral records to fetch per batch.  Higher batch size requires more memory, but reduces run time.
@@ -36,26 +47,30 @@ class Exporter extends CliTool\App
     private const BATCH_SIZE = 100;
 
     /** @inheritdoc */
+    public function getShortOpts(): array
+    {
+        return [
+            self::OPT_SHORT_HELP,
+        ];
+    }
+
+    /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FIX_MISSING,
+            self::OPT_LONG_UNEXPORTED_ONLY,
+            self::OPT_LONG_REPAIR_ONLY,
+            self::OPT_LONG_FROM,
+            self::OPT_LONG_TO,
         ];
     }
 
     /** @inheritDoc */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Syncs all pastoral care records within Schoolbox to the external pastoral care system, if one is configured.
-
-Usage: pastoralExport.php
-
-
-HELP;
+        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
+            $this->printHelp();
             exit;
         }
 
@@ -167,5 +182,63 @@ HELP;
         if (count($failedPastoralIds) > 0) {
             $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
         }
+    }
+
+    /**
+     * Print help text
+     *
+     * @return void
+     */
+    private function printHelp(): void
+    {
+        $file       = $this->getToolFilename();
+        $green      = self::COLOUR_GREEN;
+        $white      = self::COLOUR_WHITE;
+        $yellow     = self::COLOUR_YELLOW;
+        echo <<<HELP
+NAME:
+    Pastoral record exporter
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    Exports all pastoral care records within Schoolbox to the external pastoral care system, if one is configured.
+
+OPTIONS
+    $yellow-h, --help$white
+        Print this help and exit
+
+    $yellow-p, --perform$white
+        Actually export records: otherwise, only output records which would be exported.
+
+    $yellow--unexported-only$white
+        If provided, only attempt to export records which have been not yet been exported to the external pastoral care system.
+
+        Mutually exclusive with $yellow--repair-only$white: if neither is provided, all records will be exported.
+
+    $yellow--repair-only$white
+        If provided, only attempt to export records which have been recorded as exported to the external pastoral care system, but don't exist within it:
+        this attempts to repair exports which might have worked only partially.
+
+        Mutually exclusive with $yellow--unsynced-only$white.
+
+    $yellow--from=FROM_DATE$white
+        If provided, only export records created from {$yellow}FROM_DATE{$white} onward.
+
+        {$yellow}FROM_DATE{$white} will be parsed according to the following rules:
+        * as a database date (YYYY-MM-DD HH:MM:SS)
+        * as a Unix timestamp
+        * via `strtotime`
+
+        This script will fail if {$yellow}FROM_DATE{$white} is not parseable.
+
+    $yellow--to=TO_DATE$white
+        If provided, only export records created on {$yellow}TO_DATE{$white} and before.
+
+        {$yellow}TO_DATE{$white} will be parsed using the same rules as {$yellow}FROM_DATE{$white}, and will cause this script to fail for the same reasons.
+
+
+HELP;
     }
 }
