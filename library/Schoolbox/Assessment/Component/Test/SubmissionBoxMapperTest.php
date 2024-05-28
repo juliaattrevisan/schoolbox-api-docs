@@ -41,6 +41,7 @@ class SubmissionBoxMapperTest extends TestCase
             'accept_submission' => true,
             'multi_submission'  => false,
             'kami_interactive'  => true,
+            'interactive_hash'  => 'thisIsNotAHash',
             'enable_offline'    => true,
             'enable_text'       => true,
             'enable_files'      => true,
@@ -58,6 +59,7 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());
         $this->assertEquals(true, $box->getKamiInteractive());
+        $this->assertEquals('thisIsNotAHash', $box->getKamiFile());
         $this->assertEquals(true, $box->getEnableOffline());
         $this->assertEquals(true, $box->getEnableText());
         $this->assertEquals(true, $box->getEnableFiles());

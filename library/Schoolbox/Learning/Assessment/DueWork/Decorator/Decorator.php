@@ -64,6 +64,7 @@ class Decorator implements DecoratorInterface
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
      * @param bool         $kamiInteractive
+     * @param string|null  $kamiFile
      * @param bool         $enableOffline
      * @param bool         $enableText
      * @param bool         $enableFiles
@@ -84,6 +85,7 @@ class Decorator implements DecoratorInterface
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
         bool $kamiInteractive,
+        ?string $kamiFile,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
@@ -103,6 +105,7 @@ class Decorator implements DecoratorInterface
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
         $this->setKamiInteractive($kamiInteractive);
+        $this->setKamiFile($kamiFile);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
@@ -246,6 +249,7 @@ class Decorator implements DecoratorInterface
         $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
 
         $assessment->setKamiInteractive($this->getKamiInteractive());
+        $assessment->setKamiFile($this->getKamiFile());
         $assessment->setEnableOffline($this->getEnableOffline());
         $assessment->setEnableText($this->getEnableText());
         $assessment->setEnableFiles($this->getEnableFiles());

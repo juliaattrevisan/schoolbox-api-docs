@@ -234,6 +234,8 @@ class Factory
             }
         }
 
+        $this->setKamiFile($post['worksheet'] ?? null);
+
         $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
@@ -426,6 +428,7 @@ class Factory
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getKamiInteractive(),
+                    $this->getKamiFile(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),
                     $this->getEnableFiles(),
@@ -447,6 +450,7 @@ class Factory
                     $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
                     $this->getKamiInteractive(),
+                    $this->getKamiFile(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),
                     $this->getEnableFiles(),

@@ -471,13 +471,16 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // To be able to view the current student policy if enabling within the submission type
         $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
-        $data['attachzoneWorksheet'] = (new Zone('worksheet'))
+        $zone = (new Zone('worksheet'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
             ->setMimeFilter('.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png')
-            ->setFilesystemContext('worksheet')
-            ->getTwigContext();
+            ->setFilesystemContext('worksheet');
+        if ($assessment->getKamiFile()) {
+            $zone->attachFiles([$assessment->getKamiFile()]);
+        }
+        $data['attachzoneWorksheet'] = $zone->getTwigContext();
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }

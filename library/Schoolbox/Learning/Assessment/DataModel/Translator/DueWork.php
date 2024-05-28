@@ -92,6 +92,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
         null === $domainObject->getKamiInteractive()        || $dataModel->setKamiInteractive($domainObject->getKamiInteractive());
+        null === $domainObject->getKamiFile()               || $dataModel->setKamiFile($domainObject->getKamiFile());
         null === $domainObject->getEnableOffline()          || $dataModel->setEnableOffline($domainObject->getEnableOffline());
         null === $domainObject->getEnableText()             || $dataModel->setEnableText($domainObject->getEnableText());
         null === $domainObject->getEnableFiles()            || $dataModel->setEnableFiles($domainObject->getEnableFiles());
@@ -164,6 +165,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getSelfReviewability()      || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
         null === $dataModel->getSimilarityCheckEnabled() || $domainObject->setSimilarityCheckEnabled($dataModel->getSimilarityCheckEnabled());
         null === $dataModel->getKamiInteractive()        || $domainObject->setKamiInteractive($dataModel->getKamiInteractive());
+        null === $dataModel->getKamiFile()               || $domainObject->setKamiFile($dataModel->getKamiFile());
         null === $dataModel->getEnableOffline()          || $domainObject->setEnableOffline($dataModel->getEnableOffline());
         null === $dataModel->getEnableText()             || $domainObject->setEnableText($dataModel->getEnableText());
         null === $dataModel->getEnableFiles()            || $domainObject->setEnableFiles($dataModel->getEnableFiles());

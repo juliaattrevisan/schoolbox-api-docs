@@ -90,6 +90,11 @@ trait DueWorkTrait
     protected bool $kamiInteractive = false;
 
     /**
+     * @var string|null
+     */
+    protected ?string $kamiFile = null;
+
+    /**
      * @var bool
      */
     protected bool $enableOffline = false;
@@ -323,6 +328,24 @@ trait DueWorkTrait
     public function getKamiInteractive(): bool
     {
         return $this->kamiInteractive;
+    }
+
+    /**
+     * @param string|null $kamiFile
+     * @return $this
+     */
+    public function setKamiFile(?string $kamiFile): self
+    {
+        $this->kamiFile = $kamiFile;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKamiFile(): ?string
+    {
+        return $this->kamiFile;
     }
 
     /**
