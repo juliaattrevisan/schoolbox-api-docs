@@ -81,7 +81,6 @@ class Api
     /**
      * Retrieve data from the API endpoint
      *
-     * @param   string $endpoint
      * @return  null|array
      * @throws  DomainException
      * @throws  RuntimeException if the retrieval of the endpoint failed
