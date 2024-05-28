@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * The empty state for a curriculum overview component when there are no curriculum codes present
+ */
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";

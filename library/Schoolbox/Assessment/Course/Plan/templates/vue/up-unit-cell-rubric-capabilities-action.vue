@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * The component-action for a rubric capabilities cell on the unit planner
+ * Currently just links to the manage rubric page
+ */
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Unit } from "./unitPlannerTypes";
 

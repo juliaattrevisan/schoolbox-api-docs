@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * The empty state for a rubric capabilities cell on the unit planner when no capabilities are present
+ */
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Unit } from "./unitPlannerTypes";
 

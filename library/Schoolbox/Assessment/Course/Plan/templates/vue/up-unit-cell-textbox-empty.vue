@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * The empty state for a textbox cell on the unit planner
+ * Shows when:
+ * - The textbox is not created yet
+ * - The textbox is created, but has no content
+ */
 import type { Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
