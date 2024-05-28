@@ -1031,7 +1031,7 @@ class Controller extends Assessment\Controller
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
-            'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
+            'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
             'errorMessage'   => $errorMessage,
             'readonly'       => $isInteractionLocked,
             'selfReflect'    => $selfReflect,
