@@ -14,14 +14,15 @@ class None extends AbstractMarkScheme
 {
     public const SLUG = 'none';
 
-    const TITLE = 'None';
+    public const TITLE = 'None';
+
 
     /**
      * This type is not comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
 
 
     /**

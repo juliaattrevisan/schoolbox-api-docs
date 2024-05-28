@@ -15,7 +15,8 @@ abstract class AbstractMarkScheme implements IMarkScheme
     public const SLUG = 'raw';
     public const PRECISION = 2;
 
-    const TITLE = 'Abstract Mark Scheme';
+    public const TITLE = 'Abstract Mark Scheme';
+
 
     /**
      * Does this mark scheme produce human-readable results that are comparable
@@ -23,7 +24,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
 
 
     /**

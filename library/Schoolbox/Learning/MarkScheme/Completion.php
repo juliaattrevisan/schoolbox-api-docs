@@ -15,17 +15,21 @@ class Completion extends AbstractMarkScheme
 {
     public const SLUG = 'completion';
 
-    const TITLE = 'Completion';
+    public const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';
-    const HUMAN_READABLE_COMPLETE    = 'Complete';
 
     /**
      * This type is not comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
+
+
+    public const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';
+    public const HUMAN_READABLE_COMPLETE    = 'Complete';
+
+
 
     /**
      * @inheritdoc

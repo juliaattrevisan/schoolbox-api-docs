@@ -18,7 +18,16 @@ class LetterGrade extends AbstractMarkScheme
     public const SLUG = 'letter';
     public const PRECISION = 2;
 
-    const TITLE = 'Letter Grade';
+    public const TITLE = 'Letter Grade';
+
+
+    /**
+     * This type is comparable numerically, through the levels within this
+     * object's grade group.
+     *
+     * @var bool
+     */
+    public const QUANTITATIVE = true;
 
 
     /**
@@ -32,13 +41,6 @@ class LetterGrade extends AbstractMarkScheme
     /** @var GradeGroup */
     private $gradeGroup;
 
-    /**
-     * This type is comparable numerically, through the levels within this
-     * object's grade group.
-     *
-     * @var bool
-     */
-    const QUANTITATIVE = true;
 
     /**
      * @param GradeGroup $gradeGroup

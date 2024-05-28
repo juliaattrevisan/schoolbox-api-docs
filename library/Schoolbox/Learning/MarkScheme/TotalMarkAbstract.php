@@ -18,7 +18,16 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt as QuizAttempt;
  */
 abstract class TotalMarkAbstract extends AbstractMarkScheme
 {
-    const TITLE = 'Total Mark';
+    public const TITLE = 'Total Mark';
+
+
+    /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    public const QUANTITATIVE = true;
+
 
     /**
      * Quiz can set this to NULL, but then must supply an IResponse to getHumanReadable()
@@ -27,12 +36,6 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      */
     private $totalMark;
 
-    /**
-     * This type is comparable numerically.
-     *
-     * @var bool
-     */
-    const QUANTITATIVE = true;
 
     /**
      * @param null|int|float $totalMark

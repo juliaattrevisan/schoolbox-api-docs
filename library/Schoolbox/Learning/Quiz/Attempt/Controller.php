@@ -76,7 +76,6 @@ class Controller extends Base
              * If that exists, recycle it; otherwise spawn a new one altogether.
              */
             if (null !== $response) {
-
                 $attempt = $this->attemptMapper->findById($response->getId());
             } else {
                 /* If a feedback didn't already exist,

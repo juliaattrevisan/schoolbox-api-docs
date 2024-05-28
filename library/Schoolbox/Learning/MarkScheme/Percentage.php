@@ -16,14 +16,15 @@ class Percentage extends AbstractMarkScheme
 {
     public const SLUG = 'percent';
 
-    const TITLE = 'Percentage';
+    public const TITLE = 'Percentage';
+
 
     /**
      * This type is comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = true;
+    public const QUANTITATIVE = true;
 
 
     /**
