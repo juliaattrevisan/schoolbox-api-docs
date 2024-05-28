@@ -207,6 +207,11 @@ class Factory
         $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
+        $this->setKamiInteractive(trim($post['kamiInteractive'] ?? '') === 'on');
+        $this->setEnableOffline(trim($post['enableOffline'] ?? '') === 'on');
+        $this->setEnableText(trim($post['enableText'] ?? '') === 'on');
+        $this->setEnableFiles(trim($post['enableFiles'] ?? '') === 'on');
+        $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
         $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
