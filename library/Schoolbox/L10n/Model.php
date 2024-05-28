@@ -204,7 +204,6 @@ class Model
         return $this->translate(true, true);
     }
 
-
     /**
      * Convenience method for fetching all forms.
      *
@@ -217,6 +216,23 @@ class Model
             'plural'         => $this->translate(true, false),
             'properSingular' => $this->translate(false, true),
             'properPlural'   => $this->translate(true, true),
+        ];
+    }
+
+    /**
+     * Return the model as an array for use in the frontend
+     * See @js/terminology/l10n.ts
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'term'            => $this->term,
+            'title'           => $this->title,
+            'singularForm'    => $this->singularForm,
+            'pluralForm'      => $this->pluralForm,
+            'capitaliseFirst' => $this->capitaliseFirst,
+            'indefiniteArticle' => $this->indefiniteArticle,
         ];
     }
 }

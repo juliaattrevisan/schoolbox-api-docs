@@ -6,6 +6,7 @@
 import Vue from "vue";
 import dayjs from "dayjs";
 import type { Editor } from "@js/editor/types/editorTypes";
+import type { RosettaStone } from "@js/terminology/rosettaStone";
 
 declare global {
     interface Window {
@@ -28,6 +29,7 @@ declare global {
             imageSlideshows: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
+            l10n: RosettaStone;
             firebaseApps: Array<{
                 appIdentifier: string;
                 publicConfiguration: { [key: string]: any };
