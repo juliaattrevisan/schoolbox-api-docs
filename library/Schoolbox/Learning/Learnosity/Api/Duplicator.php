@@ -245,10 +245,7 @@ class Duplicator
                 // opposed to a transient error (which may complete later).
                 // Just mark as unprocessable after enough failures.
                 $updateStatus = true;
-                $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
-                    ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
-                    : Helper::LEARNOSITY_PROCESS_STATUS_FAILED
-                ;
+                $jobStatus    = $this->determineFailureStatus($quiz);
             }
 
             // If complete: set tags
@@ -265,10 +262,7 @@ class Duplicator
                 } catch (\Exception $e) {
                     // Log this somewhere I guess?
                     $updateStatus = true;
-                    $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
-                        ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
-                        : Helper::LEARNOSITY_PROCESS_STATUS_FAILED
-                    ;
+                    $jobStatus    = $this->determineFailureStatus($quiz);
                 }
             }
 
@@ -385,5 +379,21 @@ class Duplicator
         );
         $quiz->setLearnosityJobStatus($jobStatus);
         $query->execute();
+    }
+
+    /**
+     * Which Learnosity failure processing status should this have?
+     *
+     * If it's failed `self::FAILURE_THRESHOLD` or more times, it's
+     * unprocessable: otherwise it's just failed (and may be restarted).
+     *
+     * @param QuizDomainModel $quiz
+     * @return string
+     */
+    private function determineFailureStatus(QuizDomainModel $quiz): string
+    {
+        return $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
+            ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
+            : Helper::LEARNOSITY_PROCESS_STATUS_FAILED;
     }
 }
