@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Admin\SummativeReport\Payload;
 
 use Alaress\Database\Connector\IConnector;
+use DebugBar\DebugBarException;
 use http\Exception\RuntimeException;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\User;
@@ -79,18 +80,17 @@ class VictorianProgression
 
 
     /**
-     * @param IConnector $db
      * @param Mapper $workTypeMapper
      */
     public function __construct(
-        private IConnector $db,
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
     ) {
     }
 
 
     /**
-     * Set up the
+     * Set up the necessary parts
+     *
      * @return void
      * @throws \DomainException
      */
@@ -98,7 +98,7 @@ class VictorianProgression
     {
         /* Prepare megaquery
          */
-        $this->payloadStatement = $this->db->prepare(self::QUERY);
+        $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
 
         /* Find the Work Type Id first, by name for lack of a better way
          */
@@ -125,6 +125,7 @@ class VictorianProgression
      * @param \Alaress_Date_Format $endDate
      * @return array
      * @throws RuntimeException
+     * @throws DebugBarException
      * @throws \PDOException
      */
     public function generate(
@@ -146,6 +147,10 @@ class VictorianProgression
             'startDate' => $startDate->getDatabaseDate(),
             'endDate' => $endDate->getDatabaseDate()
         ]);
+
+        while ($row = $rows->fetch()) {
+            new \Alaress_Probe($row);
+        }
 
         return $struct;
     }
