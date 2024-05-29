@@ -130,6 +130,20 @@
         <div class="small-12 columns">
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
+                {% if assessment.courseManaged %}
+                    {% if kami_enabled and assessment.getKamiInteractive %}
+                        <input id="kamiInteractive-hidden" type="hidden" name="submissionOptions[]" value="kamiInteractive" />
+                    {% endif %}
+                    {% if assessment.courseManaged and assessment.getEnableOffline %}
+                        <input id="enableOffline-hidden" type="hidden" name="submissionOptions[]" value="enableOffline" />
+                    {% endif %}
+                    {% if assessment.courseManaged and assessment.getEnableText %}
+                        <input id="enableText-hidden" type="hidden" name="submissionOptions[]" value="enableText" />
+                    {% endif %}
+                    {% if assessment.courseManaged and assessment.getEnableFiles %}
+                        <input id="enableFiles-hidden" type="hidden" name="submissionOptions[]" value="enableFiles" />
+                    {% endif %}
+                {% endif %}
                 {% if kami_enabled %}
                 <li>
                     <input id="worksheet" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="submissionOptions[]" value="kamiInteractive" data-type-group>
@@ -156,6 +170,7 @@
                 </li>
                 {% if lmsStudentPolicy | length %}
                 <li>
+                    <input type="hidden" name="enablePolicy" value="{% if assessment.courseManaged and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
                     <input id="declaration" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getEnablePolicy ? 'checked' : '' }} name="enablePolicy" value="on">
                     <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
