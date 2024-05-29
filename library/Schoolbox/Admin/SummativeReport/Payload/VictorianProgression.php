@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Admin\SummativeReport\Payload;
+namespace Schoolbox\Admin\SummativeReport\Payload;
 
 use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
