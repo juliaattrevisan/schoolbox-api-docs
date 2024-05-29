@@ -15,6 +15,7 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -24,6 +25,7 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
+use Throwable;
 
 /**
  * Specialised command for duplicating quiz contents from one quiz to another,
@@ -51,6 +53,7 @@ class Duplicator
      *                                                 daemon.
      * @param Producer                $messageProducer Used to send messages to the task daemon once built.
      * @param TagFactory              $tagFactory      Used to build a set of tags for the quiz in Learnosity.
+     * @param LoggerInterface         $logger          Somewhere to log messages to
      */
     public function __construct(
         private Api $api,
@@ -61,6 +64,7 @@ class Duplicator
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
         private TagFactory $tagFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -259,10 +263,17 @@ class Duplicator
                 // count this as a fail of the job itself.
                 try {
                     $this->assignTags($quiz, $newTags);
-                } catch (\Exception $e) {
+                } catch (Throwable $e) {
                     // Log this somewhere I guess?
                     $updateStatus = true;
                     $jobStatus    = $this->determineFailureStatus($quiz);
+                    $this->logger->warning(
+                        sprintf(
+                            'Job completed, but tag assignation failed (%s, message: %s): marking job as failed',
+                            get_class($e),
+                            $e->getMessage(),
+                        )
+                    );
                 }
             }
 

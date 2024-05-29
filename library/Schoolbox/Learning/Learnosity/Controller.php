@@ -163,6 +163,12 @@ class Controller extends Base
 
 
     /**
+     * Logger: used for... logging
+     */
+    private Logger $logger;
+
+
+    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -203,17 +209,17 @@ class Controller extends Base
          * I want to avoid dumping Yet Another Thing into the kernel
          * I don't have a convenient means to access SERVER_NAME except like this, sadly
          */
-        $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+        $this->logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
 
         $this->api = new Api(
             $urlFactory->buildFullyQualified()->getHost(),
             $this->learnosityVersion,
             $this->learnosityConsumerKey,
             $this->learnosityConsumerSecret,
-            $logger
+            $this->logger
         );
 
-        $this->helper = new Helper($this->api, $logger);
+        $this->helper = new Helper($this->api, $this->logger);
     }
 
 
@@ -2203,6 +2209,7 @@ class Controller extends Base
             $this->messageFactory,
             $this->messageProducer,
             new TagFactory($this->getConfigLoader()->get('site_school_code')),
+            $this->logger,
         );
     }
 
