@@ -251,11 +251,6 @@ class Duplicator
                 ;
             }
 
-            // If complete or failed: set status
-            if ($updateStatus) {
-                $this->updateStatus($quiz, $jobStatus);
-            }
-
             // If complete: set tags
             if ($setTags) {
                 $newTags = $this->tagFactory->produceFromAssessment($quiz);
@@ -263,8 +258,23 @@ class Duplicator
                     $newTags[] = $this->tagFactory->produceImplFlag();
                 }
 
-                // If any setting of tags fails: restart the job.
-                $this->assignTags($quiz, $newTags);
+                // If any setting of tags fails:
+                // count this as a fail of the job itself.
+                try {
+                    $this->assignTags($quiz, $newTags);
+                } catch (\Exception $e) {
+                    // Log this somewhere I guess?
+                    $updateStatus = true;
+                    $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
+                        ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
+                        : Helper::LEARNOSITY_PROCESS_STATUS_FAILED
+                    ;
+                }
+            }
+
+            // If complete or failed: set status
+            if ($updateStatus) {
+                $this->updateStatus($quiz, $jobStatus);
             }
         }
     }
