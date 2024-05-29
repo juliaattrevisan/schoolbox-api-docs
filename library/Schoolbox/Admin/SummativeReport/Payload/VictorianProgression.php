@@ -182,6 +182,10 @@ class VictorianProgression
         if ($previousAcademicPeriods->count() > 1) {
             $previousAcademicPeriod = $previousAcademicPeriods->getOffset(1);
 
+            /* FIXME!!!!!!!!! For testing due to lack of data
+             */
+            $previousAcademicPeriod = $this->termMapper->findById(4);
+
             /* Add the previous academic period's curriculum nodes
              * and associated feedback, augmenting what we already made
              */
@@ -304,10 +308,17 @@ class VictorianProgression
 
             /* Pop it into the node specified by $type
              * Note that $row['mark'] will be something in 6, 6.5, 7, 7.5, 8, 8.5...etc
+             *
+             * If something was already here, don't touch it; this ensures we get
+             * the most recently published one and skipping all the older ones
              */
-            if (null === $parentNodeId) {
+            if (null === $parentNodeId && null === $struct[$nodeId][$type]) {
+                /* There is no parent node
+                 */
                 $struct[$nodeId][$type] = $outcome;
-            } else {
+            } elseif (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
+                /* There is a parent node
+                 */
                 $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
             }
         }
