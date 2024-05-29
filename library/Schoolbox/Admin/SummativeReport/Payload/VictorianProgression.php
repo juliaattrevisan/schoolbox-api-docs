@@ -93,12 +93,6 @@ class VictorianProgression
 
 
     /**
-     * @var array
-     */
-    private array $struct = [];
-
-
-    /**
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      */
@@ -226,9 +220,6 @@ class VictorianProgression
 
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
             $nodeId = $row['curriculum_node_id'];
-            $nodeName = $row['curriculum_node'];
-            $parentId = $row['parent_node_id'];
-            $parentName = $row['parent_node'];
 
             /* Init if it wasn't already here
              */
@@ -236,10 +227,10 @@ class VictorianProgression
                 $struct[$nodeId] = [
                     'node' => [
                         'id' => $nodeId,
-                        'name' => $nodeName,
+                        'name' => trim((string)$row['curriculum_node']),
                         'parent' => [
-                            'id' => $parentId,
-                            'name' => $parentName
+                            'id' => $row['parent_node_id'],
+                            'name' => trim((string)$row['parent_node'])
                         ]
                     ],
                     self::TYPE_CURRENT => null,
