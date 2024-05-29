@@ -1,6 +1,29 @@
 <style>
+    table {
+        border-collapse: collapse;
+    }
+
     th, td {
-        border: 1px solid #f00 !important;
+        border: 1px solid #ccc !important;
+    }
+
+    tr.dimensioning {
+        opacity: 0;
+        height: 0;
+    }
+
+    tr.dimensioning th,
+    tr.dimensioning td {
+        padding: 0;
+        height: 0 !important;
+    }
+
+    .outcome-cell {
+        font-size: 48px;
+        max-width: 50px;
+        min-width: 50px;
+        text-align: center;
+        vertical-align: middle;
     }
 </style>
 
@@ -10,7 +33,7 @@
 <table>
     <thead>
         <tr>
-            <th colspan="2">Nodes</th>
+            <th colspan="2"></th>
             <th>Rating</th>
             {% for i in levels %}
                 <th colspan="2" class="text-center">
@@ -18,14 +41,13 @@
                 </th>
             {% endfor %}
         </tr>
-        <tr>
+        {# This row enforces dimensioning #}
+        <tr class="dimensioning">
             <th></th>
             <th></th>
             <th></th>
             {% for i in possibleOutcomes %}
-                <th class="text-center" style="width:40px" data-value="{{ i }}">
-                    o
-                </th>
+                <th class="outcome-cell" data-value="{{ i }}"></th>
             {% endfor %}
         </tr>
     </thead>
@@ -69,7 +91,7 @@
     <td>{{ nodeData.name }}</td>
     <td data-col-name="rating"></td>
     {% for i in possibleOutcomes %}
-        <td class="text-center" style="vertical-align:middle;font-size:48px;">
+        <td class="outcome-cell">
             {# Progression Point from something in the past #}
             {% if i == nodeData.previous %}
                 ◦
