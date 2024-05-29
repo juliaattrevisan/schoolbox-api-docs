@@ -481,6 +481,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setAttachmentsLabel('')
             ->setMimeFilter('.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png')
             ->setFilesystemContext('worksheet')
+            ->setReadOnly($courseManagedFields->isReadonly()) //
             ->setFileVar('worksheet');
         if ($assessment->getKamiFile()) {
             $zone = $zone->attachFiles([$assessment->getKamiFile()]);
