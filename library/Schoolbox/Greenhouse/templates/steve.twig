@@ -70,14 +70,14 @@
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                     <tr>
                         <td>{{ nodeData.name }}</td>
-                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes) }}
+                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel) }}
                     </tr>
                 {% endfor %}
             {% else %}
                 {# No subnodes: occupy available space #}
                 <tr>
                     <td colspan="2">{{ parentNodeData.name }}</td>
-                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes) }}
+                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel) }}
                 </tr>
             {% endif %}
         {% endfor %}
@@ -90,22 +90,30 @@
  #
  # @param array $nodeData
  # @param array $possibleOutcomes
+ # @param int $currentYearLevel
  #}
-{% macro renderOutcomes(nodeData, possibleOutcomes) %}
+{% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel) %}
     <td>
         {# TODO How is "rating" decided...? It goes in this cell. #}
     </td>
     {% for i in possibleOutcomes %}
+        {% set css = 'hide-left-border' %}
+
         {# If i > floor(i), we're in a halfway point hide the left border
          # Otherwise, hide the right border
          #}
-        {% set borderStyle = 'hide-left-border' %}
+        {% set nearestFloor = i|round(0, 'floor') %}
 
-        {% if i == i|round(0, 'floor') %}
-            {% set borderStyle = 'hide-right-border' %}
+        {% if i == nearestFloor %}
+            {% set css = 'hide-right-border' %}
         {% endif %}
 
-        <td class="outcome-cell {{ borderStyle }}">
+        {# Check current year; smear it yellow if column matches student year level #}
+        {% if nearestFloor == currentYearLevel %}
+            {% set css = css ~ ' yellow' %}
+        {% endif %}
+
+        <td class="outcome-cell {{ css }}">
             {# Progression Point from something in the past #}
             {% if i == (nodeData.previous.mark ?? null) %}
                 <span title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}">◦</span>
