@@ -361,7 +361,7 @@ class Duplicator
     }
 
     /**
-     * Update the status of this job.
+     * Update the quiz's job status in `$quiz`, and its database field.
      *
      * @param QuizDomainModel $quiz
      * @param string|null     $jobStatus
@@ -370,11 +370,7 @@ class Duplicator
     private function updateStatus(QuizDomainModel $quiz, ?string $jobStatus): void
     {
         $query = $this->database->prepareQuery(
-            "
-                        UPDATE assess
-                        SET learnosity_job_status = ?
-                        WHERE assessment_id = ?
-                    ",
+            "UPDATE assess SET learnosity_job_status = ? WHERE assessment_id = ?",
             [$jobStatus, $quiz->getId()],
         );
         $quiz->setLearnosityJobStatus($jobStatus);
