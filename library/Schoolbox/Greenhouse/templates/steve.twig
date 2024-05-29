@@ -33,6 +33,11 @@
     .yellow {
         background-color: gold;
     }
+
+    .corner {
+        border-top: 0 !important;
+        border-left: 0 !important;
+    }
 </style>
 
 <h1 class="no-margin">{{ payload.student.name }}</h1>
@@ -41,7 +46,7 @@
 <table>
     <thead>
         <tr class="header">
-            <th colspan="2"></th>
+            <th colspan="2" class="corner"></th>
             <th>Rating</th>
             {% for i in payload.levels %}
                 {# Check current year; smear it yellow if i matches student year level #}
