@@ -201,7 +201,6 @@ class VictorianProgression
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
-            'currentAcademicPeriod' => $currentAcademicPeriod,
             'student' => [
                 'name' => $student->getFullName(),
                 'currentYearLevel' => $this->getYearLevel($student),
