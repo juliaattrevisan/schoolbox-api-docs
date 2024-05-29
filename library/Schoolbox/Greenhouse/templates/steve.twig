@@ -61,6 +61,9 @@
 {##
  # Render the possible outcomes for a curriculum node
  # and, if applicable, a Progression Point
+ #
+ # @param array $nodeData
+ # @param array $possibleOutcomes
  #}
 {% macro renderOutcomes(nodeData, possibleOutcomes) %}
     <td>{{ nodeData.name }}</td>
