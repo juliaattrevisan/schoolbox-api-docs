@@ -67,13 +67,19 @@ class VictorianProgression
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
         LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
         LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
+        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
         LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
         AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
         AND vaf.published_at BETWEEN :startDate AND :endDate    -- specify dates of academic period(s) in use
+        AND (
+            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
+            OR quiz.grade_group_id IS NOT NULL
+        )  
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
     ";
 
