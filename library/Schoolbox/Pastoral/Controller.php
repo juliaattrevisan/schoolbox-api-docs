@@ -1138,6 +1138,7 @@ class Controller extends Base
                     $this->pastoralDataSource->raiseNotification($record, $action, $previousRecord);
 
                     // Save record in external database, and set pastoral external_id in Schoolbox database
+                    // TODO this should log somewhere, but where?
                     $pastoralExternal->syncPastoral($record, $this->getConfigLoader()->get('external_pastoral_title_include'));
                 }
             );

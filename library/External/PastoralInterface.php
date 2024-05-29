@@ -63,6 +63,14 @@ interface External_PastoralInterface extends External\IConnector
     public function deletePastoral(Pastoral\Model $pastoral): bool;
 
     /**
+     * Does this record exist in the external system?
+     *
+     * @param Pastoral\Model $pastoral
+     * @return boolean
+     */
+    public function exists(Pastoral\Model $pastoral): bool;
+
+    /**
      * Creates a new pastoral comment in the remote system
      *
      * Returns whether a comment was created in the remote system

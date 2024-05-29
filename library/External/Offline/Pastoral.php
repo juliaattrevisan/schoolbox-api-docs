@@ -97,6 +97,14 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
     }
 
     /**
+     * @inheritdoc
+     */
+    public function exists(PastoralModel $pastoral): bool
+    {
+        return false;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getTypeList(): array
