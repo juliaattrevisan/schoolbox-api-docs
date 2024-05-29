@@ -46,6 +46,7 @@
             {% set nSubrows = parentNodeData.subnodes|length %}
 
             {% if nSubrows %}
+                {# Render at least one subnode with various spanning for presentation #}
                 <tr>
                     <td rowspan="{{ nSubrows + 1 }}">
                         {{ parentNodeData.name }}
@@ -53,17 +54,15 @@
                 </tr>
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                     <tr>
+                        <td>{{ nodeData.name }}</td>
                         {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes) }}
                     </tr>
                 {% endfor %}
             {% else %}
+                {# No subnodes: occupy available space #}
                 <tr>
-                    <td>
-                        {{ parentNodeData.name }}
-                    </td>
-                    {% for nodeId, nodeData in parentNodeData.subnodes %}
-                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes) }}
-                    {% endfor %}
+                    <td colspan="2">{{ parentNodeData.name }}</td>
+                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes) }}
                 </tr>
             {% endif %}
         {% endfor %}
@@ -78,7 +77,6 @@
  # @param array $possibleOutcomes
  #}
 {% macro renderOutcomes(nodeData, possibleOutcomes) %}
-    <td>{{ nodeData.name }}</td>
     <td>
         {# TODO How is "rating" decided...? It goes in this cell. #}
     </td>
