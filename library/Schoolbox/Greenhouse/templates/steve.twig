@@ -138,7 +138,20 @@
 
 
 
-
+<h1>Audit</h1>
+<table>
+    <tbody>
+        {% for assessmentId, errors in audit %}
+            <tr>
+                <td>
+                    {% for error in errors %}
+                        <a href="/learning/assessments/{{ assessmentId }}/modify#markType">{{ error }}</a><br />
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 
 
