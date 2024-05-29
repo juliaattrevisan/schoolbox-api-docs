@@ -123,7 +123,9 @@ class Api implements IApi
      */
     public function __construct(string $host, #[SensitiveParameter] string $dsn, string $module)
     {
-        $this->host = $host;
+        /* Enforce slash in the endpoint prefix
+         */
+        $this->host = rtrim($host, '/') . '/';
 
         /* Remember the module that was selected since we need that for diagnosis
          */

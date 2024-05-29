@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
 use DomainException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
 use SensitiveParameter;
@@ -71,14 +72,15 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
-     * @throws DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(string $host, #[SensitiveParameter] string $apiKey)
     {
-        $this->host = $host;
+        /* Enforce slash in the endpoint prefix
+         */
+        $this->host = rtrim($host, '/') . '/';
 
-        $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($this->host, $apiKey, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -92,10 +94,9 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
-     * @param int    $timeout
+     * @param int $timeout
      * @return Client
-     * @throws DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {

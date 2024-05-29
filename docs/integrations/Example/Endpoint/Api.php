@@ -87,6 +87,10 @@ class Api implements IApi
      */
     private function initClient(string $host, #[SensitiveParameter] string $key, int $timeout): Client
     {
+        /* Enforce slash in the endpoint prefix
+         */
+        $baseUri = rtrim($host, '/') . '/';
+
         /* SIS-API-Key: this header tuple depends on your sis
          * Find out what this should actually be called
          */
@@ -103,7 +107,7 @@ class Api implements IApi
             /* See https://docs.guzzlephp.org/en/stable/quickstart.html for usage
              * There's a little thing about relative urls here
              */
-            'base_uri' => $host,
+            'base_uri' => $baseUri,
         ]);
     }
 
