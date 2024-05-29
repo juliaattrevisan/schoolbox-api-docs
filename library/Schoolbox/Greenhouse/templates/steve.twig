@@ -6,6 +6,7 @@
 
 {% set levels = [6, 7, 8, 9, 10] %}
 {% set possibleOutcomes = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5] %}
+
 <table>
     <thead>
         <tr>
@@ -41,6 +42,10 @@
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                     <tr>
                         <td>{{ nodeData.name }}</td>
+                        <td data-col-name="rating"></td>
+                        {% for i in possibleOutcomes %}
+                            <td>x</td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             {% else %}
@@ -50,11 +55,14 @@
                     </td>
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                         <td>{{ nodeData.name }}</td>
+                        <td data-col-name="rating"></td>
+                        {% for i in possibleOutcomes %}
+                            <td>x</td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             {% endif %}
         {% endfor %}
-
     </tbody>
 </table>
 
