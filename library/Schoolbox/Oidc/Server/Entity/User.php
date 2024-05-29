@@ -13,6 +13,7 @@ use Alaress\Image\Transformation\Storage;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use OpenIDConnectServer\Entities\ClaimSetInterface;
 use Psr\Http\Message\UriInterface;
+use Schoolbox\Oidc\Server\Repository\Scope as ScopeRepository;
 use Schoolbox\User as UserModel;
 
 /**
@@ -71,9 +72,9 @@ class User implements UserEntityInterface, ClaimSetInterface
 
             // Schoolbox-specific claims:
             // must be prefixed with something identifying them as Schoolbox
-            'https://schoolbox.education/instance_id' => INSTANCE_ID,
-            'https://schoolbox.education/external_id' => $this->user->getExternalId(),
-            'https://schoolbox.education/role_type'   => $this->user->getRole()->getType(),
+            ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
+            ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $this->user->getExternalId(),
+            ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $this->user->getRole()->getType(),
         ];
     }
 }
