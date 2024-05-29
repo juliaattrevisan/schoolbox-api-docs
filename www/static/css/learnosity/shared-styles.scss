@@ -143,6 +143,10 @@ h3.lrn-report-item-title {
     padding: 0.5rem 1.3rem;
 }
 
+input:focus, textarea:focus, select:focus {
+    color: unset;
+}
+
 /* Removed left and right paddings on small screens to make it aligned vertically with other elements */
 @media only print, screen and (max-width: 40em) {
     #content > .row > .small-12 .content {
