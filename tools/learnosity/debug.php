@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-use Learning\Learnosity\Cli\DebugTool;
+use Schoolbox\Learning\Learnosity\Cli\DebugTool;
 use Schoolbox\Application\CliKernelAbstract;
 
 require_once __DIR__ . '/../../conf/core/require.php';

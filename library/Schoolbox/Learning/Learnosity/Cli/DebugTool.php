@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Learnosity\Cli;
+namespace Schoolbox\Learning\Learnosity\Cli;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
@@ -40,9 +40,8 @@ class DebugTool extends CliTool\App
     private const OPT_SHORT_REFERENCE = 'r:';
     private const OPT_LONG_REFERENCE  = 'reference:';
 
-    // -p, --payload: a full JSON-encoded payload
-    private const OPT_SHORT_PAYLOAD = 'p:';
-    private const OPT_LONG_PAYLOAD  = 'payload:';
+    // --payload: a full JSON-encoded payload
+    private const OPT_LONG_PAYLOAD = 'payload:';
 
     // -j, --json: output JSON instead of var_dump
     private const OPT_SHORT_JSON = 'j';
@@ -58,7 +57,6 @@ class DebugTool extends CliTool\App
             self::OPT_SHORT_ENDPOINT,
             self::OPT_SHORT_SESSION_ID,
             self::OPT_SHORT_REFERENCE,
-            self::OPT_SHORT_PAYLOAD,
             self::OPT_SHORT_JSON,
         ];
     }
@@ -97,7 +95,7 @@ class DebugTool extends CliTool\App
 
         // Build payload
         $payload       = [];
-        $payloadOption = $this->getOpt(self::OPT_SHORT_PAYLOAD) ?? $this->getOpt(self::OPT_LONG_PAYLOAD);
+        $payloadOption = $this->getOpt(self::OPT_LONG_PAYLOAD);
         if ($payloadOption) {
             $payload = json_decode($payloadOption, true, 512, JSON_THROW_ON_ERROR);
         }
@@ -174,7 +172,7 @@ OPTIONS
 
         This may be provided as either a comma-separated list, or multiple times, to export multiple records.
 
-    $yellow\[-p, --payload]=PAYLOAD$white
+    $yellow--payload=PAYLOAD$white
         If provided, set this as the payload to the endpoint.
 
         This is intended for calls to endpoints which accept neither session IDs nor references, and should be raw JSON data.
