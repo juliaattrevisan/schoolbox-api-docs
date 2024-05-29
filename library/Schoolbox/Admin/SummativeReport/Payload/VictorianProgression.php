@@ -150,7 +150,7 @@ class VictorianProgression
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
          */
-        $result = $this->generateOne(
+        $data = $this->generateOne(
             self::TYPE_CURRENT,
             $student,
             $currentAcademicPeriod->getStart(),
@@ -160,13 +160,20 @@ class VictorianProgression
         /* Add the previous academic period's curriculum nodes
          * and associated feedback, augmenting what we already made
          */
-        return $this->generateOne(
+        $data = $this->generateOne(
             self::TYPE_PREVIOUS,
             $student,
             $previousAcademicPeriod->getStart(),
             $previousAcademicPeriod->getDisplayFinish(),
-            $result
+            $data
         );
+
+        /* The final payload; maybe add extra metadata here if you need it
+         */
+        return [
+            'currentYearLevel' => $this->getYearLevel($student),
+            'data' => $data
+        ];
     }
 
 
@@ -244,5 +251,29 @@ class VictorianProgression
         }
 
         return $struct;
+    }
+
+
+    /**
+     * Figure out the student's year level numeric value so we can stripe the ui
+     * Year Level names are user configurable so we have to play "find the int"
+     *
+     * No year level? We die.
+     *
+     * @param User $student
+     * @return int
+     * @throws \DomainException
+     */
+    private function getYearLevel(\Schoolbox\User $student): int
+    {
+        preg_match('/\d+/', (string)$student->getYear()?->getName(), $matches);
+
+        $currentYearLevel = $matches[0] ?? null;
+
+        if (null === $currentYearLevel) {
+            throw new \DomainException('Unknown year level for this student.');
+        }
+
+        return (int)$currentYearLevel;
     }
 }
