@@ -33,7 +33,7 @@
         {% for parentNodeId, parentNodeData in payload.data %}
             {% set nSubrows = parentNodeData.subnodes|length %}
 
-            {% if nSubrows > 1 %}
+            {% if nSubrows %}
                 <tr>
                     <td rowspan="{{ nSubrows + 1 }}">
                         {{ parentNodeData.name }}
