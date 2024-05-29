@@ -79,11 +79,25 @@ class Markbook
     private $normalisedMean;
 
     /**
+     * Normalised (0.0 - 100.0) average mark for all draft assessments in this markbook
+     *
+     * @var float
+     */
+    private $draftNormalisedMean;
+
+    /**
      * Human readable weighted average mark for all assessments in this markbook
      *
      * @var string
      */
     private $weightedMean;
+
+    /**
+     * Human readable weighted average mark for all draft assessments in this markbook
+     *
+     * @var string
+     */
+    private $draftWeightedMean;
 
     /**
      * Statistics for each assessment.
@@ -273,7 +287,15 @@ class Markbook
             true,
             new Average()
         );
+
+        $this->draftNormalisedMean = $weightedSummator->summateAllAssessables(
+            $visibleAssessments,
+            false,
+            new Average()
+        );
+
         $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
+        $this->draftWeightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->draftNormalisedMean);
     }
 
     /**
@@ -327,13 +349,20 @@ class Markbook
         return $this->normalisedMean;
     }
 
-
     /**
      * @return string
      */
     public function getWeightedMean()
     {
         return $this->weightedMean;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDraftWeightedMean()
+    {
+        return $this->draftWeightedMean;
     }
 
     /**
