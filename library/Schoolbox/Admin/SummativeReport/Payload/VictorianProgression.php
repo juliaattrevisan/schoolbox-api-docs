@@ -34,6 +34,11 @@ class VictorianProgression
     
     /**
      * Mega Query containing shortcuts to the parts we need
+     *
+     * Note that we can take advantage of the fact that assessments must be either a due work
+     * or a quiz, but never both. Brutally LEFT JOIN the feedback tables for each, knowing only
+     * one of them can contain data for an assessment. This is probably a better alternative to
+     * smashing the db repeatedly
      */
     private const QUERY = "
         SELECT
@@ -47,12 +52,15 @@ class VictorianProgression
             vaf.feedback_table,
             vaf.feedback_id,
             vaf.student_id,
-            vaf.published_at
+            vaf.published_at,
+            COALESCE(sr.mark, aa.mark) AS mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
         LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
+        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
+        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
@@ -199,13 +207,7 @@ class VictorianProgression
 
             /* Pop it into the node specified by $type
              */
-            $struct[$nodeId][$type] = [
-                'feedback_table' => $row['feedback_table'],
-                'feedback_id' => $row['feedback_id'],
-                /* FIXME Find the feedback's human readable value
-                 */
-                'value' => null,
-            ];
+            $struct[$nodeId][$type] = $row['mark'];
         }
 
         return $struct;
