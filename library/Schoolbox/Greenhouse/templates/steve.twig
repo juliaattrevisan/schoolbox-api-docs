@@ -27,6 +27,12 @@
     .outcome-cell.hide-right-border {
         border-right: 0 !important;
     }
+
+    /* Smear a yellow stripe
+     */
+    .yellow {
+        background-color: gold;
+    }
 </style>
 
 <table>
@@ -35,7 +41,8 @@
             <th colspan="2"></th>
             <th>Rating</th>
             {% for i in payload.levels %}
-                <th colspan="2" class="text-center">
+                {# Check current year; smear it yellow if i matches student year level #}
+                <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
                     Level {{ i }}
                 </th>
             {% endfor %}
@@ -103,8 +110,6 @@
         </td>
     {% endfor %}
 {% endmacro %}
-
-
 
 
 
