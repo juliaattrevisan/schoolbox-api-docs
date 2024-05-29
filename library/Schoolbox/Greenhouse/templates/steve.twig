@@ -79,7 +79,9 @@
  #}
 {% macro renderOutcomes(nodeData, possibleOutcomes) %}
     <td>{{ nodeData.name }}</td>
-    <td data-col-name="rating"></td>
+    <td>
+        {# TODO How is "rating" decided...? It goes in this cell. #}
+    </td>
     {% for i in possibleOutcomes %}
         {# If i > floor(i), we're in a halfway point hide the left border
          # Otherwise, hide the right border
