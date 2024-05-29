@@ -47,6 +47,12 @@ class VictorianProgression
      * or a quiz, but never both. Brutally LEFT JOIN the feedback tables for each, knowing only
      * one of them can contain data for an assessment. This is probably a better alternative to
      * smashing the db repeatedly
+     *
+     *     - Work Type Id must correspond to our admin lists; one must have the name defined byy WORK_TYPE_NAME
+     *     - assessment feedback must be given to the student specified, not any other student
+     *     - assessment feedback must be published (ignore drafts)
+     *     - assessment feedback must be published between dates corresponding within a chosen academic period
+     *     - assessment must be using Letter Grade mark type, otherwise they can't choose the values properly
      */
     private const QUERY = "
         SELECT
