@@ -99,7 +99,7 @@ class Factory
     /**
      * @var Group\Mapper|null
      */
-    private ?Group\Mapper $gradeLevelGroupMapper;
+    private ?Group\Mapper $gradeLevelGroupMapper = null;
 
 
     /**
