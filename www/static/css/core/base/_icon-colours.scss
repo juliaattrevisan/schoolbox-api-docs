@@ -4,6 +4,7 @@
 :root {
     --color-icon-badge: darkorange;
     --color-icon-course: #008600;
+    --color-icon-class: #72c600;
     --color-icon-folder: var(--content-ui-foreground);
     --color-icon-home: darkorange;
     --color-icon-learning-activity: #c1009e;
@@ -12,6 +13,10 @@
 
 .icon-badge::before {
     color: var(--color-icon-badge);
+}
+
+.icon-teacher::before {
+    color: var(--color-icon-class);
 }
 
 .icon-course::before,
