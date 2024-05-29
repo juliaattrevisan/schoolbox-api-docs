@@ -45,9 +45,37 @@ class VictorianProgression
 
 
     /**
+     * We only need this once, I guess
+     *
+     * @var \PDOStatement
+     */
+    private \PDOStatement $payloadStatement;
+
+
+    /**
      * @param IConnector $db
      */
     public function __construct(private IConnector $db)
     {
+        $this->payloadStatement = $this->db->prepare(self::QUERY);
+    }
+
+
+    /**
+     * Generate a payload that finds a particular feedback between $startDate and $endDate
+     * corresponding to a Progression Point for a curriculum node
+     *
+     * @param \Alaress_Date_Format $startDate
+     * @param \Alaress_Date_Format $endDate
+     * @return array
+     */
+    public function generate(\Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate): array
+    {
+        $struct = [];
+
+
+
+
+        return $struct;
     }
 }
