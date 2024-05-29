@@ -103,12 +103,12 @@
         <td class="outcome-cell {{ borderStyle }}">
             {# Progression Point from something in the past #}
             {% if i == (nodeData.previous.mark ?? null) %}
-                ◦
+                <span title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}">◦</span>
             {% endif %}
 
             {# Progression Point from current academic period #}
             {% if i == (nodeData.current.mark ?? null) %}
-                •
+                <span title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}">•</span>
             {% endif %}
         </td>
     {% endfor %}
