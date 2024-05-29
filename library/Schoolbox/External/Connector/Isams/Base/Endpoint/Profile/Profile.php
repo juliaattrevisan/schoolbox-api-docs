@@ -61,6 +61,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Campuses are separated by semicolons here.
+     */
+    private const CAMPUS_SEPARATOR = ';';
+
+
+    /**
      * @var ValidStrats
      */
     private ValidStrats $validStrats;
@@ -1127,13 +1133,17 @@ class Profile implements IStrategy
              */
             $positionTitle = mb_substr($positionTitle, 0, self::MAX_POSITION_LENGTH, 'UTF-8');
 
-            /* Select the first campus (schoolbox connector only supports one campus per profile)
+            /* Serialize multiple campuses into a csv
              */
-            $campusName = '';
+            $campusNames = [];
 
             if ($staff->Divisions->Division) {
-                $campusName = trim((string)$staff->Divisions->Division[0]->Name);
+                foreach ($staff->Divisions->Division as $division) {
+                    $campusNames[] = trim((string)$division->Name);
+                }
             }
+
+            $campusName = implode(self::CAMPUS_SEPARATOR . ' ', $campusNames);
 
             /**
              * Staff can be teachers or employees... set that here
