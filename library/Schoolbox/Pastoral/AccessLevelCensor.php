@@ -265,7 +265,6 @@ class AccessLevelCensor
         return $accessLevel;
     }
 
-
     /**
      * Checks whether the user has pastoral moderator permission
      * @param User $user
