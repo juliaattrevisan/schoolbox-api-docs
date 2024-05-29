@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload;
 
-use DebugBar\DebugBarException;
-use Schoolbox\Learning\Assessment\WorkType\Mapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 
 /**
@@ -20,18 +20,18 @@ use Schoolbox\User;
 class VictorianProgression
 {
     /**
-     * Used to specify which nodes to populate with feedback data
-     */
-    public const TYPE_CURRENT = 'current';
-    public const TYPE_PREVIOUS = 'previous';
-
-
-    /**
      * This worktype is required
      */
     private const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
 
-    
+
+    /**
+     * Used to specify which nodes to populate with feedback data
+     */
+    private const TYPE_CURRENT = 'current';
+    private const TYPE_PREVIOUS = 'previous';
+
+
     /**
      * Mega Query containing shortcuts to the parts we need
      *
@@ -99,10 +99,12 @@ class VictorianProgression
 
 
     /**
-     * @param Mapper $workTypeMapper
+     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      */
     public function __construct(
-        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
+        private \Schoolbox\Assessment\Term\Mapper $termMapper
     ) {
     }
 
@@ -135,6 +137,46 @@ class VictorianProgression
 
 
     /**
+     * Facade method for generateOne()
+     *
+     * @param User $student
+     * @return array
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function generate(\Schoolbox\User $student): array
+    {
+        /* FIXME replace with actual way of finding the answer
+         */
+        $currentAcademicPeriod = $this->termMapper->findById(4);
+        $previousAcademicPeriod = $this->termMapper->findById(4);
+
+        /* Collate the current academic period's curriculum nodes
+         * and associated feedback
+         */
+        $result = $this->generateOne(
+            self::TYPE_CURRENT,
+            $student,
+            $currentAcademicPeriod->getStart(),
+            $currentAcademicPeriod->getDisplayFinish()
+        );
+
+        /* Add the previous academic period's curriculum nodes
+         * and associated feedback, augmenting what we already made
+         */
+        return $this->generateOne(
+            self::TYPE_PREVIOUS,
+            $student,
+            $previousAcademicPeriod->getStart(),
+            $previousAcademicPeriod->getDisplayFinish(),
+            $result
+        );
+    }
+
+
+    /**
      * Generate a payload that finds a particular feedback between $startDate and $endDate
      * corresponding to a Progression Point for a curriculum node
      *
@@ -149,7 +191,7 @@ class VictorianProgression
      * @throws \DomainException
      * @throws \PDOException
      */
-    public function generate(
+    private function generateOne(
         string $type,
         \Schoolbox\User $student,
          \Alaress_Date_Format $startDate,
