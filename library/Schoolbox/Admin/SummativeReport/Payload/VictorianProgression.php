@@ -175,18 +175,22 @@ class VictorianProgression
         ]);
 
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $curriculumNodeId = $row['curriculum_node_id'];
-            $curriculumNodeName = $row['curriculum_node'];
+            $nodeId = $row['curriculum_node_id'];
+            $nodeName = $row['curriculum_node'];
+            $parentId = $row['parent_node_id'];
             $parentName = $row['parent_node'];
 
             /* Init if it wasn't already here
              */
-            if (!isset($struct[$curriculumNodeId])) {
-                $struct[$curriculumNodeId] = [
+            if (!isset($struct[$nodeId])) {
+                $struct[$nodeId] = [
                     'node' => [
-                        'id' => $curriculumNodeId,
-                        'name' => $curriculumNodeName,
-                        'parent' => $parentName
+                        'id' => $nodeId,
+                        'name' => $nodeName,
+                        'parent' => [
+                            'id' => $parentId,
+                            'name' => $parentName
+                        ]
                     ],
                     'current' => null,
                     'previous' => null
