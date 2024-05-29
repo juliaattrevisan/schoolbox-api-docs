@@ -43,7 +43,7 @@ class Controller extends Base
         $result = (new \Schoolbox\Admin\SummativeReport\Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student);
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'data' => $result
+            'payload' => $result
         ]);
     }
 }

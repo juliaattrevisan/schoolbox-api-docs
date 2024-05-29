@@ -1,12 +1,46 @@
+<style>
+    th, td {
+        border: 1px solid #f00 !important;
+    }
+</style>
+<table>
+    <thead>
+        <tr>
+            <th>Nodes</th>
+            <th>Rating</th>
+            {% for i in [6, 7, 8, 9, 10] %}
+                <th colspan="2" class="text-center">
+                    Level {{ i }}
+                </th>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            {% for i in [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5] %}
+                <th class="text-center" style="width:40px" data-value="{{ i }}">
+                    o
+                </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
 
 
 
-
-
-
-
-
+{#{% for nodeId, nodeData in payload.data %}#}
+{#    <tr>#}
+{#        <td>#}
+{#            {{ nodeData.node.name }}#}
+{#        </td>#}
+{#        <td>#}
+{#            {{ nodeData.node.parent.name }}#}
+{#        </td>#}
+{#    </tr>#}
+{#{% endfor %}#}
 
 
 
