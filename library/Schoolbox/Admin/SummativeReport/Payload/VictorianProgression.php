@@ -24,6 +24,13 @@ class VictorianProgression
      */
     private const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
 
+
+    /**
+     * Used to specify which nodes to populate with feedback data
+     */
+    public const TYPE_CURRENT = 'current';
+    public const TYPE_PREVIOUS = 'previous';
+
     
     /**
      * Mega Query containing shortcuts to the parts we need
@@ -78,6 +85,12 @@ class VictorianProgression
 
 
     /**
+     * @var array
+     */
+    private array $struct = [];
+
+
+    /**
      * @param Mapper $workTypeMapper
      */
     public function __construct(
@@ -89,10 +102,9 @@ class VictorianProgression
     /**
      * Set up the necessary parts
      *
-     * @return $this
      * @throws \DomainException
      */
-    private function setup(): self
+    private function setup(): void
     {
         /* Prepare megaquery
          */
@@ -111,8 +123,6 @@ class VictorianProgression
         }
 
         $this->setup = true;
-
-        return $this;
     }
 
 
@@ -120,18 +130,23 @@ class VictorianProgression
      * Generate a payload that finds a particular feedback between $startDate and $endDate
      * corresponding to a Progression Point for a curriculum node
      *
+     * Augments $struct, if provided
+     *
+     * @param string $type
      * @param User $student
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
+     * @param array $struct
      * @return array
-     * @throws DebugBarException
      * @throws \DomainException
      * @throws \PDOException
      */
     public function generate(
+        string $type,
         \Schoolbox\User $student,
          \Alaress_Date_Format $startDate,
-         \Alaress_Date_Format $endDate
+         \Alaress_Date_Format $endDate,
+        array $struct = []
     ): array {
         /* Setup step is mandatory; execute as singleton
          */
@@ -139,17 +154,50 @@ class VictorianProgression
             $this->setup();
         }
 
-        $struct = [];
+        /* Only accept valid types
+         */
+        if (self::TYPE_CURRENT !== $type || self::TYPE_PREVIOUS !== $type) {
+            throw new \DomainException(sprintf(
+                'Unknown type: %s. Must be either %s or %s',
+                $type,
+                self::TYPE_CURRENT,
+                self::TYPE_PREVIOUS
+            ));
+        }
 
-        $rows = $this->payloadStatement->execute([
+        /* Let's go
+         */
+        $this->payloadStatement->execute([
             'workTypeId' => $this->workTypeId,
             'studentId' => $student->getId(),
             'startDate' => $startDate->getDatabaseDate(),
             'endDate' => $endDate->getDatabaseDate()
         ]);
 
-        while ($row = $rows->fetch()) {
-            new \Alaress_Probe($row);
+        while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $curriculumNodeId = $row['curriculum_node_id'];
+            $curriculumNodeName = $row['curriculum_node'];
+            $parentName = $row['parent_node'];
+
+            /* Init if it wasn't already here
+             */
+            if (!isset($struct[$curriculumNodeId])) {
+                $struct[$curriculumNodeId] = [
+                    'node' => [
+                        'id' => $curriculumNodeId,
+                        'name' => $curriculumNodeName,
+                        'parent' => $parentName
+                    ],
+                    'current' => null,
+                    'previous' => null
+                ];
+            }
+
+            /* Find the feedback's human readable value
+             */
+
+            /* Pop it into the node specified by $type
+             */
         }
 
         return $struct;
