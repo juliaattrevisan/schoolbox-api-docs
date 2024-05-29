@@ -41,11 +41,7 @@
                 </tr>
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                     <tr>
-                        <td>{{ nodeData.name }}</td>
-                        <td data-col-name="rating"></td>
-                        {% for i in possibleOutcomes %}
-                            <td>x</td>
-                        {% endfor %}
+                        {{ _self.renderOutcomes(nodeData, possibleOutcomes) }}
                     </tr>
                 {% endfor %}
             {% else %}
@@ -53,21 +49,25 @@
                     <td>
                         {{ parentNodeData.name }}
                     </td>
-                {% for nodeId, nodeData in parentNodeData.subnodes %}
-                        <td>{{ nodeData.name }}</td>
-                        <td data-col-name="rating"></td>
-                        {% for i in possibleOutcomes %}
-                            <td>x</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
+                    {% for nodeId, nodeData in parentNodeData.subnodes %}
+                        {{ _self.renderOutcomes(nodeData, possibleOutcomes) }}
+                    {% endfor %}
+                </tr>
             {% endif %}
         {% endfor %}
     </tbody>
 </table>
 
-
-
+{##
+ # Render the possible outcomes for a curriculum node
+ #}
+{% macro renderOutcomes(nodeData, possibleOutcomes) %}
+    <td>{{ nodeData.name }}</td>
+    <td data-col-name="rating"></td>
+    {% for i in possibleOutcomes %}
+        <td>x</td>
+    {% endfor %}
+{% endmacro %}
 
 
 
