@@ -285,6 +285,7 @@ class VictorianProgression
                         'name' => trim((string)$row['curriculum_node']),
                         self::TYPE_CURRENT => null,
                         self::TYPE_PREVIOUS => null,
+                        'subnodes' => []
                     ];
                 }
             } elseif (!isset($struct[$parentNodeId])) {
@@ -323,14 +324,18 @@ class VictorianProgression
              * If something was already here, don't touch it; this ensures we get
              * the most recently published one and skipping all the older ones
              */
-            if (null === $parentNodeId && null === $struct[$nodeId][$type]) {
-                /* There is no parent node
-                 */
-                $struct[$nodeId][$type] = $outcome;
-            } elseif (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
-                /* There is a parent node
-                 */
-                $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+            if (null === $parentNodeId) {
+                if (null === $struct[$nodeId][$type]) {
+                    /* There is no parent node
+                     */
+                    $struct[$nodeId][$type] = $outcome;
+                }
+            } else {
+                if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
+                    /* There is a parent node
+                     */
+                    $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                }
             }
         }
 
