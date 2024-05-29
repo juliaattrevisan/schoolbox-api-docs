@@ -34,6 +34,16 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
+        $workTypeMapper = \Schoolbox\Learning\Assessment\WorkType\Mapper::getInstance();
+        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+
+        $student = $userMapper->findById(25);
+
+        $result = (new \Schoolbox\Admin\SummativeReport\Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student);
+
+        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
+            'data' => $result
+        ]);
     }
 }
