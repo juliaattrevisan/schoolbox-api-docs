@@ -214,7 +214,7 @@ function check_cache(){
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 function download_file_s3(){
 
-  if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
+  if ! aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="*/$file_name_short"; then
     error "Unable to download file: $data_source/$file_name"
     exit 1;
   fi
