@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Admin\SummativeReport\Payload;
 
 use Alaress\Database\Connector\IConnector;
+use http\Exception\RuntimeException;
+use Schoolbox\Learning\Assessment\WorkType\Mapper;
+use Schoolbox\User;
 
 /**
  * Victorian Curriculum Reporting Progression Point Visualisation
@@ -17,6 +20,15 @@ use Alaress\Database\Connector\IConnector;
  */
 class VictorianProgression
 {
+    /**
+     * This worktype is required
+     */
+    private const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
+
+    
+    /**
+     * Mega Query containing shortcuts to the parts we need
+     */
     private const QUERY = "
         SELECT
             cn2.id AS parent_node_id,
@@ -53,11 +65,54 @@ class VictorianProgression
 
 
     /**
-     * @param IConnector $db
+     * Remember when setup() was run - we only need it once
+     *
+     * @var bool
      */
-    public function __construct(private IConnector $db)
+    private bool $setup = false;
+
+
+    /**
+     * @var int|null
+     */
+    private ?int $workTypeId = null;
+
+
+    /**
+     * @param IConnector $db
+     * @param Mapper $workTypeMapper
+     */
+    public function __construct(
+        private IConnector $db,
+        private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+    ) {
+    }
+
+
+    /**
+     * Set up the
+     * @return void
+     * @throws \DomainException
+     */
+    private function setup(): void
     {
+        /* Prepare megaquery
+         */
         $this->payloadStatement = $this->db->prepare(self::QUERY);
+
+        /* Find the Work Type Id first, by name for lack of a better way
+         */
+        try {
+            $workType = $this->workTypeMapper->findOneByColumn('name', self::WORK_TYPE_NAME);
+            $this->workTypeId = (int)$workType->getId();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new \DomainException(sprintf(
+                'Missing required worktype in admin: %s',
+                self::WORK_TYPE_NAME
+            ));
+        }
+
+        $this->setup = true;
     }
 
 
@@ -65,16 +120,32 @@ class VictorianProgression
      * Generate a payload that finds a particular feedback between $startDate and $endDate
      * corresponding to a Progression Point for a curriculum node
      *
+     * @param User $student
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @return array
+     * @throws RuntimeException
+     * @throws \PDOException
      */
-    public function generate(\Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate): array
-    {
+    public function generate(
+        \Schoolbox\User $student,
+         \Alaress_Date_Format $startDate,
+         \Alaress_Date_Format $endDate
+    ): array {
+        /* Setup step is mandatory
+         */
+        if (!$this->setup) {
+            throw new RuntimeException('Setup needs to run first.');
+        }
+
         $struct = [];
 
-
-
+        $rows = $this->payloadStatement->execute([
+            'workTypeId' => $this->workTypeId,
+            'studentId' => $student->getId(),
+            'startDate' => $startDate->getDatabaseDate(),
+            'endDate' => $endDate->getDatabaseDate()
+        ]);
 
         return $struct;
     }
