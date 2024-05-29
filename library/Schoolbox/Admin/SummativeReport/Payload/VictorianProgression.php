@@ -246,6 +246,7 @@ class VictorianProgression
             }
 
             /* Pop it into the node specified by $type
+             * Note that $row['mark'] will be something in 6, 6.5, 7, 7.5, 8, 8.5...etc
              */
             $struct[$nodeId][$type] = $row['mark'];
         }
