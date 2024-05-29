@@ -275,13 +275,21 @@ class VictorianProgression
                 ];
             }
 
+            /* Build the outcome struct, because that's just too handy
+             */
+            $outcome = [
+                'mark' => $row['mark'],
+                'feedback_table' => $row['feedback_table'],
+                'feedback_id' => $row['feedback_id'],
+            ];
+
             /* Pop it into the node specified by $type
              * Note that $row['mark'] will be something in 6, 6.5, 7, 7.5, 8, 8.5...etc
              */
             if (null === $parentNodeId) {
-                $struct[$nodeId][$type] = $row['mark'];
+                $struct[$nodeId][$type] = $outcome;
             } else {
-                $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $row['mark'];
+                $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
             }
         }
 

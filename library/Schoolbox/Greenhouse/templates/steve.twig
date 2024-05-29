@@ -102,12 +102,12 @@
 
         <td class="outcome-cell {{ borderStyle }}">
             {# Progression Point from something in the past #}
-            {% if i == nodeData.previous %}
+            {% if i == nodeData.previous.mark %}
                 ◦
             {% endif %}
 
             {# Progression Point from current academic period #}
-            {% if i == nodeData.current %}
+            {% if i == nodeData.current.mark %}
                 •
             {% endif %}
         </td>
