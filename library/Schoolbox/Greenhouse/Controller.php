@@ -42,20 +42,6 @@ class Controller extends Base
 
         $result = (new \Schoolbox\Admin\SummativeReport\Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student);
 
-        /* Concoct arbitrarily for a test
-         */
-        $result['data'][140]['subnodes'] = null;
-        $result['data'][140]['current'] = 9;
-        $result['data'][140]['previous'] = 8;
-
-        $result['data'][157]['subnodes'] = null;
-        $result['data'][157]['current'] = 9;
-        $result['data'][157]['previous'] = 8;
-
-        $result['data'][156]['subnodes'] = null;
-        $result['data'][156]['current'] = 9;
-        $result['data'][156]['previous'] = 8;
-
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
             'payload' => $result
         ]);
