@@ -27,6 +27,7 @@ class Portrait implements ITransformFactory
         'square64',
         'square72',
         'square80',
+        'square192',
         'square200',
         'constrain64',
         'constrain128',
@@ -53,6 +54,8 @@ class Portrait implements ITransformFactory
                 return new Square(72);
             case 'square80':
                 return new Square(80);
+            case 'square192':
+                return new Square(192);
             case 'square200':
                 return new Square(200);
             case 'constrain64':
