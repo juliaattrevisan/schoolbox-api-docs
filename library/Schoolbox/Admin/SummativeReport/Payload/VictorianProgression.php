@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 
 /**
@@ -33,7 +33,7 @@ class VictorianProgression
 
 
     /**
-     * Available leves to render in frontend; each int represents its float compatriot
+     * Available levels to render in frontend; each int represents its float compatriot
      * e.g. "Level 6" is used as a heading for values 6 and 6.5
      */
     private const LEVELS = [6, 7, 8, 9, 10];
@@ -101,6 +101,8 @@ class VictorianProgression
 
 
     /**
+     * Constructor.
+     *
      * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      */
@@ -143,10 +145,10 @@ class VictorianProgression
      *
      * @param User $student
      * @return array
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
-     * @throws Exception
-     * @throws Deleted
      */
     public function generate(\Schoolbox\User $student): array
     {
