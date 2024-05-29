@@ -152,10 +152,6 @@ class VictorianProgression
     {
         $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
 
-        /* FIXME replace with actual way of finding the answer
-         */
-        $previousAcademicPeriod = $this->termMapper->findById(4);
-
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
          */
@@ -166,20 +162,32 @@ class VictorianProgression
             $currentAcademicPeriod->getDisplayFinish()
         );
 
-        /* Add the previous academic period's curriculum nodes
-         * and associated feedback, augmenting what we already made
+        /* Start digging into the past academic period for a person's previous Progression Point
          */
-        $data = $this->generateOne(
-            self::TYPE_PREVIOUS,
-            $student,
-            $previousAcademicPeriod->getStart(),
-            $previousAcademicPeriod->getDisplayFinish(),
-            $data
-        );
+        $previousAcademicPeriods = $this->termMapper->findAllNonExtraordinary();
+
+        /* Only one academic period? There's no previous one, just the current one.
+         * No trabajo. Otherwise, get it directly from the collection lol
+         */
+        if ($previousAcademicPeriods->count() > 1) {
+            $previousAcademicPeriod = $previousAcademicPeriods->getOffset(1);
+
+            /* Add the previous academic period's curriculum nodes
+             * and associated feedback, augmenting what we already made
+             */
+            $data = $this->generateOne(
+                self::TYPE_PREVIOUS,
+                $student,
+                $previousAcademicPeriod->getStart(),
+                $previousAcademicPeriod->getDisplayFinish(),
+                $data
+            );
+        }
 
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
+            'currentAcademicPeriod' => $currentAcademicPeriod,
             'student' => [
                 'name' => $student->getFullName(),
                 'currentYearLevel' => $this->getYearLevel($student),
