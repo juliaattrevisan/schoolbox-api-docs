@@ -20,16 +20,16 @@ use Schoolbox\User;
 class VictorianProgression
 {
     /**
-     * This worktype is required
-     */
-    private const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
-
-
-    /**
      * Used to specify which nodes to populate with feedback data
      */
     public const TYPE_CURRENT = 'current';
     public const TYPE_PREVIOUS = 'previous';
+
+
+    /**
+     * This worktype is required
+     */
+    private const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
 
     
     /**
@@ -156,7 +156,7 @@ class VictorianProgression
 
         /* Only accept valid types
          */
-        if (self::TYPE_CURRENT !== $type || self::TYPE_PREVIOUS !== $type) {
+        if (self::TYPE_CURRENT !== $type && self::TYPE_PREVIOUS !== $type) {
             throw new \DomainException(sprintf(
                 'Unknown type: %s. Must be either %s or %s',
                 $type,
@@ -192,16 +192,20 @@ class VictorianProgression
                             'name' => $parentName
                         ]
                     ],
-                    'current' => null,
-                    'previous' => null
+                    self::TYPE_CURRENT => null,
+                    self::TYPE_PREVIOUS => null
                 ];
             }
 
-            /* Find the feedback's human readable value
-             */
-
             /* Pop it into the node specified by $type
              */
+            $struct[$nodeId][$type] = [
+                'feedback_table' => $row['feedback_table'],
+                'feedback_id' => $row['feedback_id'],
+                /* FIXME Find the feedback's human readable value
+                 */
+                'value' => null,
+            ];
         }
 
         return $struct;
