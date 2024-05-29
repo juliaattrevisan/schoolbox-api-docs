@@ -134,24 +134,28 @@ class Exporter extends CliTool\App
         $repairOnly        = $this->getOpt(self::OPT_LONG_REPAIR_ONLY);
         foreach (array_chunk($pastoralRecordIds, self::BATCH_SIZE) as $batchIndex => $batchOfPastoralRecordIds) {
             foreach ($pastoralMapper->findByColumn('id', $batchOfPastoralRecordIds) as $pastoralRecord) {
-                // Bail if repair-only and the record doesn't exist yet
-                if ($repairOnly && !$externalPastoral->exists($pastoralRecord)) {
-                    if ($pastoralRecord->getExternalId()) {
-                        $log->debug(
-                            sprintf(
-                                "Repair-only mode is on, and pastoral record #%d does not need repair: skipping",
-                                $pastoralRecord->getId(),
-                            )
-                        );
-                    } else {
+                // If repair-only, export only if the record:
+                // * has an external ID
+                // * does not exist in the external system
+                if ($repairOnly) {
+                    if (!$pastoralRecord->getExternalId()) {
                         $log->debug(
                             sprintf(
                                 "Repair-only mode is on, and pastoral record #%d is not yet synced: skipping",
                                 $pastoralRecord->getId(),
                             )
                         );
+                        continue;
                     }
-                    continue;
+                    if ($externalPastoral->exists($pastoralRecord)) {
+                        $log->debug(
+                            sprintf(
+                                "Repair-only mode is on, and pastoral record #%d does not need repair: skipping",
+                                $pastoralRecord->getId(),
+                            )
+                        );
+                        continue;
+                    }
                 }
 
                 // Otherwise sync
