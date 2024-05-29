@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Admin\SummativeReport\Payload;
 
-use Alaress\Database\Connector\IConnector;
 use DebugBar\DebugBarException;
-use http\Exception\RuntimeException;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\User;
 
@@ -58,19 +56,19 @@ class VictorianProgression
 
 
     /**
-     * We only need this once, I guess
-     *
-     * @var \PDOStatement
-     */
-    private \PDOStatement $payloadStatement;
-
-
-    /**
      * Remember when setup() was run - we only need it once
      *
      * @var bool
      */
     private bool $setup = false;
+
+
+    /**
+     * We only need this once, I guess
+     *
+     * @var \PDOStatement
+     */
+    private \PDOStatement $payloadStatement;
 
 
     /**
@@ -126,8 +124,8 @@ class VictorianProgression
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @return array
-     * @throws RuntimeException
      * @throws DebugBarException
+     * @throws \DomainException
      * @throws \PDOException
      */
     public function generate(
@@ -135,10 +133,10 @@ class VictorianProgression
          \Alaress_Date_Format $startDate,
          \Alaress_Date_Format $endDate
     ): array {
-        /* Setup step is mandatory
+        /* Setup step is mandatory; execute as singleton
          */
         if (!$this->setup) {
-            throw new RuntimeException('Setup needs to run first.');
+            $this->setup();
         }
 
         $struct = [];
