@@ -103,6 +103,9 @@ class Module extends BaseModule
         // Need an httpRequest.
         $httpRequest = $this->injector->get('httpRequest');
 
+        // Need a rosetta stone to translate terminology.
+        $rosettaStone = $this->injector->get('l10n');
+
         $queryParamBuilders = [
             new Database\Index\QueryParamBuilder(),
         ];
@@ -116,12 +119,14 @@ class Module extends BaseModule
                 $authorizer
             ),
             new Database\ResultType\News\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(NewsMapper::class),
                 $articleResolver,
                 $routeGenerator,
                 $authorizer
             ),
             new Database\ResultType\Page\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
                 $config,
@@ -180,6 +185,7 @@ class Module extends BaseModule
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $hydrators[] = new Database\ResultType\Assessment\Hydrator(
+                $rosettaStone,
                 $assessmentMapperProxy,
                 $mapperFactory->get(UserMapper::class),
                 Access::getInstance(),

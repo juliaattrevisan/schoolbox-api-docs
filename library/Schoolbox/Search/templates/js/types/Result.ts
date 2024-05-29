@@ -9,6 +9,7 @@ import type { Results } from "./Results";
 export type Result = {
     id: number;
     type: ResultTypes;
+    typeTitle: string; // the title of the type, with consideration for terminology settings
     date: string;
     url: string;
     title: string;

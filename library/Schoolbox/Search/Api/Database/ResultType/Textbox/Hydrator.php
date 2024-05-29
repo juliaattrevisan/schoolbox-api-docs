@@ -48,6 +48,8 @@ class Hydrator extends BaseHydrator
      * @param TextboxMapper $textboxMapper Used to fetch textboxes for hydration.
      * @param FolderMapper  $folderMapper  Used to fetch the folder to which a textbox belongs.
      * @param Access        $access        Used to determine if the current user may view this page.
+     * @param Generator     $routeGenerator
+     * @param Authorizer    $authorizer
      */
     public function __construct(
         private TextboxMapper $textboxMapper,
@@ -165,6 +167,7 @@ class Hydrator extends BaseHydrator
                          ->withFragment("textbox-" . $textbox->getId())
                          ->__toString(),
                     $match->type,
+                    'Textbox',
                     $match->relevance,
                     $textbox->getUpdatedAt(),
                     $textboxRootFolder,
@@ -209,6 +212,7 @@ class Hydrator extends BaseHydrator
                     ->withFragment("textbox-$componentInstanceId-" . $textbox->getId())
                     ->__toString(),
                 $match->type,
+                'Textbox',
                 $match->relevance,
                 $textbox->getUpdatedAt(),
                 $textboxFolder,

@@ -32,8 +32,8 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param LinkMapper $linkMapper Used to fetch links for hydration.
-     * @param Access     $access     Used to determine if the current user may view this page.
+     * @param LinkMapper   $linkMapper   Used to fetch links for hydration.
+     * @param Access       $access       Used to determine if the current user may view this page.
      */
     public function __construct(
         private LinkMapper $linkMapper,
@@ -80,6 +80,7 @@ class Hydrator extends BaseHydrator
                     $link->getDescription(), // The closest thing to a title for a link is link.description.
                     $link->getUrl(),
                     $match->type,
+                    'Link',
                     $match->relevance,
                     $link->getModified(),
                     $link->getFolder(),

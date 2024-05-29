@@ -90,6 +90,7 @@ class Hydrator extends BaseHydrator
                          ->withPath($event->getPath())
                          ->__toString(),
                     $match->type,
+                    'Event',
                     $match->relevance,
                     $event->getStartTime(),
                     // TODO: is this correct?

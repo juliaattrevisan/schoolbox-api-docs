@@ -66,7 +66,7 @@ const emit = defineEmits(["selected"]);
 
 <style lang="scss" scoped>
 @import "@schoolboxCurriculum/vue/style/viewNode";
-@import "./style/iconColours";
+@import "@css/core/base/icon-colours";
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);

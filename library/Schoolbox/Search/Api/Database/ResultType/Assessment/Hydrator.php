@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -53,6 +54,7 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
+     * @param RosettaStone $rosettaStone For translating terminology.
      * @param AssessmentMapperProxy $assessmentMapperProxy Used to fetch assessments for hydration.
      * @param UserMapper $userMapper Used to hydrate assessment creators.
      * @param Access $access Used to determine if the current user may view this page.
@@ -60,6 +62,7 @@ class Hydrator extends BaseHydrator
      * @param ServerRequestInterface $request Used to get the request URL.
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private UserMapper $userMapper,
         private Access $access,
@@ -204,6 +207,7 @@ class Hydrator extends BaseHydrator
                     $assessment->getTitle(),
                     $this->routeGenerator->generate($route, $params),
                     $match->type,
+                    $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                     $match->relevance,
                     $assessment->getUpdatedAt(),
                     $folder,
@@ -374,5 +378,24 @@ class Hydrator extends BaseHydrator
         }
 
         return $links;
+    }
+
+    /**
+     * @param string       $type
+     * @param RosettaStone $rosettaStone
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
+    {
+        return match ($type) {
+            'assessment' => $rosettaStone->translate('assessment', false, true),
+            'assessment.dueWork' => $rosettaStone->translate('dueWork', false, true),
+            'assessment.lessonPlan' => 'Lesson plan',
+            'assessment.project' => $rosettaStone->translate('project', false, true),
+            'assessment.lti' => 'LTI',
+            'assessment.task' => 'Task',
+            'assessment.quiz' => 'Quiz',
+            default => $type,
+        };
     }
 }

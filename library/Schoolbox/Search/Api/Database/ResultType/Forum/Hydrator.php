@@ -34,9 +34,9 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param PostMapper $postMapper Used to fetch forum posts for hydration.
+     * @param PostMapper   $postMapper   Used to fetch forum posts for hydration.
      * @param ThreadMapper $threadMapper Used to check whether a thread is a component.
-     * @param Access $access Used to determine if the current user may view this page.
+     * @param Access       $access       Used to determine if the current user may view this page.
      */
     public function __construct(
         private PostMapper $postMapper,
@@ -118,6 +118,7 @@ class Hydrator extends BaseHydrator
                          ->withFragment("{$post->getId()}")
                          ->__toString(),
                     $match->type,
+                    'Forum',
                     $match->relevance,
                     $post->getModified(),
                     $threadFolder,

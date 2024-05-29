@@ -34,7 +34,10 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param BadgeMapper $badgeMapper Used to fetch badge for hydration.
+     * @param BadgeMapper     $badgeMapper  Used to fetch badge for hydration.
+     * @param PrefixGenerator $prefixGenerator
+     * @param Generator       $routeGenerator
+     * @param Authorizer      $authorizer
      */
     public function __construct(
         private BadgeMapper $badgeMapper,
@@ -102,6 +105,7 @@ class Hydrator extends BaseHydrator
                     $badge->getName(), // The closest thing to a title for a badge is badge.name.
                     '',  // There is no 'view specific badge' page, so blank string here.
                     $match->type,
+                    'Badge',
                     $match->relevance,
                     $badge->getUpdatedAt(),
                     null, // A badge is not linked to any folder.

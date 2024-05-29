@@ -15,6 +15,7 @@ use Aura\Router\Generator;
 use OverflowException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -52,6 +53,7 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
+     * @param RosettaStone  $rosettaStone   Used to translate terminology.
      * @param Mapper        $folderMapper   Used to fetch folders for hydration.
      * @param Access        $access         Used to determine if the current user may view this page.
      * @param IConfigLoader $config         Used to determine if modules are enabled for links
@@ -59,6 +61,7 @@ class Hydrator extends BaseHydrator
      * @param Authorizer    $authorizer     Used to find page access permissions.
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private Folder\Mapper $folderMapper,
         private Access $access,
         private IConfigLoader $config,
@@ -108,6 +111,7 @@ class Hydrator extends BaseHydrator
                 $folder->getTitle(),
                 '/homepage/' . $match->id,
                 $match->type,
+                $this->getTypeTitleFromType($match->type, $this->rosettaStone),
                 $match->relevance,
                 null,
                 null,
@@ -222,8 +226,32 @@ class Hydrator extends BaseHydrator
             ];
         }
 
-
-
         return $links;
+    }
+
+    /**
+     * @param string       $type
+     * @param RosettaStone $rosettaStone
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
+    {
+        return match ($type) {
+            'page' => 'Page',
+            'page.class' => $rosettaStone->translate('class', false, true),
+            'page.course' => 'Course',
+            'page.homepage' => 'Homepage',
+            'page.unit' => $rosettaStone->translate('unit', false, true),
+            'page.folder' => 'Folder',
+            'page.group' => 'Group',
+            'textbox' => 'Textbox',
+            'tile' => 'Tile',
+            'user' => 'User',
+            'user.guest' => 'Guest',
+            'user.parent' => 'Parent',
+            'user.staff' => 'Staff',
+            'user.student' => 'Student',
+            default => $type,
+        };
     }
 }

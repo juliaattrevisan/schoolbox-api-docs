@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Comms\News;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
@@ -38,11 +39,13 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
+     * @param RosettaStone                  $rosettaStone    Used to translate terminology.
      * @param News\Mapper                   $newsMapper      Used for fetching news for hydration.
      * @param Generator                     $routeGenerator  Used for building routes to news articles.
      * @param News\Audience\ArticleResolver $articleResolver Used for determining user access to news articles.
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private News\Mapper $newsMapper,
         private News\Audience\ArticleResolver $articleResolver,
         private Generator $routeGenerator,
@@ -134,6 +137,7 @@ class Hydrator extends BaseHydrator
                         ->withQuery(http_build_query(['ref' => 'search']))
                         ->__toString(),
                     $match->type,
+                    $this->rosettaStone->translate('news', false, true),
                     $match->relevance,
                     $article->getPublishAt(),
                     null,

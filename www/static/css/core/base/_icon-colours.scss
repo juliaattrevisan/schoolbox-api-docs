@@ -1,0 +1,46 @@
+/**
+ * Icon colours to help more easily distinguish icon types
+ */
+:root {
+    --color-icon-badge: darkorange;
+    --color-icon-course: #008600;
+    --color-icon-class: #72c600;
+    --color-icon-folder: var(--content-ui-foreground);
+    --color-icon-home: darkorange;
+    --color-icon-learning-activity: #c1009e;
+    --color-icon-unit: grey;
+}
+
+.icon-badge::before {
+    color: var(--color-icon-badge);
+}
+
+.icon-teacher::before {
+    color: var(--color-icon-class);
+}
+
+.icon-course::before,
+.icon-course-builder::before {
+    color: var(--color-icon-course);
+}
+
+.icon-folder::before {
+    color: var(--color-icon-folder);
+}
+
+.icon-home::before {
+    color: var(--color-icon-home);
+}
+
+.icon-project::before,
+.icon-due-work::before,
+.icon-task::before,
+.icon-quiz::before,
+.icon-lesson-plan::before,
+.icon-lti::before {
+    color: var(--color-icon-learning-activity);
+}
+
+.icon-unit::before {
+    color: var(--color-icon-unit);
+}

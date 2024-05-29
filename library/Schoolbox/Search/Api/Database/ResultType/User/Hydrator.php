@@ -99,6 +99,7 @@ class Hydrator extends BaseHydrator
                     $this->userNameFormatter->formatObject($user),
                     $user->getRole()->getType() === Role::GUEST ? '' : '/search/user/' . $match->id, // Guest users do not have a profile URL
                     $match->type,
+                    $this->getTypeTitleFromType($match->type),
                     $match->relevance,
                     $user->getUpdatedAt(),
                     null,
@@ -264,5 +265,21 @@ class Hydrator extends BaseHydrator
             }
         }
         return null;
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type): string
+    {
+        return match ($type) {
+            'user' => 'User',
+            'user.guest' => 'Guest',
+            'user.parent' => 'Parent',
+            'user.staff' => 'Staff',
+            'user.student' => 'Student',
+            default => $type,
+        };
     }
 }

@@ -83,6 +83,7 @@ class Hydrator extends BaseHydrator
                          ->withPath("/blog/{$blog->getId()}")
                          ->__toString(),
                     $match->type,
+                    'Blog',
                     $match->relevance,
                     $blog->getCreatedAt(),
                     $blog->getFolder(),

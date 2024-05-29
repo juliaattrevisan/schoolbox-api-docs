@@ -41,8 +41,9 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
-     * @param File\Mapper $fileMapper Used to fetch files for hydration.
-     * @param Access      $access     Used to determine if the current user may view this page.
+     * @param File\Mapper     $fileMapper   Used to fetch files for hydration.
+     * @param Access          $access       Used to determine if the current user may view this page.
+     * @param PrefixGenerator $prefixGenerator
      */
     public function __construct(
         private File\Mapper $fileMapper,
@@ -96,6 +97,7 @@ class Hydrator extends BaseHydrator
                          ->withQuery(http_build_query(['id' => $file->getId()]))
                          ->__toString(),
                     $match->type,
+                    $this->getTypeTitleFromType($match->type),
                     $match->relevance,
                     $file->getModifiedAt(),
                     $file->getFolder(),
@@ -121,5 +123,21 @@ class Hydrator extends BaseHydrator
         // Filter out anything missing
         // TODO make generic
         return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getTypeTitleFromType(string $type): string
+    {
+        return match ($type) {
+            'file', 'file.other' => 'File',
+            'file.audio' => 'Audio',
+            'file.document' => 'Document',
+            'file.image' => 'Image',
+            'file.video' => 'Video',
+            default => $type,
+        };
     }
 }

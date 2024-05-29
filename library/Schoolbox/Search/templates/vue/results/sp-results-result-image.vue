@@ -37,9 +37,10 @@ function getImg() {
         return `<img
                     src="${props.result.image}"
                     :alt="Photo of ${props.result.title}"
+                    title="${props.result.typeTitle}"
                 />`;
     }
-    return `<div class="icon icon-${props.result.icon as string}"></div>`;
+    return `<div class="icon icon-${props.result.icon as string}" title="${props.result.typeTitle}"></div>`;
 }
 </script>
 
@@ -61,4 +62,6 @@ function getImg() {
     </div>
 </template>
 
-<style scoped></style>
+<style lang="scss">
+@import "@css/core/base/icon-colours";
+</style>
