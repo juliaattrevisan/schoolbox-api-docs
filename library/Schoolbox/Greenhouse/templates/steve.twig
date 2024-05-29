@@ -3,12 +3,15 @@
         border: 1px solid #f00 !important;
     }
 </style>
+
+{% set levels = [6, 7, 8, 9, 10] %}
+{% set possibleOutcomes = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5] %}
 <table>
     <thead>
         <tr>
-            <th>Nodes</th>
+            <th colspan="2">Nodes</th>
             <th>Rating</th>
-            {% for i in [6, 7, 8, 9, 10] %}
+            {% for i in levels %}
                 <th colspan="2" class="text-center">
                     Level {{ i }}
                 </th>
@@ -17,7 +20,8 @@
         <tr>
             <th></th>
             <th></th>
-            {% for i in [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5] %}
+            <th></th>
+            {% for i in possibleOutcomes %}
                 <th class="text-center" style="width:40px" data-value="{{ i }}">
                     o
                 </th>
@@ -25,22 +29,23 @@
         </tr>
     </thead>
     <tbody>
+        {% for nodeId, nodeData in payload.data %}
+            <tr>
+                <td>
+                    {{ nodeData.node.parent.name }}
+                </td>
+                <td>
+                    {{ nodeData.node.name }}
+                </td>
+            </tr>
+        {% endfor %}
+
     </tbody>
 </table>
 
 
 
 
-{#{% for nodeId, nodeData in payload.data %}#}
-{#    <tr>#}
-{#        <td>#}
-{#            {{ nodeData.node.name }}#}
-{#        </td>#}
-{#        <td>#}
-{#            {{ nodeData.node.parent.name }}#}
-{#        </td>#}
-{#    </tr>#}
-{#{% endfor %}#}
 
 
 
