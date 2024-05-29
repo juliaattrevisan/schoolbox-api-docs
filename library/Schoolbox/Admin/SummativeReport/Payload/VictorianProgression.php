@@ -33,6 +33,14 @@ class VictorianProgression
 
 
     /**
+     * Available leves to render in frontend; each int represents its float compatriot
+     * e.g. "Level 6" is used as a heading for values 6 and 6.5
+     */
+    private const LEVELS = [6, 7, 8, 9, 10];
+    private const POSSIBLE_OUTCOMES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5];
+
+
+    /**
      * Mega Query containing shortcuts to the parts we need
      *
      * Note that we can take advantage of the fact that assessments must be either a due work
@@ -171,7 +179,12 @@ class VictorianProgression
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
-            'currentYearLevel' => $this->getYearLevel($student),
+            'student' => [
+                'name' => $student->getFullName(),
+                'currentYearLevel' => $this->getYearLevel($student),
+            ],
+            'levels' => self::LEVELS,
+            'possibleOutcomes' => self::POSSIBLE_OUTCOMES,
             'data' => $data
         ];
     }
