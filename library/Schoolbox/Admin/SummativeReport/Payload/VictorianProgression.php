@@ -91,10 +91,10 @@ class VictorianProgression
     /**
      * Set up the necessary parts
      *
-     * @return void
+     * @return $this
      * @throws \DomainException
      */
-    private function setup(): void
+    private function setup(): self
     {
         /* Prepare megaquery
          */
@@ -113,6 +113,8 @@ class VictorianProgression
         }
 
         $this->setup = true;
+
+        return $this;
     }
 
 
