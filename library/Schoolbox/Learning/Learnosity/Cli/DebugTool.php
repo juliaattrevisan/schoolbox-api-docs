@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Learning\Learnosity\Cli;
 
-use LearnositySdk\Exceptions\ValidationException;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Url\Factory;
@@ -88,6 +88,30 @@ class DebugTool extends CliTool\App
             exit;
         }
 
+        // Which endpoint?
+        $endpoint = $this->getOpt(self::OPT_SHORT_ENDPOINT) ?? $this->getOpt(self::OPT_LONG_ENDPOINT);
+        if (!$endpoint) {
+            $this->getLogger()->error('An endpoint must be supplied.');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        // Build payload
+        $payload       = [];
+        $payloadOption = $this->getOpt(self::OPT_SHORT_PAYLOAD) ?? $this->getOpt(self::OPT_LONG_PAYLOAD);
+        if ($payloadOption) {
+            $payload = json_decode($payloadOption, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        $sessionId = $this->getOpt(self::OPT_SHORT_SESSION_ID) ?? $this->getOpt(self::OPT_LONG_SESSION_ID);
+        if ($sessionId) {
+            $payload['session_id'] = $this->normalizeOptionValue($sessionId);
+        }
+
+        $reference = $this->getOpt(self::OPT_SHORT_REFERENCE) ?? $this->getOpt(self::OPT_LONG_REFERENCE);
+        if ($reference) {
+            $payload['reference'] = $this->normalizeOptionValue($reference);
+        }
+
         $api = new Api(
             (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
             $this->getConfig()->get('learnosity_version'),
@@ -95,8 +119,20 @@ class DebugTool extends CliTool\App
             $this->getConfig()->get('learnosity_consumer_secret'),
             $this->getLogger(),
         );
+
+        $result = $api->dataGetRequest($endpoint, $payload);
+        if ($this->getOpt(self::OPT_SHORT_JSON) || $this->getOpt(self::OPT_LONG_JSON)) {
+            echo json_encode($result, JSON_UNESCAPED_SLASHES);
+        } else {
+            var_dump($result);
+        }
     }
 
+    /**
+     * Print help
+     *
+     * @return void
+     */
     private function printHelp(): void
     {
         $file   = $this->getToolFilename();
@@ -150,5 +186,23 @@ OPTIONS
 
 
 HELP;
+    }
+
+    /**
+     * Normalizes the value of an option from `$this->getOpt()` into a single
+     * dimensional arraay.
+     *
+     * Accounts for:
+     * * multiple values provided for the option (e.g. --opt=1, --opt=2)
+     * * values split by a separator (e.g. --opt=1,2)
+     * * a combination of the above
+     *
+     * @param string|array $optionValue
+     * @param string       $separator
+     * @return array
+     */
+    private function normalizeOptionValue(array|string $optionValue, string $separator = ','): array
+    {
+        return array_merge(...array_map(fn ($v) => explode($separator, $v), (array)$optionValue));
     }
 }
