@@ -226,29 +226,50 @@ class VictorianProgression
         ]);
 
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $parentNodeId = $row['parent_node_id'];
             $nodeId = $row['curriculum_node_id'];
 
-            /* Init if it wasn't already here
+            /* Construct parent node first
              */
-            if (!isset($struct[$nodeId])) {
-                $struct[$nodeId] = [
-                    'node' => [
+            if (null === $parentNodeId) {
+                if (!isset($struct[$nodeId])) {
+                    $struct[$nodeId] = [
                         'id' => $nodeId,
                         'name' => trim((string)$row['curriculum_node']),
-                        'parent' => [
-                            'id' => $row['parent_node_id'],
-                            'name' => trim((string)$row['parent_node'])
-                        ]
-                    ],
+                        self::TYPE_CURRENT => null,
+                        self::TYPE_PREVIOUS => null,
+                    ];
+                }
+            } elseif (!isset($struct[$parentNodeId])) {
+                $struct[$parentNodeId] = [
+                    'id' => $parentNodeId,
+                    'name' => trim((string)$row['parent_node']),
+                    /* A subnode, if extant;
+                     * each subnode will contain marks if it exists
+                     */
+                    'subnodes' => [],
+                ];
+            }
+
+            /* Add any subnodes if they exist
+             */
+            if ($parentNodeId && !isset($struct[$parentNodeId]['subnodes'][$nodeId])) {
+                $struct[$parentNodeId]['subnodes'][$nodeId] = [
+                    'id' => $nodeId,
+                    'name' => trim((string)$row['curriculum_node']),
                     self::TYPE_CURRENT => null,
-                    self::TYPE_PREVIOUS => null
+                    self::TYPE_PREVIOUS => null,
                 ];
             }
 
             /* Pop it into the node specified by $type
              * Note that $row['mark'] will be something in 6, 6.5, 7, 7.5, 8, 8.5...etc
              */
-            $struct[$nodeId][$type] = $row['mark'];
+            if (null === $parentNodeId) {
+                $struct[$nodeId][$type] = $row['mark'];
+            } else {
+                $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $row['mark'];
+            }
         }
 
         return $struct;
