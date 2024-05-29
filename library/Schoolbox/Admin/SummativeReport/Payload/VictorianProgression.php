@@ -66,7 +66,7 @@ class VictorianProgression
         AND vaf.student_id = :studentId                         -- filter to actual student
         AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
         AND vaf.published_at BETWEEN :startDate AND :endDate    -- specify dates of academic period(s) in use
-        ORDER BY cn1.id, a.due_date, vaf.published_at DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
     ";
 
 
