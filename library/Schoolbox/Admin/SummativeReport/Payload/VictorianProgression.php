@@ -242,8 +242,8 @@ class VictorianProgression
     private function generateOne(
         string $type,
         \Schoolbox\User $student,
-         \Alaress_Date_Format $startDate,
-         \Alaress_Date_Format $endDate,
+        \Alaress_Date_Format $startDate,
+        \Alaress_Date_Format $endDate,
         array $struct = []
     ): array {
         /* Setup step is mandatory; execute as singleton
