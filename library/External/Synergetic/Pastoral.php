@@ -585,6 +585,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         //   recreate it
         $isCreate = empty($pastoral->getExternalId()) || !$this->exists($pastoral);
         if ($isCreate) {
+            // Ensure that the external ID is cleared, so a parameter is not
+            // created for it in an insert.
+            $pastoral->setExternalId(null);
             $query = "
                 INSERT INTO tPastoralCare (
                     ID,
