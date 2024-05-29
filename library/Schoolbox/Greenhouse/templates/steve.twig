@@ -60,12 +60,23 @@
 
 {##
  # Render the possible outcomes for a curriculum node
+ # and, if applicable, a Progression Point
  #}
 {% macro renderOutcomes(nodeData, possibleOutcomes) %}
     <td>{{ nodeData.name }}</td>
     <td data-col-name="rating"></td>
     {% for i in possibleOutcomes %}
-        <td class="text-center">x</td>
+        <td class="text-center" style="vertical-align:middle;font-size:48px;">
+            {# Progression Point from something in the past #}
+            {% if i == nodeData.previous %}
+                ◦
+            {% endif %}
+
+            {# Progression Point from current academic period #}
+            {% if i == nodeData.current %}
+                •
+            {% endif %}
+        </td>
     {% endfor %}
 {% endmacro %}
 
