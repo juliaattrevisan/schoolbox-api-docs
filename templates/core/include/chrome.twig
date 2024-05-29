@@ -616,7 +616,7 @@
                                         document.dispatchEvent(
                                             new CustomEvent("PWA_NOTIFICATION_ALLOW", {
                                                 detail: {
-                                                    debug: {{ config.debug_mode }},
+                                                    debug: Boolean({{ config.debug_mode }}),
                                                     deviceId: deviceId,
                                                 },
                                             }),
@@ -640,7 +640,7 @@
                                         document.dispatchEvent(
                                             new CustomEvent("PWA_NOTIFICATION_DENY", {
                                                 detail: {
-                                                    debug: {{ config.debug_mode }},
+                                                    debug: Boolean({{ config.debug_mode }}),
                                                 },
                                             }),
                                         );
