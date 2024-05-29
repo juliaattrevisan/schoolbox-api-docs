@@ -150,9 +150,10 @@ class VictorianProgression
      */
     public function generate(\Schoolbox\User $student): array
     {
+        $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
+
         /* FIXME replace with actual way of finding the answer
          */
-        $currentAcademicPeriod = $this->termMapper->findById(4);
         $previousAcademicPeriod = $this->termMapper->findById(4);
 
         /* Collate the current academic period's curriculum nodes
