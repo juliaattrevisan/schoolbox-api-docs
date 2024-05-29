@@ -29,15 +29,30 @@
         </tr>
     </thead>
     <tbody>
-        {% for nodeId, nodeData in payload.data %}
-            <tr>
-                <td>
-                    {{ nodeData.node.parent.name }}
-                </td>
-                <td>
-                    {{ nodeData.node.name }}
-                </td>
-            </tr>
+        {% for parentNodeId, parentNodeData in payload.data %}
+            {% set nSubrows = parentNodeData.subnodes|length %}
+
+            {% if nSubrows > 1 %}
+                <tr>
+                    <td rowspan="{{ nSubrows + 1 }}">
+                        {{ parentNodeData.name }}
+                    </td>
+                </tr>
+                {% for nodeId, nodeData in parentNodeData.subnodes %}
+                    <tr>
+                        <td>{{ nodeData.name }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>
+                        {{ parentNodeData.name }}
+                    </td>
+                {% for nodeId, nodeData in parentNodeData.subnodes %}
+                        <td>{{ nodeData.name }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         {% endfor %}
 
     </tbody>
