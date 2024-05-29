@@ -120,6 +120,12 @@ class VictorianProgression
      */
     private function setup(): void
     {
+        /* We've already been here, there's nothing to do
+         */
+        if ($this->setup) {
+            return;
+        }
+
         /* Prepare megaquery
          */
         $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
@@ -136,6 +142,8 @@ class VictorianProgression
             ));
         }
 
+        /* Remember we did this
+         */
         $this->setup = true;
     }
 
