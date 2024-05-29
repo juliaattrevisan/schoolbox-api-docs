@@ -39,6 +39,13 @@ class ExternalEvents extends Base implements IExternalEvents
     private const PUBLIC_PRODUCT_CODE = 'PUBPDC';
 
     /**
+     * Date to ignore all events past this time
+     * when we cast to smalldatetime in mssql that has an upper limit of 2079-06-06
+     * so we shall set this to 2070, and just ignore any events after this point.
+     */
+    private const TASS_CALENDAR_LIMIT = '2070-01-01 00:00:00';
+
+    /**
      * Build a query to get events for a given $productCode
      * If $productCode is null, obtain personal events instead
      *
@@ -94,6 +101,9 @@ class ExternalEvents extends Base implements IExternalEvents
         ";
 
         $whereQuery = "
+            ec.end_date < :tass_calendar_limit
+            AND ec.start_date < :tass_calendar_limit
+            AND
             NOT (
                 CASE
                     WHEN ec.end_time IS NOT NULL THEN SMALLDATETIMEFROMPARTS(DATEPART(year, ec.end_date), DATEPART(month, ec.end_date), DATEPART(day, ec.end_date), DATEPART(hour, ec.end_time), DATEPART(minute, ec.end_time))
@@ -238,6 +248,7 @@ class ExternalEvents extends Base implements IExternalEvents
         $params = [
             "startTime{$paramSuffix}" => $start->getDatabase(),
             "endTime{$paramSuffix}"   => $end->getDatabase(),
+            "tass_calendar_limit"     => self::TASS_CALENDAR_LIMIT,
         ];
         if (isset($productCode)) {
             $params["productCode{$paramSuffix}"] = $productCode;
