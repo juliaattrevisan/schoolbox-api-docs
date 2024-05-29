@@ -253,16 +253,7 @@ class Duplicator
 
             // If complete or failed: set status
             if ($updateStatus) {
-                $query = $this->database->prepareQuery(
-                    "
-                        UPDATE assess
-                        SET learnosity_job_status = ?
-                        WHERE assessment_id = ?
-                    ",
-                    [$jobStatus, $quiz->getId()],
-                );
-                $quiz->setLearnosityJobStatus($jobStatus);
-                $query->execute();
+                $this->updateStatus($quiz, $jobStatus);
             }
 
             // If complete: set tags
@@ -272,80 +263,117 @@ class Duplicator
                     $newTags[] = $this->tagFactory->produceImplFlag();
                 }
 
-                /* Fetch this activity from Learnosity; we need to assign tags to each of its items
-                 * because they appear in the global Item Bank. Unless we assign the classCode tag
-                 * here, we'll never know if items are for a spec or an impl when users search
-                 */
-                $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
-                    'references' => [
-                        $quiz->getLearnosityReference()
-                    ]
-                ])['data'][0]['data']['items'] ?? null;
-
-                if (null !== $itemReferences) {
-                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                     */
-                    if (is_array($itemReferences[0])) {
-                        /* Forcibly mutate this, because learnosity insanity
-                         */
-                        $itemReferenceList = array_column($itemReferences, 'id');
-                    } else {
-                        /* Presume it was a list of reference strings already
-                         */
-                        $itemReferenceList = $itemReferences;
-                    }
-
-                    /* Initialise payload container
-                     */
-                    $emptyPayload = [
-                        'items' => []
-                    ];
-
-                    $payload = $emptyPayload;
-
-                    /* Assign tags to each item
-                     */
-                    foreach ($itemReferenceList as $item) {
-                        /* Maxed out? Send it.
-                         */
-                        if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                            $this->api->dataSetRequest('/itembank/items/tags', $payload);
-
-                            /* Reset this for the next cycle
-                             */
-                            $payload = $emptyPayload;
-                        }
-
-                        /* Keep accumulating until we max out
-                         */
-                        $payload['items'][] = [
-                            'reference' => $item,
-                            'tags' => $newTags
-                        ];
-                    }
-
-                    /* Send the last payload if anything is in it
-                     */
-                    if (\count($payload['items'])) {
-                        $this->api->dataSetRequest('/itembank/items/tags', $payload);
-                    }
-                }
-
-                /* Assign tags to the activity itself
-                 */
-                $this->api->dataSetRequest(
-                    '/itembank/activities/tags',
-                    [
-                        'activities' => [
-                            [
-                                'reference' => $quiz->getLearnosityReference(),
-                                'tags'      => $newTags,
-                            ],
-                        ],
-                    ],
-                );
+                // If any setting of tags fails: restart the job.
+                $this->assignTags($quiz, $newTags);
             }
         }
+    }
+
+    /**
+     * Assign `$newTags` to `$quiz` in Learnosity: this means assigning those
+     * tags to the activity and its items.
+     *
+     * @param QuizDomainModel $quiz
+     * @param array           $newTags
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function assignTags(QuizDomainModel $quiz, array $newTags): void
+    {
+        /* Fetch this activity from Learnosity; we need to assign tags to each of its items
+         * because they appear in the global Item Bank. Unless we assign the classCode tag
+         * here, we'll never know if items are for a spec or an impl when users search
+         */
+        $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
+            ]
+        ])['data'][0]['data']['items'] ?? null;
+
+        if (null !== $itemReferences) {
+            /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+             * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+             */
+            if (is_array($itemReferences[0])) {
+                /* Forcibly mutate this, because learnosity insanity
+                 */
+                $itemReferenceList = array_column($itemReferences, 'id');
+            } else {
+                /* Presume it was a list of reference strings already
+                 */
+                $itemReferenceList = $itemReferences;
+            }
+
+            /* Initialise payload container
+             */
+            $emptyPayload = [
+                'items' => []
+            ];
+
+            $payload = $emptyPayload;
+
+            /* Assign tags to each item
+             */
+            foreach ($itemReferenceList as $item) {
+                /* Maxed out? Send it.
+                 */
+                if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                    $this->api->dataSetRequest('/itembank/items/tags', $payload);
+
+                    /* Reset this for the next cycle
+                     */
+                    $payload = $emptyPayload;
+                }
+
+                /* Keep accumulating until we max out
+                 */
+                $payload['items'][] = [
+                    'reference' => $item,
+                    'tags'      => $newTags
+                ];
+            }
+
+            /* Send the last payload if anything is in it
+             */
+            if (\count($payload['items'])) {
+                $this->api->dataSetRequest('/itembank/items/tags', $payload);
+            }
+        }
+
+        /* Assign tags to the activity itself
+         */
+        $this->api->dataSetRequest(
+            '/itembank/activities/tags',
+            [
+                'activities' => [
+                    [
+                        'reference' => $quiz->getLearnosityReference(),
+                        'tags'      => $newTags,
+                    ],
+                ],
+            ],
+        );
+    }
+
+    /**
+     * Update the status of this job.
+     *
+     * @param QuizDomainModel $quiz
+     * @param string|null     $jobStatus
+     * @return void
+     */
+    private function updateStatus(QuizDomainModel $quiz, ?string $jobStatus): void
+    {
+        $query = $this->database->prepareQuery(
+            "
+                        UPDATE assess
+                        SET learnosity_job_status = ?
+                        WHERE assessment_id = ?
+                    ",
+            [$jobStatus, $quiz->getId()],
+        );
+        $quiz->setLearnosityJobStatus($jobStatus);
+        $query->execute();
     }
 }
