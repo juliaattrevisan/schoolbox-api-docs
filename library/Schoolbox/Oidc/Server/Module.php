@@ -113,6 +113,7 @@ class Module extends BaseModule
                 new ClaimSetEntity(
                     Scope::SCOPE_SCHOOLBOX,
                     [
+                        Scope::SCOPE_SCHOOLBOX . '/id',
                         Scope::SCOPE_SCHOOLBOX . '/instance_id',
                         Scope::SCOPE_SCHOOLBOX . '/external_id',
                         Scope::SCOPE_SCHOOLBOX . '/role_type',

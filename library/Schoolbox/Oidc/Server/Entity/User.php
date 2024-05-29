@@ -72,6 +72,7 @@ class User implements UserEntityInterface, ClaimSetInterface
 
             // Schoolbox-specific claims:
             // must be prefixed with something identifying them as Schoolbox
+            ScopeRepository::SCOPE_SCHOOLBOX . '/id'          => $this->user->getId(),
             ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
             ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $this->user->getExternalId(),
             ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $this->user->getRole()->getType(),
