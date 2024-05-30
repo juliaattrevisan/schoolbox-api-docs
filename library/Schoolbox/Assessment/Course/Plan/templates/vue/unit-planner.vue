@@ -3,7 +3,7 @@
  * The main component for the unit planner
  */
 import type { Ref } from "vue";
-import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
+import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
@@ -12,7 +12,7 @@ import UpHeader from "./up-header.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpCurriculum from "./up-curriculum.vue";
-import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
+import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
 interface Props {
     courseId: number;
