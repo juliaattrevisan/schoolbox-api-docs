@@ -15,7 +15,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
+use Alaress\Lock\LockRefreshException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -87,6 +89,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * @var \Schoolbox\Curriculum\Node\Mapper
+     */
+    private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper;
+
+
+    /**
      * Run the cli tool
      */
     public function run(): void
@@ -132,6 +140,10 @@ HELP;
 
         $this->getLogger()->info('Script commencing.');
 
+        /* Dependencies
+         */
+        $this->curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
         /* Optionally arbitrarily make curriculum nodes if they don't already exist
          */
         if ($this->getOpt(self::OPT_MAKE_CNODES)) {
@@ -165,12 +177,13 @@ HELP;
      * @param LockInterface $lock
      * @param string $filename
      * @return void
-     * @throws \Alaress\Lock\LockRefreshException
+     * @throws LockRefreshException
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
      */
     private function parseCurriculumNodes(LockInterface $lock, string $filename): void
     {
-        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
-
         /* Remember ones we've seen
          */
         $seen = [];
@@ -233,7 +246,7 @@ HELP;
 
             /* See if it already exists; if not, spawn it
              */
-            $node = $curriculumNodeMapper->createModel()
+            $node = $this->curriculumNodeMapper->createModel()
                 ->setCode($curriculumCode)
                 ->setName($row[9])
                 /* Randomly hardcoded for now
@@ -243,7 +256,7 @@ HELP;
                 ->setEnabled(true)
                 ->setUuid('');
 
-            $curriculumNodeMapper->save($node);
+            $this->curriculumNodeMapper->save($node);
 
             $seen[$curriculumCode] = $row[9];
 
