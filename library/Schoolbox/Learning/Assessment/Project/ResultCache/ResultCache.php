@@ -159,32 +159,37 @@ class ResultCache
         $normalisedMark = $participant->generateNormalisedMark(true);
         $humanReadableMark = $participant->generateHumanReadableMark(true);
 
-        if (null === $normalisedMark) {
-            // ignore null results these have no feedback, so shouldn't persist to the db..
-            return null;
+        if (null !== $normalisedMark) {
+            // Normalised mark must be within the bounds [0, 100].
+            // This restriction should (I think?) be in
+            // `\Schoolbox\Learning\Assessment\Summator\AbstractSummator::summate`
+            // implementations, but I am not sure what the change impact of adding
+            // that restriction at that level is.
+            if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
+                $normalisedMark = IMarkScheme::NORMALISED_MARK_MIN;
+            }
+            if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
+                $normalisedMark = IMarkScheme::NORMALISED_MARK_MAX;
+            }
         }
 
-        // Normalised mark must be within the bounds [0, 100].
-        // This restriction should (I think?) be in
-        // `\Schoolbox\Learning\Assessment\Summator\AbstractSummator::summate`
-        // implementations, but I am not sure what the change impact of adding
-        // that restriction at that level is.
-        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
-            $normalisedMark = IMarkScheme::NORMALISED_MARK_MIN;
-        }
-        if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
-            $normalisedMark = IMarkScheme::NORMALISED_MARK_MAX;
-        }
+        // If any part of the mark has changed, update the cache.
+        // Note a new null mark can arise if the marker removes the last non-null mark from a project's sub-assessment.
+        if (
+            $normalisedMark !== $model->getNormalisedMark() ||
+            $humanReadableMark !== $model->getHumanReadableMark() ||
+            $marker?->getId() !== $model->getMarker()?->getId()
+        ) {
+            /* Shove in all the parts
+             */
+            $model
+                ->setMarker($marker)
+                ->setHumanReadableMark($humanReadableMark)
+                ->setNormalisedMark($normalisedMark);
 
-        /* Shove in all the parts
-         */
-        $model
-            ->setMarker($marker)
-            ->setHumanReadableMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark);
-
-        if ($this->perform) {
-            $this->mapper->save($model);
+            if ($this->perform) {
+                $this->mapper->save($model);
+            }
         }
 
         return $model;
@@ -263,6 +268,8 @@ class ResultCache
                 $this->persist($project, $user, null);
             }
         }
+
+        // TODO: This seems unnecessary.  Check and remove if so.
         // Attempt some cache cleaning
         // We spawned this, we should remove it
         unset($project);
