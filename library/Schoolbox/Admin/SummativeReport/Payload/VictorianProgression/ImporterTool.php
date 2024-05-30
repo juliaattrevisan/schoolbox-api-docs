@@ -117,6 +117,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Encode their external id into our description. lol
+     */
+    private const IMPORT_IDENTIFIER = '2023-import-%s';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -740,49 +746,67 @@ HELP;
              */
             $externalAssessmentId = $row[4];
 
+            /* Used to recycle an assessment we already imported
+             */
+            $description = sprintf(
+                self::IMPORT_IDENTIFIER,
+                $externalAssessmentId
+            );
+
             /* Avengers Assemble
              */
             if (!isset($seen[$externalAssessmentId])) {
-                $assessmentData = [
-                    'assessmentType' => AssessmentType::TYPE_DUE_WORK,
-                    'context' => $folder,
-                    'title' => $row[9],
-                    'workType' => $workTypeId,
-                    'description' => '',
-                    'creator' => $creator,
-                    'weight' => $weight,
-                    'curriculumCodes' => $this->parseCurriculumCode($row[8]),
-                    'publishDate' => $publishDate,
-                    'openDate' => $openDate,
-                    'dueDate' => $dueDate,
-                    'closeDate' => $closeDate,
-                    'markType' => (string)MarkType::TYPE_LETTER,
-                    'gradingScheme' => $gradingScheme,
-                    'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
-                    /* Get past rubric foreign key shenanigans
-                     */
-                    'useRubric' => false,
-                    'capability-markType' => $capabilityMarkType,
-                    'capability-gradingScheme' => $capabilityGradingScheme
-                ];
-
-                /* Make it then save it
+                /* May have been made in separate import somewhere
+                 * Just recycle it
                  */
-                $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
-                $assessment = $assessmentFactory->produce();
+                try {
+                    $assessment = $this->assessmentMapperProxy->findOneByColumn('description', $description);
 
-                if ($this->perform()) {
-                    $this->assessmentMapperProxy->save($assessment, $creator);
                     $seen[$externalAssessmentId] = $assessment;
-                }
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $assessmentData = [
+                        'assessmentType' => AssessmentType::TYPE_DUE_WORK,
+                        'context' => $folder,
+                        'title' => $row[9],
+                        'workType' => $workTypeId,
+                        /* Secretly encode external id here
+                         */
+                        'description' => $description,
+                        'creator' => $creator,
+                        'weight' => $weight,
+                        'curriculumCodes' => $this->parseCurriculumCode($row[8]),
+                        'publishDate' => $publishDate,
+                        'openDate' => $openDate,
+                        'dueDate' => $dueDate,
+                        'closeDate' => $closeDate,
+                        'markType' => (string)MarkType::TYPE_LETTER,
+                        'gradingScheme' => $gradingScheme,
+                        'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
+                        /* Get past rubric foreign key shenanigans
+                         */
+                        'useRubric' => false,
+                        'capability-markType' => $capabilityMarkType,
+                        'capability-gradingScheme' => $capabilityGradingScheme
+                    ];
 
-                $this->getLogger()->info(sprintf(
-                    'Row %s: created new assessment "%s" (%s) in folder %s',
-                    $i,
-                    $assessment->getId(),
-                    $assessment->getTitle(),
-                    $folder->getTitle()
-                ));
+                    /* Make it then save it
+                     */
+                    $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
+                    $assessment = $assessmentFactory->produce();
+
+                    if ($this->perform()) {
+                        $this->assessmentMapperProxy->save($assessment, $creator);
+                        $seen[$externalAssessmentId] = $assessment;
+                    }
+
+                    $this->getLogger()->info(sprintf(
+                        'Row %s: created new assessment "%s" (%s) in folder %s',
+                        $i,
+                        $assessment->getId(),
+                        $assessment->getTitle(),
+                        $folder->getTitle()
+                    ));
+                }
             }
 
             /* Summon it from memory (yes I know...)
