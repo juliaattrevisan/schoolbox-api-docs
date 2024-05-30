@@ -92,14 +92,14 @@
                 {% for nodeId, nodeData in parentNodeData.subnodes %}
                     <tr>
                         <td>{{ nodeData.name }}</td>
-                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel) }}
+                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester) }}
                     </tr>
                 {% endfor %}
             {% else %}
                 {# No subnodes: occupy available space #}
                 <tr>
                     <td colspan="2">{{ parentNodeData.name }}</td>
-                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel) }}
+                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester) }}
                 </tr>
             {% endif %}
         {% endfor %}
@@ -114,7 +114,7 @@
  # @param array $possibleOutcomes
  # @param int $currentYearLevel
  #}
-{% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel) %}
+{% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester) %}
     <td>
         {# TODO How is "rating" decided...? It goes in this cell. #}
     </td>
@@ -130,13 +130,21 @@
          #}
         {% set nearestFloor = i|round(0, 'floor') %}
 
+        {# We're in the left cell #}
         {% if i == nearestFloor %}
             {% set css = 'hide-right-border' %}
         {% endif %}
 
-        {# Check current year; smear it yellow if column matches student year level #}
+        {# Check current year; smear it yellow if column matches student year level
+         # then figure out if it's the left cell or the right cell, since each of these
+         # subdivisions corresponds to a semester. There's stable-genius logic here, sry
+         #}
         {% if nearestFloor == currentYearLevel %}
-            {% set css = css ~ ' yellow' %}
+            {% if i == nearestFloor and currentSemester == 1 %}
+                {% set css = css ~ ' yellow' %}
+            {% elseif i != nearestFloor and currentSemester == 2 %}
+                {% set css = css ~ ' yellow' %}
+            {% endif %}
         {% endif %}
 
         <td class="outcome-cell {{ css }}">

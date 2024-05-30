@@ -172,6 +172,8 @@ class VictorianProgression
      */
     public function generate(\Schoolbox\User $student): array
     {
+        /* Determine what current academic period we're in
+         */
         $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
 
         /* Collate the current academic period's curriculum nodes
@@ -213,6 +215,7 @@ class VictorianProgression
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
+            'currentSemester' => $this->getCurrentSemester($currentAcademicPeriod),
             'student' => [
                 'name' => $student->getFullName(),
                 'currentYearLevel' => $this->getYearLevel($student),
@@ -340,6 +343,25 @@ class VictorianProgression
         }
 
         return $struct;
+    }
+
+
+    /**
+     * Figure out if we're in semester 1 or 2, of the given $currentAcademicPeriod
+     *
+     * @param \Schoolbox\Assessment\Term\Model $currentAcademicPeriod
+     * @return string|null
+     */
+    private function getCurrentSemester(\Schoolbox\Assessment\Term\Model $currentAcademicPeriod): ?string
+    {
+        $currentYear = date('Y');
+
+        preg_match("/{$currentYear}([-_]+)(\d+)/", $currentAcademicPeriod->getCode(), $matches);
+
+        /* Current Semester could not be determined; leave empty
+         * Otherwise send back either 1 or 2 (anything else will be ignored in frontend land)
+         */
+        return $matches[2] ?? null;
     }
 
 
