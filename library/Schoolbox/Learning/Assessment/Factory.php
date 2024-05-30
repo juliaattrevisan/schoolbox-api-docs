@@ -240,9 +240,8 @@ class Factory
 
             $this->setKamiFile($post['worksheet'] ?? null);
         }
-        if (isset($post['enablePolicy'])) {
-            $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
-        }
+
+        $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
         $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
