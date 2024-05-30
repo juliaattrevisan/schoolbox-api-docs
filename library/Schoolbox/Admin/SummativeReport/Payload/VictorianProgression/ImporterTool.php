@@ -348,7 +348,9 @@ HELP;
                 ->setEnabled(true)
                 ->setUuid('');
 
-            $this->curriculumNodeMapper->save($node);
+            if ($this->perform()) {
+                $this->curriculumNodeMapper->save($node);
+            }
 
             /* Remember we saw this
              */
@@ -456,7 +458,9 @@ HELP;
                     ->setParent($rootFolder)
                     ->setSequence(1);
 
-                $this->folderMapper->save($folder);
+                if ($this->perform()) {
+                    $this->folderMapper->save($folder);
+                }
 
                 $this->getLogger()->debug(sprintf(
                     'Row %s: created new folder %s (%s)',
@@ -474,7 +478,9 @@ HELP;
                         ->setCode($classCode)
                         ->setFolder($folder);
 
-                    $this->folderCodeMapper->save($folderCode);
+                    if ($this->perform()) {
+                        $this->folderCodeMapper->save($folderCode);
+                    }
 
                     $this->getLogger()->debug(sprintf(
                         'Row %s: created new folder code %s for folder %s',
@@ -608,7 +614,9 @@ HELP;
             $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
             $assessment = $assessmentFactory->produce();
 
-            $this->assessmentMapperProxy->save($assessment, $creator);
+            if ($this->perform()) {
+                $this->assessmentMapperProxy->save($assessment, $creator);
+            }
 
             $this->getLogger()->info(sprintf(
                 'Row %s: created new assessment "%s" (%s) in folder %s',
