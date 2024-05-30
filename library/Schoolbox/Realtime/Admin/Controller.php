@@ -212,10 +212,6 @@ class Controller extends BaseController
                     'template'    => '@adminNotifications/providers/Digistorm/entity.twig',
                     'description' => 'Digistorm',
                 ],
-                MobileApp\Registry::PROVIDER_FIREBASE => [
-                    'template'    => '@adminNotifications/providers/Firebase/entity.twig',
-                    'description' => 'Firebase',
-                ],
             ],
         ];
 
