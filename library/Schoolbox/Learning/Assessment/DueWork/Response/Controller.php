@@ -239,7 +239,6 @@ class Controller extends Base
             'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->requestQuery->get('hash'),
-            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
 
             /* The Student Carousel is the selectize thing that cycles between the currently
              * selected student and the previous/next students participating in the assessment
@@ -442,16 +441,6 @@ class Controller extends Base
         }
     }
 
-
-    /**
-     * @param IMarkScheme $scheme
-     * @return string
-     */
-    protected function deriveSchemeName(IMarkScheme $scheme)
-    {
-        $c = get_class($scheme);
-        return substr($c, strrpos($c, '\\') + 1);
-    }
 
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId

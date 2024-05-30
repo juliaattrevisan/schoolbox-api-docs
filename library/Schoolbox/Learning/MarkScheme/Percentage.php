@@ -16,21 +16,29 @@ class Percentage extends AbstractMarkScheme
 {
     public const SLUG = 'percent';
 
-    const TITLE = 'Percentage';
+    public const TITLE = 'Percentage';
+
 
     /**
      * This type is comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = true;
+    public const QUANTITATIVE = true;
+
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = 'Percentage';
+
 
     /**
      * @inheritdoc
-     * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
-     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -49,9 +57,9 @@ class Percentage extends AbstractMarkScheme
      * @param IResponse|null $response
      * @throws InvalidArgumentException If cannot parse a float
      * @throws RangeException if parsed value is outside valid range
-     * @return float
+     * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         // Cannot merely use floatval(), as that returns 0 on failed parsing.
 
@@ -61,7 +69,7 @@ class Percentage extends AbstractMarkScheme
             throw new InvalidArgumentException("Unable to parse percentage value: $humanReadableMark");
         }
 
-        $floatVal = floatval($matches[1]);
+        $floatVal = (float)$matches[1];
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }

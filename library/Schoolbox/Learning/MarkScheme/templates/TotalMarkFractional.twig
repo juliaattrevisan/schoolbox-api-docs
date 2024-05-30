@@ -1,23 +1,38 @@
-{#
-    Text-input for 'total-mark' markScheme.
-
-    Usage: [
-        markScheme:  MarkScheme\TotalMarkFractional
-        tabIndex:    int
-        errors:      string[]       Admin-configured submission states
-        readonly:    bool           Should this form input be rendered as readonly?
-    ]
-#}
+{##
+ # Combobox text input/dropdown ui element
+ #
+ # This is where you type in a grade for the Response given by the student.
+ # It applies to the "Total Mark" MarkType.
+ #
+ # For quizzes, each person's attempt can vary from other attempts, which occurs
+ # when the content of quiz changes halfway through everyone doing it. The $limit
+ # param, if specified, takes precedence over a derived value from the assessment's
+ # MarkScheme instance.
+ #
+ # @param MarkScheme\TotalMarkFractional $markScheme
+ # @param int $tabIndex
+ # @param string[] $errors  Admin-configured submission states
+ # @param bool $readonly  Should this form input be rendered as readonly?
+ #
+ # Optional precdence: used for quiz only
+ # @param float $limit  Maximum marks available per attempt, indexed by user id
+ #}
 {% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
+
+{# How many decimal places we allow #}
+{% set precision = 2 %}
+
+{# Accommodate quiz attempts' uniqueness #}
+{% set limit = limit ?? limit_decimal.limit(markScheme.totalMark, precision) %}
 
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
     participant: participant,
     feedback:    feedback,
     tabIndex:    tabIndex,
-    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit_decimal.limit(markScheme.totalMark, 2),
-    limit:       limit_decimal.limit(markScheme.totalMark, 2),
+    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ limit,
+    limit:       limit,
     maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ limit_decimal.limit(markScheme.totalMark, 2),
+    inputTitle:  'Maximum Mark: ' ~ limit,
     errors:      errors,
     readonly:    readonly,
     totalMark: 1,

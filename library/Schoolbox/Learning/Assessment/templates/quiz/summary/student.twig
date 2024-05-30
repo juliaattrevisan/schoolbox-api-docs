@@ -164,7 +164,7 @@
 
                                         {% set feedbackRoute = routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, student: student, studentId: student.id, learnositySessionReference: attempt.learnosityReference}) %}
                                         {% if feedbackRoute %}
-                                            <a href="{{ feedbackRoute }}" class="icon-staff" title="Feedback"></a>
+                                            <a href="{{ feedbackRoute }}" class="icon-quiz" title="View and grade"></a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}

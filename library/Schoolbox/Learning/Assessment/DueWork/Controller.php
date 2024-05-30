@@ -264,7 +264,6 @@ class Controller extends Assessment\Controller
         $twigData = [
             'errors'            => $this->stateMapper->listDisplayValues(),
             'type'              => Assessment\AssessmentType::objectToString($assessment),
-            'markSchemeName'    => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),
@@ -1019,7 +1018,6 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment' => $assessment,
-            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
 
             /* I need this, otherwise Combobox dies catastrophically
              */

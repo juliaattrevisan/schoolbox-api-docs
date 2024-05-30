@@ -63,6 +63,9 @@
 
     {% set pActionCount = (pActionSummary ? 1 : 0) %}
 
+    {# A discriminator for tabindexes #}
+    {% set inputNo = 1 %}
+
     {# Progress icon
      # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
      # The green dot/grey square/oj diamond
@@ -202,11 +205,16 @@
          # Action Bar at the bottom of each participant's row
          #}
         {% set canFinish  = latestResponse and not latestResponse.submitted %}
-        {% set canPublish = latestResponse and latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+
+        {# If you have made an attempt, it's officially submitted, you can publish a feedback
+         # The existing feedback, if it exists, gets updated with the new grade and comment;
+         # otherwise, a new one spawns
+         #}
+        {% set canPublish = latestResponse and latestResponse.submitted %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
-        {# Hide if no attempts, or attempt has published review #}
-        {% set actionStyle = not latestResponse or (latestFeedback.published ?? false) ? 'display:none;' : '' %}
+        {# Always show an action row since you can always spawn a rando feedback now #}
+        {% set actionStyle = '' %}
 
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
@@ -238,8 +246,65 @@
                         </a>
                     {% endif %}
                 {% endif %}
+
+                {# You can always publish a new feedback...even if the student never attempted it #}
+                <a class="button" data-interaction-publish="" href="#">Publish</a>
             {% endset %}
         {% endapply %}
+
+        {# Quizzes now support Submission States #}
+        <div class="small-12 column">
+            <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuizAttempt.postModify', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id }) }}">
+                {# Maximum available marks for this guy. Total Mark required a learnosity interrogation.
+                 # Everything else can be assumed to be out of 100, since that is already hardcoded in each
+                 # MarkScheme template already, for whatever reason; this nullsafe operator is syntactic only
+                 #
+                 # In the absence of any learnosity-derived specific maxMarks values, use the template's
+                 # defaulted hardcoded value of 100.
+                 #}
+                {% set maxMarks = maxMarks[participant.user.id] ?? latestResponse.marksAvailable ?? null %}
+
+                {# The most recent feedback, supposedly #}
+                {% set latestFeedback = participant.findMostRecentInstructorGivenFeedback %}
+
+                <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
+                <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
+
+                <div class="row">
+                    {# Quiz always has a Mark Type (it's mandatory) #}
+                    <div class="small-12 medium-3 column">
+                        <label>{{ locale.grades.proper }}
+                            {# For quizzes, each person's attempt can vary from other attempts, which occurs
+                             # when the content of quiz changes halfway through everyone doing it. This means
+                             # the $limit param can't be derived from the assessment's markScheme instance,
+                             # which would apply the same limit to everyone. This necessitates a $maxMark
+                             # lookup for each person, and in the absence of an attempt, ask Learnosity for
+                             # what's available at the moment.
+                             #}
+                            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                                assessment:  assessment,
+                                participant: participant,
+                                feedback:    latestFeedback,
+                                markScheme:  assessment.markScheme,
+                                limit:       maxMarks,
+                                tabIndex:    loop.index0 + inputNo,
+                                errors:      errors,
+                                readonly:    false,
+                            } only %}
+                            {% set inputNo = inputNo + 1 %}
+                        </label>
+                    </div>
+                    <div class="small-12 medium-9 column">
+                        {% include '@learningAssessment/quiz/comment.twig' with {
+                            feedback:       latestFeedback,
+                            participant:    participant,
+                            tabIndex:       loop.index0 + inputNo
+                        } only %}
+                        {% set inputNo = inputNo + 1 %}
+                    </div>
+                </div>
+            </form>
+        </div>
 
         {% include '@learningAssessment/fragments/actionBar.twig' with {
             actionStyle:  actionStyle,
@@ -303,9 +368,23 @@
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
+    <div class="toast" data-alert data-save-draft></div>
+
+    <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
             var $participantList  = $('#assessment-status');
+
+            $.fn.dynamicFeedback({
+                onPreDraftCallback: function () {
+                },
+                onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+                },
+                onPrePublishCallback: function () {
+                },
+                onPublishCallback: function (userId) {
+                }
+            });
 
             {# Mass review submitted but unreviewed quiz attempts #}
             $('#mass-review').bulky({

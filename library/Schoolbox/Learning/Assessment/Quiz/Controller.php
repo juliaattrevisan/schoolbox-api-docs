@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
+use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use CFPropertyList\IOException;
@@ -28,7 +29,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
@@ -37,7 +37,11 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
+use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -67,53 +71,34 @@ use UnexpectedValueException;
 class Controller extends Assessment\Controller
 {
     /**
-     * @var QuizMapper
-     */
-    private $quizMapper;
-
-
-    /**
-     * @var QuizSectionMapper
-     */
-    private $quizSectionMapper;
-
-
-    /**
-     * @var QuizAttemptMapper
-     */
-    private $quizAttemptMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
      * Controller constructor.
      *
-     * @param UserMapper                            $userMapper
-     * @param ErrorMapper                           $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param BreadcrumbFactory                     $bakery
-     * @param QuizMapper                            $quizMapper
-     * @param QuizSectionMapper                     $quizSectionMapper
-     * @param QuizAttemptMapper                     $quizAttemptMapper
-     * @param Mapper                                $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param Replicator                            $replicator
-     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param QuizMapper $quizMapper
+     * @param QuizSectionMapper $quizSectionMapper
+     * @param QuizAttemptMapper $quizAttemptMapper
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator $replicator
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
-     * @param QuizAttemptMapper                     $attemptMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param QuizAttemptMapper $attemptMapper
+     * @param StateMapper $stateMapper
+     * @param \Schoolbox\Url\Factory $urlFactory
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
      */
     public function __construct(
         UserMapper $userMapper,
@@ -123,20 +108,25 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         BreadcrumbFactory $bakery,
-        QuizMapper $quizMapper,
-        QuizSectionMapper $quizSectionMapper,
-        QuizAttemptMapper $quizAttemptMapper,
+        private QuizMapper $quizMapper,
+        private QuizSectionMapper $quizSectionMapper,
+        private QuizAttemptMapper $quizAttemptMapper,
         Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private StateMapper $stateMapper,
+        private \Schoolbox\Url\Factory $urlFactory,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
     ) {
         parent::__construct(
             $userMapper,
@@ -156,10 +146,6 @@ class Controller extends Assessment\Controller
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper
         );
-        $this->quizMapper        = $quizMapper;
-        $this->quizSectionMapper = $quizSectionMapper;
-        $this->quizAttemptMapper = $quizAttemptMapper;
-        $this->folderMapper      = $folderMapper;
     }
 
 
@@ -170,7 +156,9 @@ class Controller extends Assessment\Controller
      * This place is Staff Only
      *
      * @api GET /learning/assessment/:assessmentId/status
+     *
      * @param IAssessable $assessment
+     * @throws ApiException
      * @throws DefinitionException
      * @throws Deleted
      * @throws DomainException
@@ -180,7 +168,9 @@ class Controller extends Assessment\Controller
      * @throws PDOException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @throws ValidationException
      * @throws \InvalidArgumentException
+     * @throws \JsonException
      * @throws \LogicException
      */
     public function getStatus(IAssessable $assessment): void
@@ -209,10 +199,79 @@ class Controller extends Assessment\Controller
             $assessment = $this->getAssessmentMapper()->findByIdForReview($assessment->getId());
         }
 
+        /* Each user's attempt could have its own different max mark value; it's not uniform across
+         * every attempt. Each one could be unique. Build a hash lookup of what the maximums are,
+         * and for those who never completed an attempt: ask learnosity how much is available
+         */
+        $maxMarks = [];
+
+        foreach ($assessment->getAllParticipants() as $participant) {
+            if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+                /* Ask learnosity to find out how much their attempt *would* be worth
+                 * based on the current set of questions if any of the following occurs:
+                 *
+                 *     - this participant never made an attempt.
+                 *     - this participant's attempt is still in progress (db row won't exist yet).
+                 *     - most recent response's marksAvailable is zero.
+                 *         this occurs when you spawn an arbitrary attempt with a Letter Grade,
+                 *         then changed it to Total Mark; we never asked or recorded what the
+                 *         quantitative total actually was. Deeper in the andyland part of the
+                 *         swamp is a series of floatval() calls that cast nulls to zero.
+                 *         TODO maybe find out the breadth of this idea and undo it to support null
+                 */
+                $mostRecentResponse = $participant->findMostRecentResponse();
+
+                if (!$mostRecentResponse) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                } elseif (!$mostRecentResponse->isSubmitted()) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                } elseif (!$mostRecentResponse->getMarksAvailable()) {
+                    $maxMarks[$participant->getUser()->getId()] = null;
+                }
+            }
+        }
+
+        /* If the quiz is a Total Mark markscheme and if there was someone without a response,
+         * ask learnosity what they could potentially get; otherwise skip the api penalty
+         */
+        if (\count($maxMarks) && $assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            /* Probably inject this one day, but for now,
+             * I want to avoid dumping Yet Another Thing into the kernel
+             * I don't have a convenient means to access SERVER_NAME except like this, sadly
+             */
+            $logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+            /* TODO Derive from learnosity atm
+             *   Consider caching locally the standing maximum available marks for the assessment in the absence of an attempt.
+             *   This only matters when it's a Total Mark markscheme: everything else is out of 100
+             */
+            $api = new Api(
+                $this->urlFactory->buildFullyQualified()->getHost(),
+                $this->learnosityVersion,
+                $this->learnosityConsumerKey,
+                $this->learnosityConsumerSecret,
+                $logger
+            );
+
+            $available = (new Helper($api, $logger))->findAvailableMarks($assessment->getLearnosityReference());
+
+            /* Now assign it to them
+             */
+            foreach ($maxMarks as $userId => $value) {
+                $maxMarks[$userId] = $available;
+            }
+        }
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
-
+            /* Quizzes now support Submission States
+             * Annoyingly, Submission States are in the $errors array...
+             */
+            'errors' => $this->stateMapper->listDisplayValues(),
+            /* Each guy's maximum available marks
+             */
+            'maxMarks' => $maxMarks,
             /* Need this suffix so we can return to the status screen after
              * finishing the modification of le quiz
              */

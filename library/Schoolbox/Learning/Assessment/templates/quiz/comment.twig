@@ -1,0 +1,22 @@
+{##
+ # Overall Attempt Comment fragment
+ #
+ # This adds a Comment textarea to the Quiz' status screen, allowing them to
+ # a) create a new arbitrary attempt randomly, with this grade and comment, but unlinked to any learnosity attempts
+ # b) alter an existing attempt's feedback to have this new grade and comment
+ #
+ # @param IFeedback $feedback
+ # @param Participant $participant
+ # @param int $tabIndex
+ #}
+
+{% set placeholder = 'Feedback for ' ~ participant.user.givenName %}
+
+<label>Comment
+    <textarea
+        tabindex="{{ tabIndex }}"
+        id="comment-{{ participant.user.id }}" name="comment"
+        placeholder="{{ placeholder }}"
+        rows="3"
+    >{{ feedback is not null ? feedback.comment : ''}}</textarea>
+</label>

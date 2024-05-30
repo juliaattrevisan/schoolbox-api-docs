@@ -825,17 +825,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
-     * @param IMarkScheme $scheme
-     * @return string
-     */
-    protected function deriveSchemeName(IMarkScheme $scheme): string
-    {
-        $c = get_class($scheme);
-        return substr($c, strrpos($c, '\\') + 1);
-    }
-
-
-    /**
      * @return Term\Mapper
      */
     protected function getTermMapper(): \Schoolbox\Assessment\Term\Mapper

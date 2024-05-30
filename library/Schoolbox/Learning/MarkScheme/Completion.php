@@ -15,22 +15,26 @@ class Completion extends AbstractMarkScheme
 {
     public const SLUG = 'completion';
 
-    const TITLE = 'Completion';
+    public const TITLE = 'Completion';
 
-    const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';
-    const HUMAN_READABLE_COMPLETE    = 'Complete';
 
     /**
      * This type is not comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
+
+
+    public const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';
+    public const HUMAN_READABLE_COMPLETE    = 'Complete';
+
+
 
     /**
      * @inheritdoc
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         // Does the response not exist, or is not submitted, or explicitly marked as incomplete?
         if (!$response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
@@ -44,9 +48,9 @@ class Completion extends AbstractMarkScheme
      *
      * @param string         $humanReadableMark eg 'Completed'
      * @param IResponse|null $response
-     * @return null
+     * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
             return self::NORMALISED_MARK_MIN;

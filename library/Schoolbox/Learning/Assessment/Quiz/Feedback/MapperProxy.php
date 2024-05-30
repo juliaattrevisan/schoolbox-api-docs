@@ -144,8 +144,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
-                // TODO figure out if this is the right field
-                ->setPublishedAt($attempt->getReviewed())
+                ->setComment($attempt->getComment())
             ;
 
             // TODO populate individual answers
@@ -188,7 +187,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setFinish($domainObject->getUpdatedAt())
                 ->setDeleted($domainObject->getDeletedAt())
                 ->setReviewer($domainObject->getReviewer())
-                ->setReviewed($domainObject->getPublishedAt());
+                ->setReviewed($domainObject->getPublishedAt())
+                ->setComment($domainObject->getComment());
             $dataModels->add($dataModel);
         }
 

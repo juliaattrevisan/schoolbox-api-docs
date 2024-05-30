@@ -18,7 +18,16 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt as QuizAttempt;
  */
 abstract class TotalMarkAbstract extends AbstractMarkScheme
 {
-    const TITLE = 'Total Mark';
+    public const TITLE = 'Total Mark';
+
+
+    /**
+     * This type is comparable numerically.
+     *
+     * @var bool
+     */
+    public const QUANTITATIVE = true;
+
 
     /**
      * Quiz can set this to NULL, but then must supply an IResponse to getHumanReadable()
@@ -27,12 +36,6 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      */
     private $totalMark;
 
-    /**
-     * This type is comparable numerically.
-     *
-     * @var bool
-     */
-    const QUANTITATIVE = true;
 
     /**
      * @param null|int|float $totalMark
@@ -58,11 +61,9 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param float|null     $normalisedMark
      * @param IResponse|null $response
      * @return string|null
-     * @throws RangeException If normalised mark is outside valid range
      * @throws \DomainException If unable to derive a denominator
-     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -109,7 +110,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @throws RangeException If evaluated normalised mark is below 0 or above 100
      * @throws \DomainException If unable to derive a denominator
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';
@@ -156,7 +157,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             return null;
         }
 
-        $floatVal = round(floatval($matches[1]), AbstractMarkScheme::PRECISION);
+        $floatVal = round((float)$matches[1], AbstractMarkScheme::PRECISION);
         return sprintf("%s / %s", $floatVal, $denominator);
     }
 
@@ -204,10 +205,10 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     /**
      * @return float
      */
-    abstract protected function getGranularityNumerator();
+    abstract protected function getGranularityNumerator(): float;
 
     /**
      * @return float
      */
-    abstract protected function getGranularityDenominator();
+    abstract protected function getGranularityDenominator(): float;
 }

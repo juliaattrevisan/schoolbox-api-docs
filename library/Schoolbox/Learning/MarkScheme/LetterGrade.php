@@ -18,10 +18,8 @@ class LetterGrade extends AbstractMarkScheme
     public const SLUG = 'letter';
     public const PRECISION = 2;
 
-    const TITLE = 'Letter Grade';
+    public const TITLE = 'Letter Grade';
 
-    /** @var GradeGroup */
-    private $gradeGroup;
 
     /**
      * This type is comparable numerically, through the levels within this
@@ -29,7 +27,20 @@ class LetterGrade extends AbstractMarkScheme
      *
      * @var bool
      */
-    const QUANTITATIVE = true;
+    public const QUANTITATIVE = true;
+
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = 'LetterGrade';
+
+
+    /** @var GradeGroup */
+    private $gradeGroup;
+
 
     /**
      * @param GradeGroup $gradeGroup
@@ -46,7 +57,7 @@ class LetterGrade extends AbstractMarkScheme
      * @throws \RangeException If $normalisedMark is outside 0.0 to 100.0
      * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -77,11 +88,11 @@ class LetterGrade extends AbstractMarkScheme
      * @throws InvalidArgumentException if unable to locate corresponding GradeLevel
      * @return float
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
             if ($gradeLevel->getCaption() == $humanReadableMark) {
-                return floatval($gradeLevel->getRawGrade());
+                return (float)$gradeLevel->getRawGrade();
             }
         }
 
@@ -142,12 +153,10 @@ class LetterGrade extends AbstractMarkScheme
      * @param GradeGroup $gradeGroup
      * @return static
      */
-    protected function setGradeGroup(GradeGroup $gradeGroup)
+    protected function setGradeGroup(GradeGroup $gradeGroup): self
     {
         // Ensure levels are sorted DESC so facilitate search traversal
-        if ($gradeGroup->getGradeLevels()) {
-            $gradeGroup->getGradeLevels()->sortBy('lowerBound', 'desc');
-        }
+        $gradeGroup->getGradeLevels()?->sortBy('lowerBound', 'desc');
 
         $this->gradeGroup = $gradeGroup;
         return $this;

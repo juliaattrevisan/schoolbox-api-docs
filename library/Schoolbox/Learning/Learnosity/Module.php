@@ -34,6 +34,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\DefinitionException;
@@ -443,7 +444,6 @@ class Module extends BaseModule
                  * or a student that adheres all the non-instructor criteria
                  */
                 new Rule\Any(
-                    $this->buildAuthRuleHasInstructorAccess(),
                     /* Parents can view students' attempts if:
                      *   - They are the parent of this particular student (and thus their attempt)
                      *   - restrict_student_submissions config is disabled
@@ -725,6 +725,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(StateMapper::class),
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),

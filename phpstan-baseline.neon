@@ -4491,24 +4491,9 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/AbstractMarkScheme.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Completion\\:\\:getNormalisedMark\\(\\) should return null but returns float\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/MarkScheme/Completion.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Factory.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\MarkType will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\LetterGrade\\:\\:getHumanReadableMark\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/LetterGrade.php
 
 		-
 			message: "#^If condition is always false\\.$#"
@@ -5962,3 +5947,12 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setLearnosityReference\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Controller.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IResponse\\:\\:getMarksAvailable\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getLearnosityReference\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+

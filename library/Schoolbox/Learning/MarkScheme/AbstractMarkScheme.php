@@ -15,7 +15,8 @@ abstract class AbstractMarkScheme implements IMarkScheme
     public const SLUG = 'raw';
     public const PRECISION = 2;
 
-    const TITLE = 'Abstract Mark Scheme';
+    public const TITLE = 'Abstract Mark Scheme';
+
 
     /**
      * Does this mark scheme produce human-readable results that are comparable
@@ -23,7 +24,26 @@ abstract class AbstractMarkScheme implements IMarkScheme
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
+
+
+    /**
+     * The twig file that represents a subclass of AbstractMarkScheme
+     * These are found in the MarkScheme/templates folder and correspond exactly
+     *
+     * @var string
+     */
+    protected string $template = '';
+
+
+    /**
+     * @return string
+     */
+    public function getTemplate(): string
+    {
+        return $this->template;
+    }
+
 
     /**
      * Bounds checks a normalised mark
@@ -85,7 +105,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return string
      */
-    public static function getTitle()
+    public static function getTitle(): string
     {
         return static::TITLE;
     }
@@ -93,7 +113,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return bool
      */
-    public function isQuantitative()
+    public function isQuantitative(): bool
     {
         return static::QUANTITATIVE;
     }
@@ -101,7 +121,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * @return bool
      */
-    public function isQualitative()
+    public function isQualitative(): bool
     {
         return !static::QUANTITATIVE;
     }

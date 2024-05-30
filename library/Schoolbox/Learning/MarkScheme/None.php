@@ -14,19 +14,29 @@ class None extends AbstractMarkScheme
 {
     public const SLUG = 'none';
 
-    const TITLE = 'None';
+    public const TITLE = 'None';
+
 
     /**
      * This type is not comparable numerically.
      *
      * @var bool
      */
-    const QUANTITATIVE = false;
+    public const QUANTITATIVE = false;
+
+
+    /**
+     * Template filename
+     *
+     * @var string
+     */
+    protected string $template = '';
+
 
     /**
      * @inheritdoc
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
     {
         return null;
     }
@@ -36,9 +46,9 @@ class None extends AbstractMarkScheme
      *
      * @param string         $humanReadableMark
      * @param IResponse|null $response
-     * @return null
+     * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
     {
         return null;
     }

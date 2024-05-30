@@ -21,6 +21,16 @@ interface IMarkScheme
     public const NORMALISED_MARK_MIN = 0.0;
     public const NORMALISED_MARK_MAX = 100.0;
 
+
+    /**
+     * Get this Mark Scheme instance's template filename (without file extension)
+     * since it's included in twig land somewhere else
+     *
+     * @return string
+     */
+    public function getTemplate(): string;
+
+
     /**
      * Is this mark scheme quantitative?
      *
@@ -31,7 +41,7 @@ interface IMarkScheme
      *
      * @return bool
      */
-    public function isQuantitative();
+    public function isQuantitative(): bool;
 
     /**
      * Is this mark scheme qualitative?
@@ -43,7 +53,7 @@ interface IMarkScheme
      *
      * @return bool
      */
-    public function isQualitative();
+    public function isQualitative(): bool;
 
     /**
      * Returns a string representation of a mark.
@@ -54,7 +64,7 @@ interface IMarkScheme
      * @param IResponse|null $response          The response we wish to get the mark from
      * @return string|null
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null);
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string;
 
     /**
      * Returns a float from 0 to 100.0 inclusive.
@@ -65,7 +75,7 @@ interface IMarkScheme
      * @param IResponse|null $response          Most recent submitted response
      * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null);
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float;
 
     /**
      * Converts a value submitted from the form into a standardised
@@ -95,7 +105,7 @@ interface IMarkScheme
      *
      * @return string
      */
-    public static function getTitle();
+    public static function getTitle(): string;
 
     /**
      * Generates a context for this mark scheme.

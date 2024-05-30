@@ -630,6 +630,11 @@ class Module extends BaseModule
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
+                    $stateMapper,
+                    new \Schoolbox\Url\Factory($this->getConfig()),
+                    (string)$this->getConfig()->get('learnosity_version'),
+                    (string)$this->getConfig()->get('learnosity_consumer_key'),
+                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\Task\Controller::class:
