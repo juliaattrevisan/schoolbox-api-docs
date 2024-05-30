@@ -9,6 +9,7 @@
 
 namespace Schoolbox\MobileApp;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
@@ -21,7 +22,6 @@ use Schoolbox\Resource\Storage;
  * @method Service findOneByColumn($columnName, $columnValue, array $options = array())
  * @method Service findOneByColumnList($columnList, array $options = [])
  * @method Service createModel($identifierValue = null)
- * @method Collection|Service[] findAll($options = array())
  */
 class ServiceMapper extends Mapper
 {
@@ -81,5 +81,17 @@ class ServiceMapper extends Mapper
     protected function raiseNotification($object, $verb, $previous = null)
     {
         return false;
+    }
+
+    /**
+     * We are wanting to not show Firebase in the list, so hide it in the mapper.
+     * @param array $options
+     * @return Collection|Service
+     */
+    public function findAll($options = []): Collection|Service
+    {
+        $pb = $this->getPredicateBuilder();
+        $pb->notLike('provider', 'Firebase');
+        return $this->findByPredicates($pb, $options);
     }
 }
