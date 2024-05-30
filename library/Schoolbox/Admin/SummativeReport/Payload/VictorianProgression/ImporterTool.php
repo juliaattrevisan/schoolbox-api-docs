@@ -199,6 +199,20 @@ HELP;
                 continue;
             }
 
+            /* Strip out suffixes C2 and _2 from column 8
+             */
+            $curriculumCode = $row[8];
+
+            $curriculumCode = preg_replace('/C2$/', '', $curriculumCode);
+            $curriculumCode = preg_replace('/_2$/', '', $curriculumCode);
+
+            $this->getLogger()->debug(sprintf(
+                'Row %s: parsed %s out of %s',
+                $i,
+                $curriculumCode,
+                $row[8]
+            ));
+
             /* TODO Process nodes
              */
         }
