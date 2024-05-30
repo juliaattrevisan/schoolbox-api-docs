@@ -575,11 +575,13 @@ class Notifier extends AbstractModuleNotifier
 
         if (is_object($article->getFeatureImage())) {
             $hash  = $article->getFeatureImage()->getHash();
-            $icon  = "/storage/image.php?hash=$hash&size=constrain64";
+            $icon  = "/storage/image.php?hash=$hash&size=square192";
             $thumb = "/storage/image.php?hash=$hash&size=constrain200";
+            $pushBanner = "/storage/image.php?hash=$hash&size=pushNotificationBanner";
         } else {
             $icon  = $this->getUserIcon($author);
             $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
+            $pushBanner = null;
         }
 
         $href = sprintf(self::PATTERN_ARTICLE_HREF, $articleId);
@@ -634,12 +636,13 @@ class Notifier extends AbstractModuleNotifier
             ->addTopic("news.$articleId." . ($update ? self::TRIGGER_UPDATED : self::TRIGGER_POSTED))
             // body and byline are optional, but recommended since they render out in emails
             ->setMeta([
-                'title'    => $heading,
-                'author'   => $authorName,
-                'date'     => $activeDate->getLong(),
-                'thumb'    => $thumb,
-                'blurb'    => $article->getBlurb(),
-                'readMore' => $readMore
+                'title'         => $heading,
+                'author'        => $authorName,
+                'date'          => $activeDate->getLong(),
+                'thumb'         => $thumb,
+                'pushBanner'    => $pushBanner,
+                'blurb'         => $article->getBlurb(),
+                'readMore'      => $readMore
             ])
             ->setBody($notifBody)
             ->setByline("$shortDate by $authorName")
