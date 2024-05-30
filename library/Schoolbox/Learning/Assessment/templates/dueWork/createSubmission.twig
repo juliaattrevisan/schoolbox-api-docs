@@ -91,9 +91,11 @@ Data:
             // Submit form via AJAX
             let formContents = $form.serializeArray();
             formContents.push({name: 'saveDraft', value: '1'});
-            if (acceptsOnline) {
-                formContents.push({name: 'body', value: window.sbProps.editors['editor-body'].getData()});
-            }
+            {% if assessment.getEnableText %}
+                if (acceptsOnline) {
+                    formContents.push({name: 'body', value: window.sbProps.editors['editor-body'].getData()});
+                }
+            {% endif %}
             $formSaveLabel.toastActivate({
                 text: 'Autosaving'
             });
@@ -224,30 +226,32 @@ Data:
                     .val(submittingText);
                 // Make the form's inputs readonly (NOT disabled)
                 $form.find('input, select, textarea').prop('readonly', true);
-                // check the editor content if we accept online submissions and the "submitted in person" checkbox is not checked
-                if (acceptsOnline && !$form.find('#editor-submittedInPerson').prop('checked')) {
-                    /**
-                     * In order to submit, we need to ensure there's some textContent:
-                     * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-                     * For example if we just submit a single image, they'll be no textContent
-                     * and the submission will fail.
-                     * So we just add a new line: <p>&nbsp;</p> at the end of the editor's content
-                     */
-                    const editor = window.sbProps.editors['editor-body'];
-                    const document = new DOMParser().parseFromString(editor.getData(), "text/html");
-                    const textContent = document.body.textContent.trim();
-                    if (textContent.length === 0) {
-                        const selectionRange = editor.model.document.selection.getFirstRange();
-                        const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
-                        if (selectedElement) {
-                            editor.execute("insertParagraph", {
-                                position: editor.model.createPositionAfter(selectedElement),
-                            });
+                {% if assessment.getEnableText %}
+                    // check the editor content if we accept online submissions and the "submitted in person" checkbox is not checked
+                    if (acceptsOnline && !$form.find('#editor-submittedInPerson').prop('checked')) {
+                        /**
+                         * In order to submit, we need to ensure there's some textContent:
+                         * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+                         * For example if we just submit a single image, they'll be no textContent
+                         * and the submission will fail.
+                         * So we just add a new line: <p>&nbsp;</p> at the end of the editor's content
+                         */
+                        const editor = window.sbProps.editors['editor-body'];
+                        const document = new DOMParser().parseFromString(editor.getData(), "text/html");
+                        const textContent = document.body.textContent.trim();
+                        if (textContent.length === 0) {
+                            const selectionRange = editor.model.document.selection.getFirstRange();
+                            const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
+                            if (selectedElement) {
+                                editor.execute("insertParagraph", {
+                                    position: editor.model.createPositionAfter(selectedElement),
+                                });
+                            }
                         }
+                        // prevent any further editing while submitting
+                        editor.enableReadOnlyMode('editor-body');
                     }
-                    // prevent any further editing while submitting
-                    editor.enableReadOnlyMode('editor-body');
-                }
+                {% endif %}
                 // Disable draft autosaving
                 suspendAutosave();
                 // Submit the form
