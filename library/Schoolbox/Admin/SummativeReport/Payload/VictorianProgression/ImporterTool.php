@@ -155,7 +155,7 @@ Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
 Penola's system. It consumes a csv they provided and probably can't be readily
 reused for anyone else.
 
-Usage: import.php [--input=path/to/my/file.csv] [--perform]
+Usage: import.php --input=path/to/my/file.csv --assessments [--perform]
 
 
 Vagrant Simulation
