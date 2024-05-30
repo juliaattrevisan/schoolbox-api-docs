@@ -34,6 +34,7 @@ class AssessmentForm
     public const SELECTOR_BUTTON_CREATE = self::FORM . ' [type=submit][value="Create"]';
     public const SELECTOR_BUTTON_UPDATE = self::FORM . ' [type=submit][value="Update"]';
     public const SELECTOR_BUTTON_SAVE = 'input[type=submit][value="Save"]';
+    //public const SELECTOR_SUBMISSION_TYPE = self::FORM . ' select[name="submissionType"]';
     // Work type
     public const WORKTYPE_ASSESSMENT_TASK = 1;
     public const WORKTYPE_ASSIGNMENT = 2;
@@ -54,6 +55,13 @@ class AssessmentForm
     public const ACCEPT_SUBMISSION_NONE = 0;
     public const ACCEPT_SUBMISSION_SINGLE = 1;
     public const ACCEPT_SUBMISSION_MULTIPLE = 2;
+
+
+    //Select the type of submission allowed
+    public const ALLOW_OFFLINE = 'allow-offline';
+    public const TEXT_EDITOR = 'text-editor';
+    public const TYPE_FILES = 'files';
+
 
     /**
      * @var AcceptanceTester
@@ -160,7 +168,15 @@ class AssessmentForm
         $this->tester->selectOption(self::SELECTOR_ACCEPT_SUBMISSION, $acceptSubmission);
         return $this;
     }
-
+    /**
+     * check one of the options to allow submission
+     * options are: worksheet,allow-offline,text-editor,files*/
+    public function checkSubmissionAllowed($submissionType): self
+    {
+        $this->tester->canSee('Select the type of submission allowed:');
+        $this->tester->click('label[for=' . $submissionType . ']');
+        return $this;
+    }
     /**
      * Sets title
      * @param string $title
