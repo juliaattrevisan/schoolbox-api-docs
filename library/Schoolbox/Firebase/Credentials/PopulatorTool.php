@@ -86,7 +86,8 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
             $this->getLogger()->debug('Found Entry, Updating');
         } catch (Exception\Deleted $e) {
             $firebaseApp = $e->getDeletedObject();
-            $this->getLogger()->debug('Found Deleted Entry, Updating');
+            $firebaseApp->setDeletedAt(null);
+            $this->getLogger()->debug('Found Deleted Entry, UnDeleting and Updating');
         } catch (Exception $e) {
             $firebaseApp = $mobile->createModel();
             $this->getLogger()->debug('No Entry Found, Creating');
