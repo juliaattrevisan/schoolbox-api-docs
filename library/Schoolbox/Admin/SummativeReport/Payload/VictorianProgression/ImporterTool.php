@@ -54,6 +54,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Arbitrarily try to make curriculum nodes
+     */
+    private const OPT_MAKE_CNODES = 'nodes';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -74,7 +80,8 @@ class ImporterTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_INPUT
+            self::OPT_LONG_INPUT,
+            self::OPT_MAKE_CNODES
         ];
     }
 
@@ -93,7 +100,10 @@ Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
 Penola's system. It consumes a csv they provided and probably can't be readily
 reused for anyone else.
 
-Usage: import.php [--input=path/to/my/file.csv] [--perform]
+The --nodes option forces the script to parse curriculum nodes and make them,
+if they don't already exist. Used to simulate a production-ish setup in your vagrants.
+
+Usage: import.php [--input=path/to/my/file.csv] [--nodes] [--perform]
 
 
 HELP;
@@ -122,10 +132,15 @@ HELP;
 
         $this->getLogger()->info('Script commencing.');
 
+        /* Optionally arbitrarily make curriculum nodes if they don't already exist
+         */
+        if ($this->getOpt(self::OPT_MAKE_CNODES)) {
+            $this->parseCurriculumNodes($lock, $filename);
+        }
+
         /* Slap in assessment feedbacks
          */
         $this->parseFeedbacks($lock, $filename);
-
 
         /* Announce conclusion
          */
@@ -138,6 +153,57 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * Create curriculum nodes ahead of time, in case they don't already exist.
+     *
+     * Camille should already have assigned them properly in their prod environment
+     * so this is basically for your vagrants
+     *
+     * @param LockInterface $lock
+     * @param string $filename
+     * @return void
+     * @throws \Alaress\Lock\LockRefreshException
+     */
+    private function parseCurriculumNodes(LockInterface $lock, string $filename): void
+    {
+        /* Load a particular file
+         */
+        $fp = fopen($filename, 'r');
+
+        /* Skip header row
+         */
+        $row = fgetcsv($fp);
+
+        /* Maintain a row counter
+         */
+        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+            $this->refreshLock($lock);
+
+            /* Ignore column 0, that's the Academic Cycle id we don't care about
+             * Ignore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
+             * Ignore column 12, that's a modify datetime we don't care about
+             */
+
+            /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
+             */
+            if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
+                $this->getLogger()->info(sprintf(
+                    'Row %s: not for semester 2, found %s. Skipping.',
+                    $i,
+                    $row[2]
+                ));
+
+                continue;
+            }
+
+            /* TODO Process nodes
+             */
+        }
+
+        fclose($fp);
     }
 
 
@@ -165,7 +231,7 @@ HELP;
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
-             * IGnore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
+             * Ignore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
              * Ignore column 12, that's a modify datetime we don't care about
              */
 
