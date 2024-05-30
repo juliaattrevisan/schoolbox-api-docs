@@ -39,7 +39,7 @@ class Controller extends Base
         $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
-        $student = $userMapper->findById(25);
+        $student = $userMapper->findById($this->requestQuery->get('userId'));
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
             'payload' => (new Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student),
