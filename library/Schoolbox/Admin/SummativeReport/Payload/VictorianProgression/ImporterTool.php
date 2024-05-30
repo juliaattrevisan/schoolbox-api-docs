@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\LockRefreshException;
 use Schoobox\User;
 use Schoolbox\Application\CliTool;
@@ -24,6 +25,8 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Folder\IFolder;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -68,6 +71,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Arbitrarily try to make folders
+     */
+    private const OPT_MAKE_FOLDERS = 'folders';
+
+
+    /**
+     * Arbitrarily try to make assessments
+     */
+    private const OPT_MAKE_ASSESSMENTS = 'assessments';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -89,7 +104,9 @@ class ImporterTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INPUT,
-            self::OPT_MAKE_CNODES
+            self::OPT_MAKE_CNODES,
+            self::OPT_MAKE_FOLDERS,
+            self::OPT_MAKE_ASSESSMENTS,
         ];
     }
 
@@ -113,6 +130,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Code\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
+
+
+    /**
      * Run the cli tool
      */
     public function run(): void
@@ -126,10 +155,18 @@ Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
 Penola's system. It consumes a csv they provided and probably can't be readily
 reused for anyone else.
 
+Usage: import.php [--input=path/to/my/file.csv] [--perform]
+
+
+Vagrant Simulation
+------------------
 The --nodes option forces the script to parse curriculum nodes and make them,
 if they don't already exist. Used to simulate a production-ish setup in your vagrants.
 
-Usage: import.php [--input=path/to/my/file.csv] [--nodes] [--perform]
+The --folders option forces the script to parse folder codes and make them,
+if they don't already exist. Used to simulate a production-ish setup in your vagrants.
+
+Usage: import.php [--input=path/to/my/file.csv] [--nodes] [--folders] [--perform]
 
 
 HELP;
@@ -162,6 +199,8 @@ HELP;
          */
         $this->curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
         $this->userMapper = \Schoolbox\UserMapper::getInstance();
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
 
         /** @var AssessmentDataSource $assessmentMapperProxy */
         $this->assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
@@ -170,15 +209,24 @@ HELP;
          */
         $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
 
-        /* Optionally arbitrarily make curriculum nodes if they don't already exist
+        /* Optionally arbitrarily pre-make curriculum nodes if they don't already exist
          */
         if ($this->getOpt(self::OPT_MAKE_CNODES)) {
             $this->parseCurriculumNodes($lock, $filename);
         }
 
-        /* Slap in assessment feedbacks
+        /* Optionally arbitrarily pre-make folders if they don't already exist
          */
-        $this->parseFeedbacks($lock, $filename, $creator);
+        if ($this->getOpt(self::OPT_MAKE_FOLDERS)) {
+            $this->parseFolders($lock, $filename);
+        }
+
+        /* Optionally arbitrarily pre-make assessments+feedbacks
+         * This is why you're here!
+         */
+        if ($this->getOpt(self::OPT_MAKE_ASSESSMENTS)) {
+            $this->parseFeedbacks($lock, $filename, $creator);
+        }
 
         /* Announce conclusion
          */
@@ -307,6 +355,117 @@ HELP;
     }
 
 
+    /**
+     * Create folders ahead of time, in case they don't already exist.
+     *
+     * Camille should already have assigned them properly in their prod environment
+     * so this is basically for your vagrants
+     *
+     * @param LockInterface $lock
+     * @param string $filename
+     * @return void
+     * @throws LockRefreshException
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    private function parseFolders(LockInterface $lock, string $filename): void
+    {
+        /* New folders spawn randomly at the root
+         */
+        $rootFolder = $this->folderMapper->createModel()->setId(IFolder::ROOT_ID);
+
+        /* Remember ones we've seen
+         */
+        $seen = [];
+
+        /* Load a particular file
+         */
+        $fp = fopen($filename, 'r');
+
+        /* Skip header row
+         */
+        $row = fgetcsv($fp);
+
+        /* Maintain a row counter
+         */
+        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+            $this->refreshLock($lock);
+
+            /* Ignore column 0, that's the Academic Cycle id we don't care about
+             * Ignore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
+             * Ignore column 12, that's a modify datetime we don't care about
+             */
+
+            /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
+             */
+            if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: not for semester 2, found %s. Skipping.',
+                    $i,
+                    $row[2]
+                ));
+
+                continue;
+            }
+
+            $classCode = $row[6];
+            $className = $row[7];
+
+            /* Seen it? Skip it
+             */
+            if (isset($seen[$classCode])) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: %s already exists. Skipping.',
+                    $i,
+                    $classCode
+                ));
+
+                continue;
+            }
+
+            /* See if it already exists; if not, spawn it
+             */
+            $folder = $this->folderMapper->createModel()
+                ->setName($className)
+                ->setParent($rootFolder)
+                ->setSequence(1);
+
+            $this->folderMapper->save($folder);
+
+            /* Make folder codes
+             */
+            $folderCode = $this->folderCodeMapper->createModel()
+                ->setCode($classCode)
+                ->setFolder($folder);
+
+            $this->folderCodeMapper->save($folderCode);
+
+            $this->getLogger()->debug(sprintf(
+                'Row %s: created new folder %s (%s)',
+                $i,
+                $className,
+                $classCode
+            ));
+
+            /* Remember we saw this
+             */
+            $seen[$classCode] = $className;
+        }
+
+        /* Tell users what you did
+         */
+        foreach ($seen as $code => $name) {
+            $this->getLogger()->info(sprintf(
+                'Created folder %s (%s)',
+                $name,
+                $code
+            ));
+        }
+
+        fclose($fp);
+    }
+
 
     /**
      * Process feedbacks
@@ -315,7 +474,13 @@ HELP;
      * @param string $filename
      * @param \Schoolbox\User $creator
      * @return void
+     * @throws Exception
+     * @throws Deleted
      * @throws LockRefreshException
+     * @throws InvalidColumnException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
     private function parseFeedbacks(LockInterface $lock, string $filename, \Schoolbox\User $creator): void
@@ -363,12 +528,12 @@ HELP;
 
             /* TODO build it in their prod first
              */
-            $workTypeId = -1;
-            $gradingScheme = -1;
+            $workTypeId = '-1';
+            $gradingScheme = '-1';
 
             /* TODO maybe needs be non-zero - can't remember
              */
-            $weight = 0;
+            $weight = '';
 
             /* TODO pick an actual date
              */
@@ -377,10 +542,15 @@ HELP;
             $dueDate = '2024-01-01 01:01:02';
             $closeDate = '2024-01-01 01:01:03';
 
+            /* Assume this exists, I guess, for now
+             */
+            $folder = $this->folderMapper->findByCode($row[6]);
+
             /* Avengers Assemble
              */
             $assessmentData = [
                 'assessmentType' => AssessmentType::TYPE_DUE_WORK,
+                'context' => $folder->getId(),
                 'title' => $row[9],
                 'workType' => $workTypeId,
                 'description' => '',
@@ -391,7 +561,7 @@ HELP;
                 'openDate' => $openDate,
                 'dueDate' => $dueDate,
                 'closeDate' => $closeDate,
-                'markType' => MarkType::TYPE_LETTER,
+                'markType' => (string)MarkType::TYPE_LETTER,
                 'gradingScheme' => $gradingScheme,
                 'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT
             ];
@@ -405,6 +575,7 @@ HELP;
 
             $this->getLogger()->info(sprintf(
                 'Row %s: created new assessment "%s" (%s) in folder %s',
+                $i,
                 $assessment->getId(),
                 $assessment->getTitle(),
                 $folder->getTitle()
