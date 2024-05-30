@@ -24,13 +24,25 @@
         vertical-align: middle;
     }
 
-    /* Dots
+    /* Make Dots Great
      */
-    .outcome-cell span {
-        display: block;
+    .dot {
+        border: 3px solid black;
+        height: 20px;
+        border-radius: 50%;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        width: 20px;
         float: left;
-        font-size: 66px;
-        margin-left: -12px;
+        margin-left: -10px;
+    }
+
+    .dot.white {
+        background-color: #fff;
+    }
+
+    .dot.black {
+        background-color: #000;
     }
 
     /* Each Level comes in a pair of cells for each half of an academic period, I guess
@@ -57,6 +69,9 @@
         border-left: 0 !important;
     }
 </style>
+
+
+
 
 <h1 class="no-margin">{{ payload.student.name }}</h1>
 <p class="meta">Year {{ payload.student.currentYearLevel }} for now</p>
@@ -148,14 +163,24 @@
         {% endif %}
 
         <td class="outcome-cell {{ css }}">
-            {# Progression Point from something in the past #}
+            {# Progression Point from something in the past; special rendering condition exists.
+             #
+             # If "previous" mark exists, but "current" does not, show the previous Progression Point as black
+             # Otherwise show it as white
+             #}
             {% if i == (nodeData.previous.mark ?? null) %}
-                <span title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}">◦</span>
+                {% if (null == nodeData.current.mark ?? null) %}
+                    {% set dotColor = 'black' %}
+                {% else  %}
+                    {% set dotColor = 'white' %}
+                {% endif %}
+
+                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
             {% endif %}
 
             {# Progression Point from current academic period #}
             {% if i == (nodeData.current.mark ?? null) %}
-                <span title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}">•</span>
+                <div class="black dot" title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}"></div>
             {% endif %}
         </td>
     {% endfor %}
