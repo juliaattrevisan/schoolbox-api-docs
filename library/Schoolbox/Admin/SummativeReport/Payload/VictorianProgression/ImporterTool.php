@@ -718,12 +718,17 @@ HELP;
              */
             $weight = '';
 
-            /* TODO pick an actual date
+            /* Rubric capability mark settings
              */
-            $publishDate = '2024-01-01 01:01:00';
-            $openDate = '2024-01-01 01:01:01';
-            $dueDate = '2024-01-01 01:01:02';
-            $closeDate = '2024-01-01 01:01:03';
+            $capabilityMarkType = (string)MarkType::TYPE_NONE;
+            $capabilityGradingScheme = '1'; // "Standard"
+
+            /* Pick an actual date
+             */
+            $publishDate = '10/10/2024 12:01am';
+            $openDate = '10/10/2024 12:02am';
+            $dueDate = '10/10/2024 12:03am';
+            $closeDate = '10/10/2024 12:04am';
 
             /* Assume this exists, I guess, for now
              */
@@ -740,7 +745,7 @@ HELP;
             if (!isset($seen[$externalAssessmentId])) {
                 $assessmentData = [
                     'assessmentType' => AssessmentType::TYPE_DUE_WORK,
-                    'context' => $folder->getId(),
+                    'context' => $folder,
                     'title' => $row[9],
                     'workType' => $workTypeId,
                     'description' => '',
@@ -753,7 +758,12 @@ HELP;
                     'closeDate' => $closeDate,
                     'markType' => (string)MarkType::TYPE_LETTER,
                     'gradingScheme' => $gradingScheme,
-                    'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT
+                    'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
+                    /* Get past rubric foreign key shenanigans
+                     */
+                    'useRubric' => false,
+                    'capability-markType' => $capabilityMarkType,
+                    'capability-gradingScheme' => $capabilityGradingScheme
                 ];
 
                 /* Make it then save it
@@ -781,6 +791,7 @@ HELP;
 
             /* Make a feedback for a student
              */
+
 
             /* Save it
              */
