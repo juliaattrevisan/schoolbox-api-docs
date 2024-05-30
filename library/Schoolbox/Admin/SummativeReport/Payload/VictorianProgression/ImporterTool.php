@@ -20,6 +20,7 @@ use Alaress\Lock\LockRefreshException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Factory;
@@ -167,6 +168,17 @@ class ImporterTool extends CliTool\App
      * @var \Schoolbox\Resource\Folder\Code\Mapper
      */
     private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
+
+
+    /**
+     * Feedback creation query
+     */
+    private const QUERY_FEEDBACK = "
+        INSERT INTO submission_return
+        (box_id, marker, owner, review_route, mark, resubmission_required, created_at, published_at, published_by, updated_at)
+        VALUES
+        (:boxId, :marker, :owner, :reviewRoute, :mark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
+    ";
 
 
     /**
@@ -612,6 +624,7 @@ HELP;
                 $campusId = 1; // "Secondary" campus in sales data
 
                 $user = $this->userMapper->createModel()
+                    ->setExternalId($externalId)
                     ->setUsername($externalId)
                     ->setFirstname($externalId)
                     ->setLastname($externalId)
@@ -672,6 +685,11 @@ HELP;
         /* Remember ones we've seen
          */
         $seen = [];
+
+        /* Local dependencies
+         */
+        $submissionBoxMapper = SubmissionBoxMapper::getInstance();
+        $feedbackStatement = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
 
         /* Load a particular file
          */
@@ -813,11 +831,30 @@ HELP;
             $assessment = $seen[$externalAssessmentId];
 
             /* Make a feedback for a student
+             *
+             * listen...you could try to use the various mapperproxies, participants, plans
+             * and all this other andyland domain-level stuff, or you can just ram it straight
+             * into the bullseye
              */
+            $box = $submissionBoxMapper->findOneByColumn('assessment_id' , $assessment->getId());
+            $student = $this->userMapper->findByExternalId($row[3]);
 
+            $params = [
+                'boxId' => $box->getId(),
+                'marker' => $creator->getId(),
+                'owner' => $student->getId(),
+                'reviewRoute' => 'instructor',
+                'mark' => $row[11],
+                'resubmissionRequired' => 0,
+                'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
+                'publishedAt' => \Alaress_Date_Format::now()->getDatabase(),
+                'publishedBy' => $creator->getId(),
+                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+            ];
 
-            /* Save it
-             */
+            if ($this->perform()) {
+                $feedbackStatement->execute($params);
+            }
         }
 
         fclose($fp);
