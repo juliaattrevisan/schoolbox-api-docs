@@ -268,8 +268,6 @@ class ResultCache
                 $this->persist($project, $user, null);
             }
         }
-
-        // TODO: This seems unnecessary.  Check and remove if so.
         // Attempt some cache cleaning
         // We spawned this, we should remove it
         unset($project);
