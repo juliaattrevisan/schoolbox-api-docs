@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * CLI Tool
@@ -121,6 +122,35 @@ HELP;
 
         $this->getLogger()->info('Script commencing.');
 
+        /* Slap in assessment feedbacks
+         */
+        $this->parseFeedbacks($lock, $filename);
+
+
+        /* Announce conclusion
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+
+        /* Announce lock release
+         */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
+    }
+
+
+    /**
+     * Process feedbacks
+     *
+     * @param LockInterface $lock
+     * @param string $filename
+     * @return void
+     * @throws \Alaress\Lock\LockRefreshException
+     */
+    private function parseFeedbacks(LockInterface $lock, string $filename): void
+    {
         /* Load a particular file
          */
         $fp = fopen($filename, 'r');
@@ -151,21 +181,11 @@ HELP;
                 continue;
             }
 
-
-//            print_r($row);
+            /* TODO Process feedbacks
+             */
         }
 
-        /* Announce conclusion
-         */
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-        }
-
-        /* Announce lock release
-         */
-        $this->getLogger()->debug('Releasing lock');
-
-        $lock->release();
+        fclose($fp);
     }
 
 
