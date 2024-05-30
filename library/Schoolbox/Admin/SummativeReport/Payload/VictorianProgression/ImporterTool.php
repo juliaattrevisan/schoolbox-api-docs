@@ -721,6 +721,20 @@ HELP;
                 continue;
             }
 
+            /* Ignore feedback values that are outside the 6 - 10.5 range from column 11
+             */
+            $humanReadableMark = trim($row[11]);
+
+            if (!\in_array($humanReadableMark, [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5], false)) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: invalid feedback value %s. Skipping.',
+                    $i,
+                    $humanReadableMark
+                ));
+
+                continue;
+            }
+
             /* Process feedbacks
              *     - $creator (Alaress Admin) owns all assessments and feedbacks
              *     - Assume all feedbacks are for a Due Work
