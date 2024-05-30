@@ -327,7 +327,7 @@ HELP;
 
         /* Maintain a row counter
          */
-        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -850,7 +850,7 @@ HELP;
              * and all this other andyland domain-level stuff, or you can just ram it straight
              * into the bullseye
              */
-            $box = $submissionBoxMapper->findOneByColumn('assessment_id' , $assessment->getId());
+            $box = $submissionBoxMapper->findOneByColumn('assessment_id', $assessment->getId());
             $student = $this->userMapper->findByExternalId($row[3]);
 
             $params = [
