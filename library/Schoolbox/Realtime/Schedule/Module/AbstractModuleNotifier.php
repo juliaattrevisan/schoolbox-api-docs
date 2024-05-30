@@ -60,7 +60,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     /** @var SourceMapper */
     protected $srcMapper;
 
-    /** @var int */
+    /** @var string */
     protected $iconSize = 'square192';
 
     protected \Schoolbox\External\User $externalUser;
