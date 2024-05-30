@@ -59,8 +59,6 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
      */
     protected function buildPayload(array $content): array
     {
-        $this->getLogger()->debug(sprintf("creds from IR: %s", print_r($content, true)));
-
         // sanitise the data, we need to convert from \n to the actual character, so the open_ssl keys still work
         $key = stripcslashes(json_encode($content['key'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
         $public_configuration = stripcslashes(json_encode($content['pubilc_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
@@ -108,11 +106,5 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
         $mobile->save($firebaseApp);
 
         $this->getLogger()->debug('Saved');
-    }
-
-    /** @inheritDoc */
-    public function runAsRoot(): ?bool
-    {
-        return null; // Doesn't matter
     }
 }
