@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Role;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -82,6 +83,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Arbitrarily try to make students
+     */
+    private const OPT_MAKE_STUDENTS = 'students';
+
+
+    /**
      * Id corresponding to the Victorian Curriculum Progression Points work type
      * and will be in the lu_work_type table
      */
@@ -120,6 +127,7 @@ class ImporterTool extends CliTool\App
             self::OPT_MAKE_CNODES,
             self::OPT_MAKE_FOLDERS,
             self::OPT_MAKE_ASSESSMENTS,
+            self::OPT_MAKE_STUDENTS,
             self::OPT_WORK_TYPE_ID,
             self::OPT_GRADE_GROUP_ID
         ];
@@ -187,7 +195,10 @@ if they don't already exist. Used to simulate a production-ish setup in your vag
 The --folders option forces the script to parse folder codes and make them,
 if they don't already exist. Used to simulate a production-ish setup in your vagrants.
 
-Usage: import.php [--input=path/to/my/file.csv] [--nodes] [--folders] [--perform]
+The --students option forces the script to make new users with a given external id
+to simulate users existing in prod, but don't in your vagrant.
+
+Usage: import.php [--input=path/to/my/file.csv] [--nodes] [--folders] [--students] [--perform]
 
 
 HELP;
@@ -240,6 +251,12 @@ HELP;
          */
         if ($this->getOpt(self::OPT_MAKE_FOLDERS)) {
             $this->parseFolders($lock, $filename);
+        }
+
+        /* Optionally arbitrarily pre-make students if they don't already exist
+         */
+        if ($this->getOpt(self::OPT_MAKE_STUDENTS)) {
+            $this->parseStudents($lock, $filename);
         }
 
         /* Optionally arbitrarily pre-make assessments+feedbacks
@@ -503,6 +520,119 @@ HELP;
                 'Created folder %s (%s)',
                 $name,
                 $code
+            ));
+        }
+
+        fclose($fp);
+    }
+
+
+    /**
+     * Create students ahead of time, in case they don't already exist.
+     *
+     * @param LockInterface $lock
+     * @param string $filename
+     * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws LockRefreshException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function parseStudents(LockInterface $lock, string $filename): void
+    {
+        /* New folders spawn randomly at the root
+         */
+        $rootFolder = $this->folderMapper->createModel()->setId(IFolder::ROOT_ID);
+
+        /* Local dependencies
+         */
+        $roleMapper = \Schoolbox\RoleMapper::getInstance();
+        $campusMapper = \Schoolbox\CampusMapper::getInstance();
+
+        /* Remember ones we've seen
+         */
+        $seen = [];
+
+        /* Load a particular file
+         */
+        $fp = fopen($filename, 'r');
+
+        /* Skip header row
+         */
+        $row = fgetcsv($fp);
+
+        /* Maintain a row counter
+         */
+        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+            $this->refreshLock($lock);
+
+            /* Ignore column 0, that's the Academic Cycle id we don't care about
+             * Ignore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
+             * Ignore column 12, that's a modify datetime we don't care about
+             */
+
+            /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
+             */
+            if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: not for semester 2, found %s. Skipping.',
+                    $i,
+                    $row[2]
+                ));
+
+                continue;
+            }
+
+            $externalId = $row[3];
+
+            /* Seen it? Skip it
+             */
+            if (isset($seen[$externalId])) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: %s already exists. Skipping.',
+                    $i,
+                    $externalId
+                ));
+
+                continue;
+            }
+
+            /* See if it already exists; if not, spawn it
+             */
+            try {
+                $user = $this->userMapper->findByExternalId($externalId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $user = $this->userMapper->createModel()
+                    ->setUsername($externalId)
+                    ->setFirstname($externalId)
+                    ->setLastname($externalId)
+                    ->setRole($roleMapper->createModel()->setType(Role::STUDENT))
+                    ->setCampusCollection($campusMapper->createCollection())
+                    ->setEnabled(true);
+
+                if ($this->perform()) {
+                    $this->userMapper->save($user);
+                }
+
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: created new user %s',
+                    $i,
+                    $externalId
+                ));
+            }
+
+            /* Remember we saw this
+             */
+            $seen[$externalId] = true;
+        }
+
+        /* Tell users what you did
+         */
+        foreach ($seen as $externalId => $val) {
+            $this->getLogger()->info(sprintf(
+                'Created user %s',
+                $externalId
             ));
         }
 
