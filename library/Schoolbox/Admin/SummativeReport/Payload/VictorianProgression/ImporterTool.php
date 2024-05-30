@@ -17,7 +17,6 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\LockRefreshException;
-use Schoobox\User;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -83,6 +82,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Id corresponding to the Victorian Curriculum Progression Points work type
+     */
+    private const OPT_WORK_TYPE_ID = 'worktype:';
+
+
+    /**
+     * Id corresponding to the Victorian Curriculum Progression Points grade group
+     */
+    private const OPT_GRADE_GROUP_ID = 'gradegroup:';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -107,6 +118,8 @@ class ImporterTool extends CliTool\App
             self::OPT_MAKE_CNODES,
             self::OPT_MAKE_FOLDERS,
             self::OPT_MAKE_ASSESSMENTS,
+            self::OPT_WORK_TYPE_ID,
+            self::OPT_GRADE_GROUP_ID
         ];
     }
 
@@ -155,7 +168,7 @@ Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
 Penola's system. It consumes a csv they provided and probably can't be readily
 reused for anyone else.
 
-Usage: import.php --input=path/to/my/file.csv --assessments [--perform]
+Usage: import.php --input=path/to/my/file.csv --assessments --worktype=... --gradegroup=... [--perform]
 
 
 Vagrant Simulation
