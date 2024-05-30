@@ -174,7 +174,7 @@ class ResultCache
         }
 
         // If any part of the mark has changed, update the cache.
-        // Note a new null mark can arise if the marker removes the last non-null mark from a project's sub-assessment.
+        // Note a new null mark can arise if the marker removes all non-null marks from a project's sub-assessments.
         if (
             $normalisedMark !== $model->getNormalisedMark() ||
             $humanReadableMark !== $model->getHumanReadableMark() ||
