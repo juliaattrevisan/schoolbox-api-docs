@@ -1,0 +1,154 @@
+<?php
+
+/**
+ * CSV Importer for Penola's Semester 2, 2023 data
+ *
+ * Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
+ * Penola's system. It consumes a csv they provided and probably can't be readily
+ * reused for anyone else.
+ *
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
+
+use Schoolbox\Application\CliTool;
+
+/**
+ * CLI Tool
+ *
+ * Copy this to /tools folder
+ *
+ * To redirect log output to a file(s):
+ *     STDOUT is file descriptor 1
+ *     STDERR is file descriptor 2; our logger output ends up going here
+ *
+ *     Example: php example.php 2> log.txt
+ */
+class ImporterTool extends CliTool\App
+{
+    /**
+     * Make sure to add your locking script to the Lock Inspector tool
+     * const LOCK_NAMES in Inspector.php
+     */
+    public const LOCK_NAME = 'VicProgression_PCC_Sem2_2023';
+
+
+    /**
+     * Decide how long this should be based on your usage
+     * You might have to adjust it, but it should cover the cost of an iteration
+     */
+    private const LOCK_TTL = 60;
+
+
+    /**
+     * --input
+     *
+     * Path to csv file
+     */
+    private const OPT_LONG_INPUT = 'input:';
+
+
+    /**
+     * --help
+     *
+     * Print help text for those who don't know how to use this tool
+     */
+    private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_INPUT
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+CSV Importer for Penola's Semester 2, 2023 data
+
+Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
+Penola's system. It consumes a csv they provided and probably can't be readily
+reused for anyone else.
+
+Usage: import.php [--input=path/to/my/file.csv] [--perform]
+
+
+HELP;
+            return;
+        }
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
+        /* Check input file was specified
+         */
+        $filename = $this->getOpt(self::OPT_LONG_INPUT);
+
+        if (null === $filename) {
+            $this->getLogger()->error('no --input file specified.');
+            exit;
+        }
+
+        $this->getLogger()->info('Script commencing.');
+
+        /* Load a particular file
+         */
+        $fp = fopen($filename, 'r');
+
+        while ($row = fgetcsv($fp)) {
+            $this->refreshLock($lock);
+
+            print_r($row);
+        }
+
+        /* Announce conclusion
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+
+        /* Announce lock release
+         */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return parent::runAsRoot();
+    }
+}
