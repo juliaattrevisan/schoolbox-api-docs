@@ -61,12 +61,16 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
     {
         $this->getLogger()->debug(sprintf("creds from IR: %s", print_r($content, true)));
 
+        // sanitise the data, we need to convert from \n to the actual character, so the open_ssl keys still work
+        $key = stripcslashes(json_encode($content['key'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
+        $public_configuration = stripcslashes(json_encode($content['pubilc_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
+
         /* These go into mobile_app
          */
         return [
             'app_identifier'        => trim((string)$content['app_identifier']),
-            'key'                   => json_encode($content['key'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS),
-            'public_configuration'  => json_encode($content['pubilc_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS),
+            'key'                   => $key,
+            'public_configuration'  => $public_configuration,
             'web_push_public_key'   => trim((string)$content['web_push_public_key'])
         ];
     }
