@@ -26,7 +26,6 @@ use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\IFolder;
-use Schoolbox\Role;
 use Symfony\Component\Lock\LockInterface;
 
 /**
