@@ -209,34 +209,39 @@ class Factory
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
         /**
-         * new due work checks, this is an array, so we can use frontend validation to confirm if we have selected at least one of these options...
-         * firstly clear all the values, and set TRUE to only those that are set.
+         * are we editing? we are only sending through the options when editing / creating. not in the read only course managed state
          */
-        $this->setKamiInteractive(false);
-        $this->setEnableOffline(false);
-        $this->setEnableText(false);
-        $this->setEnableFiles(false);
-        foreach ($post['submissionOptions'] as $subOption) {
-            $value = trim($subOption ?? '');
-            switch ($value) {
-                case 'kamiInteractive':
-                    $this->setKamiInteractive(true);
-                    break;
-                case 'enableOffline':
-                    $this->setEnableOffline(true);
-                    break;
-                case 'enableText':
-                    $this->setEnableText(true);
-                    break;
-                case 'enableFiles':
-                    $this->setEnableFiles(true);
-                    break;
+        if (isset($post['submissionOptions'])) {
+            /**
+             * new due work checks, this is an array, so we can use frontend validation to confirm if we have selected at least one of these options...
+             * firstly clear all the values, and set TRUE to only those that are set.
+             */
+            $this->setKamiInteractive(false);
+            $this->setEnableOffline(false);
+            $this->setEnableText(false);
+            $this->setEnableFiles(false);
+            foreach ($post['submissionOptions'] as $subOption) {
+                $value = trim($subOption ?? '');
+                switch ($value) {
+                    case 'kamiInteractive':
+                        $this->setKamiInteractive(true);
+                        break;
+                    case 'enableOffline':
+                        $this->setEnableOffline(true);
+                        break;
+                    case 'enableText':
+                        $this->setEnableText(true);
+                        break;
+                    case 'enableFiles':
+                        $this->setEnableFiles(true);
+                        break;
+                }
             }
+
+            $this->setKamiFile($post['worksheet'] ?? null);
+
+            $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
         }
-
-        $this->setKamiFile($post['worksheet'] ?? null);
-
-        $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
         $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));

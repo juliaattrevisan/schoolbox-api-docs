@@ -248,12 +248,33 @@ class Decorator implements DecoratorInterface
          */
         $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
 
-        $assessment->setKamiInteractive($this->getKamiInteractive());
-        $assessment->setKamiFile($this->getKamiFile());
-        $assessment->setEnableOffline($this->getEnableOffline());
-        $assessment->setEnableText($this->getEnableText());
-        $assessment->setEnableFiles($this->getEnableFiles());
-        $assessment->setEnablePolicy($this->getEnablePolicy());
+        /* Are we in a course managed, and modifying something.
+         * if there are no fields in the request (submission options are required) we should just re save what was in the original assessment
+         * if there are fields being sent, irrespective if we are updating or creating, we should save those new fields.
+         */
+        if (
+            $this->original && !(
+                $this->getKamiInteractive() ||
+                $this->getEnableOffline() ||
+                $this->getEnableText() ||
+                $this->getEnableFiles()
+            )
+        ) {
+            // we aren't posting the data when updating
+            $assessment->setKamiInteractive($this->original->getKamiInteractive());
+            $assessment->setKamiFile($this->original->getKamiFile());
+            $assessment->setEnableOffline($this->original->getEnableOffline());
+            $assessment->setEnableText($this->original->getEnableText());
+            $assessment->setEnableFiles($this->original->getEnableFiles());
+            $assessment->setEnablePolicy($this->original->getEnablePolicy());
+        } else {
+            $assessment->setKamiInteractive($this->getKamiInteractive());
+            $assessment->setKamiFile($this->getKamiFile());
+            $assessment->setEnableOffline($this->getEnableOffline());
+            $assessment->setEnableText($this->getEnableText());
+            $assessment->setEnableFiles($this->getEnableFiles());
+            $assessment->setEnablePolicy($this->getEnablePolicy());
+        }
 
         if ($this->getKamiFile()) {
             // Rebuild worksheet files list

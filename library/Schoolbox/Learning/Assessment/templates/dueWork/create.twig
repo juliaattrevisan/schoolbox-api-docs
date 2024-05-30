@@ -130,20 +130,6 @@
         <div class="small-12 columns">
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
-                {% if assessment.courseManaged %}
-                    {% if kami_enabled and assessment.getKamiInteractive %}
-                        <input id="kamiInteractive-hidden" type="hidden" name="submissionOptions[]" value="kamiInteractive" />
-                    {% endif %}
-                    {% if assessment.courseManaged and assessment.getEnableOffline %}
-                        <input id="enableOffline-hidden" type="hidden" name="submissionOptions[]" value="enableOffline" />
-                    {% endif %}
-                    {% if assessment.courseManaged and assessment.getEnableText %}
-                        <input id="enableText-hidden" type="hidden" name="submissionOptions[]" value="enableText" />
-                    {% endif %}
-                    {% if assessment.courseManaged and assessment.getEnableFiles %}
-                        <input id="enableFiles-hidden" type="hidden" name="submissionOptions[]" value="enableFiles" />
-                    {% endif %}
-                {% endif %}
                 {% if kami_enabled %}
                 <li>
                     <input id="worksheet" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="submissionOptions[]" value="kamiInteractive" data-type-group>
