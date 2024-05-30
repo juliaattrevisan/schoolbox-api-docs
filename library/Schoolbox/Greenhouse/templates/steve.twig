@@ -7,12 +7,20 @@
         border: 1px solid #ccc !important;
     }
 
+    /* Spacer column between Rating and Levels
+     */
+    .level-spacer {
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+    }
+
     /* Dots go in these
      */
     .outcome-cell {
         max-width: 50px;
         min-width: 50px;
-        text-align: center;
+        padding: 0;
+        text-align: left;
         vertical-align: middle;
     }
 
@@ -20,7 +28,9 @@
      */
     .outcome-cell span {
         display: block;
-        font-size: 64px;
+        float: left;
+        font-size: 66px;
+        margin-left: -12px;
     }
 
     /* Each Level comes in a pair of cells for each half of an academic period, I guess
@@ -40,6 +50,8 @@
         background-color: gold;
     }
 
+    /* The top-left corner of the grid
+     */
     .corner {
         border-top: 0 !important;
         border-left: 0 !important;
@@ -54,6 +66,10 @@
         <tr class="header">
             <th colspan="2" class="corner"></th>
             <th>Rating</th>
+
+            {# random spacer column #}
+            <th class="level-spacer"></th>
+
             {% for i in payload.levels %}
                 {# Check current year; smear it yellow if i matches student year level #}
                 <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
@@ -102,6 +118,10 @@
     <td>
         {# TODO How is "rating" decided...? It goes in this cell. #}
     </td>
+
+    {# random spacer column #}
+    <td class="level-spacer"></td>
+
     {% for i in possibleOutcomes %}
         {% set css = 'hide-left-border' %}
 
