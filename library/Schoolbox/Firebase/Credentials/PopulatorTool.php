@@ -12,6 +12,7 @@ namespace Schoolbox\Firebase\Credentials;
 
 use Schoolbox\Mapper\Exception;
 use Schoolbox\MobileApp\Registry;
+use Schoolbox\MobileApp\Service;
 use Schoolbox\MobileApp\ServiceMapper;
 
 /**
@@ -33,11 +34,6 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
      * This endpoint gets us learnosity credentials specially
      */
     protected string $credentialsEndpoint = '%s/api/secret/firebase/%s';
-
-    /* Prepared statements
-     */
-    private const QUERY_UPDATE_CONFIG = 'INSERT INTO mobile_app (app_identifier, provider, `key`, public_configuration, web_push_public_key, cert_hash)';
-
 
     /**
      * Configure the url we use to obtain credentials
@@ -68,10 +64,10 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
         /* These go into mobile_app
          */
         return [
-            'app_identifier'        => trim((string)$content['app_identifier'] ?? "test ID"),
+            'app_identifier'        => trim((string)$content['app_identifier']),
             'key'                   => json_encode($content['key'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS),
             'public_configuration'  => json_encode($content['pubilc_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS),
-            'web_push_public_key'   => trim((string)$content['web_push_public_key'] ?? 'test web')
+            'web_push_public_key'   => trim((string)$content['web_push_public_key'])
         ];
     }
 
@@ -97,6 +93,7 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
          * update to the IR creds
          * app_identifier, provider, `key`, public_configuration, web_push_public_key
          */
+        /** @var Service $firebaseApp */
         $firebaseApp->setAppIdentifier($configTuples['app_identifier'])
             ->setProviderName('Firebase')
             ->setKey($configTuples['key'])
