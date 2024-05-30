@@ -711,8 +711,8 @@ HELP;
 
             /* TODO build it in their prod first
              */
-            $workTypeId = '-1';
-            $gradingScheme = '-1';
+            $workTypeId = $this->getOpt(self::OPT_WORK_TYPE_ID);
+            $gradingScheme = $this->getOpt(self::OPT_GRADE_GROUP_ID);
 
             /* TODO maybe needs be non-zero - can't remember
              */
