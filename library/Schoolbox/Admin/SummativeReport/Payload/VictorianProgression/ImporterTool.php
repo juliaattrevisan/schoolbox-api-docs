@@ -16,7 +16,13 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Alaress\Lock\LockRefreshException;
+use Schoobox\User;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
 
@@ -95,6 +101,18 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * @var AssessmentDataSource
+     */
+    private AssessmentDataSource $assessmentMapperProxy;
+
+
+    /**
+     * @var \Schoolbox\UserMapper
+     */
+    private \Schoolbox\UserMapper $userMapper;
+
+
+    /**
      * Run the cli tool
      */
     public function run(): void
@@ -143,6 +161,14 @@ HELP;
         /* Dependencies
          */
         $this->curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
+
+        /** @var AssessmentDataSource $assessmentMapperProxy */
+        $this->assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* This person "created" all the feedbacks and assessments
+         */
+        $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
 
         /* Optionally arbitrarily make curriculum nodes if they don't already exist
          */
@@ -152,7 +178,7 @@ HELP;
 
         /* Slap in assessment feedbacks
          */
-        $this->parseFeedbacks($lock, $filename);
+        $this->parseFeedbacks($lock, $filename, $creator);
 
         /* Announce conclusion
          */
@@ -220,10 +246,7 @@ HELP;
 
             /* Strip out suffixes C2 and _2 from column 8
              */
-            $curriculumCode = $row[8];
-
-            $curriculumCode = preg_replace('/C2$/', '', $curriculumCode);
-            $curriculumCode = preg_replace('/_2$/', '', $curriculumCode);
+            $curriculumCode = $this->parseCurriculumCode($row[8]);
 
             $this->getLogger()->debug(sprintf(
                 'Row %s: parsed %s out of %s',
@@ -258,6 +281,8 @@ HELP;
 
             $this->curriculumNodeMapper->save($node);
 
+            /* Remember we saw this
+             */
             $seen[$curriculumCode] = $row[9];
 
             $this->getLogger()->debug(sprintf(
@@ -282,15 +307,18 @@ HELP;
     }
 
 
+
     /**
      * Process feedbacks
      *
      * @param LockInterface $lock
      * @param string $filename
+     * @param \Schoolbox\User $creator
      * @return void
-     * @throws \Alaress\Lock\LockRefreshException
+     * @throws LockRefreshException
+     * @throws \UnexpectedValueException
      */
-    private function parseFeedbacks(LockInterface $lock, string $filename): void
+    private function parseFeedbacks(LockInterface $lock, string $filename, \Schoolbox\User $creator): void
     {
         /* Load a particular file
          */
@@ -322,11 +350,84 @@ HELP;
                 continue;
             }
 
-            /* TODO Process feedbacks
+            /* Process feedbacks
+             *     - $creator (Alaress Admin) owns all assessments and feedbacks
+             *     - Assume all feedbacks are for a Due Work
+             *     - Title comes from column 9 (named after the curriculum node's name)
+             *     - Work Type hardcoded to whatever is in their instance
+             *     - Mark Type is Letter Grade
+             *     - Empty description (no human was intended to read this)
+             *     - Due Date arbitrarily chosen to be in Semester 2, 2023
+             *     - Marks available to everyone I guess
              */
+
+            /* TODO build it in their prod first
+             */
+            $workTypeId = -1;
+            $gradingScheme = -1;
+
+            /* TODO maybe needs be non-zero - can't remember
+             */
+            $weight = 0;
+
+            /* TODO pick an actual date
+             */
+            $publishDate = '2024-01-01 01:01:00';
+            $openDate = '2024-01-01 01:01:01';
+            $dueDate = '2024-01-01 01:01:02';
+            $closeDate = '2024-01-01 01:01:03';
+
+            /* Avengers Assemble
+             */
+            $assessmentData = [
+                'assessmentType' => AssessmentType::TYPE_DUE_WORK,
+                'title' => $row[9],
+                'workType' => $workTypeId,
+                'description' => '',
+                'creator' => $creator,
+                'weight' => $weight,
+                'curriculumCodes' => $this->parseCurriculumCode($row[8]),
+                'publishDate' => $publishDate,
+                'openDate' => $openDate,
+                'dueDate' => $dueDate,
+                'closeDate' => $closeDate,
+                'markType' => MarkType::TYPE_LETTER,
+                'gradingScheme' => $gradingScheme,
+                'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT
+            ];
+
+            /* Make it then save it
+             */
+            $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
+            $assessment = $assessmentFactory->produce();
+
+            $this->assessmentMapperProxy->save($assessment, $creator);
+
+            $this->getLogger()->info(sprintf(
+                'Row %s: created new assessment "%s" (%s) in folder %s',
+                $assessment->getId(),
+                $assessment->getTitle(),
+                $folder->getTitle()
+            ));
         }
 
         fclose($fp);
+    }
+
+
+    /**
+     * Strip unwanted suffixes
+     *
+     * @param string $val
+     * @return string
+     */
+    private function parseCurriculumCode(string $val): string
+    {
+        $curriculumCode = trim($val);
+
+        $curriculumCode = preg_replace('/C2$/', '', $curriculumCode);
+
+        return preg_replace('/_2$/', '', $curriculumCode);
     }
 
 
