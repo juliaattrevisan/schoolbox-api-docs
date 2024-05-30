@@ -156,7 +156,7 @@
                 </li>
                 {% if lmsStudentPolicy | length %}
                 <li>
-                    <input type="hidden" name="enablePolicy" value="{% if assessment.courseManaged and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
+                    <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
                     <input id="declaration" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getEnablePolicy ? 'checked' : '' }} name="enablePolicy" value="on">
                     <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>

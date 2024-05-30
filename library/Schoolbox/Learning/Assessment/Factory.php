@@ -239,7 +239,8 @@ class Factory
             }
 
             $this->setKamiFile($post['worksheet'] ?? null);
-
+        }
+        if (isset($post['enablePolicy'])) {
             $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
         }
 
