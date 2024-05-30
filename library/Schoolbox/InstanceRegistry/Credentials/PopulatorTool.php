@@ -188,7 +188,7 @@ abstract class PopulatorTool extends App
      * @return void
      * @throws Exception
      */
-    private function updateConfig(array $configTuples): void
+    protected function updateConfig(array $configTuples): void
     {
         $this->getLogger()->info("Updating instance's config table with fetched credentials...");
 
