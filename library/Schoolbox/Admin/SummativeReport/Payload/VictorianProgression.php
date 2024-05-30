@@ -349,6 +349,8 @@ class VictorianProgression
     /**
      * Figure out if we're in semester 1 or 2, of the given $currentAcademicPeriod
      *
+     * This presumes an Academic Period uses the format "yyyy-semesternum" e.g. "2024-2"
+     *
      * @param \Schoolbox\Assessment\Term\Model $currentAcademicPeriod
      * @return string|null
      */
@@ -356,6 +358,8 @@ class VictorianProgression
     {
         $currentYear = date('Y');
 
+        /* Note that people have mistakenly used _ instead of - in PCC
+         */
         preg_match("/{$currentYear}([-_]+)(\d+)/", $currentAcademicPeriod->getCode(), $matches);
 
         /* Current Semester could not be determined; leave empty
