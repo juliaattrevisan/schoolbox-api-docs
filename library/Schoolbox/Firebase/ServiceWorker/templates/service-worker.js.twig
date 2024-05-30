@@ -24,7 +24,7 @@ self.addEventListener('push', function(event) {
     const notificationOptions = {
         body: payload.notification.body,
         icon: payload.notification.icon || "/images/logo.php?logo=skin_logo_square&size=google192",
-        image: notificationMeta.thumb ?? "",
+        image: notificationMeta.pushBanner ?? "",
         badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
         renotify: false,
         data: payload.notification
