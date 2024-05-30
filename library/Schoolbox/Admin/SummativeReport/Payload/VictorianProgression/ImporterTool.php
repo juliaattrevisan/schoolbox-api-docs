@@ -528,6 +528,10 @@ HELP;
      */
     private function parseFeedbacks(LockInterface $lock, string $filename, \Schoolbox\User $creator): void
     {
+        /* Remember ones we've seen
+         */
+        $seen = [];
+
         /* Load a particular file
          */
         $fp = fopen($filename, 'r');
@@ -589,42 +593,61 @@ HELP;
              */
             $folder = $this->folderMapper->findByCode($row[6]);
 
+            /* Figure out if we already made this assessment.
+             * If we did, reuse it.
+             * Otherwise, spawn it first.
+             */
+            $externalAssessmentId = $row[4];
+
             /* Avengers Assemble
              */
-            $assessmentData = [
-                'assessmentType' => AssessmentType::TYPE_DUE_WORK,
-                'context' => $folder->getId(),
-                'title' => $row[9],
-                'workType' => $workTypeId,
-                'description' => '',
-                'creator' => $creator,
-                'weight' => $weight,
-                'curriculumCodes' => $this->parseCurriculumCode($row[8]),
-                'publishDate' => $publishDate,
-                'openDate' => $openDate,
-                'dueDate' => $dueDate,
-                'closeDate' => $closeDate,
-                'markType' => (string)MarkType::TYPE_LETTER,
-                'gradingScheme' => $gradingScheme,
-                'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT
-            ];
+            if (!isset($seen[$externalAssessmentId])) {
+                $assessmentData = [
+                    'assessmentType' => AssessmentType::TYPE_DUE_WORK,
+                    'context' => $folder->getId(),
+                    'title' => $row[9],
+                    'workType' => $workTypeId,
+                    'description' => '',
+                    'creator' => $creator,
+                    'weight' => $weight,
+                    'curriculumCodes' => $this->parseCurriculumCode($row[8]),
+                    'publishDate' => $publishDate,
+                    'openDate' => $openDate,
+                    'dueDate' => $dueDate,
+                    'closeDate' => $closeDate,
+                    'markType' => (string)MarkType::TYPE_LETTER,
+                    'gradingScheme' => $gradingScheme,
+                    'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT
+                ];
 
-            /* Make it then save it
-             */
-            $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
-            $assessment = $assessmentFactory->produce();
+                /* Make it then save it
+                 */
+                $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
+                $assessment = $assessmentFactory->produce();
 
-            if ($this->perform()) {
-                $this->assessmentMapperProxy->save($assessment, $creator);
+                if ($this->perform()) {
+                    $this->assessmentMapperProxy->save($assessment, $creator);
+                    $seen[$externalAssessmentId] = $assessment;
+                }
+
+                $this->getLogger()->info(sprintf(
+                    'Row %s: created new assessment "%s" (%s) in folder %s',
+                    $i,
+                    $assessment->getId(),
+                    $assessment->getTitle(),
+                    $folder->getTitle()
+                ));
             }
 
-            $this->getLogger()->info(sprintf(
-                'Row %s: created new assessment "%s" (%s) in folder %s',
-                $i,
-                $assessment->getId(),
-                $assessment->getTitle(),
-                $folder->getTitle()
-            ));
+            /* Summon it from memory (yes I know...)
+             */
+            $assessment = $seen[$externalAssessmentId];
+
+            /* Make a feedback for a student
+             */
+
+            /* Save it
+             */
         }
 
         fclose($fp);
