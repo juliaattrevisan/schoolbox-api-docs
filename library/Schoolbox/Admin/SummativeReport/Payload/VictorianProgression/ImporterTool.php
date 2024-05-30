@@ -766,6 +766,7 @@ HELP;
             $openDate = '10/10/2024 12:02am';
             $dueDate = '10/10/2024 12:03am';
             $closeDate = '10/10/2024 12:04am';
+            $feedbackPublishedAt = '10/10/2024 12:05am';
 
             /* Assume this exists, I guess, for now
              */
@@ -860,10 +861,10 @@ HELP;
                 'reviewRoute' => 'instructor',
                 'mark' => $row[11],
                 'resubmissionRequired' => 0,
-                'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
-                'publishedAt' => \Alaress_Date_Format::now()->getDatabase(),
+                'createdAt' => $feedbackPublishedAt,
+                'publishedAt' => $feedbackPublishedAt,
                 'publishedBy' => $creator->getId(),
-                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+                'updatedAt' => $feedbackPublishedAt
             ];
 
             if ($this->perform()) {
