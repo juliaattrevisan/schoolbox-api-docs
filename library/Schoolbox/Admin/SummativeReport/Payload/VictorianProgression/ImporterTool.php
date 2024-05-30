@@ -61,6 +61,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * column 2 values that we care about
+     */
+    private const ALLOWED_SEMESTERS = ['SEM2', '2023'];
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -119,10 +125,34 @@ HELP;
          */
         $fp = fopen($filename, 'r');
 
-        while ($row = fgetcsv($fp)) {
+        /* Skip header row
+         */
+        $row = fgetcsv($fp);
+
+        /* Maintain a row counter
+         */
+        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
             $this->refreshLock($lock);
 
-            print_r($row);
+            /* Ignore column 0, that's the Academic Cycle id we don't care about
+             * IGnore column 1, that's the Academic Year the row is about. Can assume everything is for 2023.
+             * Ignore column 12, that's a modify datetime we don't care about
+             */
+
+            /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
+             */
+            if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
+                $this->getLogger()->info(sprintf(
+                    'Row %s: not for semester 2, found %s. Skipping.',
+                    $i,
+                    $row[2]
+                ));
+
+                continue;
+            }
+
+
+//            print_r($row);
         }
 
         /* Announce conclusion
