@@ -107,6 +107,10 @@ class DueWorkInitialCest
         $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
         $i->fillCkEditorById('assessment-description', 'We need more fish.');
         $i->selectOption('acceptOnline', '1');
+        $i->canSee('Select the type of submission allowed:');
+        $i->click('label[for=allow-offline]');
+        $i->click('label[for=text-editor]');
+        $i->click('label[for=files]');
         $i->fillField('weight', '5');
         $i->click('select#markType');
         $i->selectOption('select[name=markType]', 'Percentage');
@@ -121,6 +125,10 @@ class DueWorkInitialCest
         $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK);
         $i->fillCkEditorById('assessment-description', 'We need more fish.');
         $i->selectOption('acceptOnline', '1');
+        $i->canSee('Select the type of submission allowed:');
+        $i->click('label[for=allow-offline]');
+        $i->click('label[for=text-editor]');
+        $i->click('label[for=files]');
         $i->fillField('weight', '5');
         $i->click('input[type=submit][value=Create]');
         $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
