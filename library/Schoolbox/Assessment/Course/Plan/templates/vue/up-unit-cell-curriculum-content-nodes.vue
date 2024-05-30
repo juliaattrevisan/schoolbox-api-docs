@@ -21,6 +21,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    onHasFilteredNodeChange: [value: boolean];
+}>();
+
 const unitPlannerStore = useUnitPlannerStore(); // to allow us to reflect our changes in back into unit planner store
 const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
@@ -66,12 +70,26 @@ window.Vue.watch(
 );
 
 /**
+ * To keep the unit planner's empty state in sync with when this component has any filtered nodes
+ */
+window.Vue.watch(
+    () => folderNodesStore().filteredNodes,
+    () => {
+        emit("onHasFilteredNodeChange", folderNodesStore().hasFilteredNodes);
+    },
+    { deep: true },
+);
+
+/**
  * To ensure the entire node tree can be displayed within the unit cell
  */
 window.Vue.onMounted(async () => {
     if (!folderNodesStore().hasLoaded) {
         await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     }
+
+    // Let the parent know if we have any filtered nodes or not
+    emit("onHasFilteredNodeChange", folderNodesStore().hasFilteredNodes);
 });
 </script>
 

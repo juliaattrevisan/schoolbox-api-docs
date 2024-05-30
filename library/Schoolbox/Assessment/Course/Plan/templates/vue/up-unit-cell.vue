@@ -12,12 +12,12 @@ import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import { Column, ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
-import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
-import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
+
+// Import all the content/action/empty components for the different column types
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
-import ActivitiesListContent from "./activities-list/activities-list-content.vue";
+import UpUnitCellActivitiesListContent from "./up-unit-cell-activities-list-content.vue";
 import ActivitiesListAction from "./activities-list/activities-list-action.vue";
 import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
 import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubric-capabilities-content.vue";
@@ -39,60 +39,73 @@ const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 const dragStore = useUnitPlannerDragStore();
 
-const activitiesListDragStore = useActivitiesListDragStore(`${props.unit.id}-${props.column.id}`);
-const textboxStore = useUnitPlannerTextboxStore();
-
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
 });
 
+/**
+ * The main container around this cell's content component
+ * Used to measure the height of the content
+ */
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
 
+/**
+ * The main container around this cell's action component
+ * Used to measure the height of the component action
+ */
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
-const showViewMoreGradient = window.Vue.computed(() => {
-    if (!store.unitRowDisplayHeights[props.unit.id]) return false;
-    return contentHeight.value + componentActionHeight.value > store.unitRowDisplayHeights[props.unit.id];
-});
-const showViewMoreInner = window.Vue.computed(() => {
-    if (store.dragCurrentUnitNextTick === props.unit) return false;
-    return showViewMoreGradient.value;
+/**
+ * The component references for each type of content/action/empty component
+ * Used to allow interaction with exposed methods / communication between content/action/empty components
+ *
+ * Only one type of content component will be present at a time, based on the column type
+ */
+const textboxContentComponent = window.Vue.ref<InstanceType<typeof UpUnitCellTextboxContent> | null>(null);
+const textboxActionComponent = window.Vue.ref<InstanceType<typeof UpUnitCellTextboxAction> | null>(null);
+
+const activitiesListContentComponent = window.Vue.ref<InstanceType<typeof UpUnitCellActivitiesListContent> | null>(
+    null,
+);
+const rubricCapabilitiesContentComponent = window.Vue.ref<InstanceType<
+    typeof UpUnitCellRubricCapabilitiesContent
+> | null>(null);
+
+const curriculumContentComponent = window.Vue.ref<InstanceType<typeof UpUnitCellCurriculumContent> | null>(null);
+
+/**
+ * The active content component of the cell
+ */
+const currentContentComponent = window.Vue.computed(() => {
+    if (props.column.type === ColumnType.OVERVIEW) return textboxContentComponent.value;
+    if (props.column.type === ColumnType.ACTIVITIES) return activitiesListContentComponent.value;
+    if (props.column.type === ColumnType.RUBRIC_CAPABILITIES) return rubricCapabilitiesContentComponent.value;
+    if (props.column.type === ColumnType.CURRICULUM_OVERVIEW) return curriculumContentComponent.value;
+    return null;
 });
 
-const draggableEl = window.Vue.ref<HTMLElement>();
-let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
-
+/**
+ * Whether the content of the cell is focused
+ */
 const contentIsFocused = window.Vue.computed(() => {
     return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
 });
 
+/**
+ * Whether the content of the cell is empty (and not focused)
+ * Based on the exposed isEmpty from the current content component
+ */
 const contentIsEmpty = window.Vue.computed(() => {
     if (!storeUnit.value) return false;
 
     // If this cell is focused, treat it as not empty
     if (contentIsFocused.value) return false;
 
-    if (props.column.type === ColumnType.OVERVIEW) {
-        // If there is unsaved content, the cell is not empty
-        if (textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id] !== undefined) {
-            return false;
-        }
-
-        // Otherwise, the cell is empty if there is no content in the body yet
-        return !storeUnit.value.textboxes[props.column.label]?.body;
-    }
-    if (props.column.type === ColumnType.ACTIVITIES) {
-        return activitiesListDragStore().orderedActivities.length === 0;
-    }
-    if (props.column.type === ColumnType.RUBRIC_CAPABILITIES) {
-        return !storeUnit.value.rubricCapabilities.length;
-    }
-    if (props.column.type === ColumnType.CURRICULUM_OVERVIEW) {
-        return !storeUnit.value.curriculum.selectedNodes.length;
-    }
-    return false;
+    // Otherwise, use the exposed isEmpty from the current content component
+    // (Will show a type warning if the component doesn't have an isEmpty method exposed)
+    return currentContentComponent.value?.isEmpty || false;
 });
 
 /**
@@ -108,17 +121,27 @@ function updateContentHeight() {
     }
 }
 
-// Provide access to exposed focusEditor from the UpUnitCellTextboxContent component
-// Only relevant when props.column.type === ColumnType.OVERVIEW
-const textboxContentComponent = window.Vue.ref<(typeof UpUnitCellTextboxContent & { focusEditor: () => void }) | null>(
-    null,
-);
+/**
+ * Whether to show the view more gradient and button
+ */
+const showViewMoreGradient = window.Vue.computed(() => {
+    if (!store.unitRowDisplayHeights[props.unit.id]) return false;
+    return contentHeight.value + componentActionHeight.value > store.unitRowDisplayHeights[props.unit.id];
+});
 
-// Provide access to exposed createTextbox from the UpUnitCellTextboxAction component
-// Only relevant when props.column.type === ColumnType.OVERVIEW
-const textboxActionComponent = window.Vue.ref<(typeof UpUnitCellTextboxAction & { createTextbox: () => void }) | null>(
-    null,
-);
+/**
+ * Whether to show the view more button
+ */
+const showViewMoreInner = window.Vue.computed(() => {
+    if (store.dragCurrentUnitNextTick === props.unit) return false;
+    return showViewMoreGradient.value;
+});
+
+/**
+ * The current draggable element, relevant if the column type is UNIT
+ */
+const draggableEl = window.Vue.ref<HTMLElement>();
+let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 /**
  * When the content is clicked
@@ -250,23 +273,23 @@ window.Vue.onUnmounted(() => {
                 :column="props.column"
             />
 
-            <activities-list-content
+            <up-unit-cell-activities-list-content
                 v-else-if="props.column.type === ColumnType.ACTIVITIES"
-                :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
-                :activities="props.unit.activities.items"
-                :activities-list-routes="props.unit.activities._routes"
+                ref="activitiesListContentComponent"
+                :unit="props.unit"
+                :column="props.column"
                 :prevent-store-init="props.isSortablePlaceholder"
-                @drag-start="store.updateFocusedUnitCell(props.unit.id, props.column, true)"
-                @drag-stop="store.updateFocusedUnitCell(props.unit.id, props.column, false)"
             />
 
-            <up-unit-cell-rubricCapabilities-content
+            <up-unit-cell-rubric-capabilities-content
                 v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
+                ref="rubricCapabilitiesContentComponent"
                 :rubric-capabilities="props.unit.rubricCapabilities"
             />
 
             <up-unit-cell-curriculum-content
                 v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"
+                ref="curriculumContentComponent"
                 :unit="props.unit"
                 :column="props.column"
             />

@@ -1,0 +1,57 @@
+<script setup lang="ts">
+/**
+ * A wrapper for the activities list component to integrate it into the unit planner
+ */
+import ActivitiesListContent from "./activities-list/activities-list-content.vue";
+import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import type { Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
+
+interface Props {
+    unit: Unit; // the unit linked to the curriculum cell
+    column: Column; // the column linked to the curriculum cell
+    preventStoreInit: boolean; // Whether to skip store initialization, e.g. if we're using an existing store
+}
+
+const props = defineProps<Props>();
+const store = useUnitPlannerStore();
+
+const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
+
+const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
+
+// Add the drag start and end callbacks to the drag store
+if (!props.preventStoreInit) {
+    activitiesListDragStore().setCallbackOnDragStart(() => {
+        store.updateFocusedUnitCell(props.unit.id, props.column, true);
+    });
+
+    activitiesListDragStore().setCallbackOnDragEnd(() => {
+        store.updateFocusedUnitCell(props.unit.id, props.column, false);
+    });
+}
+
+/**
+ * Is this cell empty?
+ * Used by the parent component to determine whether to show the empty state
+ */
+const isEmpty = window.Vue.computed(() => {
+    return activitiesListDragStore().orderedActivities.length === 0;
+});
+
+// Allow the parent component to identify if the cell is empty
+defineExpose({ isEmpty });
+</script>
+
+<template>
+    <activities-list-content
+        v-if="!isEmpty"
+        :activities-list-store-id="activitiesListStoreId"
+        :activities="props.unit.activities.items"
+        :activities-list-routes="props.unit.activities._routes"
+        :prevent-store-init="props.preventStoreInit"
+    />
+</template>
+
+<style scoped></style>

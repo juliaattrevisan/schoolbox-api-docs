@@ -23,10 +23,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{
-    (e: "dragStart"): void;
-    (e: "dragStop"): void;
-}>();
 
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(props.activitiesListStoreId);
@@ -36,11 +32,7 @@ const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 window.Vue.onMounted(() => {
     if (!props.preventStoreInit) {
         activitiesListStore().init(props.activities, props.activitiesListRoutes);
-        activitiesListDragStore().init(
-            activitiesContainerEl as Ref<HTMLElement>,
-            () => emit("dragStart"),
-            () => emit("dragStop"),
-        );
+        activitiesListDragStore().init(activitiesContainerEl as Ref<HTMLElement>);
     }
 });
 </script>
