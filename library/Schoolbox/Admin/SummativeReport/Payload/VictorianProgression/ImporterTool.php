@@ -364,9 +364,10 @@ HELP;
      * @param LockInterface $lock
      * @param string $filename
      * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws LockRefreshException
      * @throws \PDOException
-     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function parseFolders(LockInterface $lock, string $filename): void
@@ -426,27 +427,42 @@ HELP;
 
             /* See if it already exists; if not, spawn it
              */
-            $folder = $this->folderMapper->createModel()
-                ->setName($className)
-                ->setParent($rootFolder)
-                ->setSequence(1);
+            try {
+                $folder = $this->folderMapper->findByCode($classCode);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $folder = $this->folderMapper->createModel()
+                    ->setName($className)
+                    ->setParent($rootFolder)
+                    ->setSequence(1);
 
-            $this->folderMapper->save($folder);
+                $this->folderMapper->save($folder);
 
-            /* Make folder codes
-             */
-            $folderCode = $this->folderCodeMapper->createModel()
-                ->setCode($classCode)
-                ->setFolder($folder);
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: created new folder %s (%s)',
+                    $i,
+                    $className,
+                    $classCode
+                ));
 
-            $this->folderCodeMapper->save($folderCode);
+                /* Make folder codes
+                 */
+                try {
+                    $folderCode = $this->folderCodeMapper->findOneByColumn('code', $classCode);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $folderCode = $this->folderCodeMapper->createModel()
+                        ->setCode($classCode)
+                        ->setFolder($folder);
 
-            $this->getLogger()->debug(sprintf(
-                'Row %s: created new folder %s (%s)',
-                $i,
-                $className,
-                $classCode
-            ));
+                    $this->folderCodeMapper->save($folderCode);
+
+                    $this->getLogger()->debug(sprintf(
+                        'Row %s: created new folder code %s for folder %s',
+                        $i,
+                        $classCode,
+                        $className,
+                    ));
+                }
+            }
 
             /* Remember we saw this
              */
