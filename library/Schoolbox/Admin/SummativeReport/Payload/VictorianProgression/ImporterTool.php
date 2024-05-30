@@ -169,6 +169,12 @@ HELP;
      */
     private function parseCurriculumNodes(LockInterface $lock, string $filename): void
     {
+        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
+        /* Remember ones we've seen
+         */
+        $seen = [];
+
         /* Load a particular file
          */
         $fp = fopen($filename, 'r');
@@ -190,7 +196,7 @@ HELP;
             /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
              */
             if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
-                $this->getLogger()->info(sprintf(
+                $this->getLogger()->debug(sprintf(
                     'Row %s: not for semester 2, found %s. Skipping.',
                     $i,
                     $row[2]
@@ -213,8 +219,50 @@ HELP;
                 $row[8]
             ));
 
-            /* TODO Process nodes
+            /* Seen it? Skip it
              */
+            if (isset($seen[$curriculumCode])) {
+                $this->getLogger()->debug(sprintf(
+                    'Row %s: %s already exists. Skipping.',
+                    $i,
+                    $curriculumCode
+                ));
+
+                continue;
+            }
+
+            /* See if it already exists; if not, spawn it
+             */
+            $node = $curriculumNodeMapper->createModel()
+                ->setCode($curriculumCode)
+                ->setName($row[9])
+                /* Randomly hardcoded for now
+                 */
+                ->setOrder(1)
+                ->setDescription('')
+                ->setEnabled(true)
+                ->setUuid('');
+
+            $curriculumNodeMapper->save($node);
+
+            $seen[$curriculumCode] = $row[9];
+
+            $this->getLogger()->debug(sprintf(
+                'Row %s: created new curriculum node %s "%s"',
+                $i,
+                $curriculumCode,
+                $row[9]
+            ));
+        }
+
+        /* Tell users what you did
+         */
+        foreach ($seen as $code => $name) {
+            $this->getLogger()->info(sprintf(
+                'Created curriculum node %s "%s"',
+                $code,
+                $name
+            ));
         }
 
         fclose($fp);
@@ -252,7 +300,7 @@ HELP;
             /* Ignore anything in column 2 that is about SEM1 - we don't care about those results.
              */
             if (!\in_array($row[2], self::ALLOWED_SEMESTERS, false)) {
-                $this->getLogger()->info(sprintf(
+                $this->getLogger()->debug(sprintf(
                     'Row %s: not for semester 2, found %s. Skipping.',
                     $i,
                     $row[2]
