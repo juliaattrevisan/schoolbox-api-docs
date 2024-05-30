@@ -603,12 +603,18 @@ HELP;
             try {
                 $user = $this->userMapper->findByExternalId($externalId);
             } catch (\Schoolbox\Mapper\Exception $e) {
+                $roleId = 3; // "Senior Students" in sales data
+                $campusId = 1; // "Secondary" campus in sales data
+
                 $user = $this->userMapper->createModel()
                     ->setUsername($externalId)
                     ->setFirstname($externalId)
                     ->setLastname($externalId)
-                    ->setRole($roleMapper->createModel()->setType(Role::STUDENT))
-                    ->setCampusCollection($campusMapper->createCollection())
+                    ->setRole($roleMapper->findById($roleId))
+                    ->setCampusCollection($campusMapper->createCollection()->add($campusMapper->findById($campusId)))
+                    ->setLocalEmail(false)
+                    ->setEportfolioEnable(false)
+                    ->setUseInternalMail(false)
                     ->setEnabled(true);
 
                 if ($this->perform()) {
