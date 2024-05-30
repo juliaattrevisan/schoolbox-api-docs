@@ -10,9 +10,11 @@
 namespace Schoolbox\MobileApp;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 /**
  * Class ServiceMapper
@@ -45,6 +47,8 @@ class ServiceMapper extends Mapper
         $this->uses('web_push_public_key', self::TYPE_STRING);
         $this->joins('cert_hash', Storage\Mapper::class, 'hash', null, null, 'certificate', 'cert');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockFirebaseDeletion']);
     }
 
 
@@ -91,7 +95,21 @@ class ServiceMapper extends Mapper
     public function findAll($options = []): Collection|Service
     {
         $pb = $this->getPredicateBuilder();
-        $pb->notLike('provider', 'Firebase');
+        $pb->notLike('provider', Registry::PROVIDER_FIREBASE);
         return $this->findByPredicates($pb, $options);
+    }
+
+    /**
+     * Pre-soft-delete callback to ensure the Firebase Delivery Provider is not deleted
+     *
+     * @param Service $service
+     * @return bool
+     */
+    public function blockFirebaseDeletion(Service $service): bool
+    {
+        if ($service->getProviderName() === Registry::PROVIDER_FIREBASE) {
+            throw new SchoolboxException(sprintf('The %s Delivery Provider may not be deleted', Registry::PROVIDER_FIREBASE));
+        }
+        return true;
     }
 }
