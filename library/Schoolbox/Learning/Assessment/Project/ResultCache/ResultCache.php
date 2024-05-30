@@ -151,7 +151,10 @@ class ResultCache
         if (null === $model) {
             $model = $this->mapper->createModel()
                 ->setProjectId($project->getId())
-                ->setUser($participant->getUser());
+                ->setUser($participant->getUser())
+                ->setMarker(null)
+                ->setHumanReadableMark(null)
+                ->setNormalisedMark(null);
         }
 
         /* We only care for published feedbacks' marks, not draft ones
@@ -159,22 +162,29 @@ class ResultCache
         $normalisedMark = $participant->generateNormalisedMark(true);
         $humanReadableMark = $participant->generateHumanReadableMark(true);
 
-        if (null !== $normalisedMark) {
-            // Normalised mark must be within the bounds [0, 100].
-            // This restriction should (I think?) be in
-            // `\Schoolbox\Learning\Assessment\Summator\AbstractSummator::summate`
-            // implementations, but I am not sure what the change impact of adding
-            // that restriction at that level is.
-            if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
-                $normalisedMark = IMarkScheme::NORMALISED_MARK_MIN;
+        if (null === $normalisedMark) {
+            if (null !== $model->getNormalisedMark()) {
+                // The new project mark is null, which the cached project mark is non-null.
+                // This situation can arise if the marker removes all non-null marks from a project's sub-assessments.
+                $this->mapper->delete($model);
             }
-            if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
-                $normalisedMark = IMarkScheme::NORMALISED_MARK_MAX;
-            }
+
+            return null;
         }
 
-        // If any part of the mark has changed, update the cache.
-        // Note a new null mark can arise if the marker removes all non-null marks from a project's sub-assessments.
+        // Normalised mark must be within the bounds [0, 100].
+        // This restriction should (I think?) be in
+        // `\Schoolbox\Learning\Assessment\Summator\AbstractSummator::summate`
+        // implementations, but I am not sure what the change impact of adding
+        // that restriction at that level is.
+        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
+            $normalisedMark = IMarkScheme::NORMALISED_MARK_MIN;
+        }
+        if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
+            $normalisedMark = IMarkScheme::NORMALISED_MARK_MAX;
+        }
+
+        // If any part of the mark differs from the cached mark, update the cache.
         if (
             $normalisedMark !== $model->getNormalisedMark() ||
             $humanReadableMark !== $model->getHumanReadableMark() ||
