@@ -83,12 +83,14 @@ class ImporterTool extends CliTool\App
 
     /**
      * Id corresponding to the Victorian Curriculum Progression Points work type
+     * and will be in the lu_work_type table
      */
     private const OPT_WORK_TYPE_ID = 'worktype:';
 
 
     /**
      * Id corresponding to the Victorian Curriculum Progression Points grade group
+     * and will be in the submission_grade_group table
      */
     private const OPT_GRADE_GROUP_ID = 'gradegroup:';
 
@@ -167,6 +169,12 @@ CSV Importer for Penola's Semester 2, 2023 data
 Imports a Semester 2, 2023 csv containing feedbacks that need to get rammed into
 Penola's system. It consumes a csv they provided and probably can't be readily
 reused for anyone else.
+
+--worktype is mandatory and needs to be obtained either from the admin lists ui
+or from the lu_work_type database table.
+
+--gradegroup is mandatory and needs to be obtained either from a Create Due Work
+ui or from the submission_grade_group database table.
 
 Usage: import.php --input=path/to/my/file.csv --assessments --worktype=... --gradegroup=... [--perform]
 
