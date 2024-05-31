@@ -170,7 +170,8 @@ class AssessmentForm
     }
     /**
      * check one of the options to allow submission
-     * options are: worksheet,allow-offline,text-editor,files*/
+     * options are: worksheet, allow-offline, text-editor,files
+     * */
     public function checkSubmissionAllowed($submissionType): self
     {
         $this->tester->canSee('Select the type of submission allowed:');
