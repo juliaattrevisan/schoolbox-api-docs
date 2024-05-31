@@ -107,7 +107,7 @@ class DebugTool extends CliTool\App
 
         $reference = $this->getOpt(self::OPT_SHORT_REFERENCE) ?? $this->getOpt(self::OPT_LONG_REFERENCE);
         if ($reference) {
-            $payload['reference'] = $this->normalizeOptionValue($reference);
+            $payload['references'] = $this->normalizeOptionValue($reference);
         }
 
         $api = new Api(
