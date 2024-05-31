@@ -147,8 +147,8 @@ h3.lrn-report-item-title {
 .lrn input:focus,
 .lrn textarea:focus,
 .lrn select:focus {
-    color: unset;
     background: unset !important;
+    color: unset;
 }
 
 /* Removed left and right paddings on small screens to make it aligned vertically with other elements */
