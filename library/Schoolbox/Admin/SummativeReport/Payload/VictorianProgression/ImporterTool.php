@@ -448,7 +448,7 @@ HELP;
 
         /* Maintain a row counter
          */
-        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -582,7 +582,7 @@ HELP;
 
         /* Maintain a row counter
          */
-        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -702,7 +702,7 @@ HELP;
 
         /* Maintain a row counter
          */
-        for ($i = 2;  $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
