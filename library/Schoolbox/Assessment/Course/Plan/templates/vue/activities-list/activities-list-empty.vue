@@ -6,7 +6,7 @@ const activityLocale = window.sbProps.l10n.get("activity");
 </script>
 
 <template>
-    <i class="icon-criteria"></i>
+    <i class="icon-course"></i>
     <p>No {{ activityLocale.singular() }} have been added to this unit yet</p>
 </template>
 
