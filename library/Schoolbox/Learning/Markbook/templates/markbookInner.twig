@@ -87,7 +87,12 @@
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
                 {% set draftWeightedMean = markbook.draftWeightedMean %}
-                <th class="fixed-left {{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
+                {% set draftsOffClass = (weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) ~ '-bg') %}
+                {% set draftsOnClass = (draftWeightedMean is null ? 'gradient-off' : urgency.marks(markbook.draftNormalisedMean) ~ '-bg') %}
+                <th class="fixed-left student-grade-cell {{ draftsOffClass }}"
+                    {% if draftWeightedMean %}data-student-average{% endif %}
+                    data-off-class="{{ draftsOffClass }}"
+                    data-on-class="{{ draftsOnClass }}">
                     <span data-actual-mark>{{ weightedMean | default('-') }}</span>
                     <span data-draft-mark style="display:none">{{ draftWeightedMean | default('-') }}</span>
                 </th>

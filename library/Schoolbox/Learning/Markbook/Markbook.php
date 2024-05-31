@@ -350,6 +350,14 @@ class Markbook
     }
 
     /**
+     * @return float
+     */
+    public function getDraftNormalisedMean()
+    {
+        return $this->draftNormalisedMean;
+    }
+
+    /**
      * @return string
      */
     public function getWeightedMean()
