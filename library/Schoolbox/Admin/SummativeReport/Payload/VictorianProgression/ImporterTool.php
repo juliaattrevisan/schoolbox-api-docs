@@ -171,6 +171,12 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * @var \Schoolbox\Error\Mapper
+     */
+    private \Schoolbox\Error\Mapper $errorMapper;
+
+
+    /**
      * Feedback creation query
      */
     private const QUERY_FEEDBACK = "
@@ -250,6 +256,7 @@ HELP;
         $this->userMapper = \Schoolbox\UserMapper::getInstance();
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+        $this->errorMapper = \Schoolbox\Error\Mapper::getInstance();
 
         /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
@@ -828,7 +835,7 @@ HELP;
 
                     /* Make it then save it
                      */
-                    $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null);
+                    $assessmentFactory = new Factory($creator, $assessmentData, AssessmentType::TYPE_DUE_WORK, null, $this->errorMapper);
                     $assessment = $assessmentFactory->produce();
 
                     if ($this->perform()) {
