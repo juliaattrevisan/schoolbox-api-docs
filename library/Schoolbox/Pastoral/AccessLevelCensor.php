@@ -282,8 +282,8 @@ class AccessLevelCensor
      */
     public static function inSameCampus(User $viewee, User $viewer): bool
     {
-        $viewerCampuses = $viewee->getCampusCollection();
-        $vieweeCampuses = $viewer->getCampusCollection();
+        $viewerCampuses = $viewer->getCampusCollection();
+        $vieweeCampuses = $viewee->getCampusCollection();
 
         if ($viewerCampuses === null || $vieweeCampuses === null) {
             // All users should be linked to a campus (since the Create User UI validation enforces this),
