@@ -109,6 +109,8 @@ class Controller extends Base
                         // Somehow this was deleted? It shouldn't be, so ignore.
                         continue;
                     }
+
+                    // The decision procedure here must match that in Page/IndexBuilder->buildTypeExpression().
                     $folderResultType = 'page.';
                     if ($folder->hasCourseSpecification()) {
                         $folderResultType .= 'course';
@@ -116,11 +118,14 @@ class Controller extends Base
                         $folderResultType .= 'unit';
                     } elseif (count($folder->getCodes())) {
                         $folderResultType .= 'class';
+                    } elseif ($folder->isGroup()) {
+                        $folderResultType .= 'group';
                     } elseif ($folder->hasHomepage()) {
                         $folderResultType .= 'homepage';
                     } else {
-                        $folderResultType .= 'other';
+                        $folderResultType .= 'folder';
                     }
+
                     $folderResultKey = $folderResultType . '.' . $folderResultId;
                     if (!isset($translatedResults[$folderResultKey])) {
                         // Finagle a raw result for the folder, and hydrate that
