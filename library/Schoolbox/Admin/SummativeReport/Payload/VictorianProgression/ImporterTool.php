@@ -766,7 +766,7 @@ HELP;
             $openDate = '10/10/2024 12:02am';
             $dueDate = '10/10/2024 12:03am';
             $closeDate = '10/10/2024 12:04am';
-            $feedbackPublishedAt = '10/10/2024 12:05am';
+            $feedbackPublishedAt = '2024-10-10 00:05:00';
 
             /* Assume this exists, I guess, for now
              */
@@ -796,6 +796,8 @@ HELP;
 
                     $seen[$externalAssessmentId] = $assessment;
                 } catch (\Schoolbox\Mapper\Exception $e) {
+                    $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
+
                     $assessmentData = [
                         'assessmentType' => AssessmentType::TYPE_DUE_WORK,
                         'context' => $folder,
@@ -806,7 +808,9 @@ HELP;
                         'description' => $description,
                         'creator' => $creator,
                         'weight' => $weight,
-                        'curriculumCodes' => $this->parseCurriculumCode($row[8]),
+                        /* This is literally a csv in a one-element array
+                         */
+                        'curriculumCodes' => [(string)$curriculumNode->getId()],
                         'publishDate' => $publishDate,
                         'openDate' => $openDate,
                         'dueDate' => $dueDate,
@@ -861,10 +865,10 @@ HELP;
                 'reviewRoute' => 'instructor',
                 'mark' => $row[11],
                 'resubmissionRequired' => 0,
-                'createdAt' => $feedbackPublishedAt,
+                'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
                 'publishedAt' => $feedbackPublishedAt,
                 'publishedBy' => $creator->getId(),
-                'updatedAt' => $feedbackPublishedAt
+                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
             ];
 
             if ($this->perform()) {
