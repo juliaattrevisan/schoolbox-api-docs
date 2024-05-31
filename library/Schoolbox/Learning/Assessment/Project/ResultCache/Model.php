@@ -44,14 +44,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The person who marked $user's project
-     *
-     * @var User|null
-     */
-    private ?User $marker = null;
-
-
-    /**
      * A nice text string for humans to read; equivalent to $normalisedMark
      * for the various Mark Types etc.
      *
