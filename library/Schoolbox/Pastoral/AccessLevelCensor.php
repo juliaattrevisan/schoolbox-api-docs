@@ -265,7 +265,6 @@ class AccessLevelCensor
         return $accessLevel;
     }
 
-
     /**
      * Checks whether the user has pastoral moderator permission
      * @param User $user
@@ -283,9 +282,18 @@ class AccessLevelCensor
      */
     public static function inSameCampus(User $viewee, User $viewer): bool
     {
+        $viewerCampuses = $viewer->getCampusCollection();
+        $vieweeCampuses = $viewee->getCampusCollection();
+
+        if ($viewerCampuses === null || $vieweeCampuses === null) {
+            // All users should be linked to a campus (since the Create User UI validation enforces this),
+            // but the database schema does not enforce this rule.  Therefore, we must handle this case.
+            return false;
+        }
+
         return !empty(array_intersect(
-            $viewee->getCampusCollection()->getPropertyValues('id'),
-            $viewer->getCampusCollection()->getPropertyValues('id')
+            $viewerCampuses->getPropertyValues('id'),
+            $vieweeCampuses->getPropertyValues('id')
         ));
     }
 }
