@@ -63,6 +63,9 @@ class FeedbackCest
 
         $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK)
             ->setAcceptSubmission(AssessmentForm::ACCEPT_SUBMISSION_MULTIPLE)
+            ->checkSubmissionAllowed(AssessmentForm::ALLOW_OFFLINE)
+            ->checkSubmissionAllowed(AssessmentForm::TEXT_EDITOR)
+            ->checkSubmissionAllowed(AssessmentForm::TYPE_FILES)
             ->setTitle($dueworkTitle1)
             ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
@@ -135,6 +138,9 @@ class FeedbackCest
 
         $dueworkForm->setWorkType(AssessmentForm::WORKTYPE_ASSESSMENT_TASK)
             ->setAcceptSubmission(AssessmentForm::ACCEPT_SUBMISSION_MULTIPLE)
+            ->checkSubmissionAllowed(AssessmentForm::ALLOW_OFFLINE)
+            ->checkSubmissionAllowed(AssessmentForm::TEXT_EDITOR)
+            ->checkSubmissionAllowed(AssessmentForm::TYPE_FILES)
             ->setTitle($dueworkTitle2)
             ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
