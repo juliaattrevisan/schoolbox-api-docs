@@ -31,7 +31,6 @@ const activitiesContainerEl = window.Vue.ref<HTMLElement | null>(null);
 
 window.Vue.onMounted(() => {
     if (!props.preventStoreInit) {
-        activitiesListStore().init(props.activities, props.activitiesListRoutes);
         activitiesListDragStore().init(activitiesContainerEl as Ref<HTMLElement>);
     }
 });

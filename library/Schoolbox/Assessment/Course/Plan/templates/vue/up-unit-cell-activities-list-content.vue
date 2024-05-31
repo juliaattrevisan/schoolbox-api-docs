@@ -3,6 +3,7 @@
  * A wrapper for the activities list component to integrate it into the unit planner
  */
 import ActivitiesListContent from "./activities-list/activities-list-content.vue";
+import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import type { Unit } from "./unitPlannerTypes";
@@ -19,18 +20,21 @@ const store = useUnitPlannerStore();
 
 const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 
+const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
 
-// Add the drag start and end callbacks to the drag store
-if (!props.preventStoreInit) {
-    activitiesListDragStore().setCallbackOnDragStart(() => {
-        store.updateFocusedUnitCell(props.unit.id, props.column, true);
-    });
-
-    activitiesListDragStore().setCallbackOnDragEnd(() => {
-        store.updateFocusedUnitCell(props.unit.id, props.column, false);
-    });
-}
+window.Vue.onMounted(() => {
+    if (!props.preventStoreInit) {
+        activitiesListStore().init(props.unit.activities.items, props.unit.activities._routes);
+        // Add the drag start and end callbacks to the drag store
+        activitiesListDragStore().setCallbackOnDragStart(() => {
+            store.updateFocusedUnitCell(props.unit.id, props.column, true);
+        });
+        activitiesListDragStore().setCallbackOnDragEnd(() => {
+            store.updateFocusedUnitCell(props.unit.id, props.column, false);
+        });
+    }
+});
 
 /**
  * Is this cell empty?
