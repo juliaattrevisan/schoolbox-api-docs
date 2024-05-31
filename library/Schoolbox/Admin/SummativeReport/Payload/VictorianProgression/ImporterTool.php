@@ -252,7 +252,8 @@ HELP;
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
 
         /** @var AssessmentDataSource $assessmentMapperProxy */
-        $this->assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
 
         /* This person "created" all the feedbacks and assessments
          */
