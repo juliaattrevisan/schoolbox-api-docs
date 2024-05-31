@@ -35,7 +35,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('project_id', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('marker_id', UserMapper::class, 'id', null, null, 'marker', 'marker');
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark', 'humanReadableMark');
         $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalisedMark', 'normalisedMark');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

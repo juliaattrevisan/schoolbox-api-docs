@@ -108,23 +108,18 @@ class ResultCache
      *
      * Shank it straight into a cache db
      *
-     * $marker is the teacher who is currently causing the project's marks
-     * to be aggregated and persisted to the db, overwriting (potentially)
-     * anyone else who might have done the same, at some point in the past
-     *
      * Note: The only public usage of persist() is the Cli Reloader tool
      * which dumps some diagnostic info at you when you use it. You should
      * prefer using refresh() first.
      *
      * @param IAssessable $project
      * @param User        $user
-     * @param User|null   $marker
      * @return Model|null
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function persist(IAssessable $project, \Schoolbox\User $user, ?\Schoolbox\User $marker): ?Model
+    public function persist(IAssessable $project, \Schoolbox\User $user): ?Model
     {
         $participant = $project->getParticipantIfExtant($user);
 
@@ -152,7 +147,6 @@ class ResultCache
             $model = $this->mapper->createModel()
                 ->setProjectId($project->getId())
                 ->setUser($participant->getUser())
-                ->setMarker(null)
                 ->setHumanReadableMark(null)
                 ->setNormalisedMark(null);
         }
@@ -187,13 +181,11 @@ class ResultCache
         // If any part of the mark differs from the cached mark, update the cache.
         if (
             $normalisedMark !== $model->getNormalisedMark() ||
-            $humanReadableMark !== $model->getHumanReadableMark() ||
-            $marker?->getId() !== $model->getMarker()?->getId()
+            $humanReadableMark !== $model->getHumanReadableMark()
         ) {
             /* Shove in all the parts
              */
             $model
-                ->setMarker($marker)
                 ->setHumanReadableMark($humanReadableMark)
                 ->setNormalisedMark($normalisedMark);
 
@@ -269,13 +261,13 @@ class ResultCache
              * If $student is not a participant, or deleted, etc.
              * just exit without doing anything
              */
-            $this->persist($project, $student, null);
+            $this->persist($project, $student);
         } else {
             /* Update everyone associated with this assessment
              */
             foreach ($project->getAllParticipants() as $userId => $participant) {
                 $user = $participant->getUser();
-                $this->persist($project, $user, null);
+                $this->persist($project, $user);
             }
         }
         // Attempt some cache cleaning

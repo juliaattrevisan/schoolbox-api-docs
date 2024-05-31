@@ -110,26 +110,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return User|null
-     */
-    public function getMarker(): ?User
-    {
-        return $this->marker;
-    }
-
-
-    /**
-     * @param User|null $marker
-     * @return Model
-     */
-    public function setMarker(?User $marker): self
-    {
-        $this->marker = $marker;
-        return $this;
-    }
-
-
-    /**
      * @return string|null
      */
     public function getHumanReadableMark(): ?string
