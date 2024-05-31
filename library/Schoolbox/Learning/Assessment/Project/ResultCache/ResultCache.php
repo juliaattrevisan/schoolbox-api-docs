@@ -158,7 +158,7 @@ class ResultCache
 
         if (null === $normalisedMark) {
             if (null !== $model->getNormalisedMark()) {
-                // The new project mark is null, which the cached project mark is non-null.
+                // The new project mark is null, and the cached project mark is non-null.
                 // This situation can arise if the marker removes all non-null marks from a project's sub-assessments.
                 $this->mapper->delete($model);
             }
