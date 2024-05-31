@@ -111,6 +111,10 @@ class Inspector extends CliTool\App
         PollProcessingTool::LOCK_NAME    => 'Poll processing quiz duplication (./tools/learnosity/poll-processing.php)',
         ResetFailedTool::LOCK_NAME       => 'Reset failed quiz duplication (./tools/learnosity/reset-failed.php)',
         AutoscoreAttemptsTool::LOCK_NAME => 'Poll processing quiz attempts (./tools/learnosity/autoscore-attempts.php)',
+
+        /* Penola Semester 2, 2023 Vic Curric Progression Points importer
+         */
+        \Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\ImporterTool::LOCK_NAME => 'Penola Semester 2, 2023 Progression Points CSV Importer (./tools/custom/pcc/import.php)',
     ];
 
 
