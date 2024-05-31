@@ -29,15 +29,6 @@ export type Activity = {
     } | null;
 };
 
-export type ActivityTypeLocale = {
-    project: {
-        proper: string;
-    };
-    dueWork: {
-        proper: string;
-    };
-};
-
 export type ActivitiesListRoutes = {
     create: string | null;
     reorder: string | null;

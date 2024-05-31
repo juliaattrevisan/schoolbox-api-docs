@@ -5,7 +5,9 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
+import type { DefineComponent } from "vue";
 import type { Editor } from "@js/editor/types/editorTypes";
+import type { RosettaStone } from "@js/terminology/rosettaStone";
 
 declare global {
     interface Window {
@@ -28,6 +30,7 @@ declare global {
             imageSlideshows: { [key: string]: any };
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
+            l10n: RosettaStone;
             firebaseApps: Array<{
                 appIdentifier: string;
                 publicConfiguration: { [key: string]: any };
@@ -42,6 +45,7 @@ declare global {
         STORYBOOK_ENV: string;
         Vue: typeof Vue;
     }
+
     interface JQuery {
         // we can add any extra methods we have extended onto the JQuery object here
         /**
@@ -54,6 +58,7 @@ declare global {
 
     // Fix types when importing .vue files and using with window.Vue.createApp
     declare module "*.vue" {
-        export default Vue.defineComponent;
+        const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>;
+        export default component;
     }
 }

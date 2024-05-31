@@ -14,6 +14,8 @@ interface Props {
 const props = defineProps<Props>();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
+
+const activityLocale = window.sbProps.l10n.get("activity");
 </script>
 
 <template>
@@ -21,7 +23,7 @@ const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
         <section>
             <sbx-pop-out
                 :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
-                button-text="Create Activity"
+                :button-text="`Create ${activityLocale.proper()}`"
                 move-to="#unitplanner-dropdown-container"
                 is-component-action
             ></sbx-pop-out>
@@ -29,7 +31,6 @@ const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
                 :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
                 :create-route="activitiesListStore().routes.create!"
                 :lti-assessments-enabled="activitiesListGlobalStore.ltiAssessmentsEnabled"
-                :activity-type-locale="activitiesListGlobalStore.locale"
             ></activities-list-action-create-inner>
         </section>
     </div>

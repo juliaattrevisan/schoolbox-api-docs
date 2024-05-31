@@ -9,6 +9,17 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+/**
+ * Is this cell empty?
+ * Used by the parent component to determine whether to show the empty state
+ */
+const isEmpty = window.Vue.computed(() => {
+    return props.rubricCapabilities.length === 0;
+});
+
+// Allow the parent component to identify if the cell is empty
+defineExpose({ isEmpty });
 </script>
 
 <template>

@@ -136,8 +136,15 @@ $(function() {
         $("#manage-caps-error").slideUp();
 
         $.post($(this).attr('action'), $(this).serialize(), null, 'json').done(function(response) {
-            // Redirect to the homepage we came from
-            window.location.href = response.redirect;
+            // If we have a ?returnUrl $_GET param, use it
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get('returnUrl');
+            if (returnUrl !== null) {
+                window.location.href = atob(returnUrl);
+            } else {
+                // Otherwise, redirect to the homepage we came from
+                window.location.href = response.redirect;
+            }
         }).fail(function(response) {
             $button.val(originalButtonText);
             $button.removeAttr("disabled");

@@ -223,6 +223,7 @@ class Controller extends Base
             // This saves needing to manipulate the initial data on the frontend on the first mount
             $textboxTemplate[] = [
                 'heading' => $heading,
+                'emptyStateMessage' => $textboxComponent->getConfigByKey('emptyStateMessage')->getValue(),
             ];
             $textboxKey[] = strtolower($heading);
         }
@@ -239,20 +240,28 @@ class Controller extends Base
             $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
         }
 
-        // Locales required to translate the activity types
-        $activityTypeLocale = [
-            'project' => [
-                'proper' => $this->rosettaStone->translate('project', false, true),
-            ],
-            'dueWork' => [
-                'proper' => $this->rosettaStone->translate('dueWork', false, true),
-            ],
+        // Locales required to translate terms in the activities list components
+        $activityComponentLocales = [
+            $this->rosettaStone->__get('project')->toArray(),
+            $this->rosettaStone->__get('dueWork')->toArray(),
+            $this->rosettaStone->__get('activity')->toArray(),
+        ];
+
+        // Locales required to translate terms in the rubric capability list components
+        $rubricCapabilityComponentLocales = [
+            $this->rosettaStone->__get('rubricGroup')->toArray(),
+        ];
+
+        // All locales required by the unit planner (compile the above together)
+        $unitPlannerLocales = [
+            ...$activityComponentLocales,
+            ...$rubricCapabilityComponentLocales,
         ];
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'activityTypeLocale' => $activityTypeLocale,
+            'unitPlannerLocales' => $unitPlannerLocales,
             'template'  => [
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumnTemplate,

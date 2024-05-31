@@ -3,9 +3,7 @@
  * The main component for the unit planner
  */
 import type { Ref } from "vue";
-import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
-import Toast from "@schoolboxVue/components/toast.vue";
-import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
+import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
@@ -14,14 +12,13 @@ import UpHeader from "./up-header.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpCurriculum from "./up-curriculum.vue";
-import ActivitiesListDeleteModal from "./activities-list-delete-modal.vue";
+import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
 interface Props {
     courseId: number;
     folderId: number;
     courseTitle: string;
     units: Unit[];
-    activityTypeLocale: ActivityTypeLocale;
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
@@ -123,7 +120,7 @@ window.Vue.watch(
 
 window.Vue.onMounted(() => {
     store.init(props.courseId, props.units, props.template);
-    activitiesListGlobalStore.init(props.activityTypeLocale, props.ltiAssessmentsEnabled);
+    activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.

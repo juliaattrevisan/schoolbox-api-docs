@@ -58,6 +58,10 @@ export type UnitTemplateComponent = {
     filter?: Node; // the node selected as the Curriculum Tree Filter on the Curriculum Overview component, if not selected, can be set to null
 };
 
+export interface UnitTemplateTextboxComponent extends UnitTemplateComponent {
+    emptyStateMessage: string;
+}
+
 /**
  * All components that have been set on a Unit template,
  * to help distinguish which component are linked to the Unit template,
@@ -65,5 +69,5 @@ export type UnitTemplateComponent = {
  */
 export type UnitTemplate = {
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
-    textboxes: UnitTemplateComponent[]; // Textbox components
+    textboxes: UnitTemplateTextboxComponent[]; // Textbox components
 };

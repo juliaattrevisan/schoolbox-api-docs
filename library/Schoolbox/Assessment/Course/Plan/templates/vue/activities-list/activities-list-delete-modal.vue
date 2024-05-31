@@ -21,6 +21,8 @@ const deleteButtonText = window.Vue.computed(() =>
  * To prevent the user from moving away from the modal while processing is taking place
  */
 const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore.isProcessing);
+
+const activityLocale = window.sbProps.l10n.get("activity");
 </script>
 
 <template>
@@ -32,7 +34,10 @@ const isModalDisabled = window.Vue.computed(() => activitiesListDeleteModalStore
         <template #sequence-1>
             <h2>Please Confirm</h2>
             <p>
-                Are you sure you wish to delete this activity? You will be unable to import this activity into classes.
+                Are you sure you wish to delete this
+                {{ activityLocale.singular() }}? You will be unable to import this
+                {{ activityLocale.singular() }}
+                into classes.
             </p>
             <ul class="flex-list">
                 <li>

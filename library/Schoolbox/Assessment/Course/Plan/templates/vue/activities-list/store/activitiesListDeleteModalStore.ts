@@ -3,13 +3,11 @@
  */
 
 import { defineStore } from "pinia";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
-import { useActivitiesListGlobalStore } from "./activitiesListGlobalStore";
 
 export const useActivitiesListDeleteModalStore = defineStore("activitiesListDeleteModalStore", () => {
-    const globalStore = useActivitiesListGlobalStore();
-
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const activityToDelete = window.Vue.ref<Activity | null>(null); // The activity to be deleted.
@@ -49,8 +47,7 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
             return; // user does not have access to delete
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        globalStore.toastEl!.activate("Deleting...");
+        activate("Deleting...");
         isProcessing.value = true;
 
         try {
@@ -63,14 +60,12 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
                 throw new Error(await extractErrorMessage(response));
             }
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-            globalStore.toastEl!.timeout(error, false, 2000);
+            timeout({ text: error as string, isSuccess: false });
             isProcessing.value = false;
             throw error;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- toasts are untyped
-        globalStore.toastEl!.timeout("Activity Deleted", true, 5000);
+        timeout({ text: "Activity Deleted", isSuccess: true });
 
         callbackOnDeleted.value();
         close();

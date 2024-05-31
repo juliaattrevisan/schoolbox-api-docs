@@ -5,28 +5,31 @@
  * sbx-pop-out is not created here, as it may need to be customised by the parent component
  */
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import type { ActivityTypeLocale } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     contentId: string;
     createRoute: string;
     ltiAssessmentsEnabled: boolean;
-    activityTypeLocale: ActivityTypeLocale;
 }
 
 const props = defineProps<Props>();
+
+const activityTypeLocale = {
+    project: window.sbProps.l10n.get("project"),
+    dueWork: window.sbProps.l10n.get("dueWork"),
+};
 </script>
 
 <template>
     <ul :id="props.contentId" class="f-dropdown" data-dropdown-content>
         <li>
             <a :href="getReturnUrl(`${props.createRoute}?type=project`)" class="icon-project">
-                {{ props.activityTypeLocale.project.proper }}
+                {{ activityTypeLocale.project.proper() }}
             </a>
         </li>
         <li>
             <a :href="getReturnUrl(`${props.createRoute}?type=dueWork`)" class="icon-due-work">
-                {{ props.activityTypeLocale.dueWork.proper }}
+                {{ activityTypeLocale.dueWork.proper() }}
             </a>
         </li>
         <li>

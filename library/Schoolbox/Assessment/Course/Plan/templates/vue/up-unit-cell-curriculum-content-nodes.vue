@@ -9,6 +9,7 @@ import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
 
@@ -20,6 +21,11 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    onHasFilteredNodeChange: [value: boolean];
+}>();
+
+const unitPlannerStore = useUnitPlannerStore(); // to allow us to reflect our changes in back into unit planner store
 const curriculumStore = useUnitPlannerCurriculumStore();
 const folderNodesStore = useFolderNodesStore(props.folderId, props.component.componentId);
 
@@ -49,12 +55,41 @@ const { ignoreUpdates } = watchIgnorable(
 );
 
 /**
+ * To keep the unit planner's selected nodes in sync with the folder nodes
+ * when the folder nodes are updated
+ */
+window.Vue.watch(
+    () => folderNodesStore().selectedNodes,
+    () => {
+        const storeUnit = unitPlannerStore.units.find((unit) => unit.folderId === props.folderId);
+        if (storeUnit) {
+            storeUnit.curriculum.selectedNodes = folderNodesStore().selectedNodes;
+        }
+    },
+    { deep: true },
+);
+
+/**
+ * To keep the unit planner's empty state in sync with when this component has any filtered nodes
+ */
+window.Vue.watch(
+    () => folderNodesStore().filteredNodes,
+    () => {
+        emit("onHasFilteredNodeChange", folderNodesStore().hasFilteredNodes);
+    },
+    { deep: true },
+);
+
+/**
  * To ensure the entire node tree can be displayed within the unit cell
  */
 window.Vue.onMounted(async () => {
     if (!folderNodesStore().hasLoaded) {
         await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     }
+
+    // Let the parent know if we have any filtered nodes or not
+    emit("onHasFilteredNodeChange", folderNodesStore().hasFilteredNodes);
 });
 </script>
 

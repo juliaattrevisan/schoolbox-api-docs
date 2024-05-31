@@ -43,10 +43,14 @@ interface Tab extends TabConfig {
 const tabConfig: TabConfig[] = [
     { id: "all", label: "All", columnTypeIDs: Object.values(ColumnType) },
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
-    { id: "activities", label: "Learning Activities", columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES] },
+    {
+        id: "activities",
+        label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
+        columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES],
+    },
     {
         id: "rubric-capabilities",
-        label: "Rubric Capabilities",
+        label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.RUBRIC_CAPABILITIES],
     },
     {
@@ -90,9 +94,15 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
-    [ColumnType.ACTIVITIES]: { label: "Learning Activities", fixedLeft: false },
-    [ColumnType.RUBRIC_CAPABILITIES]: { label: "Rubric Capabilities", fixedLeft: false },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: "Curriculum Overview", fixedLeft: false },
+    [ColumnType.ACTIVITIES]: {
+        label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
+        fixedLeft: false,
+    },
+    [ColumnType.RUBRIC_CAPABILITIES]: {
+        label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
+        fixedLeft: false,
+    },
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
 };
 
 /**

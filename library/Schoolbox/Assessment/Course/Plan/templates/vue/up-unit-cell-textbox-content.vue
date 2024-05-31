@@ -19,9 +19,13 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
+const storeUnit = window.Vue.computed(() => {
+    return store.units.find((unit) => unit.id === props.unit.id);
+});
+
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+    return (storeUnit.value?.textboxes[props.column.label].id || 0) >= 0;
 });
 
 const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].body);
@@ -48,8 +52,22 @@ function focusEditor() {
     });
 }
 
-// Allow the parent component to focus the editor
-defineExpose({ focusEditor });
+/**
+ * Is this cell empty?
+ * Used by the parent component to determine whether to show the empty state
+ */
+const isEmpty = window.Vue.computed(() => {
+    // If there is unsaved content, the cell is not empty
+    if (textboxStore.unsavedTextboxes[props.unit.id]?.[props.column.id] !== undefined) {
+        return false;
+    }
+
+    // Otherwise, the cell is empty if there is no content in the body yet
+    return editorContent.value === "";
+});
+
+// Allow the parent component to focus the editor and identify if the cell is empty
+defineExpose({ focusEditor, isEmpty });
 
 /**
  * When a new editor is created
@@ -66,7 +84,8 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
         store.updateFocusedUnitCell(props.unit.id, props.column, true);
         window.Vue.nextTick()
             .then(() => {
-                textboxStore.updateTextboxContent(props.unit.id, props.column, editor.getData());
+                editorContent.value = editor.getData();
+                textboxStore.updateTextboxContent(props.unit.id, props.column, editorContent.value);
             })
             .catch(() => {
                 // noop

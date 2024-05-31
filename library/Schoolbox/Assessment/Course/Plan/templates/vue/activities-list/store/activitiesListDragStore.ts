@@ -36,23 +36,31 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
             offsetY: number;
         } | null>(null);
 
+        /**
+         * store any passed through properties
+         * @param { Ref<HTMLElement> } $activitiesContainerEl - ref to the element containing the activities
+         */
+        function init($activitiesContainerEl: Ref<HTMLElement>) {
+            activitiesContainerEl = $activitiesContainerEl;
+        }
+
         let callbackOnDragStart: () => void;
         let callbackOnDragEnd: () => void;
 
         /**
-         * store any passed through properties
-         * @param { Ref<HTMLElement> } $activitiesContainerEl - ref to the element containing the activities
-         * @param { () => void } $callbackOnDragStart - callback function to be called on drag start
-         * @param { () => void } $callbackOnDragEnd - callback function to be called on drag end
+         * Set the callback function to be called on drag start
+         * @param { () => void } callback - the callback function
          */
-        function init(
-            $activitiesContainerEl: Ref<HTMLElement>,
-            $callbackOnDragStart: () => void,
-            $callbackOnDragEnd: () => void,
-        ) {
-            activitiesContainerEl = $activitiesContainerEl;
-            callbackOnDragStart = $callbackOnDragStart;
-            callbackOnDragEnd = $callbackOnDragEnd;
+        function setCallbackOnDragStart(callback: () => void) {
+            callbackOnDragStart = callback;
+        }
+
+        /**
+         * Set the callback function to be called on drag end
+         * @param { () => void } callback - the callback function
+         */
+        function setCallbackOnDragEnd(callback: () => void) {
+            callbackOnDragEnd = callback;
         }
 
         /**
@@ -216,6 +224,8 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         return {
             init,
+            setCallbackOnDragStart,
+            setCallbackOnDragEnd,
             activityEls,
             setActivityEl,
             unsetActivityEl,

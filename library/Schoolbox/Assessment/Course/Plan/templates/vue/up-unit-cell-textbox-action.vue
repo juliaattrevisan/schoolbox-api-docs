@@ -54,6 +54,9 @@ async function onCreateClicked() {
     onModifyClicked();
 }
 
+// Allow the parent component to create the textbox
+defineExpose({ onCreateClicked });
+
 /**
  * When the save button is clicked.
  */
