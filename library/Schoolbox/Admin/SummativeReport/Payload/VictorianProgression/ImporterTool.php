@@ -747,6 +747,8 @@ HELP;
              */
             $humanReadableMark = trim($row[11]);
 
+            /* TODO Use the const from the Vic Progression payload that's in a different PR
+             */
             if (!\in_array($humanReadableMark, [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5], false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
