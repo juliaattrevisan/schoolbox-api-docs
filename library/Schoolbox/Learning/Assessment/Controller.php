@@ -253,25 +253,26 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
-        // To be able to view the current student policy if enabling within the submission type
-        $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+        if (AssessmentType::TYPE_DUE_WORK === $type) {
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
-        // To determine whether to display the interactive worksheet option
-        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
 
-        $kamiFiles = array_map(fn ($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
+            $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
 
 
-        // To be able to add a file to use as the worksheet
-        $data['attachzoneWorksheet'] = (new Zone('worksheet'))
-            ->setMulti(false)
-            ->setAttachPrompt('Attach a worksheet')
-            ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(",", $kamiFiles))
-            ->setFilesystemContext('worksheet')
-            ->setFileVar('worksheet')
-            ->getTwigContext();
-
+            // To be able to add a file to use as the worksheet
+            $data['attachzoneWorksheet'] = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                ->setFileVar('worksheet')
+                ->getTwigContext();
+        }
         /* A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
@@ -473,27 +474,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
-        // To be able to view the current student policy if enabling within the submission type
-        $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+        if ($assessment instanceof DueWork\Model) {
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
-        // To determine whether to display the interactive worksheet option
-        $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
 
-        $kamiFiles = array_map(fn ($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
+            $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
 
-        $zone = (new Zone('worksheet'))
-            ->setMulti(false)
-            ->setAttachPrompt('Attach a worksheet')
-            ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(",", $kamiFiles))
-            ->setFilesystemContext('worksheet')
-            ->setReadOnly($courseManagedFields->isReadonly()) //
-            ->setFileVar('worksheet');
-        if ($assessment->getKamiFile()) {
-            $zone = $zone->attachFiles([$assessment->getKamiFile()]);
+            $zone = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                ->setReadOnly($courseManagedFields->isReadonly()) //
+                ->setFileVar('worksheet');
+            if ($assessment->getKamiFile()) {
+                $zone = $zone->attachFiles([$assessment->getKamiFile()]);
+            }
+            $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
-        $data['attachzoneWorksheet'] = $zone->getTwigContext();
-
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
 
