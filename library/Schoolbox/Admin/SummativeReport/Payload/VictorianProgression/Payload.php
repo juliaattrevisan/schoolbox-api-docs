@@ -260,6 +260,14 @@ class Payload
             );
         }
 
+        /* Apparently this $struct can come out in some random old order
+         * despite the ORDER BY statements; enforce an alphabetical order
+         * upon the parent nodes. Also, for consistency between reports.
+         */
+        usort($data, static function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
@@ -399,14 +407,6 @@ class Payload
                 }
             }
         }
-
-        /* Apparently this $struct can come out in some random old order
-         * despite the ORDER BY statements; enforce an alphabetical order
-         * upon the parent nodes. Also, for consistency between reports.
-         */
-        usort($struct, static function ($a, $b) {
-            return strnatcasecmp($a['name'], $b['name']);
-        });
 
         return $struct;
     }
