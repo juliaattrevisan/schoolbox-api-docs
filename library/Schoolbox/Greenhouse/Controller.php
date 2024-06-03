@@ -9,7 +9,7 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Admin\SummativeReport\Payload;
+use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Twig\Error\Error;
 
 /**
@@ -46,8 +46,8 @@ class Controller extends Base
         $classCode = $this->requestQuery->get('code');
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new Payload\VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $classCode),
-            'audit' => (new Payload\VictorianProgression\Auditor($workTypeMapper))->audit()
+            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $classCode),
+            'audit' => (new VictorianProgression\Auditor($workTypeMapper))->audit()
         ]);
     }
 }
