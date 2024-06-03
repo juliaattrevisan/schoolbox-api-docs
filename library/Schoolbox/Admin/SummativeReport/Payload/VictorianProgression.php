@@ -51,7 +51,7 @@ class VictorianProgression
      *     - Work Type Id must correspond to our admin lists; one must have the name defined byy WORK_TYPE_NAME
      *     - assessment feedback must be given to the student specified, not any other student
      *     - assessment feedback must be published (ignore drafts)
-     *     - assessment feedback must be published between dates corresponding within a chosen academic period
+     *     - assessment due date must be between dates corresponding within a chosen academic period
      *     - assessment must be using Letter Grade mark type, otherwise they can't choose the values properly
      */
     private const QUERY = "
@@ -81,7 +81,7 @@ class VictorianProgression
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
         AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
-        AND vaf.published_at BETWEEN :startDate AND :endDate    -- specify dates of academic period(s) in use
+        AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
         AND (
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
