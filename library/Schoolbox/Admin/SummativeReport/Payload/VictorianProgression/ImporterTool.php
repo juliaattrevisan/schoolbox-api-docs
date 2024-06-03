@@ -262,10 +262,6 @@ HELP;
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         $this->assessmentMapperProxy = $assessmentMapperProxy;
 
-        /* This person "created" all the feedbacks and assessments
-         */
-        $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
-
         /* Optionally arbitrarily pre-make curriculum nodes if they don't already exist
          */
         if ($this->getOpt(self::OPT_MAKE_CNODES)) {
@@ -288,6 +284,24 @@ HELP;
          * This is why you're here!
          */
         if ($this->getOpt(self::OPT_MAKE_ASSESSMENTS)) {
+            /* Work Type Id is required for this to work
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_WORK_TYPE_ID))) {
+                $this->getLogger()->error('No work type id specified.');
+                exit;
+            }
+
+            /* Grade Group Id is required for this to work
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_GRADE_GROUP_ID))) {
+                $this->getLogger()->error('No grade group id specified.');
+                exit;
+            }
+
+            /* This person "created" all the feedbacks and assessments
+             */
+            $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
+
             $this->parseFeedbacks($lock, $filename, $creator);
         }
 
@@ -733,6 +747,8 @@ HELP;
              */
             $humanReadableMark = trim($row[11]);
 
+            /* TODO Use the const from the Vic Progression payload that's in a different PR
+             */
             if (!\in_array($humanReadableMark, [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5], false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
@@ -774,7 +790,11 @@ HELP;
             $openDate = '10/10/2024 12:02am';
             $dueDate = '10/10/2024 12:03am';
             $closeDate = '10/10/2024 12:04am';
-            $feedbackPublishedAt = '2024-10-10 00:05:00';
+
+            /* Enforce feedbacks at midnight (no times specified)
+             */
+            $modified = sprintf('%s  00:00:00', trim($row[12]));
+            $feedbackPublishedAt = (new \Alaress_Date_Format($modified, 'd/m/Y H:i:s'))->getDatabase();
 
             /* Assume this exists, I guess, for now
              */
