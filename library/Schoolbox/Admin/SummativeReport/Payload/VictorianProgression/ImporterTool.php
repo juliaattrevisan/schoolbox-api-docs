@@ -262,10 +262,6 @@ HELP;
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         $this->assessmentMapperProxy = $assessmentMapperProxy;
 
-        /* This person "created" all the feedbacks and assessments
-         */
-        $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
-
         /* Optionally arbitrarily pre-make curriculum nodes if they don't already exist
          */
         if ($this->getOpt(self::OPT_MAKE_CNODES)) {
@@ -301,6 +297,10 @@ HELP;
                 $this->getLogger()->error('No grade group id specified.');
                 exit;
             }
+
+            /* This person "created" all the feedbacks and assessments
+             */
+            $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
 
             $this->parseFeedbacks($lock, $filename, $creator);
         }
