@@ -605,6 +605,7 @@
                             element?.addEventListener('click', () => {
                                 Notification.requestPermission().then((permission) => {
                                     if (permission === 'granted') {
+                                        window.localStorage.setItem("notification", "requesting");
                                         document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                             element.setAttribute('disabled', true);
                                         });
@@ -622,6 +623,7 @@
                                             }),
                                         );
                                     } else if (permission === 'denied') {
+                                        window.localStorage.setItem("notification", "denied");
                                         {% if config.debug_mode %}
                                         console.warn('Notification permission denied');
                                         {% endif %}
@@ -648,6 +650,32 @@
                                 });
                             });
                         });
+                        {# sometimes the service worker is not running when we prompt attempt to register notifications, try again if we failed... #}
+                        reAuthNotif = function () {
+                            let winNotif = window.localStorage.getItem("notification");
+                            if (['requesting','registering'].includes(winNotif)) {
+                                document.dispatchEvent(
+                                    new CustomEvent("PWA_NOTIFICATION_ALLOW", {
+                                        detail: {
+                                            debug: Boolean({{ config.debug_mode }}),
+                                            deviceId: deviceId,
+                                        },
+                                    }),
+                                );
+                            }
+                        }
+
+                        {# frontend people, I was trying to get this to load on page load, or when the page has finished loading,
+                         # so we can hit the event listener in the firebase file at the bottom of the file.
+                         # This is calling the above function which calls the firebase event, but is not passing through the data,
+                         # and there is probably a better way of doing this anyhow...
+                        #}
+                        if (document.readyState !== 'loading') {
+                            reAuthNotif();
+                        } else {
+                            document.addEventListener('DOMContentLoaded', reAuthNotif);
+                        }
+
                     } else {
                         // No Notifications, don't even give the option
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
