@@ -108,23 +108,18 @@ class ResultCache
      *
      * Shank it straight into a cache db
      *
-     * $marker is the teacher who is currently causing the project's marks
-     * to be aggregated and persisted to the db, overwriting (potentially)
-     * anyone else who might have done the same, at some point in the past
-     *
      * Note: The only public usage of persist() is the Cli Reloader tool
      * which dumps some diagnostic info at you when you use it. You should
      * prefer using refresh() first.
      *
      * @param IAssessable $project
      * @param User        $user
-     * @param User|null   $marker
      * @return Model|null
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function persist(IAssessable $project, \Schoolbox\User $user, ?\Schoolbox\User $marker): ?Model
+    public function persist(IAssessable $project, \Schoolbox\User $user): ?Model
     {
         $participant = $project->getParticipantIfExtant($user);
 
@@ -151,7 +146,9 @@ class ResultCache
         if (null === $model) {
             $model = $this->mapper->createModel()
                 ->setProjectId($project->getId())
-                ->setUser($participant->getUser());
+                ->setUser($participant->getUser())
+                ->setHumanReadableMark(null)
+                ->setNormalisedMark(null);
         }
 
         /* We only care for published feedbacks' marks, not draft ones
@@ -160,7 +157,12 @@ class ResultCache
         $humanReadableMark = $participant->generateHumanReadableMark(true);
 
         if (null === $normalisedMark) {
-            // ignore null results these have no feedback, so shouldn't persist to the db..
+            if (null !== $model->getNormalisedMark()) {
+                // The new project mark is null, and the cached project mark is non-null.
+                // This situation can arise if the marker removes all non-null marks from a project's sub-assessments.
+                $this->mapper->delete($model);
+            }
+
             return null;
         }
 
@@ -176,15 +178,20 @@ class ResultCache
             $normalisedMark = IMarkScheme::NORMALISED_MARK_MAX;
         }
 
-        /* Shove in all the parts
-         */
-        $model
-            ->setMarker($marker)
-            ->setHumanReadableMark($humanReadableMark)
-            ->setNormalisedMark($normalisedMark);
+        // If any part of the mark differs from the cached mark, update the cache.
+        if (
+            $normalisedMark !== $model->getNormalisedMark() ||
+            $humanReadableMark !== $model->getHumanReadableMark()
+        ) {
+            /* Shove in all the parts
+             */
+            $model
+                ->setHumanReadableMark($humanReadableMark)
+                ->setNormalisedMark($normalisedMark);
 
-        if ($this->perform) {
-            $this->mapper->save($model);
+            if ($this->perform) {
+                $this->mapper->save($model);
+            }
         }
 
         return $model;
@@ -254,13 +261,13 @@ class ResultCache
              * If $student is not a participant, or deleted, etc.
              * just exit without doing anything
              */
-            $this->persist($project, $student, null);
+            $this->persist($project, $student);
         } else {
             /* Update everyone associated with this assessment
              */
             foreach ($project->getAllParticipants() as $userId => $participant) {
                 $user = $participant->getUser();
-                $this->persist($project, $user, null);
+                $this->persist($project, $user);
             }
         }
         // Attempt some cache cleaning

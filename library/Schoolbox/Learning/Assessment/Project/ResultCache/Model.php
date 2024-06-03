@@ -44,14 +44,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The person who marked $user's project
-     *
-     * @var User|null
-     */
-    private ?User $marker = null;
-
-
-    /**
      * A nice text string for humans to read; equivalent to $normalisedMark
      * for the various Mark Types etc.
      *
@@ -105,26 +97,6 @@ class Model implements ISoftDeletable
     public function setProjectId(int $projectId): self
     {
         $this->projectId = $projectId;
-        return $this;
-    }
-
-
-    /**
-     * @return User|null
-     */
-    public function getMarker(): ?User
-    {
-        return $this->marker;
-    }
-
-
-    /**
-     * @param User|null $marker
-     * @return Model
-     */
-    public function setMarker(?User $marker): self
-    {
-        $this->marker = $marker;
         return $this;
     }
 

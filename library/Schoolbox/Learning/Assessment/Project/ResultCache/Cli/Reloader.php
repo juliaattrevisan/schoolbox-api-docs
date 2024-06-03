@@ -149,11 +149,6 @@ HELP;
         $projectResultCacheMapper = ResultCache\Mapper::getInstance();
         $projectResultCache = (new ResultCache\ResultCache($projectResultCacheMapper))->setPerform($this->perform());
 
-        /* TEMPORARY MARKER GUY
-         * TODO: What are we gonna do with multiple teachers marking parts of a project
-         */
-        $marker = null;
-
         try {
             foreach ($assessmentStatement->fetchAll() as $row) {
                 $this->refreshLock($lock);
@@ -207,7 +202,7 @@ HELP;
                         continue;
                     }
 
-                    $outcome = $projectResultCache->persist($project, $user, $marker);
+                    $outcome = $projectResultCache->persist($project, $user);
 
                     if (null === $outcome) {
                         /* This use case shouldn't emerge in this tool, but the
