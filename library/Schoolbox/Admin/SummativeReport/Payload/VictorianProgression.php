@@ -85,7 +85,51 @@ class VictorianProgression
         AND (
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
-        )  
+        )
+        %s
+        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
+    ";
+
+
+    /**
+     * A subvariant of the megaquery above, but filtered to a particular class,
+     * based on its folder code(s)
+     */
+    private const CLASS_QUERY = "
+        SELECT
+            cn2.id AS parent_node_id,
+            cn2.name AS parent_node,
+            cn1.id AS curriculum_node_id,
+            cn1.name AS curriculum_node,
+            a.id AS assessment_id,
+            a.title,
+            a.due_date,
+            vaf.feedback_table,
+            vaf.feedback_id,
+            vaf.student_id,
+            vaf.published_at,
+            COALESCE(sr.mark, aa.mark) AS mark
+        FROM curriculum_node_for_assessment cnoa
+        INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
+        LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
+        LEFT JOIN assessment a ON cnoa.assessment_id = a.id
+        LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
+        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
+        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
+        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
+        LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
+        LEFT JOIN folder_code fc ON fc.folder_id = mvar.folder_id
+        WHERE a.due_date IS NOT NULL
+        AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
+        AND vaf.student_id = :studentId                         -- filter to actual student
+        AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
+        AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
+        AND (
+            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
+            OR quiz.grade_group_id IS NOT NULL
+        )
+        AND fc.code = :classCode
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
     ";
 
@@ -130,7 +174,7 @@ class VictorianProgression
      *
      * @throws \DomainException
      */
-    private function setup(): void
+    private function setup(?string $classCode): void
     {
         /* We've already been here, there's nothing to do
          */
@@ -140,7 +184,13 @@ class VictorianProgression
 
         /* Prepare megaquery
          */
-        $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
+        $query = self::QUERY;
+
+        if ($classCode) {
+            $query = self::CLASS_QUERY;
+        }
+
+        $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare($query);
 
         /* Find the Work Type Id first, by name for lack of a better way
          */
@@ -164,18 +214,18 @@ class VictorianProgression
      * Facade method for generateOne()
      *
      * @param User $student
+     * @param string|null $classCode
      * @return array
      * @throws Exception
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
      */
-    public function generate(\Schoolbox\User $student): array
+    public function generate(\Schoolbox\User $student, ?string $classCode): array
     {
         /* Determine what current academic period we're in
          */
         $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
-
 
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
@@ -183,6 +233,7 @@ class VictorianProgression
         $data = $this->generateOne(
             self::TYPE_CURRENT,
             $student,
+            $classCode,
             $currentAcademicPeriod->getStart(),
             $currentAcademicPeriod->getDisplayFinish()
         );
@@ -203,6 +254,7 @@ class VictorianProgression
             $data = $this->generateOne(
                 self::TYPE_PREVIOUS,
                 $student,
+                $classCode,
                 $previousAcademicPeriod->getStart(),
                 $previousAcademicPeriod->getDisplayFinish(),
                 $data
@@ -232,6 +284,7 @@ class VictorianProgression
      *
      * @param string $type
      * @param User $student
+     * @param string|null $classCode
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @param array $struct
@@ -242,6 +295,7 @@ class VictorianProgression
     private function generateOne(
         string $type,
         \Schoolbox\User $student,
+        ?string $classCode,
         \Alaress_Date_Format $startDate,
         \Alaress_Date_Format $endDate,
         array $struct = []
@@ -249,7 +303,7 @@ class VictorianProgression
         /* Setup step is mandatory; execute as singleton
          */
         if (!$this->setup) {
-            $this->setup();
+            $this->setup($classCode);
         }
 
         /* Only accept valid types
@@ -265,12 +319,20 @@ class VictorianProgression
 
         /* Let's go
          */
-        $this->payloadStatement->execute([
+        $params = [
             'workTypeId' => $this->workTypeId,
             'studentId' => $student->getId(),
             'startDate' => $startDate->getDatabaseDate(),
             'endDate' => $endDate->getDatabaseDate()
-        ]);
+        ];
+
+        /* Optional classCode filter
+         */
+        if ($classCode) {
+            $params['classCode'] = $classCode;
+        }
+
+        $this->payloadStatement->execute($params);
 
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
             $parentNodeId = $row['parent_node_id'];

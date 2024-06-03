@@ -41,8 +41,12 @@ class Controller extends Base
 
         $student = $userMapper->findById($this->requestQuery->get('userId'));
 
+        /* TODO find out how summative report handles multiple code(s)
+         */
+        $classCode = $this->requestQuery?->get('code');
+
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student),
+            'payload' => (new Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student, $classCode),
             'audit' => (new Payload\VictorianProgressionAuditor($workTypeMapper))->audit()
         ]);
     }
