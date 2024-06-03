@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class Api
 {
-    private const PAPERLY_SCHEME = 'https://';
     private const PAPERLY_API_VIEW_IFRAME = '/api/v1/schoolbox/dashboard-widget?externalId=%u&role=%s';
     private const MAX_RETRY = 5;
     private const NAP_TIMEOUT = 3;
@@ -63,18 +62,9 @@ class Api
             'Authorization' => 'Bearer ' . $apiKey,
         ];
 
-        $parsedUrl = parse_url($apiHost);
-        $scheme = $parsedUrl['scheme'] ?? null;
-        $host = $parsedUrl['host'] ?? null;
-
         return new Client([
                               'headers' => $headers,
-                              //Forcing Https on url
-                              'base_uri' => $scheme === null ?
-                                  self::PAPERLY_SCHEME . $apiHost :
-                                  ($scheme === 'http' ?
-                                      self::PAPERLY_SCHEME . $host :
-                                      $apiHost),
+                              'base_uri' => $apiHost,
                               'http_errors' => false,
                           ]);
     }
@@ -109,6 +99,13 @@ class Api
                 continue;
             }
 
+            //In case the rate limit exceeded, kill operation and wait to try again
+            if ($response->getStatusCode() === 429) {
+                throw new RateLimitException(
+                    'Rate limit exceeded on Paperly endpoint. Please try again later.',
+                );
+            }
+
             if ($response->getStatusCode() === 200) {
                 try {
                     return json_decode(
@@ -124,18 +121,14 @@ class Api
             $failed++;
         }
 
-        if ($response) {
-            throw new RuntimeException(
-                sprintf(
-                    'Bad endpoint %s: %s %s after %s retries.',
-                    $paperlyAPIEndpoint,
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase(),
-                    self::MAX_RETRY
-                )
-            );
-        }
-
-        throw new DomainException('Could not access server, or bad json payload returned.');
+        throw new RuntimeException(
+            sprintf(
+                'Bad endpoint %s: %s %s after %s retries.',
+                $paperlyAPIEndpoint,
+                $response->getStatusCode(),
+                $response->getReasonPhrase(),
+                self::MAX_RETRY
+            )
+        );
     }
 }
