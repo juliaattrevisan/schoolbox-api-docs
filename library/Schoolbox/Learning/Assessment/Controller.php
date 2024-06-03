@@ -259,12 +259,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // To determine whether to display the interactive worksheet option
         $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
 
+        $kamiFiles = array_map(fn ($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
+
+
         // To be able to add a file to use as the worksheet
         $data['attachzoneWorksheet'] = (new Zone('worksheet'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(',', array_keys(KamiModel::ALLOWED_FILE_TYPES)))
+            ->setMimeFilter(implode(",", $kamiFiles))
             ->setFilesystemContext('worksheet')
             ->setFileVar('worksheet')
             ->getTwigContext();
@@ -476,11 +479,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // To determine whether to display the interactive worksheet option
         $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
 
+        $kamiFiles = array_map(fn ($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
+
         $zone = (new Zone('worksheet'))
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(',', array_keys(KamiModel::ALLOWED_FILE_TYPES)))
+            ->setMimeFilter(implode(",", $kamiFiles))
             ->setFilesystemContext('worksheet')
             ->setReadOnly($courseManagedFields->isReadonly()) //
             ->setFileVar('worksheet');
