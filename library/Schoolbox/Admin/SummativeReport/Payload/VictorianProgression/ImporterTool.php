@@ -288,6 +288,20 @@ HELP;
          * This is why you're here!
          */
         if ($this->getOpt(self::OPT_MAKE_ASSESSMENTS)) {
+            /* Work Type Id is required for this to work
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_WORK_TYPE_ID))) {
+                $this->getLogger()->error('No work type id specified.');
+                exit;
+            }
+
+            /* Grade Group Id is required for this to work
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_GRADE_GROUP_ID))) {
+                $this->getLogger()->error('No grade group id specified.');
+                exit;
+            }
+
             $this->parseFeedbacks($lock, $filename, $creator);
         }
 
