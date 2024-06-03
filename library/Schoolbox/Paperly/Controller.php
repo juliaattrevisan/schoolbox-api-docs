@@ -74,6 +74,7 @@ class Controller extends Base implements ICodec
         $urlDecodedValue = array_map('urldecode', $encodedValue);
         return [
             'title' => $urlDecodedValue['title'],
+            //Remove the trailing forward slash before appending path
             'url' => preg_replace(
                 '/(?<!:)\/\//',
                 '/',
