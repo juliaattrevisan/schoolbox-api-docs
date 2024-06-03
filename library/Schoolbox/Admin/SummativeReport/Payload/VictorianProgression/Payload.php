@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\SummativeReport\Payload;
+namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Mapper\Exception;
@@ -17,7 +17,7 @@ use Schoolbox\User;
  * Victorian Curriculum Reporting Progression Point Visualisation
  * Built for PCC
  */
-class VictorianProgression
+class Payload
 {
     /**
      * This worktype is required

@@ -46,8 +46,8 @@ class Controller extends Base
         $classCode = $this->requestQuery->get('code');
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student, $classCode),
-            'audit' => (new Payload\VictorianProgressionAuditor($workTypeMapper))->audit()
+            'payload' => (new Payload\VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $classCode),
+            'audit' => (new Payload\VictorianProgression\Auditor($workTypeMapper))->audit()
         ]);
     }
 }

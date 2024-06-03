@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\SummativeReport\Payload;
+namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 
-class VictorianProgressionAuditor
+class Auditor
 {
     /**
      * This is how mariadb sorts a group concat, apparently
@@ -43,12 +43,12 @@ class VictorianProgressionAuditor
         /* Find the Work Type Id first, by name for lack of a better way
          */
         try {
-            $workType = $this->workTypeMapper->findOneByColumn('name', VictorianProgression::WORK_TYPE_NAME);
+            $workType = $this->workTypeMapper->findOneByColumn('name', Payload::WORK_TYPE_NAME);
             $workTypeId = (int)$workType->getId();
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new \DomainException(sprintf(
                 'Missing required worktype in admin: %s',
-                VictorianProgression::WORK_TYPE_NAME
+                Payload::WORK_TYPE_NAME
             ));
         }
 
