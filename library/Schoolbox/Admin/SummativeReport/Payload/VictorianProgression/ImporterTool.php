@@ -774,7 +774,11 @@ HELP;
             $openDate = '10/10/2024 12:02am';
             $dueDate = '10/10/2024 12:03am';
             $closeDate = '10/10/2024 12:04am';
-            $feedbackPublishedAt = '2024-10-10 00:05:00';
+
+            /* Enforce feedbacks at midnight (no times specified)
+             */
+            $modified = sprintf('%s  00:00:00', trim($row[12]));
+            $feedbackPublishedAt = (new \Alaress_Date_Format($modified, 'd/m/Y H:i:s'))->getDatabase();
 
             /* Assume this exists, I guess, for now
              */
