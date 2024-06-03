@@ -86,7 +86,7 @@ class Payload
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
         )
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
 
 
@@ -129,7 +129,7 @@ class Payload
             OR quiz.grade_group_id IS NOT NULL
         )
         AND fc.code = :classCode
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
 
 
