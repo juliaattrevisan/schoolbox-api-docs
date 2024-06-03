@@ -557,6 +557,10 @@ class Helper
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
             group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
             LTI,
+            // Note LEFT JOINing user as reviewer on FALSE below is the easiest way to make the result of the query for
+            // projects match the format of other assessment types.  The reviewer fields will always be NULL for projects.
+            // This is because a project does not have a single reviewer.  A project is made up of sub-assessments, each
+            // of which has a reviewer, which may or may not be the same user.
             <<<PROJECT
             select
                 `pr`.`assessment_id` AS `assessment_id`,
@@ -570,7 +574,7 @@ class Helper
                 $reviewerFields
             from `project_result` `prr` join `project` `pr` on (`prr`.`project_id` = `pr`.`assessment_id`)
                 LEFT JOIN `user` `participant` on `prr`.`user_id`  = `participant`.`id`
-                LEFT JOIN `user` `reviewer`    on `prr`.`marker_id` = `reviewer`.`id`
+                LEFT JOIN `user` `reviewer`    on FALSE
             where
               `prr`.`deleted_at` is null
               and `pr`.`assessment_id` in ({$bindings->getPlaceholder()})
