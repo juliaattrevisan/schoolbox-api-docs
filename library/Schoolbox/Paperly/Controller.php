@@ -8,21 +8,23 @@
 namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Iframe\Validator;
 use Twig\Error\Error;
+use Alaress\Codec\ICodec;
 
-class Controller extends Base
+class Controller extends Base implements ICodec
 {
-    private $dummyPayload;
-    private $paperlyPayload;
+    private string $paperlyHostName;
+    private string $dummyPayload;
+    private array $paperlyPayload;
 
     /**
      * Controller constructor.
      */
-    public function __construct(private ErrorMapper $errorMapper)
+    public function __construct()
     {
+        //TODO replace with the Paperly hostname
+        $this->paperlyHostName = "https://url";
+
         //TODO replace with real payloads once we have it
 
         $this->dummyPayload = '{
@@ -85,29 +87,45 @@ class Controller extends Base
             ]
         }';
         $this->paperlyPayload = json_decode($this->dummyPayload, true);
-
-        //TODO optimizing the process and adding caching(?) to the payload
     }
 
     /**
-     * Checking whether the iframe url is valid
+     * Encode the path to the iframe by striping the hostname to be prepended by trusted Paperly hostname
      *
-     * @param null|string $iframeUrl
-     * @throws Exception
-     * @throws Error
+     * @param   mixed $rawValue
+     * @return  array
      */
-    private function validatingIframeEndpoints(null|string $iframeUrl): void
+    public function encode(mixed $rawValue): array
     {
-        //Checking if the target endpoint exists
-        if (null === $iframeUrl) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
+        $parsedUrl = parse_url($rawValue['url']);
 
-        //Making sure the url is safe to load in the iframe from payload
-        if (!(new Validator($this->getConfigLoader()->get('safe_iframe_source_list')))->isValid($iframeUrl)) {
-            //TODO error message might not accurately telling the user it's missing the url in the safe list
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-        }
+        return array_map(
+            'urlencode',
+            [
+                'title' => $rawValue['title'],
+                'url' => base64_encode(
+                    $parsedUrl['path']
+                )
+            ]
+        );
+    }
+    /**
+     * Decode the path and prepend with trusted Paperly hostname
+     *
+     * @param   mixed $encodedValue
+     * @return  array
+     */
+    public function decode(mixed $encodedValue): array
+    {
+        $urlDecodedValue = array_map('urldecode', $encodedValue);
+        return [
+            'title' => $urlDecodedValue['title'],
+            'url' => preg_replace(
+                '/(?<!:)\/\//',
+                '/',
+                $this->paperlyHostName . base64_decode($urlDecodedValue['url'])
+            )
+        ];
     }
 
     /**
@@ -123,13 +141,29 @@ class Controller extends Base
 
         foreach ($this->paperlyPayload['features'] as $feature) {
             $featureTitle = $feature['title'];
+            $path = $this->encode($feature);
             $paperlyLinks['features'][][$featureTitle] =
-                "/paperly/view/" . str_replace(' ', '-', strtolower($featureTitle));
+                $this->routeGenerator
+                    ->generate(
+                        'paperly.getPaperlyViewIframe',
+                        [
+                            'pageTitle' => $path['title'],
+                            'encodedUrl' => $path['url']
+                        ]
+                    );
         }
 
         $upcomingActions = [];
         foreach ($this->paperlyPayload['upcoming'] as $order => $upcoming) {
-            $upcoming['url'] = "/paperly/action/$order";
+            $path = $this->encode($upcoming);
+            $upcoming['url'] = $this->routeGenerator
+                ->generate(
+                    'paperly.getPaperlyViewIframe',
+                    [
+                        'pageTitle' => $path['title'],
+                        'encodedUrl' => $path['url']
+                    ]
+                );
             $upcomingActions[$order] = $upcoming;
         }
         $paperlyLinks['upcoming'] = $upcomingActions;
@@ -138,48 +172,23 @@ class Controller extends Base
     }
 
     /**
-     * Load an iframe for Paperly feature
+     * Load an iframe for Paperly
      *
-     * @param string $feature
-     * @throws Exception
+     * @param string $encodedUrl
+     * @param string $pageTitle
      * @throws Error
      */
-    public function getPaperlyViewIframe(string $feature): void
+    public function getPaperlyViewIframe(string $encodedUrl, string $pageTitle): void
     {
-
-        $iframeUrl = null;
-
-        $featureTitle = ucwords(str_replace('-', ' ', $feature));
-
-        foreach ($this->paperlyPayload['features'] as $feat) {
-            if ($feat['title'] === $featureTitle) {
-                $iframeUrl = $feat['url'];
-                break; //Exit early if the feature matched
-            }
-        }
-
-        $this->validatingIframeEndpoints($iframeUrl);
+        $path = $this->decode(
+            [
+                'title' => $pageTitle,
+                'url' => $encodedUrl
+            ]
+        );
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            'url' => $iframeUrl
-        ], "Paperly " . $featureTitle);
-    }
-
-    /**
-     * Load an iframe for Paperly action
-     *
-     * @param int $order
-     * @throws Exception
-     * @throws Error
-     */
-    public function getPaperlyActionIframe(int $order): void
-    {
-        $iframeUrl = $this->paperlyPayload['upcoming'][$order]['url'] ?? null;
-
-        $this->validatingIframeEndpoints($iframeUrl);
-
-        $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            'url' => $iframeUrl
-        ], 'Paperly Actions');
+            'url' => $path['url']
+        ], "Paperly " . $path['title']);
     }
 }
