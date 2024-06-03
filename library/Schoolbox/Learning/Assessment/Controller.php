@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Seb\Payload;
@@ -263,7 +264,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png,.pages,.key,.numbers')
+            ->setMimeFilter(implode(',', KamiModel::ALLOWED_FILE_TYPES))
             ->setFilesystemContext('worksheet')
             ->setFileVar('worksheet')
             ->getTwigContext();
@@ -479,7 +480,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('.doc,.docx,.ppt,.pptx,.xls,.xlsx,.odt,.odp,.ods,.jpeg,.gif,.tiff,.png')
+            ->setMimeFilter(implode(',', KamiModel::ALLOWED_FILE_TYPES))
             ->setFilesystemContext('worksheet')
             ->setReadOnly($courseManagedFields->isReadonly()) //
             ->setFileVar('worksheet');
