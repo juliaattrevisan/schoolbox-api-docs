@@ -41,7 +41,7 @@ class SubmissionBoxMapperTest extends TestCase
             'accept_submission' => true,
             'multi_submission'  => false,
             'kami_interactive'  => true,
-            'interactive_hash'  => 'thisIsNotAHash',
+            'kami_interactive_hash'  => 'thisIsNotAHash',
             'enable_offline'    => true,
             'enable_text'       => true,
             'enable_files'      => true,
