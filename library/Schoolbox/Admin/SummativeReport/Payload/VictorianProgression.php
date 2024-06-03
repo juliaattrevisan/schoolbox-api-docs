@@ -22,7 +22,7 @@ class VictorianProgression
     /**
      * This worktype is required
      */
-    public const WORK_TYPE_NAME = 'Victorian Curriculum Progression Points';
+    public const WORK_TYPE_NAME = 'Victorian Curriculum Standard';
 
 
     /**
