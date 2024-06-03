@@ -56,7 +56,7 @@ class Api
     private function initClient(
         string $apiHost,
         #[\SensitiveParameter] string $apiKey
-    ) {
+    ): Client {
 
         $headers = [
             'Authorization' => 'Bearer ' . $apiKey,
@@ -74,7 +74,8 @@ class Api
      * @return  null|array
      * @throws  DomainException
      * @throws  RuntimeException if the retrieval of the endpoint failed
-     * @throws  \JsonException
+     * @throws  RateLimitException if rate limit exceeded
+     * @throws  JsonException
      */
     public function retrievePaperlyIframeView(): ?array
     {

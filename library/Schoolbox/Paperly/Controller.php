@@ -28,7 +28,7 @@ class Controller extends Base implements ICodec
      *
      * @return string
      */
-    private function getPaperlyHostname() : string
+    private function getPaperlyHostname(): string
     {
         $hostname = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_HOSTNAME);
         $parsedUrl = parse_url($hostname);
