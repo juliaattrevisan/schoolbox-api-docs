@@ -264,7 +264,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(',', KamiModel::ALLOWED_FILE_TYPES))
+            ->setMimeFilter(implode(',', array_keys(KamiModel::ALLOWED_FILE_TYPES)))
             ->setFilesystemContext('worksheet')
             ->setFileVar('worksheet')
             ->getTwigContext();
@@ -480,7 +480,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ->setMulti(false)
             ->setAttachPrompt('Attach a worksheet')
             ->setAttachmentsLabel('')
-            ->setMimeFilter(implode(',', KamiModel::ALLOWED_FILE_TYPES))
+            ->setMimeFilter(implode(',', array_keys(KamiModel::ALLOWED_FILE_TYPES)))
             ->setFilesystemContext('worksheet')
             ->setReadOnly($courseManagedFields->isReadonly()) //
             ->setFileVar('worksheet');
