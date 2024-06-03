@@ -16,6 +16,8 @@ class Auditor
     /**
      * This is how mariadb sorts a group concat, apparently
      * Anyway, this has to match the values configured in admin in this exact manner for now
+     *
+     * Though we only use 6-10.5, the school's configured HEAPS more
      */
     private const EXPECTED_OUTCOMES = '0.5, 1, 1.5, 10, 10.5, 11, 2, 2.5, 3, 3.5, 4.0, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, A, B, C, D, F, F.5';
 
@@ -71,7 +73,6 @@ class Auditor
             AND a.deleted_at IS NULL
             GROUP BY a.id 
             ORDER BY a.id
-
         ";
 
         $statement = $this->workTypeMapper->getDatabase()->prepare($query);
