@@ -188,6 +188,16 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Pick an actual date...can't think of a better Semester 2 date than N7 Day, heh
+     */
+    private const ASSESSMENT_DATE_PUBLISH = '7/11/2023 12:01am';
+    private const ASSESSMENT_DATE_OPEN = '7/11/2023 12:02am';
+    private const ASSESSMENT_DATE_DUE = '7/11/2023 12:03am';
+    private const ASSESSMENT_DATE_CLOSE = '7/11/2023 12:04am';
+
+
+
+    /**
      * Run the cli tool
      */
     public function run(): void
@@ -770,7 +780,7 @@ HELP;
              *     - Marks available to everyone I guess
              */
 
-            /* TODO build it in their prod first
+            /* Build it in their prod first
              */
             $workTypeId = $this->getOpt(self::OPT_WORK_TYPE_ID);
             $gradingScheme = $this->getOpt(self::OPT_GRADE_GROUP_ID);
@@ -783,13 +793,6 @@ HELP;
              */
             $capabilityMarkType = (string)MarkType::TYPE_NONE;
             $capabilityGradingScheme = '1'; // "Standard"
-
-            /* Pick an actual date
-             */
-            $publishDate = '10/10/2024 12:01am';
-            $openDate = '10/10/2024 12:02am';
-            $dueDate = '10/10/2024 12:03am';
-            $closeDate = '10/10/2024 12:04am';
 
             /* Enforce feedbacks at midnight (no times specified)
              */
@@ -839,10 +842,10 @@ HELP;
                         /* This is literally a csv in a one-element array
                          */
                         'curriculumCodes' => [(string)$curriculumNode->getId()],
-                        'publishDate' => $publishDate,
-                        'openDate' => $openDate,
-                        'dueDate' => $dueDate,
-                        'closeDate' => $closeDate,
+                        'publishDate' => self::ASSESSMENT_DATE_PUBLISH,
+                        'openDate' => self::ASSESSMENT_DATE_OPEN,
+                        'dueDate' => self::ASSESSMENT_DATE_DUE,
+                        'closeDate' => self::ASSESSMENT_DATE_CLOSE,
                         'markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
