@@ -86,7 +86,6 @@ class VictorianProgression
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
         )
-        %s
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC
     ";
 
