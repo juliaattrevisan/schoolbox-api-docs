@@ -43,7 +43,7 @@ class Controller extends Base
 
         /* TODO find out how summative report handles multiple code(s)
          */
-        $classCode = $this->requestQuery?->get('code');
+        $classCode = $this->requestQuery->get('code');
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
             'payload' => (new Payload\VictorianProgression($workTypeMapper, $termMapper))->generate($student, $classCode),
