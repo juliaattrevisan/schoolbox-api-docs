@@ -144,6 +144,7 @@ abstract class BaseTool extends CliTool\App
             $this->getDi()->get('taskd.httpRequestMessageFactory'),
             $this->getDi()->get('taskd.messageProducer'),
             new TagFactory($this->getConfig()->get('site_school_code')),
+            $this->getLogger(),
         );
 
         // Build assessment data source

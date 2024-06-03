@@ -15,6 +15,7 @@ use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
@@ -24,6 +25,7 @@ use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
+use Throwable;
 
 /**
  * Specialised command for duplicating quiz contents from one quiz to another,
@@ -51,6 +53,7 @@ class Duplicator
      *                                                 daemon.
      * @param Producer                $messageProducer Used to send messages to the task daemon once built.
      * @param TagFactory              $tagFactory      Used to build a set of tags for the quiz in Learnosity.
+     * @param LoggerInterface         $logger          Somewhere to log messages to
      */
     public function __construct(
         private Api $api,
@@ -61,6 +64,7 @@ class Duplicator
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
         private TagFactory $tagFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -245,24 +249,7 @@ class Duplicator
                 // opposed to a transient error (which may complete later).
                 // Just mark as unprocessable after enough failures.
                 $updateStatus = true;
-                $jobStatus    = $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
-                    ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
-                    : Helper::LEARNOSITY_PROCESS_STATUS_FAILED
-                ;
-            }
-
-            // If complete or failed: set status
-            if ($updateStatus) {
-                $query = $this->database->prepareQuery(
-                    "
-                        UPDATE assess
-                        SET learnosity_job_status = ?
-                        WHERE assessment_id = ?
-                    ",
-                    [$jobStatus, $quiz->getId()],
-                );
-                $quiz->setLearnosityJobStatus($jobStatus);
-                $query->execute();
+                $jobStatus    = $this->determineFailureStatus($quiz);
             }
 
             // If complete: set tags
@@ -272,80 +259,148 @@ class Duplicator
                     $newTags[] = $this->tagFactory->produceImplFlag();
                 }
 
-                /* Fetch this activity from Learnosity; we need to assign tags to each of its items
-                 * because they appear in the global Item Bank. Unless we assign the classCode tag
-                 * here, we'll never know if items are for a spec or an impl when users search
-                 */
-                $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
-                    'references' => [
-                        $quiz->getLearnosityReference()
-                    ]
-                ])['data'][0]['data']['items'] ?? null;
-
-                if (null !== $itemReferences) {
-                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                     */
-                    if (is_array($itemReferences[0])) {
-                        /* Forcibly mutate this, because learnosity insanity
-                         */
-                        $itemReferenceList = array_column($itemReferences, 'id');
-                    } else {
-                        /* Presume it was a list of reference strings already
-                         */
-                        $itemReferenceList = $itemReferences;
-                    }
-
-                    /* Initialise payload container
-                     */
-                    $emptyPayload = [
-                        'items' => []
-                    ];
-
-                    $payload = $emptyPayload;
-
-                    /* Assign tags to each item
-                     */
-                    foreach ($itemReferenceList as $item) {
-                        /* Maxed out? Send it.
-                         */
-                        if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
-                            $this->api->dataSetRequest('/itembank/items/tags', $payload);
-
-                            /* Reset this for the next cycle
-                             */
-                            $payload = $emptyPayload;
-                        }
-
-                        /* Keep accumulating until we max out
-                         */
-                        $payload['items'][] = [
-                            'reference' => $item,
-                            'tags' => $newTags
-                        ];
-                    }
-
-                    /* Send the last payload if anything is in it
-                     */
-                    if (\count($payload['items'])) {
-                        $this->api->dataSetRequest('/itembank/items/tags', $payload);
-                    }
+                // If any setting of tags fails:
+                // count this as a fail of the job itself.
+                try {
+                    $this->assignTags($quiz, $newTags);
+                } catch (Throwable $e) {
+                    // Log this somewhere I guess?
+                    $updateStatus = true;
+                    $jobStatus    = $this->determineFailureStatus($quiz);
+                    $this->logger->warning(
+                        sprintf(
+                            'Job completed, but tag assignation failed (%s, message: %s): marking job as failed',
+                            get_class($e),
+                            $e->getMessage(),
+                        )
+                    );
                 }
+            }
 
-                /* Assign tags to the activity itself
-                 */
-                $this->api->dataSetRequest(
-                    '/itembank/activities/tags',
-                    [
-                        'activities' => [
-                            [
-                                'reference' => $quiz->getLearnosityReference(),
-                                'tags'      => $newTags,
-                            ],
-                        ],
-                    ],
-                );
+            // If complete or failed: set status
+            if ($updateStatus) {
+                $this->updateStatus($quiz, $jobStatus);
             }
         }
+    }
+
+    /**
+     * Assign `$newTags` to `$quiz` in Learnosity: this means assigning those
+     * tags to the activity and its items.
+     *
+     * @param QuizDomainModel $quiz
+     * @param array           $newTags
+     * @return void
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function assignTags(QuizDomainModel $quiz, array $newTags): void
+    {
+        /* Fetch this activity from Learnosity; we need to assign tags to each of its items
+         * because they appear in the global Item Bank. Unless we assign the classCode tag
+         * here, we'll never know if items are for a spec or an impl when users search
+         */
+        $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
+            'references' => [
+                $quiz->getLearnosityReference()
+            ]
+        ])['data'][0]['data']['items'] ?? null;
+
+        if (null !== $itemReferences) {
+            /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+             * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
+             */
+            if (is_array($itemReferences[0])) {
+                /* Forcibly mutate this, because learnosity insanity
+                 */
+                $itemReferenceList = array_column($itemReferences, 'id');
+            } else {
+                /* Presume it was a list of reference strings already
+                 */
+                $itemReferenceList = $itemReferences;
+            }
+
+            /* Initialise payload container
+             */
+            $emptyPayload = [
+                'items' => []
+            ];
+
+            $payload = $emptyPayload;
+
+            /* Assign tags to each item
+             */
+            foreach ($itemReferenceList as $item) {
+                /* Maxed out? Send it.
+                 */
+                if (\count($payload['items']) === ImporterTool::LEARNOSITY_MAX_PAYLOAD_SIZE) {
+                    $this->api->dataSetRequest('/itembank/items/tags', $payload);
+
+                    /* Reset this for the next cycle
+                     */
+                    $payload = $emptyPayload;
+                }
+
+                /* Keep accumulating until we max out
+                 */
+                $payload['items'][] = [
+                    'reference' => $item,
+                    'tags'      => $newTags
+                ];
+            }
+
+            /* Send the last payload if anything is in it
+             */
+            if (\count($payload['items'])) {
+                $this->api->dataSetRequest('/itembank/items/tags', $payload);
+            }
+        }
+
+        /* Assign tags to the activity itself
+         */
+        $this->api->dataSetRequest(
+            '/itembank/activities/tags',
+            [
+                'activities' => [
+                    [
+                        'reference' => $quiz->getLearnosityReference(),
+                        'tags'      => $newTags,
+                    ],
+                ],
+            ],
+        );
+    }
+
+    /**
+     * Update the quiz's job status in `$quiz`, and its database field.
+     *
+     * @param QuizDomainModel $quiz
+     * @param string|null     $jobStatus
+     * @return void
+     */
+    private function updateStatus(QuizDomainModel $quiz, ?string $jobStatus): void
+    {
+        $query = $this->database->prepareQuery(
+            "UPDATE assess SET learnosity_job_status = ? WHERE assessment_id = ?",
+            [$jobStatus, $quiz->getId()],
+        );
+        $quiz->setLearnosityJobStatus($jobStatus);
+        $query->execute();
+    }
+
+    /**
+     * Which Learnosity failure processing status should this have?
+     *
+     * If it's failed `self::FAILURE_THRESHOLD` or more times, it's
+     * unprocessable: otherwise it's just failed (and may be restarted).
+     *
+     * @param QuizDomainModel $quiz
+     * @return string
+     */
+    private function determineFailureStatus(QuizDomainModel $quiz): string
+    {
+        return $quiz->getLearnosityJobAttemptCount() >= self::FAILURE_THRESHOLD
+            ? Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE
+            : Helper::LEARNOSITY_PROCESS_STATUS_FAILED;
     }
 }
