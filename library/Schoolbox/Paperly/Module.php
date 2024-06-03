@@ -40,14 +40,7 @@ class Module extends BaseModule
 
         $this->register(
             'GET',
-            '/action/{order}',
-            'getPaperlyActionIframe',
-            $isLoggedIn
-        );
-
-        $this->register(
-            'GET',
-            '/view/{feature}',
+            '/view/{encodedUrl}/{pageTitle}',
             'getPaperlyViewIframe',
             $isLoggedIn
         );
@@ -66,6 +59,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
+        return new Controller();
     }
 }
