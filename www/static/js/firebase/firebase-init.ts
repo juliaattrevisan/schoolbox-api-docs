@@ -59,7 +59,7 @@ function requestNotif(event: CustomEvent) {
             getToken(messaging, {vapidKey: app.webPushPublicKey})
                 .then((currentToken) => {
                     window.localStorage.setItem("notification", "registering");
-                    window.localStorage.setItem("notifToken", "currentToken");
+                    window.localStorage.setItem("notifToken", currentToken);
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
