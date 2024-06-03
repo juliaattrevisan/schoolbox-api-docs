@@ -61,7 +61,7 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
     {
         // sanitise the data, we need to convert from \n to the actual character, so the open_ssl keys still work
         $key = stripcslashes(json_encode($content['key'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
-        $public_configuration = stripcslashes(json_encode($content['pubilc_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
+        $public_configuration = stripcslashes(json_encode($content['public_configuration'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE));
 
         /* These go into mobile_app
          */
