@@ -176,6 +176,7 @@ class VictorianProgression
          */
         $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
 
+
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
          */
@@ -195,10 +196,6 @@ class VictorianProgression
          */
         if ($previousAcademicPeriods->count() > 1) {
             $previousAcademicPeriod = $previousAcademicPeriods->getOffset(1);
-
-            /* FIXME!!!!!!!!! For testing due to lack of data
-             */
-            $previousAcademicPeriod = $this->termMapper->findById(4);
 
             /* Add the previous academic period's curriculum nodes
              * and associated feedback, augmenting what we already made
