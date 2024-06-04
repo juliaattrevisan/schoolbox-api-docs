@@ -248,19 +248,23 @@ class Payload
          * No trabajo. Otherwise, get it directly from the collection lol
          */
         if ($previousAcademicPeriods->count() > 1) {
-            $previousAcademicPeriod = $previousAcademicPeriods->getOffset(1);
+            $aggregateAcademicPeriod = (new PreviousAcademicPeriods())->generate($currentAcademicPeriod, $previousAcademicPeriods);
 
-            /* Add the previous academic period's curriculum nodes
-             * and associated feedback, augmenting what we already made
+            /* Double-check, for safety; $previousAcademicPeriods might all be archived
              */
-            $data = $this->generateOne(
-                self::TYPE_PREVIOUS,
-                $student,
-                $classCode,
-                $previousAcademicPeriod->getStart(),
-                $previousAcademicPeriod->getDisplayFinish(),
-                $data
-            );
+            if (null !== $aggregateAcademicPeriod['start'] && null !== $aggregateAcademicPeriod['finish']) {
+                /* Add the previous academic period's curriculum nodes
+                 * and associated feedback, augmenting what we already made
+                 */
+                $data = $this->generateOne(
+                    self::TYPE_PREVIOUS,
+                    $student,
+                    $classCode,
+                    $aggregateAcademicPeriod['start'],
+                    $aggregateAcademicPeriod['end'],
+                    $data
+                );
+            }
         }
 
         /* Apparently this $struct can come out in some random old order
