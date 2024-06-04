@@ -613,6 +613,22 @@
                                                 },
                                             }),
                                         );
+
+                                        const initialNotification = new Notification(
+                                            `{{ config.title }}`,
+                                                {
+                                                body: `Welcome! Your notifications are powered by the Schoolbox web app`,
+                                                icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                                                image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                                                badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                                                renotify: false,
+                                            },
+                                        );
+                                        {# send to /settings/notifications on click #}
+                                        initialNotification.onclick = (event) => {
+                                            event.preventDefault();
+                                            window.location.href = "/settings/notifications";
+                                        };
                                     } else if (permission === 'denied') {
                                         {% if config.debug_mode %}
                                         console.warn('Notification permission denied');
