@@ -102,7 +102,7 @@ class ExternalEvents extends Base implements IExternalEvents
 
         $whereQuery = "
             ec.end_date < :tass_calendar_limit{$paramSuffix}
-            AND ec.start_date < :tass_calendar_limit_2{$paramSuffix}
+            AND ec.start_date < :tass_calendar_limit_b{$paramSuffix}
             AND
             NOT (
                 CASE
@@ -249,7 +249,7 @@ class ExternalEvents extends Base implements IExternalEvents
             "startTime{$paramSuffix}" => $start->getDatabase(),
             "endTime{$paramSuffix}"   => $end->getDatabase(),
             "tass_calendar_limit{$paramSuffix}"     => self::TASS_CALENDAR_LIMIT,
-            "tass_calendar_limit_2{$paramSuffix}"     => self::TASS_CALENDAR_LIMIT,
+            "tass_calendar_limit_b{$paramSuffix}"     => self::TASS_CALENDAR_LIMIT,
         ];
         if (isset($productCode)) {
             $params["productCode{$paramSuffix}"] = $productCode;
