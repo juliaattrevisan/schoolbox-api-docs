@@ -230,6 +230,7 @@ class Payload
         ?string $classCode
     ): array {
         $studentYearLevel = $this->getYearLevel($student);
+        $currentSemester = (int)$this->getCurrentSemester($currentAcademicPeriod);
 
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
@@ -238,6 +239,7 @@ class Payload
             self::TYPE_CURRENT,
             $student,
             $studentYearLevel,
+            $currentSemester,
             $classCode,
             $currentAcademicPeriod->getStart(),
             $currentAcademicPeriod->getDisplayFinish()
@@ -263,6 +265,7 @@ class Payload
                     self::TYPE_PREVIOUS,
                     $student,
                     $studentYearLevel,
+                    $currentSemester,
                     $classCode,
                     $aggregateAcademicPeriod['start'],
                     $aggregateAcademicPeriod['end'],
@@ -282,7 +285,7 @@ class Payload
         /* The final payload; maybe add extra metadata here if you need it
          */
         return [
-            'currentSemester' => $this->getCurrentSemester($currentAcademicPeriod),
+            'currentSemester' => $currentSemester,
             'student' => [
                 'name' => $student->getFullName(),
                 'currentYearLevel' => $studentYearLevel,
@@ -303,6 +306,7 @@ class Payload
      * @param string $type
      * @param User $student
      * @param int $studentYearLevel
+     * @param int $currentSemester
      * @param string|null $classCode
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
@@ -315,6 +319,7 @@ class Payload
         string $type,
         \Schoolbox\User $student,
         int $studentYearLevel,
+        int $currentSemester,
         ?string $classCode,
         \Alaress_Date_Format $startDate,
         \Alaress_Date_Format $endDate,
@@ -426,7 +431,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
 //                if (self::TYPE_CURRENT === $type) {
-                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, (float)$struct[$nodeId][$type]['mark']);
+                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark']);
 //                }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
@@ -445,7 +450,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
 //                if (self::TYPE_CURRENT === $type) {
-                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark']);
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark']);
 //                }
             }
         }

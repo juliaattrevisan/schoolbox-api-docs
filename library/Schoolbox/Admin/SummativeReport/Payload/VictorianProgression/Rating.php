@@ -12,6 +12,13 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 class Rating
 {
     /**
+     * The algorith makes a special case usage
+     */
+    private const SEMESTER_1 = 1;
+    private const SEMESTER_1_OFFSET = 0.5;
+
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -22,36 +29,69 @@ class Rating
     /**
      * Rate My Marks
      *
+     * The boolean option $annotate forcibly appends the $reference and $diff
+     * that were used in the calculations. This is helpful for debugging and
+     * diagnosing how the rating was derived.
+     *
      * @param int $studentYearLevel
+     * @param int $currentSemester
      * @param float $mark
+     * @param bool $annotate
      * @return string
      */
-    public function rate(int $studentYearLevel, float $mark): string
-    {
-        $diff = $mark - $studentYearLevel;
+    public function rate(
+        int $studentYearLevel,
+        int $currentSemester,
+        float $mark,
+        bool $annotate = false
+    ): string {
+        $result = '';
+
+        /* In first semester, "At Standard" is the stduent's year level -0.5
+         * so in level 10, "At Standard" is measured from 9.5
+         */
+        $reference = $studentYearLevel;
+
+        if (self::SEMESTER_1 === $currentSemester) {
+            $reference -= self::SEMESTER_1_OFFSET;
+        }
+
+        /* Calculate proximity from your current expected standard
+         */
+        $diff = $mark - (float)$reference;
 
         if ($diff < -1) {
-            return 'Well Below Standard';
+            $result = 'Well Below Standard';
         }
 
         if ($diff >= -1 && $diff < 0) {
-            return 'Below Standard';
+            $result =  'Below Standard';
         }
 
         if ($diff === 0.0) {
-            return 'At Standard';
+            $result =  'At Standard';
         }
 
         if ($diff > 0 && $diff <= 1) {
-            return 'Above Standard';
+            $result =  'Above Standard';
         }
 
         if ($diff > 1) {
-            return 'Well Above Standard';
+            $result =  'Well Above Standard';
+        }
+
+        /* Add a metric annotation
+         */
+        if ($annotate) {
+            $result .= sprintf(
+                ' (ref: %s, diff: %s)',
+                $reference,
+                $diff
+            );
         }
 
         /* Not sure how you'd get here, but ok
          */
-        return '';
+        return $result;
     }
 }
