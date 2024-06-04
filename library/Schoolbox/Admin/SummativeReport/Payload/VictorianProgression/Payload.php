@@ -229,12 +229,15 @@ class Payload
         \Schoolbox\Assessment\Term\Model $currentAcademicPeriod,
         ?string $classCode
     ): array {
+        $studentYearLevel = $this->getYearLevel($student);
+
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
          */
         $data = $this->generateOne(
             self::TYPE_CURRENT,
             $student,
+            $studentYearLevel,
             $classCode,
             $currentAcademicPeriod->getStart(),
             $currentAcademicPeriod->getDisplayFinish()
@@ -259,6 +262,7 @@ class Payload
                 $data = $this->generateOne(
                     self::TYPE_PREVIOUS,
                     $student,
+                    $studentYearLevel,
                     $classCode,
                     $aggregateAcademicPeriod['start'],
                     $aggregateAcademicPeriod['end'],
@@ -281,7 +285,7 @@ class Payload
             'currentSemester' => $this->getCurrentSemester($currentAcademicPeriod),
             'student' => [
                 'name' => $student->getFullName(),
-                'currentYearLevel' => $this->getYearLevel($student),
+                'currentYearLevel' => $studentYearLevel,
             ],
             'levels' => self::LEVELS,
             'possibleOutcomes' => self::POSSIBLE_OUTCOMES,
@@ -298,6 +302,7 @@ class Payload
      *
      * @param string $type
      * @param User $student
+     * @param int $studentYearLevel
      * @param string|null $classCode
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
@@ -309,6 +314,7 @@ class Payload
     private function generateOne(
         string $type,
         \Schoolbox\User $student,
+        int $studentYearLevel,
         ?string $classCode,
         \Alaress_Date_Format $startDate,
         \Alaress_Date_Format $endDate,
@@ -359,6 +365,7 @@ class Payload
                     $struct[$nodeId] = [
                         'id' => $nodeId,
                         'name' => trim((string)$row['curriculum_node']),
+                        'rating' => null,
                         self::TYPE_CURRENT => null,
                         self::TYPE_PREVIOUS => null,
                         'subnodes' => []
@@ -368,6 +375,7 @@ class Payload
                 $struct[$parentNodeId] = [
                     'id' => $parentNodeId,
                     'name' => trim((string)$row['parent_node']),
+                    'rating' => null,
                     /* A subnode, if extant;
                      * each subnode will contain marks if it exists
                      */
@@ -381,6 +389,7 @@ class Payload
                 $struct[$parentNodeId]['subnodes'][$nodeId] = [
                     'id' => $nodeId,
                     'name' => trim((string)$row['curriculum_node']),
+                    'rating' => null,
                     self::TYPE_CURRENT => null,
                     self::TYPE_PREVIOUS => null,
                 ];
@@ -413,6 +422,12 @@ class Payload
                         $struct[$nodeId][$type] = $outcome;
                     }
                 }
+
+                /* Update rating for this curriculum node, using the "current" node
+                 */
+//                if (self::TYPE_CURRENT === $type) {
+                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, (float)$struct[$nodeId][$type]['mark']);
+//                }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
                     /* There is a parent node
@@ -426,6 +441,12 @@ class Payload
                         $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
                     }
                 }
+
+                /* Update rating for this curriculum node, using the "current" node
+                 */
+//                if (self::TYPE_CURRENT === $type) {
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark']);
+//                }
             }
         }
 
