@@ -219,9 +219,17 @@ class Survey_Answer_ParentChild extends Evaluation_Answer_ParentChild
             $student = $this->loadUser($userId);
             // Show the student and their external ID
             $responseText = $student->getFullName();
+            $extraParts   = [];
             if ($student->getExternalId()) {
-                $responseText = sprintf('%s (%s)', $responseText, $student->getExternalId());
+                $extraParts[] = sprintf('External ID: %s', $student->getExternalId());
             }
+            if ($student->getYear()) {
+                $extraParts[] = sprintf('Year: %s', $student->getYear()->getName());
+            }
+            if ($extraParts) {
+                $responseText = sprintf('%s (%s)', $responseText, implode(', ', $extraParts));
+            }
+
             $data['response'] = $responseText;
         }
         return $data;
