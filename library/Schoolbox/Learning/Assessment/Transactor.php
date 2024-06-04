@@ -17,16 +17,14 @@ use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -65,6 +63,7 @@ class Transactor
      * @param Generator                      $routeGenerator
      * @param Replicator                     $replicator
      * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
+     * @param Kami\Connector                 $kamiConnector
      */
     public function __construct(
         private FolderMapper $folderMapper,
@@ -77,6 +76,7 @@ class Transactor
         private Generator $routeGenerator,
         private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
+        private Kami\Connector $kamiConnector,
     ) {
     }
 
