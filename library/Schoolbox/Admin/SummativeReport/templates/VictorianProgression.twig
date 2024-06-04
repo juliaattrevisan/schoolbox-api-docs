@@ -41,6 +41,7 @@
         width: 20px;
         float: left;
         margin-left: -10px;
+        margin-right: 4px;
     }
 
     table.victorian-progression .dot.white {
@@ -171,14 +172,14 @@
              # If "previous" mark exists, but "current" does not, show the previous Progression Point as black
              # Otherwise show it as white
             #}
-            {% if i == (nodeData.previous.mark ?? null) %}
+            {% if (i-1) == (nodeData.previous.mark ?? null) %}
                 {% if (null == nodeData.current.mark ?? null) %}
                     {% set dotColor = 'black' %}
                 {% else  %}
                     {% set dotColor = 'white' %}
                 {% endif %}
 
-                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
+                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div> {{ nodeData.previous.mark }}
             {% endif %}
 
             {# Progression Point from current academic period #}

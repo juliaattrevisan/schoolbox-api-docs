@@ -30,8 +30,8 @@ class Payload
      * Available levels to render in frontend; each int represents its float compatriot
      * e.g. "Level 6" is used as a heading for values 6 and 6.5
      */
-    private const LEVELS = [6, 7, 8, 9, 10];
-    public const POSSIBLE_OUTCOMES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5];
+    private const LEVELS = [6, 7, 8, 9, 10, 11];
+    public const POSSIBLE_OUTCOMES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5];
 
 
     /**
