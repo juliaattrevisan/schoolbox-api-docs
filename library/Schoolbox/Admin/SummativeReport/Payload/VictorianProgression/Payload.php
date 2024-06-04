@@ -252,7 +252,7 @@ class Payload
 
             /* Double-check, for safety; $previousAcademicPeriods might all be archived
              */
-            if (null !== $aggregateAcademicPeriod['start'] && null !== $aggregateAcademicPeriod['finish']) {
+            if (null !== $aggregateAcademicPeriod['start'] && null !== $aggregateAcademicPeriod['end']) {
                 /* Add the previous academic period's curriculum nodes
                  * and associated feedback, augmenting what we already made
                  */
@@ -405,12 +405,26 @@ class Payload
                     /* There is no parent node
                      */
                     $struct[$nodeId][$type] = $outcome;
+                } else {
+                    /* Remember the biggest mark this person received for this given $nodeId
+                     * Update existing record
+                     */
+                    if ((float)$struct[$nodeId][$type]['mark'] < (float)$row['mark']) {
+                        $struct[$nodeId][$type] = $outcome;
+                    }
                 }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
                     /* There is a parent node
                      */
                     $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                } else {
+                    /* Remember the biggest mark this person received for this given ($parentNodeId, $nodeId)
+                     * Update existing record
+                    */
+                    if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
+                        $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                    }
                 }
             }
         }
