@@ -26,18 +26,18 @@ class Payload
 
 
     /**
-     * Used to specify which nodes to populate with feedback data
-     */
-    private const TYPE_CURRENT = 'current';
-    private const TYPE_PREVIOUS = 'previous';
-
-
-    /**
      * Available levels to render in frontend; each int represents its float compatriot
      * e.g. "Level 6" is used as a heading for values 6 and 6.5
      */
     private const LEVELS = [6, 7, 8, 9, 10];
-    private const POSSIBLE_OUTCOMES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5];
+    public const POSSIBLE_OUTCOMES = [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5];
+
+
+    /**
+     * Used to specify which nodes to populate with feedback data
+     */
+    private const TYPE_CURRENT = 'current';
+    private const TYPE_PREVIOUS = 'previous';
 
 
     /**

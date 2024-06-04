@@ -767,9 +767,12 @@ HELP;
              */
             $humanReadableMark = trim($row[11]);
 
-            /* TODO Use the const from the Vic Progression payload that's in a different PR
+            /* Only allow possible outcomes, decided by us; POSSIBLE_OUTCOMES is a subset
+             * of what might be in the system and normally depicts a sliding scale, a window
+             * of data that should appear on the report. How wide this window is...
+             * ...it's uncertain atm
              */
-            if (!\in_array($humanReadableMark, [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5], false)) {
+            if (!\in_array($humanReadableMark, Payload::POSSIBLE_OUTCOMES, false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
                     $i,
