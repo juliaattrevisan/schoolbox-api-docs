@@ -284,6 +284,10 @@ class Transactor
                     $this->turnitinGroupMapper->save($turnitinGroup);
                 }
             }
+
+            if ($this->assessment->getKamiInteractive() && $this->assessment->getKamiFile()) {
+                // Upload this file to Kami
+            }
         }
 
         /* The conclusion of how $returnUrl was derived
