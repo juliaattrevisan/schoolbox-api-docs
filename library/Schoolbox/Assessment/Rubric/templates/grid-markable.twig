@@ -232,6 +232,14 @@
                 let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
 
                 $(element).attr('data-scaled-mark', scaledGroupMark);
+
+                // As soon as the user has selected a valueless descriptor,
+                // we should no longer override the user's custom mark
+                // This can only be cleared by using the "Use descriptor values" button
+                if (hasSelectedValuelessDescriptor(descriptorCheckboxes)) {
+
+                    $groupSummary.attr('data-has-valueless', true);
+                }
             }
         });
 
@@ -250,8 +258,16 @@
                     $descriptorCheckboxes = $groupRows.find('input'),
                     scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
-                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                $groupSummary.attr('data-mark', scaledGroupMark);
+                // As soon as the user has selected a valueless descriptor,
+                // we should no longer override the user's custom mark
+                // This can only be cleared by using the "Use descriptor values" button
+                if (hasSelectedValuelessDescriptor($descriptorCheckboxes)) {
+                    $groupSummary.attr('data-has-valueless', true);
+                }
+                if (scaledGroupMark !== null) {
+                    $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                    $groupSummary.attr('data-mark', scaledGroupMark);
+                }
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
@@ -272,7 +288,7 @@
                 }
 
                 if ($groupSummary.length) {
-                    if (! $groupSummary.attr('data-customised')) {
+                    if (! $groupSummary.attr('data-customised') && ! $groupSummary.attr('data-has-valueless')) {
                         // Only update dropdown/input field if the mark has not been customised
                         $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
                         switch (markType) {
@@ -419,6 +435,7 @@
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
             $groupSummary.removeAttr('data-customised');
+            $groupSummary.removeAttr('data-has-valueless');
 
             var rubricTotalMark       = getTotalMark(),
                 rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
@@ -557,6 +574,29 @@
             return scaledGroupSum;
         }
 
+        /**
+         * Get the value of a specified descriptor
+         * @param {jQuery} $descriptorCheckbox - the descriptor checkbox to get the value of
+         * @returns {number|null} - the value of the descriptor, or null if it has no value
+         */
+        function getDescriptorValue($descriptorCheckbox) {
+            const descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor');
+            const $select = $rb.find('#rangeDropdown-'+String(descriptorId));
+            let descriptorValue;
+
+            if ($select.length) {
+                descriptorValue = parseFloat($select.val());
+            } else {
+                descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
+            }
+
+            if (isNaN(descriptorValue)) {
+                return null;
+            }
+
+            return descriptorValue;
+        }
+
         // Get the raw unscaled sum of selected descriptor values from the collection of descriptors passed in
         function summateDescriptors($descriptorCheckboxes) {
             var descriptorSummation = null;
@@ -565,16 +605,9 @@
                 var $descriptorCheckbox = $(this);
 
                 if ($descriptorCheckbox.prop('checked')) {
-                    // Is there a select box for this? If so use its value instead
-                    var descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor'),
-                        $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
-                        descriptorValue;
-                    if ($select.length) {
-                        descriptorValue = parseFloat($select.val());
-                    } else {
-                        descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
-                    }
-                    if (!isNaN(descriptorValue)) {
+                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
+
+                    if (descriptorValue !== null) {
                         descriptorSummation = (descriptorSummation || 0) + descriptorValue;
                     }
                 }
@@ -583,6 +616,30 @@
             return descriptorSummation;
         }
 
+
+        /**
+         * Are any of the selected descriptor values valueless? (i.e. have no defined point value)
+         * If so, we should not be overriding the user's custom mark
+         * @param {jQuery} $descriptorCheckboxes - the checkboxes to check
+         * @returns {boolean} - true if a valueless descriptor is selected, false otherwise
+         */
+        function hasSelectedValuelessDescriptor($descriptorCheckboxes) {
+            let hasValuelessDescriptor = false;
+
+            $descriptorCheckboxes.each(function () {
+                var $descriptorCheckbox = $(this);
+
+                if ($descriptorCheckbox.prop('checked')) {
+                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
+
+                    if (descriptorValue === null) {
+                        hasValuelessDescriptor = true;
+                    }
+                }
+            });
+
+            return hasValuelessDescriptor;
+        }
 
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
