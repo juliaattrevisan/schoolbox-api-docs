@@ -140,9 +140,7 @@
  # @param int $currentYearLevel
 #}
 {% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester) %}
-    <td>
-        {# TODO How is "rating" decided...? It goes in this cell. #}
-    </td>
+    <td>{{ nodeData.rating }}</td>
 
     {# random spacer column #}
     <td class="level-spacer"></td>
