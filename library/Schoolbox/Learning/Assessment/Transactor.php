@@ -53,69 +53,6 @@ class Transactor
 
 
     /**
-     * @var FolderMapper
-     */
-    protected $folderMapper;
-
-
-    /**
-     * @var UnitImplementationMapper
-     */
-    private $unitImplementationMapper;
-
-
-    /**
-     * @var UnitSpecificationMapper
-     */
-    private $unitSpecificationMapper;
-
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    protected $assessmentMapperProxy;
-
-
-    /**
-     * @var DueWork\Response\File\Plagscan\Mapper
-     */
-    protected $plagscanMapper;
-
-
-    /**
-     * @var Turnitin\Group\Mapper
-     */
-    protected Turnitin\Group\Mapper $turnitinGroupMapper;
-
-
-    /**
-     * @var SubmissionBoxMapper
-     */
-    protected SubmissionBoxMapper $submissionBoxMapper;
-
-
-    /**
-     * @var SingleFile\Mapper
-     */
-    protected $submissionFileMapper;
-
-    /**
-     * @var QuizMapper
-     */
-    protected $quizMapper;
-
-    /**
-     * @var Generator
-     */
-    protected $routeGenerator;
-
-    /**
-     * @var Replicator
-     */
-    protected Replicator $replicator;
-
-
-    /**
      * Transactor constructor.
      *
      * @param FolderMapper                          $folderMapper
@@ -132,30 +69,19 @@ class Transactor
      * @param LessonPlanActivitiesReplicator        $lessonPlanActivitiesReplicator
      */
     public function __construct(
-        FolderMapper $folderMapper,
-        UnitImplementationMapper $unitImplementationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
-        Turnitin\Group\Mapper $turnitinGroupMapper,
-        SubmissionBoxMapper $submissionBoxMapper,
-        SingleFile\Mapper $submissionFileMapper,
-        QuizMapper $quizMapper,
-        Generator $routeGenerator,
-        Replicator $replicator,
+        private FolderMapper $folderMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
+        private Turnitin\Group\Mapper $turnitinGroupMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private SingleFile\Mapper $submissionFileMapper,
+        private QuizMapper $quizMapper,
+        private Generator $routeGenerator,
+        private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
     ) {
-        $this->folderMapper = $folderMapper;
-        $this->unitImplementationMapper = $unitImplementationMapper;
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->plagscanMapper = $plagscanMapper;
-        $this->turnitinGroupMapper = $turnitinGroupMapper;
-        $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->submissionFileMapper = $submissionFileMapper;
-        $this->quizMapper = $quizMapper;
-        $this->routeGenerator = $routeGenerator;
-        $this->replicator = $replicator;
     }
 
 
@@ -287,6 +213,7 @@ class Transactor
 
             if ($this->assessment->getKamiInteractive() && $this->assessment->getKamiFile()) {
                 // Upload this file to Kami
+                // This will also need a document ID attached
             }
         }
 
