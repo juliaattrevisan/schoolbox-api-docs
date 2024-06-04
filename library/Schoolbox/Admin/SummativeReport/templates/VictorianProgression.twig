@@ -52,6 +52,12 @@
         background-color: #000;
     }
 
+    /* Optionally show annotations so you can see data points
+     */
+    table .annotation {
+        display: none;
+    }
+
     /* Each Level comes in a pair of cells for each half of an academic period, I guess
      * These should not have a dividing line in between
      */
@@ -179,12 +185,14 @@
                     {% set dotColor = 'white' %}
                 {% endif %}
 
-                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div> {{ nodeData.previous.mark }}
+                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
+                <span class="annotation">{{ nodeData.previous.mark }}</span>
             {% endif %}
 
             {# Progression Point from current academic period #}
             {% if i == (nodeData.current.mark ?? null) %}
                 <div class="black dot" title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}"></div>
+                <span class="annotation">{{ nodeData.current.mark }}</span>
             {% endif %}
         </td>
     {% endfor %}
