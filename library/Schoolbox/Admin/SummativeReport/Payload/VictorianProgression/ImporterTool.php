@@ -123,6 +123,13 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * We allow import of these feedback marks, specifically
+     * This excludes random stuff like empty string, null, DNLP, DNPP, DNPU etc.
+     */
+    private const VALID_DATA = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11];
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -185,16 +192,6 @@ class ImporterTool extends CliTool\App
         VALUES
         (:boxId, :marker, :owner, :reviewRoute, :mark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
     ";
-
-
-    /**
-     * Arbitrarily choose actual dates...in honor of Theoden King
-     * I have this unshakeable feeling that we might need SEM1 data
-     */
-//    private const ASSESSMENT_SEM1_DATE_PUBLISH = '5/5/2023 12:01am';
-//    private const ASSESSMENT_SEM1_DATE_OPEN = '5/5/2023 12:02am';
-//    private const ASSESSMENT_SEM1_DATE_DUE = '5/5/2023 12:03am';
-//    private const ASSESSMENT_SEM1_DATE_CLOSE = '5/5/2023 12:04am';
 
 
     /**
@@ -767,12 +764,11 @@ HELP;
              */
             $humanReadableMark = trim($row[11]);
 
-            /* Only allow possible outcomes, decided by us; POSSIBLE_OUTCOMES is a subset
-             * of what might be in the system and normally depicts a sliding scale, a window
-             * of data that should appear on the report. How wide this window is...
-             * ...it's uncertain atm
+            /* Only accept numeric data. This is the full superset of data we COULD display,
+             * since each report is supposed to be a "window of levels" proximal to the current
+             * year level of a student.
              */
-            if (!\in_array($humanReadableMark, Payload::POSSIBLE_OUTCOMES, false)) {
+            if (!\in_array($humanReadableMark, self::VALID_DATA, false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
                     $i,
@@ -884,40 +880,48 @@ HELP;
                     $this->getLogger()->info(sprintf(
                         'Row %s: created new assessment "%s" (%s) in folder %s',
                         $i,
-                        $assessment->getId(),
                         $assessment->getTitle(),
+                        $assessment->getId(),
                         $folder->getTitle()
                     ));
                 }
             }
 
-            /* Summon it from memory (yes I know...)
+            $this->getLogger()->debug(sprintf(
+                'Row %s: preparing feedback with human readable mark %s',
+                $i,
+                $humanReadableMark
+            ));
+
+            /* We can only generate assessments in perform mode
              */
-            $assessment = $seen[$externalAssessmentId];
-
-            /* Make a feedback for a student
-             *
-             * listen...you could try to use the various mapperproxies, participants, plans
-             * and all this other andyland domain-level stuff, or you can just ram it straight
-             * into the bullseye
-             */
-            $box = $submissionBoxMapper->findOneByColumn('assessment_id', $assessment->getId());
-            $student = $this->userMapper->findByExternalId($row[3]);
-
-            $params = [
-                'boxId' => $box->getId(),
-                'marker' => $creator->getId(),
-                'owner' => $student->getId(),
-                'reviewRoute' => 'instructor',
-                'mark' => $row[11],
-                'resubmissionRequired' => 0,
-                'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
-                'publishedAt' => $feedbackPublishedAt,
-                'publishedBy' => $creator->getId(),
-                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
-            ];
-
             if ($this->perform()) {
+                /* Summon it from memory (yes I know...)
+                 */
+                $assessment = $seen[$externalAssessmentId];
+
+                /* Make a feedback for a student
+                 *
+                 * listen...you could try to use the various mapperproxies, participants, plans
+                 * and all this other andyland domain-level stuff, or you can just ram it straight
+                 * into the bullseye
+                 */
+                $box = $submissionBoxMapper->findOneByColumn('assessment_id', $assessment->getId());
+                $student = $this->userMapper->findByExternalId($row[3]);
+
+                $params = [
+                    'boxId' => $box->getId(),
+                    'marker' => $creator->getId(),
+                    'owner' => $student->getId(),
+                    'reviewRoute' => 'instructor',
+                    'mark' => $row[11],
+                    'resubmissionRequired' => 0,
+                    'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
+                    'publishedAt' => $feedbackPublishedAt,
+                    'publishedBy' => $creator->getId(),
+                    'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+                ];
+
                 $feedbackStatement->execute($params);
             }
         }
