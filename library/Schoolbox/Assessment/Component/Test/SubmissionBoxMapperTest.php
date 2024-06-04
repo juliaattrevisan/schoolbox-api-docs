@@ -40,6 +40,12 @@ class SubmissionBoxMapperTest extends TestCase
             'owner'             => 15,
             'accept_submission' => true,
             'multi_submission'  => false,
+            'kami_interactive'  => true,
+            'kami_interactive_hash'  => 'thisIsNotAHash',
+            'enable_offline'    => true,
+            'enable_text'       => true,
+            'enable_files'      => true,
+            'enable_policy'     => true,
             'max_mark'          => 100,
             'self_reviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
         );
@@ -52,6 +58,12 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(15, $box->getOwner()->getId());
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());
+        $this->assertEquals(true, $box->getKamiInteractive());
+        $this->assertEquals('thisIsNotAHash', $box->getKamiFile());
+        $this->assertEquals(true, $box->getEnableOffline());
+        $this->assertEquals(true, $box->getEnableText());
+        $this->assertEquals(true, $box->getEnableFiles());
+        $this->assertEquals(true, $box->getEnablePolicy());
         $this->assertEquals(100, $box->getMaxMark());
     }
 

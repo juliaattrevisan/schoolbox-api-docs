@@ -70,7 +70,7 @@
     <label for="assessment-description">Description</label>
     <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
 
-    {% include 'sub/attachzone.twig' %}
+    {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
 
     {# ----------------------------------------------------------- #}
     {# Assessment Location #}
@@ -132,38 +132,45 @@
             <ul class="option-list">
                 {% if kami_enabled %}
                 <li>
-                    <input id="worksheet" type="checkbox" name="submissionOptions[]" value="submissionOptions-worksheet" data-type-group>
+                    <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="submissionOptions[]" value="kamiInteractive" data-type-group>
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
-                    <div id="worksheetDropzone" style="display:none">  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} %} </div>
+                    <div id="worksheetDropzone" {{ assessment.getKamiInteractive ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
                 </li>
                 {% endif %}
                 <li>
-                    <input id="allow-offline" type="checkbox" name="submissionOptions[]" value="submissionOptions-allow-offline" data-type-group>
+                    <input id="allow-offline" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="submissionOptions[]" value="enableOffline" data-type-group>
                     <label for="allow-offline" class="checkbox-label">Allow Offline</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work offline to acknowledge that it has been completed.">?</span>
                 </li>
                 <li>
-                    <input id="text-editor" type="checkbox" name="submissionOptions[]" value="submissionOptions-text-editor" data-type-group>
+                    <input id="text-editor" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="submissionOptions[]" value="enableText" data-type-group>
                     <label for="text-editor" class="checkbox-label">Text Editor</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type directly into the editor, and add or edit their due work content.">?</span>
                 </li>
                 <li>
-                    <input id="files" type="checkbox" name="submissionOptions[]" value="submissionOptions-files" data-type-group>
+                    <input id="files" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="submissionOptions[]" value="enableFiles" data-type-group>
                     <label for="files" class="checkbox-label">Files</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
                 </li>
                 {% if lmsStudentPolicy | length %}
                 <li>
-                    <input id="declaration" type="checkbox" name="submissionDeclaration" value="submissionOptions-declaration">
+                    <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
+                    <input id="declaration" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getEnablePolicy ? 'checked' : '' }} name="enablePolicy" value="on">
                     <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
-                    </br><aside class="meta l-mar-xl--left"><a class="link" data-reveal-id="simple">View Authenticity Declaration Terms</a></aside>
-                    <div data-reveal="" id="simple" class="reveal-modal" aria-hidden="true" style="display: none; top: 100px; opacity: 1; visibility: hidden;">
+                    </br><aside class="meta l-mar-xl--left"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
+                    <div data-reveal="" role="dialog" id="policyDialog" class="reveal-modal" aria-hidden="true" style="display: none; top: 100px; opacity: 1; visibility: hidden;">
                         <h2>Authenticity Declaration Terms</h2>
                         <p>{{ lmsStudentPolicy | purify }}</p>
-                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                        <a class="close-reveal-modal" data-close aria-label="Close">×</a>
+                        {% if not courseManaged.isReadonly %}
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes, I agree</a></li>
+                            <li><a class="button" data-reject>Cancel</a></li>
+                        </ul>
+                        {% endif %}
                     </div>
                 </li>
                 {% endif %}
@@ -336,6 +343,41 @@
     const worksheetCheckbox = document.getElementById("worksheet");
     const worksheetDropdzone = document.getElementById("worksheetDropzone");
     worksheetCheckbox.addEventListener("change", onWorksheetChange);
+    {% endif %}
+
+    {% if lmsStudentPolicy | length %}
+    // Confirm dialog (if it exists)
+    let $policyOption  = $('#declaration'),
+        $confirmDialog = $('#policyDialog'),
+        $acceptButton  = $confirmDialog.find('[data-accept]'),
+        $rejectButton  = $confirmDialog.find('[data-reject]'),
+        $closeButton  = $confirmDialog.find('[data-close]'),
+        $buttons       = $().add($acceptButton).add($rejectButton),
+        showActionButtons  = function () { $buttons.css('display', 'block'); },
+        showCloseButton  = function () { $closeButton.css('display', 'block'); },
+        hideActionButtons = function () { $buttons.css('display', 'none'); };
+        hideCloseButton = function () { $closeButton.css('display', 'none'); };
+    // Confirm dialog accept/reject
+    $acceptButton.click(function (event) {
+        hideActionButtons();
+        event.preventDefault();
+        $confirmDialog.foundation('reveal', 'close');
+        showCloseButton();
+    });
+    $rejectButton.click(function (event) {
+        hideActionButtons();
+        event.preventDefault();
+        $policyOption[0].checked = false;
+        $confirmDialog.foundation('reveal', 'close');
+        showCloseButton();
+    });
+    $policyOption.click(function(){
+        if ($policyOption[0].checked) {
+            showActionButtons();
+            hideCloseButton();
+            $confirmDialog.foundation('reveal', 'open');
+        }
+    });
     {% endif %}
 </script>
 

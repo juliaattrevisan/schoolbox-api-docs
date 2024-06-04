@@ -112,7 +112,13 @@ class AssessmentAudit
         course_implementation.deleted_at, course_unit_specification.deleted_at,
         course_unit_implementation.deleted_at, unit_spec_folder.deleted_at,
         unit_imp_folder.deleted_at, course_imp_spec_folder.deleted_at,
-        course_spec_folder.deleted_at), true, false) as 'parentDeleted'
+        course_spec_folder.deleted_at), true, false) as 'parentDeleted',
+
+        submission_box.kami_interactive as 'kami_interactive',
+        submission_box.enable_offline as 'enable_offline',
+        submission_box.enable_text as 'enable_text',
+        submission_box.enable_files as 'enable_files',
+        submission_box.enable_policy as 'enable_policy'
 
         FROM mv_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -142,7 +148,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName', 'SubjectCode',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility', 'ParentObjectDeleted'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility', 'Policy', 'SubmissionOptions', 'ParentObjectDeleted'];
 
         //run the sql, if it fails, let it error without breaking the csv file
         $statement->execute();
@@ -201,6 +207,22 @@ class AssessmentAudit
                 $capabilityGradeSchemeScale = $row['capabilityGradeGroup'];
             }
 
+            // Submission Options
+            $submissionOptions = [];
+
+            if (1 === $row['kami_interactive']) {
+                $submissionOptions[] = 'kami_interactive';
+            }
+            if (1 === $row['enable_offline']) {
+                $submissionOptions[] = 'offline';
+            }
+            if (1 === $row['enable_text']) {
+                $submissionOptions[] = 'text';
+            }
+            if (1 === $row['enable_files']) {
+                $submissionOptions[] = 'files';
+            }
+
             //build the row and send
             fputcsv($fp, [
                 $row['assessmentId'],
@@ -229,6 +251,8 @@ class AssessmentAudit
                 $row['dueDate'],
                 $row['selfReviewability'],
                 SubmissionBox::MARK_VISIBILITY_STRINGS[$row['markVisibility']],
+                1 === $row['enable_policy'] ? 'true' : 'false',
+                implode(';', $submissionOptions),
                 $row['parentDeleted']
             ]);
         }

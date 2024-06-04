@@ -91,9 +91,11 @@ Data:
             // Submit form via AJAX
             let formContents = $form.serializeArray();
             formContents.push({name: 'saveDraft', value: '1'});
-            if (acceptsOnline) {
-                formContents.push({name: 'body', value: window.sbProps.editors['editor-body'].getData()});
-            }
+            {% if assessment.getEnableText %}
+                if (acceptsOnline) {
+                    formContents.push({name: 'body', value: window.sbProps.editors['editor-body'].getData()});
+                }
+            {% endif %}
             $formSaveLabel.toastActivate({
                 text: 'Autosaving'
             });
@@ -144,9 +146,9 @@ Data:
             if (!acceptsOnline) {
                 return true;
             }
-            let inlineLen = window.sbProps.editors['editor-body'].getData().length,
-                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
-            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson').prop('checked'));
+            let inlineLen = window.sbProps.editors['editor-body']?.getData().length,
+                filesLen  = $('#files-zone').data('plugin_resourceAttach')?.dropzone.getAcceptedFiles().length;
+            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson')?.prop('checked'));
         };
 
         /**
@@ -187,7 +189,7 @@ Data:
 
         /* Spawn editors
          */
-        document.getElementById("editor-body").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
+        document.getElementById("editor-body")?.addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
         function onDefaultEditorCreated(event) {
             initAutosave(event.detail.sourceElement);
             autosavePresubmit(event.detail.sourceElement);
@@ -224,30 +226,32 @@ Data:
                     .val(submittingText);
                 // Make the form's inputs readonly (NOT disabled)
                 $form.find('input, select, textarea').prop('readonly', true);
-                // check the editor content if we accept online submissions and the "submitted in person" checkbox is not checked
-                if (acceptsOnline && !$form.find('#editor-submittedInPerson').prop('checked')) {
-                    /**
-                     * In order to submit, we need to ensure there's some textContent:
-                     * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-                     * For example if we just submit a single image, they'll be no textContent
-                     * and the submission will fail.
-                     * So we just add a new line: <p>&nbsp;</p> at the end of the editor's content
-                     */
-                    const editor = window.sbProps.editors['editor-body'];
-                    const document = new DOMParser().parseFromString(editor.getData(), "text/html");
-                    const textContent = document.body.textContent.trim();
-                    if (textContent.length === 0) {
-                        const selectionRange = editor.model.document.selection.getFirstRange();
-                        const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
-                        if (selectedElement) {
-                            editor.execute("insertParagraph", {
-                                position: editor.model.createPositionAfter(selectedElement),
-                            });
+                {% if assessment.getEnableText %}
+                    // check the editor content if we accept online submissions and the "submitted in person" checkbox is not checked
+                    if (acceptsOnline && !$form.find('#editor-submittedInPerson').prop('checked')) {
+                        /**
+                         * In order to submit, we need to ensure there's some textContent:
+                         * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+                         * For example if we just submit a single image, they'll be no textContent
+                         * and the submission will fail.
+                         * So we just add a new line: <p>&nbsp;</p> at the end of the editor's content
+                         */
+                        const editor = window.sbProps.editors['editor-body'];
+                        const document = new DOMParser().parseFromString(editor.getData(), "text/html");
+                        const textContent = document.body.textContent.trim();
+                        if (textContent.length === 0) {
+                            const selectionRange = editor.model.document.selection.getFirstRange();
+                            const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
+                            if (selectedElement) {
+                                editor.execute("insertParagraph", {
+                                    position: editor.model.createPositionAfter(selectedElement),
+                                });
+                            }
                         }
+                        // prevent any further editing while submitting
+                        editor.enableReadOnlyMode('editor-body');
                     }
-                    // prevent any further editing while submitting
-                    editor.enableReadOnlyMode('editor-body');
-                }
+                {% endif %}
                 // Disable draft autosaving
                 suspendAutosave();
                 // Submit the form
@@ -294,7 +298,7 @@ Data:
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
                 $('#editor-body').attr('disabled', true);
-                if (window.sbProps.editors['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                if (window.sbProps.editors['editor-body']?.getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
                     $('#submit-warning').hide('slow');
@@ -375,6 +379,7 @@ Data:
                         <section>
                             <div class="content">
                                 {# Submitted my own work checkbox #}
+                                {% if assessment.getEnableOffline %}
                                 <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
                                 <label for="editor-submittedInPerson" class="checkbox-label" data-test="assessment-submission-create-submittedInPerson">
                                     {% if isSubmitOnBehalfOf %}
@@ -383,11 +388,18 @@ Data:
                                         I have submitted my work in person, and don't need to upload or use the editor
                                     {% endif %}
                                 </label>
+                                {% endif %}
+                                {% if assessment.getEnableText or assessment.getEnableFiles %}
                                 <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
                                 <div id="submission-upload">
+                                    {% if assessment.getEnableText %}
                                     <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                    {% endif %}
+                                    {% if assessment.getEnableFiles %}
+                                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                    {% endif %}
                                 </div>
+                                {% endif %}
                             </div>
                         </section>
                     </div>
@@ -407,7 +419,7 @@ Data:
              #}
             {% if requiresReflection or policy | length %}
                 <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
-                    {% if policy | length %}
+                    {% if assessment.getEnablePolicy and policy | length %}
                         <p>{{ policy | purify }}</p>
                         {% if requiresReflection %}
                             <p id="confirm-empty-self-assessment-comment" class="hide">

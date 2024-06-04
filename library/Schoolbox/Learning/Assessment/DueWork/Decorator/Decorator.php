@@ -63,6 +63,12 @@ class Decorator implements DecoratorInterface
      * @param array        $attachedFiles
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
+     * @param bool         $kamiInteractive
+     * @param string|null  $kamiFile
+     * @param bool         $enableOffline
+     * @param bool         $enableText
+     * @param bool         $enableFiles
+     * @param bool         $enablePolicy
      * @param DueWork|null $original
      */
     public function __construct(
@@ -78,6 +84,12 @@ class Decorator implements DecoratorInterface
         array $attachedFiles,
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
+        bool $kamiInteractive,
+        ?string $kamiFile,
+        bool $enableOffline,
+        bool $enableText,
+        bool $enableFiles,
+        bool $enablePolicy,
         ?DueWork $original
     ) {
         $this->setAcceptOnline($acceptOnline);
@@ -92,6 +104,12 @@ class Decorator implements DecoratorInterface
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
+        $this->setKamiInteractive($kamiInteractive);
+        $this->setKamiFile($kamiFile);
+        $this->setEnableOffline($enableOffline);
+        $this->setEnableText($enableText);
+        $this->setEnableFiles($enableFiles);
+        $this->setEnablePolicy($enablePolicy);
         $this->original = $original;
     }
 
@@ -229,5 +247,40 @@ class Decorator implements DecoratorInterface
         /* Similarity Check
          */
         $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
+
+        /* Are we in a course managed, and modifying something.
+         * if there are no fields in the request (submission options are required) we should just re save what was in the original assessment
+         * if there are fields being sent, irrespective if we are updating or creating, we should save those new fields.
+         */
+        if (
+            $this->original && !(
+                $this->getKamiInteractive() ||
+                $this->getEnableOffline() ||
+                $this->getEnableText() ||
+                $this->getEnableFiles()
+            )
+        ) {
+            // we aren't posting the data when updating
+            $assessment->setKamiInteractive($this->original->getKamiInteractive());
+            $assessment->setKamiFile($this->original->getKamiFile());
+            $assessment->setEnableOffline($this->original->getEnableOffline());
+            $assessment->setEnableText($this->original->getEnableText());
+            $assessment->setEnableFiles($this->original->getEnableFiles());
+            $assessment->setEnablePolicy($this->original->getEnablePolicy());
+        } else {
+            $assessment->setKamiInteractive($this->getKamiInteractive());
+            $assessment->setKamiFile($this->getKamiFile());
+            $assessment->setEnableOffline($this->getEnableOffline());
+            $assessment->setEnableText($this->getEnableText());
+            $assessment->setEnableFiles($this->getEnableFiles());
+            $assessment->setEnablePolicy($this->getEnablePolicy());
+        }
+
+        if ($this->getKamiFile()) {
+            // Rebuild worksheet files list
+            $factory = new CollectorFactory();
+            $attachments = $factory->build([$this->getKamiFile()])->getAll();
+            $assessment->setKamiFile($attachments[0]->getHash());
+        }
     }
 }

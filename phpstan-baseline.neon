@@ -5955,4 +5955,99 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getLearnosityReference\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
-
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setKamiInteractive\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getKamiInteractive\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setKamiInteractive\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getKamiInteractive\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setKamiFile\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getKamiFile\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setKamiFile\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getKamiFile\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setEnableOffline\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getEnableOffline\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setEnableOffline\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getEnableOffline\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setEnableText\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getEnableText\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setEnableText\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getEnableText\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setEnableFiles\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getEnableFiles\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setEnableFiles\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getEnableFiles\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setEnablePolicy\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getEnablePolicy\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setEnablePolicy\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getEnablePolicy\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php

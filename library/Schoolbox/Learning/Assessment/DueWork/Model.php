@@ -135,6 +135,36 @@ class Model extends AbstractAssessment implements ISelfAssessable
      */
     private $externalId;
 
+    /**
+     * @var bool
+     */
+    protected bool $kamiInteractive = false;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $kamiFile = null;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableOffline = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableText = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $enableFiles = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $enablePolicy = false;
+
 
     /**
      * @return string
@@ -979,5 +1009,113 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         $this->externalId = $externalId;
         return $this;
+    }
+
+    /**
+     * @param bool $kamiInteractive
+     * @return $this
+     */
+    public function setKamiInteractive(bool $kamiInteractive): self
+    {
+        $this->kamiInteractive = $kamiInteractive;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getKamiInteractive(): bool
+    {
+        return $this->kamiInteractive;
+    }
+
+    /**
+     * @param string|null $kamiFile
+     * @return $this
+     */
+    public function setKamiFile(?string $kamiFile): self
+    {
+        $this->kamiFile = $kamiFile;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKamiFile(): ?string
+    {
+        return $this->kamiFile;
+    }
+
+    /**
+     * @param bool $enableOffline
+     * @return $this
+     */
+    public function setEnableOffline(bool $enableOffline): self
+    {
+        $this->enableOffline = $enableOffline;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableOffline(): bool
+    {
+        return $this->enableOffline;
+    }
+
+    /**
+     * @param bool $enableText
+     * @return $this
+     */
+    public function setEnableText(bool $enableText): self
+    {
+        $this->enableText = $enableText;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableText(): bool
+    {
+        return $this->enableText;
+    }
+
+    /**
+     * @param bool $enableFiles
+     * @return $this
+     */
+    public function setEnableFiles(bool $enableFiles): self
+    {
+        $this->enableFiles = $enableFiles;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableFiles(): bool
+    {
+        return $this->enableFiles;
+    }
+
+    /**
+     * @param bool $enablePolicy
+     * @return $this
+     */
+    public function setEnablePolicy(bool $enablePolicy): self
+    {
+        $this->enablePolicy = $enablePolicy;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnablePolicy(): bool
+    {
+        return $this->enablePolicy;
     }
 }
