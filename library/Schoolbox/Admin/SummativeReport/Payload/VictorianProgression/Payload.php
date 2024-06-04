@@ -11,7 +11,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Assessment\Term\Model;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\User;
 
 /**
@@ -151,20 +151,16 @@ class Payload
 
 
     /**
-     * @var int|null
-     */
-    private ?int $workTypeId = null;
-
-
-    /**
      * Constructor.
      *
-     * @param \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper
+     * @param Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @param int $workTypeId
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
-        private \Schoolbox\Assessment\Term\Mapper $termMapper
+        private \Schoolbox\Assessment\Term\Mapper $termMapper,
+        private int $workTypeId
     ) {
     }
 
@@ -192,18 +188,6 @@ class Payload
 
         $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare($query);
 
-        /* Find the Work Type Id first, by name for lack of a better way
-         */
-        try {
-            $workType = $this->workTypeMapper->findOneByColumn('name', self::WORK_TYPE_NAME);
-            $this->workTypeId = (int)$workType->getId();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \DomainException(sprintf(
-                'Missing required worktype in admin: %s',
-                self::WORK_TYPE_NAME
-            ));
-        }
-
         /* Remember we did this
          */
         $this->setup = true;
@@ -219,7 +203,6 @@ class Payload
      * @param Model $currentAcademicPeriod
      * @param string|null $classCode
      * @return array
-     * @throws Exception
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException

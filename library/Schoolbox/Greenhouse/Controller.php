@@ -41,6 +41,19 @@ class Controller extends Base
 
         $student = $userMapper->findById($this->requestQuery->get('userId'));
 
+        /* Find the special Work Type by name for lack of a better way.
+         * One day this will be configurable in Summative Report itself, at which point it will be conclusive.
+         */
+        try {
+            $workType = $workTypeMapper->findOneByColumn('name', VictorianProgression\Payload::WORK_TYPE_NAME);
+            $workTypeId = (int)$workType->getId();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new \DomainException(sprintf(
+                'Missing required worktype in admin: %s',
+                VictorianProgression\Payload::WORK_TYPE_NAME
+            ));
+        }
+
         /* TODO find out how summative report handles multiple code(s)
          */
         $classCode = $this->requestQuery->get('code');
@@ -48,7 +61,7 @@ class Controller extends Base
         $academicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $academicPeriod, $classCode),
+            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper, $workTypeId))->generate($student, $academicPeriod, $classCode),
             'audit' => (new VictorianProgression\Auditor($workTypeMapper))->audit()
         ]);
     }
