@@ -494,6 +494,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
+                {$this->getJoinColumnString('duework.kamiFile', 'dkf')},
+                {$this->getJoinColumnString('duework.kamiFile.allowedFileExtension', 'dkfs')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
@@ -517,6 +519,8 @@ class Mapper extends BaseMapper
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('duework.kamiFile', 'd', 'dkf', true)}
+            LEFT JOIN {$this->getJoinSql('duework.kamiFile.allowedFileExtension', 'dkf', 'dkfs', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
@@ -802,6 +806,10 @@ class Mapper extends BaseMapper
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                         ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
                         ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
+                        ->setKamiFile(
+                            $this->hydrateJoin($row, 'duework.kamiFile', 'dkf')
+                                 ?->setMimeType($this->hydrateJoin($row, 'duework.kamiFile.allowedFileExtension', 'dkfs'))
+                        )
                 );
                 $dueWorkIds[] = $row['d.id'];
             } else {
