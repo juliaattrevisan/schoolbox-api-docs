@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
@@ -210,9 +211,12 @@ class Payload
 
 
     /**
-     * Facade method for generateOne()
+     * Facade method for generateOne() and spawns data for the $currentAcademicPeriod
+     * provided. It will look back as far as two academic periods before $currentAcademicPeriod
+     * for previous data.
      *
      * @param User $student
+     * @param Model $currentAcademicPeriod
      * @param string|null $classCode
      * @return array
      * @throws Exception
@@ -220,12 +224,11 @@ class Payload
      * @throws \DomainException
      * @throws \PDOException
      */
-    public function generate(\Schoolbox\User $student, ?string $classCode): array
-    {
-        /* Determine what current academic period we're in
-         */
-        $currentAcademicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
-
+    public function generate(
+        \Schoolbox\User $student,
+        \Schoolbox\Assessment\Term\Model $currentAcademicPeriod,
+        ?string $classCode
+    ): array {
         /* Collate the current academic period's curriculum nodes
          * and associated feedback
          */

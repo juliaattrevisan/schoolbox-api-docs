@@ -22,7 +22,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(private \Schoolbox\Assessment\Term\Mapper $termMapper)
     {
     }
 
@@ -45,8 +45,10 @@ class Controller extends Base
          */
         $classCode = $this->requestQuery->get('code');
 
+        $academicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
+
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $classCode),
+            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper))->generate($student, $academicPeriod, $classCode),
             'audit' => (new VictorianProgression\Auditor($workTypeMapper))->audit()
         ]);
     }
