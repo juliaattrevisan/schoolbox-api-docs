@@ -138,7 +138,8 @@ class SubmissionBoxMapper extends BaseMapper
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('assessmentModel', 'am')},
                    {$this->getJoinColumnString('owner', 'o')},
-                   {$this->getJoinColumnString('kamiFile', 'kf')}
+                   {$this->getJoinColumnString('kamiFile', 'kf')},
+                   {$this->getJoinColumnString('kamiFile.allowedFileExtension', 'kfs')}
         ";
     }
 
@@ -153,6 +154,7 @@ class SubmissionBoxMapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
             LEFT  JOIN {$this->getJoinSql('kamiFile', '', 'kf', true)}
+            LEFT  JOIN {$this->getJoinSql('kamiFile.allowedFileExtension', 'kf', 'kfs', true)}
         ";
     }
 
@@ -169,10 +171,14 @@ class SubmissionBoxMapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
+            $kamiFile = $this->hydrateJoin($row, 'kamiFile', 'kf');
+            if ($kamiFile instanceof Storage\Model) {
+                $kamiFile->setMimeType($this->hydrateJoin($row, 'kamiFile.allowedFileExtension', 'kfs'));
+            }
             $box = $this->hydrate($row)
                         ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
                         ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
-                        ->setKamiFile($this->hydrateJoin($row, 'kamiFile', 'kf'))
+                        ->setKamiFile($kamiFile)
             ;
             $collection[$box->getId()] = $box;
         }
