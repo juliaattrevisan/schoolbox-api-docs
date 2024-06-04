@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
@@ -125,9 +126,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected bool $kamiInteractive = false;
 
     /**
-     * @var string|null
+     * @var Storage\Model|null
      */
-    protected ?string $kamiFile = null;
+    protected ?Storage\Model $kamiFile = null;
 
     /**
      * @var bool
@@ -950,19 +951,19 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param Storage\Model|null $kamiFile
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setKamiFile(?Storage\Model $kamiFile): self
     {
         $this->kamiFile = $kamiFile;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return Storage\Model|null
      */
-    public function getKamiFile(): ?string
+    public function getKamiFile(): ?Storage\Model
     {
         return $this->kamiFile;
     }

@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 /**
@@ -59,7 +60,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
-        $this->uses('kami_interactive_hash', self::TYPE_STRING, null, 'kamiFile');
+        $this->joins('kami_interactive_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
         $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
@@ -136,7 +137,8 @@ class SubmissionBoxMapper extends BaseMapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('assessmentModel', 'am')},
-                   {$this->getJoinColumnString('owner', 'o')}
+                   {$this->getJoinColumnString('owner', 'o')},
+                   {$this->getJoinColumnString('kamiFile', 'kf')}
         ";
     }
 
@@ -150,6 +152,7 @@ class SubmissionBoxMapper extends BaseMapper
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
+            LEFT  JOIN {$this->getJoinSql('kamiFile', '', 'kf', true)}
         ";
     }
 
@@ -169,6 +172,7 @@ class SubmissionBoxMapper extends BaseMapper
             $box = $this->hydrate($row)
                         ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
                         ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
+                        ->setKamiFile($this->hydrateJoin($row, 'kamiFile', 'kf'))
             ;
             $collection[$box->getId()] = $box;
         }
