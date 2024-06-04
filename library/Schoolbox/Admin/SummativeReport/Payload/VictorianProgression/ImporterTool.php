@@ -188,12 +188,22 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * Pick an actual date...can't think of a better Semester 2 date than N7 Day, heh
+     * Arbitrarily choose actual dates...in honor of Theoden King
+     * I have this unshakeable feeling that we might need SEM1 data
      */
-    private const ASSESSMENT_DATE_PUBLISH = '7/11/2023 12:01am';
-    private const ASSESSMENT_DATE_OPEN = '7/11/2023 12:02am';
-    private const ASSESSMENT_DATE_DUE = '7/11/2023 12:03am';
-    private const ASSESSMENT_DATE_CLOSE = '7/11/2023 12:04am';
+//    private const ASSESSMENT_SEM1_DATE_PUBLISH = '5/5/2023 12:01am';
+//    private const ASSESSMENT_SEM1_DATE_OPEN = '5/5/2023 12:02am';
+//    private const ASSESSMENT_SEM1_DATE_DUE = '5/5/2023 12:03am';
+//    private const ASSESSMENT_SEM1_DATE_CLOSE = '5/5/2023 12:04am';
+
+
+    /**
+     * Arbitrarily choose actual dates...can't think of a better Semester 2 date than N7 Day, heh
+     */
+    private const ASSESSMENT_SEM2_DATE_PUBLISH = '7/11/2023 12:01am';
+    private const ASSESSMENT_SEM2_DATE_OPEN = '7/11/2023 12:02am';
+    private const ASSESSMENT_SEM2_DATE_DUE = '7/11/2023 12:03am';
+    private const ASSESSMENT_SEM2_DATE_CLOSE = '7/11/2023 12:04am';
 
 
 
@@ -842,10 +852,12 @@ HELP;
                         /* This is literally a csv in a one-element array
                          */
                         'curriculumCodes' => [(string)$curriculumNode->getId()],
-                        'publishDate' => self::ASSESSMENT_DATE_PUBLISH,
-                        'openDate' => self::ASSESSMENT_DATE_OPEN,
-                        'dueDate' => self::ASSESSMENT_DATE_DUE,
-                        'closeDate' => self::ASSESSMENT_DATE_CLOSE,
+                        /* Maybe make this optional between SEM2 and SEM1 dates
+                         */
+                        'publishDate' => self::ASSESSMENT_SEM2_DATE_PUBLISH,
+                        'openDate' => self::ASSESSMENT_SEM2_DATE_OPEN,
+                        'dueDate' => self::ASSESSMENT_SEM2_DATE_DUE,
+                        'closeDate' => self::ASSESSMENT_SEM2_DATE_CLOSE,
                         'markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
