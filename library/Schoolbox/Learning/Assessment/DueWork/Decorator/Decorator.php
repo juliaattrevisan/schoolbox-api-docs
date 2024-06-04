@@ -274,6 +274,8 @@ class Decorator implements DecoratorInterface
                 $factory     = new CollectorFactory();
                 $attachments = $factory->build([$this->getKamiFile()])->getAll();
                 $assessment->setKamiFile($attachments[0]);
+            } else {
+                $assessment->setKamiFile(null);
             }
             $assessment->setEnableOffline($this->getEnableOffline());
             $assessment->setEnableText($this->getEnableText());
