@@ -280,7 +280,7 @@ class Decorator implements DecoratorInterface
             // Rebuild worksheet files list
             $factory = new CollectorFactory();
             $attachments = $factory->build([$this->getKamiFile()])->getAll();
-            $assessment->setKamiFile($attachments[0]->getHash());
+            $assessment->setKamiFile($attachments[0]);
         }
     }
 }

@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Resource\Storage\IStorage;
 
 class Model extends AbstractAssessment implements ISelfAssessable
 {
@@ -141,9 +142,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected bool $kamiInteractive = false;
 
     /**
-     * @var string|null
+     * @var IStorage|null
      */
-    protected ?string $kamiFile = null;
+    protected ?IStorage $kamiFile = null;
 
     /**
      * @var bool
@@ -1030,19 +1031,19 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param IStorage|null $kamiFile
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setKamiFile(?IStorage $kamiFile): self
     {
         $this->kamiFile = $kamiFile;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return IStorage|null
      */
-    public function getKamiFile(): ?string
+    public function getKamiFile(): ?IStorage
     {
         return $this->kamiFile;
     }
