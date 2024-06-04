@@ -55,29 +55,25 @@ class Transactor
     /**
      * Transactor constructor.
      *
-     * @param FolderMapper                          $folderMapper
-     * @param UnitImplementationMapper              $unitImplementationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param AssessmentMapperProxy                 $assessmentMapperProxy
-     * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
-     * @param Turnitin\Group\Mapper                 $turnitinGroupMapper
-     * @param SubmissionBoxMapper                   $submissionBoxMapper
-     * @param SingleFile\Mapper                     $submissionFileMapper
-     * @param QuizMapper                            $quizMapper
-     * @param Generator                             $routeGenerator
-     * @param Replicator                            $replicator
-     * @param LessonPlanActivitiesReplicator        $lessonPlanActivitiesReplicator
+     * @param FolderMapper                   $folderMapper
+     * @param UnitImplementationMapper       $unitImplementationMapper
+     * @param UnitSpecificationMapper        $unitSpecificationMapper
+     * @param AssessmentMapperProxy          $assessmentMapperProxy
+     * @param Turnitin\Group\Mapper          $turnitinGroupMapper
+     * @param SubmissionBoxMapper            $submissionBoxMapper
+     * @param SingleFile\Mapper              $submissionFileMapper
+     * @param Generator                      $routeGenerator
+     * @param Replicator                     $replicator
+     * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
      */
     public function __construct(
         private FolderMapper $folderMapper,
         private UnitImplementationMapper $unitImplementationMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
-        private DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
         private Turnitin\Group\Mapper $turnitinGroupMapper,
         private SubmissionBoxMapper $submissionBoxMapper,
         private SingleFile\Mapper $submissionFileMapper,
-        private QuizMapper $quizMapper,
         private Generator $routeGenerator,
         private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
