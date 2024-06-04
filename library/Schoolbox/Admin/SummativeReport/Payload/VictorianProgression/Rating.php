@@ -12,7 +12,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 class Rating
 {
     /**
-     * The algorith makes a special case usage
+     * The algorithm makes a special case usage
      */
     private const SEMESTER_1 = 1;
     private const SEMESTER_1_OFFSET = 0.5;
@@ -65,19 +65,19 @@ class Rating
         }
 
         if ($diff >= -1 && $diff < 0) {
-            $result =  'Below Standard';
+            $result = 'Below Standard';
         }
 
         if ($diff === 0.0) {
-            $result =  'At Standard';
+            $result = 'At Standard';
         }
 
         if ($diff > 0 && $diff <= 1) {
-            $result =  'Above Standard';
+            $result = 'Above Standard';
         }
 
         if ($diff > 1) {
-            $result =  'Well Above Standard';
+            $result = 'Well Above Standard';
         }
 
         /* Add a metric annotation
@@ -90,8 +90,6 @@ class Rating
             );
         }
 
-        /* Not sure how you'd get here, but ok
-         */
         return $result;
     }
 }
