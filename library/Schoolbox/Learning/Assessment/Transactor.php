@@ -30,6 +30,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use UnexpectedValueException;
 
@@ -64,6 +65,7 @@ class Transactor
      * @param Replicator                     $replicator
      * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
      * @param Kami\Connector                 $kamiConnector
+     * @param FilesystemProxy                $filesystemProxy
      */
     public function __construct(
         private FolderMapper $folderMapper,
@@ -77,6 +79,7 @@ class Transactor
         private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
         private Kami\Connector $kamiConnector,
+        private FilesystemProxy $filesystemProxy,
     ) {
     }
 
@@ -210,7 +213,10 @@ class Transactor
             if ($this->assessment->getKamiInteractive() && $this->assessment->getKamiFile()) {
                 // Upload this file to Kami
                 // This will also need a document ID attached
-                $document = $this->kamiConnector->uploadDocumentAsTemplate($this->assessment->getKamiFile());
+                $document = $this->kamiConnector->uploadDocumentAsTemplate(
+                    $this->assessment->getKamiFile(),
+                    $this->filesystemProxy,
+                );
             }
         }
 

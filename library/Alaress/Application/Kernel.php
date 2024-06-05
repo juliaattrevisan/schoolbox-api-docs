@@ -1600,6 +1600,7 @@ abstract class Kernel
                         ]
                     ),
                     'kamiConnector'            => $di->lazyGet('kamiConnector'),
+                    'filesystemProxy'          => $di->lazyGet('filesystem.storageProxy'),
                 ]
             )
         );
