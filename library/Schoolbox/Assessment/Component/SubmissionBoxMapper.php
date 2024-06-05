@@ -61,6 +61,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
         $this->joins('kami_interactive_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
+        $this->uses('kami_interactive_document_id', self::TYPE_STRING);
         $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');

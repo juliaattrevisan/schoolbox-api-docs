@@ -147,6 +147,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected ?IStorage $kamiFile = null;
 
     /**
+     * Document ID of any Kami document attached to this due work.
+     */
+    protected ?string $kamiInteractiveDocumentId = null;
+
+    /**
      * @var bool
      */
     protected bool $enableOffline = false;
@@ -1046,6 +1051,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function getKamiFile(): ?IStorage
     {
         return $this->kamiFile;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKamiInteractiveDocumentId(): ?string
+    {
+        return $this->kamiInteractiveDocumentId;
+    }
+
+    /**
+     * @param string|null $kamiInteractiveDocumentId
+     * @return $this
+     */
+    public function setKamiInteractiveDocumentId(?string $kamiInteractiveDocumentId): self
+    {
+        $this->kamiInteractiveDocumentId = $kamiInteractiveDocumentId;
+        return $this;
     }
 
     /**

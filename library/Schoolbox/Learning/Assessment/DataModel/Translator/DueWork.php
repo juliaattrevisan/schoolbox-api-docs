@@ -99,6 +99,7 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Kami file _may_ be null though
         $dataModel->setKamiFile($domainObject->getKamiFile());
+        $dataModel->setKamiInteractiveDocumentId($domainObject->getKamiInteractiveDocumentId();
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
             $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
@@ -174,6 +175,7 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Kami file _may_ be null though
         $domainObject->setKamiFile($dataModel->getKamiFile());
+        $domainObject->setKamiInteractiveDocumentId($dataModel->getKamiInteractiveDocumentId();
 
         /* Has Rubric? (actual rubric must be loaded outside of this method)
          * If rubric is off for this Due Work, then clear the rubric-related settings

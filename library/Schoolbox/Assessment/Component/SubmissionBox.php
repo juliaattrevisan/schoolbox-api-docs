@@ -131,6 +131,11 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected ?Storage\Model $kamiFile = null;
 
     /**
+     * Document ID of any Kami document attached to this due work.
+     */
+    protected ?string $kamiInteractiveDocumentId = null;
+
+    /**
      * @var bool
      */
     protected bool $enableOffline = false;
@@ -957,6 +962,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setKamiFile(?Storage\Model $kamiFile): self
     {
         $this->kamiFile = $kamiFile;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKamiInteractiveDocumentId(): ?string
+    {
+        return $this->kamiInteractiveDocumentId;
+    }
+
+    /**
+     * @param string|null $kamiInteractiveDocumentId
+     * @return $this
+     */
+    public function setKamiInteractiveDocumentId(?string $kamiInteractiveDocumentId): self
+    {
+        $this->kamiInteractiveDocumentId = $kamiInteractiveDocumentId;
         return $this;
     }
 
