@@ -101,16 +101,6 @@ class Kernel extends WebKernelAbstract
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
         $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
-        // Default Redis connection:
-        // uses cache, and raises a warning telling you to choose a connector
-        $di->set('redis', $di->lazy(function () use ($di) {
-            trigger_error(
-                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
-                E_USER_WARNING,
-            );
-            return $di->get('redis.storage');
-        }));
-
         // Task daemon message producer
         $di->set(
             'taskd.messageProducer',
