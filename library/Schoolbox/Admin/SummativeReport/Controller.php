@@ -20,6 +20,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -974,6 +975,48 @@ class Controller extends ConfigController
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
+        /* Optional Victorian Curriculum Progression chart thing
+         */
+        $vicProgression = [
+            'summary' => null,
+            'class' => null
+        ];
+
+        /* At least one of the Victorian Curriculum Progressions was enabled
+         */
+        if ($optionsPayload['summary']['vicProgression']['enable'] || $optionsPayload['class']['vicProgression']['enable']) {
+            /* Assume we want the first-mentioned academic period. Schools can supply multiple,
+             * but we only want one.
+             */
+            $academicPeriod = $this->termMapper->findById($optionsPayload['terms'][0]);
+
+            /* The Summary Version
+             */
+            if ($optionsPayload['summary']['vicProgression']['enable']) {
+                $vicProgression['summary'] = (new VictorianProgression\Payload(
+                    $this->workTypeMapper,
+                    $this->termMapper,
+                    (int)$optionsPayload['summary']['vicProgression']['workType']
+                ))->generate($student, $academicPeriod, null);
+            }
+
+            /* The Class Version
+             */
+            if ($optionsPayload['class']['vicProgression']['enable']) {
+                /* Render a chart for each class in $folders, I suppose
+                 */
+                foreach ($folders as $folder) {
+                    foreach ($folder->getCodes() as $code) {
+                        $vicProgression['class'][$code] = (new VictorianProgression\Payload(
+                            $this->workTypeMapper,
+                            $this->termMapper,
+                            (int)$optionsPayload['class']['vicProgression']['workType']
+                        ))->generate($student, $academicPeriod, $code);
+                    }
+                }
+            }
+        }
+
         /* Build it
          */
         $data = [
@@ -993,7 +1036,9 @@ class Controller extends ConfigController
             'classOptions'               => $optionsPayload['class'],
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
-
+            /* Optional Victorian Curriculum Progression chart thing
+             */
+            'vicProgression'             => $vicProgression,
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
