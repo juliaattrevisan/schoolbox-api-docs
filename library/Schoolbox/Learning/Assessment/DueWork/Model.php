@@ -260,6 +260,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
         // This means that the same Kami document will be associated with the
         // course and class level assessments: it remains to be seen whether
         // this is fine.
+        // I'm guessing it won't be, because this value is passed to Kami as the
+        // document_group_id in API call
+        // https://kamiapiproposed.docs.apiary.io/#reference/embedding/view-sessions/create-a-view-session
         $this->kamiInteractiveDocumentId = $source->kamiInteractiveDocumentId;
 
         // Copy attachments
