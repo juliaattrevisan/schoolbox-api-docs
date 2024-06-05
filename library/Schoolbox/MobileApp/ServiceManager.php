@@ -12,6 +12,7 @@ namespace Schoolbox\MobileApp;
 use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\NotificationBundle;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\Storage;
 
 /**
@@ -56,6 +58,7 @@ class ServiceManager implements IServiceManager
      *                                                 May be used as the title of notifications.
      * @param Storage\FilesystemProxy $filesystemProxy The file system on which the APNS config is stored.
      * @param self::SERVICE_TYPE_*    $serviceType     Service type to use: test, production or based on instance type.
+     * @param UnreadRetriever         $unreadRetriever Retriever to get the number of unread messages in queue.
      */
     public function __construct(
         private LoggerInterface $log,
@@ -63,7 +66,8 @@ class ServiceManager implements IServiceManager
         private Schoolbox\Instance $serverInstance,
         private string $appTitle,
         private Storage\FilesystemProxy $filesystemProxy,
-        private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
+        private UnreadRetriever $unreadRetriever,
+        private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
     ) {
     }
 
@@ -81,8 +85,12 @@ class ServiceManager implements IServiceManager
             return;
         }
 
-        // TODO retrieve the list of unread messages for this user - until SA-359 is complete, this is not possible...
-        $unreadCount = 1;
+        $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $userId);
+
+        $bundle = new NotificationBundle();
+        $bundle->appendInstances($unread);
+        //Might be able to just use count($unread)?
+        $unreadCount = $bundle->count();
 
         foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
             foreach ($appRegistrations as $appIdentifier => $reg) {
