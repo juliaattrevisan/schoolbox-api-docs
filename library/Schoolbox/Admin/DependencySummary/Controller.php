@@ -41,7 +41,7 @@ class Controller extends Base
 
         $dependencies = [];
         foreach ($dependencyNames as $dependencyName) {
-            $dependency     = @$this->container->get($dependencyName);
+            $dependency     = $this->container->get($dependencyName);
             $interfaces     = class_implements($dependency);
             natcasesort($interfaces);
             $dependencies[] = [
