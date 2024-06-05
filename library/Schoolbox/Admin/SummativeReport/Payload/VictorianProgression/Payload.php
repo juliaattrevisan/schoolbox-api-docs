@@ -436,9 +436,9 @@ class Payload
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
-                if (self::TYPE_CURRENT === $type) {
+//                if (self::TYPE_CURRENT === $type) {
                     $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
-                }
+//                }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
                     /* There is a parent node
@@ -455,9 +455,9 @@ class Payload
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
-                if (self::TYPE_CURRENT === $type) {
+//                if (self::TYPE_CURRENT === $type) {
                     $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
-                }
+//                }
             }
         }
 

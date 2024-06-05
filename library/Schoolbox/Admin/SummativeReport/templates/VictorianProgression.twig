@@ -12,6 +12,7 @@
     table.victorian-progression th,
     table.victorian-progression td {
         border: 1px solid #ccc !important;
+        padding: 0.5rem;
     }
 
     /* Spacer column between Rating and Levels
@@ -39,11 +40,12 @@
     table.victorian-progression .dot {
         border: 3px solid black;
         border-radius: 50%;
+        clear: both;
         float: left;
-        height: 20px;
+        height: 16px;
         margin-left: -10px;
         margin-right: 4px;
-        width: 20px;
+        width: 16px;
         -moz-border-radius: 50%;
         -webkit-border-radius: 50%;
     }
@@ -88,9 +90,6 @@
         border-top: 0 !important;
     }
 </style>
-
-<h1 class="no-margin">{{ payload.student.name }}</h1>
-<p class="meta">Year {{ payload.student.currentYearLevel }} for now</p>
 
 <table class="victorian-progression">
     <thead>
