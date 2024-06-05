@@ -984,9 +984,12 @@ class Controller extends ConfigController
 
         /* At least one of the Victorian Curriculum Progressions was enabled
          */
-        $annotate = (bool)$this->requestQuery->get('annotate', false);
-
         if ($optionsPayload['summary']['vicProgression']['enable'] || $optionsPayload['class']['vicProgression']['enable']) {
+            /* Enable to show annotations in the preview window, for debugging purposes
+             * It saves you having to make a code change
+             */
+            $annotate = (bool)$this->requestQuery->get('annotate', false);
+
             /* Assume we want the first-mentioned academic period. Schools can supply multiple,
              * but we only want one.
              */
