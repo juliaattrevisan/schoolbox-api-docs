@@ -116,11 +116,12 @@ class Transactor
         //      In order to do that, need to extract Kami interactive docs to
         //      their own mapper.
         if (
-            $this->assessment instanceof DueWork\Model
+            $originalAssessment instanceof DueWork\Model
+            && $this->assessment instanceof DueWork\Model
             && $this->assessment->getKamiInteractive()
             && $this->assessment->getKamiFile()
+            && $originalAssessment->getKamiFile()?->getHash() !== $this->assessment->getKamiFile()->getHash()
         ) {
-            // Upload this file to Kami
             $document = $this->kamiConnector->uploadDocumentAsTemplate(
                 $this->assessment->getKamiFile(),
                 $this->filesystemProxy,
