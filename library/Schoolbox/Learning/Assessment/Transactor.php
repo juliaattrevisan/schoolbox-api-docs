@@ -210,6 +210,7 @@ class Transactor
             if ($this->assessment->getKamiInteractive() && $this->assessment->getKamiFile()) {
                 // Upload this file to Kami
                 // This will also need a document ID attached
+                $document = $this->kamiConnector->uploadDocumentAsTemplate($this->assessment->getKamiFile());
             }
         }
 

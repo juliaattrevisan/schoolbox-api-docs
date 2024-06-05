@@ -127,6 +127,29 @@ class Connector implements IConnector
 
 
     /**
+     * Upload a file into Kami as a template, and return the newly assigned Kami Document Identifier.
+     *
+     * Presumably this also costs 4c per request to the production or proxy server?
+     *
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
+     * @return Document
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\EmptyApiKeyException If no Kami API key configured
+     * @throws Exception\ResponseDecodeException If cannot decode the Kami response
+     * @throws Exception\ApiException if response doesn't contain required fields
+     * @throws Exception\InvalidStatusException if response status is invalid
+     * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
+     * @throws GuzzleException
+     * @throws FilesystemException if the file doesn't exist on the disk
+     */
+    public function uploadDocumentAsTemplate(IStorage $storage, FilesystemProxy $filesystemProxy): Document
+    {
+        return $this->uploadDocumentInternal($storage, $filesystemProxy, true);
+    }
+
+
+    /**
      * Upload a file into Kami and return the newly assigned Kami Document Identifier
      *
      * Note that this method cost 4c each time you hit the production or proxy server
@@ -145,38 +168,7 @@ class Connector implements IConnector
      */
     public function uploadDocument(IStorage $storage, FilesystemProxy $filesystemProxy): Document
     {
-        $this->assertEnabled();
-
-        // The 'name' and 'document' fields are required.
-        // Note that storage files in multipart form data must be sent as string
-        // values (and not resources), because files can't be posted from
-        // non-local resources.
-        $options  = [
-            RequestOptions::MULTIPART => [
-                [
-                    'name'     => 'name',
-                    'contents' => $storage->getBasename(),
-                ],
-                [
-                    'name'     => 'document',
-                    'contents' => $filesystemProxy->read($storage),
-                    'filename' => $storage->getBasename(),
-                ],
-            ],
-        ];
-        $request  = new Request('POST', $this->getPathUploadDocument());
-        $response = $this->client->send($request, $this->getOptions($options));
-
-        if ($this->isSuccessful($response)) {
-            $decoded = $this->decodeResponseContent($response->getBody());
-            return $this->buildDocument($decoded);
-        }
-
-        // Bad response, but not a simple 'not found'?
-        if (!$this->isValidNotFound($response)) {
-            $this->generateApiException($request, $response);
-        }
-        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
+        return $this->uploadDocumentInternal($storage, $filesystemProxy, false);
     }
 
 
@@ -709,5 +701,52 @@ class Connector implements IConnector
                 )
             );
         }
+    }
+
+    /**
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
+     * @return Document
+     * @throws FilesystemException
+     * @throws GuzzleException
+     */
+    private function uploadDocumentInternal(IStorage $storage, FilesystemProxy $filesystemProxy, bool $template): Document
+    {
+        $this->assertEnabled();
+
+        // The 'name' and 'document' fields are required.
+        // Note that storage files in multipart form data must be sent as string
+        // values (and not resources), because files can't be posted from
+        // non-local resources.
+        $formParams = [
+            [
+                'name'     => 'name',
+                'contents' => $storage->getBasename(),
+            ],
+            [
+                'name'     => 'document',
+                'contents' => $filesystemProxy->read($storage),
+                'filename' => $storage->getBasename(),
+            ],
+        ];
+        if ($template) {
+            $formParams[] = [
+                'name'     => 'create_as_template',
+                'contents' => '1',
+            ];
+        }
+        $request  = new Request('POST', $this->getPathUploadDocument());
+        $response = $this->client->send($request, $this->getOptions([RequestOptions::MULTIPART => $formParams]));
+
+        if ($this->isSuccessful($response)) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
     }
 }

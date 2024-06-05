@@ -60,6 +60,20 @@ interface IConnector
 
 
     /**
+     * Upload a file into Kami as a template, and return the newly assigned Kami Document Identifier.
+     *
+     * Presumably this also costs 4c per request to the production or proxy server?
+     *
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
+     * @return Document
+     * @throws Exception\EmptyApiKeyException If no Kami API key configured
+     * @throws Exception\ResponseDecodeException If cannot decode the Kami response
+     */
+    public function uploadDocumentAsTemplate(IStorage $storage, FilesystemProxy $filesystemProxy): Document;
+
+
+    /**
      * Get a list of all documents uploaded to Kami
      *
      * @return GenericCollection|Document[]
