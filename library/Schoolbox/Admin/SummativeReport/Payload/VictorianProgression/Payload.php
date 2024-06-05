@@ -166,6 +166,15 @@ class Payload
 
 
     /**
+     * Used to derive a "Rating" string which uses progression points in the current academic
+     * period, specifically.
+     *
+     * @var Rating
+     */
+    private Rating $rating;
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $workTypeMapper
@@ -179,6 +188,7 @@ class Payload
         private int $workTypeId,
         private bool $annotate = false
     ) {
+        $this->rating = new Rating();
     }
 
 
@@ -429,7 +439,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
+                    $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
                 }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
@@ -448,7 +458,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
                 }
             }
         }
