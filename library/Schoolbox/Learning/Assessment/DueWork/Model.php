@@ -248,6 +248,19 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
         $this->useMarkRange           = $source->useMarkRange;
         $this->useRubric              = $source->useRubric;
+        $this->enableOffline          = $source->enableOffline;
+        $this->enableFiles            = $source->enableFiles;
+        $this->enablePolicy           = $source->enablePolicy;
+        $this->enableText             = $source->enableText;
+        $this->kamiInteractive        = $source->kamiInteractive;
+        $this->kamiFile               = $source->kamiFile;
+
+        // For now, copy Kami interactive document ID as is, instead of creating
+        // a new document.
+        // This means that the same Kami document will be associated with the
+        // course and class level assessments: it remains to be seen whether
+        // this is fine.
+        $this->kamiInteractiveDocumentId = $source->kamiInteractiveDocumentId;
 
         // Copy attachments
         $this->copyAttachedFiles($source);
