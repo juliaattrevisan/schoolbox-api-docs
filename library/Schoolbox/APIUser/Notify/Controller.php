@@ -57,7 +57,7 @@ class Controller extends Base
                 ->setSeverity(Logger::INFO)
                 ->setNamespace(NSMapper::NS_MESSAGE)
                 ->setHref($data['href'] ?? '#')
-                ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_MESSAGE)
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 

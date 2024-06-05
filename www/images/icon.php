@@ -26,7 +26,7 @@ $kernel->getShutdownHandler()->registerFunction(
     ShutdownHandler::PRIORITY_HIGHEST,
 );
 
-$path = '/static/images/icons/activity-icons-64x64px.png';
+$path = '/static/images/icons/activity-icons-512x512px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
 $size = isset($_GET['size']) ? $_GET['size'] : 32;

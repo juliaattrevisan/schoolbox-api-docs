@@ -51,7 +51,7 @@ class Icon implements ITransformFactory
         NSMapper::NS_BADGE                   => 'list',
     ];
 
-    private const VALID_SIZES = [16, 32, 48, 64];
+    private const VALID_SIZES = [16, 32, 48, 64, 192];
     private const VALID_CROPS = [
         'news',
         'calendar',

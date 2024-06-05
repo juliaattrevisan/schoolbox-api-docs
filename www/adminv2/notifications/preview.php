@@ -56,7 +56,7 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_DUEWORK)
             ->build());
         break;
 
@@ -77,7 +77,7 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_DUEWORK)
             ->build());
 
         $due = date('D, jS M', strtotime('tomorrow'));
@@ -92,7 +92,7 @@ switch ($this->arg[0]) {
             ->setTimestamp(strtotime('-3 days'))
             ->setBody('')
             ->setByline("Due $due")
-            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_DUEWORK)
             ->build());
 
         $decorator->appendInstance($bob
@@ -133,10 +133,10 @@ switch ($this->arg[0]) {
                 if (!$hash) {
                     throw new \Schoolbox\Mapper\Exception("No hash");
                 }
-                $image = "/storage/image.php?size=square64&hash=$hash";
+                $image = "/storage/image.php?size=square192&hash=$hash";
                 $thumb = "/storage/image.php?size=square200&hash=$hash";
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $image = '/images/icon.php?size=64&icon=' . NSMapper::NS_NEWS;
+                $image = '/images/icon.php?size=192&icon=' . NSMapper::NS_NEWS;
 
                 /** @var PrefixGenerator $prefixGenerator */
                 $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');

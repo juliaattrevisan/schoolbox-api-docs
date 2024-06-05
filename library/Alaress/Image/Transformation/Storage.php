@@ -31,6 +31,7 @@ class Storage implements ITransformFactory
         'square32',
         self::TRANSFORM_SQUARE64,
         'square128',
+        'square192',
         'square200',
         self::TRANSFORM_CONSTRAIN64,
         'constrain200',
@@ -44,6 +45,7 @@ class Storage implements ITransformFactory
         'eportfolioImageGalleryThumbnail',
         'cardImageLarge',
         'cacheTest',
+        'pushNotificationBanner',
     ];
 
     /**
@@ -60,6 +62,10 @@ class Storage implements ITransformFactory
                 return new Square(64);
             case 'square128':
                 return new Square(128);
+            case 'square192':
+                // Recommended dimension for Push Notification Icons are 192 x 192 (1:1)
+                // https://knowledgebase.webengage.com/docs/web-push-image-text-specifications
+                return new Square(192);
             case 'square200':
                 return new Square(200);
             case 'constrain64':
@@ -93,6 +99,10 @@ class Storage implements ITransformFactory
                 // Test to find out whether Constrain skipped canvas creation
                 // when resultant image dimension was the same as the original
                 return new Constrain(247, 204);
+            case 'pushNotificationBanner':
+                // Recommended dimension for Push Notification Banners are 720 x 480 (3:2)
+                // https://knowledgebase.webengage.com/docs/web-push-image-text-specifications
+                return new Rectangle(720, 480);
         }
         throw new OutOfBoundsException('Could not load transformation list.');
     }

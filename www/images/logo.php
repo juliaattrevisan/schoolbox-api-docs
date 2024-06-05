@@ -109,7 +109,6 @@ $config = $kernel->get('config');
 try {
     /* Choose a caching method to use
      */
-
     $hash            = $config->get($logo);
     if ('' === trim((string)$hash)) {
         // If user has not set a favicon, then use the default NAME_SKIN_LOGO_SQUARE or just fail
@@ -141,7 +140,11 @@ try {
      */
     /** @var ProcessorFactory $processorFactory */
     $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
-    $transform        = $myImage->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+    if ($logo == ConfigMapper::NAME_SKIN_FAVICON) {
+        $transform        = $myImage->square($logoSizes[$logo][$size][0]);
+    } else {
+        $transform        = $myImage->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+    }
     $imageProcessor   = $processorFactory->buildForStorage(
         $resource,
         $key,

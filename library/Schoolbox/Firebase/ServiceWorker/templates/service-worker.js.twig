@@ -20,10 +20,11 @@ self.addEventListener('push', function(event) {
     console.log('[Service Worker] Push Received.');
     const payload = event.data.json();  // Assuming the payload is sent as JSON
     const notificationTitle = payload.notification.title;
+    const notificationMeta = JSON.parse(payload.notification.meta);
     const notificationOptions = {
         body: payload.notification.body,
-        icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-        image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
+        icon: payload.notification.icon || "/images/logo.php?logo=skin_logo_square&size=google192",
+        image: notificationMeta.pushBanner ?? "",
         badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
         renotify: false,
         data: payload.notification
