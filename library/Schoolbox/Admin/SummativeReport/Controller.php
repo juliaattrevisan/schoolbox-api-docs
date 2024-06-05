@@ -1006,13 +1006,13 @@ class Controller extends ConfigController
                 /* Render a chart for each class in $folders, I suppose
                  */
                 foreach ($folders as $folder) {
-                    foreach ($folder->getCodes() as $code) {
-                        $vicProgression['class'][$code] = (new VictorianProgression\Payload(
-                            $this->workTypeMapper,
-                            $this->termMapper,
-                            (int)$optionsPayload['class']['vicProgression']['workType']
-                        ))->generate($student, $academicPeriod, $code);
-                    }
+                    $folderId = (int)$folder->getId();
+
+                    $vicProgression['class'][$folderId] = (new VictorianProgression\Payload(
+                        $this->workTypeMapper,
+                        $this->termMapper,
+                        (int)$optionsPayload['class']['vicProgression']['workType']
+                    ))->generate($student, $academicPeriod, $folderId);
                 }
             }
         }

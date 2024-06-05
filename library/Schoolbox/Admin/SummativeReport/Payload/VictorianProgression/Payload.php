@@ -99,7 +99,7 @@ class Payload
 
     /**
      * A subvariant of the megaquery above, but filtered to a particular class,
-     * based on its folder code(s)
+     * based on its folder id
      */
     private const CLASS_QUERY = "
         SELECT
@@ -125,8 +125,7 @@ class Payload
         LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
         LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
-        LEFT JOIN folder_code fc ON fc.folder_id = mvar.folder_id
-        LEFT JOIN folder f ON fc.folder_id = f.id
+        LEFT JOIN folder f ON mvar.folder_id = f.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
@@ -136,14 +135,13 @@ class Payload
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
         )
-        AND fc.code = :classCode
+        AND f.id = :folderId
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
         AND quiz.deleted_at IS NULL
         AND aa.deleted_at IS NULL
-        AND fc.deleted_at IS NULL
         AND f.deleted_at IS NULL
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
@@ -195,7 +193,7 @@ class Payload
     /**
      * Set up the necessary parts
      */
-    private function setup(?string $classCode): void
+    private function setup(?int $folderId): void
     {
         /* We've already been here, there's nothing to do
          */
@@ -207,7 +205,7 @@ class Payload
          */
         $query = self::QUERY;
 
-        if ($classCode) {
+        if ($folderId) {
             $query = self::CLASS_QUERY;
         }
 
@@ -226,7 +224,7 @@ class Payload
      *
      * @param User $student
      * @param Model $currentAcademicPeriod
-     * @param string|null $classCode
+     * @param int|null $folderId
      * @return array
      * @throws InvalidColumnException
      * @throws \DomainException
@@ -235,7 +233,7 @@ class Payload
     public function generate(
         \Schoolbox\User $student,
         \Schoolbox\Assessment\Term\Model $currentAcademicPeriod,
-        ?string $classCode
+        ?int $folderId
     ): array {
         $studentYearLevel = $this->getYearLevel($student);
         $currentSemester = (int)$this->getCurrentSemester($currentAcademicPeriod);
@@ -248,7 +246,7 @@ class Payload
             $student,
             $studentYearLevel,
             $currentSemester,
-            $classCode,
+            $folderId,
             $currentAcademicPeriod->getStart(),
             $currentAcademicPeriod->getDisplayFinish()
         );
@@ -274,7 +272,7 @@ class Payload
                     $student,
                     $studentYearLevel,
                     $currentSemester,
-                    $classCode,
+                    $folderId,
                     $aggregateAcademicPeriod['start'],
                     $aggregateAcademicPeriod['end'],
                     $data
@@ -315,7 +313,7 @@ class Payload
      * @param User $student
      * @param int $studentYearLevel
      * @param int $currentSemester
-     * @param string|null $classCode
+     * @param int|null $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @param array $struct
@@ -328,7 +326,7 @@ class Payload
         \Schoolbox\User $student,
         int $studentYearLevel,
         int $currentSemester,
-        ?string $classCode,
+        ?int $folderId,
         \Alaress_Date_Format $startDate,
         \Alaress_Date_Format $endDate,
         array $struct = []
@@ -336,7 +334,7 @@ class Payload
         /* Setup step is mandatory; execute as singleton
          */
         if (!$this->setup) {
-            $this->setup($classCode);
+            $this->setup($folderId);
         }
 
         /* Only accept valid types
@@ -359,10 +357,10 @@ class Payload
             'endDate' => $endDate->getDatabaseDate()
         ];
 
-        /* Optional classCode filter
+        /* Optional class filter (uses folderId)
          */
-        if ($classCode) {
-            $params['classCode'] = $classCode;
+        if ($folderId) {
+            $params['folderId'] = $folderId;
         }
 
         $this->payloadStatement->execute($params);

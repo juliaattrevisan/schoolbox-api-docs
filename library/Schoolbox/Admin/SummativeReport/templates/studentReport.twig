@@ -574,6 +574,12 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
+
+        {# Victorian Curriculum Progression: Summary #}
+        {% include '@adminSummativeReport/VictorianProgression.twig' with {
+            payload: vicProgression.summary,
+            annotate: false
+        } only %}
     </div>
     {% endif %}
 
@@ -621,6 +627,14 @@
                         } only %}
                 {% endfor %}
             </div>
+            {% endif %}
+
+            {# Victorian Curriculum Progression: Class #}
+            {% if vicProgression.class[folder.id] ?? false %}
+                {% include '@adminSummativeReport/VictorianProgression.twig' with {
+                    payload: vicProgression.class[folder.id],
+                    annotate: false
+                } only %}
             {% endif %}
         {% endfor %}
     {% endif %}
