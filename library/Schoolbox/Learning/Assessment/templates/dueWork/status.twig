@@ -183,7 +183,7 @@
                             blindMode:      false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
-                        {% if '' != assessment.markScheme.template %}
+                        {% if '' == assessment.markScheme.template %}
                             {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
                                 feedback:    participant.findMostRecentInstructorGivenFeedback,
                                 participant: participant,
