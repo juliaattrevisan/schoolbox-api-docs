@@ -423,6 +423,30 @@
                                 </table>
                             </div>
                         </fieldset>
+                        <fieldset class="content">
+                            <div class="small-12 columns">
+                                <legend>Victorian Curriculum Progression</legend>
+                                <p class="meta">
+                                    Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
+                                    whilst undertaking any assessments that use the prescribed <strong>work type</strong>.
+                                </p>
+
+                                <ul class="option-list">
+                                    <li>
+                                        <input name="summary[vicProgression][enable]" type="hidden" value="0" />
+                                        <input id="report-summary-enable-vic-progression" name="summary[vicProgression][enable]" type="checkbox" value="1" {% if options.summary.vicProgression.enable ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-summary-enable-vic-progression" class="checkbox-label">Enable</label>
+                                    </li>
+                                </ul>
+
+                                <label for="report-summary-vic-progression-worktype">Work Type</label>
+                                <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
+                                    {% for worktype in worktypesSummary %}
+                                        <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType %}selected="selected"{% endif %}>{{ worktype.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </fieldset>
                 </section>
 
                 <div class="row actions-small-1">
@@ -448,26 +472,26 @@
                 <section id="section-class">
                     <fieldset class="content">
                         <div class="small-12 columns">
-                        <fieldset class="checklist">
-                            <legend>Display Options</legend>
-                            <ul class="option-list">
-                                <li>
-                                    <input name="class[overallGrade]" type="hidden" value="0" />
-                                    <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
-                                </li>
-                                <li>
-                                    <input name="class[cohort]" type="hidden" value="0" />
-                                    <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
-                                </li>
-                                <li>
-                                    <input name="class[classCode]" type="hidden" value="0" />
-                                    <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
-                                </li>
-                            </ul>
-                        </fieldset>
+                            <fieldset class="checklist">
+                                <legend>Display Options</legend>
+                                <ul class="option-list">
+                                    <li>
+                                        <input name="class[overallGrade]" type="hidden" value="0" />
+                                        <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                                    </li>
+                                    <li>
+                                        <input name="class[cohort]" type="hidden" value="0" />
+                                        <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                                    </li>
+                                    <li>
+                                        <input name="class[classCode]" type="hidden" value="0" />
+                                        <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
+                                    </li>
+                                </ul>
+                            </fieldset>
                         </div>
                     </fieldset>
                     <fieldset class="content">
