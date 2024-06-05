@@ -13,7 +13,6 @@ namespace Schoolbox\Admin\SummativeReport;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 /**
