@@ -303,37 +303,42 @@ class Connector implements IConnector
         bool $showHelp = true,
         bool $showMenu = true
     ): Session {
-        $this->assertEnabled();
-        $this->assertValidSiteSchoolCode();
+        return $this->viewSessionInternal($documentId, null, $user, $theme, $showSave, $showPrint, $showHelp, $showMenu, $editable);
+    }
 
-        // When should the view session expire?
-        $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
-        $options  = [
-            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
-            RequestOptions::BODY    =>  \GuzzleHttp\Utils::jsonEncode([
-                'document_identifier' => $documentId,
-                'user'                => [
-                    'name'    => "{$user->getFirstname()} {$user->getLastname()}",
-                    'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
-                ],
-                'expires_at'          => $expires->getDateTimeObject()->utc()->format(Alaress_Date_Format::FORMAT_DATETIME_UTC),
-                'viewer_options'      => [
-                    'theme'                  => $theme,
-                    'show_save'              => $showSave,
-                    'show_print'             => $showPrint,
-                    'show_help'              => $showHelp,
-                    'show_menu'              => $showMenu,
-                    'enable_annotation_bank' => $editable,
-                ],
-                'editable'            => $editable,
-            ]),
-        ];
-        $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
-        $response = $this->client->send($request, $this->getOptions($options));
-        if ($this->isValidNotFound($response)) {
-            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
-        }
-        return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
+
+    /**
+     * Create a time-limited session for the view of a document group, and
+     * returns a URL you can embed in your page.
+     *
+     * @param string $documentGroupId
+     * @param User   $user
+     * @param bool   $editable
+     * @param string $theme     Sets the theme to use when viewing the document
+     * @param bool   $showSave  Hides the save (download) button
+     * @param bool   $showPrint Hides the print button
+     * @param bool   $showHelp  Hides the help button
+     * @param bool   $showMenu  Hides the menu button
+     * @return Session
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\ApiException If API response is unable to be processed by us
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
+     */
+    public function viewSessionForGroup(
+        string $documentGroupId,
+        User $user,
+        bool $editable = true,
+        string $theme = IConnector::SESSION_THEME_LIGHT,
+        bool $showSave = true,
+        bool $showPrint = true,
+        bool $showHelp = true,
+        bool $showMenu = true
+    ): Session {
+        return $this->viewSessionInternal(null, $documentGroupId, $user, $theme, $showSave, $showPrint, $showHelp, $showMenu, $editable);
     }
 
 
@@ -704,8 +709,11 @@ class Connector implements IConnector
     }
 
     /**
+     * Internal method for uploading a document.
+     *
      * @param IStorage        $storage
      * @param FilesystemProxy $filesystemProxy
+     * @param bool            $template        Is this a template document, for creation of a document group?
      * @return Document
      * @throws FilesystemException
      * @throws GuzzleException
@@ -748,5 +756,77 @@ class Connector implements IConnector
             $this->generateApiException($request, $response);
         }
         throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
+    }
+
+    /**
+     * Internal method for creating a view session.
+     *
+     * @param string|null $documentId      The document to create a view session for:
+     *                                     either this or `$documentGroupId` must be set.
+     * @param string|null $documentGroupId The document group to create a view session for:
+     *                                     either this or `$documentId` must be set.
+     * @param User        $user
+     * @param string      $theme
+     * @param bool        $showSave
+     * @param bool        $showPrint
+     * @param bool        $showHelp
+     * @param bool        $showMenu
+     * @param bool        $editable
+     * @return Session
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\ApiException If API response is unable to be processed by us
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
+     */
+    private function viewSessionInternal(
+        ?string $documentId,
+        ?string $documentGroupId,
+        User $user,
+        string $theme,
+        bool $showSave,
+        bool $showPrint,
+        bool $showHelp,
+        bool $showMenu,
+        bool $editable
+    ): Session {
+        $this->assertEnabled();
+        $this->assertValidSiteSchoolCode();
+
+        // When should the view session expire?
+        $expires  = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
+        $body     = [
+            'user'           => [
+                'name'    => "{$user->getFirstname()} {$user->getLastname()}",
+                'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
+            ],
+            'expires_at'     => $expires->getDateTimeObject()->utc()->format(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+            'viewer_options' => [
+                'theme'                  => $theme,
+                'show_save'              => $showSave,
+                'show_print'             => $showPrint,
+                'show_help'              => $showHelp,
+                'show_menu'              => $showMenu,
+                'enable_annotation_bank' => $editable,
+            ],
+            'editable'       => $editable,
+        ];
+        if (isset($documentId)) {
+            $body['document_identifier'] = $documentId;
+        } elseif (isset($documentGroupId)) {
+            $body['document_group_id'] = $documentGroupId;
+        }
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => \GuzzleHttp\Utils::jsonEncode($body),
+        ];
+        $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
+        $response = $this->client->send($request, $this->getOptions($options));
+        if ($this->isValidNotFound($response)) {
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+        }
+        return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
     }
 }

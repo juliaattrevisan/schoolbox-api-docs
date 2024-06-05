@@ -60,7 +60,8 @@ interface IConnector
 
 
     /**
-     * Upload a file into Kami as a template, and return the newly assigned Kami Document Identifier.
+     * Upload a file into Kami as a template, for later use when viewing a
+     * document group, and return the newly assigned Kami Document Identifier.
      *
      * Presumably this also costs 4c per request to the production or proxy server?
      *
@@ -132,6 +133,32 @@ interface IConnector
      */
     public function viewSession(
         string $documentId,
+        User $user,
+        bool $editable = true,
+        string $theme = IConnector::SESSION_THEME_LIGHT,
+        bool $showSave = true,
+        bool $showPrint = true,
+        bool $showHelp = true,
+        bool $showMenu = true
+    ): Session;
+
+
+    /**
+     * Create a time-limited session for the view of a document group, and
+     * returns a URL you can embed in your page.
+     *
+     * @param string $documentGroupId
+     * @param User   $user
+     * @param bool   $editable
+     * @param string $theme            Sets the theme to use when viewing the document
+     * @param bool   $showSave         Hides the save (download) button
+     * @param bool   $showPrint        Hides the print button
+     * @param bool   $showHelp         Hides the help button
+     * @param bool   $showMenu         Hides the menu button
+     * @return Session
+     */
+    public function viewSessionForGroup(
+        string $documentGroupId,
         User $user,
         bool $editable = true,
         string $theme = IConnector::SESSION_THEME_LIGHT,

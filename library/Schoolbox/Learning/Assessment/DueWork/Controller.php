@@ -1873,8 +1873,16 @@ class Controller extends Assessment\Controller
      */
     public function getWorksheet(IAssessable $assessment): void
     {
-        if (!$assessment instanceof Model) {
+        if (!($assessment instanceof Model && $assessment->getKamiInteractiveDocumentId())) {
             throw new MapperException\NotFound();
         }
+        $session = $this->kamiConnector->viewSessionForGroup($assessment->getKamiInteractiveDocumentId(), $this->getUser(), true);
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/worksheet.twig',
+            [
+                'assessment' => $assessment,
+                'session'    => $session,
+            ]
+        );
     }
 }

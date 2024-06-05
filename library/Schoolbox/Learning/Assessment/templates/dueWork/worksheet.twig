@@ -1,0 +1,60 @@
+{#
+     Displays a Kami Document for viewing.
+
+     Data:
+         kami        Kami\Model
+         session     Kami\Session              Optional. Null if document not finished processing.
+         response    DueWork\Submission\Model
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Build breadcrumbs #}
+{% set nodes = [['Learning', routeLookup('learning.getClasses')]] %}
+{# Extra crumb inserted if inside project #}
+{% if assessment.context is project %}
+    {% set nodes = nodes|merge(
+        [
+            [
+                assessment.context.title,
+                routeLookup(
+                    'learningAssessment.getStatus',
+                    {
+                        assessmentId: assessment.context.id,
+                    }
+                )
+            ],
+        ]
+    ) %}
+{% endif %}
+{% set nodes = nodes|merge(
+    [
+        [
+            assessment.title,
+            routeLookup(
+                'learningAssessment.getStatus',
+                {
+                    assessmentId: assessment.id,
+                }
+            )
+        ],
+        ['Worksheet']
+    ]
+) %}
+
+{{ bread.crumbsArray(nodes)}}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Worksheet for {{ assessment.title }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl, allow: '', dataAttributes: {}} only %}
+        </section>
+    </div>
+</div>
