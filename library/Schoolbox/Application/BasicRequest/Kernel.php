@@ -271,32 +271,28 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
-        // install sentry
-        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
-        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-        /** @phpstan-ignore-next-line */
-        if (\strlen($sentryToken) && \strlen($sentryProject)) {
-            // add sentry to the DI
-            $di->set(
-                'sentry',
-                $di->lazy(
-                    static function () use ($di, $sentryToken, $sentryProject) {
-                        try {
-                            /** @var Instance $sb */
-                            $sb = $di->get('instance');
-                            return (new \Alaress\Sentry\Factory())->build(
-                                $sb,
-                                Instance::APPLICATION_NAME,
-                                $sentryToken,
-                                $sentryProject
-                            );
-                        } catch (Di\Exception\ServiceNotFound $e) {
-                            // do nothing; sentry is not installed
-                        }
+        // add sentry to the DI
+        $di->set(
+            'sentry',
+            $di->lazy(
+                static function () use ($di) {
+                    $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+                    $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
+                    if (\strlen($sentryToken) && \strlen($sentryProject)) {
+                        /** @var Instance $sb */
+                        $sb = $di->get('instance');
+                        return (new \Alaress\Sentry\Factory())->build(
+                            $sb,
+                            Instance::APPLICATION_NAME,
+                            $sentryToken,
+                            $sentryProject
+                        );
+                    } else {
+                        return new \Alaress\Sentry\NullHub();
                     }
-                )
-            );
-        }
+                }
+            )
+        );
 
         // JWT parser
         $di->set(
