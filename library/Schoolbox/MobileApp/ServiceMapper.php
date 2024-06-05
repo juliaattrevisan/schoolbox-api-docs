@@ -9,9 +9,12 @@
 
 namespace Schoolbox\MobileApp;
 
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 /**
  * Class ServiceMapper
@@ -21,7 +24,6 @@ use Schoolbox\Resource\Storage;
  * @method Service findOneByColumn($columnName, $columnValue, array $options = array())
  * @method Service findOneByColumnList($columnList, array $options = [])
  * @method Service createModel($identifierValue = null)
- * @method Collection|Service[] findAll($options = array())
  */
 class ServiceMapper extends Mapper
 {
@@ -45,6 +47,8 @@ class ServiceMapper extends Mapper
         $this->uses('web_push_public_key', self::TYPE_STRING);
         $this->joins('cert_hash', Storage\Mapper::class, 'hash', null, null, 'certificate', 'cert');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockFirebaseDeletion']);
     }
 
 
@@ -81,5 +85,31 @@ class ServiceMapper extends Mapper
     protected function raiseNotification($object, $verb, $previous = null)
     {
         return false;
+    }
+
+    /**
+     * We are wanting to not show Firebase in the list, so hide it in the mapper.
+     * @param array $options
+     * @return Collection|Service
+     */
+    public function findAll($options = []): Collection|Service
+    {
+        $pb = $this->getPredicateBuilder();
+        $pb->notLike('provider', Registry::PROVIDER_FIREBASE);
+        return $this->findByPredicates($pb, $options);
+    }
+
+    /**
+     * Pre-soft-delete callback to ensure the Firebase Delivery Provider is not deleted
+     *
+     * @param Service $service
+     * @return bool
+     */
+    public function blockFirebaseDeletion(Service $service): bool
+    {
+        if ($service->getProviderName() === Registry::PROVIDER_FIREBASE) {
+            throw new SchoolboxException(sprintf('The %s Delivery Provider may not be deleted', Registry::PROVIDER_FIREBASE));
+        }
+        return true;
     }
 }

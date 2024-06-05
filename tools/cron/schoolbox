@@ -149,4 +149,7 @@ MAILTO="support@schoolbox.com.au"
 # upload backup to S3 at 01:00
 0 1 * * * root /usr/local/bin/jitter 3600 php /usr/share/schoolbox/tools/upload-backup-to-S3.php >> /var/log/schoolbox/S3-backup.log 2>&1
 
+# deploy new credentials: sometime overnight?
+36 1 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/firebase/deploy-credentials.php -vv >> /var/log/schoolbox/firebase-deploy-credentials.log 2>&1
+
 # End of file - do not delete
