@@ -12,7 +12,6 @@ use Alaress\Image\ITransform;
 use Alaress\Image\Transform\Constrain;
 use Alaress\Image\Transform\Square;
 
-
 /**
  * Accepts dynamic url parameters to create a dynamic transformation list
  */
