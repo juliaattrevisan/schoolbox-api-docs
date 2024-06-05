@@ -111,16 +111,20 @@ class Transactor
         // Verify that the context of the assessment is valid
         $assessmentContext = $this->assessment->getContext();
 
-        // Attach Kami interactive docs, before save
+        // Upload and attach Kami interactive docs, before save
         // TODO should attach of Kami interactive docs be moved to post-save?
         //      In order to do that, need to extract Kami interactive docs to
         //      their own mapper.
+        // TODO alternately, move to a submission box mapper post-save?
+        //      This would mean that the Kami document could be verified to not
+        //      have changed before sending to Kami.
+        //      `$originalAssessment` references the assessment from which
+        //      `$assessment` was copied, not the pre-save state of the
+        //      assessment.
         if (
-            $originalAssessment instanceof DueWork\Model
-            && $this->assessment instanceof DueWork\Model
+            $this->assessment instanceof DueWork\Model
             && $this->assessment->getKamiInteractive()
             && $this->assessment->getKamiFile()
-            && $originalAssessment->getKamiFile()?->getHash() !== $this->assessment->getKamiFile()->getHash()
         ) {
             $document = $this->kamiConnector->uploadDocumentAsTemplate(
                 $this->assessment->getKamiFile(),
