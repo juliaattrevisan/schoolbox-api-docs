@@ -984,6 +984,8 @@ class Controller extends ConfigController
 
         /* At least one of the Victorian Curriculum Progressions was enabled
          */
+        $annotate = (bool)$this->requestQuery->get('annotate', false);
+
         if ($optionsPayload['summary']['vicProgression']['enable'] || $optionsPayload['class']['vicProgression']['enable']) {
             /* Assume we want the first-mentioned academic period. Schools can supply multiple,
              * but we only want one.
@@ -996,7 +998,8 @@ class Controller extends ConfigController
                 $vicProgression['summary'] = (new VictorianProgression\Payload(
                     $this->workTypeMapper,
                     $this->termMapper,
-                    (int)$optionsPayload['summary']['vicProgression']['workType']
+                    (int)$optionsPayload['summary']['vicProgression']['workType'],
+                    $annotate
                 ))->generate($student, $academicPeriod, null);
             }
 
@@ -1011,7 +1014,8 @@ class Controller extends ConfigController
                     $vicProgression['class'][$folderId] = (new VictorianProgression\Payload(
                         $this->workTypeMapper,
                         $this->termMapper,
-                        (int)$optionsPayload['class']['vicProgression']['workType']
+                        (int)$optionsPayload['class']['vicProgression']['workType'],
+                        $annotate
                     ))->generate($student, $academicPeriod, $folderId);
                 }
             }
@@ -1037,8 +1041,11 @@ class Controller extends ConfigController
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
             /* Optional Victorian Curriculum Progression chart thing
+             * The $annotate var lets you see how we derived values, so you can look at the
+             * preview window in a staging environment without needing code changes to reveal
              */
             'vicProgression'             => $vicProgression,
+            'annotate'                   => $annotate,
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
