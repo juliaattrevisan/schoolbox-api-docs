@@ -111,6 +111,23 @@ class Transactor
         // Verify that the context of the assessment is valid
         $assessmentContext = $this->assessment->getContext();
 
+        // Attach Kami interactive docs, before save
+        // TODO should attach of Kami interactive docs be moved to post-save?
+        //      In order to do that, need to extract Kami interactive docs to
+        //      their own mapper.
+        if (
+            $this->assessment instanceof DueWork\Model
+            && $this->assessment->getKamiInteractive()
+            && $this->assessment->getKamiFile()
+        ) {
+            // Upload this file to Kami
+            $document = $this->kamiConnector->uploadDocumentAsTemplate(
+                $this->assessment->getKamiFile(),
+                $this->filesystemProxy,
+            );
+            $this->assessment->setKamiInteractiveDocumentId($document->getId());
+        }
+
         /* If you followed a creational link from a particular place,
          * go back to that place
          */
@@ -208,17 +225,6 @@ class Transactor
 
                     $this->turnitinGroupMapper->save($turnitinGroup);
                 }
-            }
-
-            if ($this->assessment->getKamiInteractive() && $this->assessment->getKamiFile()) {
-                // Upload this file to Kami
-                // This will also need a document ID attached
-                $document = $this->kamiConnector->uploadDocumentAsTemplate(
-                    $this->assessment->getKamiFile(),
-                    $this->filesystemProxy,
-                );
-
-                // TODO attach document ID to assessment
             }
         }
 
