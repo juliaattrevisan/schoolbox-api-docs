@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DependencySummary;
 
-use Alaress\Module\Registry;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Container;
 
