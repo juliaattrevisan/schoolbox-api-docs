@@ -1859,4 +1859,22 @@ class Controller extends Assessment\Controller
 
         $this->response = $this->responseAsJson($payload);
     }
+
+
+    /**
+     * Kami interactive worksheet teacher view
+     *
+     * @api   GET /learning/assessments/:assessmentId/worksheet
+     * @since 24.0
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException\NotFound
+     */
+    public function getWorksheet(IAssessable $assessment): void
+    {
+        if (!$assessment instanceof Model) {
+            throw new MapperException\NotFound();
+        }
+    }
 }

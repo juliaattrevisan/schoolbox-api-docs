@@ -311,6 +311,9 @@ class Module extends BaseModule
         $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModify, $preloadParticipant);
         // exclude user from assessment
         $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModify, $preloadParticipant);
+
+        // Due work: Teacher interactive worksheet view
+        $this->register(self::METHOD_GET, "$assRoute/worksheet", 'getWorksheet', $canModify, $preloadAssessment);
     }
 
 
