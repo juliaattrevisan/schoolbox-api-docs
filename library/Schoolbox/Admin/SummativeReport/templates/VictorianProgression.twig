@@ -18,11 +18,14 @@
     /* Spacer column between Rating and Levels
      */
     table.victorian-progression .level-spacer {
-        border-bottom: 0 !important;
-        border-top: 0 !important;
-        max-width: 24px;
+        border-left: 0 !important;
+        max-width: 32px;
         padding: 0;
-        width: 24px;
+        width: 32px;
+    }
+
+    table.victorian-progression .rating {
+        border-right: 0 !important;
     }
 
     /* Dots go in these
@@ -95,7 +98,7 @@
     <thead>
     <tr class="header">
         <th colspan="2" class="corner"></th>
-        <th>Rating</th>
+        <th class="rating">Rating</th>
 
         {# random spacer column #}
         <th class="level-spacer"></th>
@@ -145,7 +148,7 @@
  # @param int $currentYearLevel
 #}
 {% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester) %}
-    <td>{{ nodeData.rating }}</td>
+    <td class="rating">{{ nodeData.rating }}</td>
 
     {# random spacer column #}
     <td class="level-spacer"></td>
