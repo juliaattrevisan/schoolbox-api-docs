@@ -217,6 +217,8 @@ class Transactor
                     $this->assessment->getKamiFile(),
                     $this->filesystemProxy,
                 );
+
+                // TODO attach document ID to assessment
             }
         }
 
