@@ -10,6 +10,8 @@ namespace Alaress\Image\Transformation;
 
 use Alaress\Image\ITransform;
 use Alaress\Image\Transform\Constrain;
+use Alaress\Image\Transform\Square;
+
 
 /**
  * Accepts dynamic url parameters to create a dynamic transformation list
@@ -52,6 +54,15 @@ class MyImage implements ITransformFactory
     public function retrieve(int $width, int $height): ITransform
     {
         return new Constrain($width, $height);
+    }
+
+    /**
+     * @param int $size
+     * @return ITransform
+     */
+    public function square(int $size): ITransform
+    {
+        return new Square($size);
     }
 
     /**
