@@ -62,7 +62,7 @@ class Controller extends Base
 
         /* Annotation diagnostic
          */
-        $annotate = (bool)$this->requestQuery->get('userId');
+        $annotate = (bool)$this->requestQuery->get('annotate');
 
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
             'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper, $workTypeId, $annotate))->generate($student, $academicPeriod, $classCode),

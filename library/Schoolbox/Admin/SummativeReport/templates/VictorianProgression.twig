@@ -56,7 +56,7 @@
         background-color: #000;
     }
 
-    {% if not annotate %}
+    {% if not (annotate or false) %}
     /* Optionally show annotations so you can see data points
      */
     table .annotation {
