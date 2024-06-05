@@ -86,7 +86,7 @@ async function saveScore() {
     const formData = new FormData();
     formData.append(
         "learnosityReference",
-        (props.question.response as StudentItemQuestionResponse).learnosityReference,
+        (props.question.response as StudentItemQuestionResponse).learnosityReference
     );
     formData.append("score", score.value);
     await fetch(props.student.urls.score, {
@@ -121,7 +121,7 @@ watchDebounced(
         }
         void saveScore();
     },
-    { debounce: 300 },
+    { debounce: 300 }
 );
 
 /**
@@ -149,12 +149,12 @@ window.Vue.onMounted(() => {
         // Find any oembeds and load them
         responsesEl.value
             ?.querySelectorAll(
-                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))",
+                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))"
             )
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
-                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
+                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url")
                 );
             });
     }
@@ -167,12 +167,37 @@ window.Vue.onMounted(() => {
 window.Vue.onBeforeUnmount(async () => {
     if (props.question.response) {
         const response = responsesEl.value?.querySelector(
-            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`,
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
         ) as HTMLDivElement;
         props.container.appendChild(response);
         await saveScore();
     }
 });
+
+/**
+ * Filters the input to allow only digits and a single decimal point.
+ * Updates the score value accordingly.
+ * @param {Event} event - The input event.
+ */
+function filterInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    // Allow only digits and a single decimal point
+    let filteredValue = target.value.replace(/[^0-9.]/g, "");
+
+    // Ensure only one decimal point is present
+    const parts = filteredValue.split(".");
+    if (parts.length > 2) {
+        filteredValue = `${parts[0]}.${parts.slice(1).join("")}`;
+    }
+
+    // Prevent starting with a decimal point
+    if (filteredValue.startsWith(".")) {
+        filteredValue = `0${filteredValue}`;
+    }
+
+    target.value = filteredValue;
+    score.value = filteredValue;
+}
 </script>
 
 <template>
@@ -213,6 +238,7 @@ window.Vue.onBeforeUnmount(async () => {
                             v-model="score"
                             type="text"
                             inputmode="numeric"
+                            @input="filterInput"
                         />
                     </template>
                     <div class="save-container l-grid">
