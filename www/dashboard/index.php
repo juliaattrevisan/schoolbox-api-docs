@@ -53,11 +53,9 @@ foreach ($componentCollection as $component) {
             throw $e;
         }
 
-        if ($this->getDi()->has('sentry')) {
-            /** @var HubInterface $sentry */
-            $sentry = $this->getDi()->get('sentry');
-            $sentry->captureException($e);
-        }
+        /** @var HubInterface $sentry */
+        $sentry = $this->getDi()->get('sentry');
+        $sentry->captureException($e);
     }
 }
 

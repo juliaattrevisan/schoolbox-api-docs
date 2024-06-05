@@ -391,11 +391,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      */
     protected function addSentryHandler(Lumberjack\Logger $logger): bool
     {
-        if (!$this->getDependencyInjector()->has('sentry')) {
-            // If Sentry is not available, don't attempt to log to it
-            return false;
-        }
-
         /** @var HubInterface $sentryClient */
         $sentryClient  = $this->getDependencyInjector()->get('sentry');
         $sentryHandler = new SentryHandler($sentryClient, Monolog\Logger::CRITICAL);

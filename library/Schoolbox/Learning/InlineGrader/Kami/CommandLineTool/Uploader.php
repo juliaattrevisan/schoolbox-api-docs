@@ -126,10 +126,8 @@ class Uploader extends CliTool\App
             exit(0);
         }
 
-        $sentry = null;
-        if ($this->getDi()->has('sentry')) {
-            $sentry = $this->getDi()->get('sentry');
-        }
+        /** @var HubInterface $sentry */
+        $sentry = $this->getDi()->get('sentry');
 
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
@@ -148,7 +146,7 @@ class Uploader extends CliTool\App
             $kamiMapper,
             $this->getLogger(),
             $lock,
-            $sentry instanceof HubInterface ? $sentry : null,
+            $sentry,
             $this->getDi()->get('filesystem.storageProxy'),
         );
 

@@ -74,11 +74,8 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     $this->localRedir("/homepage/$prefix/$code");
 }
 
-/** @var HubInterface|null $sentry */
-$sentry = null;
-if ($this->getDi()->has('sentry')) {
-    $sentry = $this->getDi()->get('sentry');
-}
+/** @var HubInterface $sentry */
+$sentry = $this->getDi()->get('sentry');
 
 /**
  * Canvas custom redirect
