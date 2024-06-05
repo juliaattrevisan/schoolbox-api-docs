@@ -59,7 +59,7 @@ class Controller extends Base
                 'pageCurrent'    => $currentRoute,
                 'allBreadcrumbs' => [
                     ['Administration', '/adminv2/home'],
-                    ['Route Summary', $currentRoute],
+                    ['Dependency Summary', $currentRoute],
                 ],
                 'dependencies' => $dependencies,
             ],
