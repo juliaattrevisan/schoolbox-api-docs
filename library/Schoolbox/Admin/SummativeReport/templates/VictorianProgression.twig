@@ -2,7 +2,8 @@
  # Victorian Curriculum Progression Point visualisation chart
  #
  # @param array $payload  A struct containing all the curriculum nodes, feedbacks and student metadata
-#}
+ # @param bool $annotate  Optionally show some diagnostic data
+ #}
 <style>
     table.victorian-progression  {
         border-collapse: collapse;
@@ -55,11 +56,13 @@
         background-color: #000;
     }
 
+    {% if not annotate %}
     /* Optionally show annotations so you can see data points
      */
     table .annotation {
         display: none;
     }
+    {% endif %}
 
     /* Each Level comes in a pair of cells for each half of an academic period, I guess
      * These should not have a dividing line in between

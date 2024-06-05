@@ -171,11 +171,13 @@ class Payload
      * @param Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      * @param int $workTypeId
+     * @param bool $annotate
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Term\Mapper $termMapper,
-        private int $workTypeId
+        private int $workTypeId,
+        private bool $annotate = false
     ) {
     }
 
@@ -427,7 +429,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark']);
+                    $struct[$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
                 }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
@@ -446,7 +448,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark']);
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = (new Rating())->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
                 }
             }
         }

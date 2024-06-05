@@ -60,8 +60,13 @@ class Controller extends Base
 
         $academicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
 
+        /* Annotation diagnostic
+         */
+        $annotate = (bool)$this->requestQuery->get('userId');
+
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper, $workTypeId))->generate($student, $academicPeriod, $classCode),
+            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper, $workTypeId, $annotate))->generate($student, $academicPeriod, $classCode),
+            'annotate' => $annotate,
             'audit' => (new VictorianProgression\Auditor($workTypeMapper))->audit()
         ]);
     }
