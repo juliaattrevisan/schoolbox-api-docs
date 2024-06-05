@@ -87,6 +87,12 @@ class Payload
             sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
             OR quiz.grade_group_id IS NOT NULL
         )
+        AND cn1.deleted_at IS NULL
+        AND cn2.deleted_at IS NULL
+        AND a.deleted_at IS NULL
+        AND sr.deleted_at IS NULL
+        AND quiz.deleted_at IS NULL
+        AND aa.deleted_at IS NULL
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
 
@@ -120,6 +126,7 @@ class Payload
         LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
         LEFT JOIN folder_code fc ON fc.folder_id = mvar.folder_id
+        LEFT JOIN folder f ON fc.folder_id = f.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
@@ -130,6 +137,14 @@ class Payload
             OR quiz.grade_group_id IS NOT NULL
         )
         AND fc.code = :classCode
+        AND cn1.deleted_at IS NULL
+        AND cn2.deleted_at IS NULL
+        AND a.deleted_at IS NULL
+        AND sr.deleted_at IS NULL
+        AND quiz.deleted_at IS NULL
+        AND aa.deleted_at IS NULL
+        AND fc.deleted_at IS NULL
+        AND f.deleted_at IS NULL
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
 
@@ -167,8 +182,6 @@ class Payload
 
     /**
      * Set up the necessary parts
-     *
-     * @throws \DomainException
      */
     private function setup(?string $classCode): void
     {
