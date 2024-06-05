@@ -524,7 +524,7 @@ class Controller extends ConfigController
                  * Namespace controls the icon selection but that's about it...?
                  */
                 ->setNamespace(NSMapper::NS_MESSAGE)
-                ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_MESSAGE)
                 /* Go to suds import log
                  */
                 ->setHref($redirect)

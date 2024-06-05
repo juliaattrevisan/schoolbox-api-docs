@@ -404,7 +404,7 @@ class Notifier extends AbstractModuleNotifier
             return $prefixGenerator->generate() . $badge->getIcon();
         }
         if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
-            return "/storage/image.php?hash={$badge->getImage()->getHash()}&size=constrain64";
+            return "/storage/image.php?hash={$badge->getImage()->getHash()}&size=square192";
         }
         // should not happen, but just in case
         return $this->getUserIcon($award->getAwardedBy());
