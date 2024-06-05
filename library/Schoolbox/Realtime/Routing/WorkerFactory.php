@@ -25,6 +25,7 @@ use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
 class WorkerFactory
 {
@@ -100,6 +101,7 @@ class WorkerFactory
             $this->instance,
             $this->conf->get('title'),
             $this->filesystemProxy,
+            new UnreadRetriever($this->client),
             MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 

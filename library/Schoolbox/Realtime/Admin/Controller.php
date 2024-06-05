@@ -29,6 +29,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\RoleMapper;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
 class Controller extends BaseController
 {
@@ -565,6 +566,7 @@ class Controller extends BaseController
             $this->getDi()->get('instance'),
             $this->getConfigLoader()->get('title'),
             $this->filesystemProxy,
+            new UnreadRetriever($this->getDi()->get('redis.storage')),
             $liveMessage
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
