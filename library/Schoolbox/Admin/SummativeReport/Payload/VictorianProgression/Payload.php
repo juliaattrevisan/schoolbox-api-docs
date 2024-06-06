@@ -21,12 +21,6 @@ use Schoolbox\User;
 class Payload
 {
     /**
-     * This worktype is required
-     */
-    public const WORK_TYPE_NAME = 'Victorian Curriculum Standard';
-
-
-    /**
      * Available levels to render in frontend; each int represents its float compatriot
      * e.g. "Level 6" is used as a heading for values 6 and 6.5
      */
@@ -49,7 +43,7 @@ class Payload
      * one of them can contain data for an assessment. This is probably a better alternative to
      * smashing the db repeatedly
      *
-     *     - Work Type Id must correspond to our admin lists; one must have the name defined byy WORK_TYPE_NAME
+     *     - Work Type Id must correspond to our admin lists; one must have the name defined by Summative Report setting
      *     - assessment feedback must be given to the student specified, not any other student
      *     - assessment feedback must be published (ignore drafts)
      *     - assessment due date must be between dates corresponding within a chosen academic period

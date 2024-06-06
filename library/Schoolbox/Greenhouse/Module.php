@@ -51,8 +51,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
-        );
+        return new Controller();
     }
 }

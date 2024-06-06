@@ -9,7 +9,6 @@
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Twig\Error\Error;
 
 /**
@@ -22,7 +21,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct(private \Schoolbox\Assessment\Term\Mapper $termMapper)
+    public function __construct()
     {
     }
 
@@ -35,39 +34,6 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $workTypeMapper = \Schoolbox\Learning\Assessment\WorkType\Mapper::getInstance();
-        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-
-        $student = $userMapper->findById($this->requestQuery->get('userId'));
-
-        /* Find the special Work Type by name for lack of a better way.
-         * One day this will be configurable in Summative Report itself, at which point it will be conclusive.
-         */
-        try {
-            $workType = $workTypeMapper->findOneByColumn('name', VictorianProgression\Payload::WORK_TYPE_NAME);
-            $workTypeId = (int)$workType->getId();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \DomainException(sprintf(
-                'Missing required worktype in admin: %s',
-                VictorianProgression\Payload::WORK_TYPE_NAME
-            ));
-        }
-
-        /* TODO find out how summative report handles multiple code(s)
-         */
-        $classCode = $this->requestQuery->get('code');
-
-        $academicPeriod = $this->termMapper->findForDate(\Alaress_Date_Format::now());
-
-        /* Annotation diagnostic
-         */
-        $annotate = (bool)$this->requestQuery->get('annotate');
-
-        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'payload' => (new VictorianProgression\Payload($workTypeMapper, $termMapper, $workTypeId, $annotate))->generate($student, $academicPeriod, $classCode),
-            'annotate' => $annotate,
-            'audit' => (new VictorianProgression\Auditor($workTypeMapper))->audit()
-        ]);
+        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
     }
 }

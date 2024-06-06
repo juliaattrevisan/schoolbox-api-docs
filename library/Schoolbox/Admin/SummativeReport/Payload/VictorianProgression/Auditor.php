@@ -14,6 +14,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 class Auditor
 {
     /**
+     * This worktype is required. In summative report, it's dynamically chosen
+     * by the school
+     */
+    public const WORK_TYPE_NAME = 'Victorian Curriculum Standard';
+
+
+    /**
      * This is how mariadb sorts a group concat, apparently
      * Anyway, this has to match the values configured in admin in this exact manner for now
      *
@@ -45,12 +52,12 @@ class Auditor
         /* Find the Work Type Id first, by name for lack of a better way
          */
         try {
-            $workType = $this->workTypeMapper->findOneByColumn('name', Payload::WORK_TYPE_NAME);
+            $workType = $this->workTypeMapper->findOneByColumn('name', self::WORK_TYPE_NAME);
             $workTypeId = (int)$workType->getId();
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new \DomainException(sprintf(
                 'Missing required worktype in admin: %s',
-                Payload::WORK_TYPE_NAME
+                self::WORK_TYPE_NAME
             ));
         }
 
