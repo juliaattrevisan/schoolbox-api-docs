@@ -29,6 +29,16 @@ self.addEventListener('push', function(event) {
         renotify: false,
         data: payload.notification
     };
+    const notificationUnreadCount = payload.notification.unread;
+
+    if('setAppBadge' in navigator) {
+        if(notificationUnreadCount > 0) {
+            navigator.setAppBadge(notificationUnreadCount);
+        } else {
+            navigator.clearAppBadge();
+        }
+    }
+
     event.waitUntil(
         self.registration.showNotification(notificationTitle, notificationOptions)
     );
