@@ -248,7 +248,7 @@
                 {% endif %}
 
                 {# You can always publish a new feedback...even if the student never attempted it #}
-                <a class="button" data-interaction-publish="" href="#">Publish</a>
+                <a class="button" data-interaction-publish="{{ participant.user.id }}" href="#publish">Publish</a>
             {% endset %}
         {% endapply %}
 
