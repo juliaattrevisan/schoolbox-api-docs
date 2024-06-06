@@ -600,10 +600,14 @@
                             });
                             {# wait for toggle change #}
                         }
-
+                        let prompted = false;
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
                             element?.addEventListener('click', () => {
                                 Notification.requestPermission().then((permission) => {
+                                    if (prompted) {
+                                        return;
+                                    }
+                                    prompted = true;
                                     if (permission === 'granted') {
                                         window.localStorage.setItem("notification", "requesting");
                                         document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
