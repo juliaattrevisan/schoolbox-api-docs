@@ -950,7 +950,7 @@ abstract class Kernel
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
 
-                    $knownUserClasses = $this->getKnownUserClassesFromSession($di);
+                    $knownUserClasses = static::getKnownUserClassesFromSession($di);
 
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
@@ -2252,7 +2252,7 @@ abstract class Kernel
      * @param Di\Container $di
      * @return array
      */
-    abstract protected function getKnownUserClassesFromSession(Di\Container $di): array;
+    abstract static protected function getKnownUserClassesFromSession(Di\Container $di): array;
 
 
     /**

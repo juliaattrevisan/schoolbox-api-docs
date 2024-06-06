@@ -410,7 +410,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     }
 
     /** @inheritDoc */
-    protected function getKnownUserClassesFromSession(Container $di): array
+    protected static function getKnownUserClassesFromSession(Container $di): array
     {
         // No session in CLI context.
         return [];

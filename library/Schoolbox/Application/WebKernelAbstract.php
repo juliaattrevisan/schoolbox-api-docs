@@ -301,7 +301,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     }
 
     /** @inheritDoc */
-    protected function getKnownUserClassesFromSession(Di\Container $di): array
+    protected static function getKnownUserClassesFromSession(Di\Container $di): array
     {
         // Get known user-to-class mapping from the session and inject into factory
         $knownUserClasses = [];
