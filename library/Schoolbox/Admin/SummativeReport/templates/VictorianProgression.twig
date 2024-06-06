@@ -163,8 +163,10 @@
  #
  # @param array $nodeData
  # @param array $possibleOutcomes
- # @param int $currentYearLevel
-#}
+ # @param int $currentYearLevel     Corresponds to the student's current year level
+ # @param int $currentSemester      Either 1 or 2
+ # @param bool $annotate            Decides whether to render annotations, for debugging without a developer
+ #}
 {% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester, annotate) %}
     {# Remember when we start drawing a line #}
     {% set lineStarted = false %}
