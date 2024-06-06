@@ -272,7 +272,7 @@ class Payload
                     $student,
                     $studentYearLevel,
                     $currentSemester,
-                    $folderId,
+                    null,
                     $aggregateAcademicPeriod['start'],
                     $aggregateAcademicPeriod['end'],
                     $data
