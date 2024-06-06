@@ -377,7 +377,7 @@ EOL;
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
-    protected static function installDependencies(Container $di): Container
+    public static function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
 

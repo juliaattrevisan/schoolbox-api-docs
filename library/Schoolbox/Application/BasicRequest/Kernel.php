@@ -80,7 +80,7 @@ class Kernel extends WebKernelAbstract
      * @throws Di\Exception\ServiceNotObject
      * @throws \RuntimeException
      */
-    protected static function installDependencies(Di\Container $di): Di\Container
+    public static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();

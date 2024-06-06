@@ -403,7 +403,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /** @inheritDoc */
-    protected static function installDependencies(Container $di): Container
+    public static function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
         return $di;

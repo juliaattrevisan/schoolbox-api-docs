@@ -395,7 +395,7 @@ abstract class Kernel
      * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected static function installDependencies(Di\Container $di): Di\Container
+    public static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();
