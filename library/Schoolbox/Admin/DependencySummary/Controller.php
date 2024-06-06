@@ -10,9 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DependencySummary;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Container;
 use Aura\Di\ContainerBuilder;
-use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Application;
 
 /**
  * A controller for viewing a list of services defined within Schoolbox's
@@ -20,6 +19,17 @@ use Schoolbox\Application\WebRequest\Kernel;
  */
 class Controller extends Base
 {
+    private const KERNEL_DAEMON    = 'daemon';
+    private const KERNEL_BASIC_WEB = 'basic';
+    private const KERNEL_CLI       = 'cli';
+    private const KERNEL_WEB       = 'web';
+    private const KERNELS = [
+        self::KERNEL_DAEMON,
+        self::KERNEL_BASIC_WEB,
+        self::KERNEL_CLI,
+        self::KERNEL_WEB,
+    ];
+
     /**
      * GET action for viewing list of DI services
      *
@@ -31,18 +41,27 @@ class Controller extends Base
      */
     public function getDependencyList(?string $kernel)
     {
+        if ($kernel === null) {
+            $kernel = self::KERNEL_WEB;
+        }
+        if (!in_array($kernel, self::KERNELS, true)) {
+            throw new Application\Exception\NotFound();
+        }
+
+        // Build a new container
         $container = (new ContainerBuilder())->newInstance();
         match ($kernel) {
-            'daemon' => \Schoolbox\Application\Daemon\Kernel::installDependencies($container),
-            'basic'  => \Schoolbox\Application\BasicRequest\Kernel::installDependencies($container),
-            'cli'    => \Schoolbox\Application\CliTool\Kernel::installDependencies($container),
-            default  => Kernel::installDependencies($container),
+            'daemon' => Application\Daemon\Kernel::installDependencies($container),
+            'basic'  => Application\BasicRequest\Kernel::installDependencies($container),
+            'cli'    => Application\CliTool\Kernel::installDependencies($container),
+            default  => Application\WebRequest\Kernel::installDependencies($container),
         };
-        // Install route generator manually:
-        // the new router knows not about the routes already set up
-        $container->set('router', $this->getDi()->get('router'));
 
+        // Install router manually:
+        // the new container's router knows not about the routes already set up
+        $container->set('router', $this->getRouter());
 
+        // And build the list of dependencies
         $dependencyNames = $container->getServices();
         natcasesort($dependencyNames);
 
@@ -69,6 +88,25 @@ class Controller extends Base
                     ['Dependency Summary', $currentRoute],
                 ],
                 'dependencies' => $dependencies,
+                'kernels'      => [
+                    [
+                        'name' => self::KERNEL_WEB,
+                        'label' => 'Web Request (Standard)',
+                    ],
+                    [
+                        'name' => self::KERNEL_BASIC_WEB,
+                        'label' => 'Web Request (Basic)',
+                    ],
+                    [
+                        'name' => self::KERNEL_CLI,
+                        'label' => 'Command Line (Tool)',
+                    ],
+                    [
+                        'name' => self::KERNEL_DAEMON,
+                        'label' => 'Command Line (Daemon)',
+                    ],
+                ],
+                'currentKernel' => $kernel,
             ],
             'Dependencies'
         );
