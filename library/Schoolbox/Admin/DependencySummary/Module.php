@@ -27,7 +27,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET', "", 'getDependencyList', new Rule\IsSuperuser());
+        $this->register('GET', "{/kernel}", 'getDependencyList', new Rule\IsSuperuser());
     }
 
     /**
@@ -35,7 +35,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->injector);
+        return new Controller();
     }
 
     /**
