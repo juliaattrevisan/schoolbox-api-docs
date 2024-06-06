@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new \Schoolbox\Firebase\Credentials\PopulatorTool();
 
