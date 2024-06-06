@@ -386,6 +386,32 @@
                 }
             });
 
+            /**
+            * Publish quiz feedback for a single participant
+            */
+            const $publishButtons = $('[data-interaction-publish]');
+            $publishButtons.on('click', function (event) {
+                event.preventDefault();
+                const $this = $(this);
+                const userId = $this.attr('data-interaction-publish');
+
+                // use the userId to target the correct form data
+                const $form = $('form[data-feedback-form="' + userId + '"]');
+
+                var formData = $form.serializeArray();
+                formData.push({ name: "publish", value: 1 });
+
+                $.ajax($form.attr("action"), {
+                    dataType: "json",
+                    data: formData,
+                    type: "post",
+                })
+                .done(function (response) {
+                    console.warn(response);
+                });
+
+            });
+
             {# Mass review submitted but unreviewed quiz attempts #}
             $('#mass-review').bulky({
                 submitText: function (len, all) {
