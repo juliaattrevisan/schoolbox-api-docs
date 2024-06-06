@@ -32,6 +32,22 @@
         vertical-align: middle;
     }
 
+    /* Manage subdivisions' borders
+     * Each Level comes in a pair of cells for each half of an academic period, I guess
+     * These should not have a dividing line in between
+     */
+    table.victorian-progression .outcome-cell:nth-child(n) {
+        border-right-width: 0;
+    }
+
+    table.victorian-progression .outcome-cell:nth-child(2n) {
+        border-left-width: 0;
+    }
+
+    table.victorian-progression .outcome-cell:last-child {
+        border-right-width: 1px;
+    }
+
     /* Make Dots Great
      */
     table.victorian-progression .dot {
@@ -83,17 +99,6 @@
         float: left;
         font-size: 10px;
         margin-top: -4px;
-    }
-
-    /* Each Level comes in a pair of cells for each half of an academic period, I guess
-     * These should not have a dividing line in between
-     */
-    table.victorian-progression .outcome-cell.hide-left-border {
-        border-left: 0;
-    }
-
-    table.victorian-progression .outcome-cell.hide-right-border {
-        border-right: 0;
     }
 
     /* Smear a yellow stripe
@@ -175,18 +180,13 @@
 
     {# Iterate each subcell #}
     {% for i in possibleOutcomes %}
-        {% set css = 'hide-left-border' %}
+        {% set css = '' %}
         {% set hasDot = false %}
 
         {# If i > floor(i), we're in a halfway point hide the left border
          # Otherwise, hide the right border
          #}
         {% set nearestFloor = i|round(0, 'floor') %}
-
-        {# We're in the left cell #}
-        {% if i == nearestFloor %}
-            {% set css = 'hide-right-border' %}
-        {% endif %}
 
         {# Yellow Streak
          # Check current year; smear it yellow if column matches student year level
@@ -195,9 +195,9 @@
          #}
         {% if nearestFloor == currentYearLevel %}
             {% if i == nearestFloor and currentSemester == 1 %}
-                {% set css = css ~ ' yellow' %}
+                {% set css = 'yellow' %}
             {% elseif i != nearestFloor and currentSemester == 2 %}
-                {% set css = css ~ ' yellow' %}
+                {% set css = 'yellow' %}
             {% endif %}
         {% endif %}
 
