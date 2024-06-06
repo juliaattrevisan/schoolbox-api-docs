@@ -978,6 +978,10 @@ class Controller extends ConfigController
         /* Optional Victorian Curriculum Progression chart thing
          */
         $vicProgression = [
+            /* Enable to show annotations in the preview window, for debugging purposes
+             * It saves you having to make a code change
+             */
+            'annotate' => (bool)$this->requestQuery->get('annotate', false),
             'summary' => null,
             'class' => null
         ];
@@ -985,11 +989,6 @@ class Controller extends ConfigController
         /* At least one of the Victorian Curriculum Progressions was enabled
          */
         if ($optionsPayload['summary']['vicProgression']['enable'] || $optionsPayload['class']['vicProgression']['enable']) {
-            /* Enable to show annotations in the preview window, for debugging purposes
-             * It saves you having to make a code change
-             */
-            $annotate = (bool)$this->requestQuery->get('annotate', false);
-
             /* Assume we want the first-mentioned academic period. Schools can supply multiple,
              * but we only want one.
              */
@@ -1002,7 +1001,7 @@ class Controller extends ConfigController
                     $this->workTypeMapper,
                     $this->termMapper,
                     (int)$optionsPayload['summary']['vicProgression']['workType'],
-                    $annotate
+                    $vicProgression['annotate']
                 ))->generate($student, $academicPeriod, null);
             }
 
@@ -1018,7 +1017,7 @@ class Controller extends ConfigController
                         $this->workTypeMapper,
                         $this->termMapper,
                         (int)$optionsPayload['class']['vicProgression']['workType'],
-                        $annotate
+                        $vicProgression['annotate']
                     ))->generate($student, $academicPeriod, $folderId);
                 }
             }
@@ -1048,7 +1047,6 @@ class Controller extends ConfigController
              * preview window in a staging environment without needing code changes to reveal
              */
             'vicProgression'             => $vicProgression,
-            'annotate'                   => $annotate,
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */

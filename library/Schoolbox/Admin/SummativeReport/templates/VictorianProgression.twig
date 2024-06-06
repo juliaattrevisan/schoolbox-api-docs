@@ -44,16 +44,24 @@
     table.victorian-progression .dot {
         border: 3px solid black;
         border-radius: 50%;
-        clear: both;
         float: left;
-        height: 16px;
         margin-left: -8px;
-        margin-right: 4px;
+        position: relative;
         width: 16px;
+        z-index: 2;
         -moz-border-radius: 50%;
         -webkit-border-radius: 50%;
     }
 
+    /* Same height as .dot, to enforce foreground line drawing alignment funny business
+     */
+    table.victorian-progression .dot,
+    table.victorian-progression .placeholder {
+        height: 16px;
+    }
+
+    /* Actual progression points
+     */
     table.victorian-progression .dot.white {
         background-color: #fff;
     }
@@ -62,13 +70,27 @@
         background-color: #000;
     }
 
-    {% if not (annotate ?? false) %}
-    /* Optionally show annotations so you can see data points
+    /* Line between dots; z-index ensures it's always rendered below a .dot
      */
-    table .annotation {
-        display: none;
+    table.victorian-progression .bridge {
+        border-top: 3px solid #000;
+        float: left;
+        margin-top: -9px;
+        width: 100%;
+        z-index: 1
     }
-    {% endif %}
+
+    /* Show the value of the dot for diagnostic convenience
+     */
+    table.victorian-progression span.annotation {
+        clear: none;
+        {% if not (annotate ?? false) %}
+            display: none;
+        {% endif %}
+        float: left !important;
+        font-size: 10px;
+        margin-top: -4px;
+    }
 
     /* Each Level comes in a pair of cells for each half of an academic period, I guess
      * These should not have a dividing line in between
@@ -126,14 +148,14 @@
             {% for nodeId, nodeData in parentNodeData.subnodes %}
                 <tr>
                     <td>{{ nodeData.name }}</td>
-                    {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester) }}
+                    {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
                 </tr>
             {% endfor %}
         {% else %}
             {# No subnodes: occupy available space #}
             <tr>
                 <td colspan="2">{{ parentNodeData.name }}</td>
-                {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester) }}
+                {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
             </tr>
         {% endif %}
     {% endfor %}
@@ -148,18 +170,30 @@
  # @param array $possibleOutcomes
  # @param int $currentYearLevel
 #}
-{% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester) %}
+{% macro renderOutcomes(nodeData, possibleOutcomes, currentYearLevel, currentSemester, annotate) %}
+    {# Remember when we start drawing a line #}
+    {% set lineStarted = false %}
+
+    {# The mysterious line betwen two dots has specific requirements:
+     #     - There is both a white and black dot in this row
+     #     - We started drawing a line already
+     #     - We aren't in a cell with a black dot
+     #}
+    {% set hasBothDots = (nodeData.previous.mark ?? false) and (nodeData.current.mark ?? false) %}
+
     <td class="rating">{{ nodeData.rating }}</td>
 
     {# random spacer column #}
     <td class="level-spacer"></td>
 
+    {# Iterate each subcell #}
     {% for i in possibleOutcomes %}
         {% set css = 'hide-left-border' %}
+        {% set hasDot = false %}
 
         {# If i > floor(i), we're in a halfway point hide the left border
          # Otherwise, hide the right border
-        #}
+         #}
         {% set nearestFloor = i|round(0, 'floor') %}
 
         {# We're in the left cell #}
@@ -167,10 +201,11 @@
             {% set css = 'hide-right-border' %}
         {% endif %}
 
-        {# Check current year; smear it yellow if column matches student year level
+        {# Yellow Streak
+         # Check current year; smear it yellow if column matches student year level
          # then figure out if it's the left cell or the right cell, since each of these
          # subdivisions corresponds to a semester. There's stable-genius logic here, sry
-        #}
+         #}
         {% if nearestFloor == currentYearLevel %}
             {% if i == nearestFloor and currentSemester == 1 %}
                 {% set css = css ~ ' yellow' %}
@@ -193,13 +228,37 @@
                 {% endif %}
 
                 <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
+
+                {% if annotate ?? false %}
                 <span class="annotation">{{ nodeData.previous.mark }}</span>
+                {% endif %}
+
+                {# Start drawing a line to the next dot #}
+                {% set lineStarted = true %}
+                {% set hasDot = true %}
             {% endif %}
 
             {# Progression Point from current academic period #}
             {% if i == (nodeData.current.mark ?? null) %}
                 <div class="black dot" title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}"></div>
+
+                {% if annotate ?? false %}
                 <span class="annotation">{{ nodeData.current.mark }}</span>
+                {% endif %}
+
+                {# Stop drawing line #}
+                {% set lineStarted = false %}
+                {% set hasDot = true %}
+            {% endif %}
+
+            {# The mysterious line betwen two dots has specific requirements:
+             #     - There is both a white and black dot in this row
+             #     - We started drawing a line already
+             #     - We aren't in a cell with a black dot
+             #}
+            {% if lineStarted and hasBothDots %}
+                <div class="placeholder"></div>
+                <div class="bridge"></div>
             {% endif %}
         </td>
     {% endfor %}
