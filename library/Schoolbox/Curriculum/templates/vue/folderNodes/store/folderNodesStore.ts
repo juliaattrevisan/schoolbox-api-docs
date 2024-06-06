@@ -106,7 +106,6 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             nodes.value = $nodes;
             filter.value = $filter;
             isReadOnly.value = $isReadOnly;
-            await pushChanges();
             hasLoaded.value = true;
             initEventListener();
         }
