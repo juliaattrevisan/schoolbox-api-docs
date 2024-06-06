@@ -60,23 +60,23 @@ class Rating
          */
         $diff = $mark - (float)$reference;
 
-        if ($diff < -1) {
+        if ($diff <= -1) {
             $result = 'Well Below Standard';
         }
 
-        if ($diff >= -1 && $diff < 0) {
+        if ($diff > -1 && $diff < -0.5) {
             $result = 'Below Standard';
         }
 
-        if ($diff === 0.0) {
+        if ($diff >= -0.5 && $diff <= 0.0) {
             $result = 'At Standard';
         }
 
-        if ($diff > 0 && $diff <= 1) {
+        if ($diff > 0 && $diff < 1) {
             $result = 'Above Standard';
         }
 
-        if ($diff > 1) {
+        if ($diff >= 1) {
             $result = 'Well Above Standard';
         }
 
