@@ -43,8 +43,7 @@ class Notifier extends AbstractModuleNotifier
     private const PATTERN_STAFF_AWARDED_TITLE         = ':teacher has awarded :badge to :student';
     private const PATTERN_STUDENT_AWARDED_TITLE       = ':student has achieved :badge';
 
-    private const PATTERN_GOAL_SET_HREF = '/search/user/%d#goals';
-    private const PATTERN_AWARDED_HREF = '/search/user/%d#achievements';
+    private const PATTERN_AWARDED_GOAL_SET_HREF = '/learning/badge/award/%d/viewEvidence';
 
     private const MESSAGES = [
         'well done',
@@ -184,7 +183,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $student   = $award->getRecipient();
-        $awardHref = sprintf(self::PATTERN_GOAL_SET_HREF, $student->getId());
+        $awardHref = sprintf(self::PATTERN_AWARDED_GOAL_SET_HREF, $award->getId());
 
         $bob = new Builder();
         $bob->setIcon($this->getIcon($award))
@@ -257,7 +256,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $student   = $award->getRecipient();
-        $awardHref = sprintf(self::PATTERN_AWARDED_HREF, $student->getId());
+        $awardHref = sprintf(self::PATTERN_AWARDED_GOAL_SET_HREF, $award->getId());
 
         $bob = new Builder();
         $bob->setIcon($this->getIcon($award))
