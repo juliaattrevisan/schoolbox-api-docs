@@ -8,6 +8,13 @@
 
     <div class="admin-content">
         <div class="small-12 island">
+            <ul class="sub-nav">
+                {% for kernel in kernels %}
+                    <li class="{% if kernel.name == currentKernel %}active{% endif %}">
+                        <a href="{{ routeLookup('adminDependencySummary.getDependencyList', {kernel: kernel.name}) }}">{{ kernel.label }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
             <table data-sortable style="table-layout: fixed;">
                 <colgroup>
                     <col />
