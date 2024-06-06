@@ -47,8 +47,13 @@ class Rating
     ): string {
         $result = '';
 
-        /* In first semester, "At Standard" is the stduent's year level -0.5
+        /* In first semester, "At Standard" is the student's year level -0.5
          * so in level 10, "At Standard" is measured from 9.5
+         *
+         * In second semester, "At Standard" is the student's year level
+         * so in level 10, "At Standard" is measured from 10
+         *
+         * I call this "the reference value"
          */
         $reference = $studentYearLevel;
 
