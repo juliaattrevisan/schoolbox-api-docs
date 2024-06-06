@@ -12,7 +12,6 @@ namespace Schoolbox\MobileApp;
 use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\NotificationBundle;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -86,11 +85,7 @@ class ServiceManager implements IServiceManager
         }
 
         $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $userId);
-
-        $bundle = new NotificationBundle();
-        $bundle->appendInstances($unread);
-        //Might be able to just use count($unread)?
-        $unreadCount = $bundle->count();
+        $unreadCount = count($unread);
 
         foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
             foreach ($appRegistrations as $appIdentifier => $reg) {
