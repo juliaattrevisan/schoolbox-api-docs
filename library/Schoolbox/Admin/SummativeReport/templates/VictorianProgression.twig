@@ -15,18 +15,11 @@
         padding: 0.5rem;
     }
 
-    /* Spacer column between Rating and Levels
-     */
-    table.victorian-progression .level-spacer {
-        border-left: 0;
-        max-width: 32px;
-        padding: 0;
-        width: 32px;
-    }
-
     table.victorian-progression tbody td.rating,
-    table.victorian-progression thead th.rating{
+    table.victorian-progression thead th.rating {
         border-right: 0;
+        padding-right: 32px;
+        text-align: left;
     }
 
     /* Dots go in these
@@ -123,9 +116,6 @@
         <th colspan="2" class="corner"></th>
         <th class="rating">Rating</th>
 
-        {# random spacer column #}
-        <th class="level-spacer"></th>
-
         {% for i in payload.levels %}
             {# Check current year; smear it yellow if i matches student year level #}
             <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
@@ -182,9 +172,6 @@
     {% set hasBothDots = (nodeData.previous.mark ?? false) and (nodeData.current.mark ?? false) %}
 
     <td class="rating">{{ nodeData.rating }}</td>
-
-    {# random spacer column #}
-    <td class="level-spacer"></td>
 
     {# Iterate each subcell #}
     {% for i in possibleOutcomes %}
