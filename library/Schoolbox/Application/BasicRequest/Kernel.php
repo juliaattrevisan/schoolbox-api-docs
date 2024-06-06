@@ -19,6 +19,7 @@ use GuzzleHttp;
 use League\Flysystem\Filesystem;
 use Proxy\Server as ProxyServer;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
@@ -101,6 +102,15 @@ class Kernel extends WebKernelAbstract
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
         $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
+        // User token generator
+        $di->set(
+            'user.tokenBuilder',
+            $di->lazyNew(
+                Jwt::class,
+                ['configLoader' => $config]
+            )
+        );
+
         // Task daemon message producer
         $di->set(
             'taskd.messageProducer',
@@ -117,7 +127,10 @@ class Kernel extends WebKernelAbstract
             'taskd.messageFactory',
             $di->lazyNew(
                 MessageFactory::class,
-                ['instance' => $di->lazyGet('instance')],
+                [
+                    'instance'     => $di->lazyGet('instance'),
+                    'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                ],
             )
         );
 
