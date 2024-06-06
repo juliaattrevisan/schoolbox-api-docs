@@ -213,8 +213,8 @@
         {% set canPublish = latestResponse and latestResponse.submitted %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
-        {# Always show an action row since you can always spawn a rando feedback now #}
-        {% set actionStyle = '' %}
+        {# Only show if there's an existing learnosity attempt, otherwise we'll show when there's a change to grade/comment #}
+        {% set actionStyle = latestResponse.learnosityReference ?? null ? 'display: block' : 'display: none' %}
 
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
@@ -375,17 +375,18 @@
         $(function() {
             var $participantList  = $('#assessment-status');
 
+            /**
+            * We currently only use dynamicFeedback to save the 'draft' feedback
+            * As the entire Quiz backend hasn't been set up the same as the Due work set up,
+            * we don't currently have the ability to 'publish' feedback in the same way as Due work yet.
+            * As such we add a 'publish' button outside the scope of dynamicFeedback and handle it here.
+            */
             $.fn.dynamicFeedback({
-                onPreDraftCallback: function () {
-                },
                 onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-                    const publishButton = document.querySelector(`[data-interaction-publish="${userId}"]`);
-                    publishButton.classList.remove('hide');
+                    // show the publish button to be able to save the 'draft'
+                    const $publishButton = $(`[data-interaction-publish="${userId}"]`);
+                    $publishButton.removeClass('hide');
                 },
-                onPrePublishCallback: function () {
-                },
-                onPublishCallback: function (userId) {
-                }
             });
 
             /**
@@ -394,29 +395,28 @@
             const $publishButtons = $('[data-interaction-publish]');
             $publishButtons.on('click', function (event) {
                 event.preventDefault();
-
                 document.dispatchEvent(new CustomEvent('TOAST__ACTIVATE', {
                     detail: {
                         text: "Publishing...",
                     }
                 }));
-
                 const $publishButton = $(this);
                 const userId = $publishButton.attr('data-interaction-publish');
-
-                // use the userId to target the correct form data
-                const $form = $('form[data-feedback-form="' + userId + '"]');
-
+                const $form = $('form[data-feedback-form="' + userId + '"]'); // use the userId to target the correct form data
                 var formData = $form.serializeArray();
-                formData.push({ name: "publish", value: 1 });
-
-                $.ajax($form.attr("action"), {
+                formData.push({ name: "publish", value: 1 }); // add the publish flag to the form data
+                $.ajax($form.attr("action"), { // now post the form data to the feedback endpoint
                     dataType: "json",
                     data: formData,
                     type: "post",
                 })
                 .done(function (response) {
-                    $publishButton.addClass('hide');
+                    $publishButton.addClass('hide'); // hide the publish button again
+                    const $actionBar = $(`[data-action-bar="${userId}"]`);
+                    // hide the action bar again if there's no learnosity attempt (it's displayed within jquery.dynamic-feedback when onPreDraftCallback is triggered)
+                    if (!$actionBar.has('[data-interaction-review]').length > 0) {
+                        $actionBar.slideUp();
+                    }
                     document.dispatchEvent(new CustomEvent('TOAST__TIMEOUT', {
                         detail: {
                             text: "Feedback published",
