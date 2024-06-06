@@ -215,12 +215,18 @@
         {% endif %}
 
         <td class="outcome-cell {{ css }}">
+            {# Note that there's a convention with the values: feedback values that start with 9
+             # (such as 9 and 9.5) will appear in the Level 10 column. They're offset by one.
+             # The feedbacks represent the student's journey -toward- a particular level.
+             #}
+            {% set offset = i-1 %}
+
             {# Progression Point from something in the past; special rendering condition exists.
              #
              # If "previous" mark exists, but "current" does not, show the previous Progression Point as black
              # Otherwise show it as white
-            #}
-            {% if (i-1) == (nodeData.previous.mark ?? null) %}
+             #}
+            {% if offset == (nodeData.previous.mark ?? null) %}
                 {% if (null == nodeData.current.mark ?? null) %}
                     {% set dotColor = 'black' %}
                 {% else  %}
@@ -239,7 +245,7 @@
             {% endif %}
 
             {# Progression Point from current academic period #}
-            {% if i == (nodeData.current.mark ?? null) %}
+            {% if offset == (nodeData.current.mark ?? null) %}
                 <div class="black dot" title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}"></div>
 
                 {% if annotate ?? false %}
