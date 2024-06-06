@@ -237,7 +237,7 @@ abstract class Kernel
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
-        $this->installDependencies($this->di);
+        static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
     }
@@ -395,7 +395,7 @@ abstract class Kernel
      * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function installDependencies(Di\Container $di): Di\Container
+    protected static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();
@@ -620,7 +620,7 @@ abstract class Kernel
             return $router->getGenerator();
         }));
 
-        $this->installSessionService($di);
+        static::installSessionService($di);
 
         // User from session
         $di->set(
@@ -2172,7 +2172,7 @@ abstract class Kernel
 //            /** @var IConfigLoader $conf */
 //            $conf = $di->get('config');
 //            $conn = new \Alaress\Async\Stomp\Implementation\Stream\Connection(
-//                $this->get('react.loop'),
+//                $di->get('react.loop'),
 //                new \Stomp\Protocol\Protocol(null, \Stomp\Protocol\Version::VERSION_1_1),
 //                new \Stomp\Transport\Parser(),
 //                $conf->get('amqp_host'),
@@ -2263,7 +2263,7 @@ abstract class Kernel
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotObject
      */
-    protected function installSessionService(Di\Container $di): Di\Container
+    protected static function installSessionService(Di\Container $di): Di\Container
     {
         $di->set(
             'session',

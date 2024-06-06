@@ -377,7 +377,7 @@ EOL;
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
-    protected function installDependencies(Container $di): Container
+    protected static function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
 
@@ -400,7 +400,7 @@ EOL;
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
             $conn = new Stomp\Connection(
-                $this->loop,
+                $di->get('react.loop'),
                 new Protocol(null, Version::VERSION_1_1),
                 new Parser(),
                 $conf->get('amqp_host'),
@@ -416,7 +416,7 @@ EOL;
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient($conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL), $this->loop);
+            return new AsyncRedisClient($conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL), $di->get('react.loop'));
         }));
 
         // Multi-instance repositories
@@ -463,7 +463,7 @@ EOL;
                 [
                     'configRepository' => $di->lazyGet('multiInstance.configRepository'),
                     'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
-                    'loop'             => $di->lazy(fn () => $this->loop),
+                    'loop'             => $di->lazyGet('react.loop'),
                 ],
             )
         );

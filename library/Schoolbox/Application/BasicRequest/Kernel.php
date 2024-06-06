@@ -80,7 +80,7 @@ class Kernel extends WebKernelAbstract
      * @throws Di\Exception\ServiceNotObject
      * @throws \RuntimeException
      */
-    protected function installDependencies(Di\Container $di): Di\Container
+    protected static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();
@@ -207,7 +207,7 @@ class Kernel extends WebKernelAbstract
         );
 
         // Session
-        $this->installSessionService($di);
+        static::installSessionService($di);
 
         // User from session
         $di->set(
