@@ -248,7 +248,7 @@
                 {% endif %}
 
                 {# You can always publish a new feedback...even if the student never attempted it #}
-                <a class="button" data-interaction-publish="{{ participant.user.id }}" href="#publish">Publish</a>
+                <a class="button hide" data-interaction-publish="{{ participant.user.id }}" href="#publish">Publish</a>
             {% endset %}
         {% endapply %}
 
@@ -379,6 +379,8 @@
                 onPreDraftCallback: function () {
                 },
                 onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+                    const publishButton = document.querySelector(`[data-interaction-publish="${userId}"]`);
+                    publishButton.classList.remove('hide');
                 },
                 onPrePublishCallback: function () {
                 },
@@ -399,7 +401,8 @@
                     }
                 }));
 
-                const userId = $(this).attr('data-interaction-publish');
+                const $publishButton = $(this);
+                const userId = $publishButton.attr('data-interaction-publish');
 
                 // use the userId to target the correct form data
                 const $form = $('form[data-feedback-form="' + userId + '"]');
@@ -413,6 +416,7 @@
                     type: "post",
                 })
                 .done(function (response) {
+                    $publishButton.addClass('hide');
                     document.dispatchEvent(new CustomEvent('TOAST__TIMEOUT', {
                         detail: {
                             text: "Feedback published",
