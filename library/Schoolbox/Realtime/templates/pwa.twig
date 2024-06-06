@@ -4,7 +4,7 @@
     notifButton: string identifier for the checkbox/toggle for allow notifications to display correctly when there are multiple on the page
 #}
 <div class="l-flex-col l-gap-m f-no-margins" data-pwa-page="{{ pwaPage }}">
-    <div class="l-flex-col l-gap-s f-no-margins" data-pwa-action="installPWA">
+    <div class="l-flex-col l-gap-s f-no-margins" data-pwa-action="install">
         <p>To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.</p>
 
         {# Insatll PWA if not any of the following:
@@ -24,7 +24,7 @@
             {% endif %}
         {% else %}
             {# ensure the user is in the specified role #}
-            {% if USER.role.type | capitalize in config.digistorm_role_install_prompt %}
+            {% if (USER.role.type | capitalize) in config.digistorm_role_install_prompt %}
                 {% if installApple is not empty %}
                     <a data-pwa-action="installApple" class="button" href="{{ installApple }}">Install</a>
                 {% endif %}

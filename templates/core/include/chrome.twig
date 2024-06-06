@@ -437,7 +437,7 @@
                     {# if PWA was installed and you are accessing it via the PWA #}
                     if (window.matchMedia('(display-mode: standalone)').matches) {
                         // If visible, hide the install promotion
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                        document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
                             element.remove();
                         });
                     }
@@ -453,7 +453,7 @@
                         // Stash the event so it can be triggered later.
                         window.deferredPrompt = event;
                         // Remove the 'hidden' class from the install button container.
-                        document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                        document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
                             element.classList.toggle('display', 'none');
                         });
                     });
@@ -523,7 +523,11 @@
                         deviceId = 'Android';
                     }
 
-                    if (iOS() && Boolean({{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}})) {
+                    if (
+                        iOS() &&
+                        Boolean({{ (config.digistorm_apple_app_store_link ?? '' != '') ? true : false}}) &&
+                        Boolean({{ ((USER.role.type | capitalize) in config.digistorm_role_install_prompt) ? true : false }})
+                    ) {
                         {% if config.debug_mode %}
                         console.log('iOS');
                         {% endif %}
@@ -539,7 +543,11 @@
                         });
                     }
                             {# if android and the android link exists, show it and hide the rest #}
-                    else if (/android/i.test(navigator.userAgent && Boolean({{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }}))) {
+                    else if (
+                            /android/i.test(navigator.userAgent) &&
+                            Boolean({{ (config.digistorm_google_play_store_link ?? '' != '') ? true : false }}) &&
+                            Boolean({{ ((USER.role.type | capitalize) in config.digistorm_role_install_prompt) ? true : false }})
+                        ) {
                         {% if config.debug_mode %}
                         console.log('Android');
                         {% endif %}
@@ -597,6 +605,7 @@
                             element?.addEventListener('click', () => {
                                 Notification.requestPermission().then((permission) => {
                                     if (permission === 'granted') {
+                                        window.localStorage.setItem("notification", "requesting");
                                         document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                             element.setAttribute('disabled', true);
                                         });
@@ -608,7 +617,7 @@
                                         document.dispatchEvent(
                                             new CustomEvent("PWA_NOTIFICATION_ALLOW", {
                                                 detail: {
-                                                    debug: {{ config.debug_mode }},
+                                                    debug: Boolean({{ config.debug_mode }}),
                                                     deviceId: deviceId,
                                                 },
                                             }),
@@ -630,6 +639,7 @@
                                             window.location.href = "/settings/notifications";
                                         };
                                     } else if (permission === 'denied') {
+                                        window.localStorage.setItem("notification", "denied");
                                         {% if config.debug_mode %}
                                         console.warn('Notification permission denied');
                                         {% endif %}
@@ -648,13 +658,50 @@
                                         document.dispatchEvent(
                                             new CustomEvent("PWA_NOTIFICATION_DENY", {
                                                 detail: {
-                                                    debug: {{ config.debug_mode }},
+                                                    debug: Boolean({{ config.debug_mode }}),
                                                 },
                                             }),
                                         );
                                     }
                                 });
                             });
+                        });
+                        {# sometimes the service worker is not running when we prompt attempt to register notifications, try again if we failed... #}
+                        reAuthNotif = function () {
+                            let winNotif = window.localStorage.getItem("notification");
+                            if (['requesting','registering'].includes(winNotif)) {
+                                document.dispatchEvent(
+                                    new CustomEvent("PWA_NOTIFICATION_ALLOW", {
+                                        detail: {
+                                            debug: Boolean({{ config.debug_mode }}),
+                                            deviceId: deviceId,
+                                        },
+                                    }),
+                                );
+                            }
+                        }
+
+                        {# frontend people, I was trying to get this to load on page load, or when the page has finished loading,
+                         # so we can hit the event listener in the firebase file at the bottom of the file.
+                         # This is calling the above function which calls the firebase event, but is not passing through the data,
+                         # and there is probably a better way of doing this anyhow...
+                        #}
+                        if (document.readyState !== 'loading') {
+                            reAuthNotif();
+                        } else {
+                            document.addEventListener('DOMContentLoaded', reAuthNotif);
+                        }
+
+                    } else {
+                        // No Notifications, don't even give the option
+                        document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                            element.remove();
+                        });
+                        document.querySelectorAll('[data-pwa-iOS="iOSHomePrompt"]').forEach((element) => {
+                            element.remove();
                         });
                     }
 

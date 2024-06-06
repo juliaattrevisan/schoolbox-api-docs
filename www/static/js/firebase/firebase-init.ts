@@ -58,6 +58,8 @@ function requestNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, {vapidKey: app.webPushPublicKey})
                 .then((currentToken) => {
+                    window.localStorage.setItem("notification", "registering");
+                    window.localStorage.setItem("notifToken", currentToken);
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
@@ -76,7 +78,10 @@ function requestNotif(event: CustomEvent) {
                     fetch('/api/register/Firebase', {
                         method: 'POST',
                         body: formData,
-                    });
+                    }).then((response) => {
+                        window.localStorage.setItem("notification", "registered");
+                    })
+
                 })
                 .catch((error) => {
                     if (debug) {
@@ -104,6 +109,9 @@ function denyNotif(event: CustomEvent) {
                 .then((currentToken) => {
                     //delete the token from firebase
                     deleteToken(messaging)
+                    // delete the local cache token
+                    window.localStorage.removeItem("notifToken");
+                    window.localStorage.setItem("notification", "removing");
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -122,6 +130,8 @@ function denyNotif(event: CustomEvent) {
                     fetch('/api/register/Firebase', {
                         method: 'DELETE',
                         body: formData,
+                    }).then((response) => {
+                        window.localStorage.setItem("notification", "removed");
                     });
                 })
                 .catch((error) => {
