@@ -83,21 +83,16 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         if ($context->getCurriculumNodes()->count()) {
             $nodeIds = [];
             foreach ($context->getCurriculumNodes() as $node) {
-                if (!$node->getEnabled()) {
-                    continue;
-                }
-
                 $nodeIds[] = $node->getId();
             }
 
-            // Fetch every node which is an ancestor or descendant of one of
-            // this folder's nodes, and is still enabled:
-            // only enabled nodes should be selectable.
+            // Fetch every node which is an ancestor or descendant of one of this folder's nodes, whether enabled or disabled.
+            // A previously set curriculum node should remain on a folder even if the node has subsequently been disabled.
             $nodeIds = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
 
             // Then, sort the entire list of nodes into a tree structure.
             $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
-                $nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+                $nodeMapper->findByColumnList(['id' => $nodeIds]),
             );
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
@@ -114,7 +109,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
         // This should be unnecessary but PHPStan complains otherwise
         /** @var GenericCollection<Node\Model> $selectedNodes */
-        $selectedNodes       = $this->getContext()->getCurriculumNodes()->filterBy('enabled', true)->reindex();
+        $selectedNodes       = $this->getContext()->getCurriculumNodes()->reindex();
         $this->selectedNodes = $selectedNodes;
 
         // Load curriculum tree filter node
