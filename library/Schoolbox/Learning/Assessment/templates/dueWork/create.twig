@@ -343,6 +343,12 @@
     const worksheetCheckbox = document.getElementById("worksheet");
     const worksheetDropdzone = document.getElementById("worksheetDropzone");
     worksheetCheckbox.addEventListener("change", onWorksheetChange);
+
+    // Remove the error message when a worksheet file is uploaded
+    $('#worksheetDropzone').on('success.attachzone', () => {
+        $('#worksheet-file-error').remove();
+    });
+
     {% endif %}
 
     {% if lmsStudentPolicy | length %}
