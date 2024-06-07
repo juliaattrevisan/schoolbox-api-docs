@@ -423,6 +423,8 @@
                                 </table>
                             </div>
                         </fieldset>
+                        {# Victorian Curriculum Progressions is Penola-specific atm #}
+                        {% if 'pcc' == config.site_school_code|lower  %}
                         <fieldset class="content">
                             <legend>Victorian Curriculum Progressions</legend>
                             <div class="small-12 columns">
@@ -447,6 +449,7 @@
                                 </select>
                             </div>
                         </fieldset>
+                        {% endif %}
                 </section>
 
                 <div class="row actions-small-1">
@@ -534,6 +537,8 @@
                             </table>
                         </div>
                     </fieldset>
+                    {# Victorian Curriculum Progressions is Penola-specific atm #}
+                    {% if 'pcc' == config.site_school_code|lower  %}
                     <fieldset class="content">
                         <legend>Victorian Curriculum Progressions</legend>
                         <div class="small-12 columns">
@@ -558,6 +563,7 @@
                             </select>
                         </div>
                     </fieldset>
+                    {% endif %}
 
                         {# NONE of this exists yet....
                         <div class="small-12 columns">
