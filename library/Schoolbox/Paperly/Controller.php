@@ -8,14 +8,16 @@
 namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Twig\Error\Error;
-use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
 
-class Controller extends Base implements ICodec
+class Controller extends Base
 {
     private string $paperlyHostName;
     private string $dummyPayload;
     private array $paperlyPayload;
+    private Base64 $base64Codec;
 
     /**
      * Controller constructor.
@@ -24,6 +26,8 @@ class Controller extends Base implements ICodec
     {
         //TODO replace with the Paperly hostname
         $this->paperlyHostName = "https://url";
+
+        $this->base64Codec = new Base64();
 
         //TODO replace with real payloads once we have it
 
@@ -90,42 +94,30 @@ class Controller extends Base implements ICodec
     }
 
     /**
-     * Encode the path to the iframe by striping the hostname to be prepended by trusted Paperly hostname
+     * Prepare routes for paperly iframe
      *
-     * @param   mixed $rawValue
-     * @return  array
+     * @param   array $paperlyLink
+     * @return  string
+     * @throws  RouteNotFound
      */
-    public function encode(mixed $rawValue): array
+    private function preparePaperlyRoute($paperlyLink): string
     {
-        $parsedUrl = parse_url($rawValue['url']);
+        $parsedUrl = parse_url($paperlyLink['url']);
 
-        return array_map(
-            'urlencode',
+        $link = $this->base64Codec->encode(
             [
-                'title' => $rawValue['title'],
-                'url' => base64_encode(
-                    $parsedUrl['path']
-                )
+                'pageTitle' => $paperlyLink['title'],
+                'url' => $parsedUrl['path'] . (isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '')
             ]
         );
-    }
-    /**
-     * Decode the path and prepend with trusted Paperly hostname
-     *
-     * @param   mixed $encodedValue
-     * @return  array
-     */
-    public function decode(mixed $encodedValue): array
-    {
-        $urlDecodedValue = array_map('urldecode', $encodedValue);
-        return [
-            'title' => $urlDecodedValue['title'],
-            'url' => preg_replace(
-                '/(?<!:)\/\//',
-                '/',
-                $this->paperlyHostName . base64_decode($urlDecodedValue['url'])
-            )
-        ];
+
+        return $this->routeGenerator
+            ->generate(
+                'paperly.getPaperlyViewIframe',
+                [
+                    'encodedUrl' => urlencode($link)
+                ]
+            );
     }
 
     /**
@@ -140,30 +132,12 @@ class Controller extends Base implements ICodec
         $paperlyLinks = [];
 
         foreach ($this->paperlyPayload['features'] as $feature) {
-            $featureTitle = $feature['title'];
-            $path = $this->encode($feature);
-            $paperlyLinks['features'][][$featureTitle] =
-                $this->routeGenerator
-                    ->generate(
-                        'paperly.getPaperlyViewIframe',
-                        [
-                            'pageTitle' => $path['title'],
-                            'encodedUrl' => $path['url']
-                        ]
-                    );
+            $paperlyLinks['features'][][$feature['title']] = $this->preparePaperlyRoute($feature);
         }
 
         $upcomingActions = [];
         foreach ($this->paperlyPayload['upcoming'] as $order => $upcoming) {
-            $path = $this->encode($upcoming);
-            $upcoming['url'] = $this->routeGenerator
-                ->generate(
-                    'paperly.getPaperlyViewIframe',
-                    [
-                        'pageTitle' => $path['title'],
-                        'encodedUrl' => $path['url']
-                    ]
-                );
+            $upcoming['url'] = $this->preparePaperlyRoute($upcoming);
             $upcomingActions[$order] = $upcoming;
         }
         $paperlyLinks['upcoming'] = $upcomingActions;
@@ -175,20 +149,19 @@ class Controller extends Base implements ICodec
      * Load an iframe for Paperly
      *
      * @param string $encodedUrl
-     * @param string $pageTitle
      * @throws Error
      */
-    public function getPaperlyViewIframe(string $encodedUrl, string $pageTitle): void
+    public function getPaperlyViewIframe(string $encodedUrl): void
     {
-        $path = $this->decode(
-            [
-                'title' => $pageTitle,
-                'url' => $encodedUrl
-            ]
-        );
+        $path = $this->base64Codec->decode(urldecode($encodedUrl));
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            'url' => $path['url']
-        ], "Paperly " . $path['title']);
+            //Removing trailing forward slash on hostname
+            'url' => preg_replace(
+                '/(?<!:)\/\//',
+                '/',
+                $this->paperlyHostName . $path['url']
+            )
+        ], "Paperly " . $path['pageTitle']);
     }
 }
