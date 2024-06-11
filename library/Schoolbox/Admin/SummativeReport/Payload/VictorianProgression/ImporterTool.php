@@ -810,7 +810,23 @@ HELP;
 
             /* Assume this exists, I guess, for now
              */
-            $folder = $this->folderMapper->findByCode($row[6]);
+            $this->getLogger()->debug(sprintf(
+                'Row %s: looking for folder code %s',
+                $i,
+                $row[6]
+            ));
+
+            try {
+                $folder = $this->folderMapper->findByCode($row[6]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->getLogger()->warning(sprintf(
+                    'Row %s: did not find folder code %s. Skipping',
+                    $i,
+                    $row[6]
+                ));
+
+                continue;
+            }
 
             /* Figure out if we already made this assessment.
              * If we did, reuse it.
