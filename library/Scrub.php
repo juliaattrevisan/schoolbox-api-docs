@@ -129,6 +129,11 @@ class Scrub
             // TODO: remove this clear cache call
             $config->set('Cache.DefinitionImpl', null);
 
+            // Set these so that the limit will not be hit in all practical cases.  (The limit only exists to prevent
+            // exploitation of a bug involving the image’s height value overflowing its datatype on some systems.)
+            $config->set('HTML.MaxImgLength', 5000);
+            $config->set('CSS.MaxImgLength', '5000px');
+
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
