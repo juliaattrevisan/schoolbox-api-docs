@@ -9,18 +9,22 @@ namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
-use Alaress\Codec\ICodec;
 use RuntimeException;
 use Twig\Error\Error;
 use Crell\ApiProblem\ApiProblem;
+use Aura\Router\Exception\RouteNotFound;
+use Alaress\Codec\Json\Base64;
 
-class Controller extends Base implements ICodec
+class Controller extends Base
 {
+    private Base64 $base64Codec;
+
     /**
      * Controller constructor.
      */
     public function __construct()
     {
+        $this->base64Codec = new Base64();
     }
 
     /**
@@ -31,6 +35,12 @@ class Controller extends Base implements ICodec
     private function getPaperlyHostname(): string
     {
         $hostname = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_HOSTNAME);
+
+        //Early return if config not set
+        if ($hostname == null) {
+            return '';
+        }
+
         $parsedUrl = parse_url($hostname);
 
         $scheme = $parsedUrl['scheme'] ?? null;
@@ -43,44 +53,32 @@ class Controller extends Base implements ICodec
                 "https://$host" :
                 $hostname);
     }
-    /**
-     * Encode the path to the iframe by striping the hostname to be prepended by trusted Paperly hostname
-     *
-     * @param   mixed $rawValue
-     * @return  array
-     */
-    public function encode(mixed $rawValue): array
-    {
-        $parsedUrl = parse_url($rawValue['url']);
 
-        return array_map(
-            'urlencode',
+    /**
+     * Prepare routes for paperly iframe
+     *
+     * @param   array $paperlyLink
+     * @return  string
+     * @throws  RouteNotFound
+     */
+    private function preparePaperlyRoute($paperlyLink): string
+    {
+        $parsedUrl = parse_url($paperlyLink['url']);
+
+        $link = $this->base64Codec->encode(
             [
-                'title' => $rawValue['title'],
-                'url' => base64_encode(
-                    $parsedUrl['path']
-                )
+                'pageTitle' => $paperlyLink['title'],
+                'url' => $parsedUrl['path'] . (isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '')
             ]
         );
-    }
-    /**
-     * Decode the path and prepend with trusted Paperly hostname
-     *
-     * @param   mixed $encodedValue
-     * @return  array
-     */
-    public function decode(mixed $encodedValue): array
-    {
-        $urlDecodedValue = array_map('urldecode', $encodedValue);
-        return [
-            'title' => $urlDecodedValue['title'],
-            //Remove the trailing forward slash before appending path
-            'url' => preg_replace(
-                '/(?<!:)\/\//',
-                '/',
-                $this->getPaperlyHostname() . base64_decode($urlDecodedValue['url'])
-            )
-        ];
+
+        return $this->routeGenerator
+            ->generate(
+                'paperly.getPaperlyViewIframe',
+                [
+                    'encodedUrl' => urlencode($link)
+                ]
+            );
     }
 
     /**
@@ -142,30 +140,12 @@ class Controller extends Base implements ICodec
             return;
         }
         foreach ($paperlyPayload['features'] as $feature) {
-            $featureTitle = $feature['title'];
-            $path = $this->encode($feature);
-            $paperlyLinks['features'][][$featureTitle] =
-                $this->routeGenerator
-                    ->generate(
-                        'paperly.getPaperlyViewIframe',
-                        [
-                            'pageTitle' => $path['title'],
-                            'encodedUrl' => $path['url']
-                        ]
-                    );
+            $paperlyLinks['features'][][$feature['title']] = $this->preparePaperlyRoute($feature);
         }
 
         $upcomingActions = [];
         foreach ($paperlyPayload['upcoming'] as $order => $upcoming) {
-            $path = $this->encode($upcoming);
-            $upcoming['url'] = $this->routeGenerator
-                ->generate(
-                    'paperly.getPaperlyViewIframe',
-                    [
-                        'pageTitle' => $path['title'],
-                        'encodedUrl' => $path['url']
-                    ]
-                );
+            $upcoming['url'] = $this->preparePaperlyRoute($upcoming);
             $upcomingActions[$order] = $upcoming;
         }
         $paperlyLinks['upcoming'] = $upcomingActions;
@@ -177,20 +157,19 @@ class Controller extends Base implements ICodec
      * Load an iframe for Paperly
      *
      * @param string $encodedUrl
-     * @param string $pageTitle
      * @throws Error
      */
-    public function getPaperlyViewIframe(string $encodedUrl, string $pageTitle): void
+    public function getPaperlyViewIframe(string $encodedUrl): void
     {
-        $path = $this->decode(
-            [
-                'title' => $pageTitle,
-                'url' => $encodedUrl
-            ]
-        );
+        $path = $this->base64Codec->decode(urldecode($encodedUrl));
 
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            'url' => $path['url']
-        ], "Paperly " . $path['title']);
+            //Removing trailing forward slash on hostname
+            'url' => preg_replace(
+                '/(?<!:)\/\//',
+                '/',
+                $this->getPaperlyHostname() . $path['url']
+            )
+        ], "Paperly " . $path['pageTitle']);
     }
 }
