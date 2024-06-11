@@ -248,7 +248,7 @@
                 {% endif %}
 
                 {# You can always publish a new feedback...even if the student never attempted it #}
-                <a class="button hide" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
+                <a class="button" data-draft="publish" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
             {% endset %}
         {% endapply %}
 
@@ -376,63 +376,12 @@
             var $participantList  = $('#assessment-status');
 
             /**
-            * We currently only use dynamicFeedback to save the 'draft' feedback
-            * As the entire Quiz backend hasn't been set up the same as the Due work set up,
-            * we don't currently have the ability to 'publish' feedback in the same way as Due work yet.
-            * As such we add a 'publish' button outside the scope of dynamicFeedback and handle it here.
+            * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
+            * We circumvent the draft state by showing the 'Save and Publish' button immediately and abort the saving of a draft state.
             */
             $.fn.dynamicFeedback({
                 isQuiz: true,
-                onPreDraftCallback: function (participantId) {
-                    // show the publish button to be able to save the 'draft'
-                    const $publishButton = $(`[data-interaction-publish="${participantId}"]`);
-                    $publishButton.removeClass('hide');
-                },
-            });
-
-            /**
-            * Publish quiz feedback for a single participant
-            */
-            const $publishButtons = $('[data-interaction-publish]');
-            $publishButtons.on('click', function (event) {
-                event.preventDefault();
-                document.dispatchEvent(new CustomEvent('TOAST__ACTIVATE', {
-                    detail: {
-                        text: "Publishing...",
-                    }
-                }));
-                const $publishButton = $(this);
-                const userId = $publishButton.attr('data-interaction-publish');
-                const $form = $('form[data-feedback-form="' + userId + '"]'); // use the userId to target the correct form data
-                var formData = $form.serializeArray();
-                formData.push({ name: "publish", value: 1 }); // add the publish flag to the form data
-                $.ajax($form.attr("action"), { // now post the form data to the feedback endpoint
-                    dataType: "json",
-                    data: formData,
-                    type: "post",
-                })
-                .done(function (response) {
-                    $publishButton.addClass('hide'); // hide the publish button again
-                    const $actionBar = $(`[data-action-bar="${userId}"]`);
-                    // hide the action bar again if there's no learnosity attempt (it's displayed within jquery.dynamic-feedback when onPreDraftCallback is triggered)
-                    if (!$actionBar.has('[data-interaction-review]').length > 0) {
-                        $actionBar.slideUp();
-                    }
-                    document.dispatchEvent(new CustomEvent('TOAST__TIMEOUT', {
-                        detail: {
-                            text: "Feedback published",
-                        }
-                    }));
-                })
-                .fail(function (xhr) {
-                    document.dispatchEvent(new CustomEvent('TOAST__TIMEOUT', {
-                        detail: {
-                            text: xhr.responseText,
-                            isSuccess: false,
-                        }
-                    }));
-                });
-
+                publishText: "Save and Publish",
             });
 
             {# Mass review submitted but unreviewed quiz attempts #}
