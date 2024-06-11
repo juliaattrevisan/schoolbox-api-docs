@@ -8,11 +8,16 @@
 import { timeout } from "@js/util/jsUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import { payload } from "./tempPayload";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
 
-const tempPayload = window.Vue.ref<PaperlyPayload | undefined>();
+interface Props {
+    getPaperlyViewEndpoint: string //The endpoint for fetching the list of Paperly items and its iframe urls
+}
+
+const props = defineProps<Props>();
+
+const paperlyPayload = window.Vue.ref<PaperlyPayload | undefined>();
 const viewMore = window.Vue.ref(false); // to show all upcoming tasks, only show the first three by default
 const isProcessing = window.Vue.ref(false); // to display loading while the payload is being loaded
 const hasLoadError = window.Vue.ref(false); // to show an error message if the payload fails to load
@@ -23,14 +28,9 @@ const hasLoadError = window.Vue.ref(false); // to show an error message if the p
 async function loadPayload() {
     try {
         isProcessing.value = true;
-        const response = await fetch(`/api/curriculum/`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch(props.getPaperlyViewEndpoint);
         if (response.ok) {
-            // const payload = (await response.json()) as PaperlyPayload;
-            tempPayload.value = payload;
+            paperlyPayload.value = (await response.json()) as PaperlyPayload;
         } else {
             hasLoadError.value = true;
         }
@@ -55,15 +55,15 @@ window.Vue.onMounted(() => {
  */
 const upcoming = window.Vue.computed(() => {
     // if the payload is not loaded, return an empty array
-    if (tempPayload.value === undefined) {
+    if (paperlyPayload.value === undefined) {
         return [];
     }
     // if view more has not been selected, only show the first three
     if (!viewMore.value) {
-        return tempPayload.value.upcoming.slice(0, 3);
+        return paperlyPayload.value.upcoming.slice(0, 3);
     }
     // otherwise show all upcoming tasks
-    return tempPayload.value.upcoming;
+    return paperlyPayload.value.upcoming;
 });
 </script>
 
@@ -76,20 +76,20 @@ const upcoming = window.Vue.computed(() => {
     <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
-            <li v-if="tempPayload?.features.find((item) => 'Forms' in item)">
-                <a class="icon-paperly-forms" :href="tempPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''">
+            <li v-if="paperlyPayload?.features.find((item) => 'Forms' in item)">
+                <a class="icon-paperly-forms" :href="paperlyPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''">
                     Forms</a
                 >
             </li>
-            <li v-if="tempPayload?.features.find((item) => 'Excursions' in item)">
+            <li v-if="paperlyPayload?.features.find((item) => 'Excursions' in item)">
                 <a
                     class="icon-paperly-excursions"
-                    :href="tempPayload.features.find((item) => 'Excursions' in item)?.Excursions ?? ''"
+                    :href="paperlyPayload.features.find((item) => 'Excursions' in item)?.Excursions ?? ''"
                     >Excursions</a
                 >
             </li>
-            <li v-if="tempPayload?.features.find((item) => 'PTI' in item)">
-                <a class="icon-paperly-pti" :href="tempPayload.features.find((item) => 'PTI' in item)?.PTI ?? ''"
+            <li v-if="paperlyPayload?.features.find((item) => 'PTI' in item)">
+                <a class="icon-paperly-pti" :href="paperlyPayload.features.find((item) => 'PTI' in item)?.PTI ?? ''"
                     >Parent/Teacher Interview</a
                 >
             </li>
@@ -104,7 +104,7 @@ const upcoming = window.Vue.computed(() => {
             </div>
             <pdc-upcoming-item v-for="item in upcoming" v-else :key="item.url" :item="item" />
         </div>
-        <div v-if="tempPayload && tempPayload.upcoming.length > 3 && !viewMore" class="component-action">
+        <div v-if="paperlyPayload && paperlyPayload.upcoming.length > 3 && !viewMore" class="component-action">
             <section>
                 <button @click.prevent="viewMore = true">View more</button>
             </section>
