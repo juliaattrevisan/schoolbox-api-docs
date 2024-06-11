@@ -77,3 +77,13 @@ self.addEventListener("fetch", (evt) => {
         })
     );
 });
+
+// Listen for messages from the main script
+self.addEventListener('message', (event) => {
+    // iOS requires notifications to be dispatched from inside a service worker
+    // This provides a way for a script to show a notification after the user has granted permissions
+    if (event.data.type === 'SHOW_NOTIFICATION') {
+        const { title, options } = event.data;
+        self.registration.showNotification(title, options);
+    }
+});

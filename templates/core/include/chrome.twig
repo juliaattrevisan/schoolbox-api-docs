@@ -602,72 +602,71 @@
                         }
                         let prompted = false;
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
-                            element?.addEventListener('click', () => {
-                                Notification.requestPermission().then((permission) => {
-                                    if (prompted) {
-                                        return;
-                                    }
-                                    prompted = true;
-                                    if (permission === 'granted') {
-                                        window.localStorage.setItem("notification", "requesting");
-                                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                            element.setAttribute('disabled', true);
-                                        });
+                            element?.addEventListener('click', async () => {
+                                if (prompted) {
+                                    return;
+                                }
+                                prompted = true;
 
-                                        {% if config.debug_mode %}
-                                        console.info('Notification permission granted');
-                                        {% endif %}
+                                {# Use await instead of .then to avoid iOS treating as a non-interaction and failing #}
+                                const permission = await Notification.requestPermission();
+                                if (permission === 'granted') {
+                                    window.localStorage.setItem("notification", "requesting");
+                                    document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                        element.setAttribute('disabled', true);
+                                    });
 
-                                        document.dispatchEvent(
-                                            new CustomEvent("PWA_NOTIFICATION_ALLOW", {
-                                                detail: {
-                                                    debug: Boolean({{ config.debug_mode }}),
-                                                    deviceId: deviceId,
-                                                },
-                                            }),
-                                        );
+                                    {% if config.debug_mode %}
+                                    console.info('Notification permission granted');
+                                    {% endif %}
 
-                                        const initialNotification = new Notification(
-                                            `{{ config.title }}`,
-                                                {
-                                                body: `Welcome! Your notifications are powered by the Schoolbox web app`,
+                                    document.dispatchEvent(
+                                        new CustomEvent("PWA_NOTIFICATION_ALLOW", {
+                                            detail: {
+                                                debug: Boolean({{ config.debug_mode }}),
+                                                deviceId: deviceId,
+                                            },
+                                        }),
+                                    );
+
+                                    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+                                        navigator.serviceWorker.controller.postMessage({
+                                            type: 'SHOW_NOTIFICATION',
+                                            title: `{{ config.title }}`,
+                                            options: {
+                                                body: 'Welcome! Your notifications are powered by the Schoolbox web app',
                                                 icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
                                                 image: "/images/logo.php?logo=skin_logo_square&size=apple72",
                                                 badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                                                renotify: false,
-                                            },
-                                        );
-                                        {# send to /settings/notifications on click #}
-                                        initialNotification.onclick = (event) => {
-                                            event.preventDefault();
-                                            window.location.href = "/settings/notifications";
-                                        };
-                                    } else if (permission === 'denied') {
-                                        window.localStorage.setItem("notification", "denied");
-                                        {% if config.debug_mode %}
-                                        console.warn('Notification permission denied');
-                                        {% endif %}
-
-                                        document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
-                                            element.classList.remove('hide');
-                                        });
-                                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                            element.setAttribute('checked', false);
-                                        });
-                                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                            element.setAttribute('disabled', true);
-                                        });
-
-                                        {# turn notifications off... #}
-                                        document.dispatchEvent(
-                                            new CustomEvent("PWA_NOTIFICATION_DENY", {
-                                                detail: {
-                                                    debug: Boolean({{ config.debug_mode }}),
-                                                },
-                                            }),
-                                        );
+                                                renotify: false
+                                            }
+                                        })
                                     }
-                                });
+                                } else if (permission === 'denied') {
+                                    window.localStorage.setItem("notification", "denied");
+                                    {% if config.debug_mode %}
+                                    console.warn('Notification permission denied');
+                                    {% endif %}
+
+                                    document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                        element.classList.remove('hide');
+                                    });
+                                    document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                        element.setAttribute('checked', false);
+                                    });
+                                    document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
+                                        element.setAttribute('disabled', true);
+                                    });
+
+                                    {# turn notifications off... #}
+                                    document.dispatchEvent(
+                                        new CustomEvent("PWA_NOTIFICATION_DENY", {
+                                            detail: {
+                                                debug: Boolean({{ config.debug_mode }}),
+                                            },
+                                        }),
+                                    );
+                                }
                             });
                         });
                         {# sometimes the service worker is not running when we prompt attempt to register notifications, try again if we failed... #}
