@@ -444,7 +444,7 @@
                                 <label for="report-summary-vic-progression-worktype">Work Type</label>
                                 <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
                                     {% for worktype in worktypesSummary %}
-                                        <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType %}selected="selected"{% endif %}>{{ worktype.name }}</option>
+                                        <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType ?? null %}selected="selected"{% endif %}>{{ worktype.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
