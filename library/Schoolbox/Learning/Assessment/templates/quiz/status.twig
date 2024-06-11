@@ -148,10 +148,14 @@
                 </p>
             </div>
             {% if participant.allResponses | length %}
-                {% if latestResponse.submitted %}
+                {% if latestResponse.submitted and latestResponse.learnosityReference %}
                     <div class="txt">
                     <p>Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong></p>
                     {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+                    </div>
+                {% elseif latestResponse.submitted %}
+                    <div class="txt">
+                    <p>Published <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time></p>
                     </div>
                 {% endif %}
 
