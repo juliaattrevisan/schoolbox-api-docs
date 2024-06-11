@@ -111,6 +111,7 @@ class Controller extends Base
      * Returns data as JSON
      *
      * @api     GET /paperly/viewPaperly
+     * @throws  RouteNotFound
      */
     public function getPaperlyLinks(): void
     {
