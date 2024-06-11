@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Module extends BaseModule
 {
@@ -40,7 +39,7 @@ class Module extends BaseModule
 
         $this->register(
             'GET',
-            '/view/{encodedUrl}/{pageTitle}',
+            '/view/{encodedUrl}',
             'getPaperlyViewIframe',
             $isLoggedIn
         );
