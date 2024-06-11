@@ -207,7 +207,7 @@ function filterInput(event: Event) {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <p>{{ question.metadata.sample_answer }}</p>
+                    <p v-html="props.question.metadata.sample_answer"></p>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--
