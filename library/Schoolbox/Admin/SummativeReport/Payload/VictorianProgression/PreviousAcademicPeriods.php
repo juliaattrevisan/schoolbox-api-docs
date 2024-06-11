@@ -84,9 +84,14 @@ class PreviousAcademicPeriods
             }
         }
 
+        /* We are traversing in reverse chronological order, so $start will be more
+         * recent than $end. Both datetimes encapsulate the time period we care about
+         * but we have to flip them to be programmatically meaningful.
+         */
+
         return [
-            'start' => $start,
-            'end' => $end
+            'start' => $end,
+            'end' => $start
         ];
     }
 }
