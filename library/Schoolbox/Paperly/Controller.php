@@ -8,15 +8,15 @@
 namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
-use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Config\ConfigMapper;
+use RuntimeException;
 use Twig\Error\Error;
+use Crell\ApiProblem\ApiProblem;
+use Aura\Router\Exception\RouteNotFound;
 use Alaress\Codec\Json\Base64;
 
 class Controller extends Base
 {
-    private string $paperlyHostName;
-    private string $dummyPayload;
-    private array $paperlyPayload;
     private Base64 $base64Codec;
 
     /**
@@ -24,73 +24,34 @@ class Controller extends Base
      */
     public function __construct()
     {
-        //TODO replace with the Paperly hostname
-        $this->paperlyHostName = "https://url";
-
         $this->base64Codec = new Base64();
+    }
 
-        //TODO replace with real payloads once we have it
+    /**
+     * Get the hostname of Paperly endpoint with https enforced
+     *
+     * @return string
+     */
+    private function getPaperlyHostname(): string
+    {
+        $hostname = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_HOSTNAME);
 
-        $this->dummyPayload = '{
-            "features": [
-                {
-                    "title": "Forms",
-                    "url": "https://url/to/iframe/create_forms"
-                },
-                {
-                    "title": "Excursions",
-                    "url": "https://url/to/iframe/create_excursions"
-                },
-                {
-                    "title": "Parent Teacher Interview",
-                    "url": "https://url/to/iframe/view_pti"
-                }
-            ],
-            "upcoming": [
-                {
-                    "title": "Approve Field Trip: Visit to Science Museum",
-                    "status": "Pending Approval",
-                    "due": "2024-04-15T08:30:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Permission Slip: School Play Performance",
-                    "status": "Pending Approval",
-                    "due": "2024-04-17T10:15:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Parent-Teacher Conference Sign-Up",
-                    "due": "2024-04-20T12:45:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Approve Budget: Annual School Dance",
-                    "status": "Pending Approval",
-                    "due": "2024-04-22T09:00:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Review Curriculum Proposal: New Language Program",
-                    "status": "Pending Approval",
-                    "due": "2024-04-25T13:30:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Teacher Workshop Attendance Form",
-                    "status": "Pending Approval",
-                    "due": "2024-04-27T11:45:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                },
-                {
-                    "title": "Approve Student Council Budget Proposal",
-                    "status": "Pending Approval",
-                    "due": "2024-04-30T14:20:00+00:00",
-                    "url": "https://url/to/iframe/complete_action"
-                }
-            ]
-        }';
-        $this->paperlyPayload = json_decode($this->dummyPayload, true);
+        //Early return if config not set
+        if ($hostname == null) {
+            return '';
+        }
+
+        $parsedUrl = parse_url($hostname);
+
+        $scheme = $parsedUrl['scheme'] ?? null;
+        $host = $parsedUrl['host'] ?? null;
+
+        //Forcing Https on url
+        return $scheme === null ?
+            "https://$hostname" :
+            ($scheme === 'http' ?
+                "https://$host" :
+                $hostname);
     }
 
     /**
@@ -121,6 +82,30 @@ class Controller extends Base
     }
 
     /**
+     * Get Paperly payload from the API call
+     *
+     * @return array
+     * @throws RuntimeException
+     * @throws \JsonException
+     */
+    private function getPaperlyPayload(): array
+    {
+
+        $api = new Api(
+            $this->getPaperlyHostname(),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_KEY),
+            $this->getUser()
+        );
+
+        /**
+         * Currently the Paperly endpoint is called everytime function runs, might potentially hit rate limit
+         */
+        $paperlyPayload = $api->retrievePaperlyIframeView();
+
+        return $paperlyPayload;
+    }
+
+    /**
      * Get a list of Paperly links to redirect to the matching iframes
      *
      * Returns data as JSON
@@ -130,14 +115,37 @@ class Controller extends Base
      */
     public function getPaperlyLinks(): void
     {
-        $paperlyLinks = [];
+        $paperlyLinks = [
+            'features' => []
+        ];
 
-        foreach ($this->paperlyPayload['features'] as $feature) {
+        try {
+            $paperlyPayload = $this->getPaperlyPayload();
+        } catch (RateLimitException $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(429)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(429);
+            return;
+        } catch (RuntimeException $e) {
+            $problem = (new ApiProblem('Paperly endpoint is not working.'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+        foreach ($paperlyPayload['features'] as $feature) {
             $paperlyLinks['features'][][$feature['title']] = $this->preparePaperlyRoute($feature);
         }
 
         $upcomingActions = [];
-        foreach ($this->paperlyPayload['upcoming'] as $order => $upcoming) {
+        foreach ($paperlyPayload['upcoming'] as $order => $upcoming) {
             $upcoming['url'] = $this->preparePaperlyRoute($upcoming);
             $upcomingActions[$order] = $upcoming;
         }
@@ -161,7 +169,7 @@ class Controller extends Base
             'url' => preg_replace(
                 '/(?<!:)\/\//',
                 '/',
-                $this->paperlyHostName . $path['url']
+                $this->getPaperlyHostname() . $path['url']
             )
         ], "Paperly " . $path['pageTitle']);
     }
