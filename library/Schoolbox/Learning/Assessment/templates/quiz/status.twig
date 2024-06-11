@@ -382,9 +382,10 @@
             * As such we add a 'publish' button outside the scope of dynamicFeedback and handle it here.
             */
             $.fn.dynamicFeedback({
-                onDraftCallback: function (userId, isSuccess, message, feedbackId) {
+                isQuiz: true,
+                onPreDraftCallback: function (participantId) {
                     // show the publish button to be able to save the 'draft'
-                    const $publishButton = $(`[data-interaction-publish="${userId}"]`);
+                    const $publishButton = $(`[data-interaction-publish="${participantId}"]`);
                     $publishButton.removeClass('hide');
                 },
             });

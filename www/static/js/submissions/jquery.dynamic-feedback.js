@@ -100,6 +100,12 @@
                 onDraftCallback: $.noop,
                 onPrePublishCallback: $.noop,
                 onPublishCallback: $.noop,
+
+                /* Currently quiz does not support a draft state, so all feedback is published when a 'Save and Publish' button
+                 * is selected outside the context of this file. However we utilise dynamic-feedback to handle when to show
+                 * the action bar when the grade or comment is changed.
+                 */
+                isQuiz: false,
             };
 
             return $.extend(defaults, options);
@@ -385,6 +391,13 @@
                 return;
             }
 
+            if (config.isQuiz) {
+                const $actionBar = $participant.find("[data-action-bar]");
+                $actionBar.slideDown();
+                config.onPreDraftCallback($participant.data("participant"));
+                return;
+            }
+
             // No auto-saves currently queued for participant - so initiate a draft auto-save.
             autoSaveDraft($participant);
         }
@@ -437,7 +450,7 @@
                         $participant.data("participant"),
                         response.success,
                         response.message,
-                        response.id
+                        response.id,
                     );
                 })
                 .fail(function (xhr) {
