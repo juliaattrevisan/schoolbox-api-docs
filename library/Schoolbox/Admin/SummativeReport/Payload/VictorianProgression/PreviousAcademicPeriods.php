@@ -51,9 +51,9 @@ class PreviousAcademicPeriods
         foreach ($previousAcademicPeriods as $previousAcademicPeriod) {
             /* Skip archived terms
              */
-            if ($previousAcademicPeriod->getArchived()) {
-                continue;
-            }
+//            if ($previousAcademicPeriod->getArchived()) {
+//                continue;
+//            }
 
             /* Skip past academic periods more recent than $currentAcademicPeriod
              */
