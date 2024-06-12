@@ -45,6 +45,9 @@ readonly PRESERVED_CONFIG=(
   # Learnosity
   "learnosity_consumer_key" "learnosity_consumer_secret" "learnosity_version"
 
+  # Geosnapshot
+  "geosnapshot_api_key" "geosnapshot_enabled"
+
   # Others
   "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
 );
