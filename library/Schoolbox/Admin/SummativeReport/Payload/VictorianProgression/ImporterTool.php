@@ -506,7 +506,7 @@ HELP;
                 continue;
             }
 
-            $classCode = $row[6];
+            $classCode = $row[13];
             $className = $row[7];
 
             /* Seen it? Skip it
@@ -813,16 +813,16 @@ HELP;
             $this->getLogger()->debug(sprintf(
                 'Row %s: looking for folder code %s',
                 $i,
-                $row[6]
+                $row[13]
             ));
 
             try {
-                $folder = $this->folderMapper->findByCode($row[6]);
+                $folder = $this->folderMapper->findByCode($row[13]);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Row %s: did not find folder code %s. Skipping',
                     $i,
-                    $row[6]
+                    $row[13]
                 ));
 
                 continue;
