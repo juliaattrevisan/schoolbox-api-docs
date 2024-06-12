@@ -326,7 +326,7 @@ class Controller extends BaseController
             //in each record, loop through the metadata fields
             foreach ($fieldMetadata as $metadata) {
                 //if the field exists then build it, else just continue
-                if (!isset($record['fields'][lcfirst($metadata['key'])])) {
+                if (!array_key_exists(lcfirst($metadata['key']), $record['fields'])) {
                     continue;
                 }
                 /**
@@ -350,7 +350,7 @@ class Controller extends BaseController
                 $knownFields[$sequence] = $metadata['name'];
 
                 // if TextboxField confirm the field type  (url / html?)
-                $value = $record['fields'][lcfirst($metadata['key'])];
+                $value = $record['fields'][lcfirst($metadata['key'])] ?? '';
                 $type = $metadata['type'];
                 if ('TextboxField' === $metadata['type']) {
                     // is this a url, if so get twig to format as href
