@@ -852,7 +852,17 @@ HELP;
 
                     $seen[$externalAssessmentId] = $assessment;
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
+                    try {
+                        $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $this->getLogger()->warning(sprintf(
+                            'Row %s: could not find curriculum code %s. Skipping',
+                            $i,
+                            $row[8]
+                        ));
+
+                        continue;
+                    }
 
                     $assessmentData = [
                         'assessmentType' => AssessmentType::TYPE_DUE_WORK,
