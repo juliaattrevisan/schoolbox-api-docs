@@ -237,8 +237,7 @@
                 // we should no longer override the user's custom mark
                 // This can only be cleared by using the "Use descriptor values" button
                 if (hasSelectedValuelessDescriptor(descriptorCheckboxes)) {
-
-                    $groupSummary.attr('data-has-valueless', true);
+                    $(element).attr('data-has-valueless', true);
                 }
             }
         });
@@ -264,10 +263,9 @@
                 if (hasSelectedValuelessDescriptor($descriptorCheckboxes)) {
                     $groupSummary.attr('data-has-valueless', true);
                 }
-                if (scaledGroupMark !== null) {
-                    $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                    $groupSummary.attr('data-mark', scaledGroupMark);
-                }
+
+                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                $groupSummary.attr('data-mark', scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
