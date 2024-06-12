@@ -856,8 +856,9 @@ HELP;
                         $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
                     } catch (\Schoolbox\Mapper\Exception $e) {
                         $this->getLogger()->warning(sprintf(
-                            'Row %s: could not find curriculum code %s. Skipping',
+                            'Row %s: could not find curriculum code %s or original value %s. Skipping',
                             $i,
+                            $this->parseCurriculumCode($row[8]),
                             $row[8]
                         ));
 
