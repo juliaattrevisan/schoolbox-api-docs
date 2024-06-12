@@ -63,6 +63,7 @@
     <div class="small-12 island">
         <section class="content">
             {% include '@notifications/pwa.twig' with { notifButton : 'notifOnSettings', pwaPage: 'settings' } %}
+            <p id="notifEnabledMessage" class="alert-box success">You have notifications enabled for this device</p>
             <p><strong>Note:</strong> If you want to receive push notifications on multiple devices, you must install the Schoolbox web app on all your devices.</p>
         </section>
     </div>
@@ -116,3 +117,9 @@
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
+<style>
+#notifEnabledMessage {
+    display: none;
+    margin-top:20px;
+}
+</style>
