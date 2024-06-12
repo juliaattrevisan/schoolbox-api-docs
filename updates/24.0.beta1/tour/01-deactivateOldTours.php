@@ -29,9 +29,11 @@ $app = new class extends CliTool\App {
                 continue;
             }
 
-            // UPDATE commands for all `tour...` tables containing `deleted_at` columns.
+            // 'UPDATE SET deleted_at' commands for all tour tables containing deleted_at columns.
             $sqlCommands = [
-                "UPDATE tour_step SET deleted_at = :now WHERE tour_uuid = :uuid",
+                "UPDATE tour_step
+                 SET deleted_at = :now
+                 WHERE tour_uuid = :uuid",
                 "UPDATE tour_step_event
                  SET deleted_at = :now
                  WHERE tour_step_uuid IN (
@@ -47,8 +49,12 @@ $app = new class extends CliTool\App {
                  WHERE tour_step_uuid IN (
                      SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
                  )",
-                "UPDATE tour_trigger SET deleted_at = :now WHERE tour_uuid = :uuid",
-                "UPDATE tour SET deleted_at = :now WHERE uuid = :uuid",
+                "UPDATE tour_trigger
+                 SET deleted_at = :now
+                 WHERE tour_uuid = :uuid",
+                "UPDATE tour
+                 SET deleted_at = :now
+                 WHERE uuid = :uuid",
             ];
 
             foreach ($sqlCommands as $sqlCommand) {
@@ -56,7 +62,6 @@ $app = new class extends CliTool\App {
             }
         }
     }
-
     public function runAsRoot(): ?bool
     {
         return null;
