@@ -808,21 +808,28 @@ HELP;
             $modified = sprintf('%s  00:00:00', trim($row[12]));
             $feedbackPublishedAt = (new \Alaress_Date_Format($modified, 'd/m/Y H:i:s'))->getDatabase();
 
+            /* This incarnation of assessment belonged to this folder: $row[13]
+             * Assessment Id in the csv was shared among Subject Codes, which I thought to be the same folder.
+             * Anthony added row 13 on Jun 12, exposing that assessment ids from the csv (while shared among
+             * Subject Codes) should be unique per folder.
+             */
+            $folderCode = trim((string)$row[13]);
+
             /* Assume this exists, I guess, for now
              */
             $this->getLogger()->debug(sprintf(
                 'Row %s: looking for folder code %s',
                 $i,
-                $row[13]
+                $folderCode
             ));
 
             try {
-                $folder = $this->folderMapper->findByCode($row[13]);
+                $folder = $this->folderMapper->findByCode($folderCode);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->getLogger()->warning(sprintf(
                     'Row %s: did not find folder code %s. Skipping',
                     $i,
-                    $row[13]
+                    $folderCode
                 ));
 
                 continue;
@@ -843,14 +850,14 @@ HELP;
 
             /* Avengers Assemble
              */
-            if (!isset($seen[$externalAssessmentId])) {
+            if (!isset($seen[$folderCode][$externalAssessmentId])) {
                 /* May have been made in separate import somewhere
                  * Just recycle it
                  */
                 try {
                     $assessment = $this->assessmentMapperProxy->findOneByColumn('description', $description);
 
-                    $seen[$externalAssessmentId] = $assessment;
+                    $seen[$folderCode][$externalAssessmentId] = $assessment;
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     try {
                         $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
@@ -901,7 +908,7 @@ HELP;
 
                     if ($this->perform()) {
                         $this->assessmentMapperProxy->save($assessment, $creator);
-                        $seen[$externalAssessmentId] = $assessment;
+                        $seen[$folderCode][$externalAssessmentId] = $assessment;
                     }
 
                     $this->getLogger()->info(sprintf(
@@ -925,7 +932,7 @@ HELP;
             if ($this->perform()) {
                 /* Summon it from memory (yes I know...)
                  */
-                $assessment = $seen[$externalAssessmentId];
+                $assessment = $seen[$folderCode][$externalAssessmentId];
 
                 /* Make a feedback for a student
                  *
