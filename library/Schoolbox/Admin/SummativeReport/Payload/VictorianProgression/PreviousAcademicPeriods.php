@@ -42,8 +42,8 @@ class PreviousAcademicPeriods
          * to specify a new accumulated range.
          */
         $n = 0;
-        $start = null;
-        $end = null;
+        $reportingStart = null;
+        $reportingEnd = null;
 
         /* $previousAcademicPeriods is assumed to be an ordered set,
          * ordered by start, desc
@@ -66,32 +66,28 @@ class PreviousAcademicPeriods
             if ($n < self::NUM_PREVIOUS_ACADEMIC_PERIODS) {
                 /* Initial conditions
                  */
-                if (null === $start) {
-                    $start = $previousAcademicPeriod->getStart();
+                if (null === $reportingEnd) {
+                    $reportingEnd = $previousAcademicPeriod->getDisplayFinish();
                 }
 
-                if (null === $end) {
-                    $end = $previousAcademicPeriod->getDisplayFinish();
+                if (null === $reportingStart) {
+                    $reportingStart = $previousAcademicPeriod->getStart();
                 }
 
-                /* Update $end
+                /* We are traversing in reverse chronological order, so keep going back in time
+                 * to find the oldest start date we can
                  */
-                if ($end->gt($previousAcademicPeriod->getDisplayFinish())) {
-                    $end = $previousAcademicPeriod->getDisplayFinish();
+                if ($reportingStart->gt($previousAcademicPeriod->getStart())) {
+                    $reportingStart = $previousAcademicPeriod->getStart();
                 }
 
                 $n++;
             }
         }
 
-        /* We are traversing in reverse chronological order, so $start will be more
-         * recent than $end. Both datetimes encapsulate the time period we care about
-         * but we have to flip them to be programmatically meaningful.
-         */
-
         return [
-            'start' => $end,
-            'end' => $start
+            'start' => $reportingStart,
+            'end' => $reportingEnd
         ];
     }
 }
