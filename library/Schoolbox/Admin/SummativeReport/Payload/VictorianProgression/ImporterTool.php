@@ -810,7 +810,7 @@ HELP;
 
             /* This incarnation of assessment belonged to this folder: $row[13]
              * Assessment Id in the csv was shared among Subject Codes, which I thought to be the same folder.
-             * Anthony added row 13 on Jun 12, exposing that assessment ids from the csv (while shared among
+             * Anthony added $row[13] on Jun 12, exposing that assessment ids from the csv (while shared among
              * Subject Codes) should be unique per folder.
              */
             $folderCode = trim((string)$row[13]);
