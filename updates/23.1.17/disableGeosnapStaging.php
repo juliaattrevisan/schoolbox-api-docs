@@ -26,6 +26,11 @@ $app = new class extends CliTool\App {
             $dbc->execute("UPDATE config SET value = '0' WHERE name = 'geosnapshot_enabled'");
         }
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return true;
+    }
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
