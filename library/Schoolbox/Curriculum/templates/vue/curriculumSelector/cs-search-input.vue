@@ -190,6 +190,6 @@ button {
 }
 
 .input-group[data-is-small-container="true"] {
-    flex-direction: row; /*stack the input and button when the container is small */
+    flex-direction: column; /*stack the input and button when the container is small */
 }
 </style>
