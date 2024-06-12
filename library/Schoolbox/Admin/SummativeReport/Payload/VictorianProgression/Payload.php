@@ -155,6 +155,7 @@ class Payload
      * @var \PDOStatement
      */
     private \PDOStatement $payloadStatement;
+    private \PDOStatement $payloadFolderStatement;
 
 
     /**
@@ -196,14 +197,11 @@ class Payload
         }
 
         /* Prepare megaquery
+         * You end up using one or the other, *or both*; you can't just chop and change because Previous Academic
+         * Periods uses a null folder id. It canvasses the entire curriculum for previous progression points.
          */
-        $query = self::QUERY;
-
-        if ($folderId) {
-            $query = self::CLASS_QUERY;
-        }
-
-        $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare($query);
+        $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
+        $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
 
         /* Remember we did this
          */
@@ -355,9 +353,11 @@ class Payload
          */
         if ($folderId) {
             $params['folderId'] = $folderId;
-        }
 
-        $this->payloadStatement->execute($params);
+            $this->payloadFolderStatement->execute($params);
+        } else {
+            $this->payloadStatement->execute($params);
+        }
 
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
             $parentNodeId = $row['parent_node_id'];
