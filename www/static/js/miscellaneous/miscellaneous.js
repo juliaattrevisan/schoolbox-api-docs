@@ -138,17 +138,23 @@ $(function () {
      * Show/hide top nav items based on space available
      */
     function updateTopNavItems() {
-        var topMenuItemWidth = $("#top-menu > li").width();
-
+        const searchEl = document.getElementById("search");
+        if (searchEl === null) {
+            // don't need to continue if the search bar doesn't exist
+            return;
+        }
         // Determine how much space is required for the icons on the right of the top nav
         // The search bar is always visible and furthest to the left, so we can use it to determine the width
         // Other icons such as the profile menu and notifications can be revealed and hidden based on other conditions, so we can't use them
-        const searchStyle = window.getComputedStyle(document.getElementById("search"));
+        const searchStyle = window.getComputedStyle(searchEl);
+
         const extraWidth = parseInt(searchStyle.right) + parseInt(searchStyle.width);
 
         // A separator used to break up the menu items from the profile menu that appears above it in mobile.
         const sideNavSeparator = document.querySelector("li[data-sidenav-separator]");
         let secondNavHasItems = false;
+
+        var topMenuItemWidth = $("#top-menu > li").width();
 
         // Store the width left in top nav after subtracting
         var spaceLeft = $("#top-menu").width() - extraWidth;
