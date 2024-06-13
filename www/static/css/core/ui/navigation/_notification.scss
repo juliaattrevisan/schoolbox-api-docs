@@ -193,3 +193,6 @@ $allow-notification-stash: $xlarge-up;
         font-size: 0.8125rem; // keep it consistent with existing labels
     }
 }
+a#installDelayPrompt {
+    padding: 0.5rem 1rem !important;
+}
