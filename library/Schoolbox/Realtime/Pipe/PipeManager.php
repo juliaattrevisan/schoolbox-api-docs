@@ -574,8 +574,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                     $messageIds = [$messageIds];
                 }
                 foreach ($messageIds as $msgId) {
-                    if (is_string($msgId) && $subscription->acknowledgeMessage($msgId)) {
-                        $markAsRead[] = $msgId;
+                    if (is_string($msgId)) {
+                        if ($subscription->acknowledgeMessage($msgId)) {
+                            $markAsRead[] = $msgId;
+                        }
+                    } else {
+                        $this->log->debug(sprintf("Command '%s' message ID '%s' is not a string: ignoring", $command, $msgId));
                     }
                 }
 
