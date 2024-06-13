@@ -83,9 +83,9 @@ window.Vue.watch(
 /**
  * To ensure the entire node tree can be displayed within the unit cell
  */
-window.Vue.onMounted(async () => {
+window.Vue.onMounted(() => {
     if (!folderNodesStore().hasLoaded) {
-        await folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
+        folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
     }
 
     // Let the parent know if we have any filtered nodes or not
