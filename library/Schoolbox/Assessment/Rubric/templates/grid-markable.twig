@@ -51,7 +51,12 @@
                 {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.isCapabilityMarkShown(groupUsage.capability) ? 1 : 0) %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
-                <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
+                    {% set indicatorId   = critUsage.indicator.id %}
+                <tr
+                    data-group="{{ rubricId }}-{{ groupUsage.capability.id }}"
+                    data-capability-id="{{ groupUsage.capability.id }}"
+                    data-indicator-id="{{ indicatorId }}"
+                >
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
                         <th class="rb-group-name markdown" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
@@ -60,7 +65,6 @@
 
                     <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
 
-                    {% set indicatorId   = critUsage.indicator.id %}
                     {% set indicatorMark = rubricMarkedGrid
                         ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
                         : null %}
@@ -176,6 +180,147 @@
             });
         }
 
+        {#
+        /**
+         * Various types for future reference
+         * @typedef {string} CapabilityId
+         * @typedef {string} IndicatorId
+         * @typedef {string} DescriptorId
+         */
+
+        /**
+        * An object representing the state of a descriptor
+        * @typedef {Object} DescriptorState
+        * @property {number|null} value - the value of the descriptor
+        * @property {boolean} checked - whether the descriptor is checked
+        * @property {HTMLInputElement} el - the descriptor checkbox element
+        */
+
+        /**
+        * An object with all information about a descriptor, useful when using descriptors as a list
+        * @typedef {Object} DescriptorInfo
+        * @property {DescriptorState} state - the state of the descriptor
+        * @property {DescriptorId} descriptorId - the ID of the descriptor
+        * @property {IndicatorId} indicatorId - the ID of the indicator the descriptor belongs to
+        */
+        #}
+
+        /**
+         * A way to track the current configuration of the entire rubric
+         * This exists rather than using the DOM directly so that we have a far more manageable object to work with
+         * Ideally, we'd just rewrite everything into Vue and things could be a lot simpler...
+         * @var {Object.<CapabilityId, Object.<IndicatorId, Object.<DescriptorId, DescriptorState>>>}
+         */
+        let currentRubricConfiguration = {};
+
+        /**
+         * Initialise the currentRubricConfiguration object with the current state of the rubric
+         */
+        function initialiseCurrentRubricConfiguration() {
+            currentRubricConfiguration = {};
+            $rb[0].querySelectorAll("tr[data-indicator-id]").forEach(indicatorRow => {
+                const capabilityId = indicatorRow.getAttribute("data-capability-id");
+                if (!currentRubricConfiguration[capabilityId]) {
+                    currentRubricConfiguration[capabilityId] = {};
+                }
+
+                const indicatorId = indicatorRow.getAttribute("data-indicator-id");
+                if (!currentRubricConfiguration[capabilityId][indicatorId]) {
+                    currentRubricConfiguration[capabilityId][indicatorId] = {};
+                }
+
+                indicatorRow.querySelectorAll("input[data-rubric-descriptor]").forEach(descriptorCheckbox => {
+                    const descriptorId = descriptorCheckbox.getAttribute("data-rubric-descriptor");
+
+                    let descriptorValue = parseFloat(descriptorCheckbox.getAttribute("data-value"));
+                    if (isNaN(descriptorValue)) {
+                        // parseFloat will return NaN if the attribute doesn't exist or is not a number
+                        // in this case, the descriptor is valueless so we set null here.
+                        descriptorValue = null;
+                    }
+
+                    currentRubricConfiguration[capabilityId][indicatorId][descriptorId] = {
+                        value: descriptorValue,
+                        checked: descriptorCheckbox.checked,
+                        el: descriptorCheckbox,
+                    };
+                });
+            });
+        }
+
+        initialiseCurrentRubricConfiguration();
+
+        /**
+         * Maps all descriptors in a capability to a flat array of descriptor infos for easier processing
+         * @param {CapabilityId} capability
+         * @returns {DescriptorInfo[]} - an array of descriptor infos for all descriptors in the capability
+         */
+        function findAllDescriptorsInCapability(capability) {
+            const capabilityConfiguration = currentRubricConfiguration[capability];
+            if (!capabilityConfiguration) {
+                console.warn("No configuration found for capability", capability);
+                return [];
+            }
+
+            return Object.entries(capabilityConfiguration)
+                .flatMap(([indicatorId, descriptors]) => {
+                    return Object.entries(descriptors)
+                        .map(([descriptorId, descriptor]) => ({
+                            state: descriptor,
+                            descriptorId: descriptorId,
+                            indicatorId: indicatorId, // Keep the indicator ID attached in case we need it later
+                        }));
+                });
+        }
+
+        /**
+         * Finds all selected descriptors in a capability based on currentRubricConfiguration
+         * @param {CapabilityId} capabilityId - the capability to find descriptors for
+         * @returns {DescriptorInfo[]} - an array of descriptor infos for all selected descriptors in the capability
+         */
+        function findAllSelectedDescriptorsInCapability(capabilityId) {
+            const allDescriptors = findAllDescriptorsInCapability(capabilityId);
+            return allDescriptors.filter(descriptor => descriptor.state.checked);
+        }
+
+        /**
+         * Finds the currently selected descriptor for an indicator
+         * @param {CapabilityId} capabilityId - the capability to find the descriptor for
+         * @param {IndicatorId} indicatorId - the indicator to find the descriptor for
+         * @returns {DescriptorInfo|null} - the dselected descriptor information, or null if no selection
+         */
+        function findSelectedDescriptorInIndicator(capabilityId, indicatorId) {
+            const capabilityConfiguration = currentRubricConfiguration[capabilityId];
+            if (!capabilityConfiguration) {
+                console.warn("No configuration found for capability", capabilityId);
+                return null;
+            }
+
+            const indicatorConfiguration = capabilityConfiguration[indicatorId];
+            if (!indicatorConfiguration) {
+                console.warn("No configuration found for indicator", indicatorId);
+                return null;
+            }
+
+            /** @type {DescriptorInfo[]} - All selected descriptors in the indicator, although there should only be one */
+            const selectedDescriptor = Object.entries(indicatorConfiguration)
+                .filter(([descriptorId, descriptor]) => descriptor.checked)
+                .map(([descriptorId, descriptor]) => ({
+                    state: descriptor,
+                    descriptorId: descriptorId,
+                    indicatorId: indicatorId,
+                }));
+
+            if (!selectedDescriptor) {
+                return null;
+            }
+
+            if (selectedDescriptor.length > 1) {
+                console.warn("Multiple descriptors selected for indicator", indicatorId);
+            }
+
+            return selectedDescriptor[0] || null;
+        }
 
         // Disable Assign From Descriptors if value hasn't changed
         function disableEnableAssignFromDescs() {
@@ -205,13 +350,21 @@
                     }
                 }
 
-                // $this.attr('data-mark') is '', if capability mark is not provided yet ('0' if provided)
-                if (($this.attr('data-mark') !== '') && markIsDifferent) {
+                if ($this.attr('data-scaled-mark') !== '' && markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
                 } else {
                     $this.find("[data-use-descriptor-values]").hide();
-                    $this.removeAttr('data-customised');
+
+                    const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
+                        .filter(descriptor => descriptor.state.value !== null).length > 0;
+
+                    // Only remove data-customised if at least one descriptor has a value AND data-scaled-mark is not empty
+                    // We do this as when all descriptors are valueless, the only way a scaled mark can be set is manually
+                    // But we don't want to show the descriptor values button in this case as it'd never have a useful value
+                    if (capabilityHasValuedDescriptors && $this.attr('data-scaled-mark') !== '') {
+                        $this.removeAttr('data-customised');
+                    }
                 }
             });
         }
@@ -231,18 +384,51 @@
                 let descriptorCheckboxes = groupRows.find('input');
                 let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
 
-                $(element).attr('data-scaled-mark', scaledGroupMark);
+                // The raw mark value that should correlate to the initial human-readable value in the <input>
+                // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
+                let initialConfiguredMark = parseFloat($(element).attr('data-initial-configured-mark'));
+                if (isNaN(initialConfiguredMark)) { initialConfiguredMark = null; }
+
+                if (initialConfiguredMark !== scaledGroupMark) {
+                    $(element).attr('data-customised', true);
+                    $(element).attr('data-scaled-mark', initialConfiguredMark);
+                } else {
+                    $(element).attr('data-scaled-mark', scaledGroupMark);
+                }
+
+                // As soon as the user has selected a valueless descriptor,
+                // we should no longer override the user's custom mark
+                // This can only be cleared by using the "Use descriptor values" button
+                if (hasSelectedValuelessDescriptor(descriptorCheckboxes)) {
+                    $(element).attr('data-has-valueless', true);
+                }
             }
         });
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
             var $changed        = $(this),
-                groupId         = $changed.attr('data-rubric-group'),
                 rubricId        = $changed.attr('data-rubric'),
+                groupId         = $changed.attr('data-rubric-group'),
+                indicatorId     = $changed.attr('data-rubric-indicator'),
+                descriptorId    = $changed.attr('data-rubric-descriptor'),
                 rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
                 $groupRows      = $(rowSelector),
                 rubricTotalMark = null;
+
+            // Keep track of the previous state of the descriptors
+            const previouslySelectedGroupDescriptors = findAllSelectedDescriptorsInCapability(groupId);
+            const previouslySelectedIndicatorDescriptor = findSelectedDescriptorInIndicator(groupId, indicatorId);
+
+            // Make the change to the rubric configuration (check the current descriptor and uncheck the previous one)
+            if (previouslySelectedIndicatorDescriptor) {
+                currentRubricConfiguration[groupId][indicatorId][previouslySelectedIndicatorDescriptor.descriptorId].checked = false;
+            }
+            currentRubricConfiguration[groupId][indicatorId][descriptorId].checked = $changed.prop('checked');
+
+            // Find the new state of the descriptors so we can compare
+            const currentlySelectedGroupDescriptors = findAllSelectedDescriptorsInCapability(groupId);
+            const currentlySelectedIndicatorDescriptor = findSelectedDescriptorInIndicator(groupId, indicatorId);
 
             if ($groupRows.length) {
                 var groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
@@ -250,18 +436,31 @@
                     $descriptorCheckboxes = $groupRows.find('input'),
                     scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
-                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                $groupSummary.attr('data-mark', scaledGroupMark);
+                // As soon as the user has selected a valueless descriptor,
+                // we should no longer override the user's custom mark
+                // This can only be cleared by using the "Use descriptor values" button
+                if (hasSelectedValuelessDescriptor($descriptorCheckboxes)) {
+                    $groupSummary.attr('data-has-valueless', true);
+                }
+
+                // We can only update the scaled mark based on descriptors if the capability has valued descriptors
+                // Otherwise, we'll always remove the data-scaled-mark attribute as valueless descriptors require manual input to set a mark
+                const capabilityHasValuedDescriptors = findAllDescriptorsInCapability(groupId)
+                    .filter(descriptor => descriptor.state.value !== null).length > 0;
+
+                if (capabilityHasValuedDescriptors) {
+                    $groupSummary.attr('data-scaled-mark', scaledGroupMark, summateDescriptors($descriptorCheckboxes));
+                }
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
                     case 'letter':
                         var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, scaledGroupMark), grades));
                         break;
 
                     case 'percent':
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, scaledGroupMark) + "%");
                         break;
 
                     case 'raw':
@@ -272,16 +471,91 @@
                 }
 
                 if ($groupSummary.length) {
-                    if (! $groupSummary.attr('data-customised')) {
-                        // Only update dropdown/input field if the mark has not been customised
-                        $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
+
+                    // Figure out if the capability mark should be classified as "customised". It's customised if:
+                    // - The groupSummary has a data-customised attribute (we add this based on some other conditions)
+                    // - OR all previously selected descriptors in this capability were valueless (the only way to get a mark is to manually set it in this case)
+                    const capabilityMarkIsCustomised =
+                        $groupSummary.attr('data-customised')
+                        || previouslySelectedGroupDescriptors.filter(descriptor => descriptor.state.value !== null).length === 0
+
+                    // Figure out if we should update the capability mark, based on the logic in SA-17198
+                    let shouldUpdateCapabilityMark = true;
+
+                    // If there are no descriptors selected in the capability,
+                    //   then the capability mark should be cleared.
+                    if (currentlySelectedGroupDescriptors.length === 0) {
+                        $groupSummary.attr('data-scaled-mark', null);
+                        shouldUpdateCapabilityMark = true;
+                    }
+
+                    // Or, if the capability mark is NOT customised or if the mark is currently empty,
+                    else if (!capabilityMarkIsCustomised || $groupSummary.find("[data-group-mark]").val() === '') {
+                        // If I have deselected any descriptor for this indicator,
+                        //   then we should update the capability mark (it would've been cleared by the first condition if all descriptors were deselected)
+                        if (!currentlySelectedIndicatorDescriptor) {
+                            shouldUpdateCapabilityMark = true;
+                        }
+
+                        // Or, if I select a different valueless descriptor in the same capability, and no other selected descriptor in this capability has a value,
+                        //   then the capability mark should adjust to the relevant value, which is nothing, so it should be cleared.
+                        else if (
+                            currentlySelectedIndicatorDescriptor.state.value === null
+                            && currentlySelectedGroupDescriptors.filter(descriptor => descriptor.state.value !== null).length === 0
+                        ) {
+                            $groupSummary.attr('data-scaled-mark', null);
+                            shouldUpdateCapabilityMark = true;
+                        }
+
+                        // Otherwise if I select a different valued descriptor in the same capability,
+                        //   then the capability mark should adjust to the relevant value of that descriptor.
+                        else {
+                            shouldUpdateCapabilityMark = true;
+                        }
+                    }
+
+                    // Otherwise, if the capability mark is customised
+                    else {
+                        // If no descriptor was previously selected
+                        if (previouslySelectedGroupDescriptors.length === 0) {
+                            // ...and no descriptor is currently selected,
+                            //   then the capability mark should NOT change,
+                            if (currentlySelectedGroupDescriptors.length === 0) {
+                                // There shouldn't be a way to get here, but i've added the check to ensure the
+                                // next condition won't throw an error if in the odd case we do get here.
+                                console.warn("No descriptors previously or currently selected after a change?");
+                                shouldUpdateCapabilityMark = false;
+                            }
+
+                            // ...and I select a valued descriptor,
+                            //   then the capability mark should be overridden
+                            else if (currentlySelectedIndicatorDescriptor.state.value !== null) {
+                                shouldUpdateCapabilityMark = true;
+                            }
+
+                            // ...and I select a valueless descriptor,
+                            //   then the capability mark should NOT change
+                            else {
+                                shouldUpdateCapabilityMark = false;
+                            }
+                        }
+
+                        // Otherwise, if a descriptor was previously selected
+                        //   then the capability mark should NOT change, as it is customised
+                        else {
+                            shouldUpdateCapabilityMark = false;
+                        }
+                    }
+
+                    // If we've decided to update the capability mark, then do so
+                    if (shouldUpdateCapabilityMark) {
                         switch (markType) {
                             case 'letter':
-                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
+                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
                                 break;
 
                             case 'percent':
-                                $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                                $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')));
                                 break;
 
                             case 'raw':
@@ -335,8 +609,6 @@
             if ($groupSummary.length) {
                 var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
                 $groupSummary.attr('data-scaled-mark', normalisedMark);
-                $groupSummary.attr('data-mark', normalisedMark);
-                $groupSummary.find('[data-db-mark]').val(normalisedMark);
                 $groupSummary.attr('data-customised', true);
             }
 
@@ -394,16 +666,14 @@
                 scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-            $groupSummary.attr('data-mark', scaledGroupMark);
-            $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
             switch (markType) {
                 case 'letter':
-                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentage($groupSummary, scaledGroupMark), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'percent':
-                    $gradeInput.val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                    $gradeInput.val(getPercentage($groupSummary, scaledGroupMark));
                     break;
 
                 case 'raw':
@@ -419,6 +689,7 @@
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
             $groupSummary.removeAttr('data-customised');
+            $groupSummary.removeAttr('data-has-valueless');
 
             var rubricTotalMark       = getTotalMark(),
                 rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
@@ -557,6 +828,29 @@
             return scaledGroupSum;
         }
 
+        /**
+         * Get the value of a specified descriptor
+         * @param {jQuery} $descriptorCheckbox - the descriptor checkbox to get the value of
+         * @returns {number|null} - the value of the descriptor, or null if it has no value
+         */
+        function getDescriptorValue($descriptorCheckbox) {
+            const descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor');
+            const $select = $rb.find('#rangeDropdown-'+String(descriptorId));
+            let descriptorValue;
+
+            if ($select.length) {
+                descriptorValue = parseFloat($select.val());
+            } else {
+                descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
+            }
+
+            if (isNaN(descriptorValue)) {
+                return null;
+            }
+
+            return descriptorValue;
+        }
+
         // Get the raw unscaled sum of selected descriptor values from the collection of descriptors passed in
         function summateDescriptors($descriptorCheckboxes) {
             var descriptorSummation = null;
@@ -565,16 +859,9 @@
                 var $descriptorCheckbox = $(this);
 
                 if ($descriptorCheckbox.prop('checked')) {
-                    // Is there a select box for this? If so use its value instead
-                    var descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor'),
-                        $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
-                        descriptorValue;
-                    if ($select.length) {
-                        descriptorValue = parseFloat($select.val());
-                    } else {
-                        descriptorValue = parseFloat($descriptorCheckbox.attr('data-value'));
-                    }
-                    if (!isNaN(descriptorValue)) {
+                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
+
+                    if (descriptorValue !== null) {
                         descriptorSummation = (descriptorSummation || 0) + descriptorValue;
                     }
                 }
@@ -583,6 +870,30 @@
             return descriptorSummation;
         }
 
+
+        /**
+         * Are any of the selected descriptor values valueless? (i.e. have no defined point value)
+         * If so, we should not be overriding the user's custom mark
+         * @param {jQuery} $descriptorCheckboxes - the checkboxes to check
+         * @returns {boolean} - true if a valueless descriptor is selected, false otherwise
+         */
+        function hasSelectedValuelessDescriptor($descriptorCheckboxes) {
+            let hasValuelessDescriptor = false;
+
+            $descriptorCheckboxes.each(function () {
+                var $descriptorCheckbox = $(this);
+
+                if ($descriptorCheckbox.prop('checked')) {
+                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
+
+                    if (descriptorValue === null) {
+                        hasValuelessDescriptor = true;
+                    }
+                }
+            });
+
+            return hasValuelessDescriptor;
+        }
 
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
