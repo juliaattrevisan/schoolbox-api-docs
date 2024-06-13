@@ -154,24 +154,24 @@ class Controller extends Base
      */
     private function buildTreeResponse(Folder\Model $folder): ResponseInterface
     {
-        return $this->responseAsJson(
-            $this->nodeMapper->getCollectionAsTree(
-                $this->nodeMapper->findByColumnList([
-                    'id'      => $this->nodeMapper->findFamilyTreeIds(
-                        $folder->getCurriculumNodes()->getPropertyValues('id'),
-                        'curriculum_node_parent_id',
-                        min(
-                            self::MAX_ANCESTORS,
-                            max(0, $this->requestQuery->getInt('ancestors', self::MAX_ANCESTORS)),
-                        ),
-                        min(
-                            self::MAX_DESCENDANTS,
-                            max(0, $this->requestQuery->getInt('descendants', self::MAX_DESCENDANTS)),
-                        ),
-                    ),
-                    'enabled' => true,
-                ]),
+        $curriculumNodes = $this->nodeMapper->findByColumnList([
+            'id' => $this->nodeMapper->findFamilyTreeIds(
+                $folder->getCurriculumNodes()->getPropertyValues('id'),
+                'curriculum_node_parent_id',
+                min(
+                    self::MAX_ANCESTORS,
+                    max(0, $this->requestQuery->getInt('ancestors', self::MAX_ANCESTORS)),
+                ),
+                min(
+                    self::MAX_DESCENDANTS,
+                    max(0, $this->requestQuery->getInt('descendants', self::MAX_DESCENDANTS)),
+                ),
             ),
-        );
+            'enabled' => true,
+        ]);
+
+        Node\Mapper::sortNodes($curriculumNodes, 0);
+
+        return $this->responseAsJson($this->nodeMapper->getCollectionAsTree($curriculumNodes));
     }
 }
