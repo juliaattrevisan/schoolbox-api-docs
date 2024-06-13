@@ -111,6 +111,13 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Arbitrarily-spawned folders end up here; in PCC, this corresponds to:
+     * Archived Classes > Classes 2023
+     */
+    private const CONTAINER_FOLDER_ID = 26982;
+
+
+    /**
      * column 2 values that we care about
      */
     private const ALLOWED_SEMESTERS = ['SEM2', '2023'];
@@ -470,7 +477,7 @@ HELP;
     {
         /* New folders spawn randomly at the root
          */
-        $rootFolder = $this->folderMapper->createModel()->setId(IFolder::ROOT_ID);
+        $rootFolder = $this->folderMapper->findById(self::CONTAINER_FOLDER_ID);
 
         /* Remember ones we've seen
          */
