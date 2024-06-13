@@ -37,8 +37,10 @@ use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -225,6 +227,7 @@ class Module extends BaseModule
                     '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
                     '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
                     '/searchTags'                                                                  => ['searchTags' => $permissionStaff],
+                    '/searchClasses'                                                               => ['searchClasses' => $permissionStaff],
                 ],
                 'POST' => [
                     '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],
@@ -288,7 +291,9 @@ class Module extends BaseModule
                 new \External_Class(),
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
-            )
+            ),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(Access::class), // Not a mapper, but has getInstance, so does work.
         );
     }
 
