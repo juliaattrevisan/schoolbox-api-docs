@@ -35,6 +35,8 @@ class Controller extends Base
     /**
      * Returns a JSON array of users and folders based on keyword
      *
+     * This is called when the user types into the search field at the top of each page (in the header bar).
+     *
      * @api GET /search/header
      */
     public function search(): void
@@ -61,13 +63,17 @@ class Controller extends Base
     }
 
     /**
-     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
+     * Search function. Retrieve a list of class folders that match the string in $_GET['query']
      *
      * Searches by both name and class code
      *
-     * @api   GET /search/header/classes
-     * @since 24.0
+     * This is used in autocomplete search fields where the user must select one or more classes.  It is currently used
+     * in the pastoral report builder and in the course import tool.
+     * This function has nothing to do with the search feature in the header bar, but is placed in this class for
+     * convenience.
+     *
      * @throws MapperException
+     *@api GET /search/header/classes
      */
     public function searchClasses(): void
     {
