@@ -873,7 +873,7 @@ class Controller extends Assessment\Controller
 
             /* Trim everything
              */
-            $data[] = array_values(array_map('trim', $row));
+            $data[] = array_values(array_map(fn ($x) => trim($x ?? ''), $row));
         }
 
         return $data;
