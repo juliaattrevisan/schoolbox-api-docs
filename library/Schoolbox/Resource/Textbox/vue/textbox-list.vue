@@ -217,8 +217,8 @@ export default {
                 },
             });
 
-            // Apply the validation rule to each input
-            $form.find("input[type=text]").each(function (index, element) {
+            // Apply the validation rule to each input (textbox headings only, don't target ckeditor internals)
+            $form.find("input[type=text][data-textbox-heading]").each(function (index, element) {
                 $(element).rules("add", {
                     requiredNotBlank: true,
                 });
@@ -461,6 +461,7 @@ export default {
                                                 :name="'textbox[' + String(index) + '][heading]'"
                                                 type="text"
                                                 maxlength="100"
+                                                data-textbox-heading
                                                 v-model="usage.textbox.heading"
                                                 @change="markAsDirty(index)"
                                             />
