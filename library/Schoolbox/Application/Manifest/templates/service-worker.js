@@ -77,3 +77,42 @@ self.addEventListener("fetch", (evt) => {
         })
     );
 });
+
+// Listen for messages from the main script
+self.addEventListener('message', (event) => {
+    // iOS requires notifications to be dispatched from inside a service worker
+    // This provides a way for a script to show a notification after the user has granted permissions
+    if (event.data.type === 'SHOW_NOTIFICATION') {
+        const { title, options } = event.data;
+        self.registration.showNotification(title, options);
+    }
+});
+
+// example from: https://developer.mozilla.org/en-US/docs/Web/API/Clients/openWindow
+// Notification click event listener
+// Also in service-worker.js.twig (firebase) to handle notifications created from firebase
+self.addEventListener("notificationclick", (e) => {
+    // Close the notification popout
+    e.notification.close();
+    // Get all the Window clients
+    e.waitUntil(
+        clients.matchAll({ type: "window" }).then((clientsArr) => {
+            let href = "/";
+            // if no href or undefined then cast to user's dashboard
+            if (e.notification.data.href !== '' && e.notification.data.href !== undefined) {
+                href = e.notification.data.href;
+            }
+            // If a Window tab matching the targeted URL already exists, focus that;
+            const hadWindowToFocus = clientsArr.some((windowClient) =>
+                windowClient.url === href
+                    ? (windowClient.focus(), true)
+                    : false,
+            );
+            // Otherwise, open a new tab to the applicable URL and focus it.
+            if (!hadWindowToFocus)
+                clients
+                    .openWindow(href)
+                    .then((windowClient) => (windowClient ? windowClient.focus() : null));
+        }),
+    );
+});
