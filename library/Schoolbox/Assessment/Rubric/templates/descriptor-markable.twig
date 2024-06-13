@@ -6,6 +6,7 @@
        data-rubric="{{ rubricGrid.assessment.id }}"
        data-rubric-group="{{ groupUsage.capability.id }}"
        data-rubric-descriptor="{{ descriptor.id }}"
+       data-rubric-indicator="{{ indicatorId }}"
        {% if isDescriptorSelected %}checked="checked"{% endif %}
 />
 
@@ -76,5 +77,3 @@
         {% endif %}
     </select>
 {% endif %}
-
-
