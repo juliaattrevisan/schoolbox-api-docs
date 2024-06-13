@@ -14,5 +14,5 @@ tour:
         content: "<img src='{CDN_PREFIX}/images/tour/24_0_release_648x216.jpg' style='width:100%;margin-bottom:16px;'>
                   <h3>Web Push Notifications</h3>
                   <p>Make sure you never miss any events by subscribing to receive notifications directly to your device. To receive notifications on your Apple iPhone, make sure you install the web application.</p>
-                  <p>To know more, see the <a href='TODO: Get help page URL'>release notes</a>.</p>"
+                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
         class: introjs-newsmodal

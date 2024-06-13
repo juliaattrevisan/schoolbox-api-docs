@@ -18,5 +18,5 @@ tour:
                   <p>The Unit Planner has now been updated to allow you to update your units on the fly. This allows you to manage unit overviews, activities, lesson plans, and curriculum alignment from one place.</p>
                   <h3>Interactive Worksheets</h3>
                   <p>Create due work activities with interactive worksheets, to enable real-time with students before and after submission, allowing constructive feedback.</p>
-                  <p>To know more, see the <a href='TODO: Get help page URL'>release notes</a>.</p>"
+                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
         class: introjs-newsmodal
