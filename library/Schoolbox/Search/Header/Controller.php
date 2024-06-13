@@ -61,14 +61,14 @@ class Controller extends Base
      *
      * Searches by both name and class code
      *
-     * @api   GET /course/import/classes
-     * @since 160
+     * @api   GET /search/header/classes
+     * @since 24.0
      * @throws MapperException
      */
     public function searchClasses(): void
     {
-        $query          = (string)$this->requestQuery->get('query');
-        $folders        = (new Destinations($this->folderMapper))->findImportable($query);
+        $query = (string)$this->requestQuery->get('query');
+        $folders = (new Destinations($this->folderMapper))->findImportable($query);
 
         /* Swap keys for selectize compatibility -_-
          */
