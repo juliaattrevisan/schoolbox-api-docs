@@ -1422,7 +1422,7 @@ class Controller extends Base
      * @api   GET /searchTags
      * @since 21.1
      */
-    public function searchTags()
+    public function searchTags(): void
     {
         $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->requestQuery->get('query'));
         $data = $tags->map(function ($tag) {
@@ -1444,7 +1444,7 @@ class Controller extends Base
      * @since 160
      * @throws MapperException
      */
-    public function searchClasses()
+    public function searchClasses(): void
     {
         $query          = (string)$this->requestQuery->get('query');
         $folders        = (new Destinations($this->folderMapper))->findImportable($query);
