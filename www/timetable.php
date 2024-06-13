@@ -246,7 +246,7 @@ foreach ($userList as $user) {
                                     if (!isset($staffIdNameMap[$class['staffID']])) {
                                         $name = '';
                                         try {
-                                            $classStaff = $userMapper->findByExternalId($class['staffID'], Role::STAFF);
+                                            $classStaff = $userMapper->findByExternalId((string)$class['staffID'], Role::STAFF);
                                             $name       = $classStaff->getFullName();
                                         } catch (\Schoolbox\Mapper\Exception $e) {
                                         }
