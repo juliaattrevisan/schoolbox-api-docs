@@ -579,7 +579,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                             $markAsRead[] = $msgId;
                         }
                     } else {
-                        $this->log->debug(sprintf("Command '%s' message ID '%s' is not a string: ignoring", $command, $msgId));
+                        $this->log->info(sprintf("Command '%s' message ID '%s' is not a string: ignoring", $command, $msgId));
                     }
                 }
 
@@ -587,7 +587,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 break;
 
             default:
-                $this->log->debug(sprintf("Command '%s' not recognized: ignoring", $command));
+                $this->log->info(sprintf("Command '%s' not recognized: ignoring", $command));
                 break;
         }
 
