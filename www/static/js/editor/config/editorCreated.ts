@@ -3,19 +3,18 @@
  */
 
 import { Editor, EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import { injectScript, isScriptAdded, isScriptLoaded, getScriptElement } from "@js/util/domUtils";
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 
 /**
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
  * @param { Editor } editor - the CKEditor instance
- * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
+ * @param { HTMLTextAreaElement | HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  */
-function addToGlobalScope(editor: Editor, sourceElement: HTMLTextAreaElement) {
+function addToGlobalScope(editor: Editor, sourceElement: HTMLTextAreaElement | HTMLElement) {
     if (sourceElement.id) {
         window.sbProps.editors[sourceElement.id] = editor;
-    } else if (sourceElement.name) {
+    } else if (sourceElement instanceof HTMLTextAreaElement && sourceElement.name) {
         window.sbProps.editors[sourceElement.name] = editor;
     }
 }
@@ -50,7 +49,7 @@ function removeValidation() {
  * Once the iFramely script has loaded, we can add in the event listener
  * @param { Editor } editor - the CKEditor instance
  */
-function onIframelyLoaded(editor: Editor) {
+function configureIframelyListener(editor: Editor) {
     /**
      * Track copy/paste to add an extra undo step if the link fails to unfurl
      */
@@ -81,27 +80,6 @@ function onIframelyLoaded(editor: Editor) {
 }
 
 /**
- * Add the iFramely embed code in order for iframe embeds to work
- * For more info: https://iframely.com/docs/ckeditor
- * @param { EditorConfig } config - the CKEditor config object
- * @param { Editor } editor - the CKEditor instance
- */
-async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
-    if (config.toolbar === EditorToolbar.DEFAULT || config.toolbar === EditorToolbar.COMMENT) {
-        const script = "//cdn.iframe.ly/embed.js?cancel=0";
-        if (!isScriptAdded(script)) {
-            await injectScript(script);
-            onIframelyLoaded(editor);
-        } else if (!isScriptLoaded(script)) {
-            const scriptElement = getScriptElement(script) as HTMLScriptElement;
-            scriptElement.addEventListener("load", () => onIframelyLoaded(editor));
-        } else {
-            onIframelyLoaded(editor);
-        }
-    }
-}
-
-/**
  * Add the inspector to the editor to help with debugging
  * in development mode: https://ckeditor.com/docs/ckeditor5/latest/framework/development-tools.html
  * The process.env.NODE_ENV is built into node/webpack:
@@ -123,10 +101,10 @@ async function attachInspector(editor: Editor) {
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+export function modifyEditor(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
     addToGlobalScope(editor, sourceElement);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
-    await addIframelyEmbed(config, editor);
+    configureIframelyListener(editor);
 }

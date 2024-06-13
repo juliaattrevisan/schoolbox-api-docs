@@ -45,7 +45,7 @@ import UITweaks from "@js/editor/plugin/ui/UITweaks";
  * @param { EditorConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getConfig(config: EditorConfig) {
+export function getConfig(config: EditorConfig): EditorConfig {
     return {
         plugins: [
             // list all the plugins we'll use in the default editor

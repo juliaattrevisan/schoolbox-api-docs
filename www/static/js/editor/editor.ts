@@ -18,8 +18,8 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-async function onCreated(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
-    await modifyEditor(sourceElement, editor, config);
+function onCreated(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+    modifyEditor(sourceElement, editor, config);
     sourceElement.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
@@ -56,7 +56,7 @@ function create(sourceElement: HTMLElement, config: EditorConfig) {
     if (config.type === EditorType.CLASSIC) {
         ClassicEditor.create(sourceElement, getConfig(config))
             .then((editor) => {
-                void onCreated(sourceElement, editor, config);
+                onCreated(sourceElement, editor, config);
             })
             .catch((error) => {
                 console.error(error.stack);
@@ -64,7 +64,7 @@ function create(sourceElement: HTMLElement, config: EditorConfig) {
     } else if (config.type === EditorType.INLINE) {
         InlineEditor.create(sourceElement, getConfig(config))
             .then((editor) => {
-                void onCreated(sourceElement, editor, config);
+                onCreated(sourceElement, editor, config);
             })
             .catch((error) => {
                 console.error(error.stack);
