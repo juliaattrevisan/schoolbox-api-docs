@@ -350,13 +350,21 @@
                     }
                 }
 
-                // $this.attr('data-scaled-mark') is '', if capability mark is not provided yet ('0' if provided)
-                if (($this.attr('data-scaled-mark') !== '') && markIsDifferent) {
+                if ($this.attr('data-scaled-mark') !== '' && markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
                 } else {
                     $this.find("[data-use-descriptor-values]").hide();
-                    $this.removeAttr('data-customised');
+
+                    const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
+                        .filter(descriptor => descriptor.state.value !== null).length > 0;
+
+                    // Only remove data-customised if at least one descriptor has a value AND data-scaled-mark is not empty
+                    // We do this as when all descriptors are valueless, the only way a scaled mark can be set is manually
+                    // But we don't want to show the descriptor values button in this case as it'd never have a useful value
+                    if (capabilityHasValuedDescriptors && $this.attr('data-scaled-mark') !== '') {
+                        $this.removeAttr('data-customised');
+                    }
                 }
             });
         }
@@ -376,7 +384,17 @@
                 let descriptorCheckboxes = groupRows.find('input');
                 let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
 
-                $(element).attr('data-scaled-mark', scaledGroupMark);
+                // The raw mark value that should correlate to the initial human-readable value in the <input>
+                // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
+                let initialConfiguredMark = parseFloat($(element).attr('data-initial-configured-mark'));
+                if (isNaN(initialConfiguredMark)) { initialConfiguredMark = null; }
+
+                if (initialConfiguredMark !== scaledGroupMark) {
+                    $(element).attr('data-customised', true);
+                    $(element).attr('data-scaled-mark', initialConfiguredMark);
+                } else {
+                    $(element).attr('data-scaled-mark', scaledGroupMark);
+                }
 
                 // As soon as the user has selected a valueless descriptor,
                 // we should no longer override the user's custom mark
@@ -425,7 +443,14 @@
                     $groupSummary.attr('data-has-valueless', true);
                 }
 
-                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                // We can only update the scaled mark based on descriptors if the capability has valued descriptors
+                // Otherwise, we'll always remove the data-scaled-mark attribute as valueless descriptors require manual input to set a mark
+                const capabilityHasValuedDescriptors = findAllDescriptorsInCapability(groupId)
+                    .filter(descriptor => descriptor.state.value !== null).length > 0;
+
+                if (capabilityHasValuedDescriptors) {
+                    $groupSummary.attr('data-scaled-mark', scaledGroupMark, summateDescriptors($descriptorCheckboxes));
+                }
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
