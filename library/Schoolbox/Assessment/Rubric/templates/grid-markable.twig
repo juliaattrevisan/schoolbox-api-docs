@@ -209,8 +209,8 @@
                     }
                 }
 
-                // $this.attr('data-mark') is '', if capability mark is not provided yet ('0' if provided)
-                if (($this.attr('data-mark') !== '') && markIsDifferent) {
+                // $this.attr('data-scaled-mark') is '', if capability mark is not provided yet ('0' if provided)
+                if (($this.attr('data-scaled-mark') !== '') && markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
                 } else {
@@ -307,17 +307,16 @@
                 }
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                $groupSummary.attr('data-mark', scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
                     case 'letter':
                         var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, scaledGroupMark), grades));
                         break;
 
                     case 'percent':
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, scaledGroupMark) + "%");
                         break;
 
                     case 'raw':
@@ -332,11 +331,11 @@
                     if (! $groupSummary.attr('data-customised') && ! $groupSummary.attr('data-has-valueless')) {
                         switch (markType) {
                             case 'letter':
-                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
+                                assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
                                 break;
 
                             case 'percent':
-                                $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                                $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-scaled-mark')));
                                 break;
 
                             case 'raw':
@@ -390,7 +389,6 @@
             if ($groupSummary.length) {
                 var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
                 $groupSummary.attr('data-scaled-mark', normalisedMark);
-                $groupSummary.attr('data-mark', normalisedMark);
                 $groupSummary.attr('data-customised', true);
             }
 
@@ -448,15 +446,14 @@
                 scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-            $groupSummary.attr('data-mark', scaledGroupMark);
 
             switch (markType) {
                 case 'letter':
-                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(getPercentage($groupSummary, scaledGroupMark), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'percent':
-                    $gradeInput.val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                    $gradeInput.val(getPercentage($groupSummary, scaledGroupMark));
                     break;
 
                 case 'raw':
