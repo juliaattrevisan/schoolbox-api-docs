@@ -18,7 +18,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Exception;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Assessment\Course\Import\Destinations;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -26,8 +25,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
@@ -53,11 +50,9 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
@@ -128,8 +123,6 @@ class Controller extends Base
         private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\External\User $externalUser,
-        private FolderMapper $folderMapper,
-        private Access $access
     ) {
     }
 
@@ -1432,49 +1425,6 @@ class Controller extends Base
                 'name' => $tag->getName(),
             ];
         });
-        $this->response = $this->responseAsJson($data);
-    }
-
-    /**
-     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
-     *
-     * Searches by both name and class code
-     *
-     * @api   GET /course/import/classes
-     * @since 160
-     * @throws MapperException
-     */
-    public function searchClasses(): void
-    {
-        $query          = (string)$this->requestQuery->get('query');
-        $folders        = (new Destinations($this->folderMapper))->findImportable($query);
-
-        /* Swap keys for selectize compatibility -_-
-         */
-        $data = [];
-
-        foreach ($folders as $folder) {
-            // Ignore folders with CourseSpecs
-            if ($folder->getCourseSpecification() instanceof CourseSpecification\Model) {
-                continue;
-            }
-
-            // Ignore folders with UnitSpecs
-            if ($folder->getUnitSpecification() instanceof UnitSpecification\Model) {
-                continue;
-            }
-
-            // Make sure the user has access to the folder before we return it
-            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-                continue;
-            }
-
-            $data[] = [
-                'id'   => $folder->getId(),
-                'name' => $folder->getTitle(),
-            ];
-        }
-
         $this->response = $this->responseAsJson($data);
     }
 
