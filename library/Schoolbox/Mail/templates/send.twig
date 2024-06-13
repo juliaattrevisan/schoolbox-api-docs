@@ -139,7 +139,7 @@
                 }
             },
             submitHandler: function(mailForm) {
-                if (!CKEDITOR.instances['body'].getData().length) {
+                if (!window.sbProps.editors.body.getData().length) {
                     $(this).confirmDialog({
                         text: 'Message body is empty. Are you sure you want to send this message?',
                         confirmEvent: function() {
