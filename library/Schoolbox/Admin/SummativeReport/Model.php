@@ -34,7 +34,11 @@ class Model implements ISoftDeletable
             'heading' => '',
             'workType' => [],
             'cohort' => 0,
-            'overallGrade' => 0
+            'overallGrade' => 0,
+            'vicProgression' => [
+                'enable' => false,
+                'workType' => null
+            ]
         ],
         'class' => [
             'active' => 0,
@@ -43,7 +47,11 @@ class Model implements ISoftDeletable
             'learningLevels' => 0,
             'cohort' => 0,
             'capabilityGrades' => 0,
-            'progression' => 0
+            'progression' => 0,
+            'vicProgression' => [
+                'enable' => false,
+                'workType' => null
+            ]
         ]
     ];
 

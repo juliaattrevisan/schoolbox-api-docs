@@ -1,17 +1,39 @@
-<style>
-.grid-container {
-    display: grid;
-    grid-template-columns: 4fr 1fr 2fr
-}
-.grid-item {
-    padding: 10px;
-    border: 1px solid #f00;
-}
-</style>
 
 
 
-<ul class="action-list threaded content-container">
+{#<h1>Audit</h1>#}
+{#<table>#}
+{#    <tbody>#}
+{#        {% for assessmentId, errors in audit %}#}
+{#            <tr>#}
+{#                <td>#}
+{#                    {% for error in errors %}#}
+{#                        <a href="/learning/assessments/{{ assessmentId }}/modify#markType">{{ error }}</a><br />#}
+{#                    {% endfor %}#}
+{#                </td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
+{#    </tbody>#}
+{#</table>#}
+
+
+
+<div style="display:none">
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: 4fr 1fr 2fr
+        }
+        .grid-item {
+            padding: 10px;
+            border: 1px solid #f00;
+        }
+    </style>
+
+
+
+
+    <ul class="action-list threaded content-container">
     <li class="list-item">
         <div class="student-container">
             <div class="grid-container">
@@ -61,4 +83,5 @@
 
 <div class="report-footer">
     <p>Page <span class="pageNumber">1</span> of <span class="totalPages">3</span></p>
+</div>
 </div>

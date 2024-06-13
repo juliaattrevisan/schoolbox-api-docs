@@ -111,6 +111,13 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * Arbitrarily-spawned folders end up here; in PCC, this corresponds to:
+     * Archived Classes > Classes 2023
+     */
+    private const CONTAINER_FOLDER_ID = 26982;
+
+
+    /**
      * column 2 values that we care about
      */
     private const ALLOWED_SEMESTERS = ['SEM2', '2023'];
@@ -120,6 +127,13 @@ class ImporterTool extends CliTool\App
      * Encode their external id into our description. lol
      */
     private const IMPORT_IDENTIFIER = '2023-import-%s';
+
+
+    /**
+     * We allow import of these feedback marks, specifically
+     * This excludes random stuff like empty string, null, DNLP, DNPP, DNPU etc.
+     */
+    private const VALID_DATA = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11];
 
 
     /**
@@ -185,6 +199,16 @@ class ImporterTool extends CliTool\App
         VALUES
         (:boxId, :marker, :owner, :reviewRoute, :mark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
     ";
+
+
+    /**
+     * Arbitrarily choose actual dates...can't think of a better Semester 2 date than N7 Day, heh
+     */
+    private const ASSESSMENT_SEM2_DATE_PUBLISH = '7/11/2023 12:01am';
+    private const ASSESSMENT_SEM2_DATE_OPEN = '7/11/2023 12:02am';
+    private const ASSESSMENT_SEM2_DATE_DUE = '7/11/2023 12:03am';
+    private const ASSESSMENT_SEM2_DATE_CLOSE = '7/11/2023 12:04am';
+
 
 
     /**
@@ -453,7 +477,7 @@ HELP;
     {
         /* New folders spawn randomly at the root
          */
-        $rootFolder = $this->folderMapper->createModel()->setId(IFolder::ROOT_ID);
+        $rootFolder = $this->folderMapper->findById(self::CONTAINER_FOLDER_ID);
 
         /* Remember ones we've seen
          */
@@ -489,7 +513,7 @@ HELP;
                 continue;
             }
 
-            $classCode = $row[6];
+            $classCode = $row[13];
             $className = $row[7];
 
             /* Seen it? Skip it
@@ -747,9 +771,11 @@ HELP;
              */
             $humanReadableMark = trim($row[11]);
 
-            /* TODO Use the const from the Vic Progression payload that's in a different PR
+            /* Only accept numeric data. This is the full superset of data we COULD display,
+             * since each report is supposed to be a "window of levels" proximal to the current
+             * year level of a student.
              */
-            if (!\in_array($humanReadableMark, [6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5], false)) {
+            if (!\in_array($humanReadableMark, self::VALID_DATA, false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
                     $i,
@@ -770,7 +796,7 @@ HELP;
              *     - Marks available to everyone I guess
              */
 
-            /* TODO build it in their prod first
+            /* Build it in their prod first
              */
             $workTypeId = $this->getOpt(self::OPT_WORK_TYPE_ID);
             $gradingScheme = $this->getOpt(self::OPT_GRADE_GROUP_ID);
@@ -784,21 +810,37 @@ HELP;
             $capabilityMarkType = (string)MarkType::TYPE_NONE;
             $capabilityGradingScheme = '1'; // "Standard"
 
-            /* Pick an actual date
-             */
-            $publishDate = '10/10/2024 12:01am';
-            $openDate = '10/10/2024 12:02am';
-            $dueDate = '10/10/2024 12:03am';
-            $closeDate = '10/10/2024 12:04am';
-
             /* Enforce feedbacks at midnight (no times specified)
              */
             $modified = sprintf('%s  00:00:00', trim($row[12]));
             $feedbackPublishedAt = (new \Alaress_Date_Format($modified, 'd/m/Y H:i:s'))->getDatabase();
 
+            /* This incarnation of assessment belonged to this folder: $row[13]
+             * Assessment Id in the csv was shared among Subject Codes, which I thought to be the same folder.
+             * Anthony added $row[13] on Jun 12, exposing that assessment ids from the csv (while shared among
+             * Subject Codes) should be unique per folder.
+             */
+            $folderCode = trim((string)$row[13]);
+
             /* Assume this exists, I guess, for now
              */
-            $folder = $this->folderMapper->findByCode($row[6]);
+            $this->getLogger()->debug(sprintf(
+                'Row %s: looking for folder code %s',
+                $i,
+                $folderCode
+            ));
+
+            try {
+                $folder = $this->folderMapper->findByCode($folderCode);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->getLogger()->warning(sprintf(
+                    'Row %s: did not find folder code %s. Skipping',
+                    $i,
+                    $folderCode
+                ));
+
+                continue;
+            }
 
             /* Figure out if we already made this assessment.
              * If we did, reuse it.
@@ -815,16 +857,27 @@ HELP;
 
             /* Avengers Assemble
              */
-            if (!isset($seen[$externalAssessmentId])) {
+            if (!isset($seen[$folderCode][$externalAssessmentId])) {
                 /* May have been made in separate import somewhere
                  * Just recycle it
                  */
                 try {
                     $assessment = $this->assessmentMapperProxy->findOneByColumn('description', $description);
 
-                    $seen[$externalAssessmentId] = $assessment;
+                    $seen[$folderCode][$externalAssessmentId] = $assessment;
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
+                    try {
+                        $curriculumNode = $this->curriculumNodeMapper->findOneByColumn('code', $this->parseCurriculumCode($row[8]));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $this->getLogger()->warning(sprintf(
+                            'Row %s: could not find curriculum code %s or original value %s. Skipping',
+                            $i,
+                            $this->parseCurriculumCode($row[8]),
+                            $row[8]
+                        ));
+
+                        continue;
+                    }
 
                     $assessmentData = [
                         'assessmentType' => AssessmentType::TYPE_DUE_WORK,
@@ -839,10 +892,12 @@ HELP;
                         /* This is literally a csv in a one-element array
                          */
                         'curriculumCodes' => [(string)$curriculumNode->getId()],
-                        'publishDate' => $publishDate,
-                        'openDate' => $openDate,
-                        'dueDate' => $dueDate,
-                        'closeDate' => $closeDate,
+                        /* Maybe make this optional between SEM2 and SEM1 dates
+                         */
+                        'publishDate' => self::ASSESSMENT_SEM2_DATE_PUBLISH,
+                        'openDate' => self::ASSESSMENT_SEM2_DATE_OPEN,
+                        'dueDate' => self::ASSESSMENT_SEM2_DATE_DUE,
+                        'closeDate' => self::ASSESSMENT_SEM2_DATE_CLOSE,
                         'markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
@@ -860,46 +915,54 @@ HELP;
 
                     if ($this->perform()) {
                         $this->assessmentMapperProxy->save($assessment, $creator);
-                        $seen[$externalAssessmentId] = $assessment;
+                        $seen[$folderCode][$externalAssessmentId] = $assessment;
                     }
 
                     $this->getLogger()->info(sprintf(
                         'Row %s: created new assessment "%s" (%s) in folder %s',
                         $i,
-                        $assessment->getId(),
                         $assessment->getTitle(),
+                        $assessment->getId(),
                         $folder->getTitle()
                     ));
                 }
             }
 
-            /* Summon it from memory (yes I know...)
+            $this->getLogger()->debug(sprintf(
+                'Row %s: preparing feedback with human readable mark %s',
+                $i,
+                $humanReadableMark
+            ));
+
+            /* We can only generate assessments in perform mode
              */
-            $assessment = $seen[$externalAssessmentId];
-
-            /* Make a feedback for a student
-             *
-             * listen...you could try to use the various mapperproxies, participants, plans
-             * and all this other andyland domain-level stuff, or you can just ram it straight
-             * into the bullseye
-             */
-            $box = $submissionBoxMapper->findOneByColumn('assessment_id', $assessment->getId());
-            $student = $this->userMapper->findByExternalId($row[3]);
-
-            $params = [
-                'boxId' => $box->getId(),
-                'marker' => $creator->getId(),
-                'owner' => $student->getId(),
-                'reviewRoute' => 'instructor',
-                'mark' => $row[11],
-                'resubmissionRequired' => 0,
-                'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
-                'publishedAt' => $feedbackPublishedAt,
-                'publishedBy' => $creator->getId(),
-                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
-            ];
-
             if ($this->perform()) {
+                /* Summon it from memory (yes I know...)
+                 */
+                $assessment = $seen[$folderCode][$externalAssessmentId];
+
+                /* Make a feedback for a student
+                 *
+                 * listen...you could try to use the various mapperproxies, participants, plans
+                 * and all this other andyland domain-level stuff, or you can just ram it straight
+                 * into the bullseye
+                 */
+                $box = $submissionBoxMapper->findOneByColumn('assessment_id', $assessment->getId());
+                $student = $this->userMapper->findByExternalId($row[3]);
+
+                $params = [
+                    'boxId' => $box->getId(),
+                    'marker' => $creator->getId(),
+                    'owner' => $student->getId(),
+                    'reviewRoute' => 'instructor',
+                    'mark' => $row[11],
+                    'resubmissionRequired' => 0,
+                    'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
+                    'publishedAt' => $feedbackPublishedAt,
+                    'publishedBy' => $creator->getId(),
+                    'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+                ];
+
                 $feedbackStatement->execute($params);
             }
         }

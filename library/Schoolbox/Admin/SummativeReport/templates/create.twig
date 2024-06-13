@@ -423,6 +423,33 @@
                                 </table>
                             </div>
                         </fieldset>
+                        {# Victorian Curriculum Progressions is Penola-specific atm #}
+                        {% if 'pcc' == config.site_school_code|lower  %}
+                        <fieldset class="content">
+                            <legend>Victorian Curriculum Progressions</legend>
+                            <div class="small-12 columns">
+                                <p class="meta">
+                                    Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
+                                    whilst undertaking any assessments that use the prescribed <strong>work type</strong>.
+                                </p>
+
+                                <ul class="option-list">
+                                    <li>
+                                        <input name="summary[vicProgression][enable]" type="hidden" value="0" />
+                                        <input id="report-summary-enable-vic-progression" name="summary[vicProgression][enable]" type="checkbox" value="1" {% if options.summary.vicProgression.enable ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-summary-enable-vic-progression" class="checkbox-label">Enable</label>
+                                    </li>
+                                </ul>
+
+                                <label for="report-summary-vic-progression-worktype">Work Type</label>
+                                <select id="report-summary-vic-progression-worktype" name="summary[vicProgression][workType]">
+                                    {% for worktype in worktypesSummary %}
+                                        <option value="{{ worktype.id }}" {% if worktype.id == options.summary.vicProgression.workType ?? null %}selected="selected"{% endif %}>{{ worktype.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </fieldset>
+                        {% endif %}
                 </section>
 
                 <div class="row actions-small-1">
@@ -448,68 +475,95 @@
                 <section id="section-class">
                     <fieldset class="content">
                         <div class="small-12 columns">
-                        <fieldset class="checklist">
-                            <legend>Display Options</legend>
-                            <ul class="option-list">
-                                <li>
-                                    <input name="class[overallGrade]" type="hidden" value="0" />
-                                    <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
-                                </li>
-                                <li>
-                                    <input name="class[cohort]" type="hidden" value="0" />
-                                    <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
-                                </li>
-                                <li>
-                                    <input name="class[classCode]" type="hidden" value="0" />
-                                    <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
-                                    <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
-                                </li>
-                            </ul>
-                        </fieldset>
+                            <fieldset class="checklist">
+                                <legend>Display Options</legend>
+                                <ul class="option-list">
+                                    <li>
+                                        <input name="class[overallGrade]" type="hidden" value="0" />
+                                        <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                                    </li>
+                                    <li>
+                                        <input name="class[cohort]" type="hidden" value="0" />
+                                        <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class distribution</label>
+                                    </li>
+                                    <li>
+                                        <input name="class[classCode]" type="hidden" value="0" />
+                                        <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
+                                    </li>
+                                </ul>
+                            </fieldset>
                         </div>
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                        <legend>Work Types</legend>
-                        <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
-                        <table>
-                            <tr>
-                                <th>&nbsp;</th>
-                                <th>Show</th>
-                                <th>Grade</th>
-                                <th>Comment</th>
-                                <th>Rubric</th>
-                            </tr>
-                            {% for worktype in worktypesClass %}
-                                <tr data-class-worktype-id="{{ worktype.id }}">
-                                    <td>{{ worktype.name }}</td>
-                                    <td>
-                                        <input name="class[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
-                                        <input data-class-worktype-show="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-show" name="class[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
-                                        <label for="report-class-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
-                                    </td>
-                                    <td>
-                                        <input name="class[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
-                                        <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-grades="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-grades" name="class[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-class-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
-                                    </td>
-                                    <td>
-                                        <input name="class[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
-                                        <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-comments="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-comments" name="class[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-class-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
-                                    </td>
-                                    <td>
-                                        <input name="class[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
-                                        <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-rubrics="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubrics" name="class[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
-                                        <label for="report-class-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
-                                    </td>
+                            <legend>Work Types</legend>
+                            <p class="meta">Select the work types and the type of feedback you would like included on the report.</p>
+                            <table>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <th>Show</th>
+                                    <th>Grade</th>
+                                    <th>Comment</th>
+                                    <th>Rubric</th>
                                 </tr>
-                            {% endfor %}
-                        </table>
+                                {% for worktype in worktypesClass %}
+                                    <tr data-class-worktype-id="{{ worktype.id }}">
+                                        <td>{{ worktype.name }}</td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][show]" type="hidden" value="0" />
+                                            <input data-class-worktype-show="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-show" name="class[workType][{{ worktype.id }}][show]" type="checkbox" value="1" {% if worktype.show ?? false %}checked="checked"{% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-show" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][grades]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-grades="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-grades" name="class[workType][{{ worktype.id }}][grades]" type="checkbox" value="1" {% if worktype.grades ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-grades" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][comments]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-comments="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-comments" name="class[workType][{{ worktype.id }}][comments]" type="checkbox" value="1" {% if worktype.comments ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-comments" class="checkbox-label"></label>
+                                        </td>
+                                        <td>
+                                            <input name="class[workType][{{ worktype.id }}][rubrics]" type="hidden" value="0" />
+                                            <input data-class-worktype-option="{{ worktype.id }}" data-class-worktype-rubrics="{{ worktype.id }}" id="report-class-worktype-{{ worktype.id }}-rubrics" name="class[workType][{{ worktype.id }}][rubrics]" type="checkbox" value="1" {% if worktype.rubrics ?? false %}checked="checked"{% endif %} {% if not worktype.show ?? false %} disabled="disabled" {% endif %}/>
+                                            <label for="report-class-worktype-{{ worktype.id }}-rubrics" class="checkbox-label"></label>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
                         </div>
                     </fieldset>
+                    {# Victorian Curriculum Progressions is Penola-specific atm #}
+                    {% if 'pcc' == config.site_school_code|lower  %}
+                    <fieldset class="content">
+                        <legend>Victorian Curriculum Progressions</legend>
+                        <div class="small-12 columns">
+                            <p class="meta">
+                                Enabling this will provide a visualisation of <strong>progression points</strong> that students have achieved
+                                whilst undertaking any <strong>class-specific</strong> assessments that use the prescribed <strong>work type</strong>.
+                            </p>
+
+                            <ul class="option-list">
+                                <li>
+                                    <input name="class[vicProgression][enable]" type="hidden" value="0" />
+                                    <input id="report-class-enable-vic-progression" name="class[vicProgression][enable]" type="checkbox" value="1" {% if options.class.vicProgression.enable ?? false %}checked="checked"{% endif %} />
+                                    <label for="report-class-enable-vic-progression" class="checkbox-label">Enable</label>
+                                </li>
+                            </ul>
+
+                            <label for="report-class-vic-progression-worktype">Work Type</label>
+                            <select id="report-class-vic-progression-worktype" name="class[vicProgression][workType]">
+                                {% for worktype in worktypesClass %}
+                                    <option value="{{ worktype.id }}" {% if worktype.id == options.class.vicProgression.workType %}selected="selected"{% endif %}>{{ worktype.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </fieldset>
+                    {% endif %}
 
                         {# NONE of this exists yet....
                         <div class="small-12 columns">

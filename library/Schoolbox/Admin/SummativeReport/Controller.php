@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SummativeReport;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
 use Psr\Container\ContainerExceptionInterface;
@@ -19,6 +20,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -39,6 +41,7 @@ use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -54,6 +57,7 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Twig\Error\Error;
 
 /**
  * Class Controller
@@ -106,25 +110,27 @@ class Controller extends ConfigController
         'id' => self::NO_YEAR_LEVEL_ID, 'name' => 'No Year Level'
     ];
 
+
     /**
      * Constructor
      *
-     * @param \Schoolbox\Error\Mapper  $errorMapper
-     * @param Mapper                   $reportMapper
-     * @param UserMapper               $userMapper
-     * @param TermMapper               $termMapper
-     * @param YearLevelMapper          $yearLevelMapper
-     * @param CampusMapper             $campusMapper
-     * @param WorkTypeMapper           $workTypeMapper
-     * @param FolderMapper             $folderMapper
-     * @param AssessmentMapperProxy    $assessmentMapperProxy
-     * @param RubricDataSource         $rubricDataSource
-     * @param Access                   $access
-     * @param UserBulkMapper           $userBulkMapper
-     * @param RoleMapper               $roleMapper
-     * @param ConfigMapper             $configMapper
-     * @param FieldStrategyFactory     $fieldStrategyFactory
-     * @param Rebuilder                $rebuilder
+     * @param \Schoolbox\Error\Mapper $errorMapper
+     * @param Mapper $reportMapper
+     * @param UserMapper $userMapper
+     * @param TermMapper $termMapper
+     * @param YearLevelMapper $yearLevelMapper
+     * @param CampusMapper $campusMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param FolderMapper $folderMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param RubricDataSource $rubricDataSource
+     * @param Access $access
+     * @param UserBulkMapper $userBulkMapper
+     * @param RoleMapper $roleMapper
+     * @param ConfigMapper $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder $rebuilder
+     * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\User $externalUser
      */
     public function __construct(
@@ -155,6 +161,7 @@ class Controller extends ConfigController
      * A list of summative reports
      *
      * @return void
+     * @throws Error
      * @throws RouteNotFound
      * @api GET /adminv2/summative-report
      */
@@ -184,6 +191,8 @@ class Controller extends ConfigController
      * The form you use to create a report
      *
      * @return void
+     * @throws Error
+     * @throws MapperException
      * @throws RouteNotFound
      * @api GET /adminv2/summative-report/create
      */
@@ -234,6 +243,7 @@ class Controller extends ConfigController
      * Create a new summative report
      *
      * @return void
+     * @throws Exception
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \InvalidArgumentException
@@ -245,6 +255,7 @@ class Controller extends ConfigController
      */
     public function postCreate(): void
     {
+        /** @var Model $report **/
         $report = $this->reportMapper->createModel();
 
         $this->postUpdate($report);
@@ -257,8 +268,9 @@ class Controller extends ConfigController
      * @param Model $report
      * @return void
      * @throws RouteNotFound
-     * @throws \DebugBar\DebugBarException
+     * @throws DebugBarException
      * @throws \JsonException
+     * @throws Error
      * @api GET /adminv2/summative-report/{reportId}/update
      */
     public function getUpdate(Model $report): void
@@ -730,6 +742,7 @@ class Controller extends ConfigController
      *
      * @param string $key
      * @return void
+     * @throws Error
      * @throws NotFound
      * @throws RouteNotFound
      */
@@ -772,12 +785,18 @@ class Controller extends ConfigController
      * https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/2/getStudentReport/25?startDate=2015-01-01&endDate=2020-12-31&yearLevels=1,2,3&campuses=1&students=45,6,25&summaryActive=1&summaryHeading=werI%20am%20a%20cat&summaryWorkType=1,2,3,5,6,7,8,9,10,11&summaryOverallGrade=1&summaryComments=1&summaryRubrics=1&classActive=0&classWorkType=1,2,3,5,6,7,8,9,10,11,12&classOverallGrade=1&classLearningLevels=1&classCohort=1&classCapabilityGrades=1&classProgression=1&classComments=1&classRubrics=1
      *
      * @param Model $report
-     * @param User  $student
+     * @param User $student
      * @return void
+     * @throws DefinitionException
+     * @throws Error
      * @throws MapperException
      * @throws \Alaress\Web\Controller\Exception
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \JsonException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      * @api GET /adminv2/summative-report/student/:studentId
      */
     public function getStudentReport(\Schoolbox\Admin\SummativeReport\Model $report, User $student): void
@@ -956,6 +975,54 @@ class Controller extends ConfigController
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['workType']);
 
+        /* Optional Victorian Curriculum Progression chart thing
+         */
+        $vicProgression = [
+            /* Enable to show annotations in the preview window, for debugging purposes
+             * It saves you having to make a code change
+             */
+            'annotate' => (bool)$this->requestQuery->get('annotate', false),
+            'summary' => null,
+            'class' => null
+        ];
+
+        /* At least one of the Victorian Curriculum Progressions was enabled
+         */
+        if ($optionsPayload['summary']['vicProgression']['enable'] || $optionsPayload['class']['vicProgression']['enable']) {
+            /* Assume we want the first-mentioned academic period. Schools can supply multiple,
+             * but we only want one.
+             */
+            $academicPeriod = $this->termMapper->findById($optionsPayload['terms'][0]);
+
+            /* The Summary Version
+             */
+            if ($optionsPayload['summary']['vicProgression']['enable']) {
+                $vicProgression['summary'] = (new VictorianProgression\Payload(
+                    $this->workTypeMapper,
+                    $this->termMapper,
+                    (int)$optionsPayload['summary']['vicProgression']['workType'],
+                    $vicProgression['annotate']
+                ))->generate($student, $academicPeriod, null);
+            }
+
+            /* The Class Version
+             */
+            if ($optionsPayload['class']['vicProgression']['enable']) {
+                /* Render a chart for each class in $folders, I suppose
+                 */
+                foreach ($folders as $folder) {
+                    $folderId = (int)$folder->getId();
+
+                    $vicProgression['class'][$folderId] = (new VictorianProgression\Payload(
+                        $this->workTypeMapper,
+                        $this->termMapper,
+                        (int)$optionsPayload['class']['vicProgression']['workType'],
+                        $vicProgression['annotate']
+                    ))->generate($student, $academicPeriod, $folderId);
+                }
+            }
+        }
+
         /* Build it
          */
         $data = [
@@ -975,7 +1042,11 @@ class Controller extends ConfigController
             'classOptions'               => $optionsPayload['class'],
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
-
+            /* Optional Victorian Curriculum Progression chart thing
+             * The $annotate var lets you see how we derived values, so you can look at the
+             * preview window in a staging environment without needing code changes to reveal
+             */
+            'vicProgression'             => $vicProgression,
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
@@ -988,6 +1059,7 @@ class Controller extends ConfigController
 
     /**
      * Hydrate feedback and returns as a collection indexed by assessment id
+     *
      * @param Collection $folderAssessments
      * @param User       $student
      * @param User       $viewer
@@ -1032,10 +1104,10 @@ class Controller extends ConfigController
      * if there are reports to generate, send the user to the preview, or just show an error message
      *
      * @param Model $report
-     * @throws RouteNotFound
+     * @throws Exception
      * @throws \JsonException
      */
-    public function getPreview(Model $report)
+    public function getPreview(Model $report): void
     {
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
@@ -1056,28 +1128,34 @@ class Controller extends ConfigController
         //if report list is empty, display nice error message
         if (0 === count($reports)) {
             throw new Exception("There are currently no reports to preview that match the criteria selected.");
-        } else {
-            //if reports exist.
-            //redirect user to report preview
-            $this->response = $this->redirectFound($reports[0]['url']);
         }
+
+        //if reports exist.
+        //redirect user to report preview
+        $this->response = $this->redirectFound($reports[0]['url']);
     }
 
     /**
      *  Generate standard cohort graph similar to the grades page
      *
-     * @param Collection    $assessments
-     * @param Folder\Model  $folder
-     * @param Markbook      $filteredMarkbook
-     * @param bool          $lmsCohortComparison
-     * @param bool          $gradientEnable
-     * @param User          $student
-     * @param User          $viewer
-     * @param Term\Model    $term
-     * @param Helper        $gradeHelper
+     * @param Collection $assessments
+     * @param Folder\Model $folder
+     * @param Markbook $filteredMarkbook
+     * @param bool $lmsCohortComparison
+     * @param bool $gradientEnable
+     * @param User $student
+     * @param User $viewer
+     * @param Term\Model $term
+     * @param Helper $gradeHelper
      *
      * @return array{graph: array, type: string}
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \JsonException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws \UnexpectedValueException
      */
     private function generateCohortGraph(
         Collection $assessments,
@@ -1089,7 +1167,7 @@ class Controller extends ConfigController
         User $viewer,
         Term\Model $term,
         Helper $gradeHelper
-    ) {
+    ): array {
         if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
             $graphType = 'cohort';
             $graph = (new ClassResults(
