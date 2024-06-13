@@ -286,9 +286,8 @@
                 }
 
                 if ($groupSummary.length) {
+                    // Only update dropdown/input field if the mark has not been customised
                     if (! $groupSummary.attr('data-customised') && ! $groupSummary.attr('data-has-valueless')) {
-                        // Only update dropdown/input field if the mark has not been customised
-                        $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
                         switch (markType) {
                             case 'letter':
                                 assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
@@ -350,7 +349,6 @@
                 var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
                 $groupSummary.attr('data-scaled-mark', normalisedMark);
                 $groupSummary.attr('data-mark', normalisedMark);
-                $groupSummary.find('[data-db-mark]').val(normalisedMark);
                 $groupSummary.attr('data-customised', true);
             }
 
@@ -409,7 +407,6 @@
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', scaledGroupMark);
-            $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
             switch (markType) {
                 case 'letter':
