@@ -581,6 +581,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
                 $this->sendToUser($instanceId, $userId, [ $command => $markAsRead ]);
                 break;
+
+            default:
+                $this->log->debug(sprintf("Command '%s' not recognized: ignoring", $command));
+                break;
         }
 
         // release the socket if permissible
