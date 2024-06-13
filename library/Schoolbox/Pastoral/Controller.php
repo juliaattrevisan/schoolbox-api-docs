@@ -1065,7 +1065,7 @@ class Controller extends Base
             $existingAccesses = $record->getAccess()->indexBy('id');
             $keptAccessIds    = [];
             $record->setAccess($this->pastoralAccessMapper->createCollection());
-            /** @var Access\Model $access */
+            /** @var PastoralAccessModel $access */
             foreach ($accesses as $access) {
                 if ($previousRecord && $access->getId()) {
                     $keptAccessIds[] = $access->getId();
@@ -1084,7 +1084,7 @@ class Controller extends Base
                 // Delete accesses no longer exists
                 $removingAccesses = $existingAccesses->filter(
                     static function ($access) use ($keptAccessIds) {
-                        /** @var Access\Model $access */
+                        /** @var PastoralAccessModel $access */
                         return !in_array($access->getId(), $keptAccessIds);
                     }
                 );
