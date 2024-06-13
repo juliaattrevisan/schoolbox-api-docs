@@ -357,7 +357,7 @@ $rotate-span-width: 11rem;
             position: sticky;
             left: 0;
         }
-        z-index: calc(var(--depth-default - 1)); /* Z-index for left cells. */
+        z-index: calc(var(--depth-default) + 1); /* Z-index for left cells. */
     }
 
     th.fixed-left:nth-child(2) {
