@@ -33,6 +33,6 @@ class Part1 extends Request
 
     protected function getUrl(): string
     {
-        return '/search/header/classes';
+        return '/course/import/classes';
     }
 }
