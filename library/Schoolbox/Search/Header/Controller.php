@@ -33,7 +33,7 @@ class Controller extends Base
     }
 
     /**
-     * Returns a JSON array of users based on keyword
+     * Returns a JSON array of users and folders based on keyword
      *
      * @api GET /search/header
      */
@@ -47,8 +47,8 @@ class Controller extends Base
             try {
                 /** @var IConnector $db */
                 $db = $this->di->get('databaseInternal');
-                $userSearchService = new Search\Query($db, $this->getConfigLoader(), $this->getDi()->get('l10n'));
-                $result = $userSearchService->fetchResults($keyword, $this->getUser());
+                $searchService = new Search\Query($db, $this->getConfigLoader(), $this->getDi()->get('l10n'));
+                $result = $searchService->fetchResults($keyword, $this->getUser());
             } catch (Exception $exception) {
                 $errorOccurred = true;
                 $result = [
