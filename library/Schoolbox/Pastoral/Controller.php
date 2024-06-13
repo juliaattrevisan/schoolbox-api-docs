@@ -30,6 +30,7 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audience\ColorHelper;
@@ -396,7 +397,7 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
-            /** @var Access\Model $access */
+            /** @var PastoralAccessModel $access */
             foreach ($record->getAccessWithPermission() as $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());
