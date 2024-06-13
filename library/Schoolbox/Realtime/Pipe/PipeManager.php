@@ -574,7 +574,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                     $messageIds = [$messageIds];
                 }
                 foreach ($messageIds as $msgId) {
-                    if ($subscription->acknowledgeMessage($msgId)) {
+                    if (is_string($msgId) && $subscription->acknowledgeMessage($msgId)) {
                         $markAsRead[] = $msgId;
                     }
                 }
