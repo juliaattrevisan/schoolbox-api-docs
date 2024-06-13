@@ -27,8 +27,10 @@ class Module extends BaseModule
             );
         });
 
+        $staffOnly = $this->getAuthRule('isStaffOrSuper');
+
         $this->register('GET', '', 'search', $loggedIn);
-        $this->register('GET', '/classes', 'searchClasses', $loggedIn);
+        $this->register('GET', '/classes', 'searchClasses', $staffOnly);
     }
 
     /**
