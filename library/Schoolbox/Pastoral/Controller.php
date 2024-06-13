@@ -122,7 +122,7 @@ class Controller extends Base
         private Comment\Translator\ModelToArray $pastoralCommentTranslator,
         private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
-        private \Schoolbox\External\User $externalUser,
+        private \Schoolbox\External\User $externalUser
     ) {
     }
 
