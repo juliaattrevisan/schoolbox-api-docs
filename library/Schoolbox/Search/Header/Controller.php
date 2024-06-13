@@ -22,9 +22,13 @@ class Controller extends Base
     public const STATUS_OK = 200;
     public const STATUS_SERVER_ERROR = 500;
 
+    /**
+     * @param FolderMapper $folderMapper
+     * @param Access       $access
+     */
     public function __construct(
-        private FolderMapper $folderMapper,
-        private Access $access
+        private readonly FolderMapper $folderMapper,
+        private readonly Access $access
     ) {
     }
 
