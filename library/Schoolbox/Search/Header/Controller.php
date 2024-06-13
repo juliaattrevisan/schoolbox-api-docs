@@ -69,8 +69,9 @@ class Controller extends Base
      *
      * This is used in autocomplete search fields where the user must select one or more classes.  It is currently used
      * in the pastoral report builder and in the course import tool.
-     * This function has nothing to do with the search feature in the header bar, but is placed in this class for
-     * convenience.
+     * This function is not used by the search feature in the header bar, but is placed in this class for convenience
+     * due to its similarity to the header search function (both functions return folders and need to be available in
+     * all plans).
      *
      * @throws MapperException
      *@api GET /search/header/classes
