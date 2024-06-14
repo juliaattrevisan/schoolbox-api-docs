@@ -709,21 +709,17 @@ class Controller extends Base
         if ($unit->getFolder()->getCurriculumNodes()->count()) {
             $nodeIds = [];
             foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
-                if (!$node->getEnabled()) {
-                    continue;
-                }
-
                 $nodeIds[] = $node->getId();
             }
 
-            // Fetch every node which is an ancestor or descendant of one of
-            // this folder's nodes, and is still enabled:
-            // only enabled nodes should be selectable.
+            // Fetch every node which is an ancestor or descendant of one of this folder's nodes.
+            // Disabled nodes are included here because the only point of disabling a node is to prevent
+            // future links to that node from being created.
             $nodeIds = $this->nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
 
             // Then, sort the entire list of nodes into a tree structure.
             $curriculumNodes = $this->nodeMapper->getCollectionAsTree(
-                $this->nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+                $this->nodeMapper->findByColumnList(['id' => $nodeIds]),
             );
         }
 
