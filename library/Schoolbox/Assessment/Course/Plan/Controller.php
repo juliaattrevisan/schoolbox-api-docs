@@ -712,8 +712,9 @@ class Controller extends Base
                 $nodeIds[] = $node->getId();
             }
 
-            // Fetch every node which is an ancestor or descendant of one of this folder's nodes.  Disabled nodes are
-            // included here because the only point of disabling a node is to prevent future links being created.
+            // Fetch every node which is an ancestor or descendant of one of this folder's nodes.
+            // Disabled nodes are included here because the only point of disabling a node is to prevent
+            // future links to that node from being created.
             $nodeIds = $this->nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
 
             // Then, sort the entire list of nodes into a tree structure.
