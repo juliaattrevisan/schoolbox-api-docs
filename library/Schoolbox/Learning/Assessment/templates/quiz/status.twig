@@ -18,7 +18,11 @@
 
 {% block flashMessage %}
     {% if hasRescore %}
-        rescoring going on
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="alert-box warning">Rescoring in progress; please allow 30 minutes for changes to take effect.</div>
+            </div>
+        </div>
     {% endif %}
 {% endblock flashMessage %}
 
