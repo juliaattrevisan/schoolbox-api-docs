@@ -709,10 +709,6 @@ class Controller extends Base
         if ($unit->getFolder()->getCurriculumNodes()->count()) {
             $nodeIds = [];
             foreach ($unit->getFolder()->getCurriculumNodes() as $node) {
-                if (!$node->getEnabled()) {
-                    continue;
-                }
-
                 $nodeIds[] = $node->getId();
             }
 
@@ -723,7 +719,7 @@ class Controller extends Base
 
             // Then, sort the entire list of nodes into a tree structure.
             $curriculumNodes = $this->nodeMapper->getCollectionAsTree(
-                $this->nodeMapper->findByColumnList(['id' => $nodeIds, 'enabled' => true,]),
+                $this->nodeMapper->findByColumnList(['id' => $nodeIds]),
             );
         }
 
