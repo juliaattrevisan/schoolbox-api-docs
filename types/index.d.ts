@@ -12,11 +12,11 @@ import type { RosettaStone } from "@js/terminology/rosettaStone";
 declare global {
     interface Window {
         cdnPrefix: string;
-        CKEDITOR: any;
         dayjs: typeof dayjs;
         dateDisplayFormats: {
             dayjs: string;
         };
+        iframely: any;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
