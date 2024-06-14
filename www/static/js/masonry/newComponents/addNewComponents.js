@@ -105,6 +105,7 @@ function addNewDraggable(component) {
     return Draggable.create(component, {
         type: "x, y",
         autoScroll: 1,
+        zIndexBoost: false,
         onClick: function () {
             //not using arrow functions here as we need to pass 'this' through
             onNewComponentClicked(this);
@@ -168,7 +169,7 @@ function onNewComponentClicked(draggableInstance) {
         insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
         __newComponent.style.float = "none"; //needs to be factored into the document flow, so take float off
         __newComponent.style.marginBottom = "1rem"; //add the appropriate margin in
-        __newComponent.style.zIndex = 9999;
+        __newComponent.style.zIndex = "var(--depth-pop-over)"; //ensure it stays on top
         __newComponent.style.position = "static";
         __newComponent.style.width = "100%";
 
@@ -177,7 +178,7 @@ function onNewComponentClicked(draggableInstance) {
             duration: ANIMATE_SPEED * 2,
             ease: "power1.inOut",
             nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
-            zIndex: 9999, //ensure it stays on top
+            zIndex: "var(--depth-pop-over)", //ensure it stays on top
             onComplete: () => {
                 __isFlipping = false;
                 reinsertNewComponentButton();
@@ -341,7 +342,7 @@ function canCheckForChange() {
     };
     const distance = Math.sqrt(
         Math.pow(__startDragPoint.left - currentDragPoint.left, 2) +
-            Math.pow(__startDragPoint.top - currentDragPoint.top, 2)
+            Math.pow(__startDragPoint.top - currentDragPoint.top, 2),
     );
     return distance > MIN_MOVEMENT && __isProcessing && !__isScrolling && !__isFlipping;
 }
@@ -567,7 +568,7 @@ async function addNewComponent() {
                 component: newComponent,
                 paletteElement: __newComponentClone,
             },
-        })
+        }),
     );
     await gsap.to(newComponent, {
         //fade in the updated component
@@ -588,7 +589,7 @@ async function addNewComponent() {
  */
 function reinsertNewComponentButton() {
     __newComponentTabsContainer.appendChild(__newComponentClone);
-    __newComponentClone.style.zIndex = null; //ensure there's no z-index issues, as it was boosted when dragging took place
+    __newComponentClone.style.zIndex = "var(--depth-default)"; //ensure there's no z-index issues, as it was boosted when dragging took place
 }
 
 /**

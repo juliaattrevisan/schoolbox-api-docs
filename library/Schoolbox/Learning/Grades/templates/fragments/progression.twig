@@ -101,6 +101,8 @@
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">
                     $(function() {
+                        const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element
+                        const depthDefault = parseInt(rootStyles.getPropertyValue('--depth-default')); // Get the default depth for the graph
                         var assessments = [
                             {% for activity_id, activity in rubricAssessmentList %}
                             "{{ activity.name }}",
@@ -143,7 +145,7 @@
                             series: [{
                                 name: 'Marks',
                                 data: grades,
-                                zIndex: 1,
+                                zIndex: depthDefault,
                                 connectNulls: true,
                                 color: 'rgb(255, 87, 87)',
                             }, {
@@ -154,7 +156,7 @@
                                 linkedTo: ':previous',
                                 color: Highcharts.getOptions().colors[0],
                                 fillOpacity: 0.3,
-                                zIndex: 0,
+                                zIndex: depthDefault-1,
                                 marker: {
                                     enabled: false
                                 }

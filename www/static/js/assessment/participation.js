@@ -415,7 +415,7 @@
                     detail: {
                         targetElements: ["#plan-desc"],
                     },
-                })
+                }),
             );
         });
     }
@@ -438,42 +438,42 @@
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][name]")
                 .attr("data-saved-plan", 1)
-                .val(planDetails["name"])
+                .val(planDetails["name"]),
         );
 
         $hiddenInputs = $hiddenInputs.add(
             $(document.createElement("input"))
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][description]")
-                .val(planDetails["description"])
+                .val(planDetails["description"]),
         );
 
         $hiddenInputs = $hiddenInputs.add(
             $(document.createElement("input"))
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][publish_date]")
-                .val(planDetails["publishDate"])
+                .val(planDetails["publishDate"]),
         );
 
         $hiddenInputs = $hiddenInputs.add(
             $(document.createElement("input"))
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][open_date]")
-                .val(planDetails["openDate"])
+                .val(planDetails["openDate"]),
         );
 
         $hiddenInputs = $hiddenInputs.add(
             $(document.createElement("input"))
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][due_date]")
-                .val(planDetails["dueDate"])
+                .val(planDetails["dueDate"]),
         );
 
         $hiddenInputs = $hiddenInputs.add(
             $(document.createElement("input"))
                 .attr("type", "hidden")
                 .attr("name", "plans[" + planId + "][close_date]")
-                .val(planDetails["closeDate"])
+                .val(planDetails["closeDate"]),
         );
 
         // Append hidden inputs to the fieldset
@@ -679,17 +679,17 @@
             opened: function () {
                 if ($participantCustomiseModal.hasClass("toback")) {
                     // so the participant customise modal and link balloon is behind the modal bkg
-                    $participantCustomiseModal.css("z-index", "1001");
-                    updateLinkBalloonDepth("1002");
+                    $participantCustomiseModal.css("z-index", "calc(var(--depth-modal) - 3)");
+                    updateLinkBalloonDepth("calc(var(--depth-modal) - 2)");
                 } else {
-                    $participantCustomiseModal.css("z-index", "1005");
+                    $participantCustomiseModal.css("z-index", "var(--depth-modal)");
                 }
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
                 // so the participant customise modal and link balloon is back in front of the modal bkg
-                $participantCustomiseModal.css("z-index", "1005");
-                updateLinkBalloonDepth("1010");
+                $participantCustomiseModal.css("z-index", "var(--depth-modal)");
+                updateLinkBalloonDepth("calc(var(--depth-modal) + 1)");
             },
         });
     }
@@ -702,7 +702,7 @@
      */
     function updateLinkBalloonDepth(depth) {
         const linkBalloon = document.querySelector(
-            `[data-balloon-editor-id="${window.sbProps.editors["plan-desc"].id}"]`
+            `[data-balloon-editor-id="${window.sbProps.editors["plan-desc"].id}"]`,
         );
         if (linkBalloon) {
             linkBalloon.style.zIndex = depth;

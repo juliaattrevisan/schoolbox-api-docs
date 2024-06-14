@@ -97,12 +97,12 @@
                 questionItemsListHeader.style.position = 'fixed';
                 questionItemsListHeader.style.top = '0px';
                 questionItemsListHeader.style.width = questionItemsListRect.width + 'px';
-                questionItemsListHeader.style.zIndex = '100';
+                questionItemsListHeader.style.zIndex = 'var(--depth-ui-overlay)';
             } else {
                 questionItemsListHeader.style.position = '';
                 questionItemsListHeader.style.top = '';
                 questionItemsListHeader.style.width = '';
-                questionItemsListHeader.style.zIndex = '';
+                questionItemsListHeader.style.zIndex = 'var(--depth-default)';
             }
         }
     }
