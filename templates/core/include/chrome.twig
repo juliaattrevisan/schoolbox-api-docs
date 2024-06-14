@@ -584,18 +584,19 @@
                         if (Notification.permission === "granted") {
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('checked', true);
-                                document.querySelector('#enableNotifPrompt').remove();
                             });
 
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('disabled', true);
+                                document.querySelector('#enableNotifPrompt').remove();
+
                             });
 
                             document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
                                 element.remove();
                             });
-                            document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
 
+                            document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
                         } else if (Notification.permission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
@@ -614,19 +615,6 @@
                                     return;
                                 }
                                 prompted = true;
-                            element?.addEventListener('click', () => {
-                                Notification.requestPermission().then((permission) => {
-                                    if (prompted) {
-                                        return;
-                                    }
-                                    prompted = true;
-                                    if (permission === 'granted') {
-                                        window.localStorage.setItem("notification", "requesting");
-                                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
-                                            element.setAttribute('disabled', true);
-                                            document.querySelector('#enableNotifPrompt').remove();
-                                            document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
-                                        });
 
                                 {# Use await instead of .then to avoid iOS treating as a non-interaction and failing #}
                                 const permission = await Notification.requestPermission();
@@ -634,6 +622,8 @@
                                     window.localStorage.setItem("notification", "requesting");
                                     document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                         element.setAttribute('disabled', true);
+                                        document.querySelector('#enableNotifPrompt').remove();
+                                        document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
                                     });
 
                                     {% if config.debug_mode %}
