@@ -44,8 +44,19 @@
     <div data-pwa="notifBlocked" class="alert-box warning">
         You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
     </div>
+
+    <div data-pwa="notifEnabledMessage" class="alert-box success">
+        You have notifications enabled for this device
+
+    </div>
     <div class="l-flex-col l-gap-s f-no-margins" id="enableNotifPrompt" data-pwa-action="enableNotifPrompt">
         <p>Enable notifications on your device:</p>
         <a data-pwa-action="enableNotif" class="button" href="#">Enable Notifications</a>
     </div>
 </div>
+<style>
+[data-pwa="notifEnabledMessage"] {
+    display: none;
+    margin-top:1rem;
+}
+</style>
