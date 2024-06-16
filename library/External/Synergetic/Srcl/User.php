@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 class External_Synergetic_Srcl_User extends External_Synergetic_User
 {
-
     /**
      * @inheritDoc
      */
@@ -66,6 +65,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 vStudents.StudentMobilePhone,
                 vStudents.StudentSpecialNeedsFlag,
                 vStudents.StudentStudiesCode,
+                vStudents.StudentGovernmentStudentNumber,
                 AlertMessage,
                 vStudents.LegalCourtOrderType AS CourtOrderType,
                 vStudents.StudentBoarder,
