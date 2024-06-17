@@ -2264,6 +2264,10 @@ class Controller extends Base
 
         (new RescoreProcessor($this->api, true, null))->process($attempts);
 
-        $this->getSession()->getSegment(static::class)->setFlash('hasRescore', true);
+        $this->getSession()->getSegment(static::class)->set('hasRescore', 'blap');
+
+//        $state = $this->getSession()->getSegment(static::class)->get('hasRescore', 'no flash');
+
+//        $this->response = $this->responseAsJson($state);
     }
 }

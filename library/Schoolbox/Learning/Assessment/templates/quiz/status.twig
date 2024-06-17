@@ -48,10 +48,8 @@
                         format: 'html',
                         confirmLabel: 'Rescore',
                         confirmEvent: function() {
-                            $.post('{{ rescoreRoute }}', {
-
-                            }).done(function() {
-                                window.location.reload();
+                            $.post('{{ rescoreRoute }}', {}, function(responseText) {
+                                console.log(responseText);
                             });
                         }
                     });

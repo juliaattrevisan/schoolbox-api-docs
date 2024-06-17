@@ -266,14 +266,15 @@ class Controller extends Assessment\Controller
          */
         $hasRescore = false;
 
-        if ($this->getSession()->getSegment(static::class)->getFlash('hasRescore', true)) {
-            // Live run flash msg
-            $hasRescore = true;
+        $state = $this->getSession()->getSegment(static::class)->get('hasRescore', 'mog');
+        var_dump($state);
 
-            /* Only show that message once, I suppose
-             */
-            $this->getSession()->getSegment(static::class)->setFlash('hasRescore', false);
-        }
+//        if ($this->getSession()->getSegment(static::class)->getFlash('hasRescore', false)) {
+//            // Live run flash msg
+//            $hasRescore = true;
+//
+////            $this->getSession()->getSegment(static::class)->clearFlash();
+//        }
 
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
