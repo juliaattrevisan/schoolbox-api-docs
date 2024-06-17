@@ -25,7 +25,7 @@ class Processor
      * Used to find a relationship between a folder and a particular
      * assessment by its title.
      */
-    private const QUERY_ASSESSMENT = "
+    private const QUERY_ASSESSMENT_TITLE = "
         SELECT sb.id AS box_id
         FROM v_assessment_relation var
         INNER JOIN assessment a ON a.id = var.assessment_id
@@ -33,6 +33,23 @@ class Processor
         INNER JOIN folder f ON var.folder_id = f.id
         WHERE var.folder_id = :folderId
         AND a.title = :title
+        AND a.deleted_at IS NULL
+        AND f.deleted_at IS NULL
+    ";
+
+
+    /**
+     * Used to find a relationship between a folder and a particular
+     * assessment by its title.
+     */
+    private const QUERY_ASSESSMENT_WORKTYPE = "
+        SELECT sb.id AS box_id
+        FROM v_assessment_relation var
+        INNER JOIN assessment a ON a.id = var.assessment_id
+        INNER JOIN submission_box sb ON sb.assessment_id = a.id
+        INNER JOIN folder f ON var.folder_id = f.id
+        WHERE var.folder_id = :folderId
+        AND a.work_type_id = :workTypeId
         AND a.deleted_at IS NULL
         AND f.deleted_at IS NULL
     ";
@@ -67,15 +84,18 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param string|null $assessmentTitle
+     * @param int|null $workTypeId
      * @param string $publishAt
      * @param string|null $folderCode
      * @param LoggerInterface|null $logger
      * @param bool $perform
+     * @throws \RuntimeException
      */
     public function __construct(
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private ?string $assessmentTitle,
+        private ?int $workTypeId,
         private string $publishAt,
         private ?string $folderCode,
         private ?LoggerInterface $logger,
@@ -83,7 +103,17 @@ class Processor
     ) {
         /* We're going to reuse this a lot
          */
-        $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT);
+        if (null !== $this->assessmentTitle) {
+            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_TITLE);
+        } elseif (null !== $this->workTypeId) {
+            $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT_WORKTYPE);
+        } else {
+            /* This should never happen via the future ui (validation prevents it(
+             * and cli encounters are a misuse.
+             */
+            throw new \RuntimeException('Specify one of assessment title or work type to identify assessments.');
+        }
+
         $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
     }
 
@@ -186,10 +216,17 @@ class Processor
 
             /* Then find the assessment's corresponding submission box id
              */
-            $this->assessmentQuery->execute([
-                'title' => $this->assessmentTitle,
-                'folderId' => $folder->getId()
-            ]);
+            if ($this->assessmentTitle) {
+                $this->assessmentQuery->execute([
+                    'title' => $this->assessmentTitle,
+                    'folderId' => $folder->getId()
+                ]);
+            } elseif ($this->workTypeId) {
+                $this->assessmentQuery->execute([
+                    'workTypeId' => $this->workTypeId,
+                    'folderId' => $folder->getId()
+                ]);
+            }
 
             /* Presume only one tuple exists
              */

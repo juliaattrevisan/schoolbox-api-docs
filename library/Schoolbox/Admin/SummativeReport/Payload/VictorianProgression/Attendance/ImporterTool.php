@@ -65,6 +65,22 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --title
+     *
+     *Title of the assessment whose feedbacks you want to populate
+     */
+    private const OPT_LONG_TITLE = 'title:';
+
+
+    /**
+     * --worktype
+     *
+     * Work Type of the assessment whose feedbacks you want to populate
+     */
+    private const OPT_LONG_WORKTYPE = 'worktype:';
+
+
+    /**
      * --folder
      *
      * folder code whose rows you want to process specifically.
@@ -94,10 +110,12 @@ class ImporterTool extends CliTool\App
     public function getLongOpts(): array
     {
         return [
-            self::OPT_LONG_HELP,
             self::OPT_LONG_INPUT,
+            self::OPT_LONG_TITLE,
+            self::OPT_LONG_WORKTYPE,
             self::OPT_LONG_FOLDER,
-            self::OPT_LONG_CREATOR
+            self::OPT_LONG_CREATOR,
+            self::OPT_LONG_HELP
         ];
     }
 
@@ -121,13 +139,13 @@ Requirements:
  * Attendance assessments must use Percentage mark type
  * CSV Columns: FileYear, ActualSemester, Student Name, ClassCode, StudentId, Attendance Rate, Comment
 
-Usage: attendanceImport.php --input=path/to/my/file.csv [--name=...] [--worktype=...] [--folder] [--creator] [--perform]
+Usage: attendanceImport.php --input=path/to/my/file.csv [--title=...] [--worktype=...] [--folder] [--creator] [--perform]
 
 
 Options
 -------
 
-    --name  
+    --title  
         The assessment name against which feedbacks are stored. It's an exact name match.
         If you don't want to use assessment names, you can choose a work type instead.
             
@@ -169,12 +187,28 @@ HELP;
             return;
         }
 
+        /* Identify either by assessment title or work type id
+         */
+        if ('' === trim((string)$this->getOpt(self::OPT_LONG_WORKTYPE)) && '' === trim((string)$this->getOpt(self::OPT_LONG_TITLE))) {
+            $this->getLogger()->info('Please specify assessment title or work type id to identify assessments.');
+
+            return;
+        }
+
         $this->getLogger()->info('Script commencing.');
 
         /* Dependencies
          */
         $userMapper = \Schoolbox\UserMapper::getInstance();
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+
+        /* Find by work type id
+         */
+        $workTypeId = null;
+
+        if ($this->getOpt(self::OPT_LONG_WORKTYPE)) {
+            $workTypeId = (int)$this->getOpt(self::OPT_LONG_WORKTYPE);
+        }
 
         /* Folder code restriction
          */
@@ -209,6 +243,7 @@ HELP;
             $userMapper,
             $folderMapper,
             self::ASSESSMENT_TITLE,
+            $workTypeId,
             self::ASSESSMENT_SEM1_DATE_PUBLISH,
             $folderCode,
             $this->getLogger(),
