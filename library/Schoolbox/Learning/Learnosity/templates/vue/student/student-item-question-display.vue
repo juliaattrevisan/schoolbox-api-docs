@@ -3,6 +3,7 @@
  * Contains a students response to a question and will save the score if updated
  */
 
+import sanitizeHtml from "sanitize-html";
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { removeClasses } from "@js/util/cssUtils";
@@ -198,6 +199,7 @@ function filterInput(event: Event) {
     target.value = filteredValue;
     score.value = filteredValue;
 }
+
 </script>
 
 <template>
@@ -207,7 +209,7 @@ function filterInput(event: Event) {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <p v-html="props.question.metadata.sample_answer"></p>
+                    <div v-html="sanitizeHtml(props.question.metadata.sample_answer)"></div>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--
