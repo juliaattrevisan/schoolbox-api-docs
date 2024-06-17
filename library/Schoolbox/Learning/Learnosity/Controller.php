@@ -2246,6 +2246,9 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws ApiException
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws ValidationException
      * @throws \JsonException
      */
@@ -2264,10 +2267,6 @@ class Controller extends Base
 
         (new RescoreProcessor($this->api, true, null))->process($attempts);
 
-        $this->getSession()->getSegment(static::class)->set('hasRescore', 'blap');
-
-//        $state = $this->getSession()->getSegment(static::class)->get('hasRescore', 'no flash');
-
-//        $this->response = $this->responseAsJson($state);
+        $this->getSession()->getSegment(static::class)->set('hasRescore', false);
     }
 }

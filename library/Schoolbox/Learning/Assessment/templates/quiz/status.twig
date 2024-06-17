@@ -17,13 +17,11 @@
 {% set labelReviewed   = 'Reviewed' %}
 
 {% block flashMessage %}
-    {% if hasRescore %}
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="alert-box warning">Rescoring in progress; please allow 30 minutes for changes to take effect.</div>
-            </div>
+    <div class="row" id="rescore" style="display:none">
+        <div class="small-12 columns">
+            <div class="alert-box warning">Rescoring in progress; please allow 30 minutes for changes to take effect.</div>
         </div>
-    {% endif %}
+    </div>
 {% endblock flashMessage %}
 
 {% block routeModify %}
@@ -49,7 +47,7 @@
                         confirmLabel: 'Rescore',
                         confirmEvent: function() {
                             $.post('{{ rescoreRoute }}', {}, function(responseText) {
-                                console.log(responseText);
+                                $('#rescore').show();
                             });
                         }
                     });
