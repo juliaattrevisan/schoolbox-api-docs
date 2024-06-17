@@ -1,0 +1,21 @@
+<script type='text/javascript'>
+    $(function() {
+        $('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+            id: {QUESTION_ID}
+        });
+    });
+</script>
+
+<span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+<input type="text"
+       id="questionForm-{QUESTION_ID}-answer"
+       name="answer"
+       data-datepicker
+       data-datepicker-time
+       data-datepicker-hide-timetable="true"
+       value="{ANSWER}"
+/>
+
+<!-- BEGIN answerOption -->
+
+<!-- END answerOption -->
