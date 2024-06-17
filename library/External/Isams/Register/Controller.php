@@ -286,7 +286,7 @@ class Controller extends BaseController
      */
     private function getUsersData(User $user, array $register, array $config)
     {
-        $fields = $this->extractMetaFields($register['id']);
+        $metaFields = $this->extractMetaFields($register['id']);
 
         $out = [];
 
@@ -294,13 +294,13 @@ class Controller extends BaseController
             $collectionName = $conf['recordCollection'];
 
             //Skip if the fields are not in the metadata fields returned
-            if (!isset($fields[$collectionName])) {
+            if (!isset($metaFields[$collectionName])) {
                 continue;
             }
 
-            $groupType = $fields[$collectionName]['type'];
+            $groupType = $metaFields[$collectionName]['type'];
             if (!isset($out[$groupType][$collectionName]['groupName'])) {
-                $out[$groupType][$collectionName]['groupName'] = $fields[$collectionName]['name'];
+                $out[$groupType][$collectionName]['groupName'] = $metaFields[$collectionName]['name'];
             }
 
             if ($groupType == 'FieldGroup') {
@@ -312,7 +312,7 @@ class Controller extends BaseController
                     }
 
                     [$name, $type, $value] = $this->prepareUserFieldData(
-                        $fields[$collectionName]['fields'][$knownField],
+                        $metaFields[$collectionName]['fields'][$knownField],
                         $data[$knownField]
                     );
 
@@ -352,7 +352,7 @@ class Controller extends BaseController
                         }
 
                         [$name, $type, $value] = $this->prepareUserFieldData(
-                            $fields[$collectionName]['fields'][$knownField],
+                            $metaFields[$collectionName]['fields'][$knownField],
                             $record['fields'][$knownField]
                         );
 
