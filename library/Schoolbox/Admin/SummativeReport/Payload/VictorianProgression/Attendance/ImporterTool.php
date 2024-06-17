@@ -38,12 +38,6 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * This particular assessment needs feedbacks
-     */
-    private const ASSESSMENT_TITLE = 'Attendance Semester 1';
-
-
-    /**
      * Arbitrarily choose actual dates
      */
     private const ASSESSMENT_SEM1_DATE_PUBLISH = '4/05/2023 12:01am';
@@ -202,6 +196,15 @@ HELP;
         $userMapper = \Schoolbox\UserMapper::getInstance();
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
+
+        /* Find by title
+         */
+        $title = null;
+
+        if ($this->getOpt(self::OPT_LONG_TITLE)) {
+            $title = trim((string)$this->getOpt(self::OPT_LONG_TITLE));
+        }
+
         /* Find by work type id
          */
         $workTypeId = null;
@@ -244,7 +247,7 @@ HELP;
         (new Processor(
             $userMapper,
             $folderMapper,
-            self::ASSESSMENT_TITLE,
+            $title,
             $workTypeId,
             self::ASSESSMENT_SEM1_DATE_PUBLISH,
             $folderCode,
