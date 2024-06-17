@@ -77,19 +77,10 @@ class Controller extends BaseController
             throw new NotFound();
         }
 
-        // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
-        if (null === $recordCollection) {
-            /**
-             * Unable to find the specified Record Collections...
-             */
-            throw new NotFound();
-        }
-
         $usersData = [
             [
                 'user' => $student,
-                'data' => $this->getUsersData($student, $register, $recordCollection, $config),
+                'data' => $this->getUsersData($student, $register, $config),
             ]
         ];
 
@@ -97,7 +88,6 @@ class Controller extends BaseController
             '@isamsRegister/student.twig',
             [
                 'register' => $register,
-                'recordCollection' => $recordCollection,
                 'studentData'   => $usersData,
             ],
         );
@@ -135,15 +125,6 @@ class Controller extends BaseController
             throw new NotFound();
         }
 
-        // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
-        if (null === $recordCollection) {
-            /**
-             * Unable to find the specified Record Collections...
-             */
-            throw new NotFound();
-        }
-
         $externalUser = new \Schoolbox\External\User();
         $externalUser->loadChildren([$this->getUser()]);
 
@@ -151,15 +132,13 @@ class Controller extends BaseController
         foreach ($this->getUser()->getChildren() as $child) {
             $usersData[] = [
                 'user' => $child,
-                'data' => $this->getUsersData($child, $register, $recordCollection, $config),
+                'data' => $this->getUsersData($child, $register, $config),
             ];
         }
-
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
                 'register' => $register,
-                'recordCollection' => $recordCollection,
                 'studentData'   => $usersData,
             ],
         );
@@ -282,7 +261,8 @@ class Controller extends BaseController
             }
             $registerCode = $tmp[0];
             $registerCollection = $tmp[1];
-            $registersConfig[strtolower($registerCode)] = [
+            //Group all the filters with the same group code
+            $registersConfig[strtolower($registerCode)][] = [
                 'register'          => $registerCode,
                 'recordCollection'  => $registerCollection,
                 'fields'            => explode(',', $tmp[2])
@@ -296,7 +276,6 @@ class Controller extends BaseController
      *
      * @param User $user                who are we building info for
      * @param array $register           what is the requested register we want to look into
-     * @param array $recordCollection   what is the requested register collection we are extracting the data out of
      * @param array $config             the admin approved register list
      * @return array
      * @throws ClientExceptionInterface
@@ -305,80 +284,169 @@ class Controller extends BaseController
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(User $user, array $register, array $recordCollection, array $config)
+    private function getUsersData(User $user, array $register, array $config)
     {
-        // fetch user data
-        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $user->getExternalId(), $recordCollection['id']);
-
-        // fetch the field metadata to join and clean the data
-        $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
-
-        // resort user records so they display similar to within iSAMS
-        usort($userRecords, function ($a, $b) {
-            return $b['id'] <=> $a['id'];
-        });
+        $fields = $this->extractMetaFields($register['id']);
 
         $out = [];
-        $knownFields = [];
-        // loop through each record
-        foreach ($userRecords as $record) {
-            $fields = [];
-            //in each record, loop through the metadata fields
-            foreach ($fieldMetadata as $metadata) {
-                //if the field exists then build it, else just continue
-                if (!array_key_exists(lcfirst($metadata['key']), $record['fields'])) {
-                    continue;
-                }
-                /**
-                 * If the field is not in the approved list, then build it, else continue
-                 *
-                 * NOTE:
-                 * register metadata fields keys all words are caps,
-                 * the student data fields first character is lowercase...
-                 *
-                 * Regarding the capitalisation, I know this happens elsewhere with OData filters – they always flip the capitals…
-                 * -Mark@EIM
-                 *
-                 * so we need to keep the config as 1 of the schemes,
-                 * I decided that the case should match the student record, not the metadata endpoints
-                 * -Justin
-                 */
-                if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
-                    continue;
-                }
-                $sequence = array_search(lcfirst($metadata['key']), $config['fields']);
-                $knownFields[$sequence] = $metadata['name'];
 
-                // if TextboxField confirm the field type  (url / html?)
-                $value = $record['fields'][lcfirst($metadata['key'])] ?? '';
-                $type = $metadata['type'];
-                if ('TextboxField' === $metadata['type']) {
-                    // is this a url, if so get twig to format as href
-                    $url = new \Url($value);
-                    if ($url->isUrl()) {
-                        $type = 'url';
+        foreach ($config as $conf) {
+            $collectionName = $conf['recordCollection'];
+
+            //Skip if the fields are not in the metadata fields returned
+            if (!isset($fields[$collectionName])) {
+                continue;
+            }
+
+            $groupType = $fields[$collectionName]['type'];
+            if (!isset($out[$groupType][$collectionName]['groupName'])) {
+                $out[$groupType][$collectionName]['groupName'] = $fields[$collectionName]['name'];
+            }
+
+            if ($groupType == 'FieldGroup') {
+                $data = $this->cacheHelper->getStudentFields($register['id'], $user->getExternalId());
+                foreach ($conf['fields'] as $index => $knownField) {
+                    //If the field is in the approved list, then build it, else continue
+                    if (!array_key_exists($knownField, $data)) {
+                        continue;
                     }
 
-                    // is html, then get twig to sanitise with `| purify`
-                    if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
-                        $type = 'html';
-                    }
+                    [$name, $type, $value] = $this->prepareUserFieldData(
+                        $fields[$collectionName]['fields'][$knownField],
+                        $data[$knownField]
+                    );
+
+                    $out[$groupType][$collectionName]['data'][$index] = [
+                        'name' => $name,
+                        'type' => $type,
+                        'value' => $value
+                    ];
+                }
+            } else if ($groupType == 'RecordCollection') {
+                //Requested register collection we are extracting the data out of
+                $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionName);
+
+                if (null === $recordCollection) {
+                    /**
+                     * Skip if unable to find the specified Record Collections.
+                     */
+                    continue;
                 }
 
-                // join the record field to the metadata field and append to a new array
-                $fields[$sequence] = [
-                    'type' => $type,
-                    'value' => $value
+                $records = $this->cacheHelper->getRecordCollectionsRecords(
+                    $register['id'],
+                    $user->getExternalId(),
+                    $recordCollection['id']
+                );
+
+                // resort user records so they display similar to within iSAMS
+                usort($records, function ($a, $b) {
+                    return $b['id'] <=> $a['id'];
+                });
+
+                foreach ($conf['fields'] as $key => $knownField) {
+                    foreach ($records as $index => $record) {
+                        //If the field is in the approved list, then build it, else continue
+                        if (!array_key_exists($knownField, $record['fields'])) {
+                            continue;
+                        }
+
+                        [$name, $type, $value] = $this->prepareUserFieldData(
+                            $fields[$collectionName]['fields'][$knownField],
+                            $record['fields'][$knownField]
+                        );
+
+                        $out[$groupType][$collectionName]['headers'][$key] = $name;
+                        $out[$groupType][$collectionName]['data'][$index][$key] = [
+                            'type' => $type,
+                            'value' => $value
+                        ];
+                    }
+                }
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Extract and formatting meta fields with their relevant groups
+     *
+     * @param   int $registerId
+     * @return  array
+     * @throws  InvalidArgumentException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    private function extractMetaFields(int $registerId): array
+    {
+        $metadataFields = $this->cacheHelper->getMetadataFields($registerId);
+        $metaFields = [];
+
+        foreach ($metadataFields as $field) {
+            $groupData = $field['group'];
+            $groupKey = $groupData['key'];
+            if (!isset($metaFields[$groupKey])) {
+                $metaFields[$groupKey] = [
+                    'type' => $groupData['type'],
+                    'id' => $groupData['id'],
+                    'name' => $groupData['name'],
                 ];
             }
-            ksort($fields);
-            $out[] = $fields;
+
+            /**
+             * NOTE:
+             * register metadata fields keys all words are caps,
+             * the student data fields first character is lowercase...
+             *
+             * Regarding the capitalisation, I know this happens elsewhere with OData filters
+             * – they always flip the capitals…
+             * -Mark@EIM
+             *
+             * so we need to keep the config as 1 of the schemes,
+             * I decided that the case should match the student record, not the metadata endpoints
+             * -Justin
+             *
+             */
+
+            $metaFields[$groupKey]['fields'][lcfirst($field['key'])] = [
+                'name' => $field['name'],
+                'type' => $field['type']
+            ];
+        }
+        return $metaFields;
+    }
+
+    /**
+     * Prepare the user data with their appropriate type and value
+     *
+     * @param array         $field
+     * @param null|string   $value
+     * @return array
+     */
+    private function prepareUserFieldData(array $field, ?string $value): array
+    {
+
+        $type = $field['type'];
+        //Fill the empty space in the table with placeholder if no value
+        $value = $value ?? '-';
+
+        // if TextboxField confirm the field type  (url / html?)
+        if ('TextboxField' === $type) {
+            // is this an url, if so get twig to format as href
+            $url = new \Url($value);
+            if ($url->isUrl()) {
+                $type = 'url';
+            }
+
+            // is html, then get twig to sanitise with `| purify`
+            if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
+                $type = 'html';
+            }
         }
 
-        ksort($knownFields);
         return [
-            'knownFields' => $knownFields,
-            'userRecords'   => $out
+            $field['name'],
+            $type,
+            $value
         ];
     }
 
