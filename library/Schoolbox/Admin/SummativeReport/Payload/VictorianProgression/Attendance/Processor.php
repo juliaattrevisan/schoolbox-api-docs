@@ -134,6 +134,10 @@ class Processor
         \Schoolbox\User $creator,
         ?LockInterface $lock
     ): void {
+        /* Universal publish date
+         */
+        $publishAt = (new \Alaress_Date_Format($this->publishAt, 'd/m/Y H:ia'))->getDatabase();
+
         /* Load a particular file
          */
         $fp = fopen($filename, 'r');
@@ -275,7 +279,7 @@ class Processor
                     'normMark' => $normalisedMark,
                     'resubmissionRequired' => 0,
                     'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
-                    'publishedAt' => $this->publishAt,
+                    'publishedAt' => $publishAt,
                     'publishedBy' => $creator->getId(),
                     'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
                 ]);

@@ -40,7 +40,7 @@ class ImporterTool extends CliTool\App
     /**
      * Arbitrarily choose actual dates
      */
-    private const ASSESSMENT_SEM1_DATE_PUBLISH = '4/05/2023 12:01am';
+    private const ASSESSMENT_SEM1_DATE_PUBLISH = '04/05/2023 12:01am';
 
 
     /**
