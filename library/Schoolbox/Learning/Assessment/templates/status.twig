@@ -27,7 +27,6 @@
             <h1 data-test="assessment-status-meta-title">Status of {{ assessment.title }}</h1>
         </div>
     </div>
-
     {# TODO Known bug SA-5985 - this nav tot should not appear if no actions are available (eg user is staff with read access only) #}
     <nav>
         <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
@@ -94,6 +93,9 @@
     {% endblock messages %}
     </div>
 </div>
+
+{% block flashMessage %}{% endblock flashMessage %}
+
 <div class="row">
     <div class="small-12 island">
         {% if assessment.allParticipants | length %}

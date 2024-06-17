@@ -16,12 +16,19 @@
 {% set labelPending    = 'Review required' %}
 {% set labelReviewed   = 'Reviewed' %}
 
+{% block flashMessage %}
+    {% if hasRescore %}
+        rescoring going on
+    {% endif %}
+{% endblock flashMessage %}
+
 {% block routeModify %}
     {% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 
     {% if routeModify %}
         {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-        {% set rescoreRoute = '' %}
+        {% set rescoreRoute = routeLookupIfAuthorized('learnosity.postRescoreAttempts', {assessment: assessment, assessmentId: assessment.id}) %}
+
         <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
         <li><a class="icon-quiz" href="{{ rescoreRoute }}" data-rescore>Rescore all attempts</a></li>
@@ -37,8 +44,10 @@
                         format: 'html',
                         confirmLabel: 'Rescore',
                         confirmEvent: function() {
-                            $.post('', {
+                            $.post('{{ rescoreRoute }}', {
 
+                            }).done(function() {
+                                window.location.reload();
                             });
                         }
                     });

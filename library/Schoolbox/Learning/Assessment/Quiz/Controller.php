@@ -262,9 +262,25 @@ class Controller extends Assessment\Controller
             }
         }
 
+        /* If you run the Rescore tool, tell users to wait
+         */
+        $hasRescore = false;
+
+        if ($this->getSession()->getSegment(static::class)->getFlash('hasRescore', true)) {
+            // Live run flash msg
+            $hasRescore = true;
+
+            /* Only show that message once, I suppose
+             */
+            $this->getSession()->getSegment(static::class)->setFlash('hasRescore', false);
+        }
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
+            /* Flash message about rescoring
+             */
+            'hasRescore' => $hasRescore,
             /* Quizzes now support Submission States
              * Annoyingly, Submission States are in the $errors array...
              */

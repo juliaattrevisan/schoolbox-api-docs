@@ -210,6 +210,10 @@ class Module extends BaseModule
             $preloadAttempt,
         );
 
+        /* Rescore a particular quiz's attempts
+         */
+        $this->register('POST', '/{assessmentId}/rescore', 'postRescoreAttempts', $instructorPerms, $preloadAssessment);
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
