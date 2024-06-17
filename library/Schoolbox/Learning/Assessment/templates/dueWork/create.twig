@@ -154,30 +154,9 @@
                     <label for="files" class="checkbox-label">Files</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
                 </li>
-                {% if lmsStudentPolicy | length %}
-                {# <li>
-                    <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
-                    <input id="declaration" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getEnablePolicy ? 'checked' : '' }} name="enablePolicy" value="on">
-                    <label for="declaration" class="checkbox-label f-no-margins">Student Authenticity Declaration Terms</label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
-                    </br><aside class="meta l-mar-xl--left"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
-                    <div data-reveal="" role="dialog" id="policyDialog" class="reveal-modal" aria-hidden="true" style="display: none; top: 100px; opacity: 1; visibility: hidden;">
-                        <h2>Authenticity Declaration Terms</h2>
-                        <p>{{ lmsStudentPolicy | purify }}</p>
-                        <a class="close-reveal-modal" data-close aria-label="Close">×</a>
-                        {% if not courseManaged.isReadonly %}
-                        <ul class="flex-list buttons">
-                            <li><a class="button submit" data-accept>Yes, I agree</a></li>
-                            <li><a class="button" data-reject>Cancel</a></li>
-                        </ul>
-                        {% endif %}
-                    </div>
-                </li> #}
-                {% endif %}
             </ul>
             {% if lmsStudentPolicy | length %}
                 <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
-                {# <input id="declaration" {% if courseManaged.isReadonly %} disabled {% endif %} type="checkbox" {{ assessment.getEnablePolicy ? 'checked' : '' }} name="enablePolicy" value="on"> #}
                 <label for="declaration" class="inline-block">Student Authenticity Declaration Terms</label>
                 <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
                 </br><aside class="meta"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
