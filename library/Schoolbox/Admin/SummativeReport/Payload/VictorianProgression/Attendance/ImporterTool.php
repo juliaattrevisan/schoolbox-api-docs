@@ -65,6 +65,14 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --folder
+     *
+     * folder code whose rows you want to process specifically.
+     */
+    private const OPT_LONG_FOLDER = 'folder:';
+
+
+    /**
      * --creator
      *
      * id of user who will have marked and published each feedback.
@@ -88,6 +96,8 @@ class ImporterTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INPUT,
+            self::OPT_LONG_FOLDER,
+            self::OPT_LONG_CREATOR
         ];
     }
 
@@ -166,6 +176,14 @@ HELP;
         $userMapper = \Schoolbox\UserMapper::getInstance();
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
+        /* Folder code restriction
+         */
+        $folderCode = null;
+
+        if ($this->getOpt(self::OPT_LONG_FOLDER)) {
+            $folderCode = trim((string)$this->getOpt(self::OPT_LONG_FOLDER));
+        }
+
         /* This person "created" all the feedbacks and assessments
          */
         if (!$this->getOpt(self::OPT_LONG_CREATOR)) {
@@ -192,6 +210,7 @@ HELP;
             $folderMapper,
             self::ASSESSMENT_TITLE,
             self::ASSESSMENT_SEM1_DATE_PUBLISH,
+            $folderCode,
             $this->getLogger(),
             $this->perform(),
         ))->parseFeedbacks($filename, $creator, $lock);

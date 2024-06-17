@@ -67,8 +67,8 @@ class Processor
      * @param UserMapper $userMapper
      * @param Mapper $folderMapper
      * @param string|null $assessmentTitle
-//     * @param int|null $workType
      * @param string $publishAt
+     * @param string|null $folderCode
      * @param LoggerInterface|null $logger
      * @param bool $perform
      */
@@ -76,8 +76,8 @@ class Processor
         private \Schoolbox\UserMapper $userMapper,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private ?string $assessmentTitle,
-//        private ?int $workType,
         private string $publishAt,
+        private ?string $folderCode,
         private ?LoggerInterface $logger,
         private bool $perform
     ) {
@@ -130,6 +130,20 @@ class Processor
              * If not, skip it
              */
             $folderCode = trim((string)$row[3]);
+
+            /* If we specified a folder code, decide if this matches
+             * If not, skip it
+             */
+            if (null !== $this->folderCode && $folderCode !== $this->folderCode) {
+                $this->logger?->debug(sprintf(
+                    'Row %s: folder code %s does not match requested %s. Skipping',
+                    $i,
+                    $folderCode,
+                    $this->folderCode
+                ));
+
+                continue;
+            }
 
             /* Assume this exists, I guess, for now
              */
