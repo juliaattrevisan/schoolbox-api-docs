@@ -1,92 +1,26 @@
 <?php
 
 /**
- * CSV Importer for Penola's Semester 1, 2024 Attendance data
- *
- * Penola have an Accellerus export that contains feedbacks for particular assessments that
- * circumstantially represent a student's attendance in a class. This imports the feedback
- * into the db.
- *
  * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
+namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\Attendance;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\LockRefreshException;
-use Schoolbox\Application\CliTool;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
-/**
- * CLI Tool
- *
- * Copy this to /tools folder
- *
- * To redirect log output to a file(s):
- *     STDOUT is file descriptor 1
- *     STDERR is file descriptor 2; our logger output ends up going here
- *
- *     Example: php example.php 2> log.txt
- */
-class AttendanceImporterTool extends CliTool\App
+class Processor
 {
-    /**
-     * Make sure to add your locking script to the Lock Inspector tool
-     * const LOCK_NAMES in Inspector.php
-     */
-    public const LOCK_NAME = 'Attendance_PCC_Sem1_2024';
-
-
-    /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 60;
-
-
-    /**
-     * --input
-     *
-     * Path to csv file
-     */
-    private const OPT_LONG_INPUT = 'input:';
-
-
-    /**
-     * --help
-     *
-     * Print help text for those who don't know how to use this tool
-     */
-    private const OPT_LONG_HELP = 'help';
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_INPUT,
-        ];
-    }
-
-
-    /**
-     * This particular assessment needs feedbacks
-     */
-    private const ASSESSMENT_TITLE = 'Attendance Semester 1';
-
-
-    /**
-     * Arbitrarily choose actual dates
-     */
-    private const ASSESSMENT_SEM1_DATE_PUBLISH = '4/05/2023 12:01am';
-
-
     /**
      * Used to find a relationship between a folder and a particular
      * assessment by its title.
@@ -116,18 +50,6 @@ class AttendanceImporterTool extends CliTool\App
 
 
     /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
      * @var \PDOStatement
      */
     private \PDOStatement $assessmentQuery;
@@ -140,89 +62,48 @@ class AttendanceImporterTool extends CliTool\App
 
 
     /**
-     * Run the cli tool
+     * Constructor
+     *
+     * @param UserMapper $userMapper
+     * @param Mapper $folderMapper
+     * @param string|null $assessmentTitle
+//     * @param int|null $workType
+     * @param string $publishAt
+     * @param LoggerInterface|null $logger
+     * @param bool $perform
      */
-    public function run(): void
-    {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-CSV Importer for Penola's Semester 1, 2024 Attendance data
-
-Penola have an Accellerus export that contains feedbacks for particular assessments that
-circumstantially represent a student's attendance in a class. This imports the feedback
-into the db.
-
-Usage: attendanceImport.php --input=path/to/my/file.csv [--perform]
-
-
-HELP;
-            return;
-        }
-
-        /* Decide how loudly to announce lock acquisition failure
-         *
-         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
-         * specifically check for acquisition
-         */
-        try {
-            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
-        } catch (\RuntimeException $e) {
-            return;
-        }
-
-        /* Check input file was specified
-         */
-        $filename = $this->getOpt(self::OPT_LONG_INPUT);
-
-        if (null === $filename) {
-            $this->getLogger()->error('no --input file specified.');
-            exit;
-        }
-
-        $this->getLogger()->info('Script commencing.');
-
-        /* Dependencies
-         */
-        $this->userMapper = \Schoolbox\UserMapper::getInstance();
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-
-        /* This person "created" all the feedbacks and assessments
-         */
-        $creator = $this->userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
-
+    public function __construct(
+        private \Schoolbox\UserMapper $userMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private ?string $assessmentTitle,
+//        private ?int $workType,
+        private string $publishAt,
+        private ?LoggerInterface $logger,
+        private bool $perform
+    ) {
         /* We're going to reuse this a lot
          */
         $this->assessmentQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_ASSESSMENT);
         $this->feedbackQuery = $this->userMapper->getDatabase()->prepare(self::QUERY_FEEDBACK);
-
-        $this->parseFeedbacks($lock, $filename, $creator);
-
-        /* Announce conclusion
-         */
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-        }
-
-        /* Announce lock release
-         */
-        $this->getLogger()->debug('Releasing lock');
-
-        $lock->release();
     }
 
 
     /**
      * Process feedbacks
      *
-     * @param LockInterface $lock
-     * @param string        $filename
-     * @param User          $creator
+     * @param string $filename
+     * @param User $creator
+     * @param LockInterface|null $lock
      * @return void
+     * @throws InvalidColumnException
      * @throws LockRefreshException
+     * @throws \PDOException
      */
-    private function parseFeedbacks(LockInterface $lock, string $filename, \Schoolbox\User $creator): void
-    {
+    public function parseFeedbacks(
+        string $filename,
+        \Schoolbox\User $creator,
+        ?LockInterface $lock
+    ): void {
         /* Load a particular file
          */
         $fp = fopen($filename, 'r');
@@ -234,7 +115,9 @@ HELP;
         /* Maintain a row counter
          */
         for ($i = 2; $row = fgetcsv($fp); ++$i) {
-            $this->refreshLock($lock);
+            if ($lock) {
+                $this->refreshLock($lock);
+            }
 
             /* Process feedbacks
              *     - $creator (Alaress Admin) owns all assessments and feedbacks
@@ -250,7 +133,7 @@ HELP;
 
             /* Assume this exists, I guess, for now
              */
-            $this->getLogger()->debug(sprintf(
+            $this->logger?->debug(sprintf(
                 'Row %s: looking for folder code %s',
                 $i,
                 $folderCode
@@ -259,7 +142,7 @@ HELP;
             try {
                 $folder = $this->folderMapper->findByCode($folderCode);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->getLogger()->warning(sprintf(
+                $this->logger?->warning(sprintf(
                     'Row %s: did not find folder code %s. Skipping',
                     $i,
                     $folderCode
@@ -278,7 +161,7 @@ HELP;
             try {
                 $student = $this->userMapper->findByExternalId($externalId);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->getLogger()->warning(sprintf(
+                $this->logger?->warning(sprintf(
                     'Row %s: student %s not found; skipping',
                     $i,
                     $externalId
@@ -290,7 +173,7 @@ HELP;
             /* Then find the assessment's corresponding submission box id
              */
             $this->assessmentQuery->execute([
-                'title' => self::ASSESSMENT_TITLE,
+                'title' => $this->assessmentTitle,
                 'folderId' => $folder->getId()
             ]);
 
@@ -301,7 +184,7 @@ HELP;
             /* For some reason this homepage doesn't have the assessment set up
              */
             if (null === $boxId) {
-                $this->getLogger()->warning(sprintf(
+                $this->logger?->warning(sprintf(
                     'Row %s: unknown submission_box for assessment in folder %s (%s)',
                     $i,
                     $folder->getTitle(),
@@ -321,7 +204,7 @@ HELP;
 
             /* Slam in a new submission_return
              */
-            $this->getLogger()->debug(sprintf(
+            $this->logger?->debug(sprintf(
                 'Row %s: preparing attendance score %s (%s) for student %s in folder %s',
                 $i,
                 $humanReadableMark,
@@ -330,7 +213,7 @@ HELP;
                 $folderCode
             ));
 
-            if ($this->perform()) {
+            if ($this->perform) {
                 $this->feedbackQuery->execute([
                     'boxId' => $boxId,
                     'marker' => $creator->getId(),
@@ -341,13 +224,13 @@ HELP;
                     'normMark' => $normalisedMark,
                     'resubmissionRequired' => 0,
                     'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
-                    'publishedAt' => self::ASSESSMENT_SEM1_DATE_PUBLISH,
+                    'publishedAt' => $this->publishAt,
                     'publishedBy' => $creator->getId(),
                     'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
                 ]);
             }
 
-            $this->getLogger()->info(sprintf(
+            $this->logger?->info(sprintf(
                 'Row %s: added attendance score %s (%s) for student %s in folder %s (%s)',
                 $i,
                 $humanReadableMark,
@@ -363,15 +246,23 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
+     * An alias to refresh a lock but captures the exception thrown
+     * when a lock expires
      *
-     * @return bool|null
+     * @param LockInterface $lock
+     * @return void
+     * @throws LockRefreshException
      */
-    public function runAsRoot(): ?bool
+    protected function refreshLock(LockInterface $lock): void
     {
-        return parent::runAsRoot();
+        try {
+            $lock->refresh();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $message = 'Could not refresh lock; perhaps expired';
+
+            $this->logger?->warning($message);
+
+            throw new LockRefreshException($message);
+        }
     }
 }
