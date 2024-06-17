@@ -259,7 +259,7 @@ HELP;
             $publishAt = trim((string)$this->getOpt(self::OPT_LONG_PUBLISH_AT));
         }
 
-        /* TODO add Work Type as another means by which to identify assessments
+        /* This can be ported to the ui version with null and true in place of logger, perform and lock.
          */
         (new Processor(
             $userMapper,
