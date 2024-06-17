@@ -232,11 +232,7 @@ HELP;
 
         /* This person "created" all the feedbacks and assessments
          */
-        if (!$this->getOpt(self::OPT_LONG_CREATOR)) {
-            /* We can assume this guy always exists
-             */
-            $creator = $userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
-        } else {
+        if ($this->getOpt(self::OPT_LONG_CREATOR)) {
             $userId = (int)$this->getOpt(self::OPT_LONG_CREATOR);
 
             try {
@@ -249,6 +245,10 @@ HELP;
 
                 return;
             }
+        } else {
+            /* We can assume this guy always exists
+             */
+            $creator = $userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
         }
 
         /* Specify a publish date
