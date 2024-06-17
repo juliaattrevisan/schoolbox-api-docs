@@ -221,6 +221,8 @@ HELP;
         /* This person "created" all the feedbacks and assessments
          */
         if (!$this->getOpt(self::OPT_LONG_CREATOR)) {
+            /* We can assume this guy always exists
+             */
             $creator = $userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
         } else {
             $userId = (int)$this->getOpt(self::OPT_LONG_CREATOR);
