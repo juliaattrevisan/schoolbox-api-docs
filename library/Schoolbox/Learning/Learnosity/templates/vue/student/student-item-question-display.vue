@@ -3,6 +3,7 @@
  * Contains a students response to a question and will save the score if updated
  */
 
+import sanitizeHtml from "sanitize-html";
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { removeClasses } from "@js/util/cssUtils";
