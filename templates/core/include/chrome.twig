@@ -347,7 +347,7 @@
                         </li>
                         <li id="pwaPrompt" class="content">
                             {% include '@notifications/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
-                            <a id="installDelayPrompt" href="#">Later</a>
+                            <a id="installDelayPrompt" class="button load-more expand" href="#">Later</a>
                         </li>
                         <li>
                             <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
@@ -588,11 +588,18 @@
 
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('disabled', true);
+                                document.querySelector('#enableNotifPrompt').remove();
+
                             });
 
                             document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
                                 element.remove();
                             });
+
+                            const notifElement = document.querySelector('[data-pwa="notifEnabledMessage"]');
+                            if (notifElement) {
+                                notifElement.style.display = 'block';
+                            }
                         } else if (Notification.permission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
@@ -618,6 +625,11 @@
                                     window.localStorage.setItem("notification", "requesting");
                                     document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                         element.setAttribute('disabled', true);
+                                        document.querySelector('#enableNotifPrompt').remove();
+                                        const notifElement = document.querySelector('[data-pwa="notifEnabledMessage"]');
+                                        if (notifElement) {
+                                            notifElement.style.display = 'block';
+                                        }
                                     });
 
                                     {% if config.debug_mode %}
