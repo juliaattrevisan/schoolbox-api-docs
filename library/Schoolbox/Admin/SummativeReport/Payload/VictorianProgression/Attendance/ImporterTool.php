@@ -65,6 +65,14 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --creator
+     *
+     * id of user who will have marked and published each feedback.
+     */
+    private const OPT_LONG_CREATOR = 'creator:';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -148,7 +156,7 @@ HELP;
 
         if (null === $filename) {
             $this->getLogger()->error('no --input file specified.');
-            exit;
+            return;
         }
 
         $this->getLogger()->info('Script commencing.');
@@ -160,7 +168,22 @@ HELP;
 
         /* This person "created" all the feedbacks and assessments
          */
-        $creator = $userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
+        if (!$this->getOpt(self::OPT_LONG_CREATOR)) {
+            $creator = $userMapper->findOneByColumn('username', \Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
+        } else {
+            $userId = (int)$this->getOpt(self::OPT_LONG_CREATOR);
+
+            try {
+                $creator = $userMapper->findById($userId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->getLogger()->error(sprintf(
+                    'Creator user id %s not found. Exiting.',
+                    $userId
+                ));
+
+                return;
+            }
+        }
 
         /* TODO add Work Type as another means by which to identify assessments
          */
