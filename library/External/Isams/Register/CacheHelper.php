@@ -235,7 +235,7 @@ class CacheHelper
             // This ought to be cacheable for a lot longer than student data
             try {
                 $metadata = $this->api->request(
-                    '/Main/api/registers/' . $registerId . '/metadata',
+                    '/Main/api/registers/' . $registerId . '/metadata?expand=groups',
                     'GET',
                     token: $this->getToken(),
                 );
