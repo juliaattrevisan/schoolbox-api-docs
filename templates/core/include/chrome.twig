@@ -596,7 +596,10 @@
                                 element.remove();
                             });
 
-                            document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
+                            const notifElement = document.querySelector('[data-pwa="notifEnabledMessage"]');
+                            if (notifElement) {
+                                notifElement.style.display = 'block';
+                            }
                         } else if (Notification.permission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
@@ -623,7 +626,10 @@
                                     document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                         element.setAttribute('disabled', true);
                                         document.querySelector('#enableNotifPrompt').remove();
-                                        document.querySelector('[data-pwa="notifEnabledMessage"]').style.display = 'block';
+                                        const notifElement = document.querySelector('[data-pwa="notifEnabledMessage"]');
+                                        if (notifElement) {
+                                            notifElement.style.display = 'block';
+                                        }
                                     });
 
                                     {% if config.debug_mode %}
