@@ -91,6 +91,14 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --publish
+     *
+     * Choose a publish date for the feedbacks: e.g. 4/05/2023 12:01am
+     */
+    private const OPT_LONG_PUBLISH_AT = 'publish:';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -109,6 +117,7 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_WORKTYPE,
             self::OPT_LONG_FOLDER,
             self::OPT_LONG_CREATOR,
+            self::OPT_LONG_PUBLISH_AT,
             self::OPT_LONG_HELP
         ];
     }
@@ -242,6 +251,14 @@ HELP;
             }
         }
 
+        /* Specify a publish date
+         */
+        $publishAt = self::ASSESSMENT_SEM1_DATE_PUBLISH;
+
+        if ($this->getOpt(self::OPT_LONG_PUBLISH_AT)) {
+            $publishAt = trim((string)$this->getOpt(self::OPT_LONG_PUBLISH_AT));
+        }
+
         /* TODO add Work Type as another means by which to identify assessments
          */
         (new Processor(
@@ -249,7 +266,7 @@ HELP;
             $folderMapper,
             $title,
             $workTypeId,
-            self::ASSESSMENT_SEM1_DATE_PUBLISH,
+            $publishAt,
             $folderCode,
             $this->getLogger(),
             $this->perform(),
