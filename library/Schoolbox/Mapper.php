@@ -860,6 +860,7 @@ abstract class Mapper implements IMapper
         string $parentField = 'parent',
         string $childField = 'children',
     ): Collection {
+        $collection = $collection->deepClone(); // Do not mutate objects in the supplied collection.  Doing so will introduce subtle bugs.
         $treeList = $collection->emptyClone();
 
         // Process $collection into a tree list.
