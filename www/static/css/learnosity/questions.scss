@@ -1,6 +1,6 @@
 /* avoid the horizontal scroll on the questions container that's somehow being applied */
 .lrn_widget.lrn_mcq .lrn_mcqgroup {
-    overflow-x: visible;
+    overflow-x: hidden;
 }
 
 /* reset the radio and checkboxes to default */
@@ -13,13 +13,13 @@
     width: auto;
 }
 
-/*the color used to highlight the selceted item  */
+/*the color used to highlight the selected item  */
 .lrn_widget .lrn_valid,
 .lrn_widget .lrn_selected {
     background-color: var(--content-ui-selected);
 }
 
-/*the color used to highlight the selceted item in the mutiplechoice-block layout */
+/*the color used to highlight the selected item in the mutiplechoice-block layout */
 .lrn_widget.lrn_mcq .lrn_response .lrn_mcqgroup-block .lrn-mcq-option.lrn_selected .lrn-label {
     background-color: var(--content-ui-selected);
 }
@@ -32,7 +32,7 @@
     border-left-color: var(--content-ui-foreground);
 }
 
-/* update the drag item border color to  content-ui-foreground in Cloze with drago & drop */
+/* update the drag item border color to  content-ui-foreground in Cloze with drag & drop */
 .lrn_widget .lrn_btn_drag {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
@@ -42,7 +42,9 @@
 .lrn_widget .lrn_btn_drag.lrn_focus,
 .lrn_widget .lrn_btn_sort:focus,
 .lrn_widget .lrn_btn_sort.lrn_focus {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px #fff,
+    box-shadow:
+        inset 0 0 0 1px var(--content-ui-foreground),
+        inset 0 0 0 1px #fff,
         inset 0 0 0 1px var(--content-ui-foreground);
 }
 
@@ -98,7 +100,9 @@
 .lrn_widget .lrn_btn_sort.lrn_focus.lrn_active,
 .lrn_widget .lrn_btn_sort.lrn_focus:active,
 .lrn_widget .lrn_btn_sort:focus.lrn_active {
-    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 3px #fff;
+    box-shadow:
+        inset 0 0 0 1px var(--content-ui-selected),
+        inset 0 0 0 3px #fff;
 }
 
 /* updated the drop down styles*/
@@ -185,7 +189,9 @@
 .lrn_widget .lrn_btn_sort.lrn_focus.lrn_hover,
 .lrn_widget .lrn_btn_sort.lrn_focus:hover,
 .lrn_widget .lrn_btn_sort:focus.lrn_hover {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 1px var(--content-ui-foreground);
+    box-shadow:
+        inset 0 0 0 1px var(--content-ui-foreground),
+        inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn .lrn_btn_sort {
     color: #000;
@@ -407,13 +413,18 @@ button.lrn_btn.lrn_volume-high.lrn_volume_btn {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton:focus {
-    box-shadow: inset 0 0 0 1px var(--content-ui-selected), inset 0 0 0 1px #fff, inset 0 0 0 4px #1877b1;
+    box-shadow:
+        inset 0 0 0 1px var(--content-ui-selected),
+        inset 0 0 0 1px #fff,
+        inset 0 0 0 4px #1877b1;
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton {
     box-shadow: inset 0 0 0 1px var(--content-ui-foreground);
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active:focus {
-    box-shadow: inset 0 0 0 1px var(--content-ui-foreground), inset 0 0 0 3px #fff;
+    box-shadow:
+        inset 0 0 0 1px var(--content-ui-foreground),
+        inset 0 0 0 3px #fff;
 }
 .lrn_widget.lrn_rating .lrn_response .lrn_buttonGroup .lrn_ratingButton.lrn_active {
     background-color: var(--content-ui-selected);
