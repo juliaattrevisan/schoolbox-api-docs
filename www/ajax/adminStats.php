@@ -345,6 +345,7 @@ switch ($_POST['module']) {
         $connector  = new Schoolbox\Learning\InlineGrader\Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
             $config->get('kami_enabled'),
+            $config->get('kami_api_host'),
             $config->get('kami_api_key'),
             $config->get('site_school_code')
         );

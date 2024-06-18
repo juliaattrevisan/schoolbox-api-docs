@@ -20,8 +20,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
  */
 class MockConnector extends Kami\Connector
 {
-
-    public const BASE_URI = 'https://private-anon-0f1d6499dd-kamiembeddingapi.apiary-mock.com/';
+    public const DEFAULT_BASE_URI = 'https://private-anon-0f1d6499dd-kamiembeddingapi.apiary-mock.com/';
 
 
     /**
@@ -29,7 +28,7 @@ class MockConnector extends Kami\Connector
      */
     public function __construct(ClientInterface $client)
     {
-        parent::__construct($client, true, 'EXAMPLE_API_KEY', 'TESTING');
+        parent::__construct($client, true, static::DEFAULT_BASE_URI, 'EXAMPLE_API_KEY', 'TESTING');
     }
 
 

@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -22,7 +21,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\InlineGrader\Kami\Exception;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
@@ -37,7 +35,7 @@ class Connector implements IConnector
 {
     // Intentional trailing slash (@see http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client)
     // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
-    public const BASE_URI = 'https://api.notablepdf.com/';
+    public const DEFAULT_BASE_URI = 'https://api.notablepdf.com/';
 
     public const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
     public const PATH_LIST_DOCUMENTS = 'embed/documents';
@@ -51,8 +49,8 @@ class Connector implements IConnector
     public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
     public const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn on to document. Useful for printing.
 
-    /** @var Client */
-    private $client;
+    /** @var ClientInterface */
+    private ClientInterface $client;
 
     /** @var bool */
     private bool $enabled;
@@ -79,8 +77,13 @@ class Connector implements IConnector
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
      */
-    public function __construct(ClientInterface $client, ?bool $enabled, #[SensitiveParameter] ?string $apiKey, ?string $siteSchoolCode)
-    {
+    public function __construct(
+        ClientInterface $client,
+        ?bool $enabled,
+        private string $apiHost,
+        #[SensitiveParameter] ?string $apiKey,
+        ?string $siteSchoolCode,
+    ) {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
         $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
@@ -384,7 +387,7 @@ class Connector implements IConnector
     public function getExport(string $exportId): Export
     {
         $this->assertEnabled();
-        $request  = new Request('GET', self::BASE_URI . "embed/exports/$exportId");
+        $request  = new Request('GET', $this->apiHost . "embed/exports/$exportId");
         $response = $this->client->send($request, $this->getOptions());
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $exportId", $request, $response);
@@ -411,7 +414,7 @@ class Connector implements IConnector
                 'export_type'         => $exportType,
             ]),
         ];
-        $request  = new Request('POST', self::BASE_URI . 'embed/exports');
+        $request  = new Request('POST', $this->apiHost . 'embed/exports');
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
@@ -678,7 +681,7 @@ class Connector implements IConnector
         return [
             RequestOptions::HEADERS     => $this->getHeaderAuthorisation(),
             RequestOptions::HTTP_ERRORS => false,
-            'base_uri'                  => static::BASE_URI,
+            'base_uri'                  => $this->apiHost,
         ];
     }
 
@@ -822,7 +825,7 @@ class Connector implements IConnector
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
             RequestOptions::BODY    => \GuzzleHttp\Utils::jsonEncode($body),
         ];
-        $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
+        $request  = new Request('POST', $this->apiHost . 'embed/sessions');
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);

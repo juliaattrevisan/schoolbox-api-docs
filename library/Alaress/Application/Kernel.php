@@ -1661,6 +1661,7 @@ abstract class Kernel
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'         => $di->lazyGet('httpClient'),
             'enabled'        => $config->get('kami_enabled'),
+            'apiHost'        => $config->get('kami_api_host'),
             'apiKey'         => $config->get('kami_api_key'),
             'siteSchoolCode' => $config->get('site_school_code'),
         ]));
