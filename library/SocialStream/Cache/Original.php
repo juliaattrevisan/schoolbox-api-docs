@@ -21,7 +21,6 @@ use SocialStream_Post_Abstract;
  */
 class Original extends \Alaress_Cache_Abstract
 {
-
     /**
      * Whether the given url was fopen'd successfully
      *
