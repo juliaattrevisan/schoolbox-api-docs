@@ -21,7 +21,6 @@ use SocialStream_Post_Abstract;
  */
 class Original extends \Alaress_Cache_Abstract
 {
-
     /**
      * Whether the given url was fopen'd successfully
      *
@@ -161,8 +160,12 @@ class Original extends \Alaress_Cache_Abstract
         $streamHandle = @fopen($url, 'r');
 
         if ($streamHandle) {
+            // Remove any query string from the url,
+            // but only after we've retrieved it in case some parts of the query were necessary
+            $baseName = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME);
+
             $smapper = Storage\Mapper::getInstance();
-            $storage = $smapper->acceptStream(pathinfo($url, PATHINFO_BASENAME), $streamHandle, true);
+            $storage = $smapper->acceptStream($baseName, $streamHandle, true);
 
             $this->post->setCacheHash($storage->getHash());
 
