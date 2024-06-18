@@ -148,10 +148,14 @@
                 </p>
             </div>
             {% if participant.allResponses | length %}
-                {% if latestResponse.submitted %}
+                {% if latestResponse.submitted and latestResponse.learnosityReference %}
                     <div class="txt">
                     <p>Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong></p>
                     {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+                    </div>
+                {% elseif latestResponse.submitted %}
+                    <div class="txt">
+                    <p>Published <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time></p>
                     </div>
                 {% endif %}
 
@@ -213,8 +217,8 @@
         {% set canPublish = latestResponse and latestResponse.submitted %}
         {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
-        {# Always show an action row since you can always spawn a rando feedback now #}
-        {% set actionStyle = '' %}
+        {# Only show if there's an existing learnosity attempt, otherwise we'll show when there's a change to grade/comment #}
+        {% set actionStyle = latestResponse.learnosityReference ?? null ? 'display: block' : 'display: none' %}
 
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
@@ -248,7 +252,7 @@
                 {% endif %}
 
                 {# You can always publish a new feedback...even if the student never attempted it #}
-                <a class="button" data-interaction-publish="" href="#">Publish</a>
+                <a class="button" data-draft="publish" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
             {% endset %}
         {% endapply %}
 
@@ -375,15 +379,13 @@
         $(function() {
             var $participantList  = $('#assessment-status');
 
+            /**
+            * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
+            * We circumvent the draft state by showing the 'Save and Publish' button immediately and abort the saving of a draft state.
+            */
             $.fn.dynamicFeedback({
-                onPreDraftCallback: function () {
-                },
-                onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-                },
-                onPrePublishCallback: function () {
-                },
-                onPublishCallback: function (userId) {
-                }
+                isQuiz: true,
+                publishText: "Save and Publish",
             });
 
             {# Mass review submitted but unreviewed quiz attempts #}

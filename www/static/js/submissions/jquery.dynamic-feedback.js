@@ -100,6 +100,12 @@
                 onDraftCallback: $.noop,
                 onPrePublishCallback: $.noop,
                 onPublishCallback: $.noop,
+
+                /**
+                 * Currently quiz does not support a draft state, so any changes to grade/comment is published when a 'Save and Publish' button is selected instead.
+                 * We circumvent the draft state by showing the 'Save and Publish' button immediately and abort the saving of a draft state.
+                 */
+                isQuiz: false,
             };
 
             return $.extend(defaults, options);
@@ -304,6 +310,21 @@
         function timeoutUpdate() {
             var $input = $(this);
 
+            /**
+             * If this is a quiz, we don't want to save drafts, but instead provide the option
+             * to publish the feedback on change immediately.
+             * So show the action bar and ensure the publish button is enabled, as it'll typically
+             * only be enabled if the draft has been saved otherwise.
+             */
+            if (config.isQuiz) {
+                const $participant = findParticipantElement($input);
+                const $actionBar = $participant.find("[data-action-bar]");
+                $actionBar.slideDown();
+                const $btnPublish = $actionBar.find("[data-draft=publish]");
+                $btnPublish.removeAttr("disabled");
+                return;
+            }
+
             // Comment box elements have this name attribute
             var elementIsCommentBox = $input.attr("name") === "comment";
 
@@ -437,7 +458,7 @@
                         $participant.data("participant"),
                         response.success,
                         response.message,
-                        response.id
+                        response.id,
                     );
                 })
                 .fail(function (xhr) {
