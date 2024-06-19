@@ -1599,8 +1599,6 @@ abstract class Kernel
                             'assessmentDataSource'    => $di->lazyGet('assessmentDataSource'),
                         ]
                     ),
-                    'kamiConnector'            => $di->lazyGet('kamiConnector'),
-                    'filesystemProxy'          => $di->lazyGet('filesystem.storageProxy'),
                 ]
             )
         );

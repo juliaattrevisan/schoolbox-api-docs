@@ -24,13 +24,11 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use UnexpectedValueException;
 
@@ -64,8 +62,6 @@ class Transactor
      * @param Generator                      $routeGenerator
      * @param Replicator                     $replicator
      * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
-     * @param Kami\Connector                 $kamiConnector
-     * @param FilesystemProxy                $filesystemProxy
      */
     public function __construct(
         private FolderMapper $folderMapper,
@@ -78,8 +74,6 @@ class Transactor
         private Generator $routeGenerator,
         private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
-        private Kami\Connector $kamiConnector,
-        private FilesystemProxy $filesystemProxy,
     ) {
     }
 
