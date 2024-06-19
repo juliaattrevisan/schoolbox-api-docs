@@ -34,6 +34,17 @@ class Mapper extends BaseMapper
         $this->hasTable('kami_upload');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses(
+            'type',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION,
+                Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE,
+                Model::TYPE_STUDENT_SUBMISSION_WORKSHEET,
+            ],
+        );
         $this->joins('student_submission_file_id', SingleFile\Mapper::class, 'id', null, null, null, 'file');
         $this->joins(
             'worksheet_template_submission_box_id',
