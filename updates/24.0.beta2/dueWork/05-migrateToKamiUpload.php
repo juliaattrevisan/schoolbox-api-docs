@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Exception as DatabaseException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Database\Factory as DatabaseFactory;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -20,7 +21,13 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $insertIntoKamiUpload = $this->getDatabaseInternal()->prepareQuery('
+        // For now, ensure that all queries are against write database.
+        /** @var DatabaseFactory $databaseFactory */
+        $databaseFactory = $this->getDi()->get('databaseFactory');
+        $dbConnection    = $databaseFactory->getInternalWriteDatabase();
+
+        // Prepare queries
+        $insertIntoKamiUpload = $dbConnection->prepareQuery('
             INSERT INTO kami_upload (
                 kami_document_id,
                 status,
@@ -39,15 +46,15 @@ $app = new class extends CliTool\App {
                 :deletedAt
             )
         ');
-        $selectExistingKamiUploadId = $this->getDatabaseInternal()->prepareQuery('
+        $selectExistingKamiUploadId = $dbConnection->prepareQuery('
             SELECT id FROM kami_upload WHERE kami_document_id = :kamiDocumentId
         ');
-        $setStudentSubmissionFileKamiUploadId = $this->getDatabaseInternal()->prepareQuery('
+        $setStudentSubmissionFileKamiUploadId = $dbConnection->prepareQuery('
             UPDATE student_submission_file_kami
             SET kami_upload_id = :kamiUploadId
             WHERE id = :id
         ');
-        $selectFromStudentSubmissionFile = $this->getDatabaseInternal()->executeQuery('
+        $selectFromStudentSubmissionFile = $dbConnection->executeQuery('
             SELECT * FROM student_submission_file_kami WHERE kami_upload_id IS NULL
         ');
         $this->getLogger()->info(
