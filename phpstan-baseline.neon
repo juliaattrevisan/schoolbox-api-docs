@@ -5941,38 +5941,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setKamiInteractive\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getKamiInteractive\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setKamiInteractive\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getKamiInteractive\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setKamiFile\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getKamiFile\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setKamiFile\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getKamiFile\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setEnableOffline\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
