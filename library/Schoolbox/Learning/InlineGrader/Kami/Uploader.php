@@ -280,7 +280,7 @@ class Uploader
                 // Annotation: upload as document
                 if ($kamiModel->getType() === Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION) {
                     return $this->kamiConnector->uploadDocument(
-                        $kamiModel->getStorage(),
+                        $kamiModel->getStudentSubmissionFile()->getStorage(),
                         $this->filesystemProxy,
                     );
                 }
@@ -288,7 +288,7 @@ class Uploader
                 // Worksheet template: upload as template
                 if ($kamiModel->getType() === Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE) {
                     return $this->kamiConnector->uploadDocumentAsTemplate(
-                        $kamiModel->getStorage(),
+                        $kamiModel->getWorksheetTemplateSubmissionBox()->getKamiFile(),
                         $this->filesystemProxy,
                     );
                 }
@@ -352,12 +352,23 @@ class Uploader
      */
     private function logStartingUpload(UploadResults $results, int $kamiCount, Model $kamiModel): void
     {
+        switch ($kamiModel->getType()) {
+            case Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION:
+                $filename = $kamiModel->getStudentSubmissionFile()->getStorage()->getBasename();
+                break;
+            case Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE:
+                $filename = $kamiModel->getWorksheetTemplateSubmissionBox()->getKamiFile()->getBasename();
+                break;
+            default:
+                // Don't know how to log this yet
+                return;
+        }
         $this->log->notice(sprintf(
             "Uploading %d of %d. id: %d, filename: '%s'",
             $results->getCountTotal() + 1,
             $kamiCount,
             $kamiModel->getId(),
-            $kamiModel->getStorage()->getBasename()
+            $filename,
         ));
     }
 
