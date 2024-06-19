@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
@@ -134,6 +135,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * Document ID of any Kami document attached to this due work.
      */
     protected ?string $kamiInteractiveDocumentId = null;
+
+    /**
+     * Model for storing a Kami document representation of this due work's
+     * worksheet template.
+     */
+    protected ?KamiModel $kamiWorksheetTemplate;
 
     /**
      * @var bool
@@ -982,6 +989,27 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $this->kamiInteractiveDocumentId = $kamiInteractiveDocumentId;
         return $this;
     }
+
+
+    /**
+     * @return KamiModel|null
+     */
+    public function getKamiWorksheetTemplate(): ?KamiModel
+    {
+        return $this->kamiWorksheetTemplate;
+    }
+
+
+    /**
+     * @param KamiModel|null $kamiWorksheetTemplate
+     * @return $this
+     */
+    public function setKamiWorksheetTemplate(?KamiModel $kamiWorksheetTemplate): self
+    {
+        $this->kamiWorksheetTemplate = $kamiWorksheetTemplate;
+        return $this;
+    }
+
 
     /**
      * @return Storage\Model|null

@@ -61,7 +61,16 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
         $this->joins('kami_interactive_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
+
+        // Join onto Kami document
+        $this->joinsReverseSingle(
+            'worksheet_template_submission_box_id',
+            Schoolbox\Learning\InlineGrader\Kami\Mapper::class,
+            'kamiWorksheetTemplate',
+            'kamiWorksheetTemplate',
+        );
         $this->uses('kami_interactive_document_id', self::TYPE_STRING);
+
         $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
@@ -140,7 +149,8 @@ class SubmissionBoxMapper extends BaseMapper
                    {$this->getJoinColumnString('assessmentModel', 'am')},
                    {$this->getJoinColumnString('owner', 'o')},
                    {$this->getJoinColumnString('kamiFile', 'kf')},
-                   {$this->getJoinColumnString('kamiFile.allowedFileExtension', 'kfs')}
+                   {$this->getJoinColumnString('kamiFile.allowedFileExtension', 'kfs')},
+                   {$this->getJoinColumnString('kamiWorksheetTemplate', 'kamiWorksheetTemplate')}
         ";
     }
 
@@ -156,6 +166,7 @@ class SubmissionBoxMapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
             LEFT  JOIN {$this->getJoinSql('kamiFile', '', 'kf', true)}
             LEFT  JOIN {$this->getJoinSql('kamiFile.allowedFileExtension', 'kf', 'kfs', true)}
+            LEFT  JOIN {$this->getJoinSql('kamiWorksheetTemplate', '', 'kamiWorksheetTemplate', true)}
         ";
     }
 
