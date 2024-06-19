@@ -114,7 +114,7 @@ class AssessmentAudit
         unit_imp_folder.deleted_at, course_imp_spec_folder.deleted_at,
         course_spec_folder.deleted_at), true, false) as 'parentDeleted',
 
-        submission_box.kami_interactive as 'kami_interactive',
+        submission_box.enable_worksheet as 'enable_worksheet',
         submission_box.enable_offline as 'enable_offline',
         submission_box.enable_text as 'enable_text',
         submission_box.enable_files as 'enable_files',
@@ -210,8 +210,8 @@ class AssessmentAudit
             // Submission Options
             $submissionOptions = [];
 
-            if (1 === $row['kami_interactive']) {
-                $submissionOptions[] = 'kami_interactive';
+            if (1 === $row['enable_worksheet']) {
+                $submissionOptions[] = 'worksheet';
             }
             if (1 === $row['enable_offline']) {
                 $submissionOptions[] = 'offline';
