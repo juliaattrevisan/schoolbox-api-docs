@@ -216,15 +216,15 @@ class Factory
              * new due work checks, this is an array, so we can use frontend validation to confirm if we have selected at least one of these options...
              * firstly clear all the values, and set TRUE to only those that are set.
              */
-            $this->setKamiInteractive(false);
+            $this->setEnableWorksheet(false);
             $this->setEnableOffline(false);
             $this->setEnableText(false);
             $this->setEnableFiles(false);
             foreach ($post['submissionOptions'] as $subOption) {
                 $value = trim($subOption ?? '');
                 switch ($value) {
-                    case 'kamiInteractive':
-                        $this->setKamiInteractive(true);
+                    case 'enableWorksheet':
+                        $this->setEnableWorksheet(true);
                         break;
                     case 'enableOffline':
                         $this->setEnableOffline(true);
@@ -432,7 +432,7 @@ class Factory
                     $this->getMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
-                    $this->getKamiInteractive(),
+                    $this->getEnableWorksheet(),
                     $this->getKamiFile(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),
@@ -454,7 +454,7 @@ class Factory
                     $this->getAttachedFiles(),
                     $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
-                    $this->getKamiInteractive(),
+                    $this->getEnableWorksheet(),
                     $this->getKamiFile(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),

@@ -132,10 +132,10 @@
             <ul class="option-list">
                 {% if kami_enabled %}
                 <li>
-                    <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getKamiInteractive ? 'checked' : '' }} name="submissionOptions[]" value="kamiInteractive" data-type-group>
+                    <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
-                    <div id="worksheetDropzone" {{ assessment.getKamiInteractive ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
+                    <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
                 </li>
                 {% endif %}

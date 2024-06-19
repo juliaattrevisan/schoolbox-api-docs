@@ -63,7 +63,7 @@ class Decorator implements DecoratorInterface
      * @param array        $attachedFiles
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
-     * @param bool         $kamiInteractive
+     * @param bool         $enableWorksheet
      * @param string|null  $kamiFile
      * @param bool         $enableOffline
      * @param bool         $enableText
@@ -84,7 +84,7 @@ class Decorator implements DecoratorInterface
         array $attachedFiles,
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
-        bool $kamiInteractive,
+        bool $enableWorksheet,
         ?string $kamiFile,
         bool $enableOffline,
         bool $enableText,
@@ -104,7 +104,7 @@ class Decorator implements DecoratorInterface
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
-        $this->setKamiInteractive($kamiInteractive);
+        $this->setEnableWorksheet($enableWorksheet);
         $this->setKamiFile($kamiFile);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
@@ -254,7 +254,7 @@ class Decorator implements DecoratorInterface
          */
         if (
             $this->original && !(
-                $this->getKamiInteractive() ||
+                $this->getEnableWorksheet() ||
                 $this->getEnableOffline() ||
                 $this->getEnableText() ||
                 $this->getEnableFiles()
@@ -268,7 +268,7 @@ class Decorator implements DecoratorInterface
             $assessment->setEnableFiles($this->original->getEnableFiles());
             $assessment->setEnablePolicy($this->original->getEnablePolicy());
         } else {
-            $assessment->setEnableWorksheet($this->getKamiInteractive());
+            $assessment->setEnableWorksheet($this->getEnableWorksheet());
             if ($this->getKamiFile()) {
                 // Rebuild worksheet files list
                 $factory     = new CollectorFactory();

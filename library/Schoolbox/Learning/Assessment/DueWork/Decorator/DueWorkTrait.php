@@ -87,7 +87,7 @@ trait DueWorkTrait
     /**
      * @var bool
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
      * @var string|null
@@ -313,21 +313,21 @@ trait DueWorkTrait
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**
