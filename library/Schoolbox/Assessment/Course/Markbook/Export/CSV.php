@@ -241,7 +241,8 @@ class CSV extends AbstractCSV
             }
         }
         if (!isset($mark)) {
-            return $row;
+            //Make sure to fill in space if mark is not published
+            return $this->appendData($row, $assessment, '');
         }
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $mark['hr'];
