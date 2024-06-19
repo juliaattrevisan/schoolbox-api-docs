@@ -59,7 +59,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('late_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
-        $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
+        $this->uses('enable_worksheet', self::TYPE_BOOLEAN, null, 'enableWorksheet');
         $this->joins('kami_interactive_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
 
         // Join onto Kami document
