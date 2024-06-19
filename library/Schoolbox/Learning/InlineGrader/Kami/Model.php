@@ -146,9 +146,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return SingleFile\Model
+     * @return SingleFile\Model|null
      */
-    public function getStudentSubmissionFile(): SingleFile\Model
+    public function getStudentSubmissionFile(): ?SingleFile\Model
     {
         return $this->studentSubmissionFile;
     }
