@@ -90,13 +90,12 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('file', 'f')},
                 {$this->getJoinColumnString('file.storage', 's')},
                 {$this->getJoinColumnString('worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox')},
-                {$this->getJoinColumnString('worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBoxStorage')},
-
+                {$this->getJoinColumnString('worksheetTemplateSubmissionBox.kamiFile', 'worksheetTemplateSubmissionBoxKamiFile')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('file', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('file.storage', 'f', 's', true)}
             LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox', '', 'worksheetTemplateSubmissionBox', true)}
-            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBoxStorage', true)}
+            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox.kamiFile', 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBoxKamiFile', true)}
         ";
     }
 
@@ -127,7 +126,7 @@ class Mapper extends BaseMapper
             /** @var ?SubmissionBox $submissionBox */
             $submissionBox = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox');
             /** @var ?Storage\Model $submissionBoxStorage */
-            $submissionBoxStorage = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBoxStorage');
+            $submissionBoxStorage = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox.kamiFile', 'worksheetTemplateSubmissionBoxKamiFile');
             if ($submissionBoxStorage) {
                 $submissionBox?->setKamiFile($this->hydrateJoin($row, 'file.storage', 's'));
             }
