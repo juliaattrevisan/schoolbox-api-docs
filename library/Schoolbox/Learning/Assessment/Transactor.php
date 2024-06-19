@@ -121,6 +121,7 @@ class Transactor
         //      `$originalAssessment` references the assessment from which
         //      `$assessment` was copied, not the pre-save state of the
         //      assessment.
+        // see \Schoolbox\Learning\Assessment\DueWork\Controller::enqueueKamiUploads
         if (
             $this->assessment instanceof DueWork\Model
             && $this->assessment->getKamiInteractive()
