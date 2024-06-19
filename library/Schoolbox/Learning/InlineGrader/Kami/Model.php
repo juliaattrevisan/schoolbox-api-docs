@@ -155,10 +155,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param SingleFile\Model $studentSubmissionFile
+     * @param SingleFile\Model|null $studentSubmissionFile
      * @return $this|self
      */
-    public function setStudentSubmissionFile(SingleFile\Model $studentSubmissionFile): self
+    public function setStudentSubmissionFile(?SingleFile\Model $studentSubmissionFile): self
     {
         $this->studentSubmissionFile = $studentSubmissionFile;
         return $this;
