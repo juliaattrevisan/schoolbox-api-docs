@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
 {
     protected function mapping(): void
     {
-        $this->hasTable('kami_upload');
+        $this->hasTable('kami_document');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses(
