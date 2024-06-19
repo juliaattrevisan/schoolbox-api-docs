@@ -60,7 +60,15 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('enable_worksheet', self::TYPE_BOOLEAN, null, 'enableWorksheet');
-        $this->joins('worksheet_template_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
+        $this->joins(
+            'worksheet_template_hash',
+            Storage\Mapper::class,
+            'hash',
+            null,
+            null,
+            'worksheetTemplate',
+            'worksheetTemplate',
+        );
 
         // Join onto Kami document
         $this->joinsReverseSingle(
@@ -148,8 +156,8 @@ class SubmissionBoxMapper extends BaseMapper
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('assessmentModel', 'am')},
                    {$this->getJoinColumnString('owner', 'o')},
-                   {$this->getJoinColumnString('kamiFile', 'kf')},
-                   {$this->getJoinColumnString('kamiFile.allowedFileExtension', 'kfs')},
+                   {$this->getJoinColumnString('worksheetTemplate', 'worksheetTemplate')},
+                   {$this->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'worksheetTemplateAllowedFileExtension')},
                    {$this->getJoinColumnString('kamiWorksheetTemplate', 'kamiWorksheetTemplate')}
         ";
     }
@@ -164,8 +172,8 @@ class SubmissionBoxMapper extends BaseMapper
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
-            LEFT  JOIN {$this->getJoinSql('kamiFile', '', 'kf', true)}
-            LEFT  JOIN {$this->getJoinSql('kamiFile.allowedFileExtension', 'kf', 'kfs', true)}
+            LEFT  JOIN {$this->getJoinSql('worksheetTemplate', '', 'worksheetTemplate', true)}
+            LEFT  JOIN {$this->getJoinSql('worksheetTemplate.allowedFileExtension', 'worksheetTemplate', 'worksheetTemplateAllowedFileExtension', true)}
             LEFT  JOIN {$this->getJoinSql('kamiWorksheetTemplate', '', 'kamiWorksheetTemplate', true)}
         ";
     }
@@ -183,9 +191,11 @@ class SubmissionBoxMapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $worksheetTemplate = $this->hydrateJoin($row, 'kamiFile', 'kf');
+            $worksheetTemplate = $this->hydrateJoin($row, 'worksheetTemplate', 'worksheetTemplate');
             if ($worksheetTemplate instanceof Storage\Model) {
-                $worksheetTemplate->setMimeType($this->hydrateJoin($row, 'kamiFile.allowedFileExtension', 'kfs'));
+                $worksheetTemplate->setMimeType(
+                    $this->hydrateJoin($row, 'worksheetTemplate.allowedFileExtension', 'worksheetTemplateAllowedFileExtension')
+                );
             }
             $box = $this->hydrate($row)
                         ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
