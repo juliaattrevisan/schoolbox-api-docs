@@ -60,7 +60,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('enable_worksheet', self::TYPE_BOOLEAN, null, 'enableWorksheet');
-        $this->joins('kami_interactive_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
+        $this->joins('worksheet_template_hash', Storage\Mapper::class, 'hash', null, null, 'kamiFile', 'kamiFile');
 
         // Join onto Kami document
         $this->joinsReverseSingle(
@@ -183,14 +183,14 @@ class SubmissionBoxMapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            $kamiFile = $this->hydrateJoin($row, 'kamiFile', 'kf');
-            if ($kamiFile instanceof Storage\Model) {
-                $kamiFile->setMimeType($this->hydrateJoin($row, 'kamiFile.allowedFileExtension', 'kfs'));
+            $worksheetTemplate = $this->hydrateJoin($row, 'kamiFile', 'kf');
+            if ($worksheetTemplate instanceof Storage\Model) {
+                $worksheetTemplate->setMimeType($this->hydrateJoin($row, 'kamiFile.allowedFileExtension', 'kfs'));
             }
             $box = $this->hydrate($row)
                         ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
                         ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
-                        ->setKamiFile($kamiFile)
+                        ->setWorksheetTemplate($worksheetTemplate)
             ;
             $collection[$box->getId()] = $box;
         }
@@ -412,8 +412,8 @@ class SubmissionBoxMapper extends BaseMapper
             return;
         }
 
-        $currentWorksheet  = $object->getKamiFile();
-        $previousWorksheet = $previous?->getKamiFile();
+        $currentWorksheet  = $object->getWorksheetTemplate();
+        $previousWorksheet = $previous?->getWorksheetTemplate();
         if ($currentWorksheet?->getHash() === $previousWorksheet?->getHash()) {
             // Worksheet has not changed: leave as is
             return;

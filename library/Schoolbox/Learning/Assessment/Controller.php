@@ -491,8 +491,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setFilesystemContext('worksheet')
                 ->setReadOnly($courseManagedFields->isReadonly()) //
                 ->setFileVar('worksheet');
-            if ($assessment->getKamiFile()) {
-                $zone = $zone->attachFiles([$assessment->getKamiFile()]);
+            if ($assessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }

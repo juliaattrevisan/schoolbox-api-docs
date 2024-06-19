@@ -32,22 +32,22 @@ class SubmissionBoxMapperTest extends TestCase
     public function testHydrate()
     {
         $data = array(
-            'id'                => 3,
-            'assessment_id'     => 3,
-            'category'          => 11,
-            'name'              => 'Some test',
-            'description'       => 'no description',
-            'owner'             => 15,
-            'accept_submission' => true,
-            'multi_submission'  => false,
-            'enable_worksheet'  => true,
-            'kami_interactive_hash'  => 'thisIsNotAHash',
-            'enable_offline'    => true,
-            'enable_text'       => true,
-            'enable_files'      => true,
-            'enable_policy'     => true,
-            'max_mark'          => 100,
-            'self_reviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'id'                      => 3,
+            'assessment_id'           => 3,
+            'category'                => 11,
+            'name'                    => 'Some test',
+            'description'             => 'no description',
+            'owner'                   => 15,
+            'accept_submission'       => true,
+            'multi_submission'        => false,
+            'enable_worksheet'        => true,
+            'worksheet_template_hash' => 'thisIsNotAHash',
+            'enable_offline'          => true,
+            'enable_text'             => true,
+            'enable_files'            => true,
+            'enable_policy'           => true,
+            'max_mark'                => 100,
+            'self_reviewability'      => SubmissionBox::SELF_REVIEWABILITY_NONE,
         );
         $box = $this->object->hydrate($data);
         $this->assertInstanceOf('Schoolbox\\Assessment\\Component\\SubmissionBox', $box);
@@ -59,7 +59,7 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());
         $this->assertEquals(true, $box->getEnableWorksheet());
-        $this->assertEquals('thisIsNotAHash', $box->getKamiFile()->getHash());
+        $this->assertEquals('thisIsNotAHash', $box->getWorksheetTemplate()->getHash());
         $this->assertEquals(true, $box->getEnableOffline());
         $this->assertEquals(true, $box->getEnableText());
         $this->assertEquals(true, $box->getEnableFiles());

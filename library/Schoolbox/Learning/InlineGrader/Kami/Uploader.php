@@ -288,7 +288,7 @@ class Uploader
                 // Worksheet template: upload as template
                 if ($kamiModel->getType() === Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE) {
                     return $this->kamiConnector->uploadDocumentAsTemplate(
-                        $kamiModel->getWorksheetTemplateSubmissionBox()->getKamiFile(),
+                        $kamiModel->getWorksheetTemplateSubmissionBox()->getWorksheetTemplate(),
                         $this->filesystemProxy,
                     );
                 }
@@ -357,7 +357,7 @@ class Uploader
                 $filename = $kamiModel->getStudentSubmissionFile()->getStorage()->getBasename();
                 break;
             case Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE:
-                $filename = $kamiModel->getWorksheetTemplateSubmissionBox()->getKamiFile()->getBasename();
+                $filename = $kamiModel->getWorksheetTemplateSubmissionBox()->getWorksheetTemplate()->getBasename();
                 break;
             default:
                 // Don't know how to log this yet

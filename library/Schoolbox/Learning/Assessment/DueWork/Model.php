@@ -146,13 +146,12 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected bool $enableWorksheet = false;
 
     /**
-     * @var IStorage|null
+     * The uploaded worksheet template, if there is one.
      */
-    protected ?IStorage $kamiFile = null;
+    protected ?IStorage $worksheetTemplate = null;
 
     /**
-     * Model for storing a Kami document representation of this due work's
-     * worksheet template.
+     * The Kami document representation of `$this->worksheetTemplate`.
      */
     protected ?KamiModel $kamiWorksheetTemplate = null;
 
@@ -264,7 +263,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         // Copy the worksheet file.
         // Do not copy its Kami document:
         // instead, a new one will be created for this due work on save.
-        $this->kamiFile = $source->kamiFile;
+        $this->worksheetTemplate = $source->worksheetTemplate;
 
         // Copy attachments
         $this->copyAttachedFiles($source);
@@ -1053,21 +1052,21 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param IStorage|null $kamiFile
+     * @param IStorage|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?IStorage $kamiFile): self
+    public function setWorksheetTemplate(?IStorage $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
     /**
      * @return IStorage|null
      */
-    public function getKamiFile(): ?IStorage
+    public function getWorksheetTemplate(): ?IStorage
     {
-        return $this->kamiFile;
+        return $this->worksheetTemplate;
     }
 
     /**

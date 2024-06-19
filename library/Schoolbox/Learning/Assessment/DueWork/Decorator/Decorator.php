@@ -262,7 +262,7 @@ class Decorator implements DecoratorInterface
         ) {
             // we aren't posting the data when updating
             $assessment->setEnableWorksheet($this->original->getEnableWorksheet());
-            $assessment->setKamiFile($this->original->getKamiFile());
+            $assessment->setWorksheetTemplate($this->original->getWorksheetTemplate());
             $assessment->setEnableOffline($this->original->getEnableOffline());
             $assessment->setEnableText($this->original->getEnableText());
             $assessment->setEnableFiles($this->original->getEnableFiles());
@@ -273,9 +273,9 @@ class Decorator implements DecoratorInterface
                 // Rebuild worksheet files list
                 $factory     = new CollectorFactory();
                 $attachments = $factory->build([$this->getKamiFile()])->getAll();
-                $assessment->setKamiFile($attachments[0]);
+                $assessment->setWorksheetTemplate($attachments[0]);
             } else {
-                $assessment->setKamiFile(null);
+                $assessment->setWorksheetTemplate(null);
             }
             $assessment->setEnableOffline($this->getEnableOffline());
             $assessment->setEnableText($this->getEnableText());

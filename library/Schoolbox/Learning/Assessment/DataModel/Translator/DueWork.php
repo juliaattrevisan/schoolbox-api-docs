@@ -98,7 +98,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getEnablePolicy()           || $dataModel->setEnablePolicy($domainObject->getEnablePolicy());
 
         // Kami file _may_ be null though
-        $dataModel->setKamiFile($domainObject->getKamiFile());
+        $dataModel->setWorksheetTemplate($domainObject->getWorksheetTemplate());
         $dataModel->setKamiWorksheetTemplate($domainObject->getKamiWorksheetTemplate());
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
@@ -174,7 +174,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getEnablePolicy()           || $domainObject->setEnablePolicy($dataModel->getEnablePolicy());
 
         // Kami file _may_ be null though
-        $domainObject->setKamiFile($dataModel->getKamiFile());
+        $domainObject->setWorksheetTemplate($dataModel->getWorksheetTemplate());
         $domainObject->setKamiWorksheetTemplate($dataModel->getKamiWorksheetTemplate());
 
         /* Has Rubric? (actual rubric must be loaded outside of this method)

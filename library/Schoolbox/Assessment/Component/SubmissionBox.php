@@ -130,13 +130,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected bool $enableWorksheet = false;
 
     /**
-     * @var Storage\Model|null
+     * The uploaded worksheet template, if there is one.
      */
-    protected ?Storage\Model $kamiFile = null;
+    protected ?Storage\Model $worksheetTemplate = null;
 
     /**
-     * Model for storing a Kami document representation of this due work's
-     * worksheet template.
+     * The Kami document representation of `$this->worksheetTemplate`.
      */
     protected ?KamiModel $kamiWorksheetTemplate = null;
 
@@ -963,12 +962,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param Storage\Model|null $kamiFile
+     * @param Storage\Model|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?Storage\Model $kamiFile): self
+    public function setWorksheetTemplate(?Storage\Model $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
@@ -996,9 +995,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * @return Storage\Model|null
      */
-    public function getKamiFile(): ?Storage\Model
+    public function getWorksheetTemplate(): ?Storage\Model
     {
-        return $this->kamiFile;
+        return $this->worksheetTemplate;
     }
 
     /**
