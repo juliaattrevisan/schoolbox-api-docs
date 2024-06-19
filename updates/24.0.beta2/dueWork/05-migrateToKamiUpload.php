@@ -44,7 +44,7 @@ $app = new class extends CliTool\App {
             WHERE id = :id
         ');
         $selectFromStudentSubmissionFile = $this->getDatabaseInternal()->executeQuery('
-            SELECT * FROM student_submission_file_kami
+            SELECT * FROM student_submission_file_kami WHERE kami_upload_id IS NULL
         ');
         $this->getLogger()->info(
             sprintf('%d student_submission_file_kami rows found.', $selectFromStudentSubmissionFile->rowCount())
