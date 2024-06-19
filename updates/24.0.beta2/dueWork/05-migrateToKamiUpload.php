@@ -72,4 +72,4 @@ $app = new class extends CliTool\App {
     }
 };
 
-(new CliTool\Kernel($app))->runApp();
+(new CliTool\Kernel($app, [], true))->runApp();
