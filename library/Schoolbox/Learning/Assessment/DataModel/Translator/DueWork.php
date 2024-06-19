@@ -99,6 +99,7 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Kami file _may_ be null though
         $dataModel->setKamiFile($domainObject->getKamiFile());
+        $dataModel->setKamiWorksheetTemplate($domainObject->getKamiWorksheetTemplate());
         $dataModel->setKamiInteractiveDocumentId($domainObject->getKamiInteractiveDocumentId());
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
@@ -175,6 +176,7 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Kami file _may_ be null though
         $domainObject->setKamiFile($dataModel->getKamiFile());
+        $domainObject->setKamiWorksheetTemplate($dataModel->getKamiWorksheetTemplate());
         $domainObject->setKamiInteractiveDocumentId($dataModel->getKamiInteractiveDocumentId());
 
         /* Has Rubric? (actual rubric must be loaded outside of this method)

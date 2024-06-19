@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -150,6 +151,12 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * Document ID of any Kami document attached to this due work.
      */
     protected ?string $kamiInteractiveDocumentId = null;
+
+    /**
+     * Model for storing a Kami document representation of this due work's
+     * worksheet template.
+     */
+    protected ?KamiModel $kamiWorksheetTemplate;
 
     /**
      * @var bool
@@ -1084,6 +1091,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setKamiInteractiveDocumentId(?string $kamiInteractiveDocumentId): self
     {
         $this->kamiInteractiveDocumentId = $kamiInteractiveDocumentId;
+        return $this;
+    }
+
+    /**
+     * @return KamiModel|null
+     */
+    public function getKamiWorksheetTemplate(): ?KamiModel
+    {
+        return $this->kamiWorksheetTemplate;
+    }
+
+    /**
+     * @param KamiModel|null $kamiWorksheetTemplate
+     * @return $this
+     */
+    public function setKamiWorksheetTemplate(?KamiModel $kamiWorksheetTemplate): self
+    {
+        $this->kamiWorksheetTemplate = $kamiWorksheetTemplate;
         return $this;
     }
 
