@@ -1230,6 +1230,10 @@ class Controller extends Base
 
         $this->attemptMapper->save($attempt);
 
+        /* Update project result cache
+         */
+        (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
+
         /* Post back to learnosity
          * When the learnosity ui reloads again, it'll still be remembering
          * all the old scores. You have to wait for it to reload, then hit
