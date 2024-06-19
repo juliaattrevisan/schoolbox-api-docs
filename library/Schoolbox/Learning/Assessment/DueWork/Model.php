@@ -148,11 +148,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected ?IStorage $kamiFile = null;
 
     /**
-     * Document ID of any Kami document attached to this due work.
-     */
-    protected ?string $kamiInteractiveDocumentId = null;
-
-    /**
      * Model for storing a Kami document representation of this due work's
      * worksheet template.
      */
@@ -260,17 +255,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->enablePolicy           = $source->enablePolicy;
         $this->enableText             = $source->enableText;
         $this->kamiInteractive        = $source->kamiInteractive;
-        $this->kamiFile               = $source->kamiFile;
 
-        // For now, copy Kami interactive document ID as is, instead of creating
-        // a new document.
-        // This means that the same Kami document will be associated with the
-        // course and class level assessments: it remains to be seen whether
-        // this is fine.
-        // I'm guessing it won't be, because this value is passed to Kami as the
-        // document_group_id in API call
-        // https://kamiapiproposed.docs.apiary.io/#reference/embedding/view-sessions/create-a-view-session
-        $this->kamiInteractiveDocumentId = $source->kamiInteractiveDocumentId;
+        // Copy the worksheet file.
+        // Do not copy its Kami document:
+        // instead, a new one will be created for this due work on save.
+        $this->kamiFile = $source->kamiFile;
 
         // Copy attachments
         $this->copyAttachedFiles($source);
@@ -1074,24 +1063,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function getKamiFile(): ?IStorage
     {
         return $this->kamiFile;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKamiInteractiveDocumentId(): ?string
-    {
-        return $this->kamiInteractiveDocumentId;
-    }
-
-    /**
-     * @param string|null $kamiInteractiveDocumentId
-     * @return $this
-     */
-    public function setKamiInteractiveDocumentId(?string $kamiInteractiveDocumentId): self
-    {
-        $this->kamiInteractiveDocumentId = $kamiInteractiveDocumentId;
-        return $this;
     }
 
     /**

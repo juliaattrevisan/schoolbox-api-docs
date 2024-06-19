@@ -69,7 +69,6 @@ class SubmissionBoxMapper extends BaseMapper
             'kamiWorksheetTemplate',
             'kamiWorksheetTemplate',
         );
-        $this->uses('kami_interactive_document_id', self::TYPE_STRING);
 
         $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
