@@ -138,7 +138,10 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $externalId;
 
     /**
-     * @var bool
+     * Is submission via a worksheet enabled?
+     *
+     * The student will submit via a copy of the worksheet referenced in
+     * `$this->kamiWorksheetTemplate`.
      */
     protected bool $kamiInteractive = false;
 
@@ -154,22 +157,24 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected ?KamiModel $kamiWorksheetTemplate = null;
 
     /**
-     * @var bool
+     * Is offline submission (student checks a box to confirm that they have
+     * submitted a response to this due work) enabled?
      */
     protected bool $enableOffline = false;
 
     /**
-     * @var bool
+     * Is submission via a rich text editor enabled?
      */
     protected bool $enableText = false;
 
     /**
-     * @var bool
+     * Is submission via file upload enabled?
      */
     protected bool $enableFiles = false;
 
     /**
-     * @var bool
+     * Does the student need to accept the school's submission policy before
+     * submitting?
      */
     protected bool $enablePolicy = false;
 
