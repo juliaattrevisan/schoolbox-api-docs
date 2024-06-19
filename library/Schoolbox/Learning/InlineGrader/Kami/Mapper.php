@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Storage;
@@ -83,16 +84,19 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        $submissionFileMapper = $this->getJoinMapper('file');
-
         return "
             SELECT
                 {$this->getColumnString()},
-                {$submissionFileMapper->getColumnString('f')},
-                {$submissionFileMapper->getJoinColumnString('storage', 's')}
+                {$this->getJoinColumnString('file', 'f')},
+                {$this->getJoinColumnString('file.storage', 's')},
+                {$this->getJoinColumnString('worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox')},
+                {$this->getJoinColumnString('worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBoxStorage')},
+
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('file', '', 'f', true)}
-            INNER JOIN {$submissionFileMapper->getJoinSql('storage', 'f', 's', true)}
+            LEFT JOIN {$this->getJoinSql('file', '', 'f', true)}
+            LEFT JOIN {$this->getJoinSql('file.storage', 'f', 's', true)}
+            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox', '', 'worksheetTemplateSubmissionBox', true)}
+            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBoxStorage', true)}
         ";
     }
 
@@ -104,20 +108,33 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /**
-         * @var SingleFile\Mapper $submissionFileMapper
-         * @var Storage\Mapper    $storageMapper
-         */
-        $collection           = $this->createCollection();
-        $submissionFileMapper = $this->getJoinMapper('file');
-        $storageMapper        = $submissionFileMapper->getJoinMapper('storage');
+        $collection = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $model          = $this->hydrate($row);
-            $submissionFile = $submissionFileMapper->hydrate($row, 'f');
-            $submissionFile->setStorage($storageMapper->hydrate($row, 's'));
-            $model->setStudentSubmissionFile($submissionFile);
+            $model = $this->hydrate($row);
+
+            // Hydrate submission file
+            /** @var ?SingleFile\Model $submissionFile */
+            $submissionFile = $this->hydrateJoin($row, 'file', 'f');
+            /** @var ?Storage\Model $submissionFileStorage */
+            $submissionFileStorage = $this->hydrateJoin($row, 'file.storage', 's');
+            if ($submissionFileStorage) {
+                $submissionFile?->setStorage($submissionFileStorage);
+            }
+
+            // Hydrate submission box
+            /** @var ?SubmissionBox $submissionBox */
+            $submissionBox = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox');
+            /** @var ?Storage\Model $submissionBoxStorage */
+            $submissionBoxStorage = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox.storage', 'worksheetTemplateSubmissionBoxStorage');
+            if ($submissionBoxStorage) {
+                $submissionBox?->setKamiFile($this->hydrateJoin($row, 'file.storage', 's'));
+            }
+
+            $model
+                ->setStudentSubmissionFile($submissionFile)
+                ->setWorksheetTemplateSubmissionBox($submissionBox);
             $collection[$model->getId()] = $model;
         }
         return $collection;
