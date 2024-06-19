@@ -1,4 +1,4 @@
-CREATE TABLE `kami_upload`
+CREATE TABLE `kami_document`
 (
     `id`               int(11)                                                          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `kami_document_id` char(32) CHARACTER SET ascii COLLATE ascii_general_ci            DEFAULT NULL UNIQUE,
