@@ -187,6 +187,7 @@ class RelationalDelete implements IRelationalDelete
             // turnitinreport.student_submission_file_id
             // plagscan_document.student_submission_file_id
             // student_submission_file_kami.student_submission_file_id
+            // TODO remove Kami from this
             new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\RelationalDelete(
                 \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
                 $this->logger,
