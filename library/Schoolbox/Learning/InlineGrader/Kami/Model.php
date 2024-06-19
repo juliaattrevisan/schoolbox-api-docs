@@ -18,6 +18,12 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Alaress_Date_Format;
 
+/**
+ * Model for relation between student submission files and Kami data.
+ *
+ * @deprecated see `\Schoolbox\Learning\InlineGrader\Kami\Document\Mapper`
+ *             instead.
+ */
 class Model implements ISoftDeletable
 {
     use Id;
