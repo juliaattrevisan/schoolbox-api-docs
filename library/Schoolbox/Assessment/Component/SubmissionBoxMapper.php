@@ -126,6 +126,7 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateKamiDocument']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
@@ -396,6 +397,44 @@ class SubmissionBoxMapper extends BaseMapper
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);
+    }
+
+
+    /**
+     * Create a Kami document for this due work.
+     *
+     * @param SubmissionBox      $object
+     * @param SubmissionBox|null $previous
+     * @return void
+     */
+    public function updateKamiDocument(SubmissionBox $object, ?SubmissionBox $previous): void
+    {
+        if (!$this->getConfigLoader()->get('kami_enabled')) {
+            return;
+        }
+
+        $currentWorksheet  = $object->getKamiFile();
+        $previousWorksheet = $previous?->getKamiFile();
+        if ($currentWorksheet?->getHash() === $previousWorksheet?->getHash()) {
+            // Worksheet has not changed: leave as is
+            return;
+        }
+
+        // Worksheet has changed:
+        // delete any existing worksheets, and create a new one
+        /** @var Schoolbox\Learning\InlineGrader\Kami\Mapper $kamiMapper */
+        $kamiMapper = $this->getJoinMapper('kamiWorksheetTemplate');
+        if ($previousWorksheet?->getHash()) {
+            $kamiMapper->deleteByColumn('worksheet_template_submission_box_id', $object->getId());
+        }
+        if ($currentWorksheet?->getHash()) {
+            $kamiMapper->save(
+                $kamiMapper->createModel()
+                    ->setType(Schoolbox\Learning\InlineGrader\Kami\Model::TYPE_STUDENT_SUBMISSION_WORKSHEET)
+                    ->setStatusQueued()
+                    ->setWorksheetTemplateSubmissionBox($object)
+            );
+        }
     }
 
 
