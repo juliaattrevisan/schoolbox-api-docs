@@ -18,6 +18,11 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
+ * Mapper for relation between student submission files and Kami data.
+ *
+ * TODO move this class, as Kami now relates to things other than student
+ *      submission files
+ *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -32,10 +37,11 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('student_submission_file_id', SingleFile\Mapper::class, 'id', null, null, null, 'file');
-        $this->uses('kami_document_id', self::TYPE_STRING);
-        $this->uses('status', self::TYPE_STRING);
-        $this->uses('error_message', self::TYPE_STRING);
-        $this->uses('kami_created_at', self::TYPE_DATETIME);
+        $this->joins('kami_upload_id', Upload\Mapper::class, 'id', null, null, 'kamiUpload', 'kamiUpload');
+//        $this->uses('kami_document_id', self::TYPE_STRING);
+//        $this->uses('status', self::TYPE_STRING);
+//        $this->uses('error_message', self::TYPE_STRING);
+//        $this->uses('kami_created_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
