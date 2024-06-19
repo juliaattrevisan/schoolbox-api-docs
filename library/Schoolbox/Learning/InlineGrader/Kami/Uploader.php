@@ -276,10 +276,25 @@ class Uploader
         $countFailedAttempts = 0;
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
-                return $this->kamiConnector->uploadDocument(
-                    $kamiModel->getStudentSubmissionFile()->getStorage(),
-                    $this->filesystemProxy,
-                );
+                // The upload type depends on the Kami document's type.
+                // Annotation: upload as document
+                if ($kamiModel->getType() === Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION) {
+                    return $this->kamiConnector->uploadDocument(
+                        $kamiModel->getStorage(),
+                        $this->filesystemProxy,
+                    );
+                }
+
+                // Worksheet template: upload as template
+                if ($kamiModel->getType() === Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE) {
+                    return $this->kamiConnector->uploadDocumentAsTemplate(
+                        $kamiModel->getStorage(),
+                        $this->filesystemProxy,
+                    );
+                }
+
+                // Worksheet:
+                // TODO find the due work's template, and copy from that
             } catch (Exception\NotFound $e) {
                 // file not found
                 throw $e;
