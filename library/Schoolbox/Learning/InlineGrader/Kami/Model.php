@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\ISoftDeletable;
@@ -17,7 +18,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Alaress_Date_Format;
+use Schoolbox\Resource\Storage\IStorage;
 
 /**
  * Model for relation between Kami data and:
@@ -381,5 +382,21 @@ class Model implements ISoftDeletable
     {
         $this->kamiCreatedAt = $kamiCreatedAt;
         return $this;
+    }
+
+
+    /**
+     * Fetch the relevant storage model for the kami document, wherever it might
+     * be.
+     *
+     * @return IStorage|null
+     */
+    public function getStorage(): ?IStorage
+    {
+        return match ($this->type) {
+            self::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION => $this->studentSubmissionFile?->getStorage(),
+            self::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE  => $this->worksheetTemplateSubmissionBox?->getKamiFile(),
+            default                                       => null,
+        };
     }
 }
