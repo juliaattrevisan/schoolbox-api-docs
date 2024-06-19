@@ -1,0 +1,1 @@
+rename table student_submission_file_kami to kami_document;

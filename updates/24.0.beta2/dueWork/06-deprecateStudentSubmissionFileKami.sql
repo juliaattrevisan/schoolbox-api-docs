@@ -1,1 +1,0 @@
-rename table student_submission_file_kami to _student_submission_file_kami;
