@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Exception as DatabaseException;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -19,7 +20,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $insertIntoKamiDocument = $this->getDatabaseInternal()->prepareQuery('
+        $insertIntoKamiUpload = $this->getDatabaseInternal()->prepareQuery('
             INSERT INTO kami_upload (
                 kami_document_id,
                 status,
@@ -38,6 +39,9 @@ $app = new class extends CliTool\App {
                 :deletedAt
             )
         ');
+        $selectExistingKamiUploadId = $this->getDatabaseInternal()->prepareQuery('
+            SELECT id FROM kami_upload WHERE kami_document_id = :kamiDocumentId
+        ');
         $setStudentSubmissionFileKamiUploadId = $this->getDatabaseInternal()->prepareQuery('
             UPDATE student_submission_file_kami
             SET kami_upload_id = :kamiUploadId
@@ -50,18 +54,28 @@ $app = new class extends CliTool\App {
             sprintf('Migrating %d student_submission_file_kami rows to kami_upload.', $selectFromStudentSubmissionFile->rowCount())
         );
         foreach ($selectFromStudentSubmissionFile as $row) {
-            $insertIntoKamiDocument->execute([
-                'kamiDocumentId' => $row['kami_document_id'],
-                'status'         => $row['status'],
-                'errorMessage'   => $row['error_message'],
-                'kamiCreatedAt'  => $row['kami_created_at'],
-                'createdAt'      => $row['created_at'],
-                'updatedAt'      => $row['updated_at'],
-                'deletedAt'      => $row['deleted_at'],
-            ]);
+            try {
+                $insertIntoKamiUpload->execute([
+                    'kamiDocumentId' => $row['kami_document_id'],
+                    'status'         => $row['status'],
+                    'errorMessage'   => $row['error_message'],
+                    'kamiCreatedAt'  => $row['kami_created_at'],
+                    'createdAt'      => $row['created_at'],
+                    'updatedAt'      => $row['updated_at'],
+                    'deletedAt'      => $row['deleted_at'],
+                ]);
+                $kamiUploadId = $this->getDatabaseInternal()->lastInsertId();
+            } catch (DatabaseException) {
+                // This Kami document already exists: warn and use existing
+                $this->getLogger()->warning(
+                    sprintf('kami_upload with kami_document_id="%s" exists: reusing that ID', $row['kami_document_id'])
+                );
+                $selectExistingKamiUploadId->execute(['kamiDocumentId' => $row['kami_document_id']]);
+                $kamiUploadId = $selectExistingKamiUploadId->fetchColumn();
+            }
             $setStudentSubmissionFileKamiUploadId->execute([
                 'id'             => $row['id'],
-                'kamiUploadId'   => $this->getDatabaseInternal()->lastInsertId(),
+                'kamiUploadId'   => $kamiUploadId,
             ]);
         }
     }
