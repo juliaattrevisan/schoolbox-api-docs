@@ -58,7 +58,7 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(15, $box->getOwner()->getId());
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());
-        $this->assertEquals(true, $box->getKamiInteractive());
+        $this->assertEquals(true, $box->getEnableWorksheet());
         $this->assertEquals('thisIsNotAHash', $box->getKamiFile()->getHash());
         $this->assertEquals(true, $box->getEnableOffline());
         $this->assertEquals(true, $box->getEnableText());

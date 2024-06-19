@@ -127,7 +127,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * The student will submit via a copy of the worksheet referenced in
      * `$this->kamiWorksheetTemplate`.
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
      * @var Storage\Model|null
@@ -945,21 +945,21 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**

@@ -143,7 +143,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * The student will submit via a copy of the worksheet referenced in
      * `$this->kamiWorksheetTemplate`.
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
      * @var IStorage|null
@@ -259,7 +259,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->enableFiles            = $source->enableFiles;
         $this->enablePolicy           = $source->enablePolicy;
         $this->enableText             = $source->enableText;
-        $this->kamiInteractive        = $source->kamiInteractive;
+        $this->enableWorksheet        = $source->enableWorksheet;
 
         // Copy the worksheet file.
         // Do not copy its Kami document:
@@ -1035,21 +1035,21 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**
