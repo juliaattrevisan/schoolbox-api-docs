@@ -4441,21 +4441,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Connector\\:\\:\\$client \\(GuzzleHttp\\\\Client\\) does not accept GuzzleHttp\\\\ClientInterface\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
-
-		-
-			message: "#^Variable \\$storageMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Mapper.php
-
-		-
-			message: "#^Variable \\$submissionFileMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\ReQueueErrors\\:\\:getErrorKamiIds\\(\\) should return array\\<string\\> but returns array\\<int\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/ReQueueErrors.php
