@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Codec\PayloadFilename;
 use Schoolbox\Resource\Storage\Mapper;
 
 /**
@@ -64,15 +65,28 @@ class PayloadList
             ]
         ];
 
+        /* Derive created_at timestamp from the filename itself because
+         * of an idiosyncracy in our storage table reusing rows whenever
+         * there is a hash collision (leaves created_at untouched) since
+         * it misrepresents what actually happened.
+         */
+        $decoder = new PayloadFilename();
+
         foreach ($lissPayloads as $lissPayload) {
-            $parts = explode('-', $lissPayload->getFilename());
+            /* Extract info that was encoded into the filename itself
+             */
+            $parts = $decoder->decode($lissPayload->getFilename());
 
             /* "default", normally
              *
              * ...unless the school specified a ?source parameter in their Receiver all,
              * in which case it'll be that. Redlands used it.
              */
-            $source = $parts[2];
+            $source = $parts['source'];
+
+            /* Forcibly override storage's datetime
+             */
+            $lissPayload->setCreatedAt(new \Alaress_Date_Format($parts['date'], 'Ymd_His'));
 
             foreach (PayloadCache::PAYLOAD_ALL as $payloadName) {
                 $neverSeen = null === ($scheduled[$payloadName]['sources'][$source] ?? null);
