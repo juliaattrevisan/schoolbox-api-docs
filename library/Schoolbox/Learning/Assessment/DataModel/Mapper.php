@@ -29,6 +29,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
@@ -930,7 +931,7 @@ class Mapper extends BaseMapper
             $modelList->add($model);
         }
         // Load related 1-M models
-        // Due work files
+        // Due work files and Kami worksheet
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
 
         /* Task files
@@ -1107,6 +1108,34 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
+
+    /**
+     * Augments the list from hydrateSelect() with due work Kami worksheet
+     * templates.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds)
+    {
+        if (!empty($dueWorkIds)) {
+            // Retrieve and sort list of Kami docs
+            $kamiDocuments = $this->getJoinMapper('duework.kamiWorksheetTemplate')
+                ->findByColumn('worksheet_template_submission_box_id', $dueWorkIds)
+                ->indexByCallback(fn (KamiModel $kamiDocument) => $kamiDocument->getWorksheetTemplateSubmissionBox()->getId())
+            ;
+
+            // Augment list with Kami docs
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+                if ($submodel instanceof SubmissionBox) {
+                    $submodel->setKamiWorksheetTemplate($kamiDocuments[$submodel->getId()] ?? null);
+                }
+            }
+        }
+        return $modelList;
+    }
 
     /**
      * Augments the list from hydrateSelect() with task files.
