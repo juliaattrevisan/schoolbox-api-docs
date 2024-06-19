@@ -16,6 +16,7 @@ use Alaress_Date_Format;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Event\Attendance\Model as EventAttendance;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -213,7 +214,7 @@ class EventNotifier extends AbstractModuleNotifier
             ->addFilter('roletype', [$roleType])
             ->setSeverity(Logger::INFO);
 
-        if ($event->getAccess() == Event::ACCESS_CAMPUS) {
+        if ($event->getAccess() == Event::ACCESS_CAMPUS && $event->getCampusCollection() instanceof Collection) {
             $bob->addFilter('campus', $event->getCampusCollection()->getPropertyValues('id'));
         }
 
