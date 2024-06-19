@@ -156,7 +156,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * Model for storing a Kami document representation of this due work's
      * worksheet template.
      */
-    protected ?KamiModel $kamiWorksheetTemplate;
+    protected ?KamiModel $kamiWorksheetTemplate = null;
 
     /**
      * @var bool
