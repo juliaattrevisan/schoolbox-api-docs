@@ -600,10 +600,25 @@
                             if (notifElement) {
                                 notifElement.style.display = 'block';
                             }
+
+                            //Now that the user has re-enabled notification
+                            //Attempt to make the notification request again
+                            if ('denied' === window.localStorage.getItem("notification") ||
+                                    'removed' === window.localStorage.getItem("notification")) {
+                                window.localStorage.setItem("notification", "requesting");
+                            }
+
                         } else if (Notification.permission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
                             });
+
+                            //User has now blocked the notification
+                            //The token is no longer applicable, hence remove
+                            window.localStorage.setItem("notification", "denied");
+                            if (null !== window.localStorage.getItem("notifToken")) {
+                                window.localStorage.removeItem("notifToken");
+                            }
 
                         } else {
                             document.querySelectorAll('[data-pwa="notifBlocked"]').forEach((element) => {
