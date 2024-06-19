@@ -69,4 +69,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, [], true))->runApp();
