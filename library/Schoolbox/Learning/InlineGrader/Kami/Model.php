@@ -20,9 +20,6 @@ use Alaress_Date_Format;
 
 /**
  * Model for relation between student submission files and Kami data.
- *
- * @deprecated see `\Schoolbox\Learning\InlineGrader\Kami\Document\Mapper`
- *             instead.
  */
 class Model implements ISoftDeletable
 {
@@ -70,11 +67,6 @@ class Model implements ISoftDeletable
     private SingleFile\Model $studentSubmissionFile;
 
     /**
-     * The Kami upload (if any) to which this upload reference is related.
-     */
-    private ?Upload\Model $kamiUpload;
-
-    /**
      * Null if not yet successfully uploaded into Kami
      *
      * @var null|string
@@ -120,26 +112,6 @@ class Model implements ISoftDeletable
     public function setStudentSubmissionFile(SingleFile\Model $studentSubmissionFile): self
     {
         $this->studentSubmissionFile = $studentSubmissionFile;
-        return $this;
-    }
-
-
-    /**
-     * @return Upload\Model|null
-     */
-    public function getKamiUpload(): ?Upload\Model
-    {
-        return $this->kamiUpload;
-    }
-
-
-    /**
-     * @param Upload\Model|null $kamiUpload
-     * @return $this
-     */
-    public function setKamiUpload(?Upload\Model $kamiUpload): self
-    {
-        $this->kamiUpload = $kamiUpload;
         return $this;
     }
 

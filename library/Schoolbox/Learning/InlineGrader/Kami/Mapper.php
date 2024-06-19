@@ -20,9 +20,6 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * Mapper for relation between student submission files and Kami data.
  *
- * @deprecated This maps onto a deprecated model: see
- *             `\Schoolbox\Learning\InlineGrader\Kami\Document\Mapper` instead.
- *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -33,7 +30,7 @@ class Mapper extends BaseMapper
 {
     protected function mapping(): void
     {
-        $this->hasTable('_student_submission_file_kami');
+        $this->hasTable('kami_upload');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('student_submission_file_id', SingleFile\Mapper::class, 'id', null, null, null, 'file');
