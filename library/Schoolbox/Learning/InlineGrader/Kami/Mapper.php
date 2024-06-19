@@ -45,7 +45,20 @@ class Mapper extends BaseMapper
             'worksheetTemplateSubmissionBox',
         );
         $this->uses('kami_document_id', self::TYPE_STRING);
-        $this->uses('status', self::TYPE_STRING);
+        $this->uses(
+            'status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                Model::STATUS_QUEUED,
+                Model::STATUS_UPLOADING,
+                Model::STATUS_FAILED,
+                Model::STATUS_PROCESSING,
+                Model::STATUS_DONE,
+                Model::STATUS_ERROR,
+            ],
+        );
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('kami_created_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
