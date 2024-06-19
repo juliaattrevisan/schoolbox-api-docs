@@ -430,7 +430,7 @@ class SubmissionBoxMapper extends BaseMapper
         if ($currentWorksheet?->getHash()) {
             $kamiMapper->save(
                 $kamiMapper->createModel()
-                    ->setType(Schoolbox\Learning\InlineGrader\Kami\Model::TYPE_STUDENT_SUBMISSION_WORKSHEET)
+                    ->setType(Schoolbox\Learning\InlineGrader\Kami\Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE)
                     ->setStatusQueued()
                     ->setWorksheetTemplateSubmissionBox($object)
             );
