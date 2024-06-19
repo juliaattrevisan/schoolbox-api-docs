@@ -58,6 +58,10 @@ function requestNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, {vapidKey: app.webPushPublicKey})
                 .then((currentToken) => {
+                    if('denied' === window.localStorage.getItem("notification")) {
+                        //If notification blocked while requesting, should stop registering attempt
+                        throw new Error('Notification blocked. Stop registering attempts.');
+                    }
                     window.localStorage.setItem("notification", "registering");
                     window.localStorage.setItem("notifToken", currentToken);
                     // Post this token to Schoolbox,
@@ -98,6 +102,7 @@ function requestNotif(event: CustomEvent) {
  * @param { CustomEvent } event - Information about the event.
  */
 function denyNotif(event: CustomEvent) {
+    console.log('teststsdsdsdsds');
     const debug = event.detail.debug as boolean;
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
@@ -148,5 +153,6 @@ document.addEventListener("PWA_NOTIFICATION_ALLOW", (event) => {
 });
 
 document.addEventListener("PWA_NOTIFICATION_DENY", (event) => {
+    console.log('testststst');
     denyNotif(event as CustomEvent);
 });
