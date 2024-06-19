@@ -98,9 +98,24 @@ class Controller extends Base
         $maxMark = null;
 
         if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
-            $maxMark = (float)($postData['maxMarks']);
+            try {
+                $assessment->getMarkScheme()->setTotalMark((float)($postData['maxMarks']));
 
-            $assessment->getMarkScheme()->setTotalMark($maxMark);
+                /* This looks weird, but we want to try saving (float)($postData['maxMarks'])
+                 * first because in learnosity, score values are -optional-. Our legacy quiz
+                 * mandated them, though; this means you have to tolerate a RangeException
+                 * and in such a case, presume no valid marks exist in a meaningful way and
+                 * that $maxMarks should remain null.
+                 *
+                 * If we were successful, we can use $maxMark's float equivalent as usual.
+                 * Otherwise it remains null and will facilitate Submission States instead.
+                 */
+                $maxMark = (float)($postData['maxMarks']);
+            } catch (\RangeException $e) {
+                // This is thrown if you haven't assigned question scores in learnosity
+            }
+        } else {
+            $maxMark = (float)($postData['maxMarks']);
         }
 
         /* If this is an actual grade, try to interpret the pieces:
