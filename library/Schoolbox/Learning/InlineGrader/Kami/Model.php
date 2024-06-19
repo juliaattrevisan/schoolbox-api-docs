@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -62,9 +63,16 @@ class Model implements ISoftDeletable
     ];
 
     /**
-     * The student submission file to which this Kami upload reference related.
+     * The student submission file to which this Kami upload reference related,
+     * if there is one.
      */
-    private SingleFile\Model $studentSubmissionFile;
+    private ?SingleFile\Model $studentSubmissionFile = null;
+
+    /**
+     * The submission box for which this upload supplies a worksheet template,
+     * if any.
+     */
+    private ?SubmissionBox $worksheetTemplateSubmissionBox = null;
 
     /**
      * Null if not yet successfully uploaded into Kami
@@ -112,6 +120,26 @@ class Model implements ISoftDeletable
     public function setStudentSubmissionFile(SingleFile\Model $studentSubmissionFile): self
     {
         $this->studentSubmissionFile = $studentSubmissionFile;
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox|null
+     */
+    public function getWorksheetTemplateSubmissionBox(): ?SubmissionBox
+    {
+        return $this->worksheetTemplateSubmissionBox;
+    }
+
+
+    /**
+     * @param SubmissionBox|null $worksheetTemplateSubmissionBox
+     * @return $this
+     */
+    public function setWorksheetTemplateSubmissionBox(?SubmissionBox $worksheetTemplateSubmissionBox): self
+    {
+        $this->worksheetTemplateSubmissionBox = $worksheetTemplateSubmissionBox;
         return $this;
     }
 

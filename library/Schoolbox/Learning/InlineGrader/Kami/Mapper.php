@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -34,6 +35,15 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('student_submission_file_id', SingleFile\Mapper::class, 'id', null, null, null, 'file');
+        $this->joins(
+            'worksheet_template_submission_box_id',
+            SubmissionBoxMapper::class,
+            'id',
+            null,
+            null,
+            null,
+            'worksheetTemplateSubmissionBox',
+        );
         $this->uses('kami_document_id', self::TYPE_STRING);
         $this->uses('status', self::TYPE_STRING);
         $this->uses('error_message', self::TYPE_STRING);
