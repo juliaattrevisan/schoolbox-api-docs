@@ -64,7 +64,7 @@ class Decorator implements DecoratorInterface
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
      * @param bool         $enableWorksheet
-     * @param string|null  $kamiFile
+     * @param string|null  $worksheetTemplate
      * @param bool         $enableOffline
      * @param bool         $enableText
      * @param bool         $enableFiles
@@ -85,7 +85,7 @@ class Decorator implements DecoratorInterface
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
         bool $enableWorksheet,
-        ?string $kamiFile,
+        ?string $worksheetTemplate,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
@@ -105,7 +105,7 @@ class Decorator implements DecoratorInterface
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
         $this->setEnableWorksheet($enableWorksheet);
-        $this->setKamiFile($kamiFile);
+        $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
@@ -269,10 +269,10 @@ class Decorator implements DecoratorInterface
             $assessment->setEnablePolicy($this->original->getEnablePolicy());
         } else {
             $assessment->setEnableWorksheet($this->getEnableWorksheet());
-            if ($this->getKamiFile()) {
+            if ($this->getWorksheetTemplate()) {
                 // Rebuild worksheet files list
                 $factory     = new CollectorFactory();
-                $attachments = $factory->build([$this->getKamiFile()])->getAll();
+                $attachments = $factory->build([$this->getWorksheetTemplate()])->getAll();
                 $assessment->setWorksheetTemplate($attachments[0]);
             } else {
                 $assessment->setWorksheetTemplate(null);

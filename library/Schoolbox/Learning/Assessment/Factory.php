@@ -238,7 +238,7 @@ class Factory
                 }
             }
 
-            $this->setKamiFile($post['worksheet'] ?? null);
+            $this->setWorksheetTemplate($post['worksheet'] ?? null);
         }
 
         $this->setEnablePolicy(trim($post['enablePolicy'] ?? '') === 'on');
@@ -433,7 +433,7 @@ class Factory
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getEnableWorksheet(),
-                    $this->getKamiFile(),
+                    $this->getWorksheetTemplate(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),
                     $this->getEnableFiles(),
@@ -455,7 +455,7 @@ class Factory
                     $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
                     $this->getEnableWorksheet(),
-                    $this->getKamiFile(),
+                    $this->getWorksheetTemplate(),
                     $this->getEnableOffline(),
                     $this->getEnableText(),
                     $this->getEnableFiles(),

@@ -52,7 +52,7 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param array|null   $rubricData
      * @param array        $attachedFiles
      * @param bool         $enableWorksheet
-     * @param string| null $kamiFile
+     * @param string| null $worksheetTemplate
      * @param bool         $enableOffline
      * @param bool         $enableText
      * @param bool         $enableFiles
@@ -70,7 +70,7 @@ class CourseManagedDecorator implements DecoratorInterface
         ?array $rubricData,
         array $attachedFiles,
         bool $enableWorksheet,
-        ?string $kamiFile,
+        ?string $worksheetTemplate,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
@@ -87,7 +87,7 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setEnableWorksheet($enableWorksheet);
-        $this->setKamiFile($kamiFile);
+        $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);

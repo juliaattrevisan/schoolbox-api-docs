@@ -807,7 +807,7 @@ class Mapper extends BaseMapper
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                         ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
                         ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
-                        ->setKamiFile(
+                        ->setWorksheetTemplate(
                             $this->hydrateJoin($row, 'duework.worksheetTemplate', 'dueworkWorksheetTemplate')
                                  ?->setMimeType($this->hydrateJoin($row, 'duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
                         )

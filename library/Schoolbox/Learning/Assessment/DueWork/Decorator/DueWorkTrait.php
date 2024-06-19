@@ -92,7 +92,7 @@ trait DueWorkTrait
     /**
      * @var string|null
      */
-    protected ?string $kamiFile = null;
+    protected ?string $worksheetTemplate = null;
 
     /**
      * @var bool
@@ -331,21 +331,21 @@ trait DueWorkTrait
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param string|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setWorksheetTemplate(?string $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
     /**
      * @return string|null
      */
-    public function getKamiFile(): ?string
+    public function getWorksheetTemplate(): ?string
     {
-        return $this->kamiFile;
+        return $this->worksheetTemplate;
     }
 
     /**
