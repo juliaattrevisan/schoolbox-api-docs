@@ -47,7 +47,7 @@ $app = new class extends CliTool\App {
             SELECT * FROM student_submission_file_kami WHERE kami_upload_id IS NULL
         ');
         $this->getLogger()->info(
-            sprintf('%d student_submission_file_kami rows found.', $selectFromStudentSubmissionFile->rowCount())
+            sprintf('Migrating %d student_submission_file_kami rows to kami_upload.', $selectFromStudentSubmissionFile->rowCount())
         );
         foreach ($selectFromStudentSubmissionFile as $row) {
             $insertIntoKamiDocument->execute([
