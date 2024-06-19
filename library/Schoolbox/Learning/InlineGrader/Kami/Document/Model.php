@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\InlineGrader\Kami\Upload;
+namespace Schoolbox\Learning\InlineGrader\Kami\Document;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
@@ -17,7 +17,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 /**
- * Model for Kami uploads.
+ * Model for Kami documents.
  */
 class Model implements ISoftDeletable
 {

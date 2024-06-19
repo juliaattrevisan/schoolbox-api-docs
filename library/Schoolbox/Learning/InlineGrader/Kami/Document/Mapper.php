@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\InlineGrader\Kami\Upload;
+namespace Schoolbox\Learning\InlineGrader\Kami\Document;
 
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * Mapper for Kami uploads.
+ * Mapper for Kami documents.
  *
  * This may relate back to:
  * * student submission files
@@ -26,7 +26,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('kami_upload');
+        $this->hasTable('kami_document');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('kami_document_id', self::TYPE_STRING);
