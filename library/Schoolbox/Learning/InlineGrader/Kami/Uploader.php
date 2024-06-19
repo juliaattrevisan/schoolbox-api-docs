@@ -357,7 +357,7 @@ class Uploader
             $results->getCountTotal() + 1,
             $kamiCount,
             $kamiModel->getId(),
-            $kamiModel->getStudentSubmissionFile()->getBasename()
+            $kamiModel->getStorage()->getBasename()
         ));
     }
 
