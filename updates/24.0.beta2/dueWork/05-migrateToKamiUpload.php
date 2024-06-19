@@ -72,4 +72,8 @@ $app = new class extends CliTool\App {
     }
 };
 
-(new CliTool\Kernel($app, [], true))->runApp();
+(new CliTool\Kernel(
+    $app,
+    [Schoolbox\Application\CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG],
+    true,
+))->runApp();
