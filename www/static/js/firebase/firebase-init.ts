@@ -102,7 +102,6 @@ function requestNotif(event: CustomEvent) {
  * @param { CustomEvent } event - Information about the event.
  */
 function denyNotif(event: CustomEvent) {
-    console.log('teststsdsdsdsds');
     const debug = event.detail.debug as boolean;
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
@@ -153,6 +152,5 @@ document.addEventListener("PWA_NOTIFICATION_ALLOW", (event) => {
 });
 
 document.addEventListener("PWA_NOTIFICATION_DENY", (event) => {
-    console.log('testststst');
     denyNotif(event as CustomEvent);
 });
