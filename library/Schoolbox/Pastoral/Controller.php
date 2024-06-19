@@ -27,6 +27,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audience\ColorHelper;
@@ -389,7 +390,7 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
-            /** @var Access\Model $access */
+            /** @var PastoralAccessModel $access */
             foreach ($record->getAccessWithPermission() as $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());
@@ -1057,7 +1058,7 @@ class Controller extends Base
             $existingAccesses = $record->getAccess()->indexBy('id');
             $keptAccessIds    = [];
             $record->setAccess($this->pastoralAccessMapper->createCollection());
-            /** @var Access\Model $access */
+            /** @var PastoralAccessModel $access */
             foreach ($accesses as $access) {
                 if ($previousRecord && $access->getId()) {
                     $keptAccessIds[] = $access->getId();
@@ -1076,7 +1077,7 @@ class Controller extends Base
                 // Delete accesses no longer exists
                 $removingAccesses = $existingAccesses->filter(
                     static function ($access) use ($keptAccessIds) {
-                        /** @var Access\Model $access */
+                        /** @var PastoralAccessModel $access */
                         return !in_array($access->getId(), $keptAccessIds);
                     }
                 );
@@ -1414,7 +1415,7 @@ class Controller extends Base
      * @api   GET /searchTags
      * @since 21.1
      */
-    public function searchTags()
+    public function searchTags(): void
     {
         $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->requestQuery->get('query'));
         $data = $tags->map(function ($tag) {

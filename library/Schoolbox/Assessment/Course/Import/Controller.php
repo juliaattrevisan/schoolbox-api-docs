@@ -231,50 +231,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
-     *
-     * Searches by both name and class code
-     *
-     * @api   GET /course/import/classes
-     * @since 160
-     * @throws MapperException
-     */
-    public function searchClasses()
-    {
-        $query          = (string)$this->requestQuery->get('query');
-        $folders        = (new Destinations($this->folderMapper))->findImportable($query);
-
-        /* Swap keys for selectize compatibility -_-
-         */
-        $data = [];
-
-        foreach ($folders as $folder) {
-            // Ignore folders with CourseSpecs
-            if ($folder->getCourseSpecification() instanceof CourseSpecification\Model) {
-                continue;
-            }
-
-            // Ignore folders with UnitSpecs
-            if ($folder->getUnitSpecification() instanceof UnitSpecification\Model) {
-                continue;
-            }
-
-            // Make sure the user has access to the folder before we return it
-            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
-                continue;
-            }
-
-            $data[] = [
-                'id'   => $folder->getId(),
-                'name' => $folder->getTitle(),
-            ];
-        }
-
-        $this->response = $this->responseAsJson($data);
-    }
-
-
-    /**
      * This POST is the result of import stage 3.
      *
      * Returns a HTML fragment containing a list of Assessments, grouped by UnitImpl

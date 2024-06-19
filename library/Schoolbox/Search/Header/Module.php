@@ -9,6 +9,8 @@ namespace Schoolbox\Search\Header;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -25,7 +27,10 @@ class Module extends BaseModule
             );
         });
 
+        $staffOnly = $this->getAuthRule('isStaffOrSuper');
+
         $this->register('GET', '', 'search', $loggedIn);
+        $this->register('GET', '/classes', 'searchClasses', $staffOnly);
     }
 
     /**
@@ -33,6 +38,9 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(Access::class), // Not a mapper, but has getInstance, so does work.
+        );
     }
 }
