@@ -128,7 +128,7 @@ class Mapper extends BaseMapper
             /** @var ?Storage\Model $submissionBoxStorage */
             $submissionBoxStorage = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox.kamiFile', 'worksheetTemplateSubmissionBoxKamiFile');
             if ($submissionBoxStorage) {
-                $submissionBox?->setKamiFile($this->hydrateJoin($row, 'file.storage', 's'));
+                $submissionBox?->setKamiFile($submissionBoxStorage);
             }
 
             $model
