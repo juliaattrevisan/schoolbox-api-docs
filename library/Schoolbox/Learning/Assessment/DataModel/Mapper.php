@@ -933,6 +933,7 @@ class Mapper extends BaseMapper
         // Load related 1-M models
         // Due work files and Kami worksheet
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+        $modelList = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
 
         /* Task files
          */
