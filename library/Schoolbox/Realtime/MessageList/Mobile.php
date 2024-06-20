@@ -1,95 +1,32 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\NotificationBundle;
-use Alaress\Async\Queue\QueueInterface;
-use Schoolbox\MobileApp;
-
-class Mobile implements QueueInterface
+/**
+ * List for messages to be sent to mobile clients.
+ *
+ * This once was directly responsible for sending messages to mobile clients:
+ * now, it simply adds them to a list to be processed by another process.
+ *
+ * This is because this list was unable to handle retries in a stable manner:
+ * it's called within a worker, and sending the worker to sleep was causing it
+ * to get killed unexpectedly and irrecoverably by its pool; thus causing
+ * messages to be lost forever.
+ */
+class Mobile extends AbstractList
 {
-    /** @var MobileApp\IServiceManager */
-    private $cloudManager;
-
-    /** @var int */
-    private $userId;
-
-
     /**
-     * @param MobileApp\IServiceManager $cloudManager
-     * @param int                      $userId
-     */
-    public function __construct(MobileApp\IServiceManager $cloudManager, $userId)
-    {
-        $this->cloudManager = $cloudManager;
-        $this->userId       = $userId;
-    }
-
-
-    /**
-     * Returns the name of this queue
-     *
      * @return string
      */
-    public function getName(): string
+    protected function getSuffix(): string
     {
-        return "{$this->userId}:mobile";
-    }
-
-
-    /**
-     * Returns whether or not this queue contains the given instance
-     *
-     * @param Instance $instance
-     * @return bool
-     */
-    public function contains(Instance $instance): bool
-    {
-        // this "list" doesn't contain things
-        return false;
-    }
-
-
-    /**
-     * Request to drain the queue of its contents.
-     *
-     * @return void
-     */
-    public function drain(): void
-    {
-        // noop: this "list" doesn't contain things
-    }
-
-
-    /**
-     * Push the given instance onto this queue
-     *
-     * @param Instance $instance
-     * @return void
-     */
-    public function push(Instance $instance): void
-    {
-        $this->cloudManager->push($this->userId, $instance);
-    }
-
-
-    /**
-     * Populates the given Bundle with all the notifications this queue contains
-     *
-     * @param NotificationBundle $bundle    the bundle to populate
-     * @param bool               $dropCache whether or not any internally-held cache should be dropped
-     * @return void
-     */
-    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
-    {
-        // noop: this "list" doesn't contain things
+        return 'mobile';
     }
 }
