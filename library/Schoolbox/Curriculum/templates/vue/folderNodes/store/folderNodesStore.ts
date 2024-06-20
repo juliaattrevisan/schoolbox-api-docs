@@ -187,6 +187,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         }
 
         return {
+            nodes,
             selectedNodes,
             filter,
             filteredNodes,

@@ -55,7 +55,7 @@ const { ignoreUpdates } = watchIgnorable(
 );
 
 /**
- * To keep the unit planner's selected nodes in sync with the folder nodes
+ * To keep the unit planner's selected nodes in sync with the folder selected nodes
  * when the folder nodes are updated
  */
 window.Vue.watch(
@@ -64,6 +64,21 @@ window.Vue.watch(
         const storeUnit = unitPlannerStore.units.find((unit) => unit.folderId === props.folderId);
         if (storeUnit) {
             storeUnit.curriculum.selectedNodes = folderNodesStore().selectedNodes;
+        }
+    },
+    { deep: true },
+);
+
+/**
+ * To keep the unit planner's nodes in sync with the folder nodes
+ * when the folder nodes are updated
+ */
+window.Vue.watch(
+    () => folderNodesStore().nodes,
+    () => {
+        const storeUnit = unitPlannerStore.units.find((unit) => unit.folderId === props.folderId);
+        if (storeUnit) {
+            storeUnit.curriculum.nodes = folderNodesStore().nodes;
         }
     },
     { deep: true },
