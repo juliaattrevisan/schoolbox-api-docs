@@ -386,7 +386,7 @@
 
                 // The raw mark value that should correlate to the initial human-readable value in the <input>
                 // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
-                let initialConfiguredMark = parseFloat($(element).attr('data-initial-configured-mark'));
+                let initialConfiguredMark = scale($(element), parseFloat($(element).attr('data-initial-configured-mark')));
                 if (isNaN(initialConfiguredMark)) { initialConfiguredMark = null; }
 
                 if (initialConfiguredMark !== scaledGroupMark) {
@@ -825,7 +825,7 @@
                 scaledGroupSum = scaledGroupSum.toFixed(2);
             }
 
-            return scaledGroupSum;
+            return parseFloat(scaledGroupSum); // Ensure we get a float back
         }
 
         /**
