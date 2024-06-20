@@ -58,6 +58,10 @@ function requestNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, {vapidKey: app.webPushPublicKey})
                 .then((currentToken) => {
+                    if('denied' === window.localStorage.getItem("notification")) {
+                        //If notification blocked while requesting, should stop registering attempt
+                        throw new Error('Notification blocked. Stop registering attempts.');
+                    }
                     window.localStorage.setItem("notification", "registering");
                     window.localStorage.setItem("notifToken", currentToken);
                     // Post this token to Schoolbox,
