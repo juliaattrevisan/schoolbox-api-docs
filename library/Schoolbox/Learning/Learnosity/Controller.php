@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
+use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
@@ -2241,5 +2242,35 @@ class Controller extends Base
             $this->messageFactory,
             $this->messageProducer,
         );
+    }
+
+
+    /**
+     * Rescore all the attempts for a given $assessment
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     * @throws ApiException
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    public function postRescoreAttempts(QuizDomainObject $assessment): void
+    {
+        $quiz = $this->getQuizForAssessmentId($assessment->getId());
+
+        /* Find all the finished attempts for this quiz
+         * (Don't try to rescore attempts currently in progress)
+         */
+        $pb = $this->attemptMapper->getPredicateBuilder()
+            ->equals('assess_id', $quiz->getId())
+            ->notNull('finish');
+
+        $attempts = $this->attemptMapper->findByPredicates($pb);
+
+        (new RescoreProcessor($this->api, true, null))->process($attempts);
+
+        $this->getSession()->getSegment(static::class)->set('hasRescore', false);
     }
 }

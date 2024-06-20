@@ -265,6 +265,7 @@ class Controller extends Assessment\Controller
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
+
             /* Quizzes now support Submission States
              * Annoyingly, Submission States are in the $errors array...
              */

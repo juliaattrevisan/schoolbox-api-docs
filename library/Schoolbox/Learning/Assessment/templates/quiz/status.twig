@@ -16,13 +16,44 @@
 {% set labelPending    = 'Review required' %}
 {% set labelReviewed   = 'Reviewed' %}
 
+{% block flashMessage %}
+    <div class="row" id="rescore" style="display:none">
+        <div class="small-12 columns">
+            <div class="alert-box warning">Rescoring in progress; please allow 30 minutes for changes to take effect.</div>
+        </div>
+    </div>
+{% endblock flashMessage %}
+
 {% block routeModify %}
     {% set routeModify = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
 
     {% if routeModify %}
         {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
+        {% set rescoreRoute = routeLookupIfAuthorized('learnosity.postRescoreAttempts', {assessment: assessment, assessmentId: assessment.id}) %}
+
         <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
+        <li><a class="icon-quiz" href="{{ rescoreRoute }}" data-rescore>Rescore all attempts</a></li>
+
+        <script>
+            $(function() {
+                $('[data-rescore]').on('click', function(event) {
+                    event.preventDefault();
+
+                    $(this).confirmDialog({
+                        header: 'Rescore attempts',
+                        text: "If you’ve altered the scoring method of a question (such as changing a <em>Scoring Type</em> option, or changing the amount a question is worth) after students have made attempts, the attempts might not tally in the intended manner. Using this tool will update everyone’s attempt on this quiz and recalculate their scores according to the current questions' setup. It might take a little while to process; results aren’t always immediately available.<br /><br />After using this rescoring feature you should review the feedback you’ve provided for students' attempts.",
+                        format: 'html',
+                        confirmLabel: 'Rescore',
+                        confirmEvent: function() {
+                            $.post('{{ rescoreRoute }}', {}, function(responseText) {
+                                $('#rescore').show();
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
     {% endif %}
 {% endblock %}
 
