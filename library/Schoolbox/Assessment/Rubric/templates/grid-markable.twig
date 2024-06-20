@@ -332,6 +332,13 @@
                     displayedMark = $this.find("[data-group-descriptor-sum]").text().replace(/%/, '').trim(),
                     customMark    = $this.find("[data-group-mark]").val();
 
+                const hasSelectedDescriptor = findAllSelectedDescriptorsInCapability($this.attr('data-group-id')).length > 0;
+                const hasSelectedOnlyValuelessDescriptors = findAllSelectedDescriptorsInCapability($this.attr('data-group-id'))
+                    .filter(descriptor => descriptor.state.value !== null).length === 0;
+                const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
+                    .filter(descriptor => descriptor.state.value !== null).length > 0;
+
+
                 if (markType === 'letter') {
                     // Compare letter grades by their string value (easier since we're dealing with brackets)
 
@@ -345,15 +352,43 @@
 
                     var diff = Math.abs(parseFloat(displayedMark) - parseFloat(customMark));
                     // Allow for precision errors when diffing
-                    if (diff >= 0.01) {
+                    if (diff >= 0.01 || (isNaN(diff) && hasSelectedDescriptor && capabilityHasValuedDescriptors)) {
                         markIsDifferent = true;
                     }
                 }
 
-                if ($this.attr('data-scaled-mark') !== '' && markIsDifferent) {
+                // Determine if we should show the "Assign XXX from indicators" message
+                // Start by assuming we should show it if the mark is different
+                let showAssignFromButton = markIsDifferent;
+
+                // If no descriptors are selected, and the customMark is not empty, show the button (as it must be customised)
+                if (!hasSelectedDescriptor && customMark !== "") {
+                    showAssignFromButton = true;
+                }
+
+                // Otherwise, if only valueless descriptors are selected, and the customMark is already empty, never show the button (as it'll say null)
+                if (hasSelectedDescriptor && hasSelectedOnlyValuelessDescriptors && customMark === "") {
+                    showAssignFromButton = false;
+                }
+
+                // If we have selected any descriptor, then show the "assign XXX from descriptors" text
+                if (showAssignFromButton) {
+                    // Check if the customMark is not "", as we don't want to show "assign null..."
+                    if (hasSelectedDescriptor && !hasSelectedOnlyValuelessDescriptors && capabilityHasValuedDescriptors) {
+                        $this.find("[data-descriptor-assign='has-selected-descriptor']").show();
+                        $this.find("[data-descriptor-assign='no-selected-descriptor']").hide();
+                    }
+                    // Otherwise, show the "remove grade based on descriptors" text
+                    else {
+                        $this.find("[data-descriptor-assign='has-selected-descriptor']").hide();
+                        $this.find("[data-descriptor-assign='no-selected-descriptor']").show();
+                    }
+
                     $this.find("[data-use-descriptor-values]").show();
                     $this.attr('data-customised', true);
-                } else {
+                }
+                // Otherwise, hide the "assign XXX from indicators" text
+                else {
                     $this.find("[data-use-descriptor-values]").hide();
 
                     const capabilityHasValuedDescriptors = findAllDescriptorsInCapability($this.attr('data-group-id'))
@@ -369,8 +404,6 @@
             });
         }
 
-        disableEnableAssignFromDescs();
-
         // initialise dynamic mark display
         $rb.dynagrade(dynagrade);
 
@@ -384,6 +417,26 @@
                 let descriptorCheckboxes = groupRows.find('input');
                 let scaledGroupMark = scale($(element), summateDescriptors(descriptorCheckboxes));
 
+                // Set the data-group-descriptor-sum so that the initial enableAssignFromDescs can run correctly
+
+                // Update button text with mark calculated from descriptors
+                switch (markType) {
+                    case 'letter':
+                        var grades = getLetterGrades($(element).find("[data-group-mark]"));
+                        $(element).find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($(element), scaledGroupMark), grades));
+                        break;
+
+                    case 'percent':
+                        $(element).find("[data-group-descriptor-sum]").text(getPercentage($(element), scaledGroupMark) + "%");
+                        break;
+
+                    case 'raw':
+                    case 'none':
+                    default:
+                        $(element).find("[data-group-descriptor-sum]").text(scaledGroupMark);
+                        break;
+                }
+
                 // The raw mark value that should correlate to the initial human-readable value in the <input>
                 // If this doesn't match scaledGroupMark (the descriptors), then treat it as customised
                 let initialConfiguredMark = scale($(element), parseFloat($(element).attr('data-initial-configured-mark')));
@@ -395,15 +448,10 @@
                 } else {
                     $(element).attr('data-scaled-mark', scaledGroupMark);
                 }
-
-                // As soon as the user has selected a valueless descriptor,
-                // we should no longer override the user's custom mark
-                // This can only be cleared by using the "Use descriptor values" button
-                if (hasSelectedValuelessDescriptor(descriptorCheckboxes)) {
-                    $(element).attr('data-has-valueless', true);
-                }
             }
         });
+
+        disableEnableAssignFromDescs();
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
@@ -435,13 +483,6 @@
                     $groupSummary         = $rb.find(groupSummarySelector),
                     $descriptorCheckboxes = $groupRows.find('input'),
                     scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
-
-                // As soon as the user has selected a valueless descriptor,
-                // we should no longer override the user's custom mark
-                // This can only be cleared by using the "Use descriptor values" button
-                if (hasSelectedValuelessDescriptor($descriptorCheckboxes)) {
-                    $groupSummary.attr('data-has-valueless', true);
-                }
 
                 // We can only update the scaled mark based on descriptors if the capability has valued descriptors
                 // Otherwise, we'll always remove the data-scaled-mark attribute as valueless descriptors require manual input to set a mark
@@ -689,7 +730,6 @@
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
             $groupSummary.removeAttr('data-customised');
-            $groupSummary.removeAttr('data-has-valueless');
 
             var rubricTotalMark       = getTotalMark(),
                 rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',

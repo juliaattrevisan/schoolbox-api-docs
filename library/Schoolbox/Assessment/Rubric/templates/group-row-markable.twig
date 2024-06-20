@@ -95,11 +95,18 @@
                                value="{{ formInputValue }}"/> %
                     {% endif %}
 
-                    {% if groupUsage.containsDescriptorsWithValue %}
-                        <a data-use-descriptor-values class="fieldAssign">Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                    <a data-use-descriptor-values class="fieldAssign" style="display: none">
+                        <span data-descriptor-assign="has-selected-descriptor">
+                            Assign
+                            <span class="descriptor-sum" data-group-descriptor-sum>
                                 {{ capabilityMark ? capabilityMark.indicatorMarkSumScaled : null }}
-                            </span> from descriptors</a>
-                    {% endif %}
+                            </span>
+                            from {{ locale.rubricCriterion.pluralForm }}
+                        </span>
+                        <span data-descriptor-assign="no-selected-descriptor">
+                            Remove {{ locale.grades.singularForm }} based on {{ locale.rubricCriterion.pluralForm }}
+                        </span>
+                    </a>
                     {% if markType.mode == 'letter' or markType.mode == 'percent' %}
                         <!-- <p class="meta">This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p> -->
                     {% endif %}
