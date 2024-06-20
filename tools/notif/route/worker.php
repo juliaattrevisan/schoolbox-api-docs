@@ -15,11 +15,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Instance;
-use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -35,20 +32,11 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var IConfigLoader $config */
     $config = $di->get('config');
 
-    /** @var Instance $instance */
-    $instance = $di->get('instance');
-
-    /** @var RegistryMapper $registryMapper */
-    $registryMapper = $di->get('mapperFactory')->get(RegistryMapper::class);
-
     /** @var UserMapper $userMapper */
     $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
 
     /** @var RoutePermissionMapper $routePermMapper */
     $routePermMapper = $di->get('mapperFactory')->get(RoutePermissionMapper::class);
-
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $di->get('filesystem.storageProxy');
 
     /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
     $emailFactory = $di->get('mail.emailFactory');
@@ -57,11 +45,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $config,
         $log,
         $client,
-        $registryMapper,
         $userMapper,
         $routePermMapper,
-        $instance,
-        $filesystemProxy,
         $emailFactory,
         new Jitter(new FloatGenerator(), maxAttempts: 15, baseTimeout: 2500),
     ))->build($loop, INSTANCE_ID);

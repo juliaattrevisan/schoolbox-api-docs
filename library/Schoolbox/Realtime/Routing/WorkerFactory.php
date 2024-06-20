@@ -14,16 +14,12 @@ use Alaress\WorkerCrew\Worker\PipeWriter;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\EmailFactory;
-use Schoolbox\MobileApp;
-use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
@@ -35,9 +31,6 @@ class WorkerFactory
     /** @var LoggerInterface */
     private $log;
 
-    /** @var RegistryMapper */
-    private $registryMapper;
-
     /** @var UserMapper */
     private $userMapper;
 
@@ -47,9 +40,6 @@ class WorkerFactory
     /** @var ClientInterface */
     private $client;
 
-    /** @var Schoolbox\Instance */
-    private $instance;
-
     private EmailFactory $emailFactory;
 
 
@@ -57,32 +47,24 @@ class WorkerFactory
      * @param IConfigLoader         $conf
      * @param LoggerInterface       $log
      * @param ClientInterface       $client
-     * @param RegistryMapper        $registryMapper
      * @param UserMapper            $userMapper
      * @param RoutePermissionMapper $routePermMapper
-     * @param \Schoolbox\Instance   $instance
-     * @param FilesystemProxy       $filesystemProxy
      * @param EmailFactory          $emailFactory
      */
     public function __construct(
         IConfigLoader $conf,
         LoggerInterface $log,
         ClientInterface $client,
-        RegistryMapper $registryMapper,
         UserMapper $userMapper,
         RoutePermissionMapper $routePermMapper,
-        Schoolbox\Instance $instance,
-        private FilesystemProxy $filesystemProxy,
         EmailFactory $emailFactory,
         private IJitter $jitter,
     ) {
         $this->conf = $conf;
         $this->log = $log;
         $this->client = $client;
-        $this->registryMapper = $registryMapper;
         $this->userMapper = $userMapper;
         $this->routePermMapper = $routePermMapper;
-        $this->instance = $instance;
         $this->emailFactory = $emailFactory;
     }
 
@@ -94,22 +76,11 @@ class WorkerFactory
      */
     public function build(LoopInterface $loop, $instanceId)
     {
-        // set list factory dependencies
-        $cloudManager = new MobileApp\ServiceManager(
-            $this->log,
-            $this->registryMapper,
-            $this->instance,
-            $this->conf->get('title'),
-            $this->filesystemProxy,
-            new UnreadRetriever($this->client),
-            MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
-        );
-
         // responsible for draining a list into an email and sending it (only include reply-to headers if config allows)
         $mailer = new Mailer($this->emailFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
 
         // build a list factory
-        $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);
+        $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $this->userMapper, $mailer);
 
         // obtain filter list
         $filter = (new Filter\FilterFactory($listFactory, $this->conf))->build();
