@@ -32,15 +32,16 @@
                                         </colgroup>
                                         <tbody>
                                         {% for row in group.data %}
+                                            {% set rowValue = row.value ?? '' %}
                                             <tr>
                                                 <td>{{ row.name }}</td>
                                                 <td>
                                                     {% if row.type == 'url' %}
-                                                        <a href="{{ row.value }}">{{ row.value }}</a>
+                                                        <a href="{{ rowValue }}">{{ rowValue }}</a>
                                                     {% elseif row.type == 'html' %}
-                                                        {{ row.value | purify }}
+                                                        {{ rowValue | purify }}
                                                     {% else %}
-                                                        {{ row.value }}
+                                                        {{ rowValue }}
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -60,21 +61,24 @@
                                 {% if collection.data ?? [] is not empty %}
                                     <table>
                                         <thead>
-                                        {% for key, name in (collection.headers ?? []) %}
-                                            <th data-field="{{ key }}">{{ name }}</th>
-                                        {% endfor %}
+                                        <tr>
+                                            {% for key, name in (collection.headers ?? []) %}
+                                                <th data-field="{{ key }}">{{ name }}</th>
+                                            {% endfor %}
+                                        </tr>
                                         </thead>
                                         <tbody>
                                         {% for record in (collection.data) %}
                                             <tr>
                                                 {% for key, field in record %}
+                                                    {% set fieldValue = field.value ?? '' %}
                                                     <td>
                                                         {% if field.type == 'url' %}
-                                                            <a href="{{ field.value }}">{{ collection.headers[key] }}</a>
+                                                            <a href="{{ fieldValue }}">{{ collection.headers[key] }}</a>
                                                         {% elseif field.type == 'html' %}
-                                                            {{ field.value | purify }}
+                                                            {{ fieldValue | purify }}
                                                         {% else %}
-                                                            {{ field.value }}
+                                                            {{ fieldValue }}
                                                         {% endif %}
                                                     </td>
                                                 {% endfor %}
