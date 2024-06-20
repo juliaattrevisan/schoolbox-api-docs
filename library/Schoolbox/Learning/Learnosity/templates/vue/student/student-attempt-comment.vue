@@ -116,7 +116,8 @@ window.Vue.onUnmounted(async () => {
                 v-html="props.student.attemptComment.comment"
             ></div>
             <template v-else>
-                <textarea :id="editorId" rows="3"></textarea>
+                <label :for="editorId">Comment</label>
+                <textarea :id="editorId" v-model="comment" rows="3"></textarea>
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
                         <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
