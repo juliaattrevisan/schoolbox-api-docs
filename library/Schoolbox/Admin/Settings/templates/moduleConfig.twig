@@ -122,6 +122,23 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificationSetting = document.querySelector('[name=messaging_enabled][type=checkbox]');
+        const pushSetting = document.querySelector('[name=push_notifications_enabled][type=checkbox]');
+        document.querySelector('[name=messaging_enabled][type=checkbox]').addEventListener('change', function(e) {
+            const checked = e.target.checked;
+            //Toggle push notification on change
+            pushSetting.toggleAttribute('disabled', !checked)
+            if(!checked) {
+                //Turn off push notification if disabled
+                pushSetting.toggleAttribute('checked', checked)
+            }
+        });
+        //Toggle push notification settings on load
+        notificationSetting.dispatchEvent(new Event('change'));
+    })
+</script>
 {% if hasTimePicker %}
     <datalist id="time-steps">
         {% for hour in 0..23 %}
