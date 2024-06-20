@@ -557,35 +557,39 @@
 
                     // Otherwise, if the capability mark is customised
                     else {
-                        // If no descriptor was previously selected
-                        if (previouslySelectedGroupDescriptors.length === 0) {
-                            // ...and no descriptor is currently selected,
-                            //   then the capability mark should NOT change,
-                            if (currentlySelectedGroupDescriptors.length === 0) {
-                                // There shouldn't be a way to get here, but i've added the check to ensure the
-                                // next condition won't throw an error if in the odd case we do get here.
-                                console.warn("No descriptors previously or currently selected after a change?");
-                                shouldUpdateCapabilityMark = false;
-                            }
+                        // Then we never want to override it, we'll show an "Assign XXX from indicators" button instead
+                        // I've left the equivalent logic for each case below, just in case we change this.
+                        shouldUpdateCapabilityMark = false;
 
-                            // ...and I select a valued descriptor,
-                            //   then the capability mark should be overridden
-                            else if (currentlySelectedIndicatorDescriptor.state.value !== null) {
-                                shouldUpdateCapabilityMark = true;
-                            }
+                        //// If no descriptor was previously selected
+                        //if (previouslySelectedGroupDescriptors.length === 0) {
+                        //    // ...and no descriptor is currently selected,
+                        //    //   then the capability mark should NOT change,
+                        //    if (currentlySelectedGroupDescriptors.length === 0) {
+                        //        // There shouldn't be a way to get here, but i've added the check to ensure the
+                        //        // next condition won't throw an error if in the odd case we do get here.
+                        //        console.warn("No descriptors previously or currently selected after a change?");
+                        //        shouldUpdateCapabilityMark = false;
+                        //    }
 
-                            // ...and I select a valueless descriptor,
-                            //   then the capability mark should NOT change
-                            else {
-                                shouldUpdateCapabilityMark = false;
-                            }
-                        }
+                        //    // ...and I select a valued descriptor,
+                        //    //   then the capability mark should be overridden
+                        //    else if (currentlySelectedIndicatorDescriptor.state.value !== null) {
+                        //        shouldUpdateCapabilityMark = false;
+                        //    }
 
-                        // Otherwise, if a descriptor was previously selected
-                        //   then the capability mark should NOT change, as it is customised
-                        else {
-                            shouldUpdateCapabilityMark = false;
-                        }
+                        //    // ...and I select a valueless descriptor,
+                        //    //   then the capability mark should NOT change
+                        //    else {
+                        //        shouldUpdateCapabilityMark = false;
+                        //    }
+                        //}
+
+                        //// Otherwise, if a descriptor was previously selected
+                        ////   then the capability mark should NOT change, as it is customised
+                        //else {
+                        //    shouldUpdateCapabilityMark = false;
+                        //}
                     }
 
                     // If we've decided to update the capability mark, then do so
