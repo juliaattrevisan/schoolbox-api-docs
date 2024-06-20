@@ -462,4 +462,17 @@ window.Vue.onUnmounted(() => {
         }
     }
 }
+@media print {
+    .unit-cell {
+        height: auto !important; // Expand the unit cell to show all content
+        overflow: visible !important;
+        page-break-after: always !important;
+    }
+    i.icon-grip.ui-sortable-handle.grip {
+        display: none !important;
+    }
+    .content-container-fixed {
+        display: none !important;
+    }
+}
 </style>

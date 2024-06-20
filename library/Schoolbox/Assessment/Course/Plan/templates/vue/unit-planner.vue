@@ -153,7 +153,7 @@ window.Vue.onUnmounted(() => {
     <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
         <div class="small-12 island">
-            <dl ref="tabsEl" class="tabs">
+            <dl ref="tabsEl" class="tabs no-print">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
                     <a @click="selectedTab = tab">{{ tab.label }}</a>
                 </dd>
@@ -303,5 +303,16 @@ window.Vue.onUnmounted(() => {
     position: absolute;
     width: 100%;
     z-index: var(--depth-pop-over);
+}
+
+/* Styles for printing */
+@media print {
+    .no-print {
+        display: none;
+    }
+    .scrollable {
+        overflow: visible !important;
+        height: 100% !important;
+    }
 }
 </style>
