@@ -5,7 +5,6 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
-import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
@@ -14,12 +13,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = props.isReadOnly
-    ? window.Vue.ref("")
-    : useEditor(props.student.attemptComment.comment ?? "", `#${editorId}`, {
-          targetElements: [`#${editorId}`],
-          hasTokens: true,
-      }); // Use a ckeditor for the comments field
+const comment = window.Vue.ref(props.student.attemptComment.comment ?? "");
 const isSaving = window.Vue.ref(false);
 const isSavedDelay = window.Vue.ref(false);
 
@@ -126,7 +120,7 @@ window.Vue.onUnmounted(async () => {
                     Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                     details on creation.
                 </p>
-                <textarea :id="editorId"></textarea>
+                <textarea :id="editorId" rows="3"></textarea>
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
                         <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
