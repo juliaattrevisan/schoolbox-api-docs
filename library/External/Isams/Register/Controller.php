@@ -298,72 +298,26 @@ class Controller extends BaseController
                 continue;
             }
 
-            $groupType = $metaFields[$collectionName]['type'];
-            if (!isset($out[$groupType][$collectionName]['groupName'])) {
-                $out[$groupType][$collectionName]['groupName'] = $metaFields[$collectionName]['name'];
+            $metaGroupType = $metaFields[$collectionName]['type'];
+            if (!isset($out[$metaGroupType][$collectionName]['groupName'])) {
+                $out[$metaGroupType][$collectionName]['groupName'] = $metaFields[$collectionName]['name'];
+            }
+            $factory = new GrouptypeFactory();
+            $groupType = $factory->produce(
+                $metaGroupType,
+                $this->cacheHelper,
+                $user,
+                $register,
+                $conf,
+                $metaFields
+            );
+
+            //If the type does not exist. Skip.
+            if (null === $groupType) {
+                continue;
             }
 
-            if ($groupType == 'FieldGroup') {
-                $data = $this->cacheHelper->getStudentFields($register['id'], $user->getExternalId());
-                foreach ($conf['fields'] as $index => $knownField) {
-                    //If the field is in the approved list, then build it, else continue
-                    if (!array_key_exists($knownField, $data)) {
-                        continue;
-                    }
-
-                    [$name, $type, $value] = $this->prepareUserFieldData(
-                        $metaFields[$collectionName]['fields'][$knownField],
-                        $data[$knownField]
-                    );
-
-                    $out[$groupType][$collectionName]['data'][$index] = [
-                        'name' => $name,
-                        'type' => $type,
-                        'value' => $value
-                    ];
-                }
-            } else if ($groupType == 'RecordCollection') {
-                //Requested register collection we are extracting the data out of
-                $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $collectionName);
-
-                if (null === $recordCollection) {
-                    /**
-                     * Skip if unable to find the specified Record Collections.
-                     */
-                    continue;
-                }
-
-                $records = $this->cacheHelper->getRecordCollectionsRecords(
-                    $register['id'],
-                    $user->getExternalId(),
-                    $recordCollection['id']
-                );
-
-                // resort user records so they display similar to within iSAMS
-                usort($records, function ($a, $b) {
-                    return $b['id'] <=> $a['id'];
-                });
-
-                foreach ($conf['fields'] as $key => $knownField) {
-                    foreach ($records as $index => $record) {
-                        //If the field is in the approved list, then build it, else continue
-                        if (!array_key_exists($knownField, $record['fields'])) {
-                            continue;
-                        }
-
-                        [$name, $type, $value] = $this->prepareUserFieldData(
-                            $metaFields[$collectionName]['fields'][$knownField],
-                            $record['fields'][$knownField]
-                        );
-
-                        $out[$groupType][$collectionName]['headers'][$key] = $name;
-                        $out[$groupType][$collectionName]['data'][$index][$key] = [
-                            'type' => $type,
-                            'value' => $value
-                        ];
-                    }
-                }
-            }
+            $out = $groupType->process($out);
         }
         return $out;
     }
@@ -413,41 +367,6 @@ class Controller extends BaseController
             ];
         }
         return $metaFields;
-    }
-
-    /**
-     * Prepare the user data with their appropriate type and value
-     *
-     * @param array         $field
-     * @param null|string   $value
-     * @return array
-     */
-    private function prepareUserFieldData(array $field, ?string $value): array
-    {
-
-        $type = $field['type'];
-        //Fill the empty space in the table with placeholder if no value
-        $value = $value ?? '-';
-
-        // if TextboxField confirm the field type  (url / html?)
-        if ('TextboxField' === $type) {
-            // is this an url, if so get twig to format as href
-            $url = new \Url($value);
-            if ($url->isUrl()) {
-                $type = 'url';
-            }
-
-            // is html, then get twig to sanitise with `| purify`
-            if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
-                $type = 'html';
-            }
-        }
-
-        return [
-            $field['name'],
-            $type,
-            $value
-        ];
     }
 
     /**
