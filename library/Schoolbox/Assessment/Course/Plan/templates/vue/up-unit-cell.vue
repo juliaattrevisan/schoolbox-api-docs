@@ -230,6 +230,8 @@ window.Vue.onUnmounted(() => {
             'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'content-focused': contentIsFocused,
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
+            'print-only': props.column.isPrintOnly,
+            'hide-on-print': !props.column.showOnPrint,
         }"
         :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
         @click="onContentClicked"
@@ -473,6 +475,10 @@ window.Vue.onUnmounted(() => {
     }
     .content-container-fixed {
         display: none !important;
+    }
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
     }
 }
 </style>

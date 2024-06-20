@@ -163,7 +163,8 @@ window.Vue.onUnmounted(() => {
                 class="scrollable"
                 :style="{
                     height: containerHeight + 'px',
-                    '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
+                    '--UnitPlannerVisibleColumns':
+                        selectedTab.columns.filter((column) => !column.isPrintOnly).length - 1,
                     '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
                 }"
             >
@@ -178,7 +179,11 @@ window.Vue.onUnmounted(() => {
                             v-for="column in selectedTab.columns"
                             :key="column.id"
                             class="fixed-top"
-                            :class="{ 'fixed-left': column.fixedLeft }"
+                            :class="{
+                                'fixed-left': column.fixedLeft,
+                                'print-only': column.isPrintOnly,
+                                'hide-on-print': !column.showOnPrint,
+                            }"
                         >
                             {{ column.label }}
                         </div>
@@ -304,7 +309,6 @@ window.Vue.onUnmounted(() => {
     width: 100%;
     z-index: var(--depth-pop-over);
 }
-
 /* Styles for printing */
 @media print {
     .no-print {
@@ -313,6 +317,13 @@ window.Vue.onUnmounted(() => {
     .scrollable {
         overflow: visible !important;
         height: 100% !important;
+    }
+    .unit-planner {
+        grid-template-columns: repeat(calc(var(--UnitPlannerVisibleColumns) * 2), minmax(400px, 1fr));
+    }
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
     }
 }
 </style>

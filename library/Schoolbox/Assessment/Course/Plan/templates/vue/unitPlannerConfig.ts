@@ -14,6 +14,7 @@ export enum ColumnType {
 interface ColumnConfig {
     label: string | null; // If null, the label must be set by some other condition
     fixedLeft: boolean; // Whether the column should be fixed to the left of the grid
+    showOnPrint: boolean; // Whether the column should be shown when printing the unit planner
 }
 
 // Configuration options for a tab
@@ -29,6 +30,7 @@ export interface Column extends ColumnConfig {
     id: string; // Vue requires unique keys for v-for loops, but they must be the same across tabs for the same column
     type: ColumnType;
     label: string;
+    isPrintOnly: boolean; // Whether the column should only be shown when printing the unit planner
 }
 
 // An implemented tab as given to the unit planner, linking the tab with implemented columns to display
@@ -92,17 +94,20 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
 const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
-    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
+    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true, showOnPrint: false },
+    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false, showOnPrint: true }, // The label is set by the textbox keys
     [ColumnType.ACTIVITIES]: {
         label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
         fixedLeft: false,
+        showOnPrint: true,
+
     },
     [ColumnType.RUBRIC_CAPABILITIES]: {
         label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
         fixedLeft: false,
+        showOnPrint: true,
     },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false, showOnPrint: true }, // The label is set by the curriculum component headings
 };
 
 /**
@@ -147,7 +152,8 @@ function getColumns(
             ...newColumnBase,
             id: `${columnTypeID}-${columnId}`,
             type: columnTypeID, // Add the missing 'type' property
-            label: component.heading.trim(), // Ignore trailing or leading whitespace
+            label: component.heading.trim(), // Ignore trailing or leading whitespace,
+            isPrintOnly: false,
         });
     });
 }
@@ -169,6 +175,7 @@ export function createTabs(template: UnitTemplate) {
                 id: `${columnTypeID}-1`,
                 type: columnTypeID,
                 label: modifiedColumnConfig[columnTypeID].label || columnTypeID,
+                isPrintOnly: false,
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
@@ -181,9 +188,26 @@ export function createTabs(template: UnitTemplate) {
             }
             tabColumns.push(newColumnBase);
         });
+         // Add print-only unit columns before each non-unit column to help with printing the unit planner
+         const tabColumnsWithHiddenUnit: typeof tabColumns = tabColumns.flatMap((column, index) => {
+            if (column.type !== ColumnType.UNIT) {
+                return [
+                    {
+                        id: `${ColumnType.UNIT}-printOnly-${index}`,
+                        type: ColumnType.UNIT,
+                        label: columnConfig[ColumnType.UNIT].label || ColumnType.UNIT,
+                        isPrintOnly: true,
+                        showOnPrint: true,
+                        fixedLeft: column.fixedLeft,
+                    },
+                    column,
+                ];
+            }
+            return column;
+        });
         return {
             ...tabInfo,
-            columns: tabColumns,
+            columns: tabColumnsWithHiddenUnit,
         };
     });
 }

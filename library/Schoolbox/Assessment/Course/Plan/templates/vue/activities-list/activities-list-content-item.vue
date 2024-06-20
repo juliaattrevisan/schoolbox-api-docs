@@ -207,4 +207,15 @@ li[data-sortable-active="true"] .sortable-holder {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* Styles for printing */
+@media print {
+    .information-list.sortable > li .grip:before,
+    .information-list.sortable-card > li .grip:before {
+        display: none !important;
+    }
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
+    }
+}
 </style>
