@@ -15,7 +15,8 @@ const props = defineProps<Props>();
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = window.Vue.ref(props.student.attemptComment.comment ?? "");
 const isSaving = window.Vue.ref(false);
-const isSavedDelay = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedComment: [comment: string];
@@ -29,6 +30,9 @@ const saveText = window.Vue.computed(() => {
     if (isSaving.value) {
         return "Saving...";
     }
+    if (hasError.value) {
+        return "Comment could not be saved";
+    }
     return "Comment saved";
 });
 
@@ -37,7 +41,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || isSavedDelay.value) {
+    if (isSaving.value || hasSaved.value || hasError.value) {
         return "1fr";
     }
     return "0fr";
@@ -65,20 +69,29 @@ async function saveComment() {
     if (props.student.urls === undefined) {
         return;
     }
-    isSaving.value = true;
-    emit("updatedComment", comment.value);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-    const formData = new FormData();
-    formData.append("comment", comment.value);
-    await fetch(props.student.urls.attemptComment, {
-        method: "POST",
-        body: formData,
-    });
-    window.removeEventListener("beforeunload", beforeUnloadHandler);
-    isSavedDelay.value = true;
-    isSaving.value = false;
+    try {
+        isSaving.value = true;
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append("comment", comment.value);
+        const response = await fetch(props.student.urls.attemptComment, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            emit("updatedComment", comment.value);
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSaving.value = false;
+    } catch (error) {
+        hasError.value = true;
+    }
     await timeout(2000);
-    isSavedDelay.value = false;
+    hasSaved.value = false;
+    hasError.value = false;
 }
 
 /**
@@ -120,7 +133,7 @@ window.Vue.onUnmounted(async () => {
                 <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                        <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                             <em>{{ saveText }}</em>
                         </div>
                     </div>
