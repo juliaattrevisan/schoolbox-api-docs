@@ -321,12 +321,20 @@ class DataSource
         array $options = [],
     ): GenericCollection {
         $permissionClause = $this->getPermissionClause($viewer, $student, null, null);
-        return $this->findRawRecordsByPredicates(
+
+        $records = $this->findRawRecordsByPredicates(
             $pb->rawWhere($permissionClause['where'], $permissionClause['params']),
             $options['order'] ?? [],
             $options['offset'] ?? null,
             $options['limit'] ?? null,
         );
+
+        // Each pastoral record we collected belongs to the student passed to this function.
+        foreach ($records as $record) {
+            $record->setStudent($student);
+        }
+
+        return $records;
     }
 
 
@@ -350,7 +358,15 @@ class DataSource
             $linkedClause = $this->getLinkedClause($viewer, $linkedStudent, $linkedRecordIds);
             $pb = $pb->rawWhere($linkedClause['where'], $linkedClause['params']);
         }
-        return $this->findRawRecordsByPredicates($pb, [], $offset, $limit);
+
+        $records = $this->findRawRecordsByPredicates($pb, [], $offset, $limit);
+
+        // Each pastoral record we collected belongs to the student passed to this function.
+        foreach ($records as $record) {
+            $record->setStudent($student);
+        }
+
+        return $records;
     }
 
 
@@ -377,7 +393,6 @@ class DataSource
             SELECT
                 {$this->mapper->getColumnString('p')},
                 {$this->mapper->getJoinColumnString('owner', 'o')},
-                {$this->mapper->getJoinColumnString('student', 's')},
                 {$this->mapper->getJoinColumnString('modifiedBy', 'm')},
                 {$this->mapper->getJoinColumnString('severity', 'sev')},
                 {$this->mapper->getJoinColumnString('type', 't')},
@@ -433,10 +448,6 @@ class DataSource
                 /** @var User $modifiedBy */
                 $modifiedBy = $userMapper->hydrate($row, 'm');
                 $record->setModifiedBy($modifiedBy);
-                /** @var User $student */
-                $student = $userMapper->hydrate($row, 's');
-                $record->setStudent($student);
-
                 if ($severityEnabled) {
                     /** @var PastoralSeverity $severity */
                     $severity = $severityMapper->hydrate($row, 'sev');
