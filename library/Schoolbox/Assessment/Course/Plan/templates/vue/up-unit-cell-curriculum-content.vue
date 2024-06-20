@@ -2,6 +2,7 @@
 /**
  * To display a curriculum overview component within the unit planner
  */
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
 import UpUnitCellCurriculumContentNodes from "./up-unit-cell-curriculum-content-nodes.vue";
 import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
@@ -12,6 +13,12 @@ interface Props {
     column: Column; // the column linked to the curriculum cell
 }
 const props = defineProps<Props>();
+
+const unitPlannerStore = useUnitPlannerStore();
+
+const storeUnit = window.Vue.computed(() => {
+    return unitPlannerStore.units.find((unit) => unit.id === props.unit.id);
+});
 
 const curriculumStore = useUnitPlannerCurriculumStore();
 const component = window.Vue.ref<CurriculumOverviewComponent | null>(
@@ -56,8 +63,8 @@ window.Vue.watch(
 
 <template>
     <up-unit-cell-curriculum-content-nodes
-        v-if="component !== null"
-        :selected-nodes="props.unit.curriculum.selectedNodes"
+        v-if="component !== null && storeUnit"
+        :selected-nodes="storeUnit.curriculum.selectedNodes"
         :nodes="props.unit.curriculum.nodes ?? []"
         :folder-id="props.unit.folderId"
         :component="component"
