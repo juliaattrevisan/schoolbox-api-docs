@@ -116,10 +116,6 @@ window.Vue.onUnmounted(async () => {
                 v-html="props.student.attemptComment.comment"
             ></div>
             <template v-else>
-                <p class="meta">
-                    Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                    details on creation.
-                </p>
                 <textarea :id="editorId" rows="3"></textarea>
                 <div class="save-container l-grid">
                     <div class="save-container__inner-container">
