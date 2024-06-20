@@ -1,23 +1,24 @@
 <?php
 
 /**
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
 
 /**
- * Interface IListFactory
- *
- * @package Schoolbox\Realtime\MessageList
+ * Interface for factory for building message queues.
  */
 interface IListFactory
 {
     /**
+     * Build the queue for instant messages, whether read or unread.
+     *
      * @param int    $userId
      * @return QueueInterface
      */
@@ -25,6 +26,10 @@ interface IListFactory
 
 
     /**
+     * Build the queue for only the instant messages which are unread.
+     *
+     * When a message is marked as read, it's removed from this queue.
+     *
      * @param int $userId
      * @return QueueInterface
      */
@@ -32,6 +37,11 @@ interface IListFactory
 
 
     /**
+     * Build the queue for messages which will be sent via the digest.
+     *
+     * The digest is an email which is an accumulation of all messages sent to
+     * a user since the last digest was sent.
+     *
      * @param int $userId
      * @return QueueInterface
      */
@@ -39,10 +49,24 @@ interface IListFactory
 
 
     /**
+     * Build the queue for instant messages, delivered in-browser.
+     *
+     * This generally is a composite of the listed and unread queues.
+     *
      * @param int $userId
      * @return QueueInterface
      */
     public function instant($userId);
+
+
+    /**
+     * Build the queue for messages delivered to a mobile app or personal web
+     * app.
+     *
+     * @param int $userId
+     * @return QueueInterface
+     */
+    public function mobile($userId);
 
 
     /**
@@ -67,6 +91,7 @@ interface IListFactory
 
     /**
      * Returns a queue which handles message set for a given event object.
+     *
      * @param string $eventObjectId
      * @return QueueInterface
      */

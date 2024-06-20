@@ -46,18 +46,6 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
         $this->mailer       = $mailer;
     }
 
-
-
-    /**
-     * @param int $userId
-     * @return QueueInterface
-     */
-    public function mobile($userId)
-    {
-        return new Mobile($this->cloudManager, $userId);
-    }
-
-
     /**
      * @param int $userId
      * @return QueueInterface
