@@ -36,7 +36,7 @@
                                             <tr>
                                                 <td>{{ row.name }}</td>
                                                 <td>
-                                                    {% if row.type == 'url' %}
+                                                    {% if row.type == 'url' and rowValue %}
                                                         <a href="{{ rowValue }}">{{ rowValue }}</a>
                                                     {% elseif row.type == 'html' %}
                                                         {{ rowValue | purify }}
@@ -73,7 +73,7 @@
                                                 {% for key, field in record %}
                                                     {% set fieldValue = field.value ?? '' %}
                                                     <td>
-                                                        {% if field.type == 'url' %}
+                                                        {% if field.type == 'url' and fieldValue %}
                                                             <a href="{{ fieldValue }}">{{ collection.headers[key] }}</a>
                                                         {% elseif field.type == 'html' %}
                                                             {{ fieldValue | purify }}
