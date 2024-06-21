@@ -30,6 +30,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     /** @var Async\Client $asyncRedis */
     $asyncRedis = $di->get('redis.signalQueue.sub');
+
+    // Need a new strat for listening to mobile queue?
     $strat      = new DefaultDispatchStrategy($flags);
 
     $scheduler = new Scheduler($loop, $strat, $log, $clock);
