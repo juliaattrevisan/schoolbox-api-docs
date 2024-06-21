@@ -68,6 +68,18 @@ class AttemptEvaluator
                 'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
             ]
         );
+
+        /* Update schoolbox when we're done
+         */
+        $callbackUrl = $this->routeGenerator->generate(
+            'learningQuizAttempt.postRescore',
+            [
+                'assessmentId'               => $assessment->getId(),
+                'studentId'                  => $existingAttempt->getUser()->getId(),
+                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
+            ]
+        );
+
         $message = $this->messageFactory
             ->setUser($user)
             ->setRequest(
@@ -78,6 +90,7 @@ class AttemptEvaluator
                     )
                     ->withHeader('accept', 'application/json')
             )
+            ->setCallbackUrl($callbackUrl)
             ->build();
 
         $this->messageProducer->send(

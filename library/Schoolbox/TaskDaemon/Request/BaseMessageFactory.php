@@ -60,7 +60,8 @@ abstract class BaseMessageFactory
     /**
      * Set a callback URL for this call to taskd.
      *
-     * This URL will be called when taskd completes.
+     * This URL will be called via POST when taskd completes,
+     * using the callbackParams specified as a POST payload.
      *
      * @param string|null $callbackUrl
      * @return static
@@ -73,7 +74,7 @@ abstract class BaseMessageFactory
     }
 
     /**
-     * Set parameters to the callback URL for this call to taskd.
+     * Set POST parameters to the callback URL for this call to taskd.
      *
      * These parameters will be added to the call to the callback URL when taskd
      * completes.
