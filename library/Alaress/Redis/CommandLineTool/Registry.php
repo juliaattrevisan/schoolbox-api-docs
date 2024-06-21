@@ -86,6 +86,7 @@ class Registry
             '^msg:' . INSTANCE_ID . ':q:\d+:unread',
             '^msg:' . INSTANCE_ID . ':q:\d+:listed',
             '^msg:' . INSTANCE_ID . ':q:\d+:digest',
+            '^msg:' . INSTANCE_ID . ':q:\d+:mobile',
             // Not sure if the below are used
             //            '^msg:' . INSTANCE_ID . ':q:\d+:push',
             //            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
