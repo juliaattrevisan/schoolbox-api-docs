@@ -32,6 +32,7 @@ class Broker implements IBroker
     public const QUEUE = 'sb.schedule';
 
     /**
+     * @param string          $queue   Name of the queue
      * @param string          $instanceId
      * @param AMQPInterface   $amqp    an instance of the AMQP client interface
      * @param ClientInterface $redis   an instance of the Predis client interface
@@ -39,14 +40,14 @@ class Broker implements IBroker
      *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
     public function __construct(
+        private string $queue,
         private string $instanceId,
         private AMQPInterface $amqp,
         private ClientInterface $redis,
         private ?IClient $stomp = null
     ) {
         // ensure the queue requested exists so we can publish to it (via the default exchange)
-
-        $amqp->declareQueue(self::QUEUE);
+        $amqp->declareQueue($this->queue);
     }
 
 
@@ -63,7 +64,7 @@ class Broker implements IBroker
 
         try {
             $this->stomp->subscribeWithAck(
-                self::QUEUE,
+                $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
                 function (IFrame $frame, IAckResolver $resolver) use ($consumer) {
                     $resolve = new Resolver($resolver);
@@ -151,7 +152,7 @@ class Broker implements IBroker
      */
     protected function getRoutingKey(): string
     {
-        return self::QUEUE; // the routing key is simply the queue's name
+        return $this->queue; // the routing key is simply the queue's name
     }
 
 

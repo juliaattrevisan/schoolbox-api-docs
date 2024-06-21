@@ -9,7 +9,6 @@
 
 namespace Alaress\Scheduler\Cache;
 
-use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Predis;
@@ -17,6 +16,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 
 class RedisCache implements ICache
