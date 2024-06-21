@@ -32,7 +32,7 @@ abstract class GroupTypeBase implements GroupTypeInterface
         $this->collectionName = $this->config['recordCollection'];
     }
 
-    abstract protected function retrieveRecords(): mixed;
+    abstract protected function retrieveRecords(): ?array;
     abstract public function process(array $out): array;
 
     /**

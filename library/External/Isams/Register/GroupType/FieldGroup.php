@@ -18,7 +18,7 @@ class FieldGroup extends GroupTypeBase
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      *
      */
-    protected function retrieveRecords(): mixed
+    protected function retrieveRecords(): ?array
     {
         return $this->cacheHelper->getStudentFields($this->register['id'], $this->user->getExternalId());
     }
