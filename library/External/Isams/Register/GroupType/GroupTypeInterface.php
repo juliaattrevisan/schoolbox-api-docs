@@ -8,7 +8,6 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 interface GroupTypeInterface
 {
-
     /**
      * Process the output array for group type data
      *
