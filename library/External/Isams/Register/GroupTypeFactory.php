@@ -9,9 +9,8 @@ use External\Isams\Register\GroupType\FieldGroup;
 use External\Isams\Register\GroupType\RecordCollection;
 use Schoolbox\User;
 
-class GrouptypeFactory
+class GroupTypeFactory
 {
-
     public function __construct(
         private CacheHelper $cacheHelper,
         private User $user,

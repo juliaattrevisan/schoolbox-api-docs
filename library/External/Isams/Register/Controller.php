@@ -290,6 +290,7 @@ class Controller extends BaseController
 
         $out = [];
 
+        $factory = new GroupTypeFactory($this->cacheHelper, $user, $register, $metaFields);
         foreach ($config as $conf) {
             $collectionName = $conf['recordCollection'];
 
@@ -302,14 +303,9 @@ class Controller extends BaseController
             if (!isset($out[$metaGroupType][$collectionName]['groupName'])) {
                 $out[$metaGroupType][$collectionName]['groupName'] = $metaFields[$collectionName]['name'];
             }
-            $factory = new GrouptypeFactory();
             $groupType = $factory->produce(
                 $metaGroupType,
-                $this->cacheHelper,
-                $user,
-                $register,
-                $conf,
-                $metaFields
+                $conf
             );
 
             //If the type does not exist. Skip.
