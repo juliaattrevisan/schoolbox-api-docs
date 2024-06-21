@@ -2,14 +2,25 @@
 
 namespace External\Isams\Register\GroupType;
 
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
+
 class RecordCollection extends GroupTypeBase
 {
+    protected const GROUP_TYPE = 'RecordCollection';
     /**
      * Retrieving record collections
      *
-     * @return array|mixed
+     * @return array|null
+     * @throws ClientExceptionInterface
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     *
      */
-    private function retreiveRecords()
+    protected function retrieveRecords(): ?array
     {
         //Requested register collection we are extracting the data out of
         $recordCollection = $this->cacheHelper->getRecordCollections($this->register['id'], $this->collectionName);
@@ -25,9 +36,12 @@ class RecordCollection extends GroupTypeBase
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function process(array $out): array
     {
-        $data = $this->retreiveRecords();
+        $data = $this->retrieveRecords();
 
         if (null === $data) {
             /**
@@ -53,7 +67,7 @@ class RecordCollection extends GroupTypeBase
                     $record['fields'][$knownField]
                 );
 
-                $groupType = $this->getType();
+                $groupType = self::GROUP_TYPE;
                 $out[$groupType][$this->collectionName]['headers'][$key] = $name;
                 $out[$groupType][$this->collectionName]['data'][$index][$key] = [
                     'type' => $type,

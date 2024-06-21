@@ -7,12 +7,11 @@ namespace External\Isams\Register\GroupType;
 use External\Isams\Register\CacheHelper;
 use Schoolbox\User;
 
-
-abstract class GroupTypeBase
+abstract class GroupTypeBase implements GroupTypeInterface
 {
-    CONST TYPE_TEXTBOX_FIELD = 'TextboxField';
-    CONST TYPE_URL = 'url';
-    CONST TYPE_HTML = 'html';
+    private const TYPE_TEXTBOX_FIELD = 'TextboxField';
+    private const TYPE_URL = 'url';
+    private const TYPE_HTML = 'html';
 
     protected string $collectionName;
 
@@ -32,6 +31,9 @@ abstract class GroupTypeBase
     ) {
         $this->collectionName = $this->config['recordCollection'];
     }
+
+    abstract protected function retrieveRecords(): mixed;
+    abstract public function process(array $out): array;
 
     /**
      * Prepare the user data with their appropriate type and value
@@ -66,17 +68,5 @@ abstract class GroupTypeBase
             $type,
             $value
         ];
-    }
-
-    /**
-     * Getting the group's type
-     *
-     * @return string
-     */
-    protected function getType(): string
-    {
-        $class = get_class($this);
-        $class = substr($class, strrpos($class, '\\') + 1);
-        return $class;
     }
 }
