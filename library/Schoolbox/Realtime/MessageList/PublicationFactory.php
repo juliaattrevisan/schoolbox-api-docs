@@ -1,10 +1,8 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 namespace Schoolbox\Realtime\MessageList;
@@ -15,19 +13,27 @@ use Schoolbox\MobileApp;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\UserMapper;
 
+/**
+ * Factory for message "queues" for direct publication.
+ */
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
     /**
-     * @param string                    $instanceId
-     * @param ClientInterface           $redis
-     * @param MobileApp\IServiceManager $cloudManager
-     * @param UserMapper                $userMapper
-     * @param Mailer                    $mailer
+     * Constructor
+     *
+     * @param string                    $instanceId          The instance for which this factory is created.
+     * @param ClientInterface           $redis               Redis client: data store for messages.
+     * @param MobileApp\IServiceManager $cloudManager        Service required for direct send of mobile messages:
+     *                                                       responsible for actually sending to a delivery agent.
+     * @param UserMapper                $userMapper          User mapper: required for finding user's email address.
+     * @param Mailer                    $mailer              Mailer class: required for sending emails.
      * @param bool                      $mobileDaemonEnabled If true, creating mobile queue creates the daemon's queue:
      *                                                       otherwise, create the direct send queue.
+     *                                                       It's expected this option will be removed once the mobile
+     *                                                       daemon is verified to be stable.
      */
     public function __construct(
-        private $instanceId,
+        private string $instanceId,
         private ClientInterface $redis,
         private MobileApp\IServiceManager $cloudManager,
         private UserMapper $userMapper,
