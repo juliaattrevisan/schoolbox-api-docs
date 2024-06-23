@@ -60,16 +60,6 @@ interface IListFactory
 
 
     /**
-     * Build the queue for messages delivered to a mobile app or personal web
-     * app.
-     *
-     * @param int $userId
-     * @return QueueInterface
-     */
-    public function mobile($userId);
-
-
-    /**
      * Create a "queue" that when a notification is pushed onto it:
      * * retracts any matches for the notification from any other queues
      *   (Match = has same message string, href and params)

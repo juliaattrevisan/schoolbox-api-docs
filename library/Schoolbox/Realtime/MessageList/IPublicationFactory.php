@@ -21,6 +21,18 @@ use Alaress\Async\Queue\QueueInterface;
 interface IPublicationFactory extends IListFactory
 {
     /**
+     * Build the queue for messages delivered to a mobile app or personal web
+     * app.
+     *
+     * TODO move back to IListFactory once MobileSend is removed:
+     *
+     * @param int $userId
+     * @return QueueInterface
+     */
+    public function mobile($userId);
+
+
+    /**
      * Build the message queue for sending via email.
      *
      * @param int $userId

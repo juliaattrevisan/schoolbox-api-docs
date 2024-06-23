@@ -69,16 +69,6 @@ class ListFactory implements IListFactory
 
 
     /**
-     * @param int $userId
-     * @return QueueInterface
-     */
-    public function mobile($userId)
-    {
-        return new Mobile($this->redis, $this->instanceId, $userId);
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function retract(): QueueInterface
