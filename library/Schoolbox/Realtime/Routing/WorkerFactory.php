@@ -108,7 +108,14 @@ class WorkerFactory
         $mailer = new Mailer($this->emailFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
 
         // build a list factory
-        $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);
+        $listFactory = new MessageList\PublicationFactory(
+            $instanceId,
+            $this->client,
+            $cloudManager,
+            $this->userMapper,
+            $mailer,
+            (bool)$this->conf->get(Schoolbox\Config\ConfigMapper::NAME_MOBILE_DAEMON_ENABLED),
+        );
 
         // obtain filter list
         $filter = (new Filter\FilterFactory($listFactory, $this->conf))->build();
