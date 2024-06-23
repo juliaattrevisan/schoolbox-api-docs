@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Realtime\MessageList;
+
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\NotificationBundle;
+use Alaress\Async\Queue\QueueInterface;
+use Schoolbox\MobileApp;
+
+/**
+ * "List" which sends messages it receives directly to a mobile device.
+ *
+ * Renamed from `Mobile` in SA-17997.
+ *
+ * @deprecated this will be superseded by the new `Mobile` list, which is an
+ *             actual list which is read by another daemon.
+ */
+class MobileSend implements QueueInterface
+{
+    /** @var MobileApp\IServiceManager */
+    private $cloudManager;
+
+    /** @var int */
+    private $userId;
+
+
+    /**
+     * @param MobileApp\IServiceManager $cloudManager
+     * @param int                      $userId
+     */
+    public function __construct(MobileApp\IServiceManager $cloudManager, $userId)
+    {
+        $this->cloudManager = $cloudManager;
+        $this->userId       = $userId;
+    }
+
+
+    /**
+     * Returns the name of this queue
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return "{$this->userId}:mobile";
+    }
+
+
+    /**
+     * Returns whether or not this queue contains the given instance
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public function contains(Instance $instance): bool
+    {
+        // this "list" doesn't contain things
+        return false;
+    }
+
+
+    /**
+     * Request to drain the queue of its contents.
+     *
+     * @return void
+     */
+    public function drain(): void
+    {
+        // noop: this "list" doesn't contain things
+    }
+
+
+    /**
+     * Push the given instance onto this queue
+     *
+     * @param Instance $instance
+     * @return void
+     */
+    public function push(Instance $instance): void
+    {
+        $this->cloudManager->push($this->userId, $instance);
+    }
+
+
+    /**
+     * Populates the given Bundle with all the notifications this queue contains
+     *
+     * @param NotificationBundle $bundle    the bundle to populate
+     * @param bool               $dropCache whether or not any internally-held cache should be dropped
+     * @return void
+     */
+    public function fetchIntoBundle(NotificationBundle $bundle, bool $dropCache = false): void
+    {
+        // noop: this "list" doesn't contain things
+    }
+}
