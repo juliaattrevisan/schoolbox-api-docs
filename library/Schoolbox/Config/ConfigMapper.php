@@ -343,6 +343,7 @@ class ConfigMapper extends Mapper
         'restrict_parent_duework_access',
         'restrict_student_submissions',
         'restrict_parent_grades',
+        self::NAME_MOBILE_DAEMON_ENABLED,
     ];
 
     /**
