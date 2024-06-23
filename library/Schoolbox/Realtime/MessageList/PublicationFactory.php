@@ -11,11 +11,15 @@ namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
 use Predis\ClientInterface;
+use Schoolbox\MobileApp;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\UserMapper;
 
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
+    /** @var MobileApp\IServiceManager */
+    private $cloudManager;
+
     /** @var UserMapper */
     private $userMapper;
 
@@ -23,18 +27,21 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
     private $mailer;
 
     /**
-     * @param string          $instanceId
-     * @param ClientInterface $redis
-     * @param UserMapper      $userMapper
-     * @param Mailer          $mailer
+     * @param string                    $instanceId
+     * @param ClientInterface           $redis
+     * @param MobileApp\IServiceManager $cloudManager
+     * @param UserMapper                $userMapper
+     * @param Mailer                    $mailer
      */
     public function __construct(
         $instanceId,
         ClientInterface $redis,
+        MobileApp\IServiceManager $cloudManager,
         UserMapper $userMapper,
         Mailer $mailer
     ) {
         parent::__construct($instanceId, $redis);
+        $this->cloudManager = $cloudManager;
         $this->userMapper   = $userMapper;
         $this->mailer       = $mailer;
     }
