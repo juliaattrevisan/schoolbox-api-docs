@@ -17,15 +17,6 @@ use Schoolbox\UserMapper;
 
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
-    /** @var MobileApp\IServiceManager */
-    private $cloudManager;
-
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var Mailer */
-    private $mailer;
-
     /**
      * @param string                    $instanceId
      * @param ClientInterface           $redis
@@ -36,19 +27,15 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
      *                                                       otherwise, create the direct send queue.
      */
     public function __construct(
-        $instanceId,
-        ClientInterface $redis,
-        MobileApp\IServiceManager $cloudManager,
-        UserMapper $userMapper,
-        Mailer $mailer,
+        private $instanceId,
+        private ClientInterface $redis,
+        private MobileApp\IServiceManager $cloudManager,
+        private UserMapper $userMapper,
+        private Mailer $mailer,
         private bool $mobileDaemonEnabled,
     ) {
         parent::__construct($instanceId, $redis);
-        $this->cloudManager = $cloudManager;
-        $this->userMapper   = $userMapper;
-        $this->mailer       = $mailer;
     }
-
 
 
     /**
@@ -62,7 +49,7 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
     public function mobile($userId)
     {
         return $this->mobileDaemonEnabled
-            ? parent::mobile($userId)
+            ? new Mobile($this->redis, $this->instanceId, $userId)
             : new MobileSend($this->cloudManager, $userId);
     }
 
