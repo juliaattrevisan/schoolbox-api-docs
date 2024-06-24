@@ -160,8 +160,8 @@ HELP;
             'questions' => []
         ];
 
-        /** @var AssessmentMapperProxy $assessmentMapperProxy */
         try {
+            /** @var AssessmentMapperProxy $assessmentMapperProxy */
             $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             $logger->error('Could not get assessment data source.  ' . $e->getMessage());
