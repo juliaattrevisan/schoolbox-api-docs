@@ -35,14 +35,14 @@ class Rating
      *
      * @param int $studentYearLevel
      * @param int $currentSemester
-     * @param float $mark
+     * @param string $mark
      * @param bool $annotate
      * @return string
      */
     public function rate(
         int $studentYearLevel,
         int $currentSemester,
-        float $mark,
+        string $mark,
         bool $annotate = false
     ): string {
         $result = '';
@@ -61,38 +61,54 @@ class Rating
             $reference -= self::SEMESTER_1_OFFSET;
         }
 
-        /* Calculate proximity from your current expected standard
+        /* TODO Deal with submission states first
          */
-        $diff = $mark - (float)$reference;
+        if ('DNPP' === $mark) {
+            $result = 'Did not participate';
+            $submissionState = 'DNPP';
 
-        if ($diff < -1) {
-            $result = 'Well Below Standard';
-        }
+            /* Add a metric annotation
+             */
+            if ($annotate) {
+                $result .= sprintf(
+                    ' (ref: %s)',
+                    $submissionState
+                );
+            }
+        } else {
+            /* Calculate proximity from your current expected standard
+             */
+            $diff = $mark - (float)$reference;
 
-        if ($diff >= -1 && $diff < -0.5) {
-            $result = 'Below Standard';
-        }
+            if ($diff < -1) {
+                $result = 'Well Below Standard';
+            }
 
-        if ($diff >= -0.5 && $diff <= 0.0) {
-            $result = 'At Standard';
-        }
+            if ($diff >= -1 && $diff < -0.5) {
+                $result = 'Below Standard';
+            }
 
-        if ($diff > 0 && $diff <= 1) {
-            $result = 'Above Standard';
-        }
+            if ($diff >= -0.5 && $diff <= 0.0) {
+                $result = 'At Standard';
+            }
 
-        if ($diff > 1) {
-            $result = 'Well Above Standard';
-        }
+            if ($diff > 0 && $diff <= 1) {
+                $result = 'Above Standard';
+            }
 
-        /* Add a metric annotation
-         */
-        if ($annotate) {
-            $result .= sprintf(
-                ' (ref: %s, diff: %s)',
-                $reference,
-                $diff
-            );
+            if ($diff > 1) {
+                $result = 'Well Above Standard';
+            }
+
+            /* Add a metric annotation
+             */
+            if ($annotate) {
+                $result .= sprintf(
+                    ' (ref: %s, diff: %s)',
+                    $reference,
+                    $diff
+                );
+            }
         }
 
         return $result;

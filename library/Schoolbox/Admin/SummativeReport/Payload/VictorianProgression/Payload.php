@@ -203,6 +203,9 @@ class Payload
         $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
         $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
 
+        /* TODO Find submission states and store them here, for reference
+         */
+
         /* Remember we did this
          */
         $this->setup = true;
@@ -403,7 +406,7 @@ class Payload
             /* Build the outcome struct, because that's just too handy
              */
             $outcome = [
-                'mark' => $row['mark'],
+                'mark' => 'DNPP',
                 'feedback_table' => $row['feedback_table'],
                 'feedback_id' => $row['feedback_id'],
             ];
@@ -420,19 +423,25 @@ class Payload
                      */
                     $struct[$nodeId][$type] = $outcome;
                 } else {
-                    /* Remember the biggest mark this person received for this given $nodeId
-                     * Update existing record
+                    /* TODO Deal with submission state
                      */
-                    if ((float)$struct[$nodeId][$type]['mark'] < (float)$row['mark']) {
+                    if ('DNPP' === $row['mark']) {
                         $struct[$nodeId][$type] = $outcome;
+                    } else {
+                        /* Remember the biggest mark this person received for this given $nodeId
+                         * Update existing record
+                         */
+                        if ((float)$struct[$nodeId][$type]['mark'] < (float)$row['mark']) {
+                            $struct[$nodeId][$type] = $outcome;
+                        }
                     }
                 }
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
-                if (self::TYPE_CURRENT === $type) {
-                    $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
-                }
+//                if (self::TYPE_CURRENT === $type) {
+                    $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (string)$struct[$nodeId][$type]['mark'], $this->annotate);
+//                }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
                     /* There is a parent node
@@ -442,16 +451,22 @@ class Payload
                     /* Remember the biggest mark this person received for this given ($parentNodeId, $nodeId)
                      * Update existing record
                     */
-                    if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
+                    /* TODO Deal with submission state
+                     */
+                    if ('DNPP' === $row['mark']) {
                         $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                    } else {
+                        if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
+                            $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                        }
                     }
                 }
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
-                if (self::TYPE_CURRENT === $type) {
+//                if (self::TYPE_CURRENT === $type) {
                     $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
-                }
+//                }
             }
         }
 
