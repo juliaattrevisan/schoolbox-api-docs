@@ -58,10 +58,18 @@ abstract class BaseMessageFactory
     }
 
     /**
-     * Set a callback URL for this call to taskd.
+     * Set a fully-qualified callback URL for this call to taskd.
      *
      * This URL will be called via POST when taskd completes,
      * using the callbackParams specified as a POST payload.
+     *
+     * If you use our aura router to generate urls, use the following
+     * example to apply a fully-qualified name to it:
+     *
+     *     // an instance of (new Factory($this->getConfigLoader()))->buildFullyQualified()
+     *     private UriInterface $baseUrl;
+     *
+     *     (string)$this->baseUrl->withPath($callbackUrl)
      *
      * @param string|null $callbackUrl
      * @return static
