@@ -159,23 +159,6 @@ function check_cache_file_hash(){
   log "Current cached file is outdated: $cache_dir/$file_basename, downloading from upstream..."
 }
 
-# See https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
-function check_cache_s3(){
-  if ! head=$(aws s3api head-object --bucket "$s3_bucket" --key "$file_name_short"); then
-    error "Unable to fetch aws s3api head-object for $s3_bucket/$file_name_short"
-    exit 1;
-  fi
-
-  local etag;
-  etag=$(echo "$head" | jq -r '.ETag')
-  if [ -z "$etag" ]; then
-    error "Unable to parse etag from curl head"
-    exit 1;
-  fi
-
-  check_cache_file_hash "$etag"
-}
-
 # TODO. Need to test this and probably update it to work with Melbourne office proxy caching server
 function check_cache_proxy_server(){
   local curl_head;
@@ -201,16 +184,6 @@ function check_cache_proxy_server(){
   check_cache_file_hash "$etag"
 }
 
-# Checks if a cached file exists and is up to date.
-# If so, file is touched and program exits immediately.
-function check_cache(){
-  if is_s3_data_source; then
-    check_cache_s3
-  else
-    check_cache_proxy_server
-  fi
-}
-
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 function download_file_s3(){
 
@@ -234,8 +207,12 @@ function download_file(){
   log "Downloading $data_source/$file_name";
 
   if is_s3_data_source; then
+    # use s3 sync to check if the file already exists and is up to date, or downloads new version
     download_file_s3
   else
+    # Checks if a cached file exists and is up to date.
+    # If so, file is touched and program exits immediately.
+    check_cache_proxy_server
     download_file_proxy_server
   fi
 }
@@ -250,9 +227,6 @@ function main(){
   # If file already exists, check whether it is up to date
   if [[ ! -f "$cache_dir/$file_basename" ]]; then
     log "No cached file for '$file_basename' exists, downloading from upstream..."
-  else
-    log "Cache file found for '$file_basename' checking for upstream changes..."
-    check_cache
   fi
   download_file
 }
