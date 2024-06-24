@@ -55,7 +55,13 @@ class MaxMarksToolBulk extends CliTool\App
      * Maximum number of Questions per payload
      * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
      */
-    private const LEARNOSITY_MAX_QUESTIONS = 5;
+    private const LEARNOSITY_MAX_QUESTIONS = 50;
+
+    /**
+     * The number of assessments to process between progress updates.
+     * (Progress updates show fraction of assessments processed, and so allow estimation of script completion time.)
+     */
+    private const N_ASSESSMENTS_BETWEEN_PROGRESS_UPDATES = 10;
 
     /**
      * @var QuizMapper
@@ -275,7 +281,7 @@ HELP;
                 }
             }
 
-            if ($n % 4 === 0) {
+            if ($n % self::N_ASSESSMENTS_BETWEEN_PROGRESS_UPDATES === 0) {
                 $logger->info("--- Processed $n of $nAssessmentIds assessments ---");
             }
         }
@@ -334,9 +340,11 @@ HELP;
                 $logger->info("Request failed with status '{$response['meta']['status']}'");
                 return false;
             }
+
+            $logger->info('Request succeeded.');
         } else {
             $logger->info(
-                'Skipped sending ' . count($payload['questions']) . ' updated questions to Learnosity because not in perform mode'
+                'Skipped sending ' . count($payload['questions']) . ' updated questions to Learnosity because not in perform mode.'
             );
         }
 
