@@ -17,6 +17,7 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -418,7 +419,7 @@ class SubmissionBoxMapper extends BaseMapper
      */
     public function updateKamiDocument(SubmissionBox $object, ?SubmissionBox $previous): void
     {
-        if (!$this->getConfigLoader()->get('kami_enabled')) {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED)) {
             return;
         }
 

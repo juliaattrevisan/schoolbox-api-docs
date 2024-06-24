@@ -191,7 +191,7 @@ class Controller extends Base
                 'is_cloud'  => $this->isCloudHosted(),
                 "hostnames" => $this->instanceHostnames(),
                 'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
-                'kami_enabled' => $this->getConfigLoader()->get('kami_enabled'),
+                'kami_enabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED),
 
                 /* SUDS panel
                  */
