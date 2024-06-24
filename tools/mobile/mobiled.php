@@ -12,6 +12,7 @@ use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Redis\Async;
+use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -53,7 +54,28 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         // we'll be using the mobile broker for receiving...
         $broker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp);
 
-        // and then do something or other with it here
+
+        // Need a new strat for listening to mobile queue?
+        $strat     = new DefaultDispatchStrategy($flags);
+        $scheduler = new Scheduler($loop, $strat, $log, $clock);
+
+
+        // restoring from redis cache
+//        $jit = new RedisCache($redis, $log, INSTANCE_ID);
+//        $scheduler->setJitCache($jit);
+//        $jit->restoreSchedule($amqp, Broker::QUEUE);
+
+        // due to the async nature of STOMP, only register the consumer once the connection is actually established
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis) {
+            $log->info('Connected to STOMP', ['char' => '+']);
+
+            $broker->registerConsumer($scheduler);
+            $log->debug('Consuming amqp://' . Broker::QUEUE);
+
+            $topic = 'mobiled.' . INSTANCE_ID . '.*';
+            $asyncRedis->psubscribe($topic, $scheduler);
+            $log->info("Listening on signal queue: redis://$topic");
+        });
     } catch (ConnectionException $e) {
         $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), ['exception' => $e]);
     } catch (AMQPRuntimeException $e) {
@@ -62,11 +84,4 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
         throw $e;
     }
-
-    // Need a new strat for listening to mobile queue?
-    $strat      = new DefaultDispatchStrategy($flags);
-
-    $scheduler = new Scheduler($loop, $strat, $log, $clock);
-    $asyncRedis->psubscribe($topic, $scheduler);
-    $log->info("Listening on redis://$topic");
 });
