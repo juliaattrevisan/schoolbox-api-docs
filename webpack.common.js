@@ -160,6 +160,7 @@ module.exports = {
         horizontalMarking:
             "./library/Schoolbox/Learning/Learnosity/templates/vue/horizontalMarking/horizontalMarking.ts",
         quizFeedback: "./library/Schoolbox/Learning/Learnosity/templates/vue/feedback/quizFeedback.ts",
+        quizContent: "./library/Schoolbox/Learning/Learnosity/templates/js/quizContent.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
