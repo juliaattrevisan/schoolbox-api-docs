@@ -2271,6 +2271,28 @@ class Controller extends Base
 
         (new RescoreProcessor($this->api, true, null))->process($attempts);
 
+        $attemptEvaluator = $this->buildAttemptEvaluator();
+
+        foreach ($attempts as $attempt) {
+            $attemptEvaluator->poll(
+                $this->getUser(),
+                $assessment,
+                $attempt,
+            );
+        }
+
         $this->getSession()->getSegment(static::class)->set('hasRescore', false);
+    }
+
+
+    /**
+     * taskd POSTs callbackParams to this url
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     */
+    public function postRescoreAttemptsCallback(QuizDomainObject $assessment): void
+    {
+        // TODO: something goes here, but what?
     }
 }
