@@ -2289,10 +2289,21 @@ class Controller extends Base
      * taskd POSTs callbackParams to this url
      *
      * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $attempt
      * @return void
      */
-    public function postRescoreAttemptsCallback(QuizDomainObject $assessment): void
-    {
-        // TODO: something goes here, but what?
+    public function postRescoreAttemptsCallback(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        /* Ask learnosity about $attempt's new score and ram that back in
+         */
+
+        /* TODO but...what does taskd do about this?
+         *  How do I get the updated attempt score back here
+         */
+        (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll', $attempt->getLearnosityReference());
     }
 }
