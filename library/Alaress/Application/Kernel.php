@@ -517,7 +517,7 @@ abstract class Kernel
                         $gotenbergApiVersion,
                         GotenbergClient::API_KEY_HEADER,
                         GotenbergClient::API_VERSION_HEADER,
-                        // TODO pass Kami API host into taskd
+                        $config->get(ConfigMapper::NAME_KAMI_API_HOST),
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
