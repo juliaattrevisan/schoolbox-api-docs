@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use JsonException;
 use LearnositySdk\Exceptions\ValidationException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -18,6 +20,8 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Url\Factory;
 
 /**
@@ -157,7 +161,12 @@ HELP;
         ];
 
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
-        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        try {
+            $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            $logger->error('Could not get assessment data source.  ' . $e->getMessage());
+            exit(1);
+        }
 
         /* We need these mappers
          */
@@ -170,7 +179,15 @@ HELP;
             /* See if this assessment exists
              */
             /** @var QuizDomainModel $assessment */
-            $assessment = $assessmentMapperProxy->findById($assessmentId);
+            try {
+                $assessment = $assessmentMapperProxy->findById($assessmentId);
+            } catch (Deleted) {
+                $logger->warning('Skipping deleted assessment.');
+                continue;
+            } catch (Exception) {
+                $logger->warning('Could not get assessment.  Skipping.');
+                continue; // Skip deleted assessments.
+            }
 
             /* We need this $quiz container thing to hold attempts
              */
@@ -180,8 +197,8 @@ HELP;
                 /* This somehow found to be a survey, not a quiz.
                  * How this could be possible is a mystery except due to dev mistake
                  */
-                $logger->warning($e->getMessage());
-
+                $logger->error('Could not get quiz container object.  ' . $e->getMessage());
+                $logger->info('Continuing to next assessment.');
                 exit(1);
             }
 
@@ -193,15 +210,23 @@ HELP;
                     $assessment->getId(),
                     $quiz->getId()
                 ));
-
-                exit(1);
+                $logger->info('Continuing to next assessment.');
+                continue;
             }
 
-            $itemReferences = $api->dataGetRequest('/itembank/activities', [
-                'references' => [
-                    $quiz->getLearnosityReference()
-                ]
-            ])['data'][0]['data']['items'];
+            $itemReferences = null;
+
+            try {
+                $itemReferences = $api->dataGetRequest('/itembank/activities', [
+                    'references' => [
+                        $quiz->getLearnosityReference()
+                    ]
+                ])['data'][0]['data']['items'];
+            } catch (\Exception $e) {
+                $logger->error('Request to /itembank/activities failed.  ' . $e->getMessage());
+                $logger->info('Continuing to next assessment.');
+                continue;
+            }
 
             $itemReferenceList = [];
 
@@ -222,23 +247,36 @@ HELP;
 
             /* Get the full struct of data from learnosity, because they can't cope with partial data
              */
-            $items = $api->dataGetRequest('/itembank/items', ['references' => $itemReferenceList]);
+            try {
+                $items = $api->dataGetRequest('/itembank/items', ['references' => $itemReferenceList]);
+            } catch (JsonException | ValidationException $e) {
+                $logger->error('Request to /itembank/items failed.  ' . $e->getMessage());
+                $logger->info('Continuing to next assessment.');
+                continue;
+            }
 
             foreach ($items['data'] as $item) {
                 $itemTitleLogged = false;
                 foreach ($item['questions'] as $questionStub) {
                     if (self::LEARNOSITY_SHORT_TEXT === $questionStub['type']) {
-
                         if (!$itemTitleLogged) {
                             // Only log the item title if the item contains quiz questions.
                             $logger->debug(" * Item '{$item['title']}':");
                             $itemTitleLogged = true;
                         }
 
-                        $question = $api->dataGetRequest(
-                            '/itembank/questions',
-                            ['references' => [$questionStub['reference']]]
-                        )['data'][0];
+                        $question = null;
+
+                        try {
+                            $question = $api->dataGetRequest(
+                                '/itembank/questions',
+                                ['references' => [$questionStub['reference']]]
+                            )['data'][0];
+                        } catch (JsonException | ValidationException $e) {
+                            $logger->error('   Request to /itembank/questions failed.  ' . $e->getMessage());
+                            $logger->debug('   Continuing to next question.');
+                            continue;
+                        }
 
                         /* If the max_score value was already set, don't change anything;
                          * the user might have done something here.
@@ -307,7 +345,7 @@ HELP;
      * @param array $payload
      * @return bool Whether the request to Learnosity succeeded.  If not in 'perform' mode, this will always be true.
      */
-    private function sendRequestToLearnosityIfPerforming($api, array $payload): bool
+    private function sendRequestToLearnosityIfPerforming(LearnosityApi $api, array $payload): bool
     {
         $logger = $this->getLogger();
 
