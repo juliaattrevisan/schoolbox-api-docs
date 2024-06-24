@@ -400,6 +400,11 @@
                     if (capabilityHasValuedDescriptors && $this.attr('data-scaled-mark') !== '') {
                         $this.removeAttr('data-customised');
                     }
+
+                    // Or, if the capability mark input is actually empty, then we should remove the data-customised attribute
+                    if (customMark === "") {
+                        $this.removeAttr('data-customised');
+                    }
                 }
             });
         }
