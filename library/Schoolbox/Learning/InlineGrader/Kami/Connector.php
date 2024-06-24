@@ -56,6 +56,11 @@ class Connector implements IConnector
     private bool $enabled;
 
     /**
+     * Kami API host: defaults to `self::DEFAULT_BASE_URI` if empty.
+     */
+    private ?string $apiHost;
+
+    /**
      * Shared by all schoolbox instances. There is an alternative api-key available for testing to keep
      * test documents out of the production kami account. See SA-4489
      *
@@ -80,12 +85,13 @@ class Connector implements IConnector
     public function __construct(
         ClientInterface $client,
         ?bool $enabled,
-        private string $apiHost,
+        ?string $apiHost,
         #[SensitiveParameter] ?string $apiKey,
         ?string $siteSchoolCode,
     ) {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
+        $this->apiHost        = ($apiHost ?? self::DEFAULT_BASE_URI);
         $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
         $this->siteSchoolCode = null === $siteSchoolCode ? '' : trim($siteSchoolCode);
     }
