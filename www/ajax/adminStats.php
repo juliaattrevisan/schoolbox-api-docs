@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
@@ -344,10 +345,10 @@ switch ($_POST['module']) {
         $status = 'online';
         $connector  = new Schoolbox\Learning\InlineGrader\Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
-            $config->get('kami_enabled'),
-            $config->get('kami_api_host'),
-            $config->get('kami_api_key'),
-            $config->get('site_school_code')
+            $config->get(ConfigMapper::NAME_KAMI_ENABLED),
+            $config->get(ConfigMapper::NAME_KAMI_API_HOST),
+            $config->get(ConfigMapper::NAME_KAMI_API_KEY),
+            $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         );
         if (!$connector->isOnline()) {
             $light = 'alert';

@@ -1658,10 +1658,10 @@ abstract class Kernel
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'         => $di->lazyGet('httpClient'),
-            'enabled'        => $config->get('kami_enabled'),
-            'apiHost'        => $config->get('kami_api_host'),
-            'apiKey'         => $config->get('kami_api_key'),
-            'siteSchoolCode' => $config->get('site_school_code'),
+            'enabled'        => $config->get(ConfigMapper::NAME_KAMI_ENABLED),
+            'apiHost'        => $config->get(ConfigMapper::NAME_KAMI_API_HOST),
+            'apiKey'         => $config->get(ConfigMapper::NAME_KAMI_API_KEY),
+            'siteSchoolCode' => $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         ]));
 
         // PDF generator

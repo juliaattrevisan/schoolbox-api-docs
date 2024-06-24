@@ -245,6 +245,10 @@ class ConfigMapper extends Mapper
     public const NAME_PAPERLY_API_HOSTNAME = 'paperly_iframe_api_host';
     public const NAME_PAPERLY_API_KEY = 'paperly_iframe_api_key';
 
+    public const NAME_KAMI_ENABLED = 'kami_enabled';
+    public const NAME_KAMI_API_HOST = 'kami_api_host';
+    public const NAME_KAMI_API_KEY = 'kami_api_key';
+
     /**
      * Skin Config Fields
      */

@@ -16,6 +16,7 @@ use GuzzleHttp;
 use GuzzleHttp\HandlerStack;
 use Proxy;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Sentry\State\HubInterface;
@@ -114,10 +115,10 @@ class Uploader extends CliTool\App
             ? new Kami\MockConnector($client)
             : new Kami\Connector(
                 $client,
-                $this->getConfig()->get('kami_enabled'),
-                $this->getConfig()->get('kami_api_host'),
-                $this->getConfig()->get('kami_api_key'),
-                $this->getConfig()->get('site_school_code')
+                $this->getConfig()->get(ConfigMapper::NAME_KAMI_ENABLED),
+                $this->getConfig()->get(ConfigMapper::NAME_KAMI_API_HOST),
+                $this->getConfig()->get(ConfigMapper::NAME_KAMI_API_KEY),
+                $this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
             );
 
         if (!$connector->isEnabled()) {
