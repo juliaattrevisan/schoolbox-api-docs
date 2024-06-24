@@ -29,15 +29,15 @@ use Predis\ClientInterface;
  */
 class Broker implements IBroker
 {
-    public const QUEUE = 'sb.schedule';
-
     /**
-     * @param string          $queue   Name of the queue
-     * @param string          $instanceId
-     * @param AMQPInterface   $amqp    an instance of the AMQP client interface
-     * @param ClientInterface $redis   an instance of the Predis client interface
-     * @param IClient|null    $stomp   an instanceof the STOMP client interface
-     *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
+     * Constructor
+     *
+     * @param string          $queue      Name of the queue
+     * @param string          $instanceId The instance on which this broker is listening
+     * @param AMQPInterface   $amqp       an instance of the AMQP client interface
+     * @param ClientInterface $redis      an instance of the Predis client interface
+     * @param IClient|null    $stomp      an instanceof the STOMP client interface
+     *                                    (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
     public function __construct(
         private string $queue,

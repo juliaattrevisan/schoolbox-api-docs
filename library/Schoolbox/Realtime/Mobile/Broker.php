@@ -15,12 +15,23 @@ use Alaress\Async\Stomp\IClient;
 use Predis\ClientInterface;
 
 /**
- * Queue broker for the scheduled message queue.
+ * Queue broker for the mobiled message queue.
  */
 class Broker extends StompRedis\Broker
 {
+    /**
+     * The name of the queue.
+     */
     public const QUEUE = 'sb.mobile';
 
+    /**
+     * Constructor
+     *
+     * @param string          $instanceId
+     * @param AMQPInterface   $amqp
+     * @param ClientInterface $redis
+     * @param IClient|null    $stomp
+     */
     public function __construct(
         string $instanceId,
         AMQPInterface $amqp,

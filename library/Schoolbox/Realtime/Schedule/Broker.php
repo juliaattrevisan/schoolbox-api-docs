@@ -19,8 +19,19 @@ use Predis\ClientInterface;
  */
 class Broker extends StompRedis\Broker
 {
+    /**
+     * The name of the queue.
+     */
     public const QUEUE = 'sb.schedule';
 
+    /**
+     * Constructor: builds a Stomp+Redis queue pointing to `self::QUEUE`.
+     *
+     * @param string          $instanceId
+     * @param AMQPInterface   $amqp
+     * @param ClientInterface $redis
+     * @param IClient|null    $stomp
+     */
     public function __construct(
         string $instanceId,
         AMQPInterface $amqp,

@@ -20,6 +20,9 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
  */
 class Scheduler extends AbstractScheduler implements EventListener
 {
+    /**
+     * @return string
+     */
     protected function getMethod()
     {
         return DefaultDispatchStrategy::TASK_MOBILE;
