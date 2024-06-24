@@ -270,6 +270,10 @@
         {{ initOptions | raw }},
         authorAppCallback
     );
+    window.sbProps.authorApp = {
+        initOptions: {{ initOptions | raw }},
+        sitePlan: "{{ config.site_plan|lower }}"
+    }
 </script>
 {% endautoescape %}
 <script src="{{ CDN_PREFIX }}/js/bundle/quizContent.js?v={{ config.site_version }}"></script>

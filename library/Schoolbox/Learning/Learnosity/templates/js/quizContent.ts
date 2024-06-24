@@ -1,1 +1,1 @@
-console.warn("yep");
+// console.warn(window.sbProbs.authorApp);
