@@ -189,6 +189,19 @@ const authorAppCallback = {
                 navigateAuthorApp();
             }
         };
+
+        LT.init(authorApp); // Set up LT with the Author API application instance variable
+
+        // Put individual extensions in the LT object if that makes your life easier
+        LT.extensions = {
+            imageUploader,
+        };
+
+        // Run the image uploader extension
+        LT.extensions.imageUploader.run(
+            window.sbProps.authorApp.initOptions.security,
+            window.sbProps.authorApp.initOptions.request,
+        );
     },
     /* Log errors to console and to screen for users
      */
@@ -207,12 +220,3 @@ const authorAppCallback = {
 };
 
 const authorApp = window.LearnosityAuthor.init(window.sbProps.authorApp.initOptions, authorAppCallback);
-
-LT.init(authorApp); // Set up LT with the Author API application instance variable
-
-// Put individual extensions in the LT object if that makes your life easier
-LT.extensions = {
-    imageUploader,
-};
-
-LT.extensions.imageUploader.run(security, request);
