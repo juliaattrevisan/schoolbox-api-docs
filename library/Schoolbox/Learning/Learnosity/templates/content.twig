@@ -83,7 +83,8 @@
 <script>
     window.sbProps.authorApp = {
         initOptions: {{ initOptions | raw }},
-        sitePlan: "{{ config.site_plan|lower }}"
+        sitePlan: "{{ config.site_plan|lower }}",
+        activityTags: {{ tags|raw }}
     }
 </script>
 {% endautoescape %}

@@ -1,4 +1,6 @@
-// console.warn(window.sbProbs.authorApp);
+/**
+ *
+ */
 
 /**
  * Adjust the header of the question items list to be fixed when scrolling down
@@ -102,7 +104,7 @@ const authorAppCallback = {
          * spawned immediately upon authorApp rendering
          */
         authorApp.on("render:activity", function (event) {
-            // authorApp.setActivityTags({{ tags|raw }});
+            authorApp.setActivityTags(window.sbProps.authorApp.activityTags);
         });
 
         /**
@@ -131,22 +133,22 @@ const authorAppCallback = {
             }
         });
 
-        // {% if 'elite' != config.site_plan|lower %}
-        authorApp.on("widgetedit:editor:ready", function (event) {
-            /* Artificially wait for their dom
-             */
-            setTimeout(function () {
-                document
-                    .querySelector('[data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"]')
-                    ?.closest("li")
-                    .remove();
-                document
-                    .querySelector('[data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]')
-                    ?.closest("li")
-                    .remove();
-            }, 100);
-        });
-        // {% endif %}
+        if (window.sbProps.authorApp.sitePlan === "elite") {
+            authorApp.on("widgetedit:editor:ready", function (event) {
+                /* Artificially wait for their dom
+                 */
+                setTimeout(function () {
+                    document
+                        .querySelector('[data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"]')
+                        ?.closest("li")
+                        .remove();
+                    document
+                        .querySelector('[data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]')
+                        ?.closest("li")
+                        .remove();
+                }, 100);
+            });
+        }
 
         /**
          * Push app location changes to browser history, so we can use the browser back/forward
@@ -201,7 +203,4 @@ const authorAppCallback = {
     },
 };
 
-// const authorApp = LearnosityAuthor.init(
-//     {{ initOptions | raw }},
-//     authorAppCallback
-// );
+const authorApp = window.LearnosityAuthor.init(window.sbProps.authorApp.initOptions, authorAppCallback);
