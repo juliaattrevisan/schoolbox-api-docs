@@ -86,7 +86,6 @@ HELP;
         $statement = $db->prepare($attemptQuery);
         $statement->execute();
 
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->getLogger()->info(sprintf(
                 'Attempt %s: converting overall comment to plaintext',
