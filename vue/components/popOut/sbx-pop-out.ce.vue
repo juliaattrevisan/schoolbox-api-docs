@@ -199,4 +199,11 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         transform: rotate(0deg);
     }
 }
+
+/* Styles for printing */
+@media print {
+    button.sbx-button.sbx-button--icon-only {
+        display: none !important;
+    }
+}
 </style>

@@ -217,5 +217,8 @@ li[data-sortable-active="true"] .sortable-holder {
         color: #000 !important;
         text-decoration: none !important;
     }
+    .information-list > li {
+        border: none !important;
+    }
 }
 </style>

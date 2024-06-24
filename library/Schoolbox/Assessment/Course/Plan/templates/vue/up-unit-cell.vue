@@ -219,6 +219,10 @@ window.Vue.onUnmounted(() => {
         draggableInstance[0].kill();
     }
 });
+
+const isFirstUnit = window.Vue.computed(() => {
+    return store.units[0].id === props.unit.id;
+});
 </script>
 
 <template>
@@ -232,11 +236,16 @@ window.Vue.onUnmounted(() => {
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
             'print-only': props.column.isPrintOnly,
             'hide-on-print': !props.column.showOnPrint,
+            'first-unit': isFirstUnit,
         }"
         :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
         @click="onContentClicked"
     >
         <div ref="contentEl">
+            <h2 v-if="props.column.type === ColumnType.UNIT" class="print-only unit-title-print">
+                <strong>{{ props.unit.title }}</strong>
+            </h2>
+            <h3 v-else class="print-only label-print">{{ props.column.label }}</h3>
             <template v-if="props.column.type === ColumnType.UNIT">
                 <div
                     v-if="dragStore.routeFolderSequence"
@@ -245,8 +254,7 @@ window.Vue.onUnmounted(() => {
                     data-test="unit-row-drag-handle"
                     :class="{ isDragging: store.dragCurrentUnit === props.unit }"
                 ></div>
-
-                <div>
+                <div class="no-print">
                     <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
                     <div>
                         <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`">
@@ -309,7 +317,7 @@ window.Vue.onUnmounted(() => {
                     </button>
                 </div>
             </div>
-            <div v-else class="content-overlay empty-state">
+            <div v-else class="content-overlay empty-state no-print">
                 <up-unit-cell-textbox-empty
                     v-if="props.column.type === ColumnType.OVERVIEW"
                     :unit="props.unit"
@@ -468,17 +476,38 @@ window.Vue.onUnmounted(() => {
     .unit-cell {
         height: auto !important; // Expand the unit cell to show all content
         overflow: visible !important;
-        page-break-after: always !important;
     }
-    i.icon-grip.ui-sortable-handle.grip {
-        display: none !important;
-    }
-    .content-container-fixed {
-        display: none !important;
+    .meta {
+        display: none;
     }
     a {
         color: #000 !important;
         text-decoration: none !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .label-print {
+        border-bottom: 1px solid #eee;
+        border-top: 1px solid #eee;
+        margin: 0.5rem;
+        padding: 0.5rem;
+    }
+}
+@media print and (max-width: 210mm) {
+    .content-container-fixed {
+        display: none !important;
+    }
+
+    .unit-title-print {
+        border: 2px solid #999;
+        margin-left: 0px !important;
+        margin-top: 2rem !important;
+        padding: 0.5rem;
+        page-break-before: always !important;
+    }
+    .unit-cell.first-unit .unit-title-print {
+        page-break-before: avoid !important; // Avoid breaking the page before the first unit
     }
 }
 </style>

@@ -315,15 +315,25 @@ window.Vue.onUnmounted(() => {
         display: none;
     }
     .scrollable {
-        overflow: visible !important;
         height: 100% !important;
-    }
-    .unit-planner {
-        grid-template-columns: repeat(calc(var(--UnitPlannerVisibleColumns) * 2), minmax(400px, 1fr));
+        overflow: visible !important;
     }
     a {
         color: #000 !important;
         text-decoration: none !important;
+    }
+    .header-row {
+        display: none !important;
+    }
+}
+@media print and (max-width: 210mm) {
+    .unit-planner {
+        grid-template-columns: 1fr !important;
+    }
+    .grid-row {
+        > div {
+            border: none !important;
+        }
     }
 }
 </style>

@@ -28,6 +28,12 @@ const props = defineProps<Props>();
 //         addUnitStore.prompt();
 //     }
 // }
+/**
+ * To show the print option under three dot menu
+ */
+function onPrintSelected() {
+    window.print();
+}
 </script>
 
 <template>
@@ -62,9 +68,21 @@ const props = defineProps<Props>();
                 >Assessment Calendar</a
             >
         </li>
+        <li>
+            <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
+        </li>
     </ul>
     <!--
     <Transition!-- @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <up-add-unit v-if="addUnitStore.isOpen" />
     </Transition!-->
 </template>
+
+<style scoped>
+/* Styles for printing */
+@media print {
+    ul#unit-dropdown {
+        display: none !important;
+    }
+}
+</style>

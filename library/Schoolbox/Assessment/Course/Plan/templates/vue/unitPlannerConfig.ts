@@ -94,7 +94,7 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
 const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true, showOnPrint: false },
+    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true, showOnPrint: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false, showOnPrint: true }, // The label is set by the textbox keys
     [ColumnType.ACTIVITIES]: {
         label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
@@ -188,26 +188,10 @@ export function createTabs(template: UnitTemplate) {
             }
             tabColumns.push(newColumnBase);
         });
-         // Add print-only unit columns before each non-unit column to help with printing the unit planner
-         const tabColumnsWithHiddenUnit: typeof tabColumns = tabColumns.flatMap((column, index) => {
-            if (column.type !== ColumnType.UNIT) {
-                return [
-                    {
-                        id: `${ColumnType.UNIT}-printOnly-${index}`,
-                        type: ColumnType.UNIT,
-                        label: columnConfig[ColumnType.UNIT].label || ColumnType.UNIT,
-                        isPrintOnly: true,
-                        showOnPrint: true,
-                        fixedLeft: column.fixedLeft,
-                    },
-                    column,
-                ];
-            }
-            return column;
-        });
+
         return {
             ...tabInfo,
-            columns: tabColumnsWithHiddenUnit,
+            columns: tabColumns,
         };
     });
 }
