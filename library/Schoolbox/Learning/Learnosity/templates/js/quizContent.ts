@@ -2,6 +2,9 @@
  *
  */
 
+import { LT } from "@caspingus/lt/src/authoring/core";
+import * as imageUploader from "@caspingus/lt/src/authoring/extensions/ui/imageUploader/index";
+
 /**
  * Adjust the header of the question items list to be fixed when scrolling down
  * Prevents the "Add items" button from being lost when scrolling down
@@ -204,3 +207,12 @@ const authorAppCallback = {
 };
 
 const authorApp = window.LearnosityAuthor.init(window.sbProps.authorApp.initOptions, authorAppCallback);
+
+LT.init(authorApp); // Set up LT with the Author API application instance variable
+
+// Put individual extensions in the LT object if that makes your life easier
+LT.extensions = {
+    imageUploader,
+};
+
+LT.extensions.imageUploader.run(security, request);
