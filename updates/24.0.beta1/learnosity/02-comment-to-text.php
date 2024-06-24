@@ -95,7 +95,7 @@ HELP;
 
             $updateStatement->execute([
                 'attemptId' => $row['attempt_id'],
-                'comment' => strip_tags($row['comment'])
+                'comment' => \Scrub::html2text($row['comment'])
             ]);
         }
 
