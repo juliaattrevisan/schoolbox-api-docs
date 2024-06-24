@@ -1804,6 +1804,7 @@ class Controller extends Assessment\Controller
                 /* Create a new one if it didn't already exist
                  */
                 $kamiModel = $this->kamiMapper->createModel()
+                    ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
                     ->setStudentSubmissionFile($file)
                     ->setStatusQueued();
 
