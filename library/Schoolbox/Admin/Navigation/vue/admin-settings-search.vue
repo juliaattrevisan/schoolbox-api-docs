@@ -88,36 +88,6 @@ export default window.Vue.defineComponent({
             const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
             return matchedTitleList.concat(matchedNameAndDescriptionList); // so those that have title matches take precedence
         },
-
-        /**
-         * the settings relevant to the search input and capped to resultsShownLimit
-         * @returns {SBSettingsListItem[]} a limited list of search results
-         */
-        resultsListLimited(): SBSettingsListItem[] {
-            if (this.resultsList.length > this.resultsShownLimit) {
-                // return the capped results
-                return this.resultsList.filter((setting, index) => index < this.resultsShownLimit);
-            }
-
-            // otherwise just return the whole list
-            return this.resultsList;
-        },
-
-        /**
-         * to show the search refine note
-         * @returns {boolean} true if there are results beyond the limit
-         */
-        hasResultsBeydondLimit(): boolean {
-            return this.resultsList.length > this.resultsShownLimit;
-        },
-
-        /**
-         * to show the count of how many aren't appearing in the search
-         * @returns {number} the count of results beyond the limit
-         */
-        resultsBeyondLimitCount(): number {
-            return this.resultsList.length - this.resultsShownLimit;
-        },
     },
 
     watch: {
@@ -409,7 +379,7 @@ export default window.Vue.defineComponent({
                 @after-leave="checkEachResultIndex"
                 @leave-cancelled="checkEachResultIndex"
             >
-                <li v-for="(result, index) in resultsListLimited" :key="result.name" :data-index="index">
+                <li v-for="(result, index) in resultsList" :key="result.name" :data-index="index">
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
@@ -420,9 +390,6 @@ export default window.Vue.defineComponent({
                     />
                 </li>
             </transition-group>
-            <aside v-if="isActive && hasResultsBeydondLimit" class="search-refine-note">
-                {{ resultsBeyondLimitCount }} search results not shown, try refining your search further.
-            </aside>
         </div>
     </div>
 </template>
@@ -447,6 +414,8 @@ ul {
     @media only screen and (max-width: 640px) {
         width: 100%;
     }
+    max-height: 400px;
+    overflow-y: scroll;
     li {
         border-bottom: 1px solid $body-bg;
         border-left: 1px solid $navigation-hover;
@@ -459,14 +428,5 @@ ul {
             border-bottom: 1px solid $navigation-hover;
         }
     }
-}
-
-.search-refine-note {
-    background-color: #fafafa;
-    border: 1px solid #ededed;
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 13px;
-    font-style: italic;
 }
 </style>
