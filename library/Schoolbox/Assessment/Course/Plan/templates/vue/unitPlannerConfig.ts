@@ -74,7 +74,7 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
         const allTab = modifiedTabConfig.find((tab) => tab.id === "all") as TabConfig;
         allTab.columnTypeIDs = allTab?.columnTypeIDs.filter((columnType) => columnType !== ColumnType.OVERVIEW);
         // as well as the entire overview tab
-        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "overview");
+        modifiedTabConfig = modifiedTabConfig.filter((tab) => tab.id !== "overview");
     }
     if (template.curriculum.length === 0) {
         // remove the curriculum overview column from the all tab
@@ -83,7 +83,7 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
             (columnType) => columnType !== ColumnType.CURRICULUM_OVERVIEW,
         );
         // as well as the entire curriculum overview tab
-        modifiedTabConfig = tabConfig.filter((tab) => tab.id !== "curriculum-overview");
+        modifiedTabConfig = modifiedTabConfig.filter((tab) => tab.id !== "curriculum-overview");
     }
     return modifiedTabConfig;
 }
@@ -160,7 +160,6 @@ function getColumns(
 export function createTabs(template: UnitTemplate) {
     const modifiedTabConfig = modifyTabConfig(tabConfig, template);
     const modifiedColumnConfig = modifyColumnConfig(columnConfig, template);
-
     return modifiedTabConfig.map((tabInfo) => {
         const tabColumns: Tab["columns"] = [];
         tabInfo.columnTypeIDs.forEach((columnTypeID) => {
