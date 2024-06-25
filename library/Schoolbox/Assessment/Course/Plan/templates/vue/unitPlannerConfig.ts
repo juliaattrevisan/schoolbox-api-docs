@@ -14,7 +14,6 @@ export enum ColumnType {
 interface ColumnConfig {
     label: string | null; // If null, the label must be set by some other condition
     fixedLeft: boolean; // Whether the column should be fixed to the left of the grid
-    showOnPrint: boolean; // Whether the column should be shown when printing the unit planner
 }
 
 // Configuration options for a tab
@@ -30,7 +29,6 @@ export interface Column extends ColumnConfig {
     id: string; // Vue requires unique keys for v-for loops, but they must be the same across tabs for the same column
     type: ColumnType;
     label: string;
-    isPrintOnly: boolean; // Whether the column should only be shown when printing the unit planner
 }
 
 // An implemented tab as given to the unit planner, linking the tab with implemented columns to display
