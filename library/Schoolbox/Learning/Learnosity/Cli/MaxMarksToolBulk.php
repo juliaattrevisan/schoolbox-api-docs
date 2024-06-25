@@ -326,7 +326,7 @@ HELP;
     private function getActivityReferenceByItemReference(LearnosityApi $api, array $activityReferences): array
     {
         $logger = $this->getLogger();
-        $activityReferencesChunked = array_chunk($activityReferences,self::BATCH_SIZE_N_ITEMS);
+        $activityReferencesChunked = array_chunk($activityReferences, self::BATCH_SIZE_N_ITEMS);
         $activityReferenceByItemReference = [];
 
         foreach ($activityReferencesChunked as $activityReferences) {
