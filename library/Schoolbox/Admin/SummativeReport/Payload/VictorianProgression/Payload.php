@@ -60,29 +60,29 @@ class Payload
             a.title,
             a.id AS assessment_id,
             a.due_date,
-            vaf.feedback_table,
-            vaf.feedback_id,
-            vaf.student_id,
-            vaf.published_at,
+            vmrf.feedback_table,
+            vmrf.feedback_id,
+            vmrf.student_id,
+            vmrf.published_at,
             sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
-        LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
-        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
-        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
+        LEFT JOIN v_most_recent_feedback vmrf ON a.id = vmrf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN submission_return sr ON vmrf.feedback_id = sr.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
-        AND vaf.student_id = :studentId                         -- filter to actual student
-        AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
+        AND vmrf.student_id = :studentId                        -- filter to actual student
+        AND vmrf.published_at IS NOT NULL                       -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
         AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vmrf.published_at DESC, vmrf.feedback_id DESC
     ";
 
 
@@ -100,24 +100,24 @@ class Payload
             a.title,
             a.id AS assessment_id,
             a.due_date,
-            vaf.feedback_table,
-            vaf.feedback_id,
-            vaf.student_id,
-            vaf.published_at,
+            vmrf.feedback_table,
+            vmrf.feedback_id,
+            vmrf.student_id,
+            vmrf.published_at,
             sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
-        LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
-        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
-        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
+        LEFT JOIN v_most_recent_feedback vmrf ON a.id = vmrf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN submission_return sr ON vmrf.feedback_id = sr.id
         LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
         LEFT JOIN folder f ON mvar.folder_id = f.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
-        AND vaf.student_id = :studentId                         -- filter to actual student
-        AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
+        AND vmrf.student_id = :studentId                        -- filter to actual student
+        AND vmrf.published_at IS NOT NULL                       -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
         AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND f.id = :folderId
@@ -126,7 +126,7 @@ class Payload
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
         AND f.deleted_at IS NULL
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vmrf.published_at DESC, vmrf.feedback_id DESC
     ";
 
 
