@@ -143,7 +143,8 @@ export default {
     padding: 0.75rem;
     background: white;
     transition: background 0.2s;
-    &:hover {
+    &:hover,
+    &:focus {
         background: $content-ui-hover;
     }
     h4 {

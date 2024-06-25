@@ -190,6 +190,7 @@ export default window.Vue.defineComponent({
         decrementActiveIndex() {
             if (this.activeIndex > 0) {
                 this.activeIndex -= 1;
+                this.scrollActiveResultIntoView();
             }
         },
 
@@ -198,8 +199,19 @@ export default window.Vue.defineComponent({
          * with the arrow keys
          */
         incrementActiveIndex() {
-            if (this.activeIndex < this.resultsListLimited.length - 1) {
+            if (this.activeIndex < this.resultsList.length - 1) {
                 this.activeIndex += 1;
+                this.scrollActiveResultIntoView();
+            }
+        },
+
+        /**
+         * Scroll the active search result into view
+         */
+        scrollActiveResultIntoView() {
+            if (this.activeIndex !== -1) {
+                const activeElement = (this.$refs.searchResultListItems as HTMLElement[])[this.activeIndex];
+                activeElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
             }
         },
 
@@ -275,7 +287,7 @@ export default window.Vue.defineComponent({
          * how the element animates off
          */
         checkEachResultIndex() {
-            this.$refs.searchResults.forEach((searchResult) => {
+            (this.$refs.searchResults as InstanceType<typeof AdminSettingsSearchResult>[]).forEach((searchResult) => {
                 searchResult.checkIndex();
             });
         },
@@ -379,7 +391,12 @@ export default window.Vue.defineComponent({
                 @after-leave="checkEachResultIndex"
                 @leave-cancelled="checkEachResultIndex"
             >
-                <li v-for="(result, index) in resultsList" :key="result.name" :data-index="index">
+                <li
+                    v-for="(result, index) in resultsList"
+                    :key="result.name"
+                    ref="searchResultListItems"
+                    :data-index="index"
+                >
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
