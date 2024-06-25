@@ -78,17 +78,18 @@ class ForwardToBrokeredQueue implements QueueInterface
     /**
      * Push the given instance onto the brokered queue.
      *
-     * Messages are published with the contexts:
-     * * this object's namespace
-     * * this user ID
+     * Messages are published with `$this->instanceId` and `$this->userId` as
+     * contexts:
+     * * instance ID is not yet required, but may be if the brokered queue
+     *   becomes instance-agnostic
+     * * user ID is required so that `$instance` may be sent to a particular
+     *   user
      *
      * @param Instance $instance
      * @return void
      */
     public function push(Instance $instance): void
     {
-        // What gets put into the brokered queue?
-        // Let's just say the message instance and the user ID.
         $this->broker->publish($instance, [$this->instanceId, $this->userId]);
     }
 

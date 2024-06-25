@@ -101,11 +101,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         // * put it back on Redis, or a Rabbit delayed queue?
         // * add a timer for re-processing it
         // * if the mobile daemon is restarted: the JIT cache will rebuild it
-//        $this->serviceManager->push($payload->get);
+        if (!is_array($context)) {
+            // Go no further: I don't know who to send to
+        }
 
-        $this->log->notice(sprintf('payload: %s', json_encode($payload)));
-        $this->log->notice(sprintf('resolver: %s', json_encode($resolver)));
-        $this->log->notice(sprintf('context: %s', json_encode($context)));
+        // Context will be instance ID + user ID:
+        // currently instance ID is unused, but may be if this daemon is ever
+        // made instance-agnostic.
+        $instanceId = $context[0] ?? null;
+        $userId     = $context[1] ?? null;
+
+        // Now send
+        $this->serviceManager->push($userId, $payload);
     }
 
     /**
