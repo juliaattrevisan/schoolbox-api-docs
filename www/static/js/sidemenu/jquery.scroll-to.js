@@ -70,9 +70,9 @@
                  * This is because the previous submenu height could exceed the viewport, and the new submenu
                  * could be shorter, so wouldn't be visible if the user scrolled to the bottom of the previous submenu.
                  */
-                const element = event.target.closest(".left-submenu");
-                if (element && element.scrollTop > 0) {
-                    element.scrollTop = 0;
+                const subMenu = event.target.closest("[data-sub-menu]");
+                if (subMenu && subMenu.scrollTop > 0) {
+                    subMenu.scrollTop = 0;
                 }
             });
         }
@@ -85,7 +85,7 @@
                 {
                     scrollTop: $(config.scrollTo).offset().top,
                 },
-                config.velocity
+                config.velocity,
             );
         }
     };
