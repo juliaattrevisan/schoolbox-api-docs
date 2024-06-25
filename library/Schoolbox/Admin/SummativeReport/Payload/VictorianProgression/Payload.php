@@ -64,7 +64,7 @@ class Payload
             vaf.feedback_id,
             vaf.student_id,
             vaf.published_at,
-            COALESCE(sr.mark, aa.mark) AS mark
+            sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
@@ -72,23 +72,16 @@ class Payload
         LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
         LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
         LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
-        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
-        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
         AND vaf.student_id = :studentId                         -- filter to actual student
         AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
-        AND (
-            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
-            OR quiz.grade_group_id IS NOT NULL
-        )
+        AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
-        AND quiz.deleted_at IS NULL
-        AND aa.deleted_at IS NULL
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
 
@@ -111,7 +104,7 @@ class Payload
             vaf.feedback_id,
             vaf.student_id,
             vaf.published_at,
-            COALESCE(sr.mark, aa.mark) AS mark
+            sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
@@ -119,8 +112,6 @@ class Payload
         LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
         LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
         LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
-        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
-        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
         LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
         LEFT JOIN folder f ON mvar.folder_id = f.id
         WHERE a.due_date IS NOT NULL
@@ -128,17 +119,12 @@ class Payload
         AND vaf.student_id = :studentId                         -- filter to actual student
         AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
-        AND (
-            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
-            OR quiz.grade_group_id IS NOT NULL
-        )
+        AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND f.id = :folderId
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
-        AND quiz.deleted_at IS NULL
-        AND aa.deleted_at IS NULL
         AND f.deleted_at IS NULL
         ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
     ";
