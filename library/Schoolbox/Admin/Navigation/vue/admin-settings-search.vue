@@ -5,6 +5,7 @@
  * search result can be selected to move to the relevant page/setting
  */
 import { gsap } from "gsap/all";
+import ScrollFadeWrapper from "@schoolboxVue/components/scroll-fade-wrapper.vue";
 import AdminSettingsSearchResult from "./admin-settings-search-result.vue";
 
 const SB_SETTINGS_LIST = "sb_settingsList";
@@ -20,6 +21,7 @@ interface SBSettingsListItem {
 export default window.Vue.defineComponent({
     components: {
         AdminSettingsSearchResult,
+        ScrollFadeWrapper,
     },
 
     data() {
@@ -379,7 +381,7 @@ export default window.Vue.defineComponent({
             class=""
             @input="$event.target.composing = false"
         />
-        <div>
+        <scroll-fade-wrapper tag="div" target-selector="ul">
             <transition-group
                 name="staggered-fade"
                 tag="ul"
@@ -407,7 +409,7 @@ export default window.Vue.defineComponent({
                     />
                 </li>
             </transition-group>
-        </div>
+        </scroll-fade-wrapper>
     </div>
 </template>
 
@@ -432,7 +434,7 @@ ul {
         width: 100%;
     }
     max-height: 400px;
-    overflow-y: scroll;
+    overflow-y: auto;
     li {
         border-bottom: 1px solid $body-bg;
         border-left: 1px solid $navigation-hover;

@@ -1,0 +1,82 @@
+<script setup lang="ts">
+/**
+ * Adds fading effects to the top and bottom of the scrollable content area
+ * when there is more content available to scroll to
+ */
+const props = defineProps({
+    tag: {
+        type: String,
+        default: "div",
+    },
+    targetSelector: {
+        type: String,
+        default: "ul",
+    },
+});
+
+const scrollContainerRef = window.Vue.ref<HTMLElement | null>(null);
+
+const showTopFade = window.Vue.ref(false);
+const showBottomFade = window.Vue.ref(false);
+
+window.Vue.onMounted(() => {
+    if (!scrollContainerRef.value) return;
+    const scrollContainer = scrollContainerRef.value.querySelector(props.targetSelector);
+    if (!scrollContainer) return;
+
+    const checkScroll = () => {
+        if (!scrollContainer) return;
+        showTopFade.value = scrollContainer.scrollTop > 0;
+        showBottomFade.value = scrollContainer.scrollTop + scrollContainer.clientHeight < scrollContainer.scrollHeight;
+    };
+
+    // To respond to changes in the scroll position
+    scrollContainer.addEventListener("scroll", checkScroll);
+
+    // To respoond to changes in the scrollable content size
+    const resizeObserver = new ResizeObserver(checkScroll);
+    resizeObserver.observe(scrollContainer);
+
+    checkScroll(); // Initial check
+
+    window.Vue.onUnmounted(() => {
+        scrollContainer.removeEventListener("scroll", checkScroll);
+        resizeObserver.disconnect();
+    });
+});
+</script>
+
+<template>
+    <component :is="props.tag" ref="scrollContainerRef" class="scroll-fade-container">
+        <div v-show="showTopFade" class="scroll-fade-top"></div>
+        <slot></slot>
+        <div v-show="showBottomFade" class="scroll-fade-bottom"></div>
+    </component>
+</template>
+
+<style scoped>
+.scroll-fade-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.scroll-fade-top,
+.scroll-fade-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 40px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+    z-index: 2;
+}
+
+.scroll-fade-top {
+    top: 0;
+}
+
+.scroll-fade-bottom {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+}
+</style>
