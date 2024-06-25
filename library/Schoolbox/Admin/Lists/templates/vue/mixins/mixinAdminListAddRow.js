@@ -53,7 +53,8 @@ export default {
          * @param { String }
          */
         getNextId() {
-            const newId = this.loadedData.rows.length - (this.rows.length + 1); //+1 as the row hasn't been added in yet, with each new row the id will decrement
+            // Find the lowest negative number that isn't already in use. with each new row the id will decrement by 1
+            const newId = Math.min(...this.rows.map((row) => parseInt(row.id, 10)), 0) - 1;
             return newId.toString();
         },
     },
