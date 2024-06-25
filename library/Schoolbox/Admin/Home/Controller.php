@@ -189,7 +189,6 @@ class Controller extends Base
                 'collabDocsEnabled' => $this->collabDocsEnabled(),
                 'turnitinEnabled' => (new Helper($this->getConfigLoader()))->isConfigured(),
                 'is_cloud'  => $this->isCloudHosted(),
-                "hostnames" => $this->instanceHostnames(),
                 'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
                 'kami_enabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED),
 
@@ -199,26 +198,6 @@ class Controller extends Base
                 'suds_import_logs' => $importLogs,
                 'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
                 'show_saml_widget' => $this->shouldSamlWidgetBeShown(),
-            ],
-        );
-    }
-
-    /**
-     * Shows a page of common troubleshooting steps to help users troubleshoot SSL renewal being offline
-     *
-     * @api GET /adminv2/home/ssl-renewal-help
-     */
-    public function getSslRenewalHelp(): void
-    {
-        $this->response = $this->responseFromTemplate(
-            '@adminHome/ssl-renewal-help.twig',
-            [
-                'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
-                'is_cloud'       => $this->isCloudHosted(),
-                'api_url'        => $this->getConfigLoader()->get('schoolbox_api_url'),
-                "hostnames"      => $this->instanceHostnames(),
-                "primaryDomain"  => $this->getConfigLoader()->get('site_hostname') . '.' . $this->getConfigLoader()->get('site_domain'),
             ],
         );
     }
@@ -500,19 +479,5 @@ class Controller extends Base
             $this->getConfigLoader()->get('saml_sso_url') !== '' ||
             $this->getConfigLoader()->get('saml_idp_certificate') !== '' ||
             $this->getConfigLoader()->get('saml_idp_metadata_url') !== '';
-    }
-
-    /**
-     * Returns the hostnames configured for this instance
-     *
-     * @return string[]
-     */
-    private function instanceHostnames(): array
-    {
-        exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", escapeshellarg(INSTANCE_ID)), $execOutput);
-        $filtered = array_filter($execOutput, static function (string $hostname): bool {
-            return !preg_match("/^\d+\.\d+\.\d+\.\d+$/", $hostname);
-        });
-        return array_values($filtered);
     }
 }

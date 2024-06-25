@@ -67,7 +67,21 @@ switch ($_POST['module']) {
 
         break;
 
-
+    case 'letsdebug':
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+        $domain = "{$config->get('site_hostname')}.{$config->get('site_domain')}";
+        $letsdebug_url = "https://letsdebug.net/";
+        $method = "http-01";
+        $client = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions(), 'headers' => ['Content-Type' => 'application/json']]);
+        $response = $client->post($letsdebug_url, [
+            'body' => json_encode([
+                'domain' => $domain,
+                'method' => $method,
+            ]),
+        ]);
+        $output[] = json_decode($response->getBody()->getContents(), true);
+        break;
         // other cases unimplemented for now
     case 'storage':
     case 'memory':

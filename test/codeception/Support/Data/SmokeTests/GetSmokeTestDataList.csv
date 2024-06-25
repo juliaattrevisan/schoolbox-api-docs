@@ -10,10 +10,6 @@ Admin,"Go to reports group",Superuser,https://vagrant.dev.schoolbox.cloud/adminv
 Admin,"Go to reports group",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6,400
 Admin,"Go to reports group",Student,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6,400
 Admin,"Go to reports group",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6,400
-Admin,"Go to SSL Renewal",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help,200
-Admin,"Go to SSL Renewal",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help,401
-Admin,"Go to SSL Renewal",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help,401
-Admin,"Go to SSL Renewal",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help,401
 Admin,"User Management Activity Report",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,200
 Admin,"User Management Activity Report",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,400
 Admin,"User Management Activity Report",Student,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,400
