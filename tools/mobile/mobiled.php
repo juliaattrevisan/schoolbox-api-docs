@@ -29,10 +29,47 @@ use Schoolbox\Realtime\Mobile\Scheduler;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel('Mobile App Delivery', []);
+$kernel = new Daemon\Kernel(
+    'Mobile App Delivery Daemon',
+    [
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'h',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['force-production', 'help']
+    ],
+);
 
 // Create the mobile app delivery daemon.
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+    /** @var Instance $instance */
+    $instance   = $di->get('instance');
+    $instanceId = $instance->getId();
+
+    if (isset($opts['help']) || isset($opts['h'])) {
+        $queue = Broker::QUEUE;
+        echo <<<HELP
+NAME:
+    Mobile App Delivery Daemon
+
+SYNOPSIS:
+    ./mobiled.php [OPTION]...
+
+DESCRIPTION:
+    Daemon for listening to requests to forward notifications to a mobile app or personal web app.
+
+    This daemon listens on an AMQP queue named `{$queue}`, whose data is stored in Redis:
+    * `msg:{$instanceId}:s:*`
+
+
+OPTIONS:
+  -h, --help                    Display this help message
+  --force-production            If set, force usage of the production mobile service manager, even on staging instances.
+                                This ensures that messages are actually delivered to subscribed mobile devices:
+                                otherwise, this daemon will only log on staging instances.
+
+
+HELP;
+        return;
+    }
+
     /** @var Notif $notif */
     $notif = $di->get('notif');
 
@@ -43,9 +80,6 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     /** @var IConfigLoader $config */
     $config = $di->get('config');
-
-    /** @var Instance $instance */
-    $instance = $di->get('instance');
 
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
@@ -58,7 +92,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $amqp = $di->get('amqp');
 
         // we'll be using the mobile broker for receiving...
-        $broker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+        $broker = new Broker($instanceId, $amqp, $redis, $stomp);
 
         // Mobile thing
         // TODO figure out how to always send to mobile app, for testing
@@ -77,18 +111,18 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
 
         // TODO restore from redis cache
-//        $jit = new RedisCache($redis, $log, INSTANCE_ID);
+//        $jit = new RedisCache($redis, $log, $instanceId);
 //        $scheduler->setJitCache($jit);
 //        $jit->restoreSchedule($amqp, Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis) {
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis, $instanceId) {
             $log->info('Connected to STOMP', ['char' => '+']);
 
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);
 
-            $topic = 'mobiled.' . INSTANCE_ID . '.*';
+            $topic = 'mobiled.' . $instanceId . '.*';
             $asyncRedis->psubscribe($topic, $scheduler);
             $log->info("Listening on signal queue: redis://$topic");
         });
