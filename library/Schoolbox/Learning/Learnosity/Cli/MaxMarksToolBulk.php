@@ -220,7 +220,6 @@ HELP;
 
         // If there are any updated questions that have not been sent to Learnosity, send them.
         if (count($payload['questions']) > 0) {
-            $logger->info(count($payload['questions']) . ' question(s) remain to be dealt with.');
             if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
                 $logger->info('Request to Learnosity failed, so stopping.');
             }
