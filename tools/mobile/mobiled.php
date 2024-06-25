@@ -57,7 +57,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $scheduler = new Scheduler($loop, $strat, $log, $clock);
 
 
-        // restoring from redis cache
+        // TODO restore from redis cache
 //        $jit = new RedisCache($redis, $log, INSTANCE_ID);
 //        $scheduler->setJitCache($jit);
 //        $jit->restoreSchedule($amqp, Broker::QUEUE);

@@ -13,6 +13,7 @@ use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
@@ -62,13 +63,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     /**
      * Receive a message, and do something with it.
      *
-     * @param            $payload
+     * @param Instance   $payload
      * @param IResolver  $resolver
      * @param array|null $context
      * @return void
      */
     public function onMessage($payload, IResolver $resolver, ?array $context)
     {
+        // Send $payload.
+        // If it is not sent due to a rate limit or something:
+        // * put it back on Redis, or a Rabbit delayed queue?
+        // * add a timer for re-processing it
+        // * if the mobile daemon is restarted: the JIT cache will rebuild it
         $this->log->notice(sprintf('payload: %s', json_encode($payload)));
         $this->log->notice(sprintf('resolver: %s', json_encode($resolver)));
         $this->log->notice(sprintf('context: %s', json_encode($context)));
