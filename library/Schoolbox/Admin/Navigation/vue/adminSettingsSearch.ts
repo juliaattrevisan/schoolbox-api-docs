@@ -1,4 +1,4 @@
-import AdminSettingsSearch from "./admin-settings-search";
+import AdminSettingsSearch from "./admin-settings-search.vue";
 
 window.Vue.createApp({
     components: {
