@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-
 /**
  * @author      James Leckie <james.leckie@schoolbox.education>
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
@@ -14,11 +13,11 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * This tool will clean up the video queue log and remove any successful run logs from over 3 months ago.  This prevents the video_queue table from becoming very large
+ * This tool will clean up the video queue log and remove any successful run logs from over 3 months ago.
+ * This prevents the video_queue table from becoming very large
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
@@ -36,7 +35,6 @@ $app = new class extends CliTool\App
             self::OPT_LONG_HELP,
         ];
     }
-
 
     /**
      * Run the cli tool
