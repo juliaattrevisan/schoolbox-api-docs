@@ -1,7 +1,6 @@
 Admin,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
 Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
 Admin,Go to reports group,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6
-Admin,Go to SSL Renewal,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help
 Admin,User Management Activity Report,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all
 Admin,User Management Login Log,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all
 Admin,User Management Schoolbox Help All,https://vagrant.dev.schoolbox.cloud/adminv2/shaps
