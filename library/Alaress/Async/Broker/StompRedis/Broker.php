@@ -70,7 +70,7 @@ class Broker implements IBroker
                     $resolve = new Resolver($resolver);
 
                     try {
-                        [$key, $context] = json_decode($frame->getBody(), true);
+                        [$key, $context] = json_decode($frame->getBody(), true, 512, JSON_THROW_ON_ERROR);
                     } catch (\Throwable $e) {
                         // if the JSON decode fails, fall back to assuming frame.body == key
                         $key     = $frame->getBody();
