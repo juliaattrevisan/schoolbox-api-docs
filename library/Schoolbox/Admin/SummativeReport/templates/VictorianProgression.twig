@@ -4,6 +4,8 @@
  # @param array $payload  A struct containing all the curriculum nodes, feedbacks and student metadata
  # @param bool $annotate  Optionally show some diagnostic data
  #}
+{# Victorian Curriculum Progressions is Penola-specific atm #}
+{% if payload is not null %}
 <style>
     table.victorian-progression  {
         border-collapse: collapse;
@@ -124,8 +126,6 @@
 
 <h2 class="victorian-progression-heading">Summary of Victorian Curriculum Standards</h2>
 
-{# Victorian Curriculum Progressions is Penola-specific atm #}
-{% if payload is not null %}
 <table class="victorian-progression">
     <thead>
     <tr class="header">
