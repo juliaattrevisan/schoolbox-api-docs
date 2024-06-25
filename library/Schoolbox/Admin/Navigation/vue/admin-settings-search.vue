@@ -381,7 +381,7 @@ export default window.Vue.defineComponent({
             class=""
             @input="$event.target.composing = false"
         />
-        <scroll-fade-wrapper tag="div" target-selector="ul">
+        <scroll-fade-wrapper wrapper-tag="div" slotted-element-selector="ul">
             <transition-group
                 name="staggered-fade"
                 tag="ul"

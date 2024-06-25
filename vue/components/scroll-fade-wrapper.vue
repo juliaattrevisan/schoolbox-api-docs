@@ -4,11 +4,15 @@
  * when there is more content available to scroll to
  */
 const props = defineProps({
-    tag: {
+    // The tag that will be used to wrap the content
+    // Defaults to div, but exists to provide flexibility in case a different tag is desired
+    wrapperTag: {
         type: String,
         default: "div",
     },
-    targetSelector: {
+    // The selector for the scrollable content area (what is inserted to the slot)
+    // This exists to allow you to use dynamic content in the slot that may not allow a ref to be placed on it
+    slottedElementSelector: {
         type: String,
         default: "ul",
     },
@@ -21,7 +25,7 @@ const showBottomFade = window.Vue.ref(false);
 
 window.Vue.onMounted(() => {
     if (!scrollContainerRef.value) return;
-    const scrollContainer = scrollContainerRef.value.querySelector(props.targetSelector);
+    const scrollContainer = scrollContainerRef.value.querySelector(props.slottedElementSelector);
     if (!scrollContainer) return;
 
     const checkScroll = () => {
@@ -47,7 +51,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <component :is="props.tag" ref="scrollContainerRef" class="scroll-fade-container">
+    <component :is="props.wrapperTag" ref="scrollContainerRef" class="scroll-fade-container">
         <div v-show="showTopFade" class="scroll-fade-top"></div>
         <slot></slot>
         <div v-show="showBottomFade" class="scroll-fade-bottom"></div>
