@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Notif\Notif;
@@ -44,6 +45,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var IConfigLoader $config */
     $config = $di->get('config');
 
+    /** @var Instance $instance */
+    $instance = $di->get('instance');
+
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
 
@@ -62,7 +66,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $serviceManager = new ServiceManager(
             $log,
             $di->get('mapperFactory')->get(RegistryMapper::class),
-            INSTANCE_ID,
+            $instance,
             $config->get('title'),
             $di->get('filesystem.storageProxy'),
             ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,

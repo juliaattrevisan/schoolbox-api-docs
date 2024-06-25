@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
@@ -35,6 +36,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     /** @var IConfigLoader $config */
     $config = $di->get('config');
+
+    /** @var Instance $instance */
+    $instance = $di->get('instance');
 
     /** @var RegistryMapper $registryMapper */
     $registryMapper = $di->get('mapperFactory')->get(RegistryMapper::class);
@@ -66,7 +70,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
             new ServiceManager(
                 $log,
                 $registryMapper,
-                INSTANCE_ID,
+                $instance,
                 $config->get('title'),
                 $filesystemProxy,
                 ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
