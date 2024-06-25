@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\User;
 
 /**
@@ -168,20 +169,34 @@ class Payload
 
 
     /**
+     * A set of submission state codes that have a specific meaning that isn't currently
+     * in a schoolbox instance, due to the varchar(4) limit on submission state codes
+     * and 16 chars on submission state display names. Penola needed three places to store
+     * data, but we only give them two for now.
+     *
+     * The human readable variants of DNPP DNPL etc. are in Rating.php as a consequence.
+     *
+     * @var array
+     */
+    private array $submissionStateCodes = [];
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @param StateMapper $stateMapper
      * @param int $workTypeId
      * @param bool $annotate
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Term\Mapper $termMapper,
+        private \Schoolbox\Learning\DueWork\StateMapper $stateMapper,
         private int $workTypeId,
         private bool $annotate = false
     ) {
-        $this->rating = new Rating();
     }
 
 
@@ -203,8 +218,13 @@ class Payload
         $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
         $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
 
-        /* TODO Find submission states and store them here, for reference
+        /* Find submission states and store them here, for reference
          */
+        $this->submissionStateCodes = $this->stateMapper->findAll()->indexBy('code')->keys();
+
+        /* We'll be interpreting Submission State marks as Ratings in the chart
+         */
+        $this->rating = new Rating($this->submissionStateCodes);
 
         /* Remember we did this
          */
@@ -406,7 +426,7 @@ class Payload
             /* Build the outcome struct, because that's just too handy
              */
             $outcome = [
-                'mark' => 'DNPP',
+                'mark' => $row['mark'],
                 'feedback_table' => $row['feedback_table'],
                 'feedback_id' => $row['feedback_id'],
             ];
@@ -423,9 +443,10 @@ class Payload
                      */
                     $struct[$nodeId][$type] = $outcome;
                 } else {
-                    /* TODO Deal with submission state
+                    /* Deal with submission state (it takes precedence; never heard of someone getting a submission
+                     * state then having it overturned by actually doing the work they were supposed to do?)
                      */
-                    if ('DNPP' === $row['mark']) {
+                    if (\in_array($row['mark'], $this->submissionStateCodes, true)) {
                         $struct[$nodeId][$type] = $outcome;
                     } else {
                         /* Remember the biggest mark this person received for this given $nodeId
@@ -450,10 +471,11 @@ class Payload
                 } else {
                     /* Remember the biggest mark this person received for this given ($parentNodeId, $nodeId)
                      * Update existing record
-                    */
-                    /* TODO Deal with submission state
+                     *
+                     * Deal with submission state (it takes precedence; never heard of someone getting a submission
+                     * state then having it overturned by actually doing the work they were supposed to do?)
                      */
-                    if ('DNPP' === $row['mark']) {
+                    if (\in_array($row['mark'], $this->submissionStateCodes, true)) {
                         $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
                     } else {
                         if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
@@ -465,7 +487,7 @@ class Payload
                 /* Update rating for this curriculum node, using the "current" node
                  */
 //                if (self::TYPE_CURRENT === $type) {
-                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (string)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
 //                }
             }
         }

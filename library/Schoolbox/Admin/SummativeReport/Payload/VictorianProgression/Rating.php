@@ -20,8 +20,10 @@ class Rating
 
     /**
      * Constructor
+     *
+     * @param array $submissionStateCodes
      */
-    public function __construct()
+    public function __construct(private array $submissionStateCodes)
     {
     }
 
@@ -61,18 +63,23 @@ class Rating
             $reference -= self::SEMESTER_1_OFFSET;
         }
 
-        /* TODO Deal with submission states first
+        /* Deal with submission states first
          */
-        if ('DNPP' === $mark) {
-            $result = 'Did not participate';
-            $submissionState = 'DNPP';
+        if (in_array($mark, $this->submissionStateCodes, true)) {
+            switch ($mark) {
+                case 'DNPE': $result = 'Exemption from a Curriculum Area'; break;
+                case 'DNPI': $result = 'Serious illness'; break;
+                case 'DNPL': $result = 'Low participation'; break;
+                case 'DNPP': $result = 'Late enrolment'; break;
+                case 'DNPU': $result = 'Absent without reasonable excuse'; break;
+            }
 
             /* Add a metric annotation
              */
             if ($annotate) {
                 $result .= sprintf(
                     ' (ref: %s)',
-                    $submissionState
+                    $mark
                 );
             }
         } else {
