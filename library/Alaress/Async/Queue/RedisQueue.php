@@ -238,11 +238,11 @@ abstract class RedisQueue implements QueueInterface
     }
 
     /**
-     * @param TriggerInterface $trigger
-     * @param string           $instanceId
+     * @param Instance|TriggerInterface $trigger
+     * @param string                    $instanceId
      * @return array
      */
-    public static function getStorage(TriggerInterface $trigger, string $instanceId): array
+    public static function getStorage(Instance|TriggerInterface $trigger, string $instanceId): array
     {
         $compressedData = self::deflate($trigger);
         $hash           = sha1($compressedData);
