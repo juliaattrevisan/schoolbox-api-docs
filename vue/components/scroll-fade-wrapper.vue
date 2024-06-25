@@ -56,18 +56,18 @@ window.Vue.onMounted(() => {
 
 <style scoped>
 .scroll-fade-container {
-    position: relative;
     overflow: hidden;
+    position: relative;
 }
 
 .scroll-fade-top,
 .scroll-fade-bottom {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 40px;
-    pointer-events: none;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+    height: 40px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
     z-index: 2;
 }
 
@@ -76,7 +76,7 @@ window.Vue.onMounted(() => {
 }
 
 .scroll-fade-bottom {
-    bottom: 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+    bottom: 0;
 }
 </style>

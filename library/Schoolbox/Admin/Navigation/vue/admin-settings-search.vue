@@ -427,14 +427,15 @@ export default window.Vue.defineComponent({
 }
 
 ul {
-    margin: 0;
     list-style: none;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
     width: 500px;
     @media only screen and (max-width: 640px) {
         width: 100%;
     }
-    max-height: 400px;
-    overflow-y: auto;
+
     li {
         border-bottom: 1px solid $body-bg;
         border-left: 1px solid $navigation-hover;
