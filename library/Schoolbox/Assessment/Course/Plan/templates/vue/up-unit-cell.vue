@@ -472,6 +472,7 @@ const isFirstUnit = window.Vue.computed(() => {
         }
     }
 }
+/* Styles for printing */
 @media print {
     .unit-cell {
         height: auto !important; // Expand the unit cell to show all content
@@ -494,6 +495,7 @@ const isFirstUnit = window.Vue.computed(() => {
         padding: 0.5rem;
     }
 }
+/* Print styles for paper size below A4 portrait  */
 @media print and (max-width: 210mm) {
     .content-container-fixed {
         display: none !important;
