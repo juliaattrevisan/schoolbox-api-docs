@@ -221,8 +221,15 @@ class Payload
         $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
 
         /* Find submission states and store them here, for reference
+         * THIS LOOKS WEIRD, but there's tw naming schemes going on.
+         * Penola have historical data with the old scheme (stored in `code`) used for 2023 data,
+         * and they've stored the new scheme in `display_as`, which were used for 2024 data.
+         * They both co-exist concurrently and have the same meaning.
          */
-        $this->submissionStateCodes = $this->stateMapper->findAll()->indexBy('code')->keys();
+        $this->submissionStateCodes = array_merge(
+            $this->stateMapper->findAll()->indexBy('code')->keys(),
+            $this->stateMapper->findAll()->indexBy('displayAs')->keys()
+        );
 
         /* We'll be interpreting Submission State marks as Ratings in the chart
          */

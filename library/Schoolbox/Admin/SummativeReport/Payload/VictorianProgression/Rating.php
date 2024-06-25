@@ -23,12 +23,17 @@ class Rating
      * I have to hardcode a mapping between an outdated naming convention
      * and their human-readable meaning
      */
-    private const SUBMISSION_STATE_MAP = [
+    public const SUBMISSION_STATE_MAP = [
         'DNPE' => 'Exemption from a Curriculum Area',
+        'DNP-EX' => 'Exemption from a Curriculum Area',
         'DNPI' => 'Serious illness',
+        'DNP-SI' => 'Serious illness',
         'DNPL' => 'Low participation',
+        'DNP-LP' => 'Low participation',
         'DNPP' => 'Late enrolment',
-        'DNPU' => 'Absent without reasonable excuse'
+        'DNP-LE' => 'Late enrolment',
+        'DNPU' => 'Absent without reasonable excuse',
+        'DNP-UN' => 'Absent without reasonable excuse',
     ];
 
 
