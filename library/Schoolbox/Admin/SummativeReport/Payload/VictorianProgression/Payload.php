@@ -58,6 +58,7 @@ class Payload
             cn1.name AS curriculum_node,
             a.id AS assessment_id,
             a.title,
+            a.id AS assessment_id,
             a.due_date,
             vaf.feedback_table,
             vaf.feedback_id,
@@ -104,6 +105,7 @@ class Payload
             cn1.name AS curriculum_node,
             a.id AS assessment_id,
             a.title,
+            a.id AS assessment_id,
             a.due_date,
             vaf.feedback_table,
             vaf.feedback_id,
@@ -382,7 +384,11 @@ class Payload
             $this->payloadStatement->execute($params);
         }
 
-        while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
+        /* Only find the most recent feedback per assessment, discarding ancient history
+         */
+        $stack = (new Precompiler())->precompile($this->payloadStatement);
+
+        foreach ($stack as $row) {
             $parentNodeId = $row['parent_node_id'];
             $nodeId = $row['curriculum_node_id'];
 
