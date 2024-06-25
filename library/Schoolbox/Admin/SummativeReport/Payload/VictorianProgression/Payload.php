@@ -379,9 +379,7 @@ class Payload
 
         /* Only find the most recent feedback per assessment, discarding ancient history
          */
-        $stack = (new Precompiler())->precompile($this->payloadStatement);
-
-        foreach ($stack as $row) {
+        while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
             $parentNodeId = $row['parent_node_id'];
             $nodeId = $row['curriculum_node_id'];
 
