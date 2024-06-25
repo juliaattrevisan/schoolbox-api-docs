@@ -130,10 +130,19 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * We allow import of these feedback marks, specifically
-     * This excludes random stuff like empty string, null, DNLP, DNPP, DNPU etc.
+     * We allow import of these numeric feedback marks, specifically
      */
-    private const VALID_DATA = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11];
+    private const VALID_NUMERIC_DATA = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11];
+
+
+    /**
+     * A set of Submission State Codes as defined by your instance's admin,
+     * combined with VALID_NUMERIC_DATA, to build an overall whitelist of
+     * legal values to import (DNPP et al. are vic gov submission states)
+     *
+     * @var array
+     */
+    private array $validData = [];
 
 
     /**
@@ -182,6 +191,12 @@ class ImporterTool extends CliTool\App
      * @var \Schoolbox\Resource\Folder\Code\Mapper
      */
     private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
+
+
+    /**
+     * @var \Schoolbox\Learning\Duework\StateMapper
+     */
+    private \Schoolbox\Learning\Duework\StateMapper $stateMapper;
 
 
     /**
@@ -280,11 +295,17 @@ HELP;
         $this->userMapper = \Schoolbox\UserMapper::getInstance();
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+        $this->stateMapper = \Schoolbox\Learning\DueWork\StateMapper::getInstance();
         $this->errorMapper = \Schoolbox\Error\Mapper::getInstance();
 
         /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         $this->assessmentMapperProxy = $assessmentMapperProxy;
+
+        /* Combined with the numeric data that we can chart, we can build a whitelist of
+         * legal values (numerics + submission states) to process as either dots or ratings
+         */
+        $this->validData = array_merge(self::VALID_NUMERIC_DATA, $this->stateMapper->findAll()->indexBy('code')->keys());
 
         /* Optionally arbitrarily pre-make curriculum nodes if they don't already exist
          */
@@ -775,7 +796,7 @@ HELP;
              * since each report is supposed to be a "window of levels" proximal to the current
              * year level of a student.
              */
-            if (!\in_array($humanReadableMark, self::VALID_DATA, false)) {
+            if (!\in_array($humanReadableMark, $this->validData, false)) {
                 $this->getLogger()->debug(sprintf(
                     'Row %s: invalid feedback value %s. Skipping.',
                     $i,
