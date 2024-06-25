@@ -166,7 +166,7 @@ module.exports = {
 
         // Admin
         adminGrades: "./library/Schoolbox/Admin/Grades/vue/adminGrades.js",
-        adminSettingsSearch: "./library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js",
+        adminSettingsSearch: "./library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.ts",
         staleUsersReport: "./library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js",
         userBulkModify: "./library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js",
         adminList: "./library/Schoolbox/Admin/Lists/templates/vue/adminList.js",

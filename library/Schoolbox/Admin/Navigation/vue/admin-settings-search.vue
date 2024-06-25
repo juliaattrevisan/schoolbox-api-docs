@@ -1,17 +1,23 @@
-<script>
+<script lang="ts">
 /**
  * To help users find admin settings faster (hopefully!)
  * Search field is used to filter the results, then the relevant
  * search result can be selected to move to the relevant page/setting
- *
  */
-
-import AdminSettingsSearchResult from "./admin-settings-search-result";
 import { gsap } from "gsap/all";
+import AdminSettingsSearchResult from "./admin-settings-search-result.vue";
 
 const SB_SETTINGS_LIST = "sb_settingsList";
 
-export default {
+interface SBSettingsListItem {
+    title: string;
+    name: string;
+    description: string;
+    module?: string;
+    url: string;
+}
+
+export default window.Vue.defineComponent({
     components: {
         AdminSettingsSearchResult,
     },
@@ -24,100 +30,92 @@ export default {
             query: "",
             minQueryLength: 3,
             resultsShownLimit: 6,
-            activeIndex: 0, //to track which index is selected
+            activeIndex: 0, // to track which index is selected
+        } as {
+            settingsList: SBSettingsListItem[];
+            isLoaded: boolean;
+            hasLoadError: boolean;
+            query: string;
+            minQueryLength: number;
+            resultsShownLimit: number;
+            activeIndex: number;
         };
     },
 
     computed: {
         /**
          * to notify whether still loading the results or not
-         *
-         * @returns { String } loading status
+         * @returns {string} loading status
          */
-        inputPlaceholder() {
+        inputPlaceholder(): string {
             if (this.isLoaded) {
                 return "Search administration settings...";
-            } else {
-                return "Loading settings, please wait...";
             }
+
+            return "Loading settings, please wait...";
         },
 
         /**
          * only when started typing beyond minQueryLength count and there's actual results
-         *
-         * @returns { Boolean } start displaying results or not
+         * @returns {boolean} start displaying results or not
          */
-        isActive() {
-            if (this.query.length >= this.minQueryLength && this.resultsList.length > 0) {
-                return true;
-            } else {
-                return false;
-            }
+        isActive(): boolean {
+            return this.query.length >= this.minQueryLength && this.resultsList.length > 0;
         },
 
         /**
          * the search string broken into words, to search for each word
-         *
-         * @returns { Array } the search string broken into single words
+         * @returns {string[]} the search string broken into single words
          */
-        queryWordList() {
+        queryWordList(): string[] {
             const allWords = this.query.match(/\b(\w+)\b/g);
             if (allWords && allWords.length > 0) {
                 const onlyWordsAboveTwoLetters = allWords.filter((word) => word.length > 1);
                 return onlyWordsAboveTwoLetters;
-            } else {
-                return [];
             }
+            return [];
         },
 
         /**
          * the settings relevant to the search input
-         *
-         * @returns { Array } all relevant search results, with title matches first over those just with description matches
+         * @returns {SBSettingsListItem[]} the list of search results
          */
-        resultsList() {
+        resultsList(): SBSettingsListItem[] {
             if (this.query.length < this.minQueryLength) {
                 return [];
             }
             const matchedTitleList = this.settingsList.filter(this.searchForTitle);
             const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
-            return matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
+            return matchedTitleList.concat(matchedNameAndDescriptionList); // so those that have title matches take precedence
         },
 
         /**
          * the settings relevant to the search input and capped to resultsShownLimit
-         *
-         * @returns { Array }
+         * @returns {SBSettingsListItem[]} a limited list of search results
          */
-        resultsListLimited() {
+        resultsListLimited(): SBSettingsListItem[] {
             if (this.resultsList.length > this.resultsShownLimit) {
-                //return the capped results
+                // return the capped results
                 return this.resultsList.filter((setting, index) => index < this.resultsShownLimit);
-            } else {
-                //otherwise just return the whole list
-                return this.resultsList;
             }
+
+            // otherwise just return the whole list
+            return this.resultsList;
         },
 
         /**
          * to show the search refine note
-         *
-         * @returns { Boolean }
+         * @returns {boolean} true if there are results beyond the limit
          */
-        hasResultsBeydondLimit() {
-            if (this.resultsList.length > this.resultsShownLimit) {
-                return true;
-            } else {
-                return false;
-            }
+        hasResultsBeydondLimit(): boolean {
+            return this.resultsList.length > this.resultsShownLimit;
         },
 
         /**
          * to show the count of how many aren't appearing in the search
-         *
-         * @returns { Number }
+         * @returns {number} the count of results beyond the limit
          */
-        resultsBeyondLimitCount() {
+        resultsBeyondLimitCount(): number {
             return this.resultsList.length - this.resultsShownLimit;
         },
     },
@@ -125,8 +123,10 @@ export default {
     watch: {
         /**
          * reset the active index when the list changes as the index may become out of range
+         * @param {SBSettingsListItem[]} newValue - the new list of results
+         * @param {SBSettingsListItem[]} oldValue - the old list of results
          */
-        resultsList(newValue, oldValue) {
+        resultsList(newValue: SBSettingsListItem[], oldValue: SBSettingsListItem[]) {
             if (newValue.length !== oldValue.length && this.activeIndex > 0) {
                 this.activeIndex = 0;
             }
@@ -136,42 +136,37 @@ export default {
     mounted() {
         this.initKeyboardEvents();
         this.initMouseEvents();
-        this.loadSettings();
+        void this.loadSettings();
     },
 
     methods: {
         /**
          * find all those results that match EACH search word
          * within the the title field
-         *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
+         * @param {SBSettingsListItem} setting - the setting to check
+         * @returns {boolean} true if found
          */
-        searchForTitle(setting) {
+        searchForTitle(setting: SBSettingsListItem): boolean {
             let wordMatchCount = 0;
             this.queryWordList.forEach((wordInSearch) => {
                 if (setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
+                    wordMatchCount += 1;
                 }
             });
             if (wordMatchCount === this.queryWordList.length) {
-                //all words have to match
+                // all words have to match
                 return true;
-            } else {
-                return false;
             }
+            return false;
         },
 
         /**
          * find all those results that match EACH search word
          * within the name and description fields
-         *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
+         * @param {SBSettingsListItem} setting - the setting to check
+         * @returns {boolean} true if found
          */
-        searchForNameAndDescription(setting) {
+        searchForNameAndDescription(setting: SBSettingsListItem): boolean {
             let wordMatchCount = 0;
             this.queryWordList.forEach((wordInSearch) => {
                 if (
@@ -179,15 +174,14 @@ export default {
                         setting.description?.toLowerCase().includes(wordInSearch.toLowerCase())) &&
                     !setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())
                 ) {
-                    wordMatchCount++;
+                    wordMatchCount += 1;
                 }
             });
             if (wordMatchCount === this.queryWordList.length) {
-                //all words have to match
+                // all words have to match
                 return true;
-            } else {
-                return false;
             }
+            return false;
         },
 
         /**
@@ -196,13 +190,13 @@ export default {
         initKeyboardEvents() {
             document.addEventListener("keyup", (event) => {
                 const keyName = event.key;
-                const keyOptions = {
+                const keyOptions: Record<string, () => void> = {
                     Enter: () => this.onEnterKeyPressed(),
                     ArrowUp: () => this.decrementActiveIndex(),
                     ArrowDown: () => this.incrementActiveIndex(),
                 };
                 if (keyOptions[keyName] && document.activeElement === this.$refs.queryInput) {
-                    //ensure search input has focus
+                    // ensure search input has focus
                     keyOptions[keyName]();
                 }
             });
@@ -213,8 +207,8 @@ export default {
          * select the currently active search result
          */
         onEnterKeyPressed() {
-            if (this.resultsList.length > 0 && this.activeIndex != -1) {
-                //only if there's results to select and activeIndex is set
+            if (this.resultsList.length > 0 && this.activeIndex !== -1) {
+                // only if there's results to select and activeIndex is set
                 this.selectResult(this.resultsList[this.activeIndex].url);
             }
         },
@@ -225,7 +219,7 @@ export default {
          */
         decrementActiveIndex() {
             if (this.activeIndex > 0) {
-                this.activeIndex--;
+                this.activeIndex -= 1;
             }
         },
 
@@ -235,7 +229,7 @@ export default {
          */
         incrementActiveIndex() {
             if (this.activeIndex < this.resultsListLimited.length - 1) {
-                this.activeIndex++;
+                this.activeIndex += 1;
             }
         },
 
@@ -245,7 +239,7 @@ export default {
          */
         initMouseEvents() {
             document.addEventListener("click", (event) => {
-                if (!this.$el.contains(event.target)) {
+                if (event.target instanceof Node && !(this.$el as HTMLElement).contains(event.target)) {
                     this.clearInput();
                 }
             });
@@ -254,11 +248,11 @@ export default {
         /**
          * check if already loaded and saved, or load up
          */
-        loadSettings() {
+        async loadSettings() {
             if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
                 this.loadSessionSettings();
             } else {
-                this.loadRemoteSettings();
+                await this.loadRemoteSettings();
             }
         },
 
@@ -267,7 +261,12 @@ export default {
          */
         loadSessionSettings() {
             const sessionStorageSettingsList = sessionStorage.getItem(SB_SETTINGS_LIST);
-            this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
+
+            if (sessionStorageSettingsList === null) {
+                this.settingsList = [];
+            } else {
+                this.settingsList = JSON.parse(sessionStorageSettingsList) as SBSettingsListItem[]; // convert the saved string var back to JSON
+            }
             this.isLoaded = true;
         },
 
@@ -277,11 +276,11 @@ export default {
         async loadRemoteSettings() {
             try {
                 const response = await fetch("/adminv2/setting/search");
-                const responseJson = await response.json();
+                const responseJson = (await response.json()) as SBSettingsListItem[];
                 this.settingsList = responseJson;
-                sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
+                sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); // session storage vars need to be saved as strings only
             } catch (error) {
-                this.hasLoadError = true; //hide search bar in the dom
+                this.hasLoadError = true; // hide search bar in the dom
             } finally {
                 this.isLoaded = true;
             }
@@ -304,10 +303,6 @@ export default {
 
         /**
          * how the element animates off
-         *
-         * @param { DOMElement } element - the element that's animating
-         * @param { Function } done - to be called once animation is complete
-         *
          */
         checkEachResultIndex() {
             this.$refs.searchResults.forEach((searchResult) => {
@@ -319,45 +314,35 @@ export default {
          * animate settings to help context when filtering
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
-         *
-         * @param { DOMElement } element - the element that's animating
-         *
+         * @param {Element} element - the element that's animating
          */
-        onBeforeOnEnter(element) {
+        onBeforeOnEnter(element: Element) {
             gsap.set(element, { opacity: 0, y: 10, height: 0 });
         },
 
         /**
          * how it element animates on
-         *
-         * @param { DOMElement } element - the element that's animating
-         * @param { Function } done - to be called once animation is complete
-         *
+         * @param {Element} element - the element that's animating
+         * @param {() => void} done - to be called once animation is complete
          */
-        onEnter(element, done) {
-            let delay = element.dataset.index * 0.025;
+        onEnter(element: Element, done: () => void) {
+            const delay = element.dataset.index * 0.025;
             gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay: delay, onComplete: done });
         },
 
         /**
          * how the element animates off
-         *
-         * @param { DOMElement } element - the element that's animating
-         * @param { Function } done - to be called once animation is complete
-         *
+         * @param {Element} element - the element that's animating
+         * @param {() => void} done - to be called once animation is complete
          */
-        onLeave(element, done) {
+        onLeave(element: Element, done: () => void) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done });
         },
 
         /**
          * how the element animates off
-         *
-         * @param { DOMElement } element - the element that's animating
-         * @param { Function } done - to be called once animation is complete
-         *
          */
-        onAfterLeave(element) {
+        onAfterLeave() {
             this.$refs.searchResults.forEach((searchResult) => {
                 searchResult.test();
             });
@@ -367,58 +352,56 @@ export default {
          * a result has been moused over via #admin-settings-search-result
          */
         onMouseOverResult() {
-            this.activeIndex = -1; //disable the keyboard selection, mouse takes precedence until search is updated
+            this.activeIndex = -1; // disable the keyboard selection, mouse takes precedence until search is updated
         },
 
         /**
          * a result has been selected via #admin-settings-search-result
-         *
-         * @param { String }
+         * @param {string} url - the url to move to
          */
-        onSelectedResult(url) {
+        onSelectedResult(url: string) {
             this.selectResult(url);
         },
 
         /**
          * to move to the page the selected search result is on
          * which will have the result highlighted
-         *
-         * @param { String }
+         * @param {string} url - the url to move to
          */
-        selectResult(url) {
+        selectResult(url: string) {
             this.clearInput();
             window.location.href = url;
-            if (window.location.href != url) {
-                //only dispatch if on the same page, otherwise handled in page load in #moduleConfig.twig
-                var event = new CustomEvent("admin-settings-search__on-result-selected", {
+            if (window.location.href !== url) {
+                // only dispatch if on the same page, otherwise handled in page load in #moduleConfig.twig
+                const event = new CustomEvent("admin-settings-search__on-result-selected", {
                     detail: {
-                        url: url,
+                        url,
                     },
                 });
                 document.dispatchEvent(event);
             }
         },
     },
-};
+});
 </script>
 
 <template>
     <div class="admin-search-container">
         <input
             v-if="!hasLoadError"
+            ref="queryInput"
             v-model="query"
-            @input="$event.target.composing = false"
             :readonly="!isLoaded"
             :placeholder="inputPlaceholder"
-            ref="queryInput"
             type="text"
             class=""
+            @input="$event.target.composing = false"
         />
         <div>
             <transition-group
                 name="staggered-fade"
                 tag="ul"
-                v-bind:css="false"
+                :css="false"
                 @before-enter="onBeforeOnEnter"
                 @enter="onEnter"
                 @enter-cancelled="checkEachResultIndex"
