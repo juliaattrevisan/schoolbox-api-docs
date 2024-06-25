@@ -30,7 +30,7 @@ use Schoolbox\Url\Factory;
  * because learnosity has two different contexts of automark: true and false,
  * each setting uses a different field to assign the maximum marks available.
  */
-class MaxMarksToolBulk extends CliTool\App
+class MaxMarksTool extends CliTool\App
 {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
