@@ -17,7 +17,9 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\MessageList\Mobile;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
@@ -53,6 +55,27 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
     $emailFactory = $di->get('mail.emailFactory');
 
+    // Build a mobile queue factory
+    $mobileQueueFactory = $config->get(Schoolbox\Config\ConfigMapper::NAME_MOBILE_DAEMON_ENABLED)
+        ? new Mobile\ForwardToBrokeredQueueFactory(
+            new Schoolbox\Realtime\Mobile\Broker(
+                INSTANCE_ID,
+                $di->get('amqp'),
+                $client,
+                $di->get('stomp'),
+            ),
+        )
+        : new Mobile\DirectSendFactory(
+            new ServiceManager(
+                $log,
+                $registryMapper,
+                INSTANCE_ID,
+                $config->get('title'),
+                $filesystemProxy,
+                ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+            ),
+        );
+
     (new Routing\WorkerFactory(
         $config,
         $log,
@@ -64,6 +87,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $filesystemProxy,
         $emailFactory,
         new Jitter(new FloatGenerator(), maxAttempts: 15, baseTimeout: 2500),
+        $mobileQueueFactory,
     ))->build($loop, INSTANCE_ID);
 });
 

@@ -31,6 +31,8 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
      *                                                       otherwise, create the direct send queue.
      *                                                       It's expected this option will be removed once the mobile
      *                                                       daemon is verified to be stable.
+     * @param Mobile\IQueueFactory      $mobileQueueFactory  The factory which may build a different type of mobile
+     *                                                       queue, dependent on configuration.
      */
     public function __construct(
         private string $instanceId,
@@ -39,24 +41,19 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
         private UserMapper $userMapper,
         private Mailer $mailer,
         private bool $mobileDaemonEnabled,
+        private Mobile\IQueueFactory $mobileQueueFactory,
     ) {
         parent::__construct($instanceId, $redis);
     }
 
 
     /**
-     * The type of queue constructed depends on configuration:
-     * * if the mobile daemon is enabled, create its queue
-     * * otherwise, create the mobile direct send queue
-     *
      * @param int $userId
      * @return QueueInterface
      */
     public function mobile($userId)
     {
-        return $this->mobileDaemonEnabled
-            ? new Mobile($this->redis, $this->instanceId, $userId)
-            : new Mobile\DirectSend($this->cloudManager, $userId);
+        return $this->mobileQueueFactory->build($userId);
     }
 
 

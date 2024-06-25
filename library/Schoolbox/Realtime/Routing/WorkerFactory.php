@@ -16,12 +16,14 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Instance;
 use Schoolbox\Mail\EmailFactory;
 use Schoolbox\MobileApp;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
+use Schoolbox\Realtime\MessageList\Mobile\IQueueFactory;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
@@ -54,15 +56,17 @@ class WorkerFactory
 
 
     /**
-     * @param IConfigLoader         $conf
-     * @param LoggerInterface       $log
-     * @param ClientInterface       $client
-     * @param RegistryMapper        $registryMapper
-     * @param UserMapper            $userMapper
-     * @param RoutePermissionMapper $routePermMapper
-     * @param \Schoolbox\Instance   $instance
-     * @param FilesystemProxy       $filesystemProxy
-     * @param EmailFactory          $emailFactory
+     * @param IConfigLoader                    $conf
+     * @param LoggerInterface                  $log
+     * @param ClientInterface                  $client
+     * @param RegistryMapper                   $registryMapper
+     * @param UserMapper                       $userMapper
+     * @param RoutePermissionMapper            $routePermMapper
+     * @param Instance                         $instance
+     * @param FilesystemProxy                  $filesystemProxy
+     * @param EmailFactory                     $emailFactory
+     * @param IJitter                          $jitter
+     * @param MessageList\Mobile\IQueueFactory $mobileQueueFactory
      */
     public function __construct(
         IConfigLoader $conf,
@@ -75,6 +79,7 @@ class WorkerFactory
         private FilesystemProxy $filesystemProxy,
         EmailFactory $emailFactory,
         private IJitter $jitter,
+        private MessageList\Mobile\IQueueFactory $mobileQueueFactory,
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -115,6 +120,7 @@ class WorkerFactory
             $this->userMapper,
             $mailer,
             (bool)$this->conf->get(Schoolbox\Config\ConfigMapper::NAME_MOBILE_DAEMON_ENABLED),
+            $this->mobileQueueFactory,
         );
 
         // obtain filter list
