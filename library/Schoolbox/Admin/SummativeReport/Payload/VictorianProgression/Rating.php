@@ -63,20 +63,6 @@ class Rating
     ): string {
         $result = '';
 
-        /* In first semester, "At Standard" is the student's year level -0.5
-         * so in level 10, "At Standard" is measured from 9.5
-         *
-         * In second semester, "At Standard" is the student's year level
-         * so in level 10, "At Standard" is measured from 10
-         *
-         * I call this "the reference value"
-         */
-        $reference = $studentYearLevel;
-
-        if (self::SEMESTER_1 === $currentSemester) {
-            $reference -= self::SEMESTER_1_OFFSET;
-        }
-
         /* Deal with submission states first
          */
         if (in_array($mark, $this->submissionStateCodes, true)) {
@@ -90,40 +76,58 @@ class Rating
                     $mark
                 );
             }
-        } else {
-            /* Calculate proximity from your current expected standard
-             */
-            $diff = $mark - (float)$reference;
 
-            if ($diff < -1) {
-                $result = 'Well Below Standard';
-            }
+            return $result;
+        }
 
-            if ($diff >= -1 && $diff < -0.5) {
-                $result = 'Below Standard';
-            }
+        /* Otherwise, student received a numeric outcome.
+         *
+         * In first semester, "At Standard" is the student's year level -0.5
+         * so in level 10, "At Standard" is measured from 9.5
+         *
+         * In second semester, "At Standard" is the student's year level
+         * so in level 10, "At Standard" is measured from 10
+         *
+         * I call this "the reference value"
+         */
+        $reference = $studentYearLevel;
 
-            if ($diff >= -0.5 && $diff <= 0.0) {
-                $result = 'At Standard';
-            }
+        if (self::SEMESTER_1 === $currentSemester) {
+            $reference -= self::SEMESTER_1_OFFSET;
+        }
 
-            if ($diff > 0 && $diff <= 1) {
-                $result = 'Above Standard';
-            }
+        /* Calculate proximity from your current expected standard
+         */
+        $diff = $mark - (float)$reference;
 
-            if ($diff > 1) {
-                $result = 'Well Above Standard';
-            }
+        if ($diff < -1) {
+            $result = 'Well Below Standard';
+        }
 
-            /* Add a metric annotation
-             */
-            if ($annotate) {
-                $result .= sprintf(
-                    ' (ref: %s, diff: %s)',
-                    $reference,
-                    $diff
-                );
-            }
+        if ($diff >= -1 && $diff < -0.5) {
+            $result = 'Below Standard';
+        }
+
+        if ($diff >= -0.5 && $diff <= 0.0) {
+            $result = 'At Standard';
+        }
+
+        if ($diff > 0 && $diff <= 1) {
+            $result = 'Above Standard';
+        }
+
+        if ($diff > 1) {
+            $result = 'Well Above Standard';
+        }
+
+        /* Add a metric annotation
+         */
+        if ($annotate) {
+            $result .= sprintf(
+                ' (ref: %s, diff: %s)',
+                $reference,
+                $diff
+            );
         }
 
         return $result;
