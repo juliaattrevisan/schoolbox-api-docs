@@ -517,7 +517,8 @@ abstract class Kernel
                         $gotenbergApiVersion,
                         GotenbergClient::API_KEY_HEADER,
                         GotenbergClient::API_VERSION_HEADER,
-                        $config->get('kami_api_key'),
+                        $config->get(ConfigMapper::NAME_KAMI_API_HOST),
+                        $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
                     );
@@ -1585,11 +1586,9 @@ abstract class Kernel
                     'unitImplementationMapper' => $mapperFactory->getLazy(\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper::class),
                     'unitSpecificationMapper'  => $mapperFactory->getLazy(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class),
                     'assessmentMapperProxy'    => $di->lazyGet('assessmentDataSource'),
-                    'plagscanMapper'           => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
                     'turnitinGroupMapper'      => $mapperFactory->getLazy(\Schoolbox\Learning\Turnitin\Group\Mapper::class),
                     'submissionBoxMapper'      => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBoxMapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
-                    'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                     'routeGenerator'           => $di->lazyGet('router.generator'),
                     'replicator'               => $di->lazyGet('assessment.replicator'),
                     'lessonPlanActivitiesReplicator' => $di->lazyNew(
@@ -1660,9 +1659,10 @@ abstract class Kernel
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'         => $di->lazyGet('httpClient'),
-            'enabled'        => $config->get('kami_enabled'),
-            'apiKey'         => $config->get('kami_api_key'),
-            'siteSchoolCode' => $config->get('site_school_code'),
+            'enabled'        => $config->get(ConfigMapper::NAME_KAMI_ENABLED),
+            'apiHost'        => $config->get(ConfigMapper::NAME_KAMI_API_HOST),
+            'apiKey'         => $config->get(ConfigMapper::NAME_KAMI_API_KEY),
+            'siteSchoolCode' => $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         ]));
 
         // PDF generator

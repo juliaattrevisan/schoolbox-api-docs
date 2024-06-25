@@ -91,12 +91,15 @@ class DueWork implements IAssessmentTypeTranslator
         null === $domainObject->getUseMarkRange()           || $dataModel->setMarkedUsingRange($domainObject->getUseMarkRange());
         null === $domainObject->getSelfReviewability()      || $dataModel->setSelfReviewability($domainObject->getSelfReviewability());
         null === $domainObject->getSimilarityCheckEnabled() || $dataModel->setSimilarityCheckEnabled($domainObject->getSimilarityCheckEnabled());
-        null === $domainObject->getKamiInteractive()        || $dataModel->setKamiInteractive($domainObject->getKamiInteractive());
-        null === $domainObject->getKamiFile()               || $dataModel->setKamiFile($domainObject->getKamiFile());
+        null === $domainObject->getEnableWorksheet()        || $dataModel->setEnableWorksheet($domainObject->getEnableWorksheet());
         null === $domainObject->getEnableOffline()          || $dataModel->setEnableOffline($domainObject->getEnableOffline());
         null === $domainObject->getEnableText()             || $dataModel->setEnableText($domainObject->getEnableText());
         null === $domainObject->getEnableFiles()            || $dataModel->setEnableFiles($domainObject->getEnableFiles());
         null === $domainObject->getEnablePolicy()           || $dataModel->setEnablePolicy($domainObject->getEnablePolicy());
+
+        // Kami file _may_ be null though
+        $dataModel->setWorksheetTemplate($domainObject->getWorksheetTemplate());
+        $dataModel->setKamiWorksheetTemplate($domainObject->getKamiWorksheetTemplate());
 
         if (null !== $domainObject->isAcceptSingle() && null !== $domainObject->isAcceptMulti()) {
             $dataModel->setAcceptOnline($domainObject->isAcceptSingle() || $domainObject->isAcceptMulti());
@@ -164,12 +167,15 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getMarkVisibility()         || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         null === $dataModel->getSelfReviewability()      || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
         null === $dataModel->getSimilarityCheckEnabled() || $domainObject->setSimilarityCheckEnabled($dataModel->getSimilarityCheckEnabled());
-        null === $dataModel->getKamiInteractive()        || $domainObject->setKamiInteractive($dataModel->getKamiInteractive());
-        null === $dataModel->getKamiFile()               || $domainObject->setKamiFile($dataModel->getKamiFile());
+        null === $dataModel->getEnableWorksheet()        || $domainObject->setEnableWorksheet($dataModel->getEnableWorksheet());
         null === $dataModel->getEnableOffline()          || $domainObject->setEnableOffline($dataModel->getEnableOffline());
         null === $dataModel->getEnableText()             || $domainObject->setEnableText($dataModel->getEnableText());
         null === $dataModel->getEnableFiles()            || $domainObject->setEnableFiles($dataModel->getEnableFiles());
         null === $dataModel->getEnablePolicy()           || $domainObject->setEnablePolicy($dataModel->getEnablePolicy());
+
+        // Kami file _may_ be null though
+        $domainObject->setWorksheetTemplate($dataModel->getWorksheetTemplate());
+        $domainObject->setKamiWorksheetTemplate($dataModel->getKamiWorksheetTemplate());
 
         /* Has Rubric? (actual rubric must be loaded outside of this method)
          * If rubric is off for this Due Work, then clear the rubric-related settings

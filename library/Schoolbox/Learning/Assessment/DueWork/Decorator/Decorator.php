@@ -63,8 +63,8 @@ class Decorator implements DecoratorInterface
      * @param array        $attachedFiles
      * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
-     * @param bool         $kamiInteractive
-     * @param string|null  $kamiFile
+     * @param bool         $enableWorksheet
+     * @param string|null  $worksheetTemplate
      * @param bool         $enableOffline
      * @param bool         $enableText
      * @param bool         $enableFiles
@@ -84,8 +84,8 @@ class Decorator implements DecoratorInterface
         array $attachedFiles,
         ?string $selfReviewable,
         bool $similarityCheckEnabled,
-        bool $kamiInteractive,
-        ?string $kamiFile,
+        bool $enableWorksheet,
+        ?string $worksheetTemplate,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
@@ -104,8 +104,8 @@ class Decorator implements DecoratorInterface
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
-        $this->setKamiInteractive($kamiInteractive);
-        $this->setKamiFile($kamiFile);
+        $this->setEnableWorksheet($enableWorksheet);
+        $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);
@@ -254,33 +254,33 @@ class Decorator implements DecoratorInterface
          */
         if (
             $this->original && !(
-                $this->getKamiInteractive() ||
+                $this->getEnableWorksheet() ||
                 $this->getEnableOffline() ||
                 $this->getEnableText() ||
                 $this->getEnableFiles()
             )
         ) {
             // we aren't posting the data when updating
-            $assessment->setKamiInteractive($this->original->getKamiInteractive());
-            $assessment->setKamiFile($this->original->getKamiFile());
+            $assessment->setEnableWorksheet($this->original->getEnableWorksheet());
+            $assessment->setWorksheetTemplate($this->original->getWorksheetTemplate());
             $assessment->setEnableOffline($this->original->getEnableOffline());
             $assessment->setEnableText($this->original->getEnableText());
             $assessment->setEnableFiles($this->original->getEnableFiles());
             $assessment->setEnablePolicy($this->original->getEnablePolicy());
         } else {
-            $assessment->setKamiInteractive($this->getKamiInteractive());
-            $assessment->setKamiFile($this->getKamiFile());
+            $assessment->setEnableWorksheet($this->getEnableWorksheet());
+            if ($this->getWorksheetTemplate()) {
+                // Rebuild worksheet files list
+                $factory     = new CollectorFactory();
+                $attachments = $factory->build([$this->getWorksheetTemplate()])->getAll();
+                $assessment->setWorksheetTemplate($attachments[0]);
+            } else {
+                $assessment->setWorksheetTemplate(null);
+            }
             $assessment->setEnableOffline($this->getEnableOffline());
             $assessment->setEnableText($this->getEnableText());
             $assessment->setEnableFiles($this->getEnableFiles());
             $assessment->setEnablePolicy($this->getEnablePolicy());
-        }
-
-        if ($this->getKamiFile()) {
-            // Rebuild worksheet files list
-            $factory = new CollectorFactory();
-            $attachments = $factory->build([$this->getKamiFile()])->getAll();
-            $assessment->setKamiFile($attachments[0]->getHash());
         }
     }
 }

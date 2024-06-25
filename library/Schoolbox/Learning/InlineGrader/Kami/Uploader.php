@@ -276,10 +276,25 @@ class Uploader
         $countFailedAttempts = 0;
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
-                return $this->kamiConnector->uploadDocument(
-                    $kamiModel->getStudentSubmissionFile()->getStorage(),
-                    $this->filesystemProxy,
-                );
+                // The upload type depends on the Kami document's type.
+                // Annotation: upload as document
+                if ($kamiModel->getType() === Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION) {
+                    return $this->kamiConnector->uploadDocument(
+                        $kamiModel->getStudentSubmissionFile()->getStorage(),
+                        $this->filesystemProxy,
+                    );
+                }
+
+                // Worksheet template: upload as template
+                if ($kamiModel->getType() === Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE) {
+                    return $this->kamiConnector->uploadDocumentAsTemplate(
+                        $kamiModel->getWorksheetTemplateSubmissionBox()->getWorksheetTemplate(),
+                        $this->filesystemProxy,
+                    );
+                }
+
+                // Worksheet:
+                // TODO find the due work's template, and copy from that
             } catch (Exception\NotFound $e) {
                 // file not found
                 throw $e;
@@ -337,12 +352,23 @@ class Uploader
      */
     private function logStartingUpload(UploadResults $results, int $kamiCount, Model $kamiModel): void
     {
+        switch ($kamiModel->getType()) {
+            case Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION:
+                $filename = $kamiModel->getStudentSubmissionFile()->getStorage()->getBasename();
+                break;
+            case Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE:
+                $filename = $kamiModel->getWorksheetTemplateSubmissionBox()->getWorksheetTemplate()->getBasename();
+                break;
+            default:
+                // Don't know how to log this yet
+                return;
+        }
         $this->log->notice(sprintf(
             "Uploading %d of %d. id: %d, filename: '%s'",
             $results->getCountTotal() + 1,
             $kamiCount,
             $kamiModel->getId(),
-            $kamiModel->getStudentSubmissionFile()->getBasename()
+            $filename,
         ));
     }
 

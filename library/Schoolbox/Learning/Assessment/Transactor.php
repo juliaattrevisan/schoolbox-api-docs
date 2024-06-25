@@ -17,16 +17,13 @@ use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -53,109 +50,31 @@ class Transactor
 
 
     /**
-     * @var FolderMapper
-     */
-    protected $folderMapper;
-
-
-    /**
-     * @var UnitImplementationMapper
-     */
-    private $unitImplementationMapper;
-
-
-    /**
-     * @var UnitSpecificationMapper
-     */
-    private $unitSpecificationMapper;
-
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    protected $assessmentMapperProxy;
-
-
-    /**
-     * @var DueWork\Response\File\Plagscan\Mapper
-     */
-    protected $plagscanMapper;
-
-
-    /**
-     * @var Turnitin\Group\Mapper
-     */
-    protected Turnitin\Group\Mapper $turnitinGroupMapper;
-
-
-    /**
-     * @var SubmissionBoxMapper
-     */
-    protected SubmissionBoxMapper $submissionBoxMapper;
-
-
-    /**
-     * @var SingleFile\Mapper
-     */
-    protected $submissionFileMapper;
-
-    /**
-     * @var QuizMapper
-     */
-    protected $quizMapper;
-
-    /**
-     * @var Generator
-     */
-    protected $routeGenerator;
-
-    /**
-     * @var Replicator
-     */
-    protected Replicator $replicator;
-
-
-    /**
      * Transactor constructor.
      *
-     * @param FolderMapper                          $folderMapper
-     * @param UnitImplementationMapper              $unitImplementationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param AssessmentMapperProxy                 $assessmentMapperProxy
-     * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
-     * @param Turnitin\Group\Mapper                 $turnitinGroupMapper
-     * @param SubmissionBoxMapper                   $submissionBoxMapper
-     * @param SingleFile\Mapper                     $submissionFileMapper
-     * @param QuizMapper                            $quizMapper
-     * @param Generator                             $routeGenerator
-     * @param Replicator                            $replicator
-     * @param LessonPlanActivitiesReplicator        $lessonPlanActivitiesReplicator
+     * @param FolderMapper                   $folderMapper
+     * @param UnitImplementationMapper       $unitImplementationMapper
+     * @param UnitSpecificationMapper        $unitSpecificationMapper
+     * @param AssessmentMapperProxy          $assessmentMapperProxy
+     * @param Turnitin\Group\Mapper          $turnitinGroupMapper
+     * @param SubmissionBoxMapper            $submissionBoxMapper
+     * @param SingleFile\Mapper              $submissionFileMapper
+     * @param Generator                      $routeGenerator
+     * @param Replicator                     $replicator
+     * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
      */
     public function __construct(
-        FolderMapper $folderMapper,
-        UnitImplementationMapper $unitImplementationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
-        Turnitin\Group\Mapper $turnitinGroupMapper,
-        SubmissionBoxMapper $submissionBoxMapper,
-        SingleFile\Mapper $submissionFileMapper,
-        QuizMapper $quizMapper,
-        Generator $routeGenerator,
-        Replicator $replicator,
+        private FolderMapper $folderMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Turnitin\Group\Mapper $turnitinGroupMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private SingleFile\Mapper $submissionFileMapper,
+        private Generator $routeGenerator,
+        private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
     ) {
-        $this->folderMapper = $folderMapper;
-        $this->unitImplementationMapper = $unitImplementationMapper;
-        $this->unitSpecificationMapper = $unitSpecificationMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->plagscanMapper = $plagscanMapper;
-        $this->turnitinGroupMapper = $turnitinGroupMapper;
-        $this->submissionBoxMapper = $submissionBoxMapper;
-        $this->submissionFileMapper = $submissionFileMapper;
-        $this->quizMapper = $quizMapper;
-        $this->routeGenerator = $routeGenerator;
-        $this->replicator = $replicator;
     }
 
 

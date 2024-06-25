@@ -12,12 +12,16 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
+ * Mapper for relation between student submission files and Kami data.
+ *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -28,12 +32,45 @@ class Mapper extends BaseMapper
 {
     protected function mapping(): void
     {
-        $this->hasTable('student_submission_file_kami');
+        $this->hasTable('kami_document');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses(
+            'type',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION,
+                Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE,
+                Model::TYPE_STUDENT_SUBMISSION_WORKSHEET,
+            ],
+        );
         $this->joins('student_submission_file_id', SingleFile\Mapper::class, 'id', null, null, null, 'file');
+        $this->joins(
+            'worksheet_template_submission_box_id',
+            SubmissionBoxMapper::class,
+            'id',
+            null,
+            null,
+            null,
+            'worksheetTemplateSubmissionBox',
+        );
         $this->uses('kami_document_id', self::TYPE_STRING);
-        $this->uses('status', self::TYPE_STRING);
+        $this->uses(
+            'status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [
+                Model::STATUS_QUEUED,
+                Model::STATUS_UPLOADING,
+                Model::STATUS_FAILED,
+                Model::STATUS_PROCESSING,
+                Model::STATUS_DONE,
+                Model::STATUS_ERROR,
+            ],
+        );
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('kami_created_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -47,16 +84,18 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        $submissionFileMapper = $this->getJoinMapper('file');
-
         return "
             SELECT
                 {$this->getColumnString()},
-                {$submissionFileMapper->getColumnString('f')},
-                {$submissionFileMapper->getJoinColumnString('storage', 's')}
+                {$this->getJoinColumnString('file', 'f')},
+                {$this->getJoinColumnString('file.storage', 's')},
+                {$this->getJoinColumnString('worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox')},
+                {$this->getJoinColumnString('worksheetTemplateSubmissionBox.worksheetTemplate', 'worksheetTemplateSubmissionBoxWorksheetTemplate')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('file', '', 'f', true)}
-            INNER JOIN {$submissionFileMapper->getJoinSql('storage', 'f', 's', true)}
+            LEFT JOIN {$this->getJoinSql('file', '', 'f', true)}
+            LEFT JOIN {$this->getJoinSql('file.storage', 'f', 's', true)}
+            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox', '', 'worksheetTemplateSubmissionBox', true)}
+            LEFT JOIN {$this->getJoinSql('worksheetTemplateSubmissionBox.worksheetTemplate', 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBoxWorksheetTemplate', true)}
         ";
     }
 
@@ -68,20 +107,33 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /**
-         * @var SingleFile\Mapper $submissionFileMapper
-         * @var Storage\Mapper    $storageMapper
-         */
-        $collection           = $this->createCollection();
-        $submissionFileMapper = $this->getJoinMapper('file');
-        $storageMapper        = $submissionFileMapper->getJoinMapper('storage');
+        $collection = $this->createCollection();
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $model          = $this->hydrate($row);
-            $submissionFile = $submissionFileMapper->hydrate($row, 'f');
-            $submissionFile->setStorage($storageMapper->hydrate($row, 's'));
-            $model->setStudentSubmissionFile($submissionFile);
+            $model = $this->hydrate($row);
+
+            // Hydrate submission file
+            /** @var ?SingleFile\Model $submissionFile */
+            $submissionFile = $this->hydrateJoin($row, 'file', 'f');
+            /** @var ?Storage\Model $submissionFileStorage */
+            $submissionFileStorage = $this->hydrateJoin($row, 'file.storage', 's');
+            if ($submissionFileStorage) {
+                $submissionFile?->setStorage($submissionFileStorage);
+            }
+
+            // Hydrate submission box
+            /** @var ?SubmissionBox $submissionBox */
+            $submissionBox = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox', 'worksheetTemplateSubmissionBox');
+            /** @var ?Storage\Model $submissionBoxStorage */
+            $submissionBoxStorage = $this->hydrateJoin($row, 'worksheetTemplateSubmissionBox.worksheetTemplate', 'worksheetTemplateSubmissionBoxWorksheetTemplate');
+            if ($submissionBoxStorage) {
+                $submissionBox?->setWorksheetTemplate($submissionBoxStorage);
+            }
+
+            $model
+                ->setStudentSubmissionFile($submissionFile)
+                ->setWorksheetTemplateSubmissionBox($submissionBox);
             $collection[$model->getId()] = $model;
         }
         return $collection;

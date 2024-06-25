@@ -87,12 +87,12 @@ trait DueWorkTrait
     /**
      * @var bool
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
      * @var string|null
      */
-    protected ?string $kamiFile = null;
+    protected ?string $worksheetTemplate = null;
 
     /**
      * @var bool
@@ -313,39 +313,39 @@ trait DueWorkTrait
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param string|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setWorksheetTemplate(?string $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
     /**
      * @return string|null
      */
-    public function getKamiFile(): ?string
+    public function getWorksheetTemplate(): ?string
     {
-        return $this->kamiFile;
+        return $this->worksheetTemplate;
     }
 
     /**

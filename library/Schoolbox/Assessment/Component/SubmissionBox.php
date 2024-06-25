@@ -18,9 +18,11 @@ use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
@@ -120,32 +122,42 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $accept_multiple;
 
     /**
-     * @var bool
+     * Is submission via a worksheet enabled?
+     *
+     * The student will submit via a copy of the worksheet referenced in
+     * `$this->kamiWorksheetTemplate`.
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
-     * @var string|null
+     * The uploaded worksheet template, if there is one.
      */
-    protected ?string $kamiFile = null;
+    protected ?Storage\Model $worksheetTemplate = null;
 
     /**
-     * @var bool
+     * The Kami document representation of `$this->worksheetTemplate`.
+     */
+    protected ?KamiModel $kamiWorksheetTemplate = null;
+
+    /**
+     * Is offline submission (student checks a box to confirm that they have
+     * submitted a response to this due work) enabled?
      */
     protected bool $enableOffline = false;
 
     /**
-     * @var bool
+     * Is submission via a rich text editor enabled?
      */
     protected bool $enableText = false;
 
     /**
-     * @var bool
+     * Is submission via file upload enabled?
      */
     protected bool $enableFiles = false;
 
     /**
-     * @var bool
+     * Does the student need to accept the school's submission policy before
+     * submitting?
      */
     protected bool $enablePolicy = false;
 
@@ -932,39 +944,60 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param Storage\Model|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setWorksheetTemplate(?Storage\Model $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
+
     /**
-     * @return string|null
+     * @return KamiModel|null
      */
-    public function getKamiFile(): ?string
+    public function getKamiWorksheetTemplate(): ?KamiModel
     {
-        return $this->kamiFile;
+        return $this->kamiWorksheetTemplate;
+    }
+
+
+    /**
+     * @param KamiModel|null $kamiWorksheetTemplate
+     * @return $this
+     */
+    public function setKamiWorksheetTemplate(?KamiModel $kamiWorksheetTemplate): self
+    {
+        $this->kamiWorksheetTemplate = $kamiWorksheetTemplate;
+        return $this;
+    }
+
+
+    /**
+     * @return Storage\Model|null
+     */
+    public function getWorksheetTemplate(): ?Storage\Model
+    {
+        return $this->worksheetTemplate;
     }
 
     /**

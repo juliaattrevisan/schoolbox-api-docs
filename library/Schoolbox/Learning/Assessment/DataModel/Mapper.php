@@ -29,6 +29,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
@@ -494,6 +495,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.mark_type', 'mt')},
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
+                {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
+                {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
@@ -517,6 +520,8 @@ class Mapper extends BaseMapper
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
+            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
+            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
@@ -802,6 +807,10 @@ class Mapper extends BaseMapper
                         ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
                         ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
                         ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
+                        ->setWorksheetTemplate(
+                            $this->hydrateJoin($row, 'duework.worksheetTemplate', 'dueworkWorksheetTemplate')
+                                 ?->setMimeType($this->hydrateJoin($row, 'duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
+                        )
                 );
                 $dueWorkIds[] = $row['d.id'];
             } else {
@@ -922,8 +931,9 @@ class Mapper extends BaseMapper
             $modelList->add($model);
         }
         // Load related 1-M models
-        // Due work files
+        // Due work files and Kami worksheet
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+        $modelList = $this->augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds);
 
         /* Task files
          */
@@ -1099,6 +1109,34 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
+
+    /**
+     * Augments the list from hydrateSelect() with due work Kami worksheet
+     * templates.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $dueWorkIds
+     * @return Collection|Model[]
+     */
+    protected function augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds)
+    {
+        if (!empty($dueWorkIds)) {
+            // Retrieve and sort list of Kami docs
+            $kamiDocuments = $this->getJoinMapper('duework.kamiWorksheetTemplate')
+                ->findByColumn('worksheet_template_submission_box_id', $dueWorkIds)
+                ->indexByCallback(fn (KamiModel $kamiDocument) => $kamiDocument->getWorksheetTemplateSubmissionBox()->getId())
+            ;
+
+            // Augment list with Kami docs
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+                if ($submodel instanceof SubmissionBox) {
+                    $submodel->setKamiWorksheetTemplate($kamiDocuments[$submodel->getId()] ?? null);
+                }
+            }
+        }
+        return $modelList;
+    }
 
     /**
      * Augments the list from hydrateSelect() with task files.

@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -22,7 +21,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\InlineGrader\Kami\Exception;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
@@ -37,7 +35,7 @@ class Connector implements IConnector
 {
     // Intentional trailing slash (@see http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client)
     // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
-    public const BASE_URI = 'https://api.notablepdf.com/';
+    public const DEFAULT_BASE_URI = 'https://api.notablepdf.com/';
 
     public const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
     public const PATH_LIST_DOCUMENTS = 'embed/documents';
@@ -51,11 +49,16 @@ class Connector implements IConnector
     public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
     public const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn on to document. Useful for printing.
 
-    /** @var Client */
-    private $client;
+    /** @var ClientInterface */
+    private ClientInterface $client;
 
     /** @var bool */
     private bool $enabled;
+
+    /**
+     * Kami API host: defaults to `self::DEFAULT_BASE_URI` if empty.
+     */
+    private ?string $apiHost;
 
     /**
      * Shared by all schoolbox instances. There is an alternative api-key available for testing to keep
@@ -79,10 +82,16 @@ class Connector implements IConnector
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
      */
-    public function __construct(ClientInterface $client, ?bool $enabled, #[SensitiveParameter] ?string $apiKey, ?string $siteSchoolCode)
-    {
+    public function __construct(
+        ClientInterface $client,
+        ?bool $enabled,
+        ?string $apiHost,
+        #[SensitiveParameter] ?string $apiKey,
+        ?string $siteSchoolCode,
+    ) {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
+        $this->apiHost        = ($apiHost ?? self::DEFAULT_BASE_URI);
         $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
         $this->siteSchoolCode = null === $siteSchoolCode ? '' : trim($siteSchoolCode);
     }
@@ -127,6 +136,29 @@ class Connector implements IConnector
 
 
     /**
+     * Upload a file into Kami as a template, and return the newly assigned Kami Document Identifier.
+     *
+     * Presumably this also costs 4c per request to the production or proxy server?
+     *
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
+     * @return Document
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\EmptyApiKeyException If no Kami API key configured
+     * @throws Exception\ResponseDecodeException If cannot decode the Kami response
+     * @throws Exception\ApiException if response doesn't contain required fields
+     * @throws Exception\InvalidStatusException if response status is invalid
+     * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
+     * @throws GuzzleException
+     * @throws FilesystemException if the file doesn't exist on the disk
+     */
+    public function uploadDocumentAsTemplate(IStorage $storage, FilesystemProxy $filesystemProxy): Document
+    {
+        return $this->uploadDocumentInternal($storage, $filesystemProxy, true);
+    }
+
+
+    /**
      * Upload a file into Kami and return the newly assigned Kami Document Identifier
      *
      * Note that this method cost 4c each time you hit the production or proxy server
@@ -145,38 +177,7 @@ class Connector implements IConnector
      */
     public function uploadDocument(IStorage $storage, FilesystemProxy $filesystemProxy): Document
     {
-        $this->assertEnabled();
-
-        // The 'name' and 'document' fields are required.
-        // Note that storage files in multipart form data must be sent as string
-        // values (and not resources), because files can't be posted from
-        // non-local resources.
-        $options  = [
-            RequestOptions::MULTIPART => [
-                [
-                    'name'     => 'name',
-                    'contents' => $storage->getBasename(),
-                ],
-                [
-                    'name'     => 'document',
-                    'contents' => $filesystemProxy->read($storage),
-                    'filename' => $storage->getBasename(),
-                ],
-            ],
-        ];
-        $request  = new Request('POST', $this->getPathUploadDocument());
-        $response = $this->client->send($request, $this->getOptions($options));
-
-        if ($this->isSuccessful($response)) {
-            $decoded = $this->decodeResponseContent($response->getBody());
-            return $this->buildDocument($decoded);
-        }
-
-        // Bad response, but not a simple 'not found'?
-        if (!$this->isValidNotFound($response)) {
-            $this->generateApiException($request, $response);
-        }
-        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
+        return $this->uploadDocumentInternal($storage, $filesystemProxy, false);
     }
 
 
@@ -311,37 +312,42 @@ class Connector implements IConnector
         bool $showHelp = true,
         bool $showMenu = true
     ): Session {
-        $this->assertEnabled();
-        $this->assertValidSiteSchoolCode();
+        return $this->viewSessionInternal($documentId, null, $user, $theme, $showSave, $showPrint, $showHelp, $showMenu, $editable);
+    }
 
-        // When should the view session expire?
-        $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
-        $options  = [
-            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
-            RequestOptions::BODY    =>  \GuzzleHttp\Utils::jsonEncode([
-                'document_identifier' => $documentId,
-                'user'                => [
-                    'name'    => "{$user->getFirstname()} {$user->getLastname()}",
-                    'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
-                ],
-                'expires_at'          => $expires->getDateTimeObject()->utc()->format(Alaress_Date_Format::FORMAT_DATETIME_UTC),
-                'viewer_options'      => [
-                    'theme'                  => $theme,
-                    'show_save'              => $showSave,
-                    'show_print'             => $showPrint,
-                    'show_help'              => $showHelp,
-                    'show_menu'              => $showMenu,
-                    'enable_annotation_bank' => $editable,
-                ],
-                'editable'            => $editable,
-            ]),
-        ];
-        $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
-        $response = $this->client->send($request, $this->getOptions($options));
-        if ($this->isValidNotFound($response)) {
-            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
-        }
-        return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
+
+    /**
+     * Create a time-limited session for the view of a document group, and
+     * returns a URL you can embed in your page.
+     *
+     * @param string $documentGroupId
+     * @param User   $user
+     * @param bool   $editable
+     * @param string $theme     Sets the theme to use when viewing the document
+     * @param bool   $showSave  Hides the save (download) button
+     * @param bool   $showPrint Hides the print button
+     * @param bool   $showHelp  Hides the help button
+     * @param bool   $showMenu  Hides the menu button
+     * @return Session
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\ApiException If API response is unable to be processed by us
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
+     */
+    public function viewSessionForGroup(
+        string $documentGroupId,
+        User $user,
+        bool $editable = true,
+        string $theme = IConnector::SESSION_THEME_LIGHT,
+        bool $showSave = true,
+        bool $showPrint = true,
+        bool $showHelp = true,
+        bool $showMenu = true
+    ): Session {
+        return $this->viewSessionInternal(null, $documentGroupId, $user, $theme, $showSave, $showPrint, $showHelp, $showMenu, $editable);
     }
 
 
@@ -387,7 +393,7 @@ class Connector implements IConnector
     public function getExport(string $exportId): Export
     {
         $this->assertEnabled();
-        $request  = new Request('GET', self::BASE_URI . "embed/exports/$exportId");
+        $request  = new Request('GET', $this->apiHost . "embed/exports/$exportId");
         $response = $this->client->send($request, $this->getOptions());
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $exportId", $request, $response);
@@ -414,7 +420,7 @@ class Connector implements IConnector
                 'export_type'         => $exportType,
             ]),
         ];
-        $request  = new Request('POST', self::BASE_URI . 'embed/exports');
+        $request  = new Request('POST', $this->apiHost . 'embed/exports');
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
@@ -681,7 +687,7 @@ class Connector implements IConnector
         return [
             RequestOptions::HEADERS     => $this->getHeaderAuthorisation(),
             RequestOptions::HTTP_ERRORS => false,
-            'base_uri'                  => static::BASE_URI,
+            'base_uri'                  => $this->apiHost,
         ];
     }
 
@@ -709,5 +715,127 @@ class Connector implements IConnector
                 )
             );
         }
+    }
+
+    /**
+     * Internal method for uploading a document.
+     *
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
+     * @param bool            $template        Is this a template document, for creation of a document group?
+     * @return Document
+     * @throws FilesystemException
+     * @throws GuzzleException
+     */
+    private function uploadDocumentInternal(IStorage $storage, FilesystemProxy $filesystemProxy, bool $template): Document
+    {
+        $this->assertEnabled();
+
+        // The 'name' and 'document' fields are required.
+        // Note that storage files in multipart form data must be sent as string
+        // values (and not resources), because files can't be posted from
+        // non-local resources.
+        $formParams = [
+            [
+                'name'     => 'name',
+                'contents' => $storage->getBasename(),
+            ],
+            [
+                'name'     => 'document',
+                'contents' => $filesystemProxy->read($storage),
+                'filename' => $storage->getBasename(),
+            ],
+        ];
+        if ($template) {
+            $formParams[] = [
+                'name'     => 'create_as_template',
+                'contents' => '1',
+            ];
+        }
+        $request  = new Request('POST', $this->getPathUploadDocument());
+        $response = $this->client->send($request, $this->getOptions([RequestOptions::MULTIPART => $formParams]));
+
+        if ($this->isSuccessful($response)) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Document not uploaded", $request, $response);
+    }
+
+    /**
+     * Internal method for creating a view session.
+     *
+     * @param string|null $documentId      The document to create a view session for:
+     *                                     either this or `$documentGroupId` must be set.
+     * @param string|null $documentGroupId The document group to create a view session for:
+     *                                     either this or `$documentId` must be set.
+     * @param User        $user
+     * @param string      $theme
+     * @param bool        $showSave
+     * @param bool        $showPrint
+     * @param bool        $showHelp
+     * @param bool        $showMenu
+     * @param bool        $editable
+     * @return Session
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
+     * @throws Exception\ApiException If API response is unable to be processed by us
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
+     */
+    private function viewSessionInternal(
+        ?string $documentId,
+        ?string $documentGroupId,
+        User $user,
+        string $theme,
+        bool $showSave,
+        bool $showPrint,
+        bool $showHelp,
+        bool $showMenu,
+        bool $editable
+    ): Session {
+        $this->assertEnabled();
+        $this->assertValidSiteSchoolCode();
+
+        // When should the view session expire?
+        $expires  = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
+        $body     = [
+            'user'           => [
+                'name'    => "{$user->getFirstname()} {$user->getLastname()}",
+                'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
+            ],
+            'expires_at'     => $expires->getDateTimeObject()->utc()->format(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+            'viewer_options' => [
+                'theme'                  => $theme,
+                'show_save'              => $showSave,
+                'show_print'             => $showPrint,
+                'show_help'              => $showHelp,
+                'show_menu'              => $showMenu,
+                'enable_annotation_bank' => $editable,
+            ],
+            'editable'       => $editable,
+        ];
+        if (isset($documentId)) {
+            $body['document_identifier'] = $documentId;
+        } elseif (isset($documentGroupId)) {
+            $body['document_group_id'] = $documentGroupId;
+        }
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => \GuzzleHttp\Utils::jsonEncode($body),
+        ];
+        $request  = new Request('POST', $this->apiHost . 'embed/sessions');
+        $response = $this->client->send($request, $this->getOptions($options));
+        if ($this->isValidNotFound($response)) {
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+        }
+        return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
     }
 }

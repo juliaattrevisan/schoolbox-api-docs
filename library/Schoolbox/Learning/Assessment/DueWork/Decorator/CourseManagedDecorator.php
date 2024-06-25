@@ -51,8 +51,8 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
-     * @param bool         $kamiInteractive
-     * @param string| null $kamiFile
+     * @param bool         $enableWorksheet
+     * @param string| null $worksheetTemplate
      * @param bool         $enableOffline
      * @param bool         $enableText
      * @param bool         $enableFiles
@@ -69,8 +69,8 @@ class CourseManagedDecorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
-        bool $kamiInteractive,
-        ?string $kamiFile,
+        bool $enableWorksheet,
+        ?string $worksheetTemplate,
         bool $enableOffline,
         bool $enableText,
         bool $enableFiles,
@@ -86,8 +86,8 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
-        $this->setKamiInteractive($kamiInteractive);
-        $this->setKamiFile($kamiFile);
+        $this->setEnableWorksheet($enableWorksheet);
+        $this->setWorksheetTemplate($worksheetTemplate);
         $this->setEnableOffline($enableOffline);
         $this->setEnableText($enableText);
         $this->setEnableFiles($enableFiles);

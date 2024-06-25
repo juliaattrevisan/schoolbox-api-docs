@@ -56,6 +56,8 @@ class MessageFactory extends BaseMessageFactory
      * @param string|null $gotenbergApiVersion       The API version which the Gotenberg container requires, if any.
      * @param string|null $gotenbergApiKeyHeader     The header in which `$gotenbergApiKey` will be passed.
      * @param string|null $gotenbergApiVersionHeader The header in which `$gotenbergApiVersion` will be passed.
+     * @param string|null $kamiApiHost               The Kami API host: if null, taskd will use the default value of
+     *                                               `\Schoolbox\Learning\InlineGrader\Kami\Connector::DEFAULT_BASE_URI`
      * @param string|null $kamiApiKey                The API key used to authenticate with Kami.
      * @param string|null $turnitinApiKey            The API key used to authenticate with Turnitin.
      * @param string|null $turnitinApiHost           The host name of this instance's Turnitin instance.
@@ -68,6 +70,7 @@ class MessageFactory extends BaseMessageFactory
         private ?string $gotenbergApiVersion,
         private ?string $gotenbergApiKeyHeader,
         private ?string $gotenbergApiVersionHeader,
+        private ?string $kamiApiHost,
         private ?string $kamiApiKey,
         private ?string $turnitinApiKey,
         private ?string $turnitinApiHost,
@@ -206,6 +209,9 @@ class MessageFactory extends BaseMessageFactory
                     : null,
                 'footer'  => $this->pdfFooter,
             ];
+        }
+        if (isset($this->kamiApiHost)) {
+            $params['kami']['apiHost'] = $this->kamiApiHost;
         }
         if (isset($this->kamiApiKey)) {
             $params['kami']['apiKey'] = $this->kamiApiKey;

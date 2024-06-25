@@ -14,6 +14,7 @@ use Alaress\Random;
 use GuzzleHttp;
 use Proxy;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Throwable;
@@ -106,9 +107,10 @@ HELP;
         $kamiMapper = $mapperFactory->get(Kami\Mapper::class);
         $connector  = new Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
-            $this->getConfig()->get('kami_enabled'),
-            $this->getConfig()->get('kami_api_key'),
-            $this->getConfig()->get('site_school_code')
+            $this->getConfig()->get(ConfigMapper::NAME_KAMI_ENABLED),
+            $this->getConfig()->get(ConfigMapper::NAME_KAMI_API_HOST),
+            $this->getConfig()->get(ConfigMapper::NAME_KAMI_API_KEY),
+            $this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
         );
 
         if (!$connector->isEnabled()) {

@@ -17,11 +17,13 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 /**
@@ -58,8 +60,25 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('late_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
-        $this->uses('kami_interactive', self::TYPE_BOOLEAN, null, 'kamiInteractive');
-        $this->uses('kami_interactive_hash', self::TYPE_STRING, null, 'kamiFile');
+        $this->uses('enable_worksheet', self::TYPE_BOOLEAN, null, 'enableWorksheet');
+        $this->joins(
+            'worksheet_template_hash',
+            Storage\Mapper::class,
+            'hash',
+            null,
+            null,
+            'worksheetTemplate',
+            'worksheetTemplate',
+        );
+
+        // Join onto Kami document
+        $this->joinsReverseSingle(
+            'worksheet_template_submission_box_id',
+            Schoolbox\Learning\InlineGrader\Kami\Mapper::class,
+            'kamiWorksheetTemplate',
+            'kamiWorksheetTemplate',
+        );
+
         $this->uses('enable_offline', self::TYPE_BOOLEAN, null, 'enableOffline');
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
@@ -115,6 +134,7 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateKamiDocument']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
@@ -136,7 +156,10 @@ class SubmissionBoxMapper extends BaseMapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('assessmentModel', 'am')},
-                   {$this->getJoinColumnString('owner', 'o')}
+                   {$this->getJoinColumnString('owner', 'o')},
+                   {$this->getJoinColumnString('worksheetTemplate', 'worksheetTemplate')},
+                   {$this->getJoinColumnString('worksheetTemplate.allowedFileExtension', 'worksheetTemplateAllowedFileExtension')},
+                   {$this->getJoinColumnString('kamiWorksheetTemplate', 'kamiWorksheetTemplate')}
         ";
     }
 
@@ -150,6 +173,9 @@ class SubmissionBoxMapper extends BaseMapper
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
+            LEFT  JOIN {$this->getJoinSql('worksheetTemplate', '', 'worksheetTemplate', true)}
+            LEFT  JOIN {$this->getJoinSql('worksheetTemplate.allowedFileExtension', 'worksheetTemplate', 'worksheetTemplateAllowedFileExtension', true)}
+            LEFT  JOIN {$this->getJoinSql('kamiWorksheetTemplate', '', 'kamiWorksheetTemplate', true)}
         ";
     }
 
@@ -166,9 +192,16 @@ class SubmissionBoxMapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
+            $worksheetTemplate = $this->hydrateJoin($row, 'worksheetTemplate', 'worksheetTemplate');
+            if ($worksheetTemplate instanceof Storage\Model) {
+                $worksheetTemplate->setMimeType(
+                    $this->hydrateJoin($row, 'worksheetTemplate.allowedFileExtension', 'worksheetTemplateAllowedFileExtension')
+                );
+            }
             $box = $this->hydrate($row)
                         ->setAssessmentModel($this->hydrateJoin($row, 'assessmentModel', 'am'))
                         ->setOwner($this->hydrateJoin($row, 'owner', 'o'))
+                        ->setWorksheetTemplate($worksheetTemplate)
             ;
             $collection[$box->getId()] = $box;
         }
@@ -374,6 +407,44 @@ class SubmissionBoxMapper extends BaseMapper
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);
+    }
+
+
+    /**
+     * Create a Kami document for this due work.
+     *
+     * @param SubmissionBox      $object
+     * @param SubmissionBox|null $previous
+     * @return void
+     */
+    public function updateKamiDocument(SubmissionBox $object, ?SubmissionBox $previous): void
+    {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED)) {
+            return;
+        }
+
+        $currentWorksheet  = $object->getWorksheetTemplate();
+        $previousWorksheet = $previous?->getWorksheetTemplate();
+        if ($currentWorksheet?->getHash() === $previousWorksheet?->getHash()) {
+            // Worksheet has not changed: leave as is
+            return;
+        }
+
+        // Worksheet has changed:
+        // delete any existing worksheets, and create a new one
+        /** @var Schoolbox\Learning\InlineGrader\Kami\Mapper $kamiMapper */
+        $kamiMapper = $this->getJoinMapper('kamiWorksheetTemplate');
+        if ($previousWorksheet?->getHash()) {
+            $kamiMapper->deleteByColumn('worksheet_template_submission_box_id', $object->getId());
+        }
+        if ($currentWorksheet?->getHash()) {
+            $kamiMapper->save(
+                $kamiMapper->createModel()
+                    ->setType(Schoolbox\Learning\InlineGrader\Kami\Model::TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE)
+                    ->setStatusQueued()
+                    ->setWorksheetTemplateSubmissionBox($object)
+            );
+        }
     }
 
 

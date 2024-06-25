@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
+use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -27,6 +28,7 @@ use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Resource\Storage\IStorage;
 
 class Model extends AbstractAssessment implements ISelfAssessable
 {
@@ -136,32 +138,42 @@ class Model extends AbstractAssessment implements ISelfAssessable
     private $externalId;
 
     /**
-     * @var bool
+     * Is submission via a worksheet enabled?
+     *
+     * The student will submit via a copy of the worksheet referenced in
+     * `$this->kamiWorksheetTemplate`.
      */
-    protected bool $kamiInteractive = false;
+    protected bool $enableWorksheet = false;
 
     /**
-     * @var string|null
+     * The uploaded worksheet template, if there is one.
      */
-    protected ?string $kamiFile = null;
+    protected ?IStorage $worksheetTemplate = null;
 
     /**
-     * @var bool
+     * The Kami document representation of `$this->worksheetTemplate`.
+     */
+    protected ?KamiModel $kamiWorksheetTemplate = null;
+
+    /**
+     * Is offline submission (student checks a box to confirm that they have
+     * submitted a response to this due work) enabled?
      */
     protected bool $enableOffline = false;
 
     /**
-     * @var bool
+     * Is submission via a rich text editor enabled?
      */
     protected bool $enableText = false;
 
     /**
-     * @var bool
+     * Is submission via file upload enabled?
      */
     protected bool $enableFiles = false;
 
     /**
-     * @var bool
+     * Does the student need to accept the school's submission policy before
+     * submitting?
      */
     protected bool $enablePolicy = false;
 
@@ -242,6 +254,16 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
         $this->useMarkRange           = $source->useMarkRange;
         $this->useRubric              = $source->useRubric;
+        $this->enableOffline          = $source->enableOffline;
+        $this->enableFiles            = $source->enableFiles;
+        $this->enablePolicy           = $source->enablePolicy;
+        $this->enableText             = $source->enableText;
+        $this->enableWorksheet        = $source->enableWorksheet;
+
+        // Copy the worksheet file.
+        // Do not copy its Kami document:
+        // instead, a new one will be created for this due work on save.
+        $this->worksheetTemplate = $source->worksheetTemplate;
 
         // Copy attachments
         $this->copyAttachedFiles($source);
@@ -1012,39 +1034,57 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param bool $kamiInteractive
+     * @param bool $enableWorksheet
      * @return $this
      */
-    public function setKamiInteractive(bool $kamiInteractive): self
+    public function setEnableWorksheet(bool $enableWorksheet): self
     {
-        $this->kamiInteractive = $kamiInteractive;
+        $this->enableWorksheet = $enableWorksheet;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function getKamiInteractive(): bool
+    public function getEnableWorksheet(): bool
     {
-        return $this->kamiInteractive;
+        return $this->enableWorksheet;
     }
 
     /**
-     * @param string|null $kamiFile
+     * @param IStorage|null $worksheetTemplate
      * @return $this
      */
-    public function setKamiFile(?string $kamiFile): self
+    public function setWorksheetTemplate(?IStorage $worksheetTemplate): self
     {
-        $this->kamiFile = $kamiFile;
+        $this->worksheetTemplate = $worksheetTemplate;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return IStorage|null
      */
-    public function getKamiFile(): ?string
+    public function getWorksheetTemplate(): ?IStorage
     {
-        return $this->kamiFile;
+        return $this->worksheetTemplate;
+    }
+
+    /**
+     * @return KamiModel|null
+     */
+    public function getKamiWorksheetTemplate(): ?KamiModel
+    {
+        return $this->kamiWorksheetTemplate;
+    }
+
+    /**
+     * @param KamiModel|null $kamiWorksheetTemplate
+     * @return $this
+     */
+    public function setKamiWorksheetTemplate(?KamiModel $kamiWorksheetTemplate): self
+    {
+        $this->kamiWorksheetTemplate = $kamiWorksheetTemplate;
+        return $this;
     }
 
     /**

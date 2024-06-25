@@ -1804,6 +1804,7 @@ class Controller extends Assessment\Controller
                 /* Create a new one if it didn't already exist
                  */
                 $kamiModel = $this->kamiMapper->createModel()
+                    ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
                     ->setStudentSubmissionFile($file)
                     ->setStatusQueued();
 
@@ -1858,5 +1859,35 @@ class Controller extends Assessment\Controller
             ->generate($assessment);
 
         $this->response = $this->responseAsJson($payload);
+    }
+
+
+    /**
+     * Kami interactive worksheet teacher view
+     *
+     * @api   GET /learning/assessments/:assessmentId/worksheet
+     * @since 24.0
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException\NotFound
+     */
+    public function getWorksheet(IAssessable $assessment): void
+    {
+        if (!($assessment instanceof Model && $assessment->getKamiWorksheetTemplate())) {
+            throw new MapperException\NotFound();
+        }
+        $session = $this->kamiConnector->viewSessionForGroup(
+            $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(),
+            $this->getUser(),
+            true,
+        );
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/worksheet.twig',
+            [
+                'assessment' => $assessment,
+                'session'    => $session,
+            ]
+        );
     }
 }

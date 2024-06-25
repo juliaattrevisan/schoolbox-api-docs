@@ -10,14 +10,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Alaress_Date_Format;
 
+/**
+ * Model for relation between Kami data and:
+ * * student submission file annotations
+ * * submission box worksheet templates
+ * * student submission worksheets
+ */
 class Model implements ISoftDeletable
 {
     use Id;
@@ -25,19 +32,29 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    const STATUS_QUEUED = 'queued';          // Initial state. Inserted when we save a eligible submission file
-    const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
-    const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
-    const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
-    const STATUS_DONE = 'done';              // As reported by Kami. End state.
-    const STATUS_ERROR = 'error';            // As reported by Kami. Probably an end state.
+    public const STATUS_QUEUED = 'queued';          // Initial state. Inserted when we save a eligible submission file
+    public const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
+    public const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
+    public const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
+    public const STATUS_DONE = 'done';              // As reported by Kami. End state.
+    public const STATUS_ERROR = 'error';            // As reported by Kami. Probably an end state.
+
+    /**
+     * Types for this Kami upload:
+     * * TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION: annotations on a file a student has submitted
+     * * TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE:  a worksheet template, uploaded by a teacher
+     * * TYPE_STUDENT_SUBMISSION_WORKSHEET:       a worksheet, created from a template by a student
+     */
+    public const TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION = 'annotation';
+    public const TYPE_SUBMISSION_BOX_WORKSHEET_TEMPLATE  = 'worksheet_template';
+    public const TYPE_STUDENT_SUBMISSION_WORKSHEET       = 'worksheet';
 
     /**
      * Supported mime types
      *
      * @var array<string, bool>
      */
-    const ALLOWED_FILE_TYPES = [
+    public const ALLOWED_FILE_TYPES = [
         'doc'     => true,
         'docx'    => true,
         'ppt'     => true,
@@ -59,9 +76,23 @@ class Model implements ISoftDeletable
     ];
 
     /**
-     * @var SingleFile\Model
+     * The type of document: how it relates to something in Schoolbox.
+     *
+     * @var self::TYPE_*
      */
-    private $studentSubmissionFile;
+    private string $type;
+
+    /**
+     * The student submission file to which this Kami upload reference related,
+     * if there is one.
+     */
+    private ?SingleFile\Model $studentSubmissionFile = null;
+
+    /**
+     * The submission box for which this upload supplies a worksheet template,
+     * if any.
+     */
+    private ?SubmissionBox $worksheetTemplateSubmissionBox = null;
 
     /**
      * Null if not yet successfully uploaded into Kami
@@ -94,21 +125,61 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return SingleFile\Model
+     * @return self::TYPE_*
      */
-    public function getStudentSubmissionFile(): SingleFile\Model
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+
+    /**
+     * @param self::TYPE_* $type
+     * @return $this
+     */
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+
+    /**
+     * @return SingleFile\Model|null
+     */
+    public function getStudentSubmissionFile(): ?SingleFile\Model
     {
         return $this->studentSubmissionFile;
     }
 
 
     /**
-     * @param SingleFile\Model $studentSubmissionFile
+     * @param SingleFile\Model|null $studentSubmissionFile
      * @return $this|self
      */
-    public function setStudentSubmissionFile(SingleFile\Model $studentSubmissionFile): self
+    public function setStudentSubmissionFile(?SingleFile\Model $studentSubmissionFile): self
     {
         $this->studentSubmissionFile = $studentSubmissionFile;
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox|null
+     */
+    public function getWorksheetTemplateSubmissionBox(): ?SubmissionBox
+    {
+        return $this->worksheetTemplateSubmissionBox;
+    }
+
+
+    /**
+     * @param SubmissionBox|null $worksheetTemplateSubmissionBox
+     * @return $this
+     */
+    public function setWorksheetTemplateSubmissionBox(?SubmissionBox $worksheetTemplateSubmissionBox): self
+    {
+        $this->worksheetTemplateSubmissionBox = $worksheetTemplateSubmissionBox;
         return $this;
     }
 
@@ -134,7 +205,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return self::STATUS_*
      */
     public function getStatus(): string
     {

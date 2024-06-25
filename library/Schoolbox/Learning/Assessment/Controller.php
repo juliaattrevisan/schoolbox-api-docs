@@ -21,6 +21,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
@@ -258,7 +259,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
             // To determine whether to display the interactive worksheet option
-            $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
 
             $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
 
@@ -479,7 +480,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
 
             // To determine whether to display the interactive worksheet option
-            $data['kami_enabled'] = $this->getConfigLoader()->get('kami_enabled');
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
 
             $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
 
@@ -491,8 +492,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setFilesystemContext('worksheet')
                 ->setReadOnly($courseManagedFields->isReadonly()) //
                 ->setFileVar('worksheet');
-            if ($assessment->getKamiFile()) {
-                $zone = $zone->attachFiles([$assessment->getKamiFile()]);
+            if ($assessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
