@@ -43,4 +43,11 @@ defineExpose({ isEmpty });
 table {
     margin-bottom: 5px;
 }
+/* Styles for printing */
+@media print {
+    table td,
+    th {
+        border: none !important;
+    }
+}
 </style>

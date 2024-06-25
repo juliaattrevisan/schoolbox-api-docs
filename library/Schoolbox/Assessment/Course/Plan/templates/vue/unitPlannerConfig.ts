@@ -147,7 +147,7 @@ function getColumns(
             ...newColumnBase,
             id: `${columnTypeID}-${columnId}`,
             type: columnTypeID, // Add the missing 'type' property
-            label: component.heading.trim(), // Ignore trailing or leading whitespace
+            label: component.heading.trim(), // Ignore trailing or leading whitespace,
         });
     });
 }
@@ -180,6 +180,7 @@ export function createTabs(template: UnitTemplate) {
             }
             tabColumns.push(newColumnBase);
         });
+
         return {
             ...tabInfo,
             columns: tabColumns,

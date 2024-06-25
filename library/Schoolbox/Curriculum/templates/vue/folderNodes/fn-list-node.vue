@@ -131,4 +131,10 @@ function onRemoveSelected() {
 ul li ul {
     margin-inline-start: v-bind(marginStart);
 }
+@media print {
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
+    }
+}
 </style>

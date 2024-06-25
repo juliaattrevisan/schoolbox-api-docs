@@ -153,7 +153,7 @@ window.Vue.onUnmounted(() => {
     <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
         <div class="small-12 island">
-            <dl ref="tabsEl" class="tabs">
+            <dl ref="tabsEl" class="tabs no-print">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
                     <a @click="selectedTab = tab">{{ tab.label }}</a>
                 </dd>
@@ -178,7 +178,9 @@ window.Vue.onUnmounted(() => {
                             v-for="column in selectedTab.columns"
                             :key="column.id"
                             class="fixed-top"
-                            :class="{ 'fixed-left': column.fixedLeft }"
+                            :class="{
+                                'fixed-left': column.fixedLeft,
+                            }"
                         >
                             {{ column.label }}
                         </div>
@@ -303,5 +305,34 @@ window.Vue.onUnmounted(() => {
     position: absolute;
     width: 100%;
     z-index: var(--depth-pop-over);
+}
+/* Styles for printing */
+@media print {
+    .no-print {
+        display: none;
+    }
+    .scrollable {
+        height: 100% !important; // Expand scrollable elements to full height in print view
+        overflow: visible !important; // Ensure all content is visible
+    }
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
+    }
+    .header-row {
+        display: none !important;
+    }
+}
+
+/* Print styles for paper size below A4 portrait  */
+@media print and (max-width: 210mm) {
+    .unit-planner {
+        grid-template-columns: 1fr !important; // Set a single column layout for unit planner on smaller paper sizes
+    }
+    .grid-row {
+        > div {
+            border: none !important; // Remove borders from grid items on smaller paper sizes
+        }
+    }
 }
 </style>
