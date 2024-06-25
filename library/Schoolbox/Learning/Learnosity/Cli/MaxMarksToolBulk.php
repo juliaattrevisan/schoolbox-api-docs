@@ -15,7 +15,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -72,6 +71,12 @@ class MaxMarksToolBulk extends CliTool\App
      */
     private QuizMapper $quizMapper;
 
+    /**
+     * Used for performance metrics.
+     */
+    private ?float $apiRequestTotalWaitTimeSeconds = null;
+    private ?float $apiUpdatesTotalWaitTimeSeconds = null;
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -123,12 +128,15 @@ HELP;
                 'SELECT id
                 FROM assessment assm
                 JOIN assess ass ON ass.assessment_id = assm.id
-                WHERE assm.deleted_at IS NULL
-                LIMIT 10'
+                WHERE assm.deleted_at IS NULL'
             )->fetchColumnArray('id');
         } else {
             $assessmentIds = [$assessmentId];
         }
+
+        $scriptStartTime = microtime(true);
+        $this->apiRequestTotalWaitTimeSeconds = 0;
+        $this->apiUpdatesTotalWaitTimeSeconds = 0;
 
         $nAssessmentIds = count($assessmentIds);
         $logger->info("Found $nAssessmentIds assessmentIds.");
@@ -161,7 +169,6 @@ HELP;
         ];
 
         try {
-            /** @var AssessmentMapperProxy $assessmentMapperProxy */
             $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             $logger->error('Could not get assessment data source.  ' . $e->getMessage());
@@ -216,6 +223,7 @@ HELP;
 
             $itemReferences = null;
 
+            $t0 = microtime(true);
             try {
                 $itemReferences = $api->dataGetRequest('/itembank/activities', [
                     'references' => [
@@ -227,6 +235,7 @@ HELP;
                 $logger->info('Continuing to next assessment.');
                 continue;
             }
+            $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
 
             $itemReferenceList = [];
 
@@ -247,6 +256,7 @@ HELP;
 
             /* Get the full struct of data from learnosity, because they can't cope with partial data
              */
+            $t0 = microtime(true);
             try {
                 $items = $api->dataGetRequest('/itembank/items', ['references' => $itemReferenceList]);
             } catch (JsonException | ValidationException $e) {
@@ -254,6 +264,7 @@ HELP;
                 $logger->info('Continuing to next assessment.');
                 continue;
             }
+            $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
 
             foreach ($items['data'] as $item) {
                 $itemTitleLogged = false;
@@ -267,6 +278,7 @@ HELP;
 
                         $question = null;
 
+                        $t0 = microtime(true);
                         try {
                             $question = $api->dataGetRequest(
                                 '/itembank/questions',
@@ -277,6 +289,7 @@ HELP;
                             $logger->debug('   Continuing to next question.');
                             continue;
                         }
+                        $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
 
                         /* If the max_score value was already set, don't change anything;
                          * the user might have done something here.
@@ -333,8 +346,12 @@ HELP;
             }
         }
 
+        $scriptFinishTime = microtime(true);
+
         $logger->info('');
-        $logger->info("Processed all $n assessments.  Done.");
+        $logger->info("Processed all $n assessments in " . round($scriptFinishTime - $scriptStartTime, 3) . ' seconds.');
+        $logger->info(round($this->apiRequestTotalWaitTimeSeconds, 3) . ' seconds was spent in information gathering API requests.');
+        $logger->info(round($this->apiUpdatesTotalWaitTimeSeconds, 3) . ' seconds was spent in question updating API requests.');
     }
 
     /**
@@ -361,6 +378,7 @@ HELP;
         if ($this->perform()) {
             $logger->info('Sending ' . count($payload['questions']) . ' updated questions to Learnosity...');
 
+            $t0 = microtime(true);
             try {
                 // Learnosity docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
                 $response = $api->dataSetRequest('/itembank/questions', $payload);
@@ -371,6 +389,7 @@ HELP;
                 $logger->info('Request failed due to ValidationException');
                 return false;
             }
+            $this->apiUpdatesTotalWaitTimeSeconds += microtime(true) - $t0;
 
             $status = $response['meta']['status'] ?? false;
 
