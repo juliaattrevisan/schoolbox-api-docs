@@ -98,7 +98,7 @@ class Rating
 
         /* Calculate proximity from your current expected standard
          */
-        $diff = $mark - (float)$reference;
+        $diff = (float)$mark - (float)$reference;
 
         if ($diff < -1) {
             $result = 'Well Below Standard';

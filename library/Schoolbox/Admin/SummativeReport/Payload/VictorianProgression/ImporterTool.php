@@ -194,9 +194,9 @@ class ImporterTool extends CliTool\App
 
 
     /**
-     * @var \Schoolbox\Learning\Duework\StateMapper
+     * @var \Schoolbox\Learning\DueWork\StateMapper
      */
-    private \Schoolbox\Learning\Duework\StateMapper $stateMapper;
+    private \Schoolbox\Learning\DueWork\StateMapper $stateMapper;
 
 
     /**
@@ -223,7 +223,6 @@ class ImporterTool extends CliTool\App
     private const ASSESSMENT_SEM2_DATE_OPEN = '7/11/2023 12:02am';
     private const ASSESSMENT_SEM2_DATE_DUE = '7/11/2023 12:03am';
     private const ASSESSMENT_SEM2_DATE_CLOSE = '7/11/2023 12:04am';
-
 
 
     /**
