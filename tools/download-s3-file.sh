@@ -38,7 +38,6 @@ declare cache_dir="$CACHE_DIR_DEFAULT"
 declare s3_referer;
 # Where to fetch files from:
 # eg "https://s3-ap-southeast-2.amazonaws.com/schoolbox-data-temp"  - S3, use IAM credentials
-# eg "https://gw-mel.alaress.com.au/sandbox-data"                   - not S3, no auth
 declare data_source
 declare s3_bucket
 
@@ -65,7 +64,7 @@ function print_help(){
   echo "  $0 [OPTIONS] --$ARG_DATA_SOURCE <data-source> --$ARG_FILE_NAME <file-name>"
   echo "OPTIONS"
   echo "  -$ARG_HELP_SHORT,--$ARG_HELP                         Optional. Show this help message and exit"
-  echo "  --$ARG_DATA_SOURCE <data-source>       Required. Where to download file from. Either S3 or Camberwell office caching proxy."
+  echo "  --$ARG_DATA_SOURCE <data-source>       Required. Where to download file from."
   echo "  --$ARG_CACHE_DIR <cache-dir>           Optional. Defaults to '$CACHE_DIR_DEFAULT'. Where to download file to."
   echo "  --$ARG_S3_REFERER <s3-referer>         Optional. Authentication token."
 }
@@ -141,103 +140,23 @@ function validate_args(){
   fi
 }
 
-# Checks whether local file's md5 matches $etag. If so, exits.
-function check_cache_file_hash(){
-  etag=$1
-
-  local md5;
-  if ! md5=$(md5sum "$cache_dir/$file_basename" | cut -f 1 -d ' '); then
-    error "Unable to determine md5 of $cache_dir/$file_basename"
-    exit 1;
-  fi
-
-  if [ "$md5" == "$etag" ]; then
-    log "Current cached file is up to date: $cache_dir/$file_basename"
-    touch "$cache_dir/$file_basename"
-    exit 0;
-  fi
-  log "Current cached file is outdated: $cache_dir/$file_basename, downloading from upstream..."
-}
-
-# See https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
-function check_cache_s3(){
-  if ! head=$(aws s3api head-object --bucket "$s3_bucket" --key "$file_name_short"); then
-    error "Unable to fetch aws s3api head-object for $s3_bucket/$file_name_short"
-    exit 1;
-  fi
-
-  local etag;
-  etag=$(echo "$head" | jq -r '.ETag')
-  if [ -z "$etag" ]; then
-    error "Unable to parse etag from curl head"
-    exit 1;
-  fi
-
-  check_cache_file_hash "$etag"
-}
-
-# TODO. Need to test this and probably update it to work with Melbourne office proxy caching server
-function check_cache_proxy_server(){
-  local curl_head;
-  if ! curl_head=$(curl -I "$data_source/$file_name" 2>/dev/null); then
-    error "Unable to fetch curl head for $data_source/$file_name"
-    exit 1;
-  fi
-
-  local http_response_code;
-  http_response_code=$(echo "$curl_head" | grep -E 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2);
-  if [ "$http_response_code" != "200" ]; then
-    error "Curl header HTTP response code error: $http_response_code";
-    exit 1;
-  fi
-
-  local etag;
-  etag=$(echo "$curl_head" | grep -E '^ETag: "(\w+)"' | cut -d'"' -f2)
-  if [ -z "$etag" ]; then
-    error "Unable to parse etag from curl head"
-    exit 1;
-  fi
-
-  check_cache_file_hash "$etag"
-}
-
-# Checks if a cached file exists and is up to date.
-# If so, file is touched and program exits immediately.
-function check_cache(){
-  if is_s3_data_source; then
-    check_cache_s3
-  else
-    check_cache_proxy_server
-  fi
-}
-
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 function download_file_s3(){
-
-  if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
+  aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
+  if [ $? -ne 0 ] ; then
     error "Unable to download file: $data_source/$file_name"
     exit 1;
   fi
 }
-
-# TODO this still needs to be tested against Melbourne caching proxy server
-function download_file_proxy_server(){
-  if ! wget -q --no-check-certificate --no-verbose --header="Referer: $s3_referer" "$data_source/$file_name" -O "$cache_dir/$file_name_short"; then
-    error "Unable to download file: $data_source/$file_name"
-    exit 1;
-  fi
-}
-
 
 # Downloads the file from S3
 function download_file(){
   log "Downloading $data_source/$file_name";
 
-  if is_s3_data_source; then
-    download_file_s3
-  else
-    download_file_proxy_server
-  fi
+  # use s3 sync to check if the file already exists and is up to date, or downloads new version
+  download_file_s3
+  log "Download completed";
+
 }
 
 
@@ -250,9 +169,6 @@ function main(){
   # If file already exists, check whether it is up to date
   if [[ ! -f "$cache_dir/$file_basename" ]]; then
     log "No cached file for '$file_basename' exists, downloading from upstream..."
-  else
-    log "Cache file found for '$file_basename' checking for upstream changes..."
-    check_cache
   fi
   download_file
 }
