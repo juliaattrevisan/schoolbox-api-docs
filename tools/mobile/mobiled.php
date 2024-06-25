@@ -30,9 +30,6 @@ $kernel = new Daemon\Kernel('Mobile App Delivery', []);
 
 // Create the mobile app delivery daemon.
 $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
-    $instance = INSTANCE_ID;
-    $topic    = "mobile.$instance.*";
-
     /** @var Notif $notif */
     $notif = $di->get('notif');
 
