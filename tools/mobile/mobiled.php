@@ -12,7 +12,6 @@ use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Redis\Async;
-use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
