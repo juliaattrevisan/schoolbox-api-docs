@@ -210,7 +210,6 @@ HELP;
                     $logger->info('Request to Learnosity failed, so stopping.');
                     die;
                 }
-                $logger->info(''); // Blank line to make log readable.
                 $payload['questions'] = []; // Clear questions array, so we can continue using $payload for future requests.
             }
         }
