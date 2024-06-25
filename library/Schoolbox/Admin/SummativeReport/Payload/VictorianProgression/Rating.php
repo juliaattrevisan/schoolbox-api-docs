@@ -19,6 +19,20 @@ class Rating
 
 
     /**
+     * There isn't enough room in schoolbox to store this properly, for now.
+     * I have to hardcode a mapping between an outdated naming convention
+     * and their human-readable meaning
+     */
+    private const SUBMISSION_STATE_MAP = [
+        'DNPE' => 'Exemption from a Curriculum Area',
+        'DNPI' => 'Serious illness',
+        'DNPL' => 'Low participation',
+        'DNPP' => 'Late enrolment',
+        'DNPU' => 'Absent without reasonable excuse'
+    ];
+
+
+    /**
      * Constructor
      *
      * @param array $submissionStateCodes
@@ -66,13 +80,7 @@ class Rating
         /* Deal with submission states first
          */
         if (in_array($mark, $this->submissionStateCodes, true)) {
-            switch ($mark) {
-                case 'DNPE': $result = 'Exemption from a Curriculum Area'; break;
-                case 'DNPI': $result = 'Serious illness'; break;
-                case 'DNPL': $result = 'Low participation'; break;
-                case 'DNPP': $result = 'Late enrolment'; break;
-                case 'DNPU': $result = 'Absent without reasonable excuse'; break;
-            }
+            $result = self::SUBMISSION_STATE_MAP[$mark] ?? '';
 
             /* Add a metric annotation
              */
