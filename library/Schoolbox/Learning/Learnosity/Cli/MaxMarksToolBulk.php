@@ -246,16 +246,14 @@ HELP;
         $activityReferences = $this->getActivityReferencesFromAssessmentIds($assessmentIds);
         $logger->info(' * Found ' . count($activityReferences) . ' activity references.');
 
-        $activityReferenceByItemReference = $this->getActivityReferenceByItemReference($api, $activityReferences);
-        $itemReferences = array_keys($activityReferenceByItemReference);
+        $itemReferences = $this->getItemReferencesFromActivityReferences($api, $activityReferences);
         $logger->info(' * Found ' . count($itemReferences) . ' item references.');
 
-        $itemReferenceByQuestionReference = $this->getItemReferenceByShortTextQuestionReference($api, $itemReferences);
-        $questionReferences = array_keys($itemReferenceByQuestionReference);
+        $questionReferences = $this->getShortTextQuestionReferencesFromItemReferences($api, $itemReferences);
         $logger->info(' * Found ' . count($questionReferences) . ' short text question references.');
 
-        $questions = $this->getQuestions($api, $questionReferences);
-        $logger->info(' * Found ' . count($questions) . ' questions.');
+        $questions = $this->getQuestionsFromQuestionReferences($api, $questionReferences);
+        $logger->info(' * Found ' . count($questions) . ' short text questions.');
 
         return $questions;
     }
@@ -321,11 +319,11 @@ HELP;
      * @param array         $activityReferences
      * @return array
      */
-    private function getActivityReferenceByItemReference(LearnosityApi $api, array $activityReferences): array
+    private function getItemReferencesFromActivityReferences(LearnosityApi $api, array $activityReferences): array
     {
         $logger = $this->getLogger();
         $activityReferencesChunked = array_chunk($activityReferences, self::BATCH_SIZE_N_ITEMS);
-        $activityReferenceByItemReference = [];
+        $itemReferences = [];
 
         foreach ($activityReferencesChunked as $activityReferences) {
             $logger->info(' * Requesting chunk of ' . count($activityReferences) . ' activities from /itembank/activities.');
@@ -352,24 +350,22 @@ HELP;
                 }
 
                 $activityData = $activity['data'] ?? [];
-                $itemReferences = $activityData['items'] ?? [];
+                $itemReferencesBatch = $activityData['items'] ?? [];
 
-                if (null !== $itemReferences) {
+                if (null !== $itemReferencesBatch) {
                     /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
                      * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
                      */
-                    if (is_array($itemReferences[0])) {
-                        $itemReferences = array_column($itemReferences, 'id');
+                    if (is_array($itemReferencesBatch[0])) {
+                        $itemReferencesBatch = array_column($itemReferencesBatch, 'id');
                     }
                 }
 
-                foreach ($itemReferences as $itemReference) {
-                    $activityReferenceByItemReference[$itemReference] = $activityReference;
-                }
+                $itemReferences = array_merge($itemReferences, $itemReferencesBatch);
             }
         }
 
-        return $activityReferenceByItemReference;
+        return $itemReferences;
     }
 
     /**
@@ -377,11 +373,11 @@ HELP;
      * @param array         $itemReferences
      * @return array
      */
-    private function getItemReferenceByShortTextQuestionReference(LearnosityApi $api, array $itemReferences): array
+    private function getShortTextQuestionReferencesFromItemReferences(LearnosityApi $api, array $itemReferences): array
     {
         $logger = $this->getLogger();
-        $itemReferenceByQuestionReference = [];
         $itemReferencesChunked = array_chunk($itemReferences, self::BATCH_SIZE_N_ITEMS);
+        $shortTextQuestionReferences = [];
 
         foreach ($itemReferencesChunked as $itemReferences) {
             $logger->info(' * Requesting chunk of ' . count($itemReferences) . ' items from /itembank/items.');
@@ -411,13 +407,13 @@ HELP;
 
                 foreach ($questionStubs as $questionStub) {
                     if (self::LEARNOSITY_SHORT_TEXT === $questionStub['type']) {
-                        $itemReferenceByQuestionReference[$questionStub['reference']] = $itemReference;
+                        $shortTextQuestionReferences[] = $questionStub['reference'];
                     }
                 }
             }
         }
 
-        return $itemReferenceByQuestionReference;
+        return $shortTextQuestionReferences;
     }
 
     /**
@@ -425,7 +421,7 @@ HELP;
      * @param array         $questionReferences
      * @return array
      */
-    private function getQuestions(LearnosityApi $api, array $questionReferences): array
+    private function getQuestionsFromQuestionReferences(LearnosityApi $api, array $questionReferences): array
     {
         $logger = $this->getLogger();
         $questionReferencesChunked = array_chunk($questionReferences, self::BATCH_SIZE_N_ITEMS);
