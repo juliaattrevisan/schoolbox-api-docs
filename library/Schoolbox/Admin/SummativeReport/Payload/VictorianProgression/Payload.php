@@ -191,7 +191,7 @@ class Payload
     /**
      * Set up the necessary parts
      */
-    private function setup(?int $folderId): void
+    private function setup(): void
     {
         /* We've already been here, there's nothing to do
          */
@@ -207,7 +207,7 @@ class Payload
         $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
 
         /* Find submission states and store them here, for reference
-         * THIS LOOKS WEIRD, but there's tw naming schemes going on.
+         * THIS LOOKS WEIRD, but there's two naming schemes going on.
          * Penola have historical data with the old scheme (stored in `code`) used for 2023 data,
          * and they've stored the new scheme in `display_as`, which were used for 2024 data.
          * They both co-exist concurrently and have the same meaning.
@@ -344,7 +344,7 @@ class Payload
         /* Setup step is mandatory; execute as singleton
          */
         if (!$this->setup) {
-            $this->setup($folderId);
+            $this->setup();
         }
 
         /* Only accept valid types
