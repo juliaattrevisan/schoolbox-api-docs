@@ -234,8 +234,13 @@
                 <span class="annotation">{{ nodeData.previous.mark }} ({{ nodeData.previous.feedback_id ?? null }})</span>
                 {% endif %}
 
-                {# Start drawing a line to the next dot #}
-                {% set lineStarted = true %}
+                {# Start drawing a line to the next dot; but be careful!
+                 # Don't try to draw a line to a Submission State whose prefix starts with DNP
+                 #}
+                {% if (nodeData.current.mark ?? null) and not (nodeData.current.mark matches '/^DNP/' %}
+                    {% set lineStarted = true %}
+                {% endif %}
+
                 {% set hasDot = true %}
             {% endif %}
 
