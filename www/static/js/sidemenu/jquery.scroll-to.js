@@ -65,6 +65,15 @@
                 if (config.cancel.apply(this) == false) {
                     executeScroll();
                 }
+                /**
+                 * We also need to scrollTop the previous submenu to ensure the new submenu is visible.
+                 * This is because the previous submenu height could exceed the viewport, and the new submenu
+                 * could be shorter, so wouldn't be visible if the user scrolled to the bottom of the previous submenu.
+                 */
+                const element = event.target.closest(".left-submenu");
+                if (element && element.scrollTop > 0) {
+                    element.scrollTop = 0;
+                }
             });
         }
 
