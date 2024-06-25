@@ -169,7 +169,6 @@ export function createTabs(template: UnitTemplate) {
                 id: `${columnTypeID}-1`,
                 type: columnTypeID,
                 label: modifiedColumnConfig[columnTypeID].label || columnTypeID,
-                isPrintOnly: false,
             };
 
             if (columnTypeID === ColumnType.OVERVIEW) {
