@@ -228,13 +228,7 @@
              # Otherwise show it as white
              #}
             {% if offset == (nodeData.previous.mark ?? null) %}
-                {% if (null == nodeData.current.mark ?? null) %}
-                    {% set dotColor = 'black' %}
-                {% else  %}
-                    {% set dotColor = 'white' %}
-                {% endif %}
-
-                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
+                <div class="white dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
 
                 {% if annotate ?? false %}
                 <span class="annotation">{{ nodeData.previous.mark }} ({{ nodeData.previous.feedback_id ?? null }})</span>
