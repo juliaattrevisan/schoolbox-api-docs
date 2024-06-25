@@ -1,10 +1,46 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/core.css?v={{ config.site_version }}" />
+        <link rel="stylesheet" type="text/css" href="/css/core/skin.css.php?v={{ config.site_version }}" />
     </head>
     <body>
         <div class="content">
             <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
         </div>
     </body>
+    <script>
+    /**
+     * Run through and check the element for any links with href="#page-anchor-to-top"
+     */
+    function checkForToTopLinks(element) {
+        const links = element.querySelectorAll("a[href='#page-anchor-to-top']");
+        links.forEach((link) => {
+            link.addEventListener("click", (event) => {
+                event.preventDefault();
+                // check if the link is within an iframe
+                if (window.top !== window.self) {
+                    window.top.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                } else {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * To be able to scroll to the top of the page
+     * when clicking on a link with href="#page-anchor-to-top"
+     * Used within the help docs to help guide users back to the top of the page
+     */
+    window.addEventListener("load", (event) => {
+        checkForToTopLinks(document);
+    });
+</script>
+
 </html>
