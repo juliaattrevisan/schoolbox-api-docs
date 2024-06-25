@@ -72,7 +72,7 @@ window.Vue.onMounted(() => {
     pointer-events: none;
     position: absolute;
     right: 0;
-    z-index: 2;
+    z-index: var(--depth-ui-overlay);
 }
 
 .scroll-fade-top {
