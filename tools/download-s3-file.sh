@@ -142,7 +142,7 @@ function validate_args(){
 
 # See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 function download_file_s3(){
-aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
+  aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
   if [ $? -ne 0 ] ; then
     error "Unable to download file: $data_source/$file_name"
     exit 1;
@@ -155,7 +155,7 @@ function download_file(){
 
   # use s3 sync to check if the file already exists and is up to date, or downloads new version
   download_file_s3
-  log "Download $data_source/$file_name completed";
+  log "Download completed";
 
 }
 
