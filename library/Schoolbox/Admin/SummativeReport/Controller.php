@@ -1008,17 +1008,19 @@ class Controller extends ConfigController
             /* The Class Version
              */
             if ($optionsPayload['class']['vicProgression']['enable']) {
+                $generator = new VictorianProgression\Payload(
+                    $this->workTypeMapper,
+                    $this->termMapper,
+                    (int)$optionsPayload['class']['vicProgression']['workType'],
+                    $vicProgression['annotate']
+                );
+
                 /* Render a chart for each class in $folders, I suppose
                  */
                 foreach ($folders as $folder) {
                     $folderId = (int)$folder->getId();
 
-                    $vicProgression['class'][$folderId] = (new VictorianProgression\Payload(
-                        $this->workTypeMapper,
-                        $this->termMapper,
-                        (int)$optionsPayload['class']['vicProgression']['workType'],
-                        $vicProgression['annotate']
-                    ))->generate($student, $academicPeriod, $folderId);
+                    $vicProgression['class'][$folderId] = $generator->generate($student, $academicPeriod, $folderId);
                 }
             }
         }
