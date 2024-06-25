@@ -14,13 +14,18 @@ use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Date\IClock;
 use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use PDOException;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\External\Exception as ExternalException;
+use Schoolbox\MobileApp\ServiceManager;
 
 /**
  * The mobile app scheduler: responsible for forwarding notifications to mobile
@@ -28,6 +33,27 @@ use Schoolbox\External\Exception as ExternalException;
  */
 class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
+    /**
+     * Constructor
+     *
+     * @param LoopInterface             $loop
+     * @param DispatchStrategyInterface $dispatchStrategy
+     * @param LoggerInterface           $log
+     * @param IClock                    $clock
+     * @param ServiceManager            $serviceManager   The mobile app service manager: used to send messages to
+     *                                                    mobile apps.
+     */
+    public function __construct(
+        LoopInterface $loop,
+        DispatchStrategyInterface $dispatchStrategy,
+        LoggerInterface $log,
+        IClock $clock,
+        private ServiceManager $serviceManager,
+    ) {
+        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+    }
+
+
     /**
      * @return string
      */
@@ -75,6 +101,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         // * put it back on Redis, or a Rabbit delayed queue?
         // * add a timer for re-processing it
         // * if the mobile daemon is restarted: the JIT cache will rebuild it
+//        $this->serviceManager->push($payload->get);
+
         $this->log->notice(sprintf('payload: %s', json_encode($payload)));
         $this->log->notice(sprintf('resolver: %s', json_encode($resolver)));
         $this->log->notice(sprintf('context: %s', json_encode($context)));

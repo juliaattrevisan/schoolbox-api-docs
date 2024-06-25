@@ -60,6 +60,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
                 $client,
                 $di->get('stomp'),
             ),
+            INSTANCE_ID,
         )
         : new Mobile\DirectSendFactory(
             new ServiceManager(

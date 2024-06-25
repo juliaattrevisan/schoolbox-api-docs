@@ -20,6 +20,9 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
+use Schoolbox\IConfigLoader;
+use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Mobile\Broker;
 use Schoolbox\Realtime\Mobile\Scheduler;
@@ -38,6 +41,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var ClientInterface $redis */
     $redis = $di->get('redis.storage');
 
+    /** @var IConfigLoader $config */
+    $config = $di->get('config');
+
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
 
@@ -51,10 +57,20 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         // we'll be using the mobile broker for receiving...
         $broker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp);
 
+        // Mobile thing
+        // TODO figure out how to always send to mobile app, for testing
+        $serviceManager = new ServiceManager(
+            $log,
+            $di->get('mapperFactory')->get(RegistryMapper::class),
+            INSTANCE_ID,
+            $config->get('title'),
+            $di->get('filesystem.storageProxy'),
+            ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+        );
 
         // Need a new strat for listening to mobile queue?
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, $clock);
+        $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager);
 
 
         // TODO restore from redis cache

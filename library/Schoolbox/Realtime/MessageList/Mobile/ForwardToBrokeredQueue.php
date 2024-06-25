@@ -35,10 +35,12 @@ class ForwardToBrokeredQueue implements QueueInterface
     /**
      * Constructor
      *
-     * @param IBroker $broker The brokered queue to publish into.
-     * @param int     $userId The user ID to create a queue for.
+     * @param IBroker $broker     The brokered queue to publish into.
+     * @param string  $instanceId The identifier for this Schoolbox instance: used as part of the message's context
+     *                            when it is pushed onto the brokered queue.
+     * @param int     $userId     The user ID to create a queue for.
      */
-    public function __construct(private IBroker $broker, private int $userId)
+    public function __construct(private IBroker $broker, private string $instanceId, private int $userId)
     {
     }
 
@@ -76,14 +78,18 @@ class ForwardToBrokeredQueue implements QueueInterface
     /**
      * Push the given instance onto the brokered queue.
      *
+     * Messages are published with the contexts:
+     * * this object's namespace
+     * * this user ID
+     *
      * @param Instance $instance
      * @return void
      */
     public function push(Instance $instance): void
     {
         // What gets put into the brokered queue?
-        // Let's just say the message instance.
-        $this->broker->publish($instance, null);
+        // Let's just say the message instance and the user ID.
+        $this->broker->publish($instance, [$this->instanceId, $this->userId]);
     }
 
     /**
