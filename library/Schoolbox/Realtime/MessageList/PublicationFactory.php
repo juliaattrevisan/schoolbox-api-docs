@@ -56,7 +56,7 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
     {
         return $this->mobileDaemonEnabled
             ? new Mobile($this->redis, $this->instanceId, $userId)
-            : new MobileSend($this->cloudManager, $userId);
+            : new Mobile\DirectSend($this->cloudManager, $userId);
     }
 
 

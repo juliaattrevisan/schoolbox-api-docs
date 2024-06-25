@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Realtime\MessageList;
+namespace Schoolbox\Realtime\MessageList\Mobile;
 
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Notification\Instance\Instance;
@@ -30,7 +30,7 @@ use Alaress\Async\Queue\QueueInterface;
  * Note that it is no longer feasible to access messages once they are in the
  * brokered queue: thus `contains`, `drain` and `fetchIntoBundle` are no-ops.
  */
-class MobileForwardToBrokeredQueue implements QueueInterface
+class ForwardToBrokeredQueue implements QueueInterface
 {
     /**
      * Constructor

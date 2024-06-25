@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Realtime\MessageList;
+namespace Schoolbox\Realtime\MessageList\Mobile;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
@@ -17,12 +17,12 @@ use Schoolbox\MobileApp;
 /**
  * "List" which sends messages it receives directly to a mobile device.
  *
- * Renamed from `Mobile` in SA-17997.
+ * Renamed from `\Schoolbox\Realtime\MessageList\Mobile` in SA-17997.
  *
- * @deprecated this will be superseded by the new `Mobile` list, which is an
- *             actual list which is read by another daemon.
+ * @deprecated this will be superseded by `ForwardToBrokeredQueue`, which is a
+ *             forwards messages to a brokered queue.
  */
-class MobileSend implements QueueInterface
+class DirectSend implements QueueInterface
 {
     /** @var MobileApp\IServiceManager */
     private $cloudManager;
