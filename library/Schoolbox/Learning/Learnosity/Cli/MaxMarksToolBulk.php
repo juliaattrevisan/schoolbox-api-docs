@@ -55,16 +55,10 @@ class MaxMarksToolBulk extends CliTool\App
     private const LEARNOSITY_SHORT_TEXT = 'shorttext';
 
     /**
-     * Maximum number of Questions per payload
+     * Maximum number of items per payload.  This seems to be the same for all Learnosity data-api endpoints.
      * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
      */
-    private const LEARNOSITY_MAX_QUESTIONS = 50;
-
-    /**
-     * The number of assessments to process between progress updates.
-     * (Progress updates show fraction of assessments processed, and so allow estimation of script completion time.)
-     */
-    private const N_ASSESSMENTS_BETWEEN_PROGRESS_UPDATES = 10;
+    private const BATCH_SIZE_N_ITEMS = 50;
 
     /**
      * @var QuizMapper
@@ -168,6 +162,114 @@ HELP;
             'questions' => []
         ];
 
+        /* We need these mappers
+         */
+        $this->quizMapper = QuizMapper::getInstance();
+
+        $questions = $this->getQuestionsInfoFromLearnosity($api, $assessmentIds);
+
+        $logger->info(''); // Blank line to make log readable.
+        $logger->info('Updating questions:');
+
+        $nQuestionsSkipped = 0;
+        foreach ($questions as $question) {
+            /* If the max_score value was already set, don't change anything;
+             * the user might have done something here.
+             */
+            if (isset($question['data']['validation']['max_score'])) {
+                $logger->debug(" * Question {$question['reference']} - Max score already set - skipping.");
+                ++$nQuestionsSkipped;
+                continue;
+            }
+
+            /* Assign max_score to be the same as validation.valid_response.score
+             * ...because learnosity reasons
+             */
+            $updatedQuestion = $question;
+
+            /* Short Text doesn't have a max_score field officially, so let's find out
+             * if that's just a mistake, or if it really doesn't.
+             */
+            $updatedQuestion['data']['validation']['max_score'] = (
+                $updatedQuestion['data']['validation']['valid_response']['score']
+            );
+
+            $logger->debug(
+                sprintf(
+                    ' * Question %s - Copying validation.valid_response.score %s to validation.max_score.',
+                    $question['reference'],
+                    $updatedQuestion['data']['validation']['valid_response']['score']
+                )
+            );
+
+            $payload['questions'][] = $updatedQuestion;
+
+            if (count($payload['questions']) === self::BATCH_SIZE_N_ITEMS) {
+                // Maximum number of questions for API call reached.
+                if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
+                    $logger->info('Request to Learnosity failed, so stopping.');
+                    die;
+                }
+                $logger->info(''); // Blank line to make log readable.
+                $payload['questions'] = []; // Clear questions array, so we can continue using $payload for future requests.
+            }
+        }
+
+        if ($nQuestionsSkipped > 0) {
+            $logger->info(" * Skipped $nQuestionsSkipped questions because max score already set.");
+        }
+
+        // If there are any updated questions that have not been sent to Learnosity, send them.
+        if (count($payload['questions']) > 0) {
+            $logger->info(count($payload['questions']) . ' question(s) remain to be dealt with.');
+            if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
+                $logger->info('Request to Learnosity failed, so stopping.');
+            }
+        }
+
+        $scriptFinishTime = microtime(true);
+
+        $logger->info('');
+        $logger->info('Processed all ' . count($questions) . ' questions in ' . round($scriptFinishTime - $scriptStartTime, 3) . ' seconds.');
+        $logger->info(round($this->apiRequestTotalWaitTimeSeconds, 3) . ' seconds was spent in information gathering API requests.');
+        $logger->info(round($this->apiUpdatesTotalWaitTimeSeconds, 3) . ' seconds was spent in question updating API requests.');
+    }
+
+    /**
+     * @param LearnosityApi $api
+     * @param array         $assessmentIds
+     * @return array
+     */
+    private function getQuestionsInfoFromLearnosity(LearnosityApi $api, array $assessmentIds): array
+    {
+        $logger = $this->getLogger();
+        $logger->info('Gathering information from Learnosity:');
+
+        $activityReferences = $this->getActivityReferencesFromAssessmentIds($assessmentIds);
+        $logger->info(' * Found ' . count($activityReferences) . ' activity references.');
+
+        $activityReferenceByItemReference = $this->getActivityReferenceByItemReference($api, $activityReferences);
+        $itemReferences = array_keys($activityReferenceByItemReference);
+        $logger->info(' * Found ' . count($itemReferences) . ' item references.');
+
+        $itemReferenceByQuestionReference = $this->getItemReferenceByShortTextQuestionReference($api, $itemReferences);
+        $questionReferences = array_keys($itemReferenceByQuestionReference);
+        $logger->info(' * Found ' . count($questionReferences) . ' short text question references.');
+
+        $questions = $this->getQuestions($api, $questionReferences);
+        $logger->info(' * Found ' . count($questions) . ' questions.');
+
+        return $questions;
+    }
+
+    /**
+     * @param $assessmentIds
+     * @return array
+     */
+    private function getActivityReferencesFromAssessmentIds($assessmentIds): array
+    {
+        $logger = $this->getLogger();
+
         try {
             $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
         } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
@@ -175,24 +277,17 @@ HELP;
             exit(1);
         }
 
-        /* We need these mappers
-         */
-        $this->quizMapper = QuizMapper::getInstance();
+        $learnosityReferences = [];
 
-        $n = 0; // Loop counter.
         foreach ($assessmentIds as $assessmentId) {
-            $logger->debug('Assessment ' . ++$n . " of $nAssessmentIds (assessmentId $assessmentId)");
-
-            /* See if this assessment exists
-             */
             /** @var QuizDomainModel $assessment */
             try {
                 $assessment = $assessmentMapperProxy->findById($assessmentId);
             } catch (Deleted) {
-                $logger->warning('Skipping deleted assessment.');
+                $logger->warning("Skipping deleted assessment $assessmentId.");
                 continue;
             } catch (Exception) {
-                $logger->warning('Could not get assessment.  Skipping.');
+                $logger->warning("Could not get assessment $assessmentId.  Skipping.");
                 continue; // Skip deleted assessments.
             }
 
@@ -204,7 +299,7 @@ HELP;
                 /* This somehow found to be a survey, not a quiz.
                  * How this could be possible is a mystery except due to dev mistake
                  */
-                $logger->error('Could not get quiz container object.  ' . $e->getMessage());
+                $logger->error("Could not get quiz container object for assessment $assessmentId.  " . $e->getMessage());
                 $logger->info('Continuing to next assessment.');
                 exit(1);
             }
@@ -212,146 +307,150 @@ HELP;
             /* Check this quiz is in learnosity
              */
             if ('' === trim((string)$quiz->getLearnosityReference())) {
-                $logger->info(sprintf(
-                    'Assessment %s (assess_id %s) does not have a learnosity reference; exiting.',
-                    $assessment->getId(),
-                    $quiz->getId()
-                ));
+                $logger->error("Assessment $assessmentId does not have a learnosity reference.");
                 $logger->info('Continuing to next assessment.');
                 continue;
             }
 
-            $itemReferences = null;
+            $learnosityReferences[] = $quiz->getLearnosityReference();
+        }
 
+        return $learnosityReferences;
+    }
+
+    /**
+     * @param LearnosityApi $api
+     * @param array         $activityReferences
+     * @return array
+     */
+    private function getActivityReferenceByItemReference(LearnosityApi $api, array $activityReferences): array
+    {
+        $logger = $this->getLogger();
+        $activityReferencesChunked = array_chunk($activityReferences,self::BATCH_SIZE_N_ITEMS);
+        $activityReferenceByItemReference = [];
+
+        foreach ($activityReferencesChunked as $activityReferences) {
+            $logger->info(' * Requesting chunk of ' . count($activityReferences) . ' activities from /itembank/activities.');
             $t0 = microtime(true);
             try {
-                $itemReferences = $api->dataGetRequest('/itembank/activities', [
-                    'references' => [
-                        $quiz->getLearnosityReference()
-                    ]
-                ])['data'][0]['data']['items'];
+                // Docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+                $response = $api->dataGetRequest('/itembank/activities', ['references' => $activityReferences]);
             } catch (\Exception $e) {
                 $logger->error('Request to /itembank/activities failed.  ' . $e->getMessage());
-                $logger->info('Continuing to next assessment.');
+                $logger->info('Continuing to next activity reference.');
                 continue;
             }
             $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
 
-            $itemReferenceList = [];
+            $activities = $response['data'];
 
-            if (null !== $itemReferences) {
-                /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                 * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                 */
-                if (is_array($itemReferences[0])) {
-                    /* Forcibly mutate this, because learnosity insanity
+            foreach ($activities as $activity) {
+                $activityReference = $activity['reference'] ?? null;
+
+                if ($activityReference === null) {
+                    $logger->error('Activity returned from Learnosity has no reference.');
+                    $logger->info('Continuing to next activity references chunk.');
+                    continue;
+                }
+
+                $activityData = $activity['data'] ?? [];
+                $itemReferences = $activityData['items'] ?? [];
+
+                if (null !== $itemReferences) {
+                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
+                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
                      */
-                    $itemReferenceList = array_column($itemReferences, 'id');
-                } else {
-                    /* Presume it was a list of reference strings already
-                     */
-                    $itemReferenceList = $itemReferences;
+                    if (is_array($itemReferences[0])) {
+                        $itemReferences = array_column($itemReferences, 'id');
+                    }
+                }
+
+                foreach ($itemReferences as $itemReference) {
+                    $activityReferenceByItemReference[$itemReference] = $activityReference;
                 }
             }
+        }
 
-            /* Get the full struct of data from learnosity, because they can't cope with partial data
-             */
+        return $activityReferenceByItemReference;
+    }
+
+    /**
+     * @param LearnosityApi $api
+     * @param array         $itemReferences
+     * @return array
+     */
+    private function getItemReferenceByShortTextQuestionReference(LearnosityApi $api, array $itemReferences): array
+    {
+        $logger = $this->getLogger();
+        $itemReferenceByQuestionReference = [];
+        $itemReferencesChunked = array_chunk($itemReferences, self::BATCH_SIZE_N_ITEMS);
+
+        foreach ($itemReferencesChunked as $itemReferences) {
+            $logger->info(' * Requesting chunk of ' . count($itemReferences) . ' items from /itembank/items.');
             $t0 = microtime(true);
             try {
-                $items = $api->dataGetRequest('/itembank/items', ['references' => $itemReferenceList]);
+                // Docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+                $response = $api->dataGetRequest('/itembank/items', ['references' => $itemReferences]);
             } catch (JsonException | ValidationException $e) {
                 $logger->error('Request to /itembank/items failed.  ' . $e->getMessage());
-                $logger->info('Continuing to next assessment.');
+                $logger->info('Continuing to next item references chunk.');
                 continue;
             }
             $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
 
-            foreach ($items['data'] as $item) {
-                $itemTitleLogged = false;
-                foreach ($item['questions'] as $questionStub) {
+            $items = $response['data'];
+
+            foreach ($items as $item) {
+                $itemReference = $item['reference'] ?? null;
+
+                if ($itemReference === null) {
+                    $logger->error('Item returned from Learnosity has no reference.');
+                    $logger->info('Continuing to next item.');
+                    continue;
+                }
+
+                $questionStubs = $item['questions'] ?? [];
+
+                foreach ($questionStubs as $questionStub) {
                     if (self::LEARNOSITY_SHORT_TEXT === $questionStub['type']) {
-                        if (!$itemTitleLogged) {
-                            // Only log the item title if the item contains quiz questions.
-                            $logger->debug(" * Item '{$item['title']}':");
-                            $itemTitleLogged = true;
-                        }
-
-                        $question = null;
-
-                        $t0 = microtime(true);
-                        try {
-                            $question = $api->dataGetRequest(
-                                '/itembank/questions',
-                                ['references' => [$questionStub['reference']]]
-                            )['data'][0];
-                        } catch (JsonException | ValidationException $e) {
-                            $logger->error('   Request to /itembank/questions failed.  ' . $e->getMessage());
-                            $logger->debug('   Continuing to next question.');
-                            continue;
-                        }
-                        $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
-
-                        /* If the max_score value was already set, don't change anything;
-                         * the user might have done something here.
-                         */
-                        if (isset($question['data']['validation']['max_score'])) {
-                            $logger->debug("    * Question {$question['reference']} - Max score already set - skipping.");
-                            continue;
-                        }
-
-                        /* Assign max_score to be the same as validation.valid_response.score
-                         * ...because learnosity reasons
-                         */
-                        $updatedQuestion = $question;
-
-                        /* Short Text doesn't have a max_score field officially, so let's find out
-                         * if that's just a mistake, or if it really doesn't.
-                         */
-                        $updatedQuestion['data']['validation']['max_score'] = (
-                            $updatedQuestion['data']['validation']['valid_response']['score']
-                        );
-
-                        $logger->debug(sprintf(
-                            '    * Question %s - Copying validation.valid_response.score %s to validation.max_score.',
-                            $question['reference'],
-                            $updatedQuestion['data']['validation']['valid_response']['score']
-                        ));
-
-                        $payload['questions'][] = $updatedQuestion;
-
-                        if (count($payload['questions']) === self::LEARNOSITY_MAX_QUESTIONS) {
-                            // Maximum number of questions for API call reached.
-                            if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
-                                $logger->info('Request to Learnosity failed, so stopping.');
-                                die;
-                            }
-                            $logger->info(''); // Blank line to make log readable.
-                            $payload['questions'] = []; // Clear questions array, so we can continue using $payload for future requests.
-                        }
+                        $itemReferenceByQuestionReference[$questionStub['reference']] = $itemReference;
                     }
                 }
             }
-
-            if ($n % self::N_ASSESSMENTS_BETWEEN_PROGRESS_UPDATES === 0) {
-                $logger->info("--- Processed $n of $nAssessmentIds assessments ---");
-            }
         }
 
-        // If there are any updated questions that have not been sent to Learnosity, send them.
-        if (count($payload['questions']) > 0) {
-            $logger->info(''); // Blank line to make log readable.
-            $logger->info(count($payload['questions']) . ' question(s) remain to be dealt with.');
-            if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
-                $logger->info('Request to Learnosity failed, so stopping.');
+        return $itemReferenceByQuestionReference;
+    }
+
+    /**
+     * @param LearnosityApi $api
+     * @param array         $questionReferences
+     * @return array
+     */
+    private function getQuestions(LearnosityApi $api, array $questionReferences): array
+    {
+        $logger = $this->getLogger();
+        $questionReferencesChunked = array_chunk($questionReferences, self::BATCH_SIZE_N_ITEMS);
+        $questions = [];
+
+        foreach ($questionReferencesChunked as $questionReferences) {
+            $logger->info(' * Requesting chunk of ' . count($questionReferences) . ' questions from /itembank/questions.');
+            $t0 = microtime(true);
+            try {
+                // Docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
+                $response = $api->dataGetRequest('/itembank/questions', ['references' => $questionReferences]);
+            } catch (JsonException | ValidationException $e) {
+                $logger->error('   Request to /itembank/questions failed.  ' . $e->getMessage());
+                $logger->debug('   Continuing to next question references chunk.');
+                continue;
             }
+            $this->apiRequestTotalWaitTimeSeconds += microtime(true) - $t0;
+
+            $questionsBatch = $response['data'];
+            $questions = array_merge($questions, $questionsBatch);
         }
 
-        $scriptFinishTime = microtime(true);
-
-        $logger->info('');
-        $logger->info("Processed all $n assessments in " . round($scriptFinishTime - $scriptStartTime, 3) . ' seconds.');
-        $logger->info(round($this->apiRequestTotalWaitTimeSeconds, 3) . ' seconds was spent in information gathering API requests.');
-        $logger->info(round($this->apiUpdatesTotalWaitTimeSeconds, 3) . ' seconds was spent in question updating API requests.');
+        return $questions;
     }
 
     /**
@@ -366,8 +465,6 @@ HELP;
     {
         $logger = $this->getLogger();
 
-        $logger->info(''); // Blank line to make log readable.
-
         /* Optionally show array payloads
          */
         if ($this->getOpt(self::OPT_LONG_BLUEPRINT)) {
@@ -376,8 +473,7 @@ HELP;
         }
 
         if ($this->perform()) {
-            $logger->info('Sending ' . count($payload['questions']) . ' updated questions to Learnosity...');
-
+            $logger->info(' * Requesting updates to chunk of ' . count($payload['questions']) . ' questions (using /itembank/questions).');
             $t0 = microtime(true);
             try {
                 // Learnosity docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
@@ -398,7 +494,7 @@ HELP;
                 return false;
             }
 
-            $logger->info('Request succeeded.');
+            $logger->info('   Request succeeded.');
         } else {
             $logger->info(
                 'Skipped sending ' . count($payload['questions']) . ' updated questions to Learnosity because not in perform mode.'
