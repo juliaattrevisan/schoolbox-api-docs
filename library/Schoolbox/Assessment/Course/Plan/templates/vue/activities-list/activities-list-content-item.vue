@@ -207,18 +207,19 @@ li[data-sortable-active="true"] .sortable-holder {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 /* Styles for printing */
 @media print {
     .information-list.sortable > li .grip:before,
     .information-list.sortable-card > li .grip:before {
-        display: none !important;
+        display: none !important; // Hide the grip element in sortable lists
     }
     a {
         color: #000 !important;
         text-decoration: none !important;
     }
     .information-list > li {
-        border: none !important;
+        border: none !important; // Remove borders from list items in the information list
     }
 }
 </style>

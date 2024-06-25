@@ -92,20 +92,17 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
 const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true, showOnPrint: true },
-    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false, showOnPrint: true }, // The label is set by the textbox keys
+    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
+    [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.ACTIVITIES]: {
         label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
         fixedLeft: false,
-        showOnPrint: true,
-
     },
     [ColumnType.RUBRIC_CAPABILITIES]: {
         label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
         fixedLeft: false,
-        showOnPrint: true,
     },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false, showOnPrint: true }, // The label is set by the curriculum component headings
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
 };
 
 /**
@@ -151,7 +148,6 @@ function getColumns(
             id: `${columnTypeID}-${columnId}`,
             type: columnTypeID, // Add the missing 'type' property
             label: component.heading.trim(), // Ignore trailing or leading whitespace,
-            isPrintOnly: false,
         });
     });
 }

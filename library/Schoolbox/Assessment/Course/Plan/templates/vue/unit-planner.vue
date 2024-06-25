@@ -163,8 +163,7 @@ window.Vue.onUnmounted(() => {
                 class="scrollable"
                 :style="{
                     height: containerHeight + 'px',
-                    '--UnitPlannerVisibleColumns':
-                        selectedTab.columns.filter((column) => !column.isPrintOnly).length - 1,
+                    '--UnitPlannerVisibleColumns': selectedTab.columns.length - 1,
                     '--UnitPlannerTableHeaderHeight': headerRowHeight + 'px',
                 }"
             >
@@ -181,8 +180,6 @@ window.Vue.onUnmounted(() => {
                             class="fixed-top"
                             :class="{
                                 'fixed-left': column.fixedLeft,
-                                'print-only': column.isPrintOnly,
-                                'hide-on-print': !column.showOnPrint,
                             }"
                         >
                             {{ column.label }}
@@ -315,8 +312,8 @@ window.Vue.onUnmounted(() => {
         display: none;
     }
     .scrollable {
-        height: 100% !important;
-        overflow: visible !important;
+        height: 100% !important; // Expand scrollable elements to full height in print view
+        overflow: visible !important; // Ensure all content is visible
     }
     a {
         color: #000 !important;
@@ -326,13 +323,15 @@ window.Vue.onUnmounted(() => {
         display: none !important;
     }
 }
+
+/* Print styles for paper size below A4 portrait  */
 @media print and (max-width: 210mm) {
     .unit-planner {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr !important; // Set a single column layout for unit planner on smaller paper sizes
     }
     .grid-row {
         > div {
-            border: none !important;
+            border: none !important; // Remove borders from grid items on smaller paper sizes
         }
     }
 }

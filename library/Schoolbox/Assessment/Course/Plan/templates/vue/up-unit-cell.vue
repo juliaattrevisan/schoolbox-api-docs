@@ -220,6 +220,10 @@ window.Vue.onUnmounted(() => {
     }
 });
 
+/**
+ * Define 'isFirstUnit' to check if the current unit is the first in the table.
+ * Used to avoid adding a blank page at the beginning of the document in print media
+ */
 const isFirstUnit = window.Vue.computed(() => {
     return store.units[0].id === props.unit.id;
 });
@@ -235,7 +239,6 @@ const isFirstUnit = window.Vue.computed(() => {
             'content-focused': contentIsFocused,
             'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
             'print-only': props.column.isPrintOnly,
-            'hide-on-print': !props.column.showOnPrint,
             'first-unit': isFirstUnit,
         }"
         :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
@@ -476,17 +479,17 @@ const isFirstUnit = window.Vue.computed(() => {
 @media print {
     .unit-cell {
         height: auto !important; // Expand the unit cell to show all content
-        overflow: visible !important;
+        overflow: visible !important; // Ensure content is fully visible
     }
     .meta {
-        display: none;
+        display: none; // Remove meta data
     }
     a {
         color: #000 !important;
-        text-decoration: none !important;
+        text-decoration: none !important; // Remove underline from links for print
     }
     .no-print {
-        display: none !important;
+        display: none !important; // Hide elements with 'no-print' class
     }
     .label-print {
         border-bottom: 1px solid #eee;
@@ -498,7 +501,7 @@ const isFirstUnit = window.Vue.computed(() => {
 /* Print styles for paper size below A4 portrait  */
 @media print and (max-width: 210mm) {
     .content-container-fixed {
-        display: none !important;
+        display: none !important; // Hide fixed content container for smaller paper sizes
     }
 
     .unit-title-print {
@@ -506,7 +509,7 @@ const isFirstUnit = window.Vue.computed(() => {
         margin-left: 0px !important;
         margin-top: 2rem !important;
         padding: 0.5rem;
-        page-break-before: always !important;
+        page-break-before: always !important; // Ensure page break before each unit title
     }
     .unit-cell.first-unit .unit-title-print {
         page-break-before: avoid !important; // Avoid breaking the page before the first unit
