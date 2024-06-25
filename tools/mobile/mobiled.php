@@ -94,15 +94,21 @@ HELP;
         // we'll be using the mobile broker for receiving...
         $broker = new Broker($instanceId, $amqp, $redis, $stomp);
 
+        $forceProduction = isset($opts['force-production']);
+        if ($forceProduction) {
+            $log->notice('Forcing delivery of messages to subscribed mobile devices');
+        }
+
         // Mobile thing
-        // TODO figure out how to always send to mobile app, for testing
         $serviceManager = new ServiceManager(
             $log,
             $di->get('mapperFactory')->get(RegistryMapper::class),
             $instance,
             $config->get('title'),
             $di->get('filesystem.storageProxy'),
-            ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+            $forceProduction
+                ? ServiceManager::SERVICE_TYPE_PRODUCTION
+                : ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
         // Need a new strat for listening to mobile queue?
