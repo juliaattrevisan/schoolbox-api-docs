@@ -58,6 +58,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param array|null $allowedEventTypes
      * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
@@ -197,7 +198,13 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         }
                         if ($period['category'] instanceof Folder) {
                             // Put this into a category
-                            $event->setCategoryId($period['category']->getId());
+                            // Only assign folder ID when user has the correct permission
+                            if (
+                                 $this->getPermission($period['category']->getId()) >=
+                                \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+                            ) {
+                                $event->setCategoryId($period['category']->getId());
+                            }
                             $event->setCategoryName($period['category']->getName());
 
                             // Finagle a category collection for this event

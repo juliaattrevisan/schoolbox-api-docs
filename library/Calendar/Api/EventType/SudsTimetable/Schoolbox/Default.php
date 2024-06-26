@@ -109,6 +109,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
      * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
@@ -177,7 +178,15 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setAllDay(false);
             $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
             $instance->setType($eventType);
-            $instance->setFolder($timetableEvent->getFolder());
+            //Only when the user has the right permission will obtain the folder ID
+            if (
+                $this->getPermission($timetableEvent->getFolder()?->getId()) >=
+                \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+            ) {
+                $instance->setFolder($timetableEvent->getFolder());
+            } else {
+                $instance->setFolder(null);
+            }
             $instance->setStaff($timetableEvent->getStaff());
             $instance->setAttendanceUrl($attendanceLink);
 
