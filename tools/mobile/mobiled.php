@@ -11,6 +11,8 @@ declare(strict_types=1);
 use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
@@ -33,7 +35,12 @@ $kernel = new Daemon\Kernel(
     'Mobile App Delivery Daemon',
     [
         Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'h',
-        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['force-production', 'help']
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => [
+            'help',
+            'force-production',
+            'retry-max-attempts:',
+            'retry-base-timeout:',
+        ]
     ],
 );
 
@@ -53,7 +60,12 @@ SYNOPSIS:
     ./mobiled.php [OPTION]...
 
 DESCRIPTION:
-    Daemon for listening to requests to forward notifications to a mobile app or personal web app.
+    Daemon for listening to requests to forward notifications to a mobile app or personal web app. This may use one of
+    the follwoing delivery mechanisms:
+    * Apple Push Notification Service
+    * Digistorm API
+    * Firebase
+    * Google Cloud Messaging
 
     This daemon listens on an AMQP queue named `{$queue}`, whose data is stored in Redis:
     * `msg:{$instanceId}:s:*`
@@ -61,6 +73,11 @@ DESCRIPTION:
 
 OPTIONS:
   -h, --help                    Display this help message
+  --retry-max-attempts          If the service manager detects that a delivery mechanism has been rate limited:
+                                retry the delivery this many times. (Defaults to 15 retries.)
+  --retry-base-timeout          If the service manager detects that a delivery mechanism has been rate limited, this
+                                daemon will exponentially backoff between retries, for a base timeout of this many ms.
+                                (Defaults to 2500ms.)
   --force-production            If set, force usage of the production mobile service manager, even on staging instances.
                                 This ensures that messages are actually delivered to subscribed mobile devices:
                                 otherwise, this daemon will only log on staging instances.
@@ -99,6 +116,31 @@ HELP;
             $log->notice('Forcing delivery of messages to subscribed mobile devices');
         }
 
+        // Configure jitter
+        $retryMaxAttempts = filter_var(
+            $opts['retry-max-attempts'] ?? null,
+            FILTER_VALIDATE_INT,
+            FILTER_NULL_ON_FAILURE,
+        );
+        if (isset($retryMaxAttempts)) {
+            $log->notice(sprintf('Retry max attempts: %d', $retryMaxAttempts));
+        } else {
+            $retryMaxAttempts = 15;
+            $log->notice(sprintf('Retry max attempts: %d (default)', $retryMaxAttempts));
+        }
+        $retryBaseTimeout = filter_var(
+            $opts['retry-base-timeout'] ?? null,
+            FILTER_VALIDATE_INT,
+            FILTER_NULL_ON_FAILURE,
+        );
+        if (isset($retryBaseTimeout)) {
+            $log->notice(sprintf('Retry base timeout: %dms', $retryBaseTimeout));
+        } else {
+            $retryBaseTimeout = 2500;
+            $log->notice(sprintf('Retry max attempts: %dms (default)', $retryBaseTimeout));
+        }
+        $jitter = new Jitter(new FloatGenerator(), $retryMaxAttempts, $retryBaseTimeout);
+
         // Mobile thing
         $serviceManager = new ServiceManager(
             $log,
@@ -113,7 +155,7 @@ HELP;
 
         // Need a new strat for listening to mobile queue?
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager);
+        $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager, $jitter);
 
 
         // TODO restore from redis cache

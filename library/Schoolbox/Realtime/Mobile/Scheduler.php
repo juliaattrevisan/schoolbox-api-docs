@@ -15,6 +15,7 @@ use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Date\IClock;
+use Alaress\Jitter\IJitter;
 use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
@@ -42,15 +43,19 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param IClock                    $clock
      * @param ServiceManager            $serviceManager   The mobile app service manager: used to send messages to
      *                                                    mobile apps.
+     * @param IJitter                   $jitter           Jitter: used to determine how many times to retry send of a
+     *                                                    mobile notification, and also of how long to wait between
+     *                                                    retries.
      */
     public function __construct(
-        LoopInterface $loop,
+        private LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
         LoggerInterface $log,
         IClock $clock,
         private ServiceManager $serviceManager,
+        private IJitter $jitter,
     ) {
-        parent::__construct($loop, $dispatchStrategy, $log, $clock);
+        parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
     }
 
 
