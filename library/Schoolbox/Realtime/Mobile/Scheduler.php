@@ -203,6 +203,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                         $attemptNum,
                     )
                 );
+                // TODO should this be acknowledged or just ignored?
+                //      If it's acknowledged, it will never be sent again.
                 $resolver->acknowledge();
                 return;
             }
