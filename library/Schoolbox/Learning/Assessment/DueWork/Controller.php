@@ -979,23 +979,27 @@ class Controller extends Assessment\Controller
                         $editorContents = $this->filesystemProxy->read($file);
                     }
                 }
+                // Kami Interactive Worksheet
+                // show the existing kami file
             } else {
                 /* Otherwise, spawn an entirely new draft
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
                 $latestResponse = null;
                 $dangerZone     = $attachZoneFactory->buildForDueWorkResponse(new Submission());
+
+                // Kami Interactive Worksheet
+                // request kami clone previous attempt kami file
+                // copy the previous attempt kami hash to the new attempt
             }
         } else {
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
             $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
+            // Kami Interactive Worksheet
+            // clone the worksheet template for the student
         }
-
-        // Kami Interactive Worksheet
-        // do we have a worksheet for this student yet?
-        // if we have no worksheet, clone the worksheet for the student
 
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
