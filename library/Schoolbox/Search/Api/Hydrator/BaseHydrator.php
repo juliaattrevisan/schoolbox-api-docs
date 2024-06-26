@@ -89,7 +89,7 @@ abstract class BaseHydrator implements IHydrator
         // Simplicity is better here.  Previously more elaborate methods of converting HTML to text were used here,
         // but the result was more complexity and more problematic edge-cases, with little benefit.
         // See https://github.com/alaress/schoolbox/pull/29275
-        return strip_tags($html);
+        return strip_tags(html_entity_decode($html));
     }
 
     /**
