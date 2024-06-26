@@ -14,7 +14,6 @@ use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
 use Alaress\Redis\Async;
-use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -143,7 +142,7 @@ HELP;
         }
         $jitter = new Jitter(new FloatGenerator(), $retryMaxAttempts, $retryBaseTimeout);
 
-        // Mobile thing
+        // Create mobile service manager
         $serviceManager = new ServiceManager(
             $log,
             $di->get('mapperFactory')->get(RegistryMapper::class),
@@ -156,16 +155,18 @@ HELP;
                 : ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
-        // Need a new strat for listening to mobile queue?
+        // Dispatch to mobile queue
         $strat     = new DefaultDispatchStrategy($flags);
         $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager, $jitter);
 
-        // restore from redis cache
-        $jit = new RedisCache($redis, $log, $instanceId);
-        $scheduler->setJitCache($jit);
-        $jit->restoreSchedule($amqp, Broker::QUEUE);
+        // This daemon does not need to restore its messages from the Redis
+        // cache, like scheduled does.
+        // This is because this daemon does not acknowledge messages
+        // (thus removing them from the queue) and then defer processing of them
+        // using a React loop (thus losing that message if the daemon fails).
 
-        // due to the async nature of STOMP, only register the consumer once the connection is actually established
+        // due to the async nature of STOMP:
+        // only register consumer once the connection is actually established
         $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis, $instanceId) {
             $log->info('Connected to STOMP', ['char' => '+']);
 
