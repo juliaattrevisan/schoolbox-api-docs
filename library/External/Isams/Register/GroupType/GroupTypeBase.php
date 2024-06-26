@@ -33,7 +33,6 @@ abstract class GroupTypeBase implements GroupTypeInterface
     }
 
     abstract protected function retrieveRecords(): ?array;
-    abstract public function process(array $out): array;
 
     /**
      * Prepare the user data with their appropriate type and value

@@ -13,9 +13,6 @@ interface GroupTypeInterface
      *
      * @param array $out
      * @return array
-     * @throws InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     *
      */
     public function process(array $out): array;
 }

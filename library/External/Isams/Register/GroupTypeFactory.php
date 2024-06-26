@@ -11,6 +11,12 @@ use Schoolbox\User;
 
 class GroupTypeFactory
 {
+    /**
+     * @param CacheHelper $cacheHelper
+     * @param User        $user
+     * @param array       $register
+     * @param array       $metaFields
+     */
     public function __construct(
         private CacheHelper $cacheHelper,
         private User $user,
@@ -19,19 +25,26 @@ class GroupTypeFactory
     ) {
     }
 
+    /**
+     * Creating the object for the group type object
+     *
+     * @param string $type
+     * @param array  $config
+     * @return GroupTypeBase|null
+     */
     public function produce(
         string $type,
         array $config,
     ): ?GroupTypeBase {
         return match ($type) {
-            'FieldGroup' => new FieldGroup(
+            FieldGroup::GROUP_TYPE => new FieldGroup(
                 $this->cacheHelper,
                 $this->user,
                 $this->register,
                 $config,
                 $this->metaFields
             ),
-            'RecordCollection' => new RecordCollection(
+            RecordCollection::GROUP_TYPE => new RecordCollection(
                 $this->cacheHelper,
                 $this->user,
                 $this->register,

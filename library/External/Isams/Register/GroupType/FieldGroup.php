@@ -8,15 +8,15 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class FieldGroup extends GroupTypeBase
 {
-    protected const GROUP_TYPE = 'FieldGroup';
+    public const GROUP_TYPE = 'FieldGroup';
 
     /**
      * Getting the student fields for data output
      *
      * @return array|mixed
      * @throws InvalidArgumentException
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     *
      */
     protected function retrieveRecords(): ?array
     {
@@ -25,6 +25,10 @@ class FieldGroup extends GroupTypeBase
 
     /**
      * @inheritdoc
+     *
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function process(array $out): array
     {

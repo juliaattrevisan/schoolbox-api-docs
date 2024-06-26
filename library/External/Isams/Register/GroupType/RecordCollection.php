@@ -8,7 +8,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class RecordCollection extends GroupTypeBase
 {
-    protected const GROUP_TYPE = 'RecordCollection';
+    public const GROUP_TYPE = 'RecordCollection';
     /**
      * Retrieving record collections
      *
@@ -38,6 +38,11 @@ class RecordCollection extends GroupTypeBase
 
     /**
      * @inheritdoc
+     * @throws ClientExceptionInterface
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function process(array $out): array
     {

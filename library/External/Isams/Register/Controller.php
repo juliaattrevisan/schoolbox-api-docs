@@ -57,9 +57,11 @@ class Controller extends BaseController
      * @throws Error
      * @throws GuzzleException
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     * @since 23.1
-     * @api   GET /modules/isams/register/{register}/student/{studentId}
+     * @since                    23.1
+     * @api                      GET /modules/isams/register/{register}/student/{studentId}
      */
     public function getStudent(string $registerCode, User $student): void
     {
@@ -100,16 +102,17 @@ class Controller extends BaseController
      *
      * @param string $registerCode
      * @return void
-     * @throws GuzzleException
      * @throws ClientExceptionInterface
-     * @throws InvalidArgumentException
      * @throws Error
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws SchoolboxException
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     * @api   GET /modules/isams/register/{register}/parent
-     * @since 23.1
-     *
+     * @api                      GET /modules/isams/register/{register}/parent
+     * @since                    23.1
      */
-    public function getParent(string $registerCode)
+    public function getParent(string $registerCode): void
     {
         $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '');
 
@@ -274,17 +277,14 @@ class Controller extends BaseController
     /**
      * common function to fetch / build register info for an array of users
      *
-     * @param User $user                who are we building info for
-     * @param array $register           what is the requested register we want to look into
-     * @param array $config             the admin approved register list
+     * @param User  $user     who are we building info for
+     * @param array $register what is the requested register we want to look into
+     * @param array $config   the admin approved register list
      * @return array
-     * @throws ClientExceptionInterface
-     * @throws GuzzleException
      * @throws InvalidArgumentException
-     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(User $user, array $register, array $config)
+    private function getUsersData(User $user, array $register, array $config): array
     {
         $metaFields = $this->extractMetaFields($register['id']);
 

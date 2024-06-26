@@ -99,6 +99,7 @@ class CacheHelper
      * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getToken(): string
@@ -225,6 +226,7 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getMetadataFields(int $registerId): mixed
@@ -256,6 +258,7 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentDateRanges(int $registerId, string $externalId): mixed
@@ -287,6 +290,7 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentFields(int $registerId, string $externalId): mixed
@@ -312,13 +316,14 @@ class CacheHelper
 
     /**
      * Retrieve the Data Source as specified by the Metadata Field
-     * @see self::getMetadataFields
-     *
      * @param string $dataSourceUrl
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     * @see                      self::getMetadataFields
+     *
      */
     public function getDataSource(string $dataSourceUrl): mixed
     {
