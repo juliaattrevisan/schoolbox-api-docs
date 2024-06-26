@@ -22,9 +22,9 @@ class Reader
      */
     public function getAttendanceLink(array|string $metadata): ?string
     {
-        $attendanceUrl = (new Codec\Metadata())->decode($metadata)['links']['attendance'] ?? null;
+        $attendanceUrl = (new Codec\Metadata())->decode($metadata)['links']['attendance'] ?? '';
 
-        if (null === $attendanceUrl) {
+        if ('' === trim($attendanceUrl)) {
             return null;
         }
 
