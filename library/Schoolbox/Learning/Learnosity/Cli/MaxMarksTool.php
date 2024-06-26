@@ -13,7 +13,6 @@ use JsonException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Url\Factory;
 
 /**
@@ -52,11 +51,6 @@ class MaxMarksTool extends CliTool\App
      * https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
      */
     private const BATCH_SIZE_N_ITEMS = 50;
-
-    /**
-     * @var QuizMapper
-     */
-    private QuizMapper $quizMapper;
 
     /**
      * Used for performance metrics.
@@ -154,10 +148,6 @@ HELP;
             ],
             'questions' => []
         ];
-
-        /* We need these mappers
-         */
-        $this->quizMapper = QuizMapper::getInstance();
 
         $questions = $this->getQuestionsInfoFromLearnosity($api, $assessmentIds);
 
