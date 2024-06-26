@@ -73,6 +73,16 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     }
 
     /**
+     * @param ICache $jit
+     * @return static
+     */
+    public function setJitCache(ICache $jit): self
+    {
+        $this->jit = $jit;
+        return $this;
+    }
+
+    /**
      * Schedule a trigger for deferred execution
      *
      * @param TriggerInterface $trigger

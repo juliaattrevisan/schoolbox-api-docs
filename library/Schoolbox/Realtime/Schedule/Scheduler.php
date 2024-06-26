@@ -75,17 +75,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
 
     /**
-     * @param ICache $jit
-     * @return static
-     */
-    public function setJitCache(ICache $jit): self
-    {
-        $this->jit = $jit;
-        return $this;
-    }
-
-
-    /**
      * Callback executed when an exception bubbles to the top of the loop
      *
      * @param \Exception $e
