@@ -190,7 +190,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         try {
             $this->serviceManager->push($userId, $payload);
             $resolver->acknowledge();
-        } catch (RateLimitException) {
+        } catch (RateLimitException $e) {
             // Too many attempts already: give up
             // Does this mean the message should be completely rejected?
             // I guess, but log exactly to whom delivery failed.
@@ -211,9 +211,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $wait = $this->jitter->calculateJitter($attemptNum);
             $this->log->notice(
                 sprintf(
-                    'Message delivery to instance:user %s:%d is likely rate-limited: waiting %dms before trying again',
+                    'Message delivery to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
                     $instanceId,
                     $userId,
+                    $e->getMessage(),
                     $wait,
                 )
             );
