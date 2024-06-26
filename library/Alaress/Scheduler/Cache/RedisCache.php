@@ -125,7 +125,9 @@ class RedisCache implements ICache
      */
     protected function fetchItemKeys(): array
     {
-        return $this->redis->smembers($this->getNamespacedKey('index'));
+        $namespacedKey = $this->getNamespacedKey('index');
+        $this->log->debug(sprintf("Restoring keys from set: %s", $namespacedKey));
+        return $this->redis->smembers($namespacedKey);
     }
 
 
