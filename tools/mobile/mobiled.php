@@ -14,6 +14,7 @@ use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
 use Alaress\Redis\Async;
+use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -157,11 +158,10 @@ HELP;
         $strat     = new DefaultDispatchStrategy($flags);
         $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager, $jitter);
 
-
-        // TODO restore from redis cache
-//        $jit = new RedisCache($redis, $log, $instanceId);
-//        $scheduler->setJitCache($jit);
-//        $jit->restoreSchedule($amqp, Broker::QUEUE);
+        // restore from redis cache
+        $jit = new RedisCache($redis, $log, $instanceId);
+        $scheduler->setJitCache($jit);
+        $jit->restoreSchedule($amqp, Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
         $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis, $instanceId) {
