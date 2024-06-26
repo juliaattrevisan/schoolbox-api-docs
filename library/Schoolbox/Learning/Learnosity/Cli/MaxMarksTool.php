@@ -11,16 +11,9 @@ namespace Schoolbox\Learning\Learnosity\Cli;
 
 use JsonException;
 use LearnositySdk\Exceptions\ValidationException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use RuntimeException;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Url\Factory;
 
 /**
@@ -243,7 +236,31 @@ HELP;
         $logger = $this->getLogger();
         $logger->info('Gathering information from Learnosity:');
 
-        $activityReferences = $this->getActivityReferencesFromAssessmentIds($assessmentIds);
+        $activityReferences = $this->getDatabaseInternal()->executeQuery(
+            'SELECT assess.learnosity_reference
+            FROM mv_assessment_relation
+            JOIN assessment          ON mv_assessment_relation.assessment_id = assessment.id
+            LEFT JOIN project        ON mv_assessment_relation.project_assessment_id = project.id
+            LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+            LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+            LEFT JOIN task           ON task.assessment_id = assessment.id
+            LEFT JOIN assess         ON assess.assessment_id = assessment.id
+            LEFT JOIN lesson_plan    ON lesson_plan.assessment_id = assessment.id
+            WHERE assessment.id IN (' . implode(',', array_map('intval', $assessmentIds)) . ')
+            AND CONCAT(
+               "assessment.",
+               COALESCE(
+                  IF(task.id, "task", NULL),
+                  IF(assess.assessment_id, "quiz", NULL),
+                  IF(lti_assessment.assessment_id, "lti", NULL),
+                  IF(submission_box.id, "dueWork", NULL),
+                  IF(project.id, "project", NULL),
+                  IF(lesson_plan.id, "lessonPlan", NULL)
+               )
+            ) = "assessment.quiz"
+            AND assessment.deleted_at IS NULL
+            ORDER BY assessment.id ASC'
+        )->fetchColumnArray('learnosity_reference');
         $logger->info(' * Found ' . count($activityReferences) . ' activity references.');
 
         $itemReferences = $this->getItemReferencesFromActivityReferences($api, $activityReferences);
@@ -256,62 +273,6 @@ HELP;
         $logger->info(' * Found ' . count($questions) . ' short text questions.');
 
         return $questions;
-    }
-
-    /**
-     * @param $assessmentIds
-     * @return array
-     */
-    private function getActivityReferencesFromAssessmentIds($assessmentIds): array
-    {
-        $logger = $this->getLogger();
-
-        try {
-            $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            $logger->error('Could not get assessment data source.  ' . $e->getMessage());
-            exit(1);
-        }
-
-        $learnosityReferences = [];
-
-        foreach ($assessmentIds as $assessmentId) {
-            /** @var QuizDomainModel $assessment */
-            try {
-                $assessment = $assessmentMapperProxy->findById($assessmentId);
-            } catch (Deleted) {
-                $logger->warning("Skipping deleted assessment $assessmentId.");
-                continue;
-            } catch (Exception) {
-                $logger->warning("Could not get assessment $assessmentId.  Skipping.");
-                continue; // Skip deleted assessments.
-            }
-
-            /* We need this $quiz container thing to hold attempts
-             */
-            try {
-                $quiz = $this->getQuizForAssessmentId($assessment->getId());
-            } catch (RuntimeException $e) {
-                /* This somehow found to be a survey, not a quiz.
-                 * How this could be possible is a mystery except due to dev mistake
-                 */
-                $logger->error("Could not get quiz container object for assessment $assessmentId.  " . $e->getMessage());
-                $logger->info('Continuing to next assessment.');
-                exit(1);
-            }
-
-            /* Check this quiz is in learnosity
-             */
-            if ('' === trim((string)$quiz->getLearnosityReference())) {
-                $logger->error("Assessment $assessmentId does not have a learnosity reference.");
-                $logger->info('Continuing to next assessment.');
-                continue;
-            }
-
-            $learnosityReferences[] = $quiz->getLearnosityReference();
-        }
-
-        return $learnosityReferences;
     }
 
     /**
@@ -331,7 +292,7 @@ HELP;
             try {
                 // Docs: https://reference.learnosity.com/data-api/endpoints/itembank_endpoints#setQuestions
                 $response = $api->dataGetRequest('/itembank/activities', ['references' => $activityReferences]);
-            } catch (\Exception $e) {
+            } catch (JsonException | ValidationException $e) {
                 $logger->error('Request to /itembank/activities failed.  ' . $e->getMessage());
                 $logger->info('Continuing to next activity reference.');
                 continue;
@@ -496,38 +457,5 @@ HELP;
         }
 
         return true;
-    }
-
-    /**
-     * Converts an assessment_id to a Quiz
-     *
-     * Literally copypasta'd
-     *
-     * @param int $assessmentId
-     * @return Quiz
-     * @throws RuntimeException
-     */
-    protected function getQuizForAssessmentId(int $assessmentId): Quiz
-    {
-        /** @var null|Quiz $quiz */
-        $quiz = $this->quizMapper->findByColumn('assessment_id', $assessmentId, ['deleted' => true])->first();
-
-        /* Not a quiz
-         */
-        if (null === $quiz) {
-            throw new RuntimeException(sprintf(
-                'Assessment id %s is not a quiz.',
-                $assessmentId
-            ));
-        }
-
-        if (Quiz::AVAILABILITY_ASSESS !== $quiz->getAvailability()) {
-            throw new RuntimeException(sprintf(
-                'Assessment id %s is somehow not associated with a quiz.',
-                $assessmentId
-            ));
-        }
-
-        return $quiz;
     }
 }
