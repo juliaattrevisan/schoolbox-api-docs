@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Mobile;
 
-use Alaress\Async\Broker\DuplicateResolutionException;
-use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Notification\Cloud\RateLimitException;
@@ -20,11 +18,8 @@ use Alaress\Jitter\IJitter;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Exception;
-use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\MobileApp\ServiceManager;
 
 /**
@@ -117,39 +112,6 @@ class Scheduler extends AbstractScheduler implements IConsumer
 
         // All good? Attempt to send.
         $this->attemptPush($instanceId, $userId, $payload, $resolver);
-    }
-
-    /**
-     * Exception handler: currently copied from schedule daemon
-     *
-     * @param Exception $e
-     * @return void
-     * @throws Exception
-     */
-    public function onException(Exception $e)
-    {
-        if ($e instanceof IBrokerException) {
-            $msg = $e->getMessage();
-            if ($e->getPrevious()) {
-                $msg .= " - {$e->getPrevious()->getMessage()}";
-            }
-
-            $this->log->warning("Could not schedule: {$msg}. Dropping message.");
-
-            try {
-                // drop the message
-                $e->getResolver()->acknowledge();
-            } catch (DuplicateResolutionException $e) {
-                // do nothing, this message was just double broken.
-            }
-            return;
-        }
-
-        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), ['exception' => $e]);
-        // we need the daemon to crash if there's a database issue
-        if ($e instanceof PDOException || $e instanceof ExternalException) {
-            throw $e;
-        }
     }
 
     /**

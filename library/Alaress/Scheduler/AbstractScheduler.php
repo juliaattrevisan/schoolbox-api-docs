@@ -9,6 +9,8 @@
 
 namespace Alaress\Scheduler;
 
+use Alaress\Async\Broker\DuplicateResolutionException;
+use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\SignalEmitter;
@@ -21,9 +23,11 @@ use Alaress\WorkerCrew\DispatcherInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
+use Schoolbox\External;
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
@@ -71,6 +75,42 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         $this->dispatcher = new Dispatcher($loop, $this, $log, $dispatchStrategy); // TODO IoC
     }
+
+
+    /**
+     * Callback executed when an exception bubbles to the top of the loop
+     *
+     * @param \Exception $e
+     * @throws PDOException
+     * @throws External\Exception
+     * @return void
+     */
+    public function onException(\Exception $e)
+    {
+        if ($e instanceof IBrokerException) {
+            $msg = $e->getMessage();
+            if ($e->getPrevious()) {
+                $msg .= " - {$e->getPrevious()->getMessage()}";
+            }
+
+            $this->log->warning("Could not schedule: {$msg}. Dropping message.");
+
+            try {
+                // drop the message
+                $e->getResolver()->acknowledge();
+            } catch (DuplicateResolutionException $e) {
+                // do nothing, this message was just double broken.
+            }
+            return;
+        }
+
+        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), ['exception' => $e]);
+        // we need the daemon to crash if there's a database issue
+        if ($e instanceof PDOException || $e instanceof External\Exception) {
+            throw $e;
+        }
+    }
+
 
     /**
      * @param ICache $jit
