@@ -1,5 +1,5 @@
 <div class="small-12 island">
-    <h2 class="subheader">{{ register.name }} ({{ recordCollection.name }})</h2>
+    <h2 class="subheader">{{ register.name }}</h2>
         <div class="l-flex-col l-gap-m l-pad-m">
             {% for child in studentData %}
                 <div class="l-flex-col">
@@ -18,33 +18,83 @@
                             </div>
                         </div>
                     </div>
+                    {# Field Group details #}
                     <div class="c-island l-pad-m--horiz">
-                        {% if child.data.userRecords is defined %}
-                            <table>
-                                <thead>
-                                {% for key,name in (child.data.knownFields ?? []) %}
-                                    <th data-field="{{ key }}">{{ name }}</th>
-                                {% endfor %}
-                                </thead>
-                                <tbody>
-                                {% for record in (child.data.userRecords ?? []) %}
-                                    <tr>
-                                        {% for key, field in record %}
-                                            <td>
-                                                {% if field.type == 'url' %}
-                                                    <a href="{{ field.value }}">{{ child.data.knownFields[key] }}</a>
-                                                {% elseif field.type == 'html' %}
-                                                    {{ field.value | purify }}
-                                                {% else %}
-                                                    {{ field.value }}
-                                                {% endif %}
-                                            </td>
+                        {% if child.data.FieldGroup is defined %}
+                            {% for group in child.data.FieldGroup %}
+                                <h2>{{ group.groupName }}</h2>
+                                {% if group.data ?? [] is not empty %}
+                                    <table>
+                                        <colgroup>
+                                            {% for numberCol in range(0, 1) %}
+                                                <col>
+                                            {% endfor %}
+                                        </colgroup>
+                                        <tbody>
+                                        {% for row in group.data %}
+                                            {% set rowValue = row.value ?? '' %}
+                                            <tr>
+                                                <td>{{ row.name }}</td>
+                                                <td>
+                                                    {% if row.type == 'url' and rowValue %}
+                                                        <a href="{{ rowValue }}">{{ rowValue }}</a>
+                                                    {% elseif row.type == 'html' %}
+                                                        {{ rowValue | purify }}
+                                                    {% else %}
+                                                        {{ rowValue }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
                                         {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p><em>No data available.</em></p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        {# Record Collection details #}
+                        {% set recordCollection = child.data.RecordCollection %}
+                        {% if recordCollection is defined %}
+                            {% for collection in recordCollection %}
+                                <h2>{{ collection.groupName }}</h2>
+                                {% if collection.data ?? [] is not empty %}
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            {% for key, name in (collection.headers ?? []) %}
+                                                <th data-field="{{ key }}">{{ name }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for record in (collection.data) %}
+                                            <tr>
+                                                {% for key, field in record %}
+                                                    {% set fieldValue = field.value ?? '' %}
+                                                    <td>
+                                                        {% if field.type == 'url' and fieldValue %}
+                                                            <a href="{{ fieldValue }}">{{ collection.headers[key] }}</a>
+                                                        {% elseif field.type == 'html' %}
+                                                            {{ fieldValue | purify }}
+                                                        {% else %}
+                                                            {{ fieldValue }}
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p><em>No data available.</em></p>
+                                {% endif %}
+                            {% endfor %}
                         {% else %}
+                            <p><em>No data available.</em></p>
+                        {% endif %}
+                        {% if child.data is empty %}
+                            {# No data found against the student #}
                             <p><em>No data available.</em></p>
                         {% endif %}
                     </div>

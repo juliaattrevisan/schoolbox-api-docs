@@ -57,9 +57,11 @@ class Controller extends BaseController
      * @throws Error
      * @throws GuzzleException
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     * @since 23.1
-     * @api   GET /modules/isams/register/{register}/student/{studentId}
+     * @since                    23.1
+     * @api                      GET /modules/isams/register/{register}/student/{studentId}
      */
     public function getStudent(string $registerCode, User $student): void
     {
@@ -77,19 +79,10 @@ class Controller extends BaseController
             throw new NotFound();
         }
 
-        // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
-        if (null === $recordCollection) {
-            /**
-             * Unable to find the specified Record Collections...
-             */
-            throw new NotFound();
-        }
-
         $usersData = [
             [
                 'user' => $student,
-                'data' => $this->getUsersData($student, $register, $recordCollection, $config),
+                'data' => $this->getUsersData($student, $register, $config),
             ]
         ];
 
@@ -97,7 +90,6 @@ class Controller extends BaseController
             '@isamsRegister/student.twig',
             [
                 'register' => $register,
-                'recordCollection' => $recordCollection,
                 'studentData'   => $usersData,
             ],
         );
@@ -110,16 +102,17 @@ class Controller extends BaseController
      *
      * @param string $registerCode
      * @return void
-     * @throws GuzzleException
      * @throws ClientExceptionInterface
-     * @throws InvalidArgumentException
      * @throws Error
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws SchoolboxException
+     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
-     * @api   GET /modules/isams/register/{register}/parent
-     * @since 23.1
-     *
+     * @api                      GET /modules/isams/register/{register}/parent
+     * @since                    23.1
      */
-    public function getParent(string $registerCode)
+    public function getParent(string $registerCode): void
     {
         $adminConfig = $this->extractRegisterConfig($this->getConfigLoader()->get(ConfigMapper::EXTERNAL_ISAMS_FINANCIAL_REGISTERS) ?? '');
 
@@ -135,15 +128,6 @@ class Controller extends BaseController
             throw new NotFound();
         }
 
-        // we now have the correct register we are after
-        $recordCollection = $this->cacheHelper->getRecordCollections($register['id'], $config['recordCollection']);
-        if (null === $recordCollection) {
-            /**
-             * Unable to find the specified Record Collections...
-             */
-            throw new NotFound();
-        }
-
         $externalUser = new \Schoolbox\External\User();
         $externalUser->loadChildren([$this->getUser()]);
 
@@ -151,15 +135,13 @@ class Controller extends BaseController
         foreach ($this->getUser()->getChildren() as $child) {
             $usersData[] = [
                 'user' => $child,
-                'data' => $this->getUsersData($child, $register, $recordCollection, $config),
+                'data' => $this->getUsersData($child, $register, $config),
             ];
         }
-
         $this->response = $this->responseFromTemplate(
             '@isamsRegister/student.twig',
             [
                 'register' => $register,
-                'recordCollection' => $recordCollection,
                 'studentData'   => $usersData,
             ],
         );
@@ -282,7 +264,8 @@ class Controller extends BaseController
             }
             $registerCode = $tmp[0];
             $registerCollection = $tmp[1];
-            $registersConfig[strtolower($registerCode)] = [
+            //Group all the filters with the same group code
+            $registersConfig[strtolower($registerCode)][] = [
                 'register'          => $registerCode,
                 'recordCollection'  => $registerCollection,
                 'fields'            => explode(',', $tmp[2])
@@ -294,87 +277,92 @@ class Controller extends BaseController
     /**
      * common function to fetch / build register info for an array of users
      *
-     * @param User $user                who are we building info for
-     * @param array $register           what is the requested register we want to look into
-     * @param array $recordCollection   what is the requested register collection we are extracting the data out of
-     * @param array $config             the admin approved register list
+     * @param User  $user     who are we building info for
+     * @param array $register what is the requested register we want to look into
+     * @param array $config   the admin approved register list
      * @return array
-     * @throws ClientExceptionInterface
-     * @throws GuzzleException
      * @throws InvalidArgumentException
-     * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    private function getUsersData(User $user, array $register, array $recordCollection, array $config)
+    private function getUsersData(User $user, array $register, array $config): array
     {
-        // fetch user data
-        $userRecords = $this->cacheHelper->getRecordCollectionsRecords($register['id'], $user->getExternalId(), $recordCollection['id']);
-
-        // fetch the field metadata to join and clean the data
-        $fieldMetadata = $this->cacheHelper->getMetadataFields($register['id']);
+        $metaFields = $this->extractMetaFields($register['id']);
 
         $out = [];
-        $knownFields = [];
-        // loop through each record
-        foreach ($userRecords as $record) {
-            $fields = [];
-            //in each record, loop through the metadata fields
-            foreach ($fieldMetadata as $metadata) {
-                //if the field exists then build it, else just continue
-                if (!isset($record['fields'][lcfirst($metadata['key'])])) {
-                    continue;
-                }
-                /**
-                 * If the field is not in the approved list, then build it, else continue
-                 *
-                 * NOTE:
-                 * register metadata fields keys all words are caps,
-                 * the student data fields first character is lowercase...
-                 *
-                 * Regarding the capitalisation, I know this happens elsewhere with OData filters – they always flip the capitals…
-                 * -Mark@EIM
-                 *
-                 * so we need to keep the config as 1 of the schemes,
-                 * I decided that the case should match the student record, not the metadata endpoints
-                 * -Justin
-                 */
-                if (!in_array(lcfirst($metadata['key']), $config['fields'])) {
-                    continue;
-                }
-                $sequence = array_search(lcfirst($metadata['key']), $config['fields']);
-                $knownFields[$sequence] = $metadata['name'];
 
-                // if TextboxField confirm the field type  (url / html?)
-                $value = $record['fields'][lcfirst($metadata['key'])];
-                $type = $metadata['type'];
-                if ('TextboxField' === $metadata['type']) {
-                    // is this a url, if so get twig to format as href
-                    $url = new \Url($value);
-                    if ($url->isUrl()) {
-                        $type = 'url';
-                    }
+        $factory = new GroupTypeFactory($this->cacheHelper, $user, $register, $metaFields);
+        foreach ($config as $conf) {
+            $collectionName = $conf['recordCollection'];
 
-                    // is html, then get twig to sanitise with `| purify`
-                    if (0 !== preg_match("/<[^<]+>/", $value, $m)) {
-                        $type = 'html';
-                    }
-                }
+            //Skip if the fields are not in the metadata fields returned
+            if (!isset($metaFields[$collectionName])) {
+                continue;
+            }
 
-                // join the record field to the metadata field and append to a new array
-                $fields[$sequence] = [
-                    'type' => $type,
-                    'value' => $value
+            $metaGroupType = $metaFields[$collectionName]['type'];
+            if (!isset($out[$metaGroupType][$collectionName]['groupName'])) {
+                $out[$metaGroupType][$collectionName]['groupName'] = $metaFields[$collectionName]['name'];
+            }
+            $groupType = $factory->produce(
+                $metaGroupType,
+                $conf
+            );
+
+            //If the type does not exist. Skip.
+            if (null === $groupType) {
+                continue;
+            }
+
+            $out = $groupType->process($out);
+        }
+        return $out;
+    }
+
+    /**
+     * Extract and formatting meta fields with their relevant groups
+     *
+     * @param   int $registerId
+     * @return  array
+     * @throws  InvalidArgumentException
+     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
+     */
+    private function extractMetaFields(int $registerId): array
+    {
+        $metadataFields = $this->cacheHelper->getMetadataFields($registerId);
+        $metaFields = [];
+
+        foreach ($metadataFields as $field) {
+            $groupData = $field['group'];
+            $groupKey = $groupData['key'];
+            if (!isset($metaFields[$groupKey])) {
+                $metaFields[$groupKey] = [
+                    'type' => $groupData['type'],
+                    'id' => $groupData['id'],
+                    'name' => $groupData['name'],
                 ];
             }
-            ksort($fields);
-            $out[] = $fields;
-        }
 
-        ksort($knownFields);
-        return [
-            'knownFields' => $knownFields,
-            'userRecords'   => $out
-        ];
+            /**
+             * NOTE:
+             * register metadata fields keys all words are caps,
+             * the student data fields first character is lowercase...
+             *
+             * Regarding the capitalisation, I know this happens elsewhere with OData filters
+             * – they always flip the capitals…
+             * -Mark@EIM
+             *
+             * so we need to keep the config as 1 of the schemes,
+             * I decided that the case should match the student record, not the metadata endpoints
+             * -Justin
+             *
+             */
+
+            $metaFields[$groupKey]['fields'][lcfirst($field['key'])] = [
+                'name' => $field['name'],
+                'type' => $field['type']
+            ];
+        }
+        return $metaFields;
     }
 
     /**
