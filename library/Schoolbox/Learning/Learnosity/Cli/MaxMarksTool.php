@@ -97,7 +97,7 @@ HELP;
          */
         $logger = $this->getLogger();
         $logger->info('');
-        $logger->info('Learnosity Attempt MaxMarksBulk copier');
+        $logger->info('Learnosity ShortText Question MaxMarks Copier');
         $logger->info('');
 
         /* Check mandatory args first
@@ -190,8 +190,7 @@ HELP;
             if (count($payload['questions']) === self::BATCH_SIZE_N_ITEMS) {
                 // Maximum number of questions for API call reached.
                 if (!$this->sendRequestToLearnosityIfPerforming($api, $payload)) {
-                    $logger->info('Request to Learnosity failed, so stopping.');
-                    die;
+                    $logger->info('Request to Learnosity failed, but continuing to next batch.');
                 }
                 $payload['questions'] = []; // Clear questions array, so we can continue using $payload for future requests.
             }
