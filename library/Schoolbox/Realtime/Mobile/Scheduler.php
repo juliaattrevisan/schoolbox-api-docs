@@ -101,21 +101,34 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function onMessage($payload, IResolver $resolver, ?array $context)
     {
+        // Basic checks: payload type, context
+        if (!$payload instanceof Instance) {
+            $this->log->warning(sprintf('Message received payload is not a %s instance: rejecting', Instance::class));
+            $resolver->reject();
+            return;
+        }
+        if (!is_array($context)) {
+            $this->log->warning('Message received has no context, thus receiving user cannot be determined: rejecting');
+            $resolver->reject();
+            return;
+        }
+
+        // Check context is instance ID + user ID:
+        // currently instance ID is unused, but may be if this daemon is ever
+        // made instance-agnostic.
+        $instanceId = $context[0] ?? null;
+        $userId     = $context[1] ?? null;
+        if (!isset($instanceId, $userId)) {
+            $this->log->warning('Message received context is not a tuple (instanceId, userId): rejecting');
+            $resolver->reject();
+            return;
+        }
+
         // Send $payload.
         // If it is not sent due to a rate limit or something:
         // * put it back on Redis, or a Rabbit delayed queue?
         // * add a timer for re-processing it
         // * if the mobile daemon is restarted: the JIT cache will rebuild it
-        if (!is_array($context)) {
-            // Go no further: I don't know who to send to
-        }
-
-        // Context will be instance ID + user ID:
-        // currently instance ID is unused, but may be if this daemon is ever
-        // made instance-agnostic.
-        $instanceId = $context[0] ?? null;
-        $userId     = $context[1] ?? null;
-
         // Now send
         $this->serviceManager->push($userId, $payload);
     }
