@@ -68,6 +68,13 @@ class Builder
      */
     private function buildAttendanceLink(array $class, array $classInstance): string
     {
+        /* We only care about class instances whose isTeachingSession is true;
+         * returns empty string otherwise.
+         */
+        if (!$classInstance['isTeachingSession']) {
+            return '';
+        }
+
         /* FIXME Is attendance link mandatory for every class, or just some?
          *  Find optionality
          *
