@@ -13,6 +13,7 @@ use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
+use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Date\IClock;
 use Alaress\Jitter\IJitter;
@@ -114,23 +115,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         }
 
         // Check context is instance ID + user ID:
-        // currently instance ID is unused, but may be if this daemon is ever
+        // currently instance ID is unused, but will be if this daemon is ever
         // made instance-agnostic.
         $instanceId = $context[0] ?? null;
-        $userId     = $context[1] ?? null;
+        $userId     = filter_var($context[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if (!isset($instanceId, $userId)) {
-            $this->log->warning('Message received context is not a tuple (instanceId, userId): rejecting');
+            $this->log->warning('Message received context is not a tuple (instanceId: string, userId: int): rejecting');
             $resolver->reject();
             return;
         }
 
-        // Send $payload.
-        // If it is not sent due to a rate limit or something:
-        // * put it back on Redis, or a Rabbit delayed queue?
-        // * add a timer for re-processing it
-        // * if the mobile daemon is restarted: the JIT cache will rebuild it
-        // Now send
-        $this->serviceManager->push($userId, $payload);
+        // All good? Attempt to send.
+        $this->attemptPush($instanceId, $userId, $payload, $resolver);
     }
 
     /**
@@ -163,6 +159,63 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         // we need the daemon to crash if there's a database issue
         if ($e instanceof PDOException || $e instanceof ExternalException) {
             throw $e;
+        }
+    }
+
+    /**
+     * Internal method for attempting push of messages to service manager.
+     *
+     * @param string    $instanceId
+     * @param int       $userId
+     * @param Instance  $payload
+     * @param IResolver $resolver
+     * @param int       $attemptNum
+     * @return void
+     */
+    private function attemptPush(string $instanceId, int $userId, Instance $payload, IResolver $resolver, int $attemptNum = 1): void
+    {
+        $this->log->debug(
+            sprintf(
+                'Attempting to deliver message to instance:user %s:%d, attempt %d',
+                $instanceId,
+                $userId,
+                $attemptNum,
+            )
+        );
+        try {
+            $this->serviceManager->push($userId, $payload);
+            $resolver->acknowledge();
+        } catch (RateLimitException) {
+            // Too many attempts already: give up
+            // Does this mean the message should be completely rejected?
+            // I guess, but log exactly to whom delivery failed.
+            if ($this->jitter->tooManyAttempts($attemptNum)) {
+                $this->log->warning(
+                    sprintf(
+                        'Message received could not be delivered to instance:user %s:%d after %d attempts: message rejected',
+                        $instanceId,
+                        $userId,
+                        $attemptNum,
+                    )
+                );
+                $resolver->reject();
+                return;
+            }
+
+            // Otherwise add it to the timer
+            $wait = $this->jitter->calculateJitter($attemptNum);
+            $this->log->notice(
+                sprintf(
+                    'Message delivery to instance:user %s:%d is likely rate-limited: waiting %dms before trying again',
+                    $instanceId,
+                    $userId,
+                    $wait,
+                )
+            );
+            $this->loop->addTimer(
+                $wait / 1000,
+                fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, $attemptNum + 1),
+            );
         }
     }
 }
