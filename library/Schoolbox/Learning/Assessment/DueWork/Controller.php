@@ -993,6 +993,10 @@ class Controller extends Assessment\Controller
             $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
         }
 
+        // Kami Interactive Worksheet
+        // do we have a worksheet for this student yet?
+        // if we have no worksheet, clone the worksheet for the student
+
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
 
