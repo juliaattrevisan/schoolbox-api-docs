@@ -104,13 +104,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     {
         // Basic checks: payload type, context
         if (!$payload instanceof Instance) {
-            $this->log->warning(sprintf('Message received payload is not a %s instance: rejecting', Instance::class));
-            $resolver->reject();
+            $this->log->warning(sprintf('Message received payload is not a %s instance: not retrying delivery', Instance::class));
+            // acknowledge instead of reject looks weird here,
+            // but rejecting a message ends with it being put back in the queue
+            // to be processed forever.
+            // I'd've guessed that reject() would put the message in a dead
+            // letter queue or something, but apparently not.
+            $resolver->acknowledge();
             return;
         }
         if (!is_array($context)) {
-            $this->log->warning('Message received has no context, thus receiving user cannot be determined: rejecting');
-            $resolver->reject();
+            $this->log->warning('Message received has no context, thus receiving user cannot be determined: not retrying delivery');
+            $resolver->acknowledge();
             return;
         }
 
@@ -120,8 +125,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         $instanceId = $context[0] ?? null;
         $userId     = filter_var($context[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if (!isset($instanceId, $userId)) {
-            $this->log->warning('Message received context is not a tuple (instanceId: string, userId: int): rejecting');
-            $resolver->reject();
+            $this->log->warning('Message received context is not a tuple (instanceId: string, userId: int): not retrying delivery');
+            $resolver->acknowledge();
             return;
         }
 
@@ -192,13 +197,13 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             if ($this->jitter->tooManyAttempts($attemptNum)) {
                 $this->log->warning(
                     sprintf(
-                        'Message received could not be delivered to instance:user %s:%d after %d attempts: message rejected',
+                        'Message received could not be delivered to instance:user %s:%d after %d attempts: not retrying delivery',
                         $instanceId,
                         $userId,
                         $attemptNum,
                     )
                 );
-                $resolver->reject();
+                $resolver->acknowledge();
                 return;
             }
 
