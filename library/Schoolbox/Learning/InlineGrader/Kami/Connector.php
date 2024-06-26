@@ -41,6 +41,7 @@ class Connector implements IConnector
     public const PATH_LIST_DOCUMENTS = 'embed/documents';
     public const PATH_GET_DOCUMENT = 'embed/documents/';
     public const PATH_DELETE_DOCUMENT = 'embed/documents/';
+    public const PATH_CREATE_FROM_TEMPLATE = 'embed/documents';
 
     // How long should view sessions last for by default?
     public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
@@ -837,5 +838,43 @@ class Connector implements IConnector
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
         return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
+    }
+
+    /**
+     * hit the kami api and clone a kami template for a student to use in a class
+     * @see https://kamiapiproposed.docs.apiary.io/#reference/embedding/uploads/create-a-document-from-a-template
+     *
+     * @param string $name the name of the document
+     * @param string $templateId the kami id of the template we are cloning
+     * @param string $groupReference the reference to the assessment collection, so teachers can see all these worksheets at once
+     * @return Document
+     * @throws GuzzleException
+     */
+    public function cloneWorksheet(string $name, string $templateId, string $groupReference): Document
+    {
+        $this->assertEnabled();
+
+        // this kami endpoint accepts json
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => json_encode([
+                'name' => $name,
+                'template_document_id' => $templateId,
+                'document_groups' => [$groupReference],
+            ]),
+        ];
+        $request  = new Request('POST', self::PATH_CREATE_FROM_TEMPLATE);
+        $response = $this->client->send($request, $this->getOptions($options));
+
+        if ($this->isSuccessful($response)) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Worksheet not cloned", $request, $response);
     }
 }

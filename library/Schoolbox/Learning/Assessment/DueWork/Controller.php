@@ -954,6 +954,7 @@ class Controller extends Assessment\Controller
          */
         $latestResponse = null;
         $editorContents = '';
+        $kamiFile = null;
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -998,7 +999,39 @@ class Controller extends Assessment\Controller
              */
             $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
             // Kami Interactive Worksheet
-            // clone the worksheet template for the student
+            if ($assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
+                // clone the worksheet template for the student
+                // worksheet name there is no reference to a character limit, so lets concat things
+                $worksheetName = sprintf("%s_%s", $assessment->getTitle(), $student->getFullName());
+                // kami example format "#{school_id}_#{course_id}_#{assignment_id}_#{attachment_id}"
+                $kamiGroup = sprintf("%s_%d_%d", INSTANCE_ID, $assessment->getBaseContext()->getId(), $assessment->getId());
+                $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
+                $kamiFile = $kamiDoc->getId();
+
+                // create kami object
+                $kamiModel = $this->kamiMapper->createModel()
+                    ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
+                    ->setKamiDocumentId($kamiDoc->getId())
+                    ->setStatusDone();
+
+                $this->kamiMapper->save($kamiModel);
+
+                // Create a new response
+                $response = $this->dueWorkResponseMapper->createModel()
+                    ->setSubmittedBy($this->getUser())
+                    ->setSubmittedOnBehalfOf($student)
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())
+                    ->setAssessable($assessment);
+
+                $this->dueWorkResponseMapper->save($response);
+
+                // join kami to the response
+                $submissionFile = $this->submissionFileMapper->createModel()
+                    ->setKami($kamiModel)
+                    ->setSubmission($response);
+                $this->submissionFileMapper->save($submissionFile);
+            }
         }
 
         // Is the page being displayed in readonly mode?
@@ -1037,6 +1070,7 @@ class Controller extends Assessment\Controller
             'participant'    => $participant,
             'feedback'       => $feedback,
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
+            'kamiFile'       => $kamiFile,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
