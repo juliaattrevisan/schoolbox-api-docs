@@ -29,6 +29,7 @@ use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Mobile\Broker;
 use Schoolbox\Realtime\Mobile\Scheduler;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -149,6 +150,7 @@ HELP;
             $instance,
             $config->get('title'),
             $di->get('filesystem.storageProxy'),
+            new UnreadRetriever($redis),
             $forceProduction
                 ? ServiceManager::SERVICE_TYPE_PRODUCTION
                 : ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,

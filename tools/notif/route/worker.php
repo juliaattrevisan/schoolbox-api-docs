@@ -21,6 +21,7 @@ use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList\Mobile;
 use Schoolbox\Realtime\Routing;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
@@ -73,6 +74,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
                 $instance,
                 $config->get('title'),
                 $filesystemProxy,
+                new UnreadRetriever($client),
                 ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
             ),
         );

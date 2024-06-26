@@ -21,7 +21,6 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\UserMapper;
-use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
 class WorkerFactory
 {
