@@ -13,7 +13,6 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
-use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -102,9 +101,6 @@ HELP;
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
 
-    /** @var Async\Client $asyncRedis */
-    $asyncRedis = $di->get('redis.signalQueue.sub');
-
     try {
         /** @var \Schoolbox\Notif\MQ\Connector $amqp */
         $amqp = $di->get('amqp');
@@ -167,15 +163,10 @@ HELP;
 
         // due to the async nature of STOMP:
         // only register consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis, $instanceId) {
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log) {
             $log->info('Connected to STOMP', ['char' => '+']);
-
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);
-
-            $topic = 'mobiled.' . $instanceId . '.*';
-            $asyncRedis->psubscribe($topic, $scheduler);
-            $log->info("Listening on signal queue: redis://$topic");
         });
     } catch (ConnectionException $e) {
         $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), ['exception' => $e]);

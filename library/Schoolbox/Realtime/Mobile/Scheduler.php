@@ -17,8 +17,6 @@ use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Date\IClock;
 use Alaress\Jitter\IJitter;
-use Alaress\Redis\Async\Event\IEvent;
-use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -33,7 +31,7 @@ use Schoolbox\MobileApp\ServiceManager;
  * The mobile app scheduler: responsible for forwarding notifications to mobile
  * apps.
  */
-class Scheduler extends AbstractScheduler implements IConsumer, EventListener
+class Scheduler extends AbstractScheduler implements IConsumer
 {
     /**
      * Constructor
@@ -59,25 +57,12 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
     }
 
-
     /**
      * @return string
      */
     protected function getMethod()
     {
         return DefaultDispatchStrategy::TASK_MOBILE;
-    }
-
-    /**
-     * Handle events sent to this scheduler's signal queue.
-     *
-     * @param IEvent $event
-     * @return void
-     */
-    public function handle(IEvent $event)
-    {
-        // noop: this is the signal queue listener
-        // Maybe this will allow restart of the daemon with a signal?
     }
 
     /**
