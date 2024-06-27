@@ -129,11 +129,16 @@ class Mapper extends BaseMapper
      * If hierarchy of types is changing, ensure pastoral records also reflect the new hierarchy.
      *
      * @param SubTypeModel $subType
-     * @param SubTypeModel $previous
+     * @param ?SubTypeModel $previous
      * @return void
      */
-    protected function updateTypeHierarchy(SubTypeModel $subType, SubTypeModel $previous): void
+    protected function updateTypeHierarchy(SubTypeModel $subType, ?SubTypeModel $previous): void
     {
+        if ($previous === null) {
+            // No previous subtype, so there are no old records to update.
+            return;
+        }
+
         if ($subType->getPastoralType()->getId() !== $previous->getPastoralType()->getId()) {
             $this->getDatabase()->query(
                 "UPDATE pastoral SET
