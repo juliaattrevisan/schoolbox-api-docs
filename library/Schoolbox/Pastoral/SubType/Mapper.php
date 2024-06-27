@@ -134,13 +134,12 @@ class Mapper extends BaseMapper
      */
     function updateTypeHierarchy(SubTypeModel $subType, SubTypeModel $previous): void
     {
-        // NOTE: getPastoralType() returns an id, not an object.
-        if ($subType->getPastoralType() !== $previous->getPastoralType()) {
+        if ($subType->getPastoralType()->getId() !== $previous->getPastoralType()->getId()) {
             $this->getDatabase()->query(
                 "UPDATE pastoral SET
                 type_id = ?
                 WHERE subtype_id = ? ",
-                [$subType->getPastoralType(), $subType->getId()]
+                [$subType->getPastoralType()->getId(), $subType->getId()]
             );
         }
     }

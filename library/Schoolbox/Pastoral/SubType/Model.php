@@ -18,14 +18,14 @@ class Model extends TypeAbstract
     /**
      * @var PastoralType
      */
-    private $pastoralType;
+    private PastoralType $pastoralType;
 
     /**
      * @param PastoralType $pastoralType
      *
      * @return self
      */
-    public function setPastoralType($pastoralType): self
+    public function setPastoralType(PastoralType $pastoralType): self
     {
         $this->pastoralType = $pastoralType;
 
@@ -35,7 +35,7 @@ class Model extends TypeAbstract
     /**
      * @return PastoralType
      */
-    public function getPastoralType()
+    public function getPastoralType(): PastoralType
     {
         return $this->pastoralType;
     }
