@@ -119,7 +119,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 },
+    { debounce: 1000 }
 );
 
 /**
@@ -139,7 +139,7 @@ window.Vue.onUnmounted(async () => {
                 props.item.questions[0].response?.comment !== ''
             "
         >
-            <div class="comment-container l-pad-m--top" v-if="props.hasMarkVisibility">
+            <div v-if="props.hasMarkVisibility" class="comment-container l-pad-m--top">
                 <label>Comment</label>
                 <div v-html="props.item.questions[0].response.comment"></div>
             </div>
