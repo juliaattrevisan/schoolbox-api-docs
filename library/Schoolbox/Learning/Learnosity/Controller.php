@@ -2310,7 +2310,39 @@ class Controller extends Base
     ): void {
         /* Ask learnosity about $attempt's new score and ram that back in
          */
-        $attempt->setMark('cat');
+        $payload = [
+            'session_id' => [
+                $attempt->getLearnosityReference()
+            ]
+        ];
+
+        $result = $this->api->dataGetRequest('/sessions/scores', $payload);
+
+        // As with posting a feedback:
+        // need the existing response to determine a human-readable mark.
+        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
+
+        // TODO as with posting a feedback:
+        //      what kind of error should we present to users? It's asynchronous
+        if (!$existingResponse) {
+            return;
+        }
+
+        /* Instead of asking learnosity how it tallied everything, we can
+         * just...do it ourselves, I guess, and sort-of delete this problem
+         * We knew the max_mark from the attempt table, so it could potentially
+         * desync from what Learnosity knows.
+         *
+         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
+         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
+         */
+        $sanitisedScore = (new SanitiseScores())->sanitise($result['data'][0]['score'], $result['data'][0]['max_score']);
+
+        $mark = $sanitisedScore['score'];
+        $maxMark = $sanitisedScore['max_score'];
+
+        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
+
         $this->attemptMapper->save($attempt);
 
         /* TODO but...what does taskd do about this?
