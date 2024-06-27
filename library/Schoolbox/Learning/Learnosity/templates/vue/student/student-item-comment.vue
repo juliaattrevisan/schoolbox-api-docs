@@ -43,7 +43,7 @@ const saveText = window.Vue.computed(() => {
         return "Saving...";
     }
     if (hasError.value) {
-        return "Comment could not be saved";
+        return "Sorry, the comment could not be saved. Please refresh the page and try again. If the problem persists, contact your support.";
     }
     return "Comment saved";
 });
@@ -107,8 +107,9 @@ async function saveComment() {
         hasError.value = true;
     }
     await timeout(2000);
-    hasSaved.value = false;
-    hasError.value = false;
+    if (hasSaved.value) {
+        hasSaved.value = false;
+    }
 }
 
 /**
