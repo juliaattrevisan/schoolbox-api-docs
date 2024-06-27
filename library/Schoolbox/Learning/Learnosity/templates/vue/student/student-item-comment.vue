@@ -80,17 +80,21 @@ async function saveComment() {
     if (props.student.urls === undefined) {
         return;
     }
-    isSaving.value = true;
-    emit("updatedComment", comment.value);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-    const formData = new FormData();
-    formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
-    formData.append("comment", comment.value);
-    await fetch(props.student.urls.comment, {
-        method: "POST",
-        body: formData,
-    });
-    window.removeEventListener("beforeunload", beforeUnloadHandler);
+    try {
+        isSaving.value = true;
+        emit("updatedComment", comment.value);
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
+        formData.append("comment", comment.value);
+        await fetch(props.student.urls.comment, {
+            method: "POST",
+            body: formData,
+        });
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+    } catch (error) {
+        console.error(error);
+    }
     isSavedDelay.value = true;
     isSaving.value = false;
     await timeout(2000);
