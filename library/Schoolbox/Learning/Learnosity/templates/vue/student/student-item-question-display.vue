@@ -80,21 +80,25 @@ async function saveScore() {
         score.value = "";
         return;
     }
-    isSaving.value = true;
-    emit("updatedScore", props.question, parseFloat(score.value));
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-    const formData = new FormData();
-    formData.append(
-        "learnosityReference",
-        (props.question.response as StudentItemQuestionResponse).learnosityReference,
-    );
-    formData.append("score", score.value);
-    await fetch(props.student.urls.score, {
-        method: "POST",
-        body: formData,
-    });
-    window.removeEventListener("beforeunload", beforeUnloadHandler);
-    isSavedDelay.value = true;
+    try {
+        isSaving.value = true;
+        emit("updatedScore", props.question, parseFloat(score.value));
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append(
+            "learnosityReference",
+            (props.question.response as StudentItemQuestionResponse).learnosityReference
+        );
+        formData.append("score", score.value);
+        await fetch(props.student.urls.score, {
+            method: "POST",
+            body: formData,
+        });
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSavedDelay.value = true;
+    } catch (error) {
+        console.error(error);
+    }
     isSaving.value = false;
     await timeout(2000);
     isSavedDelay.value = false;
@@ -121,7 +125,7 @@ watchDebounced(
         }
         void saveScore();
     },
-    { debounce: 300 },
+    { debounce: 300 }
 );
 
 /**
@@ -149,12 +153,12 @@ window.Vue.onMounted(() => {
         // Find any oembeds and load them
         responsesEl.value
             ?.querySelectorAll(
-                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))",
+                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))"
             )
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
-                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
+                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url")
                 );
             });
     }
@@ -167,7 +171,7 @@ window.Vue.onMounted(() => {
 window.Vue.onBeforeUnmount(async () => {
     if (props.question.response) {
         const response = responsesEl.value?.querySelector(
-            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`,
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
         ) as HTMLDivElement;
         props.container.appendChild(response);
         await saveScore();
