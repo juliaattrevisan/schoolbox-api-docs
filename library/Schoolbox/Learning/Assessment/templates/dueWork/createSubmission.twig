@@ -335,6 +335,12 @@ Data:
             {% include '@learning/fragments/meta/curriculumCodes.twig' %}
         </ul>
 
+        {% if kamiSession %}
+            <section>
+                {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: kamiSession.viewerUrl, allow: '', dataAttributes: {}} only %}
+            </section>
+        {% endif %}
+
         <form id="editor-form"
               data-feedback-form="{{ student.id }}"
               method="post"
