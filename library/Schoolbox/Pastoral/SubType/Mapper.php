@@ -132,7 +132,7 @@ class Mapper extends BaseMapper
      * @param SubTypeModel $previous
      * @return void
      */
-    function updateTypeHierarchy(SubTypeModel $subType, SubTypeModel $previous): void
+    protected function updateTypeHierarchy(SubTypeModel $subType, SubTypeModel $previous): void
     {
         if ($subType->getPastoralType()->getId() !== $previous->getPastoralType()->getId()) {
             $this->getDatabase()->query(
