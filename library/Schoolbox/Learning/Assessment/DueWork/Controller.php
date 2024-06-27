@@ -1017,7 +1017,7 @@ class Controller extends Assessment\Controller
 
                 // clone the worksheet template for the student
                 // kami example format "#{school_id}_#{course_id}_#{assignment_id}_#{attachment_id}"
-                $kamiGroup = sprintf("%s_%d_%d", INSTANCE_ID, $assessment->getBaseContext()->getId(), $assessment->getId());
+                $kamiGroup = sprintf("%s_%d_%d", INSTANCE_ID, $assessment->getBaseContext()->getFolder(), $assessment->getId());
 
                 // if no historic attempts exist, then spawn kami from the assessment template
                 if ($participant?->findMostRecentResponse() === null) {
