@@ -26,7 +26,7 @@ const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element 
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<string>("");
 const isSaving = window.Vue.ref(false);
-const isSavedDelay = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedScore: [question: StudentItemQuestion, score: number];
@@ -45,7 +45,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || isSavedDelay.value) {
+    if (isSaving.value || hasSaved.value) {
         return "1fr";
     }
     return "0fr";
@@ -95,13 +95,13 @@ async function saveScore() {
             body: formData,
         });
         window.removeEventListener("beforeunload", beforeUnloadHandler);
-        isSavedDelay.value = true;
+        hasSaved.value = true;
     } catch (error) {
         console.error(error);
     }
     isSaving.value = false;
     await timeout(2000);
-    isSavedDelay.value = false;
+    hasSaved.value = false;
 }
 
 /**
@@ -253,7 +253,7 @@ function filterInput(event: Event) {
                     </template>
                     <div class="save-container l-grid">
                         <div class="save-container__inner-container">
-                            <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                            <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''}`">
                                 <em>{{ saveText }}</em>
                             </div>
                         </div>
