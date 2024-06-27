@@ -10,7 +10,7 @@
       "license": "UNLICENSED",
       "dependencies": {
         "@andxor/jquery-ui-touch-punch-fix": "~1.0.2",
-        "@caspingus/lt": "^2.12.0",
+        "@caspingus/lt": "^2.13.3",
         "@ckeditor/ckeditor5-ai": "~40.2.0",
         "@ckeditor/ckeditor5-alignment": "~40.2.0",
         "@ckeditor/ckeditor5-basic-styles": "~40.2.0",
@@ -2806,9 +2806,9 @@
       "devOptional": true
     },
     "node_modules/@caspingus/lt": {
-      "version": "2.12.0",
-      "resolved": "https://registry.npmjs.org/@caspingus/lt/-/lt-2.12.0.tgz",
-      "integrity": "sha512-7i5vbv0UWPN2uF9ic1i5BQo5i1QViJNoULzJ4Cqkg1XzJMwfRY58PT6JXghV7RTrldjZ2mCXVLm7RChP783MUQ==",
+      "version": "2.13.3",
+      "resolved": "https://registry.npmjs.org/@caspingus/lt/-/lt-2.13.3.tgz",
+      "integrity": "sha512-3zPs2iw/p1pHhEslvwuG/lpPudR2vMqvFKvIpp78HgiaGmy/gpVgT6zthcuJxYULrPeAAtUMjz+IY4GwSaWMKQ==",
       "dependencies": {
         "@uppy/compressor": "^1.1.4",
         "@uppy/core": "^3.11.3",
@@ -32430,9 +32430,9 @@
       "devOptional": true
     },
     "@caspingus/lt": {
-      "version": "2.12.0",
-      "resolved": "https://registry.npmjs.org/@caspingus/lt/-/lt-2.12.0.tgz",
-      "integrity": "sha512-7i5vbv0UWPN2uF9ic1i5BQo5i1QViJNoULzJ4Cqkg1XzJMwfRY58PT6JXghV7RTrldjZ2mCXVLm7RChP783MUQ==",
+      "version": "2.13.3",
+      "resolved": "https://registry.npmjs.org/@caspingus/lt/-/lt-2.13.3.tgz",
+      "integrity": "sha512-3zPs2iw/p1pHhEslvwuG/lpPudR2vMqvFKvIpp78HgiaGmy/gpVgT6zthcuJxYULrPeAAtUMjz+IY4GwSaWMKQ==",
       "requires": {
         "@uppy/compressor": "^1.1.4",
         "@uppy/core": "^3.11.3",
