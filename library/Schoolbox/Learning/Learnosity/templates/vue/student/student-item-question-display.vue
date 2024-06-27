@@ -119,16 +119,28 @@ async function saveScore() {
 }
 
 /**
- * add some quick validation to prevent the score input going below 0 and above the max score and save the score
+ * add some validation to minimise the chance of invalid score input
  */
 watchDebounced(
     score,
     (newScore) => {
+        // Allow only digits and a single decimal point
+        score.value = newScore.replace(/[^0-9.]/g, "");
+        // Ensure only one decimal point is present
+        const parts = newScore.split(".");
+        if (parts.length > 2) {
+            score.value = `${parts[0]}.${parts.slice(1).join("")}`;
+        }
+        // Prevent starting with a decimal point
+        if (newScore.startsWith(".")) {
+            score.value = `0${newScore}`;
+        }
+        // Prevent the score going below 0
         if (parseFloat(newScore) < 0) {
             score.value = "0";
             return;
         }
-        // keep it within the max score
+        // Keep it within the max score
         if (
             props.question.response &&
             props.question.response?.maxScore &&
@@ -191,31 +203,6 @@ window.Vue.onBeforeUnmount(async () => {
         await saveScore();
     }
 });
-
-/**
- * Filters the input to allow only digits and a single decimal point.
- * Updates the score value accordingly.
- * @param {Event} event - The input event.
- */
-function filterInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    // Allow only digits and a single decimal point
-    let filteredValue = target.value.replace(/[^0-9.]/g, "");
-
-    // Ensure only one decimal point is present
-    const parts = filteredValue.split(".");
-    if (parts.length > 2) {
-        filteredValue = `${parts[0]}.${parts.slice(1).join("")}`;
-    }
-
-    // Prevent starting with a decimal point
-    if (filteredValue.startsWith(".")) {
-        filteredValue = `0${filteredValue}`;
-    }
-
-    target.value = filteredValue;
-    score.value = filteredValue;
-}
 </script>
 
 <template>
@@ -262,7 +249,6 @@ function filterInput(event: Event) {
                             v-model="score"
                             type="text"
                             inputmode="numeric"
-                            @input="filterInput"
                         />
                     </template>
                     <div class="save-container l-grid">
