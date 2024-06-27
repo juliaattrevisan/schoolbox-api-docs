@@ -31,6 +31,7 @@ Data:
         let $form              = $('#editor-form'),
             $formSaveLabel     = $form.find('[data-save-draft]'),
             acceptsOnline      = {{ acceptsOnline ? 'true' : 'false' }},
+            hasKamiFile        = {{ kamiFileId ? 'true' : 'false' }},
             hasPolicy          = {{ (policy | length) > 0 ? 'true' : 'false' }},
             requiresReflection = {{ requiresReflection ? 'true' : 'false' }},
             submitOnBehalfOf   = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
@@ -139,10 +140,14 @@ Data:
          * * There's content in the inline editor
          * * There's at least one file uploaded
          * * The "Submitted in person" checkbox is checked
+         * * There's a Kami document (which we assume the user has edited)
          *
          * @return Boolean
          */
         let allowSubmit = function() {
+            if (hasKamiFile) {
+                return true;
+            }
             if (!acceptsOnline) {
                 return true;
             }
@@ -363,6 +368,7 @@ Data:
              #}
             <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
             <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
+            <input type="hidden" name="kamiFileId" value="{{ kamiFileId }}"/>
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 

@@ -1025,6 +1025,7 @@ class Controller extends Assessment\Controller
                     // join kami to the response
                     /** @var SubmissionFile $submissionFile */
                     $submissionFile = $this->submissionFileMapper->createModel()
+                        ->setFilename($worksheetName)
                         ->setKami($kamiModel)
                         ->setStorage($assessment->getWorksheetTemplate())
                         ->setSubmission($response);
@@ -1067,6 +1068,7 @@ class Controller extends Assessment\Controller
                 // join kami to the response
                 /** @var SubmissionFile $submissionFile */
                 $submissionFile = $this->submissionFileMapper->createModel()
+                    ->setFilename($worksheetName)
                     ->setKami($kamiModel)
                     ->setStorage($assessment->getWorksheetTemplate())
                     ->setSubmission($response);
@@ -1132,6 +1134,7 @@ class Controller extends Assessment\Controller
             'acceptsOnline'  => $acceptsOnlineSubmissions,
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
+            'kamiFileId'     => $kamiFile,
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
@@ -1273,9 +1276,10 @@ class Controller extends Assessment\Controller
         if ($isFinal) {
             $acceptsOnline = $assessment->getAcceptOnline();
             $notSubmittedInPerson = !$requestPost->getBool('submitted_in_person');
+            $notHasKamiFile = !$requestPost->get('kamiFileId', false);
 
             // should there be files attached? fail if we didn't get any
-            if ($acceptsOnline && $notSubmittedInPerson && $response->getAllFiles()->count() === 0) {
+            if ($acceptsOnline && $notSubmittedInPerson && $response->getAllFiles()->count() === 0 && $notHasKamiFile) {
                 $errorMessage = 'One or more files failed to attach to your submission; please try again.';
                 $redirect     = $this->routeGenerator->generate(
                     'learningAssessment.getCreateResponseForm',
