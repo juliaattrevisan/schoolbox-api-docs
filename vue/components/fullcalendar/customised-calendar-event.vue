@@ -3,7 +3,6 @@
  * To customise the display of the event, ensuring the background/text colour is readable
  *
  */
-
 import tinycolor from "tinycolor2";
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
@@ -36,11 +35,11 @@ export default {
         },
 
         /**
-         * Ensure the new lines are respected
+         * Split the title text by new lines so we can add <br> tags in-between
+         * @returns {string[]}
          */
         lineBreakedTitleText() {
-            const eventTitle = this.content.event.title;
-            return eventTitle.replace("\n", "<br>");
+            return this.content.event.title.split("\n");
         },
 
         /**
@@ -104,7 +103,7 @@ export default {
                     .mostReadable(this.eventBackgroundColor, ["black", "white"])
                     .toRgbString();
                 // no need to set color, if white
-                if (readableTextColor === tinycolor("white").toRgbString()){
+                if (readableTextColor === tinycolor("white").toRgbString()) {
                     return;
                 }
 
@@ -133,15 +132,16 @@ export default {
 </script>
 
 <template>
-    <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
+    <div ref="eventContainer" class="event-container" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
-        <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete" />
-        <span
-            ref="titleText"
-            class="fc-event-title"
-            v-html="lineBreakedTitleText"
-            :class="{ strike: isTaskComplete }"
-        ></span>
+        <input v-if="isTask" v-model="isTaskComplete" type="checkbox" class="checkbox plain" name="completed" />
+
+        <span ref="titleText" class="fc-event-title" :class="{ strike: isTaskComplete }">
+            <template v-for="(line, lineIndex) in lineBreakedTitleText" :key="lineIndex">
+                {{ line }}
+                <br v-if="lineIndex < lineBreakedTitleText.length - 1" />
+            </template>
+        </span>
     </div>
 </template>
 
