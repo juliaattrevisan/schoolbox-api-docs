@@ -27,6 +27,7 @@ const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<string>("");
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedScore: [question: StudentItemQuestion, score: number];
@@ -37,7 +38,13 @@ const emit = defineEmits<{
  * @returns {string} - the text to display
  */
 const saveText = window.Vue.computed(() => {
-    return isSaving.value ? "Saving..." : "Score saved";
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    if (hasError.value) {
+        return "Sorry, the score could not be saved. Please refresh the page and try again. If the problem persists, contact your support.";
+    }
+    return "Comment saved";
 });
 
 /**
@@ -45,7 +52,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || hasSaved.value) {
+    if (isSaving.value || hasSaved.value || hasError.value) {
         return "1fr";
     }
     return "0fr";
@@ -97,7 +104,7 @@ async function saveScore() {
         window.removeEventListener("beforeunload", beforeUnloadHandler);
         hasSaved.value = true;
     } catch (error) {
-        console.error(error);
+        hasError.value = true;
     }
     isSaving.value = false;
     await timeout(2000);
@@ -253,7 +260,11 @@ function filterInput(event: Event) {
                     </template>
                     <div class="save-container l-grid">
                         <div class="save-container__inner-container">
-                            <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''}`">
+                            <div
+                                :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${
+                                    hasError ? 'alert' : ''
+                                }`"
+                            >
                                 <em>{{ saveText }}</em>
                             </div>
                         </div>
