@@ -191,47 +191,46 @@
                 {% endif %}
 
                 {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+            {% endif %}
 
-                {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
-                 # Legacy Quiz attempts are not going to be in learnosity
-                 #
-                 # So if we have a learnosity_reference, make a link to learnosity feedback screen
-                 # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
-                 # We might make a "museum" for these old attempts one day
-                 #}
-                {% if latestResponse %}
-                    {% if latestResponse.learnosityReference %}
-                        {% if latestResponse.submitted %}
-                            {% if not latestFeedback %}
-                                <div class="grade review">
-                                    <span>Awaiting Review</span>
-                                </div>
-                            {% elseif latestFeedback.normalisedMark|length %}
-                                <div class="grade {{ urgencyClass }}-bg">
-                                    <span>{{ latestFeedback.humanReadableMark }}</span>
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            <div class="grade in-progress">
-                                <span>In Progress</span>
+            {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
+             # Legacy Quiz attempts are not going to be in learnosity
+             #
+             # So if we have a learnosity_reference, make a link to learnosity feedback screen
+             # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
+             # We might make a "museum" for these old attempts one day
+             #}
+            {% if latestResponse %}
+                {% if latestResponse.learnosityReference %}
+                    {% if latestResponse.submitted %}
+                        {% if not latestFeedback %}
+                            <div class="grade review">
+                                <span>Awaiting Review</span>
+                            </div>
+                        {% elseif latestFeedback.normalisedMark|length %}
+                            <div class="grade {{ urgencyClass }}-bg">
+                                <span>{{ latestFeedback.humanReadableMark }}</span>
                             </div>
                         {% endif %}
                     {% else %}
-                        {# Legacy quiz attempts are rendered here
-                         # mostly synonymously with learnosity
-                         # except for the things you can't action here (ie. to be reviewed)
-                         # hence the mark will be hidden from the screen
-                         #}
-                        {% if latestResponse.submitted %}
-                            {% if latestFeedback and latestFeedback.normalisedMark|length %}
-                                <div class="grade {{ urgencyClass }}-bg">
-                                    <span>{{ latestFeedback.humanReadableMark }}</span>
-                                </div>
-                            {% endif %}
-                        {% endif %}
+                        <div class="grade in-progress">
+                            <span>In Progress</span>
+                        </div>
                     {% endif %}
                 {% else %}
-                    &ndash;
+
+                    {# Legacy quiz attempts are rendered here
+                     # mostly synonymously with learnosity
+                     # except for the things you can't action here (ie. to be reviewed)
+                     # hence the mark will be hidden from the screen
+                     #}
+                    {% if latestResponse.submitted %}
+                        {% if latestFeedback and latestFeedback.humanReadableMark|length %}
+                            <div class="grade {{ urgencyClass }}-bg">
+                                <span>{{ latestFeedback.humanReadableMark }}</span>
+                            </div>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </div>
