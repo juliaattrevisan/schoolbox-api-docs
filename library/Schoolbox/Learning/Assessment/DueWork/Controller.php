@@ -1021,20 +1021,19 @@ class Controller extends Assessment\Controller
 
                 // if no historic attempts exist, then spawn kami from the assessment template
                 if ($participant?->findMostRecentResponse() === null) {
-                    $kamiFile = $assessment->getKamiWorksheetTemplate()->getKamiDocumentId();
+                    $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
+                    $kamiFile = $kamiDoc->getId();
                 } else {
                     // fetch latest attempt and use that kami file.
                     $kamiFile = $participant?->findMostRecentResponse()->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
                         return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
                     })->first()?->getKami()?->getKamiDocumentId();
                 }
-                $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $kamiFile, $kamiGroup);
-                $kamiFile = $kamiDoc->getId();
 
                 // create kami object
                 $kamiModel = $this->kamiMapper->createModel()
                     ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
-                    ->setKamiDocumentId($kamiDoc->getId())
+                    ->setKamiDocumentId($kamiFile)
                     ->setStatusDone();
 
                 $this->kamiMapper->save($kamiModel);
