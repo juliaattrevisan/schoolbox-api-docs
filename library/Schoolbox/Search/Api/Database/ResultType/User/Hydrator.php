@@ -222,13 +222,17 @@ class Hydrator extends BaseHydrator
             $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Pastoral Care', 'icon-pastoral');
         }
 
-        $route  = 'timetable.getTimetableCalendarRedirect';
-        $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
+        // The timetable link from a search result should work in the same way as the timetable link from the user profile.
+        // Function generateLinkIfRouteAuthorized() is not used here because timetable.php is a SitePage page (not Aura).
         if (
             ($searchResultUser->getRole()->isStudent() || $searchResultUser->getRole()->isStaff())
             && !$searchResultUser->getHideTimetable()
         ) {
-            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Timetable', 'icon-timetable');
+            $links[] = [
+                'title' => 'Timetable',
+                'icon'  => 'icon-timetable',
+                'url'   => 'timetable/' . $searchResultUser->getId(),
+            ];
         }
 
         return array_values(array_filter($links));
