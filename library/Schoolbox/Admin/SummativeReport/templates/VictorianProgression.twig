@@ -100,7 +100,8 @@
         {% endif %}
         float: left;
         font-size: 10px;
-        margin-top: -4px;
+        margin-left: 8px;
+        margin-top: -40px;
     }
 
     /* Smear a yellow stripe
@@ -228,29 +229,27 @@
              # Otherwise show it as white
              #}
             {% if offset == (nodeData.previous.mark ?? null) %}
-                {% if (null == nodeData.current.mark ?? null) %}
-                    {% set dotColor = 'black' %}
-                {% else  %}
-                    {% set dotColor = 'white' %}
-                {% endif %}
-
-                <div class="{{ dotColor }} dot" title="{{ nodeData.previous.mark }} {{ nodeData.previous.feedback_id ?? null }}"></div>
+                <div class="white dot" title="{{ nodeData.previous.mark }} ({{ nodeData.previous.feedback_id ?? null }})"></div>
 
                 {% if annotate ?? false %}
-                <span class="annotation">{{ nodeData.previous.mark }}</span>
+                <span class="annotation">{{ nodeData.previous.mark }} ({{ nodeData.previous.feedback_id ?? null }})</span>
                 {% endif %}
 
-                {# Start drawing a line to the next dot #}
-                {% set lineStarted = true %}
-                {% set hasDot = true %}
+                {# Start drawing a line to the next dot; but be careful!
+                 # Don't try to draw a line to a Submission State whose prefix starts with DNP
+                 #}
+                {% if (nodeData.current.mark ?? null) and not (nodeData.current.mark matches '/^DNP/') %}
+                    {% set lineStarted = true %}
+                    {% set hasDot = true %}
+                {% endif %}
             {% endif %}
 
             {# Progression Point from current academic period #}
             {% if offset == (nodeData.current.mark ?? null) %}
-                <div class="black dot" title="{{ nodeData.current.mark }} {{ nodeData.current.feedback_id ?? null }}"></div>
+                <div class="black dot" title="{{ nodeData.current.mark }} ({{ nodeData.current.feedback_id ?? null }})"></div>
 
                 {% if annotate ?? false %}
-                <span class="annotation">{{ nodeData.current.mark }}</span>
+                <span class="annotation">{{ nodeData.current.mark }} ({{ nodeData.current.feedback_id ?? null }})</span>
                 {% endif %}
 
                 {# Stop drawing line #}

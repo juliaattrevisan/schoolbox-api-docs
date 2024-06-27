@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Learning\Assessment\WorkType\Mapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\User;
 
 /**
@@ -57,37 +58,31 @@ class Payload
             cn1.name AS curriculum_node,
             a.id AS assessment_id,
             a.title,
+            a.id AS assessment_id,
             a.due_date,
-            vaf.feedback_table,
-            vaf.feedback_id,
-            vaf.student_id,
-            vaf.published_at,
-            COALESCE(sr.mark, aa.mark) AS mark
+            vmrf.feedback_table,
+            vmrf.feedback_id,
+            vmrf.student_id,
+            vmrf.published_at,
+            sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
-        LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
-        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
-        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
-        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
-        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
+        LEFT JOIN v_most_recent_feedback vmrf ON a.id = vmrf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN submission_return sr ON vmrf.feedback_id = sr.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
-        AND vaf.student_id = :studentId                         -- filter to actual student
-        AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
+        AND vmrf.student_id = :studentId                        -- filter to actual student
+        AND vmrf.published_at IS NOT NULL                       -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
-        AND (
-            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
-            OR quiz.grade_group_id IS NOT NULL
-        )
+        AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
-        AND quiz.deleted_at IS NULL
-        AND aa.deleted_at IS NULL
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vmrf.published_at DESC, vmrf.feedback_id DESC
     ";
 
 
@@ -103,41 +98,35 @@ class Payload
             cn1.name AS curriculum_node,
             a.id AS assessment_id,
             a.title,
+            a.id AS assessment_id,
             a.due_date,
-            vaf.feedback_table,
-            vaf.feedback_id,
-            vaf.student_id,
-            vaf.published_at,
-            COALESCE(sr.mark, aa.mark) AS mark
+            vmrf.feedback_table,
+            vmrf.feedback_id,
+            vmrf.student_id,
+            vmrf.published_at,
+            sr.mark
         FROM curriculum_node_for_assessment cnoa
         INNER JOIN curriculum_node cn1 ON cnoa.curriculum_node_id = cn1.id
         LEFT JOIN curriculum_node cn2 ON cn1.curriculum_node_parent_id = cn2.id
         LEFT JOIN assessment a ON cnoa.assessment_id = a.id
-        LEFT JOIN v_assessment_feedback vaf ON a.id = vaf.assessment_id
-        LEFT JOIN submission_box sb ON sb.assessment_id = a.id AND feedback_table = 'submission_return'
-        LEFT JOIN submission_return sr ON vaf.feedback_id = sr.id AND feedback_table = 'submission_return'
-        LEFT JOIN assess quiz ON quiz.assessment_id = a.id AND feedback_table = 'assess_attempt'
-        LEFT JOIN assess_attempt aa ON vaf.feedback_id = aa.attempt_id AND feedback_table = 'assess_attempt'
+        LEFT JOIN v_most_recent_feedback vmrf ON a.id = vmrf.assessment_id
+        LEFT JOIN submission_box sb ON sb.assessment_id = a.id
+        LEFT JOIN submission_return sr ON vmrf.feedback_id = sr.id
         LEFT JOIN mv_assessment_relation mvar ON mvar.assessment_id = a.id
         LEFT JOIN folder f ON mvar.folder_id = f.id
         WHERE a.due_date IS NOT NULL
         AND a.work_type_id = :workTypeId                        -- use the actual one corresponding to Vic thing
-        AND vaf.student_id = :studentId                         -- filter to actual student
-        AND vaf.published_at IS NOT NULL                        -- only accept published feedbackery
+        AND vmrf.student_id = :studentId                        -- filter to actual student
+        AND vmrf.published_at IS NOT NULL                       -- only accept published feedbackery
         AND a.due_date BETWEEN :startDate AND :endDate          -- specify dates of academic period(s) in use
-        AND (
-            sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
-            OR quiz.grade_group_id IS NOT NULL
-        )
+        AND sb.submission_grade_group_id IS NOT NULL            -- Letter Grade is required
         AND f.id = :folderId
         AND cn1.deleted_at IS NULL
         AND cn2.deleted_at IS NULL
         AND a.deleted_at IS NULL
         AND sr.deleted_at IS NULL
-        AND quiz.deleted_at IS NULL
-        AND aa.deleted_at IS NULL
         AND f.deleted_at IS NULL
-        ORDER BY cn2.name, cn1.order, a.due_date, vaf.published_at DESC, vaf.feedback_id DESC
+        ORDER BY cn2.name, cn1.order, a.due_date, vmrf.published_at DESC, vmrf.feedback_id DESC
     ";
 
 
@@ -168,27 +157,41 @@ class Payload
 
 
     /**
+     * A set of submission state codes that have a specific meaning that isn't currently
+     * in a schoolbox instance, due to the varchar(4) limit on submission state codes
+     * and 16 chars on submission state display names. Penola needed three places to store
+     * data, but we only give them two for now.
+     *
+     * The human readable variants of DNPP DNPL etc. are in Rating.php as a consequence.
+     *
+     * @var array
+     */
+    private array $submissionStateCodes = [];
+
+
+    /**
      * Constructor.
      *
      * @param Mapper $workTypeMapper
      * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @param StateMapper $stateMapper
      * @param int $workTypeId
      * @param bool $annotate
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\WorkType\Mapper $workTypeMapper,
         private \Schoolbox\Assessment\Term\Mapper $termMapper,
+        private \Schoolbox\Learning\DueWork\StateMapper $stateMapper,
         private int $workTypeId,
         private bool $annotate = false
     ) {
-        $this->rating = new Rating();
     }
 
 
     /**
      * Set up the necessary parts
      */
-    private function setup(?int $folderId): void
+    private function setup(): void
     {
         /* We've already been here, there's nothing to do
          */
@@ -202,6 +205,23 @@ class Payload
          */
         $this->payloadStatement = $this->workTypeMapper->getDatabase()->prepare(self::QUERY);
         $this->payloadFolderStatement = $this->workTypeMapper->getDatabase()->prepare(self::CLASS_QUERY);
+
+        /* Find submission states and store them here, for reference
+         * THIS LOOKS WEIRD, but there's two naming schemes going on.
+         * Penola have historical data with the old scheme (stored in `code`) used for 2023 data,
+         * and they've stored the new scheme in `display_as`, which were used for 2024 data.
+         * They both co-exist concurrently and have the same meaning.
+         */
+        $states = $this->stateMapper->findAll();
+
+        $this->submissionStateCodes = array_merge(
+            $states->indexBy('code')->keys(),
+            $states->indexBy('displayAs')->keys()
+        );
+
+        /* We'll be interpreting Submission State marks as Ratings in the chart
+         */
+        $this->rating = new Rating($this->submissionStateCodes);
 
         /* Remember we did this
          */
@@ -326,7 +346,7 @@ class Payload
         /* Setup step is mandatory; execute as singleton
          */
         if (!$this->setup) {
-            $this->setup($folderId);
+            $this->setup();
         }
 
         /* Only accept valid types
@@ -359,6 +379,8 @@ class Payload
             $this->payloadStatement->execute($params);
         }
 
+        /* Only find the most recent feedback per assessment, discarding ancient history
+         */
         while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
             $parentNodeId = $row['parent_node_id'];
             $nodeId = $row['curriculum_node_id'];
@@ -420,18 +442,25 @@ class Payload
                      */
                     $struct[$nodeId][$type] = $outcome;
                 } else {
-                    /* Remember the biggest mark this person received for this given $nodeId
-                     * Update existing record
+                    /* Deal with submission state (it takes precedence; never heard of someone getting a submission
+                     * state then having it overturned by actually doing the work they were supposed to do?)
                      */
-                    if ((float)$struct[$nodeId][$type]['mark'] < (float)$row['mark']) {
+                    if (\in_array($row['mark'], $this->submissionStateCodes, true)) {
                         $struct[$nodeId][$type] = $outcome;
+                    } else {
+                        /* Remember the biggest mark this person received for this given $nodeId
+                         * Update existing record
+                         */
+                        if ((float)$struct[$nodeId][$type]['mark'] < (float)$row['mark']) {
+                            $struct[$nodeId][$type] = $outcome;
+                        }
                     }
                 }
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$nodeId][$type]['mark'], $this->annotate);
+                    $struct[$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (string)$struct[$nodeId][$type]['mark'], $this->annotate);
                 }
             } else {
                 if (null === $struct[$parentNodeId]['subnodes'][$nodeId][$type]) {
@@ -441,16 +470,23 @@ class Payload
                 } else {
                     /* Remember the biggest mark this person received for this given ($parentNodeId, $nodeId)
                      * Update existing record
-                    */
-                    if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
+                     *
+                     * Deal with submission state (it takes precedence; never heard of someone getting a submission
+                     * state then having it overturned by actually doing the work they were supposed to do?)
+                     */
+                    if (\in_array($row['mark'], $this->submissionStateCodes, true)) {
                         $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                    } else {
+                        if ((float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'] < (float)$row['mark']) {
+                            $struct[$parentNodeId]['subnodes'][$nodeId][$type] = $outcome;
+                        }
                     }
                 }
 
                 /* Update rating for this curriculum node, using the "current" node
                  */
                 if (self::TYPE_CURRENT === $type) {
-                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (float)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
+                    $struct[$parentNodeId]['subnodes'][$nodeId]['rating'] = $this->rating->rate($studentYearLevel, $currentSemester, (string)$struct[$parentNodeId]['subnodes'][$nodeId][$type]['mark'], $this->annotate);
                 }
             }
         }

@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -161,6 +162,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(WorkTypeMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(StateMapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(Access::class),

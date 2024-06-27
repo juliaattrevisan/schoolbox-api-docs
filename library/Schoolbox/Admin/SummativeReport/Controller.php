@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
@@ -122,6 +123,7 @@ class Controller extends ConfigController
      * @param CampusMapper $campusMapper
      * @param WorkTypeMapper $workTypeMapper
      * @param FolderMapper $folderMapper
+     * @param StateMapper $stateMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param RubricDataSource $rubricDataSource
      * @param Access $access
@@ -142,6 +144,7 @@ class Controller extends ConfigController
         private CampusMapper $campusMapper,
         private WorkTypeMapper $workTypeMapper,
         private FolderMapper $folderMapper,
+        private \Schoolbox\Learning\DueWork\StateMapper $stateMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private RubricDataSource $rubricDataSource,
         private Access $access,
@@ -1000,6 +1003,7 @@ class Controller extends ConfigController
                 $vicProgression['summary'] = (new VictorianProgression\Payload(
                     $this->workTypeMapper,
                     $this->termMapper,
+                    $this->stateMapper,
                     (int)$optionsPayload['summary']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 ))->generate($student, $academicPeriod, null);
@@ -1008,17 +1012,20 @@ class Controller extends ConfigController
             /* The Class Version
              */
             if ($optionsPayload['class']['vicProgression']['enable']) {
+                $generator = new VictorianProgression\Payload(
+                    $this->workTypeMapper,
+                    $this->termMapper,
+                    $this->stateMapper,
+                    (int)$optionsPayload['class']['vicProgression']['workType'],
+                    $vicProgression['annotate']
+                );
+
                 /* Render a chart for each class in $folders, I suppose
                  */
                 foreach ($folders as $folder) {
                     $folderId = (int)$folder->getId();
 
-                    $vicProgression['class'][$folderId] = (new VictorianProgression\Payload(
-                        $this->workTypeMapper,
-                        $this->termMapper,
-                        (int)$optionsPayload['class']['vicProgression']['workType'],
-                        $vicProgression['annotate']
-                    ))->generate($student, $academicPeriod, $folderId);
+                    $vicProgression['class'][$folderId] = $generator->generate($student, $academicPeriod, $folderId);
                 }
             }
         }

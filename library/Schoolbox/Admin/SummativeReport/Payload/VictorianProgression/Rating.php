@@ -19,9 +19,30 @@ class Rating
 
 
     /**
-     * Constructor
+     * There isn't enough room in schoolbox to store this properly, for now.
+     * I have to hardcode a mapping between an outdated naming convention
+     * and their human-readable meaning
      */
-    public function __construct()
+    public const SUBMISSION_STATE_MAP = [
+        'DNPE' => 'Exemption from a Curriculum Area',
+        'DNP-EX' => 'Exemption from a Curriculum Area',
+        'DNPI' => 'Serious illness',
+        'DNP-SI' => 'Serious illness',
+        'DNPL' => 'Low participation',
+        'DNP-LP' => 'Low participation',
+        'DNPP' => 'Late enrolment',
+        'DNP-LE' => 'Late enrolment',
+        'DNPU' => 'Absent without reasonable excuse',
+        'DNP-UN' => 'Absent without reasonable excuse',
+    ];
+
+
+    /**
+     * Constructor
+     *
+     * @param array $submissionStateCodes
+     */
+    public function __construct(private array $submissionStateCodes)
     {
     }
 
@@ -35,19 +56,38 @@ class Rating
      *
      * @param int $studentYearLevel
      * @param int $currentSemester
-     * @param float $mark
+     * @param string $mark
      * @param bool $annotate
      * @return string
      */
     public function rate(
         int $studentYearLevel,
         int $currentSemester,
-        float $mark,
+        string $mark,
         bool $annotate = false
     ): string {
         $result = '';
 
-        /* In first semester, "At Standard" is the student's year level -0.5
+        /* Deal with submission states first
+         */
+        if (in_array($mark, $this->submissionStateCodes, true)) {
+            $result = self::SUBMISSION_STATE_MAP[$mark] ?? '';
+
+            /* Add a metric annotation
+             */
+            if ($annotate) {
+                $result .= sprintf(
+                    ' (ref: %s)',
+                    $mark
+                );
+            }
+
+            return $result;
+        }
+
+        /* Otherwise, student received a numeric outcome.
+         *
+         * In first semester, "At Standard" is the student's year level -0.5
          * so in level 10, "At Standard" is measured from 9.5
          *
          * In second semester, "At Standard" is the student's year level
@@ -63,7 +103,7 @@ class Rating
 
         /* Calculate proximity from your current expected standard
          */
-        $diff = $mark - (float)$reference;
+        $diff = (float)$mark - (float)$reference;
 
         if ($diff < -1) {
             $result = 'Well Below Standard';
