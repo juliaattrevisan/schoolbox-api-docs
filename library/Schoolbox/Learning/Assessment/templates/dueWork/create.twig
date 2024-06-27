@@ -54,7 +54,7 @@
              #}
             <input type="hidden" name="courseManaged" value="{% if not courseManaged.isMutable %}{{ assessment.courseManaged }}{% else %}0{% endif %}" />
 
-            <label for="courseManaged" class="checkbox-label inline-block">Common Assessment <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span></label>
+            <label for="courseManaged" class="checkbox-label inline-block">Common Assessment <span class="hint has-tip tip-top"  title="To ensure consistency, you can't edit these fields when you import {{ locale.dueWork.proper }} to a class: Title, Work Type, Submission Types, Weight, Mark Type, and Rubric." data-tooltip="">?</span></label>
 
             <div class="switch">
                 <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
@@ -134,20 +134,20 @@
                 <li>
                     <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
                     <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with a worksheet that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses.">?</span>
+                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per due work that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
                     <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
                 </li>
                 {% endif %}
                 <li>
                     <input id="allow-offline" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="submissionOptions[]" value="enableOffline" data-type-group>
-                    <label for="allow-offline" class="checkbox-label">Allow Offline</label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work offline to acknowledge that it has been completed.">?</span>
+                    <label for="allow-offline" class="checkbox-label">Submit in person</label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work in person to acknowledge that it has been completed.">?</span>
                 </li>
                 <li>
                     <input id="text-editor" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="submissionOptions[]" value="enableText" data-type-group>
                     <label for="text-editor" class="checkbox-label">Text Editor</label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type directly into the editor, and add or edit their due work content.">?</span>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type or paste text directly into the text editor for their submission. An HTML file gets created, which you can download and also check for similarity across submissions.">?</span>
                 </li>
                 <li>
                     <input id="files" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="submissionOptions[]" value="enableFiles" data-type-group>
