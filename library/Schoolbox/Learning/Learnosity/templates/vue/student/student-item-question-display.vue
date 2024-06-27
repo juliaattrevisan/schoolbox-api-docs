@@ -44,7 +44,7 @@ const saveText = window.Vue.computed(() => {
     if (hasError.value) {
         return "Sorry, the score could not be saved. Please refresh the page and try again. If the problem persists, contact your support.";
     }
-    return "Comment saved";
+    return "Score saved";
 });
 
 /**
