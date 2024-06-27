@@ -207,7 +207,13 @@ function filterInput(event: Event) {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <div v-html="sanitizeHtml(props.question.metadata.sample_answer)"></div>
+                    <div
+                        v-html="
+                            sanitizeHtml(props.question.metadata.sample_answer, {
+                                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+                            })
+                        "
+                    ></div>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--
