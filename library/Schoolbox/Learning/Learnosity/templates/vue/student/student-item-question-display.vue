@@ -89,7 +89,6 @@ async function saveScore() {
     }
     try {
         isSaving.value = true;
-        emit("updatedScore", props.question, parseFloat(score.value));
         window.addEventListener("beforeunload", beforeUnloadHandler);
         const formData = new FormData();
         formData.append(
@@ -97,18 +96,26 @@ async function saveScore() {
             (props.question.response as StudentItemQuestionResponse).learnosityReference
         );
         formData.append("score", score.value);
-        await fetch(props.student.urls.score, {
+        const response = await fetch(props.student.urls.score, {
             method: "POST",
             body: formData,
         });
+        if (response.ok) {
+            emit("updatedScore", props.question, parseFloat(score.value));
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
         window.removeEventListener("beforeunload", beforeUnloadHandler);
-        hasSaved.value = true;
+        isSaving.value = false;
     } catch (error) {
+        isSaving.value = false;
         hasError.value = true;
     }
-    isSaving.value = false;
     await timeout(2000);
-    hasSaved.value = false;
+    if (hasSaved.value) {
+        hasSaved.value = false;
+    }
 }
 
 /**
