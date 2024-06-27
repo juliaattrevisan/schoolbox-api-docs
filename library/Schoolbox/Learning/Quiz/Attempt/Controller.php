@@ -163,26 +163,6 @@ class Controller extends Base
 
 
     /**
-     * @param QuizDomainObject $assessment
-     * @param User $student
-     * @param Model $attempt
-     * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function postRescore(
-        QuizDomainObject $assessment,
-        \Schoolbox\User $student,
-        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void {
-        $attempt->setMark('cat');
-
-        $this->attemptMapper->save($attempt);
-    }
-
-
-    /**
      * TODO Literally copypasta'd
      *
      * Converts an assessment_id to a Quiz

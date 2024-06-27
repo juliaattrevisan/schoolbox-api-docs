@@ -41,7 +41,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -210,7 +209,11 @@ class Module extends BaseModule
             $preloadAttempt,
         );
 
-        /* Rescore a particular quiz's attempts
+        /* Update a particular attempt due to rescoring being finished asynchronously via polld
+         */
+        $this->register('POST', '/{assessmentId}/rescore/{studentId}/{learnositySessionReference}', 'postRescoreAttemptsCallback', $instructorPerms, $preloadAttemptForReview);
+
+        /* Request learnosity to rescore a particular quiz's attempts via polld
          */
         $this->register('POST', '/{assessmentId}/rescore', 'postRescoreAttempts', $instructorPerms, $preloadAssessment);
 

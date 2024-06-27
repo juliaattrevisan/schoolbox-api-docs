@@ -84,7 +84,7 @@ class AttemptEvaluator
         /* Update schoolbox when we're done
          */
         $callbackUrl = $this->routeGenerator->generate(
-            'learningQuizAttempt.postRescore',
+            'learnosity.postRescoreAttemptsCallback',
             [
                 'assessmentId'               => $assessment->getId(),
                 'studentId'                  => $existingAttempt->getUser()->getId(),

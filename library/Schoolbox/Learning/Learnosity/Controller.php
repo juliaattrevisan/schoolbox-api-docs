@@ -2253,7 +2253,12 @@ class Controller extends Base
      * @throws ApiException
      * @throws Exception
      * @throws InvalidColumnException
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \Interop\Queue\Exception
+     * @throws \InvalidArgumentException
      * @throws \JsonException
      */
     public function postRescoreAttempts(QuizDomainObject $assessment): void
@@ -2279,6 +2284,8 @@ class Controller extends Base
                 $assessment,
                 $attempt,
             );
+
+            (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll 1', $attempt->getLearnosityReference());
         }
 
         $this->getSession()->getSegment(static::class)->set('hasRescore', false);
@@ -2292,6 +2299,9 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postRescoreAttemptsCallback(
         QuizDomainObject $assessment,
@@ -2300,10 +2310,12 @@ class Controller extends Base
     ): void {
         /* Ask learnosity about $attempt's new score and ram that back in
          */
+        $attempt->setMark('cat');
+        $this->attemptMapper->save($attempt);
 
         /* TODO but...what does taskd do about this?
          *  How do I get the updated attempt score back here
          */
-        (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll', $attempt->getLearnosityReference());
+        (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll 2', $attempt->getLearnosityReference());
     }
 }

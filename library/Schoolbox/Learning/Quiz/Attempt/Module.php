@@ -67,14 +67,6 @@ class Module extends BaseModule
          * "complete" is not a valid learnosity reference lol
          */
         $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/update', 'postModify', $instructorPerms, $preloadParticipant);
-
-        /* Update a particular attempt due to rescoring being finished asynchronously via polld
-         */
-        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/rescoreCallback', 'postRescoreCallback', $instructorPerms, $preloadAttempt);
-
-        /* Initiate rescore polling via polld
-         */
-        $this->register('POST', '/quiz/{assessmentId}/attempt/{studentId}/{learnositySessionReference}/rescore', 'postRescore', $instructorPerms, $preloadAttempt);
     }
 
 
