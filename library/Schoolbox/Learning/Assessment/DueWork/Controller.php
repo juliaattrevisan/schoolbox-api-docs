@@ -955,6 +955,7 @@ class Controller extends Assessment\Controller
         $latestResponse = null;
         $editorContents = '';
         $kamiFile = null;
+        $kamiSession = null;
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -962,12 +963,7 @@ class Controller extends Assessment\Controller
          */
         if ($allResponses->count()) {
             /** @var Submission|null $latestResponse */
-            $latestResponse = $participant ? $participant->findMostRecentResponse() : null;
-
-            // Kami Worksheet - fetch Kami Doc
-            $kamiFile = $latestResponse->getAllFiles()->filter(function (SubmissionFile $file) {
-                return (bool)$file->getKami();
-            })?->first()?->getKami()?->getKamiDocumentId();
+            $latestResponse = $participant?->findMostRecentResponse();
 
             /* If the latest response is a draft, collect all its contents for editing
              */
@@ -993,58 +989,46 @@ class Controller extends Assessment\Controller
                  */
                 $latestResponse = null;
                 $dangerZone     = $attachZoneFactory->buildForDueWorkResponse(new Submission());
-
-                // Kami Interactive Worksheet
-                if ($assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
-                    // clone the worksheet template for the student
-                    // worksheet name there is no reference to a character limit, so lets concat things
-                    $worksheetName = sprintf("%s_%s", $assessment->getTitle(), $student->getFullName());
-                    // kami example format "#{school_id}_#{course_id}_#{assignment_id}_#{attachment_id}"
-                    $kamiGroup = sprintf("%s_%d_%d", INSTANCE_ID, $assessment->getBaseContext()->getId(), $assessment->getId());
-                    $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
-                    $kamiFile = $kamiDoc->getId();
-
-                    // create kami object
-                    $kamiModel = $this->kamiMapper->createModel()
-                        ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
-                        ->setKamiDocumentId($kamiDoc->getId())
-                        ->setStatusDone();
-
-                    $this->kamiMapper->save($kamiModel);
-
-                    // Create a new response
-                    $response = $this->dueWorkResponseMapper->createModel()
-                        ->setSubmittedBy($this->getUser())
-                        ->setSubmittedOnBehalfOf($student)
-                        ->setCreatedAt(Alaress_Date_Format::now())
-                        ->setUpdatedAt(Alaress_Date_Format::now())
-                        ->setAssessable($assessment);
-
-                    $this->dueWorkResponseMapper->save($response);
-
-                    // join kami to the response
-                    /** @var SubmissionFile $submissionFile */
-                    $submissionFile = $this->submissionFileMapper->createModel()
-                        ->setFilename($worksheetName)
-                        ->setKami($kamiModel)
-                        ->setStorage($assessment->getWorksheetTemplate())
-                        ->setSubmission($response);
-                    $this->submissionFileMapper->save($submissionFile);
-                }
             }
         } else {
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
             $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
-            // Kami Interactive Worksheet
-            if ($assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
+        }
+
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
+
+        // Kami Interactive Worksheet
+        if ($assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
+            // worksheet name there is no reference to a character limit, so lets concat things
+            $worksheetName = sprintf("%s_%s", $assessment->getTitle(), $student->getFullName());
+
+            //if this is an existing attempt, then fetch the kami file
+            if ($latestResponse) {
+                // Kami Worksheet - fetch Kami Doc
+                $kamiFile = $latestResponse->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
+                    return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
+                })->first()?->getKami()?->getKamiDocumentId();
+            } else {
+                // spawning new attempt, need to create a new kami clone first
+
                 // clone the worksheet template for the student
-                // worksheet name there is no reference to a character limit, so lets concat things
-                $worksheetName = sprintf("%s_%s", $assessment->getTitle(), $student->getFullName());
                 // kami example format "#{school_id}_#{course_id}_#{assignment_id}_#{attachment_id}"
                 $kamiGroup = sprintf("%s_%d_%d", INSTANCE_ID, $assessment->getBaseContext()->getId(), $assessment->getId());
-                $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
+
+                // if no historic attempts exist, then spawn kami from the assessment template
+                if ($participant?->findMostRecentResponse() === null) {
+                    $kamiFile = $assessment->getKamiWorksheetTemplate()->getKamiDocumentId();
+                } else {
+                    // fetch latest attempt and use that kami file.
+                    $kamiFile = $participant?->findMostRecentResponse()->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
+                        return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
+                    })->first()?->getKami()?->getKamiDocumentId();
+                }
+                $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $kamiFile, $kamiGroup);
                 $kamiFile = $kamiDoc->getId();
 
                 // create kami object
@@ -1056,14 +1040,14 @@ class Controller extends Assessment\Controller
                 $this->kamiMapper->save($kamiModel);
 
                 // Create a new response
-                $response = $this->dueWorkResponseMapper->createModel()
+                $latestResponse = $this->dueWorkResponseMapper->createModel()
                     ->setSubmittedBy($this->getUser())
                     ->setSubmittedOnBehalfOf($student)
                     ->setCreatedAt(Alaress_Date_Format::now())
                     ->setUpdatedAt(Alaress_Date_Format::now())
                     ->setAssessable($assessment);
 
-                $this->dueWorkResponseMapper->save($response);
+                $this->dueWorkResponseMapper->save($latestResponse);
 
                 // join kami to the response
                 /** @var SubmissionFile $submissionFile */
@@ -1071,24 +1055,24 @@ class Controller extends Assessment\Controller
                     ->setFilename($worksheetName)
                     ->setKami($kamiModel)
                     ->setStorage($assessment->getWorksheetTemplate())
-                    ->setSubmission($response);
+                    ->setSubmission($latestResponse);
                 $this->submissionFileMapper->save($submissionFile);
+
+                // cause I don't trust anything...
+                $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($submissionFile));
+            }
+
+            // Kami Worksheet - display the student view of the student worksheet
+            if ($kamiFile) {
+                $kamiSession = $this->kamiConnector->viewSession(
+                    $kamiFile,
+                    $this->getUser(),
+                    !$isInteractionLocked,
+                );
             }
         }
 
-        // Kami Worksheet - display the student view of the student worksheet
-        $kamiSession = null;
-        if ($kamiFile) {
-            $kamiSession = $this->kamiConnector->viewSession(
-                $kamiFile,
-                $this->getUser(),
-                true,
-            );
-        }
-
-
-        // Is the page being displayed in readonly mode?
-        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+        $latestResponse = $participant?->findMostRecentResponse();
 
         // For some reason I can't use get/setFlash?
         $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
