@@ -28,6 +28,7 @@ const comment = props.isReadOnly
       }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedComment: [comment: string];
@@ -41,6 +42,9 @@ const saveText = window.Vue.computed(() => {
     if (isSaving.value) {
         return "Saving...";
     }
+    if (hasError.value) {
+        return "Comment could not be saved";
+    }
     return "Comment saved";
 });
 
@@ -49,7 +53,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || hasSaved.value) {
+    if (isSaving.value || hasSaved.value || hasError.value) {
         return "1fr";
     }
     return "0fr";
@@ -93,12 +97,13 @@ async function saveComment() {
         });
         window.removeEventListener("beforeunload", beforeUnloadHandler);
     } catch (error) {
-        console.error(error);
+        hasError.value = true;
     }
     hasSaved.value = true;
     isSaving.value = false;
     await timeout(2000);
     hasSaved.value = false;
+    hasError.value = false;
 }
 
 /**
@@ -142,7 +147,7 @@ window.Vue.onUnmounted(async () => {
             <textarea :id="editorId"></textarea>
             <div class="save-container l-grid">
                 <div class="save-container__inner-container">
-                    <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''}`">
+                    <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                         <em>{{ saveText }}</em>
                     </div>
                 </div>
