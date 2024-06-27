@@ -3,7 +3,7 @@
     {% for childNode in node.children %}
         {% if loop.first %}
             {# This is the first child, open the <ul> tag #}
-            <ul class="left-submenu">
+            <ul class="left-submenu" data-sub-menu>
             <li class="back"><a href="#">Back</a></li>
             {% if node.url %}
                 <a href="{{ node.url | ireplace(tokens) }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
