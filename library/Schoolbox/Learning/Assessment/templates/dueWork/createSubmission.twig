@@ -355,12 +355,6 @@ Data:
             {% include '@learning/fragments/meta/curriculumCodes.twig' %}
         </ul>
 
-        {% if kamiSession %}
-            <section>
-                {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: kamiSession.viewerUrl, allow: '', dataAttributes: {}} only %}
-            </section>
-        {% endif %}
-
         <form id="editor-form"
               data-feedback-form="{{ student.id }}"
               method="post"
@@ -386,6 +380,18 @@ Data:
             <input type="hidden" name="kamiFileId" value="{{ kamiFileId }}"/>
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
+
+                {% if kamiSession %}
+                    <div class="row">
+                        <div class="small-12 island">
+                            <section>
+                                <div class="content">
+                                    {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: kamiSession.viewerUrl, allow: '', dataAttributes: {}} only %}
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                {% endif %}
 
                 {% if not isSubmitOnBehalfOf %}
                     <div class="row">
