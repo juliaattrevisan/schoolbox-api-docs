@@ -90,14 +90,20 @@ HELP;
             $totalMismatchedRecords += $nMismatchedRecords;
 
             if ($this->perform()) {
-                $statement = $dbc->executeQuery(
-                    'UPDATE pastoral
-                    SET type_id = :typeId
-                    WHERE id IN (
-                        ' . implode(',', array_map('intval', $pastoralIdsWithMismatchedTypes)) . '
-                    )',
-                    ['typeId' => $typeId]
-                );
+                try {
+                    $statement = $dbc->executeQuery(
+                        'UPDATE pastoral
+                        SET type_id = :typeId
+                        WHERE id IN (
+                            ' . implode(',', array_map('intval', $pastoralIdsWithMismatchedTypes)) . '
+                        )',
+                        ['typeId' => $typeId]
+                    );
+                } catch (\PDOException $e) {
+                    $log->error('   Update query failed - ' . $e->getMessage());
+                    $log->info('   Continuing to next type/subtype pair...');
+                    continue;
+                }
                 $nRowsAffected = $statement->rowCount();
 
                 $log->info("   Updated $nRowsAffected rows.");
