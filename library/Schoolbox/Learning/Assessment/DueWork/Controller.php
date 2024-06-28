@@ -1041,8 +1041,6 @@ class Controller extends Assessment\Controller
             );
         }
 
-        $latestResponse = $participant?->findMostRecentResponse();
-
         // For some reason I can't use get/setFlash?
         $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
