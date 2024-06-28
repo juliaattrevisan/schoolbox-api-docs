@@ -1179,17 +1179,6 @@ class Controller extends Assessment\Controller
         }
         $response->setAssessable($assessment);
 
-        // Kami worksheet - capture kami file before we clear the files collection
-        /** @var null|SubmissionFile $kamiFile */
-        $kamiFile = null;
-        if ($requestPost->get('kamiFileId')) {
-            $kamiFileId = $requestPost->get('kamiFileId');
-            $kamiFile = $response->getAllFiles()->filter(function (SubmissionFile $file) use ($kamiFileId) {
-                // ensure the file is a kami file, and is the actual kami file we are expecting
-                return (bool)$file->getKami() && $file->getKami()->getKamiDocumentId() === $kamiFileId;
-            })->first();
-        }
-
         // Replace files with what was actually submitted
         $response->setAllFiles(new Collection());
 
@@ -1241,26 +1230,27 @@ class Controller extends Assessment\Controller
             $kamiFileId = $requestPost->get('kamiFileId');
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
 
-            // if the kami file has not been stored onto the response, we need to create a file and attach all the things
-            if (!$kamiFile) {
-                // create kami object
+            try {
+                $kamiModel = $this->kamiMapper->findOneByColumn('kami_document_id', $kamiFileId);
+            } catch (Deleted $e) {
+                /** @var Kami\Model $kamiModel */
+                $kamiModel = $e->getDeletedObject();
+                $kamiModel->setDeletedAt(null);
+            } catch (MapperException $e) {
                 $kamiModel = $this->kamiMapper->createModel()
                     ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
                     ->setKamiDocumentId($kamiFileId)
                     ->setStatusDone();
-
                 $this->kamiMapper->save($kamiModel);
-
-                // join kami to the response
-                $kamiFile = $this->submissionFileMapper->createModel()
-                    ->setFilename($worksheetName)
-                    ->setKami($kamiModel)
-                    ->setStorage($assessment->getWorksheetTemplate())
-                    ->setSubmission($response);
-                $response->getAllFiles()->add($kamiFile);
-            } else {
-                $kamiModel = $this->kamiMapper->findOneByColumn('kami_document_id', $kamiFileId);
             }
+
+            // apparently we need to always create a new student submission object...
+            $kamiFile = $this->submissionFileMapper->createModel()
+                ->setFilename($worksheetName)
+                ->setKami($kamiModel)
+                ->setStorage($assessment->getWorksheetTemplate())
+                ->setSubmission($response);
+            $response->getAllFiles()->add($kamiFile);
         }
 
         // If we're saving the final version of the submission (i.e. not a draft) ram the current datetime in
@@ -1293,8 +1283,8 @@ class Controller extends Assessment\Controller
         // Save the response before attempting to save any feedback: we need a response ID to be able to attach the feedback
         $this->dueWorkResponseMapper->save($response);
 
-        // re save the kami file (if we had to create it)
-        if (!$kamiFile && isset($kamiModel)) {
+        // re save the kami file, now with the submission file object id
+        if (isset($kamiModel, $kamiFile)) {
             $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($kamiFile));
         }
 
