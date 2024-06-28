@@ -16,7 +16,7 @@ use Schoolbox\Pastoral\Type\Model as PastoralType;
 class Model extends TypeAbstract
 {
     /**
-     * @var PastoralType
+     * @var ?PastoralType
      */
     private ?PastoralType $pastoralType = null; // Should only be null before hydration.  The database field is not-nullable.
 
