@@ -70,6 +70,8 @@ HELP;
         foreach ($pastoralTypeIdBySubtypeId as $subtypeId => $typeId) {
             $log->info(" * Finding pastoral records with subtype $subtypeId, and type not $typeId.");
             $pastoralIdsWithMismatchedTypes = $dbc->executeQuery(
+                // Deliberately include soft-deleted pastoral records here, to ensure that after this script has run,
+                // no records will have invalid type/subtype combination (with no exception).
                 'SELECT id
                 FROM pastoral
                 WHERE subtype_id = :subtypeId
