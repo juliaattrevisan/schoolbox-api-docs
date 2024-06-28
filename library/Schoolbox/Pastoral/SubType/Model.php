@@ -18,7 +18,7 @@ class Model extends TypeAbstract
     /**
      * @var PastoralType
      */
-    private PastoralType $pastoralType;
+    private ?PastoralType $pastoralType = null; // Should only be null before hydration.  The database field is not-nullable.
 
     /**
      * @param PastoralType $pastoralType
@@ -33,9 +33,9 @@ class Model extends TypeAbstract
     }
 
     /**
-     * @return PastoralType
+     * @return ?PastoralType
      */
-    public function getPastoralType(): PastoralType
+    public function getPastoralType(): ?PastoralType
     {
         return $this->pastoralType;
     }
