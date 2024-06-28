@@ -912,6 +912,7 @@ class Controller extends Assessment\Controller
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         $acceptsOnlineSubmissions = $assessment->getAcceptOnline();
+        /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
 
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
@@ -1025,7 +1026,9 @@ class Controller extends Assessment\Controller
                     $kamiFile = $kamiDoc->getId();
                 } else {
                     // fetch latest attempt and use that kami file.
-                    $kamiFile = $participant?->findMostRecentResponse()->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
+                    /** @var Submission|null $lastResponse */
+                    $lastResponse = $participant->findMostRecentResponse();
+                    $kamiFile = $lastResponse?->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
                         return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
                     })->first()?->getKami()?->getKamiDocumentId();
                 }
