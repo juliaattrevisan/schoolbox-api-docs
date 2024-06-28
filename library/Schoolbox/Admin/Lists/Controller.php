@@ -167,11 +167,6 @@ class Controller extends Base
                     continue;
                 }
 
-                if ($getter === 'getPastoralType') {
-                    // Some getters return objects not strings/ints.  For those cases we must set before we can get.
-                    $model->setPastoralType((new PastoralTypeModel())->setId($values['pastoralType'][$currentIndex]));
-                }
-
                 if ($model->$getter() !== $value[$currentIndex]) {
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
