@@ -3,7 +3,6 @@
  * To customise the display of the event, ensuring the background/text colour is readable
  *
  */
-
 import tinycolor from "tinycolor2";
 import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
@@ -33,14 +32,6 @@ export default {
          */
         eventBackgroundColor() {
             return this.$el.parentElement.parentElement.style.backgroundColor;
-        },
-
-        /**
-         * Ensure the new lines are respected
-         */
-        lineBreakedTitleText() {
-            const eventTitle = this.content.event.title;
-            return eventTitle.replace("\n", "<br>");
         },
 
         /**
@@ -104,7 +95,7 @@ export default {
                     .mostReadable(this.eventBackgroundColor, ["black", "white"])
                     .toRgbString();
                 // no need to set color, if white
-                if (readableTextColor === tinycolor("white").toRgbString()){
+                if (readableTextColor === tinycolor("white").toRgbString()) {
                     return;
                 }
 
@@ -133,15 +124,12 @@ export default {
 </script>
 
 <template>
-    <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
+    <div ref="eventContainer" class="event-container" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
-        <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete" />
-        <span
-            ref="titleText"
-            class="fc-event-title"
-            v-html="lineBreakedTitleText"
-            :class="{ strike: isTaskComplete }"
-        ></span>
+        <input v-if="isTask" v-model="isTaskComplete" type="checkbox" class="checkbox plain" name="completed" />
+        <span ref="titleText" class="fc-event-title" :class="{ strike: isTaskComplete }">
+            {{ content.event.title }}
+        </span>
     </div>
 </template>
 
