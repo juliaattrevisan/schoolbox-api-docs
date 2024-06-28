@@ -112,13 +112,9 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     protected function getPermission(?int $folderID, int $userID = 0, bool $cache = true): int
     {
         if ($userID == 0) {
-            $sessionUser = $this->extractSessionUser();
-            if ($sessionUser) {
-                $userID = $sessionUser->getId();
-                $this->cacheUser[$userID] = $sessionUser;
-            } else {
-                return UserAccess::ACCESS_DENY;
-            }
+            $sessionUser = $this->getViewer();
+            $userID = $sessionUser->getId();
+            $this->cacheUser[$userID] = $sessionUser;
         }
 
         // Cache users as well
@@ -134,17 +130,5 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
         }
 
         return Access::getInstance()->getFolderAccess($user, (int)$folderID, $cache);
-    }
-
-    /**
-     * Extract a user out of the session.
-     *
-     * @return User|null
-     */
-    private function extractSessionUser(): ?User
-    {
-        return isset($this->viewer) && $this->viewer instanceof User
-            ? $this->viewer
-            : null;
     }
 }
