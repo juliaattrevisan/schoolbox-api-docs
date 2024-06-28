@@ -315,6 +315,12 @@ Data:
                 $('#editor-body').attr('disabled', false);
             }
         });
+
+        /* If there is a kami file, start with an autosave
+         */
+        if (hasKamiFile) {
+            initAutosave();
+        }
     });
 </script>
 {% endautoescape %}
