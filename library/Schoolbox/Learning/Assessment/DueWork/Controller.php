@@ -19,6 +19,7 @@ use DOMException;
 use Eportfolio\ShowcaseMapper;
 use Eportfolio_Authenticator;
 use External\Canvas\Importer\CanvasDb;
+use GuzzleHttp\Client;
 use ICollection;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
@@ -1030,6 +1031,54 @@ class Controller extends Assessment\Controller
                 if (!$kamiFile) {
                     $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
                     $kamiFile = $kamiDoc->getId();
+                } else {
+                    /**
+                     * kami file exists. 2 options
+                     * 1. when the student starts a new attempt we save a PDF export of the annotated file onto the old attempt, then move the kami hash to the new attempt
+                     * 2. we download the kami file of the previous attempt and pipe that to the kami upload endpoint which according to kami will work, and can transfer the annotations
+                     * option 2 has the issue, that the cloned worksheet will appear in the same group (student may have duplicate entries)
+                     *
+                     * I will be going with option 1.
+                     * When the student starts a new attempt (the feedback for the old attempt should be finished),
+                     * so we export the annotated feedback for the last attempt, save this to the last attempt (as a normal file which kami will upload)
+                     * then move the kami hash to the new attempt.
+                     */
+                    /**
+                     * clone from
+                     * @see \Schoolbox\Learning\Assessment\DueWork\Response\Controller::getKamiExport
+                     */
+                    // Less overhead in sleeping the server process, than spinning it up per client poll.
+                    // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
+                    $maxPolls  = 10;
+                    $exponent  = 2;
+                    $sleep     = 500000; // 0.5 seconds initial back-off
+                    $pollCount = 0;
+                    $export = $this->kamiConnector->createAnnotatedExport($kamiFile);
+                    while ($export->isStatusPending()) {
+                        if ($pollCount >= $maxPolls) {
+                            break;
+                        }
+                        usleep($sleep);
+                        $sleep  *= $exponent; // exponential back-off.
+                        $export = $this->kamiConnector->getExport($export->getId());
+                        $pollCount++;
+                    }
+
+                    // Unable to generate the export? (either due to error or timeout)
+                    if (!$export->isStatusDone()) {
+                        throw new MapperException("unable to generate export...");
+                    }
+
+                    // save to storage
+                    $guzzleResponse     = (new Client())->get($export->getFileUrl());
+                    $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()
+                        ->acceptStream($worksheetName, $guzzleResponse->getBody(), false);
+
+                    $lastResponse->getAllFiles()->add(
+                        SingleFile\Mapper::getInstance()->createModel()
+                            ->setStorage($storage)
+                            ->setFilename($worksheetName)
+                    );
                 }
             }
 
