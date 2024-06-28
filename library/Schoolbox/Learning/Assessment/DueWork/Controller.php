@@ -1005,7 +1005,9 @@ class Controller extends Assessment\Controller
 
         // Kami Interactive Worksheet
         if ($this->kamiConnector->isOnline() && $assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
+            // kami string if needed.
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
+            $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
 
             //if this is an existing attempt, then fetch the kami file
             if ($latestResponse) {
@@ -1015,10 +1017,7 @@ class Controller extends Assessment\Controller
                 })->first()?->getKami()?->getKamiDocumentId();
             }
             if (!$kamiFile) {
-                // spawning new attempt or current attempt has no kami file, need to create a new kami clone first
-
-                // clone the worksheet template for the student
-                $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
+                // the latest response has no kami worksheet, or there was no previous response.
 
                 // try and use the last attempt (published)
                 /** @var Submission|null $lastResponse */
@@ -1051,6 +1050,7 @@ class Controller extends Assessment\Controller
             }
 
             // Kami Worksheet - display the student view of the student worksheet
+            // with perms to edit the kami if we are allowing editing of this attempt
             $kamiSession = $this->kamiConnector->viewSession(
                 $kamiFile,
                 $this->getUser(),
@@ -1091,7 +1091,6 @@ class Controller extends Assessment\Controller
             'participant'    => $participant,
             'feedback'       => $feedback,
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
-            'kamiFile'       => $kamiFile,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
             'policy'         => $assessment->getEnablePolicy() ? $this->getConfigLoader()->get('lms_student_policy') : '', // only use the policy, if this assessment is showing the policy
