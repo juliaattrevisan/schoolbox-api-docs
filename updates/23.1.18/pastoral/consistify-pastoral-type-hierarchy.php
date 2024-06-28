@@ -60,7 +60,7 @@ HELP;
         //     * update pastoral record type to match type from pair
 
         $pastoralTypeIdBySubtypeId = $dbc->executeQuery(
-        'SELECT id AS subtypeId, pastoral_type_id AS typeId
+            'SELECT id AS subtypeId, pastoral_type_id AS typeId
             FROM lu_pastoral_subtype',
         )->fetchColumnArray('typeId', 'subtypeId');
         $log->info('Found ' . count($pastoralTypeIdBySubtypeId) . ' current pastoral type/subtype pairs.');
