@@ -27,7 +27,8 @@ const comment = props.isReadOnly
           hasTokens: true,
       }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
-const isSavedDelay = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedComment: [comment: string];
@@ -41,6 +42,9 @@ const saveText = window.Vue.computed(() => {
     if (isSaving.value) {
         return "Saving...";
     }
+    if (hasError.value) {
+        return "Sorry, the comment could not be saved. Please refresh the page and try again. If the problem persists, contact your support.";
+    }
     return "Comment saved";
 });
 
@@ -49,7 +53,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || isSavedDelay.value) {
+    if (isSaving.value || hasSaved.value || hasError.value) {
         return "1fr";
     }
     return "0fr";
@@ -80,21 +84,32 @@ async function saveComment() {
     if (props.student.urls === undefined) {
         return;
     }
-    isSaving.value = true;
-    emit("updatedComment", comment.value);
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-    const formData = new FormData();
-    formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
-    formData.append("comment", comment.value);
-    await fetch(props.student.urls.comment, {
-        method: "POST",
-        body: formData,
-    });
-    window.removeEventListener("beforeunload", beforeUnloadHandler);
-    isSavedDelay.value = true;
-    isSaving.value = false;
+    try {
+        isSaving.value = true;
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
+        formData.append("comment", comment.value);
+        const response = await fetch(props.student.urls.comment, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            emit("updatedComment", comment.value);
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSaving.value = false;
+    } catch (error) {
+        isSaving.value = false;
+        hasError.value = true;
+    }
     await timeout(2000);
-    isSavedDelay.value = false;
+    if (hasSaved.value) {
+        hasSaved.value = false;
+    }
 }
 
 /**
@@ -105,7 +120,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 },
+    { debounce: 1000 }
 );
 
 /**
@@ -125,7 +140,7 @@ window.Vue.onUnmounted(async () => {
                 props.item.questions[0].response?.comment !== ''
             "
         >
-            <div class="comment-container l-pad-m--top" v-if="props.hasMarkVisibility">
+            <div v-if="props.hasMarkVisibility" class="comment-container l-pad-m--top">
                 <label>Comment</label>
                 <div v-html="props.item.questions[0].response.comment"></div>
             </div>
@@ -138,7 +153,7 @@ window.Vue.onUnmounted(async () => {
             <textarea :id="editorId"></textarea>
             <div class="save-container l-grid">
                 <div class="save-container__inner-container">
-                    <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                    <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
                         <em>{{ saveText }}</em>
                     </div>
                 </div>

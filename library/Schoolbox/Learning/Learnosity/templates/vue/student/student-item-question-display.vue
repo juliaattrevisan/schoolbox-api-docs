@@ -26,7 +26,8 @@ const responsesEl = window.Vue.ref<HTMLDivElement | null>(null); // the element 
 const scoreEl = window.Vue.ref<HTMLInputElement | null>(null);
 const score = window.Vue.ref<string>("");
 const isSaving = window.Vue.ref(false);
-const isSavedDelay = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedScore: [question: StudentItemQuestion, score: number];
@@ -37,7 +38,13 @@ const emit = defineEmits<{
  * @returns {string} - the text to display
  */
 const saveText = window.Vue.computed(() => {
-    return isSaving.value ? "Saving..." : "Score saved";
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    if (hasError.value) {
+        return "Sorry, the score could not be saved. Please refresh the page and try again. If the problem persists, contact your support.";
+    }
+    return "Score saved";
 });
 
 /**
@@ -45,7 +52,7 @@ const saveText = window.Vue.computed(() => {
  * @returns {string} - the grid-template-rows
  */
 const saveContainerHeight = window.Vue.computed(() => {
-    if (isSaving.value || isSavedDelay.value) {
+    if (isSaving.value || hasSaved.value || hasError.value) {
         return "1fr";
     }
     return "0fr";
@@ -80,37 +87,60 @@ async function saveScore() {
         score.value = "";
         return;
     }
-    isSaving.value = true;
-    emit("updatedScore", props.question, parseFloat(score.value));
-    window.addEventListener("beforeunload", beforeUnloadHandler);
-    const formData = new FormData();
-    formData.append(
-        "learnosityReference",
-        (props.question.response as StudentItemQuestionResponse).learnosityReference,
-    );
-    formData.append("score", score.value);
-    await fetch(props.student.urls.score, {
-        method: "POST",
-        body: formData,
-    });
-    window.removeEventListener("beforeunload", beforeUnloadHandler);
-    isSavedDelay.value = true;
-    isSaving.value = false;
+    try {
+        isSaving.value = true;
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append(
+            "learnosityReference",
+            (props.question.response as StudentItemQuestionResponse).learnosityReference
+        );
+        formData.append("score", score.value);
+        const response = await fetch(props.student.urls.score, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            emit("updatedScore", props.question, parseFloat(score.value));
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSaving.value = false;
+    } catch (error) {
+        isSaving.value = false;
+        hasError.value = true;
+    }
     await timeout(2000);
-    isSavedDelay.value = false;
+    if (hasSaved.value) {
+        hasSaved.value = false;
+    }
 }
 
 /**
- * add some quick validation to prevent the score input going below 0 and above the max score and save the score
+ * add some validation to minimise the chance of invalid score input
  */
 watchDebounced(
     score,
     (newScore) => {
+        // Allow only digits and a single decimal point
+        score.value = newScore.replace(/[^0-9.]/g, "");
+        // Ensure only one decimal point is present
+        const parts = newScore.split(".");
+        if (parts.length > 2) {
+            score.value = `${parts[0]}.${parts.slice(1).join("")}`;
+        }
+        // Prevent starting with a decimal point
+        if (newScore.startsWith(".")) {
+            score.value = `0${newScore}`;
+        }
+        // Prevent the score going below 0
         if (parseFloat(newScore) < 0) {
             score.value = "0";
             return;
         }
-        // keep it within the max score
+        // Keep it within the max score
         if (
             props.question.response &&
             props.question.response?.maxScore &&
@@ -121,7 +151,7 @@ watchDebounced(
         }
         void saveScore();
     },
-    { debounce: 300 },
+    { debounce: 300 }
 );
 
 /**
@@ -149,12 +179,12 @@ window.Vue.onMounted(() => {
         // Find any oembeds and load them
         responsesEl.value
             ?.querySelectorAll(
-                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))",
+                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))"
             )
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
-                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
+                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url")
                 );
             });
     }
@@ -167,37 +197,12 @@ window.Vue.onMounted(() => {
 window.Vue.onBeforeUnmount(async () => {
     if (props.question.response) {
         const response = responsesEl.value?.querySelector(
-            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`,
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
         ) as HTMLDivElement;
         props.container.appendChild(response);
         await saveScore();
     }
 });
-
-/**
- * Filters the input to allow only digits and a single decimal point.
- * Updates the score value accordingly.
- * @param {Event} event - The input event.
- */
-function filterInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    // Allow only digits and a single decimal point
-    let filteredValue = target.value.replace(/[^0-9.]/g, "");
-
-    // Ensure only one decimal point is present
-    const parts = filteredValue.split(".");
-    if (parts.length > 2) {
-        filteredValue = `${parts[0]}.${parts.slice(1).join("")}`;
-    }
-
-    // Prevent starting with a decimal point
-    if (filteredValue.startsWith(".")) {
-        filteredValue = `0${filteredValue}`;
-    }
-
-    target.value = filteredValue;
-    score.value = filteredValue;
-}
 </script>
 
 <template>
@@ -207,7 +212,13 @@ function filterInput(event: Event) {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <div v-html="sanitizeHtml(props.question.metadata.sample_answer)"></div>
+                    <div
+                        v-html="
+                            sanitizeHtml(props.question.metadata.sample_answer, {
+                                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+                            })
+                        "
+                    ></div>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--
@@ -238,12 +249,15 @@ function filterInput(event: Event) {
                             v-model="score"
                             type="text"
                             inputmode="numeric"
-                            @input="filterInput"
                         />
                     </template>
                     <div class="save-container l-grid">
                         <div class="save-container__inner-container">
-                            <div :class="`alert-box f-no-margins ${isSavedDelay ? 'success' : ''}`">
+                            <div
+                                :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${
+                                    hasError ? 'alert' : ''
+                                }`"
+                            >
                                 <em>{{ saveText }}</em>
                             </div>
                         </div>
