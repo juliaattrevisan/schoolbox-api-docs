@@ -35,14 +35,6 @@ export default {
         },
 
         /**
-         * Split the title text by new lines so we can add <br> tags in-between
-         * @returns {string[]}
-         */
-        lineBreakedTitleText() {
-            return this.content.event.title.split("\n");
-        },
-
-        /**
          * to display a checkbox to show complete/incomplete
          *
          * @returns { Boolean }
@@ -135,12 +127,8 @@ export default {
     <div ref="eventContainer" class="event-container" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
         <input v-if="isTask" v-model="isTaskComplete" type="checkbox" class="checkbox plain" name="completed" />
-
         <span ref="titleText" class="fc-event-title" :class="{ strike: isTaskComplete }">
-            <template v-for="(line, lineIndex) in lineBreakedTitleText" :key="lineIndex">
-                {{ line }}
-                <br v-if="lineIndex < lineBreakedTitleText.length - 1" />
-            </template>
+            {{ content.event.title }}
         </span>
     </div>
 </template>
