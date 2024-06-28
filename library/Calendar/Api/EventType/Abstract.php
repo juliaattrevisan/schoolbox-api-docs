@@ -143,8 +143,8 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      */
     private function extractSessionUser(): ?User
     {
-        return isset($_SESSION['user']) && $_SESSION['user'] instanceof User
-            ? $_SESSION['user']
+        return isset($this->viewer) && $this->viewer instanceof User
+            ? $this->viewer
             : null;
     }
 }
