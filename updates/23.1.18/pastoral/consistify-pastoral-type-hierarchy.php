@@ -68,6 +68,7 @@ HELP;
         $log->info('Finding and fixing pastoral records with mismatched type/subtype...');
         $totalMismatchedRecords = 0;
         foreach ($pastoralTypeIdBySubtypeId as $subtypeId => $typeId) {
+            $log->info(" * Finding pastoral records with subtype $subtypeId, and type not $typeId.");
             $pastoralIdsWithMismatchedTypes = $dbc->executeQuery(
                 'SELECT id
                 FROM pastoral
@@ -82,7 +83,7 @@ HELP;
                 continue;
             }
 
-            $log->info(" * Found $nMismatchedRecords mismatched pastoral records for type/subtype $typeId/$subtypeId.");
+            $log->info("   Found $nMismatchedRecords pastoral record(s).");
 
             $totalMismatchedRecords += $nMismatchedRecords;
 
@@ -99,7 +100,7 @@ HELP;
 
                 $log->info("   Updated $nRowsAffected rows.");
             } else {
-                $log->info('   No UPDATE, because not in --perform mode.');
+                $log->info('   No update, because not in --perform mode.');
             }
         }
 
