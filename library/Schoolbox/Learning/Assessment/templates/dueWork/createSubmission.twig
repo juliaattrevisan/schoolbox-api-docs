@@ -70,7 +70,7 @@ Data:
         let autosavePresubmit = function () {
 
             // Has anything changed? If not check again later (re-init the autosave counter)
-            currentSubmissionContent = window.sbProps.editors['editor-body'].getData(); //start with grabbing the ckeditor content
+            currentSubmissionContent = window.sbProps.editors['editor-body']?.getData(); //start with grabbing the ckeditor content
             const formData = new FormData(document.getElementById('editor-form')); //then retrieve any dropzone, rubric and self-assessment changes
             formData.forEach((value) => currentSubmissionContent += value); //loop through and grab all the form values, creating a single string
 
@@ -318,9 +318,18 @@ Data:
 
         /* If there is a kami file, start with an autosave
          */
-        if (hasKamiFile) {
-            initAutosave();
-        }
+        // Listen to Kami events here
+        let kamiViewport = document.querySelector("#kami-viewport");
+        window.addEventListener("message", function (event) {
+            if (
+                kamiViewport &&
+                event.source === kamiViewport.contentWindow &&
+                event.data.type === "kamiembedding" &&
+                (event.data.event_name === "createdAnnotation" || event.data.event_name === "deletedAnnotation")
+            ) {
+                autosaveAjaxSubmit();
+            }
+        });
     });
 </script>
 {% endautoescape %}
