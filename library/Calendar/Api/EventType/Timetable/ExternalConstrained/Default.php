@@ -8,6 +8,8 @@ use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -198,10 +200,12 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         }
                         if ($period['category'] instanceof Folder) {
                             // Put this into a category
-                            // Only assign folder ID when user has the correct permission
+                            // Only show link to homepage when user has the correct permission
                             if (
-                                 $this->getPermission($period['category']->getId()) >=
-                                \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+                                Access::getInstance()->getFolderAccess(
+                                    $this->getViewer(),
+                                    $period['category']->getId()
+                                ) >= UserAccess::ACCESS_READ
                             ) {
                                 $event->setCategoryId($period['category']->getId());
                             }

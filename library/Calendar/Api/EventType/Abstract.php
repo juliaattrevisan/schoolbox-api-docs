@@ -1,8 +1,6 @@
 <?php
 
 use Schoolbox\User;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Calendar_Api_EventType_Abstract
@@ -96,39 +94,5 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
         return Calendar_Api_Config_Mapper::getInstance()->findById(
             $this->connectorId
         );
-    }
-
-    /**
-     * The new getPermission method, which uses `\Schoolbox\Permission\Access\Access::getFolderAccess`
-     * under the hood.
-     *
-     * @param null|int  $folderID    The ID of the object to get permissions on.
-     * @param int  $userID      The user to get permissions for.
-     *                          If omitted, defaults to current user.
-     * @param bool $cache       If false, ignore cache.
-     * @return int
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    protected function getPermission(?int $folderID, int $userID = 0, bool $cache = true): int
-    {
-        if ($userID == 0) {
-            $sessionUser = $this->getViewer();
-            $userID = $sessionUser->getId();
-            $this->cacheUser[$userID] = $sessionUser;
-        }
-
-        // Cache users as well
-
-        if (!isset($this->cacheUser[$userID]) || !$cache) {
-            try {
-                $this->cacheUser[$userID] = $user = \Schoolbox\UserMapper::getInstance()->findById($userID);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                return UserAccess::ACCESS_DENY;
-            }
-        } else {
-            $user = $this->cacheUser[$userID];
-        }
-
-        return Access::getInstance()->getFolderAccess($user, (int)$folderID, $cache);
     }
 }

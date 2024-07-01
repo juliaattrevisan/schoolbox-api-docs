@@ -12,6 +12,8 @@ use Schoolbox\External\Connector\AttendanceFactory;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -178,10 +180,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setAllDay(false);
             $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
             $instance->setType($eventType);
-            //Only when the user has the right permission will obtain the folder ID
+            //Only when the user has the right permission will have link to homepage
             if (
-                $this->getPermission($timetableEvent->getFolder()?->getId()) >=
-                \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+                Access::getInstance()->getFolderAccess(
+                    $this->getViewer(),
+                    $timetableEvent->getFolder()?->getId()
+                ) >= UserAccess::ACCESS_READ
             ) {
                 $instance->setFolder($timetableEvent->getFolder());
             } else {
