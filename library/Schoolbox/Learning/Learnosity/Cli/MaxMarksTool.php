@@ -164,11 +164,11 @@ HELP;
             /* If the max_score value was already set, don't change anything;
              * the user might have done something here.
              */
-//            if (isset($question['data']['validation']['max_score'])) {
-//                $logger->debug(" * Question {$question['reference']} - Max score already set - skipping.");
-//                ++$nQuestionsSkipped;
-//                continue;
-//            }
+            if (isset($question['data']['validation']['max_score'])) {
+                $logger->debug(" * Question {$question['reference']} - Max score already set - skipping.");
+                ++$nQuestionsSkipped;
+                continue;
+            }
 
             /* Assign max_score to be the same as validation.valid_response.score
              * ...because learnosity reasons
