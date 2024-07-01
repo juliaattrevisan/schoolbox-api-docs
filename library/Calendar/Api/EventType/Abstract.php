@@ -37,7 +37,6 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      */
     private $viewer;
 
-    public array $cacheUser = array();
 
     /**
      * @param int  $connectorId
