@@ -10,10 +10,10 @@
 namespace Alaress\WorkerCrew;
 
 use Alaress\Exception\IO\IOException;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
 use PDOException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -31,7 +31,7 @@ class Dispatcher implements DispatcherInterface
     /** @var Pool */
     protected $pool;
 
-    /** @var TimerInterface */
+    /** @var TimerInterface|null */
     protected $timer = null;
 
     /** @var DispatchStrategyInterface */
@@ -176,7 +176,7 @@ class Dispatcher implements DispatcherInterface
          * @var string $cmd
          * @var array  $data
          */
-        list($identifier, $cmd, $data) = $this->q->bottom();
+        [$identifier, $cmd, $data] = $this->q->bottom();
 
         // decide whether to delegate this to a Worker, or return it straight into the handler
         if (!in_array($cmd, $this->pool->getSupportedActions())) {
@@ -214,8 +214,15 @@ class Dispatcher implements DispatcherInterface
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
         } catch (RuntimeException $e) {
             $this->log->critical("Failed to spawn worker: " . $e->getMessage(), ['exception' => $e]);
+            if ($e instanceof AMQPRuntimeException) {
+                // AMQP exceptions must be rethrown:
+                // these suggest this daemon's queue is inaccessible, and thus
+                // the daemon must be restarted
+                throw $e;
+            }
         } catch (Exception $e) {
             // we need to catch any and all exception here, lest we explode our reactor
+            // (except for AMQP exceptions, as mentioned above)
             $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception' => $e]);
         }
     }

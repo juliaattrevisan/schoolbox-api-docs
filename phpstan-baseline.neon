@@ -421,11 +421,6 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
-			message: "#^Property Alaress\\\\WorkerCrew\\\\Dispatcher\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
-			count: 2
-			path: library/Alaress/WorkerCrew/Dispatcher.php
-
-		-
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Transaction\\\\AbstractTransaction\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
