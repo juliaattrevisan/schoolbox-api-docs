@@ -28,6 +28,10 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /** @var IConfigLoader */
     private $configLoader;
 
+    /**
+     * @var Access;
+     */
+    private $access;
 
     /**
      * @var \Schoolbox\Calendar\EventTypeMapper
@@ -43,12 +47,14 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         User $user,
         User $viewer,
         IConfigLoader $configLoader,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        Access $access,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->configLoader = $configLoader;
         $this->eventTypeMapper = $eventTypeMapper;
+        $this->access = $access;
     }
 
 
@@ -202,7 +208,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                             // Put this into a category
                             // Only show link to homepage when user has the correct permission
                             if (
-                                Access::getInstance()->getFolderAccess(
+                                $this->access->getFolderAccess(
                                     $this->getViewer(),
                                     $period['category']->getId()
                                 ) >= UserAccess::ACCESS_READ

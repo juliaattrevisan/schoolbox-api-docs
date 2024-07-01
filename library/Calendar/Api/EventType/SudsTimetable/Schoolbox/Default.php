@@ -14,6 +14,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -70,6 +71,10 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      */
     private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
 
+    /**
+     * @var Access
+     */
+    private Access $access;
 
     /**
      * @inheritdoc
@@ -86,7 +91,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
         \Timetable_ColourMapper $timetableColourMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
+        Access $access,
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -99,6 +105,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->overrideMapper = $overrideMapper;
         $this->timetableColourMapper = $timetableColourMapper;
         $this->staffProfileMapper = $staffProfileMapper;
+        $this->access = $access;
     }
 
 
@@ -182,9 +189,10 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setType($eventType);
             //Only when the user has the right permission will have link to homepage
             if (
-                Access::getInstance()->getFolderAccess(
+                $timetableEvent->getFolder() instanceof Folder &&
+                $this->access->getFolderAccess(
                     $this->getViewer(),
-                    $timetableEvent->getFolder()?->getId()
+                    $timetableEvent->getFolder()->getId()
                 ) >= UserAccess::ACCESS_READ
             ) {
                 $instance->setFolder($timetableEvent->getFolder());
