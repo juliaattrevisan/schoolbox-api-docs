@@ -233,7 +233,7 @@ HELP;
                 $file,
                 $this->getLogger(),
                 \Schoolbox\External\Connector\Log\Mapper::getInstance()
-            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
+            ))->run($time, $runId, Endpoint\Scheduler::MANUAL_SIS_SCRIPT_NAME . $subtitle);
         }
 
         /* Execute scheduler: calendar stuff
@@ -250,7 +250,7 @@ HELP;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
+        ))->run($time, $runId, Endpoint\Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
         /* Announce lock release
          */
