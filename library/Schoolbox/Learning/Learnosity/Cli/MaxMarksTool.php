@@ -164,11 +164,11 @@ HELP;
             /* If the max_score value was already set, don't change anything;
              * the user might have done something here.
              */
-            if (isset($question['data']['validation']['max_score'])) {
-                $logger->debug(" * Question {$question['reference']} - Max score already set - skipping.");
-                ++$nQuestionsSkipped;
-                continue;
-            }
+//            if (isset($question['data']['validation']['max_score'])) {
+//                $logger->debug(" * Question {$question['reference']} - Max score already set - skipping.");
+//                ++$nQuestionsSkipped;
+//                continue;
+//            }
 
             /* Assign max_score to be the same as validation.valid_response.score
              * ...because learnosity reasons
@@ -310,18 +310,18 @@ HELP;
                 }
 
                 $activityData = $activity['data'] ?? [];
-                $itemReferencesBatch = $activityData['items'] ?? [];
+                $itemReferencesBatch = $activityData['items']; // Might be null.
 
-                if (null !== $itemReferencesBatch) {
-                    /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
-                     * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
-                     */
-                    if (is_array($itemReferencesBatch[0])) {
+                if (is_array($itemReferencesBatch)) {
+                    // Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258, we have to
+                    // accommodate $itemReference being a string as well as an array like ['id' => ..., 'reference' => ...].
+                    // if the first itemReference is an array, assume all in the batch are arrays.
+                    if (count($itemReferencesBatch) > 0 && is_array($itemReferencesBatch[0])) {
                         $itemReferencesBatch = array_column($itemReferencesBatch, 'id');
                     }
-                }
 
-                $itemReferences = array_merge($itemReferences, $itemReferencesBatch);
+                    $itemReferences = array_merge($itemReferences, $itemReferencesBatch);
+                }
             }
         }
 
