@@ -47,10 +47,16 @@ class MessageSerializer
         $callback = $message->getCallbackUrl();
         if (isset($callback)) {
             $return['task']['callback'] = [
-                'url'    => $callback,
-                'params' => $message->getCallbackParams(),
-                'token'  => $message->getCallbackToken(),
+                'url' => $callback,
             ];
+            $callbackParams = $message->getCallbackParams();
+            if (isset($callbackParams)) {
+                $return['task']['callback']['params'] = $callbackParams;
+            }
+            $callbackToken = $message->getCallbackToken();
+            if (isset($callbackToken)) {
+                $return['task']['callback']['token'] = $callbackToken;
+            }
         }
 
         $failureCallback = $message->getFailureCallbackUrl();

@@ -9,12 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Api;
 
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
+use Interop\Queue\Exception;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Attempt;
+use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
@@ -43,6 +48,7 @@ class AttemptEvaluator
     ) {
     }
 
+
     /**
      * Start polling for this attempt's score.
      *
@@ -50,9 +56,15 @@ class AttemptEvaluator
      * `\Schoolbox\Learning\Learnosity\Helper::processAttemptCompletion`
      * (via a controller) repeatedly until that method reports it's done.
      *
+     * @param User $user
      * @param QuizDomainModel $assessment
-     * @param Attempt\Model   $existingAttempt
+     * @param Model $existingAttempt
      * @return void
+     * @throws RouteNotFound
+     * @throws Exception
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws \InvalidArgumentException
      */
     public function poll(
         User $user,
@@ -68,6 +80,18 @@ class AttemptEvaluator
                 'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
             ]
         );
+
+        /* Update schoolbox when we're done
+         */
+        $callbackUrl = $this->routeGenerator->generate(
+            'learnosity.postRescoreAttemptsCallback',
+            [
+                'assessmentId'               => $assessment->getId(),
+                'studentId'                  => $existingAttempt->getUser()->getId(),
+                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
+            ]
+        );
+
         $message = $this->messageFactory
             ->setUser($user)
             ->setRequest(
@@ -78,6 +102,7 @@ class AttemptEvaluator
                     )
                     ->withHeader('accept', 'application/json')
             )
+            ->setCallbackUrl((string)$this->baseUrl->withPath($callbackUrl))
             ->build();
 
         $this->messageProducer->send(
