@@ -55,6 +55,14 @@ class Model implements IFile, ISoftDeletable
     /** @var Kami\Model */
     private $kami;
 
+    /**
+     * Is this file the student kami worksheet?
+     * Similar logic to the $editableInline, it doesn't show in the file list,
+     * and when rendering we extract this for displaying in a dedicated method
+     * @var bool
+     */
+    protected bool $isWorksheet;
+
 
     /**
      * A Turnitin Report model, optionally null
@@ -212,5 +220,23 @@ class Model implements IFile, ISoftDeletable
     {
         $this->kami = $kami;
         return $this;
+    }
+
+    /**
+     * @param bool $isWorksheet
+     * @return Model
+     */
+    public function setIsWorksheet(bool $isWorksheet): self
+    {
+        $this->isWorksheet = $isWorksheet;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsWorksheet(): bool
+    {
+        return $this->isWorksheet;
     }
 }

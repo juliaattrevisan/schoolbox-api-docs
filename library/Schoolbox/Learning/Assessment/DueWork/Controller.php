@@ -1012,8 +1012,8 @@ class Controller extends Assessment\Controller
             //if this is an existing attempt, then fetch the kami file
             if ($latestResponse) {
                 // Kami Worksheet - fetch Kami Doc
-                $kamiFile = $latestResponse->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
-                    return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
+                $kamiFile = $latestResponse->getAllFiles()->filter(function (SubmissionFile $file) {
+                    return $file->getIsWorksheet();
                 })->first()?->getKami()?->getKamiDocumentId();
             }
             if (!$kamiFile) {
@@ -1022,8 +1022,8 @@ class Controller extends Assessment\Controller
                 // try and use the last attempt (published)
                 /** @var Submission|null $lastResponse */
                 $lastResponse = $participant->findMostRecentResponse();
-                $kamiFile = $lastResponse?->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
-                    return (bool)$file->getKami() && $file->getFilename() === $worksheetName;
+                $kamiFile = $lastResponse?->getAllFiles()->filter(function (SubmissionFile $file) {
+                    return $file->getIsWorksheet();
                 })->first()?->getKami()?->getKamiDocumentId();
 
                 // if still no kami file from a previous attempt, just spawn a new one
@@ -1042,8 +1042,8 @@ class Controller extends Assessment\Controller
                      * we will cache the kami ID for the student. (which we already have as $kamiFile)
                      * clear the student submission from the old attempt, and move along
                      */
-                    $lastResponse->setAllFiles($lastResponse->getAllFiles()->filter(function (SubmissionFile $file) use ($worksheetName) {
-                        return !((bool)$file->getKami() && $file->getFilename() === $worksheetName);
+                    $lastResponse->setAllFiles($lastResponse->getAllFiles()->filter(function (SubmissionFile $file) {
+                        return !$file->getIsWorksheet();
                     }));
                     $this->dueWorkResponseMapper->save($lastResponse);
                 }
@@ -1259,9 +1259,11 @@ class Controller extends Assessment\Controller
             }
 
             // apparently we need to always create a new student submission object...
+            /** @var SubmissionFile $kamiFile */
             $kamiFile = $this->submissionFileMapper->createModel()
                 ->setFilename($worksheetName)
                 ->setKami($kamiModel)
+                ->setIsWorksheet(true)
                 ->setStorage($assessment->getWorksheetTemplate())
                 ->setSubmission($response);
             $response->getAllFiles()->add($kamiFile);

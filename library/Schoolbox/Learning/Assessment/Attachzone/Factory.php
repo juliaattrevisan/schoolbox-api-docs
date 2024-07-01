@@ -156,9 +156,11 @@ class Factory
         $response->getAllFiles()->sortBy('filename', 'asc');
 
         foreach ($response->getAllFiles() as $file) {
-            /* Ignore accumulation of wizzywig contents
+            /* Ignore accumulation of:
+             * wizzywig contents
+             * kami worksheets
              */
-            if (!$file->getEditableInline()) {
+            if (!($file->getEditableInline() || $file->getIsWorksheet())) {
                 $files[] = $file;
             }
         }

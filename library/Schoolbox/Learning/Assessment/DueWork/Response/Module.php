@@ -81,21 +81,40 @@ class Module extends BaseModule
 
         $hasResponseAccess = new Rule\All(
             new Rule\IsLoggedIn(),
-            $this->buildRuleHasWriteAccess(),
-            new Rule\Callback(function (array $params) {
-                if (($params['response'] ?? null) instanceof IResponse) {
-                    return true;
-                }
-                if (($params['assessment'] ?? null) instanceof IAssessable && ($params['student'] ?? null) instanceof User) {
-                    // check whether the student is a participant
-                    foreach ($params['assessment']->getAllParticipants() as $p) {
-                        if ($p->getUser()->getId() === $params['student']->getId()) {
+            new Rule\Any(
+                new Rule\Callback(
+                    static function (array $params = [], User $user = null) {
+                        // students who own the kami worksheet, can always view the state of the draft feedback
+                        if (isset($params['kami'])) {
+                            /** @var Kami\Model $params['kami'] */
+                            if (
+                                $params['kami']->getStudentSubmissionFile()->getFilename() === sprintf(Kami\Document::WORKSHEET_TITLE, $params['assessment']->getTitle(), $params['student']->getFullName()) &&
+                                $user->getId() === $params['student']->getId()
+                            ) {
+                                return;
+                            }
+                        }
+                        throw new Unauthorized();
+                    }
+                ),
+                new Rule\All(
+                    $this->buildRuleHasWriteAccess(),
+                    new Rule\Callback(function (array $params) {
+                        if (($params['response'] ?? null) instanceof IResponse) {
                             return true;
                         }
-                    }
-                }
-                throw new InvalidPath();
-            })
+                        if (($params['assessment'] ?? null) instanceof IAssessable && ($params['student'] ?? null) instanceof User) {
+                            // check whether the student is a participant
+                            foreach ($params['assessment']->getAllParticipants() as $p) {
+                                if ($p->getUser()->getId() === $params['student']->getId()) {
+                                    return true;
+                                }
+                            }
+                        }
+                        throw new InvalidPath();
+                    })
+                )
+            )
         );
 
         $hasKamiAccess = new Rule\All(
