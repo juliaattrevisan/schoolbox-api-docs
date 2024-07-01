@@ -120,11 +120,12 @@ HELP;
         $this->apiUpdatesTotalWaitTimeSeconds = 0;
 
         $nAssessmentIds = count($assessmentIds);
+$nAssessmentIds = 0;
         $logger->info("Found $nAssessmentIds assessmentIds.");
         $logger->info(''); // Blank line to make log readable.
 
         if ($nAssessmentIds === 0) {
-            $logger->info('Nothing to do.  Exiting');
+            $logger->info('Nothing to do.  Exiting.');
             exit(0);
         }
 
