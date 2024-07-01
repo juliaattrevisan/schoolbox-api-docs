@@ -271,8 +271,9 @@
             </div>
         </div>
         {% if importQueue.instance %}
-            <div class="small-12 island">
+            <div class="small-12 island scheduled-imports">
                 <h3 class="subheader">Scheduled Imports</h3>
+                <p class="meta">Note that you can only schedule one sync at a time.</p>
                 {% include '@adminImportIndex/schoolData/importQueue.twig' with {
                     importQueue: importQueue
                 } %}
