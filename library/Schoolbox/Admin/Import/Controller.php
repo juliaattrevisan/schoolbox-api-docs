@@ -67,12 +67,11 @@ class Controller extends ConfigController
      * @param Rebuilder $rebuilder
      * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
-     * @param ClientInterface $redisStorage
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      * @param \Schoolbox\Resource\File\Mapper $fileMapper
-     * @param \Schoolbox\External\Connector\ImportQueue\Mapper
+     * @param \Schoolbox\External\Connector\ImportQueue\Mapper $importQueueMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -80,7 +79,6 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
-        private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
