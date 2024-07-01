@@ -61,7 +61,7 @@ class Model implements IFile, ISoftDeletable
      * and when rendering we extract this for displaying in a dedicated method
      * @var bool
      */
-    protected bool $isWorksheet;
+    protected bool $isWorksheet = false;
 
 
     /**
