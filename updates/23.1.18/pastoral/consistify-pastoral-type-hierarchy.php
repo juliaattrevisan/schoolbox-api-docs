@@ -89,27 +89,23 @@ HELP;
 
             $totalMismatchedRecords += $nMismatchedRecords;
 
-            if ($this->perform()) {
-                try {
-                    $statement = $dbc->executeQuery(
-                        'UPDATE pastoral
-                        SET type_id = :typeId
-                        WHERE id IN (
-                            ' . implode(',', array_map('intval', $pastoralIdsWithMismatchedTypes)) . '
-                        )',
-                        ['typeId' => $typeId]
-                    );
-                } catch (\PDOException $e) {
-                    $log->error('   Update query failed - ' . $e->getMessage());
-                    $log->info('   Continuing to next type/subtype pair...');
-                    continue;
-                }
-                $nRowsAffected = $statement->rowCount();
-
-                $log->info("   Updated $nRowsAffected rows.");
-            } else {
-                $log->info('   No update, because not in --perform mode.');
+            try {
+                $statement = $dbc->executeQuery(
+                    'UPDATE pastoral
+                    SET type_id = :typeId
+                    WHERE id IN (
+                        ' . implode(',', array_map('intval', $pastoralIdsWithMismatchedTypes)) . '
+                    )',
+                    ['typeId' => $typeId]
+                );
+            } catch (\PDOException $e) {
+                $log->error('   Update query failed - ' . $e->getMessage());
+                $log->info('   Continuing to next type/subtype pair...');
+                continue;
             }
+            $nRowsAffected = $statement->rowCount();
+
+            $log->info("   Updated $nRowsAffected rows.");
         }
 
         if ($totalMismatchedRecords === 0) {
@@ -117,10 +113,6 @@ HELP;
         }
 
         $log->info("Processed a total of $totalMismatchedRecords pastoral records with mismatched type/subtype.");
-
-        if (!$this->perform()) {
-            $log->info('BUT PERFORMED NO UPDATES, BECAUSE --perform NOT USED');
-        }
     }
 };
 
