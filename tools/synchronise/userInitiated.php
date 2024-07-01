@@ -92,8 +92,6 @@ HELP;
             exit(1);
         }
 
-        \Schoolbox\External\Connector\ImportQueue\Mapper::getInstance();
-
         /* Spawn scheduler based on args
          *
          * This scheduler never takes a cached file as input source
@@ -118,6 +116,10 @@ HELP;
          * It's off by default.
          */
         $lissAdditiveMode = (bool)$this->getConfig()->get('external_liss_additive_mode');
+
+        /* Clear the sis_import_queue once we started, even if a lock was encountered.
+         */
+        \Schoolbox\External\Connector\ImportQueue\Mapper::getInstance()->truncate();
 
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
@@ -188,10 +190,6 @@ HELP;
          */
         /** @var FilesystemProxy $filesystemProxy */
         $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
-        /* Clear the sis_import_queue once we started
-         */
-        \Schoolbox\External\Connector\ImportQueue\Mapper::getInstance()->truncate();
 
         foreach ($splitStrats as $currentStrat) {
             /* Importer strats can be defined by cli args
