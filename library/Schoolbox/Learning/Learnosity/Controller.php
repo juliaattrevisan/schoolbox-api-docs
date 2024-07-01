@@ -2284,8 +2284,6 @@ class Controller extends Base
                 $assessment,
                 $attempt,
             );
-
-            (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll 1', $attempt->getLearnosityReference());
         }
 
         $this->getSession()->getSegment(static::class)->set('hasRescore', false);
@@ -2299,6 +2297,9 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -2344,10 +2345,5 @@ class Controller extends Base
         $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         $this->attemptMapper->save($attempt);
-
-        /* TODO but...what does taskd do about this?
-         *  How do I get the updated attempt score back here
-         */
-        (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll 2', $attempt->getLearnosityReference());
     }
 }

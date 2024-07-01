@@ -105,11 +105,6 @@ class AttemptEvaluator
             ->setCallbackUrl((string)$this->baseUrl->withPath($callbackUrl))
             ->build();
 
-        /* TODO but...what does taskd do about this?
-         *  How do I get the updated attempt score back here
-         */
-        (new \Alaress_Log_File('/tmp/myfile.log'))->log('taskd poll', $message);
-
         $this->messageProducer->send(
             $message,
             delay: 5,
