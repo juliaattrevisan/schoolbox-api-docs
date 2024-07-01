@@ -73,6 +73,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\External\ClassEntryMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\File\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\External\Connector\ImportQueue\Mapper::class),
         );
     }
 

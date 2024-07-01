@@ -270,6 +270,14 @@
                 </div>
             </div>
         </div>
+        {% if importQueue.instance %}
+            <div class="small-12 island">
+                <h3 class="subheader">Scheduled Imports</h3>
+                {% include '@adminImportIndex/schoolData/importQueue.twig' with {
+                    importQueue: importQueue
+                } %}
+            </div>
+        {% endif %}
 
         {% if importLogs|length %}
             <div class="small-12 island" id="previous">
