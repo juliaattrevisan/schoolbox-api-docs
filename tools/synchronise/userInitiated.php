@@ -82,6 +82,18 @@ HELP;
             exit;
         }
 
+        /* Decide if there's anything to do
+        */
+        $importQueueMapper = \Schoolbox\External\Connector\ImportQueue\Mapper::getInstance();
+
+        $hasRequested = $importQueueMapper->countAll();
+
+        if (!$hasRequested) {
+            exit(1);
+        }
+
+        \Schoolbox\External\Connector\ImportQueue\Mapper::getInstance();
+
         /* Spawn scheduler based on args
          *
          * This scheduler never takes a cached file as input source
