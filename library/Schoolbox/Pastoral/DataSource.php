@@ -285,23 +285,7 @@ class DataSource
      */
     public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?User $linkedStudent): GenericCollection
     {
-        // get records for the student
-        $studentRecords = $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null);
-
-        if (!$studentRecords->count()) {
-            return $studentRecords;
-        }
-
-        // create parent -> record map to find siblings
-        $parentChildMap = [];
-        /** @var Model $record */
-        foreach ($studentRecords as $record) {
-            // get ids to find linked records
-            if ($record->getParent()) {
-                $parentChildMap[$record->getParent()->getId()] = $record->getId();
-            }
-        }
-        return $studentRecords;
+        return $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null);
     }
 
 

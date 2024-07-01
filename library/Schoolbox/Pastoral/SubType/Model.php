@@ -16,16 +16,16 @@ use Schoolbox\Pastoral\Type\Model as PastoralType;
 class Model extends TypeAbstract
 {
     /**
-     * @var PastoralType
+     * @var ?PastoralType
      */
-    private $pastoralType;
+    private ?PastoralType $pastoralType = null; // Should only be null before hydration.  The database field is not-nullable.
 
     /**
      * @param PastoralType $pastoralType
      *
      * @return self
      */
-    public function setPastoralType($pastoralType): self
+    public function setPastoralType(PastoralType $pastoralType): self
     {
         $this->pastoralType = $pastoralType;
 
@@ -33,9 +33,9 @@ class Model extends TypeAbstract
     }
 
     /**
-     * @return PastoralType
+     * @return ?PastoralType
      */
-    public function getPastoralType()
+    public function getPastoralType(): ?PastoralType
     {
         return $this->pastoralType;
     }

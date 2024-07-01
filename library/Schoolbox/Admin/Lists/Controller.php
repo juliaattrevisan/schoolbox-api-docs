@@ -36,6 +36,7 @@ use Schoolbox\Sequential;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
 use Schoolbox\Pastoral;
@@ -177,7 +178,13 @@ class Controller extends Base
                         $value[$currentIndex] = trim($value[$currentIndex]);
                     }
 
-                    $model->$setter($value[$currentIndex]);
+                    // Some setters expect objects as parameters.  For those cases we need to create objects.
+                    $valueToSet = match ($setter) {
+                        'setPastoralType' => (new PastoralTypeModel())->setId($value[$currentIndex]),
+                        default => $value[$currentIndex],
+                    };
+
+                    $model->$setter($valueToSet);
                 }
             }
 

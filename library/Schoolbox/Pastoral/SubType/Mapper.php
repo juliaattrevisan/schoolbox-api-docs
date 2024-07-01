@@ -12,6 +12,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\SubType\Model as SubTypeModel;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use PDOStatement;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
@@ -46,6 +47,8 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('subtype_id', Pastoral\TypeAction\Mapper::class, 'typeActions', 'typeActions');
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateTypeHierarchy']);
 
 //        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
@@ -120,6 +123,32 @@ class Mapper extends BaseMapper
         }
         return $collection;
     }
+
+
+    /**
+     * If hierarchy of types is changing, ensure pastoral records also reflect the new hierarchy.
+     *
+     * @param SubTypeModel $subType
+     * @param ?SubTypeModel $previous
+     * @return void
+     */
+    protected function updateTypeHierarchy(SubTypeModel $subType, ?SubTypeModel $previous): void
+    {
+        if ($previous === null) {
+            // No previous subtype, so there are no old records to update.
+            return;
+        }
+
+        if ($subType->getPastoralType()->getId() !== $previous->getPastoralType()->getId()) {
+            $this->getDatabase()->query(
+                "UPDATE pastoral SET
+                type_id = ?
+                WHERE subtype_id = ? ",
+                [$subType->getPastoralType()->getId(), $subType->getId()]
+            );
+        }
+    }
+
 
 //    /**
 //     * Pre-soft-delete callback to ensure there are no
