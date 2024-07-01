@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\ImportQueue;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 /**
@@ -34,5 +35,52 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+        ";
+    }
+
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param \PDOStatement $statement
+     * @return GenericCollection
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $record = $this->hydrate($row);
+
+            /* Hydrate the user that requested this import queue record
+             */
+            /** @var \Schoolbox\User $user */
+            $user = $this->hydrateJoin($row, 'user', 'u');
+
+            $record->setUser($user);
+
+            $collection->add($record);
+        }
+
+        return $collection;
     }
 }
