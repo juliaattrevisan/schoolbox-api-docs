@@ -38,18 +38,28 @@ Usage:
  #}
 {% set readonly = interactionLocked and not USER.superUser %}
 
+{%  set feedbackRoute = routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
+    assessmentId: assessment.id,
+    studentId:    participant.user.id,
+    responseId:   response.id ?? null,
+    assessment:   assessment,
+    student:      participant.user
+}) %}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {# Participant Carousel #}
-{% block participantCarousel %}
-    {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
-        carousel: carousel,
-        participant: participant,
-        assessment: assessment,
-        blindMode: blindMode ?? false
-    } only %}
-{% endblock %}
+{% if feedbackRoute %}
+    {% block participantCarousel %}
+        {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
+            carousel: carousel,
+            participant: participant,
+            assessment: assessment,
+            blindMode: blindMode ?? false
+        } only %}
+    {% endblock %}
+{% endif %}
 
 {# These includes vary depending on who is viewing this page:
  # * Teachers doing their usual grading
@@ -129,6 +139,7 @@ Usage:
         {% endblock %}
 
         {# A subheading for the grading part #}
+        {% if feedbackRoute %}
         {% block subheading %}
             <div class="row">
                 <div class="small-12 island">
@@ -168,13 +179,7 @@ Usage:
         {# Grading logic and structure #}
         <div class="row mark-scheme" id="assessment-status" data-participant="{{ participant.user.id }}">
             <div class="small-12 island">
-                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
-                    assessmentId: assessment.id,
-                    studentId:    participant.user.id,
-                    responseId:   response.id ?? null,
-                    assessment:   assessment,
-                    student:      participant.user
-                }) }}">
+                <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ feedbackRoute }}">
                     <section>
                         <input type="hidden" name="responseId" value="{{ response.id ?? '' }}" />
                         {# Required so that this form is recognised as containing a rubric and files #}
@@ -368,5 +373,6 @@ Usage:
 
             <div id='toaster' class="toast" data-alert data-save-draft></div>
         </div>
+        {% endif %}
     </div>
 </div>

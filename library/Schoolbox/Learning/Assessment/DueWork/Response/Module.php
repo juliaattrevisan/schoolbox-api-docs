@@ -81,38 +81,37 @@ class Module extends BaseModule
 
         $hasResponseAccess = new Rule\All(
             new Rule\IsLoggedIn(),
+            $this->buildRuleHasWriteAccess(),
+            new Rule\Callback(function (array $params) {
+                if (($params['response'] ?? null) instanceof IResponse) {
+                    return true;
+                }
+                if (($params['assessment'] ?? null) instanceof IAssessable && ($params['student'] ?? null) instanceof User) {
+                    // check whether the student is a participant
+                    foreach ($params['assessment']->getAllParticipants() as $p) {
+                        if ($p->getUser()->getId() === $params['student']->getId()) {
+                            return true;
+                        }
+                    }
+                }
+                throw new InvalidPath();
+            })
+        );
+
+        $hasWorksheetView = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\Any(
+                $hasResponseAccess,
                 new Rule\Callback(
                     static function (array $params = [], User $user = null) {
                         // students who own the kami worksheet, can always view the state of the draft feedback
-                        if (isset($params['kami'])) {
-                            /** @var Kami\Model $params['kami'] */
-                            if (
-                                $params['kami']->getStudentSubmissionFile()->getFilename() === sprintf(Kami\Document::WORKSHEET_TITLE, $params['assessment']->getTitle(), $params['student']->getFullName()) &&
-                                $user->getId() === $params['student']->getId()
-                            ) {
+                        if (isset($params['response']) && $params['response'] instanceof Model && ($params['student'] ?? null) instanceof User) {
+                            if ($params['response']->getAllFiles()->filterBy('isWorksheet', true)->count() && $user->getId() === $params['student']->getId()) {
                                 return;
                             }
                         }
                         throw new Unauthorized();
                     }
-                ),
-                new Rule\All(
-                    $this->buildRuleHasWriteAccess(),
-                    new Rule\Callback(function (array $params) {
-                        if (($params['response'] ?? null) instanceof IResponse) {
-                            return true;
-                        }
-                        if (($params['assessment'] ?? null) instanceof IAssessable && ($params['student'] ?? null) instanceof User) {
-                            // check whether the student is a participant
-                            foreach ($params['assessment']->getAllParticipants() as $p) {
-                                if ($p->getUser()->getId() === $params['student']->getId()) {
-                                    return true;
-                                }
-                            }
-                        }
-                        throw new InvalidPath();
-                    })
                 )
             )
         );
@@ -144,7 +143,7 @@ class Module extends BaseModule
         $this->register('DELETE', $responsePattern, 'deleteParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasResponseAccess, $preloadParticipant); // a || r
-        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWorksheetView, $preloadParticipant); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
