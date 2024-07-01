@@ -94,7 +94,8 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
             $this->eventMapper,
             $this->overridesMapper,
             $this->colourMapper,
-            $this->staffProfileMapper
+            $this->staffProfileMapper,
+            $this->access,
         ))->getEvents($startTimestamp, $endTimestamp);
 
         /* Sort by time, because this is a ordered grid view, not a fullcalendar implementation

@@ -8,6 +8,8 @@ use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -26,6 +28,10 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /** @var IConfigLoader */
     private $configLoader;
 
+    /**
+     * @var Access;
+     */
+    private $access;
 
     /**
      * @var \Schoolbox\Calendar\EventTypeMapper
@@ -41,12 +47,14 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         User $user,
         User $viewer,
         IConfigLoader $configLoader,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        Access $access,
     ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->configLoader = $configLoader;
         $this->eventTypeMapper = $eventTypeMapper;
+        $this->access = $access;
     }
 
 
@@ -58,6 +66,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param array|null $allowedEventTypes
      * @return GenericCollection<EventInterface>
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
@@ -197,7 +206,15 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         }
                         if ($period['category'] instanceof Folder) {
                             // Put this into a category
-                            $event->setCategoryId($period['category']->getId());
+                            // Only show link to homepage when user has the correct permission
+                            if (
+                                $this->access->getFolderAccess(
+                                    $this->getViewer(),
+                                    $period['category']->getId()
+                                ) >= UserAccess::ACCESS_READ
+                            ) {
+                                $event->setCategoryId($period['category']->getId());
+                            }
                             $event->setCategoryName($period['category']->getName());
 
                             // Finagle a category collection for this event

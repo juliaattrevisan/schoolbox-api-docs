@@ -160,7 +160,8 @@ class Calendar_Api_Factory
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Timetable_ColourMapper::getInstance(),
-                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                Access::getInstance(),
             ));
         }
 
@@ -220,7 +221,8 @@ class Calendar_Api_Factory
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Timetable_ColourMapper::getInstance(),
-                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                Access::getInstance()
             )
         );
 
@@ -230,7 +232,8 @@ class Calendar_Api_Factory
                 $user,
                 $viewer,
                 $this->configLoader,
-                \Schoolbox\Calendar\EventTypeMapper::getInstance()
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                Access::getInstance(),
             )
         );
 
@@ -316,7 +319,14 @@ class Calendar_Api_Factory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance()
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
-                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader, \Schoolbox\Calendar\EventTypeMapper::getInstance());
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    $this->configLoader,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    Access::getInstance(),
+                );
 
             /* Resource Booking out of the cyclic grid
              * TODO (but where/how is this used/accessed?)
@@ -354,7 +364,8 @@ class Calendar_Api_Factory
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Timetable_ColourMapper::getInstance(),
-                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                    Access::getInstance(),
                 );
             case Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class:
                 return new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(

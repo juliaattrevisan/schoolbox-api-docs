@@ -258,7 +258,8 @@ try {
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Timetable_ColourMapper::getInstance(),
-                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                    Access::getInstance(),
                 ],
                 true,
                 $sentry
@@ -334,6 +335,7 @@ try {
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Timetable_ColourMapper::getInstance(),
                     \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                    Access::getInstance(),
                 ],
                 true,
                 $sentry
@@ -346,6 +348,7 @@ try {
                     $viewer,
                     $kernel->getDependencyInjector()->get('config'),
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    Access::getInstance(),
                 ],
                 true,
                 $sentry
@@ -508,7 +511,8 @@ try {
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Timetable_ColourMapper::getInstance(),
-                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                    Access::getInstance(),
                 ],
                 true,
                 $sentry
@@ -595,7 +599,13 @@ try {
                 //build timetable
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                    [ $user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
+                    [
+                        $user,
+                        $viewer,
+                        $kernel->getDependencyInjector()->get('config'),
+                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                        Access::getInstance(),
+                    ],
                     true,
                     $sentry
                 );
@@ -658,7 +668,8 @@ try {
                         \Schoolbox\External\Event\Mapper::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                         \Timetable_ColourMapper::getInstance(),
-                        \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                        \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                        Access::getInstance(),
                     ],
                     true,
                     $sentry
