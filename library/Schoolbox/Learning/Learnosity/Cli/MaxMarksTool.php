@@ -123,6 +123,11 @@ HELP;
         $logger->info("Found $nAssessmentIds assessmentIds.");
         $logger->info(''); // Blank line to make log readable.
 
+        if ($nAssessmentIds === 0) {
+            $logger->info('Nothing to do.  Exiting');
+            exit(0);
+        }
+
         /* Build dependencies
          */
         $api = new LearnosityApi(
@@ -224,6 +229,11 @@ HELP;
     {
         $logger = $this->getLogger();
         $logger->info('Gathering information from Learnosity:');
+
+        if (count($assessmentIds) === 0) {
+            $logger->info(' * No assessmentIds, so no short text questions.');
+            return [];
+        }
 
         $activityReferences = $this->getDatabaseInternal()->executeQuery(
             'SELECT assess.learnosity_reference
