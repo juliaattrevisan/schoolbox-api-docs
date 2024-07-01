@@ -58,10 +58,6 @@ class Module extends BaseModule
             return $this->preloadAssessmentAndStudent($params);
         };
 
-        $preloadAttempt = function ($params) {
-            return $this->preloadAttempt($params);
-        };
-
         /* The /update part is so we deconflict with the other Learnosity/Module.php routes,
          * specifically the complete route: /{assessmentId}/attempt/{studentId}/complete
          * "complete" is not a valid learnosity reference lol
@@ -107,39 +103,6 @@ class Module extends BaseModule
                 )
             )
         );
-    }
-
-
-    /**
-     * Preloads an attempt via its learnosity reference identifier
-     *
-     * @param array $params
-     * @return array
-     * @throws ContainerExceptionInterface
-     * @throws DefinitionException
-     * @throws DomainException
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws NotFound
-     * @throws NotFoundExceptionInterface
-     */
-    protected function preloadAttempt(array $params): array
-    {
-        $participantPreload = $this->preloadAssessmentAndStudent($params);
-
-        try {
-            $attempt = $this->getAttemptMapper()->findOneByColumnList([
-                'user_id' => $params['studentId'],
-                'learnosity_reference' => $params['learnositySessionReference']
-            ]);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new NotFound();
-        }
-
-        return array_merge($participantPreload, [
-            'attempt' => $attempt
-        ]);
     }
 
 
@@ -257,16 +220,6 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
-
-
-    /**
-     * @return Mapper|\Schoolbox\Learning\Quiz\Attempt\Mapper
-     * @throws InvalidArgumentException
-     */
-    protected function getAttemptMapper()
-    {
-        return $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class);
     }
 
 
