@@ -93,7 +93,6 @@ class NavigationSelector
      */
     public function __construct(Generator $routeGenerator, User $user, array $externalUser, IConnector $db, ?int $year)
     {
-$externalUser = ['StudentID' => 201];
         $this->routeGenerator = $routeGenerator;
         $this->user           = $user;
         $this->externalUser = $externalUser;
@@ -259,7 +258,6 @@ $externalUser = ['StudentID' => 201];
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return 1;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -281,7 +279,6 @@ return 1;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return 1;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -303,7 +300,6 @@ return 1;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return 1;
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
@@ -325,7 +321,7 @@ return 1;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return 1;
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM dbo.uvSchoolBoxIBResults
@@ -350,7 +346,7 @@ return 1;
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
-return 1;
+
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
             FROM uvSchoolBoxCoCurricularClasses
