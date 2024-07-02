@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -62,14 +63,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IFeedbackDataSource   $feedbackDataSource
+     * @param IFeedbackDataSource $feedbackDataSource
      * @param ParticipantDataSource $participantDataSource
-     * @param AssessmentDataSource  $assessmentDataSource
-     * @param ResponseDataSource    $responseDataSource
-     * @param UserMapper            $userMapper
-     * @param RubricDataSource      $rubricMapper
-     * @param ReturnedWorkMapper    $returnedWorkMapper
-     * @param Mapper                $projectResultCacheMapper
+     * @param AssessmentDataSource $assessmentDataSource
+     * @param ResponseDataSource $responseDataSource
+     * @param UserMapper $userMapper
+     * @param RubricDataSource $rubricMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param Mapper $projectResultCacheMapper
+     * @param Connector $kamiConnector
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -79,7 +81,8 @@ class Controller extends Base
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
-        private Project\ResultCache\Mapper $projectResultCacheMapper
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Connector $kamiConnector,
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -349,6 +352,22 @@ class Controller extends Base
 
         $feedback      = $dueWorkFeedbackFactory->produce();
         $isNewFeedback = $feedback->getId() === null;
+        if ($isNewFeedback) {
+            // Find the Kami worksheet (if it exists)
+            /** @var DueWork\Response\Model $response */
+            $response = $feedback->getResponse();
+            $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+                return $file->getIsWorksheet();
+            })->first()?->getKami();
+            if ($kamiModel) {
+                // Save the kami doc to the feedback object
+                $this->kamiConnector->initiatePollingForKamiDownload(
+                    $kamiModel,
+                    'submission',
+                    $this->getUser(),
+                );
+            }
+        }
         if (!$hasRubric && !$isNewFeedback && $feedback->isEmpty()) {
             $this->getFeedbackDataSource()->delete($feedback);
         } else {
@@ -477,12 +496,7 @@ class Controller extends Base
             $this->kamiConnector->initiatePollingForKamiDownload(
                 $kamiModel,
                 'submission',
-                $this->routeGenerator,
-                $this->messageFactory,
                 $this->getUser(),
-                $this->httpFactory,
-                $this->baseUrl,
-                $this->messageProducer
             );
         }
 

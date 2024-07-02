@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Aura\Router\Generator;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
+use Http\Discovery\Psr17Factory;
 use League\Flysystem\FilesystemException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -24,6 +26,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use SensitiveParameter;
 use stdClass;
@@ -82,6 +87,11 @@ class Connector implements IConnector
      * @param null|bool       $enabled Will be null when invoked by update scripts prior to config addition
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
+     * @param MessageFactory $messageFactory
+     * @param Psr17Factory $httpFactory
+     * @param Uri $baseUrl
+     * @param Producer $messageProducer
+     * @param Generator $routeGenerator
      */
     public function __construct(
         ClientInterface $client,
@@ -89,6 +99,11 @@ class Connector implements IConnector
         ?string $apiHost,
         #[SensitiveParameter] ?string $apiKey,
         ?string $siteSchoolCode,
+        private ?MessageFactory $messageFactory = null,
+        private ?Psr17Factory $httpFactory = null,
+        private ?Uri $baseUrl = null,
+        private ?Producer $messageProducer = null,
+        private ?Generator $routeGenerator = null
     ) {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
@@ -880,14 +895,22 @@ class Connector implements IConnector
 
 
 
-    public function initiatePollingForKamiDownload(Document $document, string $action, $routeGenerator,
-        $messageFactory,
-        $getUser,
-        $httpFactory,
-        $baseUrl,
-        $messageProducer,): void
-    {
-        $route = $routeGenerator->generate(
+    public function initiatePollingForKamiDownload(
+        Model $document,
+        string $action,
+        User $getUser,
+    ): void {
+        // if any of these are not set, then error out
+        if (
+            null === $this->routeGenerator ||
+            null === $this->messageFactory ||
+            null === $this->httpFactory ||
+            null === $this->baseUrl ||
+            null === $this->messageProducer
+        ) {
+            trigger_error("No Kami Connection.");
+        }
+        $route = $this->routeGenerator->generate(
             'learningDueWorkResponse.postPollKamiDownload',
             [
                 'kamiId'    => $document->getId(),
@@ -895,19 +918,19 @@ class Connector implements IConnector
                 'action'    => $action,
             ]
         );
-        $message = $messageFactory
-            ->setUser($getUser())
+        $message = $this->messageFactory
+            ->setUser($getUser)
             ->setRequest(
-                $httpFactory
+                $this->httpFactory
                     ->createRequest(
                         'POST',
-                        $baseUrl->withPath($route),
+                        $this->baseUrl->withPath($route),
                     )
                     ->withHeader('accept', 'application/json')
             )
             ->build();
 
-        $messageProducer->send(
+        $this->messageProducer->send(
             $message,
             delay: 5,
             maxRequeues: 10,

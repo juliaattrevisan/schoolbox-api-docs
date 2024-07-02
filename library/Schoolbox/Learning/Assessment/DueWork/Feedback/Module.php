@@ -13,10 +13,12 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Client;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
@@ -25,10 +27,12 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Role;
@@ -210,6 +214,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class),
+            $this->injector->get('kamiConnector')
         );
     }
 

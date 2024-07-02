@@ -73,6 +73,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -599,7 +600,7 @@ class Module extends BaseModule
                     $dueWorkDownloadMessageFactory,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
                 );
 
             case Assessment\Project\Controller::class:

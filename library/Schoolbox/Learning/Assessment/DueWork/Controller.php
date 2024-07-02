@@ -188,7 +188,7 @@ class Controller extends Assessment\Controller
         private Download\MessageFactory $dueWorkDownloadMessageFactory,
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
-        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
     ) {
         parent::__construct(
             $userMapper,
@@ -1293,17 +1293,12 @@ class Controller extends Assessment\Controller
             $response->setSubmittedAt(Alaress_Date_Format::now());
 
             // Kami worksheet
-            if ($kamiModel) {
+            if (isset($kamiModel)) {
                 // export students document to pdf, store this to this attempt
                 $this->kamiConnector->initiatePollingForKamiDownload(
                     $kamiModel,
                     'submission',
-                    $this->routeGenerator,
-                    $this->messageFactory,
                     $this->getUser(),
-                    $this->httpFactory,
-                    $this->baseUrl,
-                    $this->messageProducer
                 );
             }
         }
