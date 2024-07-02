@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -464,6 +465,26 @@ class Controller extends Base
         // Update project mark as the published feedback may affect the project cache
         (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
             ->refresh($this->assessmentDataSource, $assessment, $student);
+
+        // Find the Kami worksheet (if it exists)
+        /** @var DueWork\Response\Model $response */
+        $response = $feedback->getResponse();
+        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+            return $file->getIsWorksheet();
+        })->first()?->getKami();
+        if ($kamiModel) {
+            // Save the kami doc to the feedback object
+            $this->kamiConnector->initiatePollingForKamiDownload(
+                $kamiModel,
+                'submission',
+                $this->routeGenerator,
+                $this->messageFactory,
+                $this->getUser(),
+                $this->httpFactory,
+                $this->baseUrl,
+                $this->messageProducer
+            );
+        }
 
         $data = [
             'success' => true,

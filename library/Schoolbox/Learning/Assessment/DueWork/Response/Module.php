@@ -152,6 +152,7 @@ class Module extends BaseModule
         );
         $this->register('GET', '/kami/{kamiId:\d+}', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
+        $this->register('POST', '/kami/{kamiId:\d+}/{action:\s+}/poll', 'postPollKamiDownload', $canAccessKami, $preloadKami);
 
         // This rule is a simplified version of the rule from
         // `\Schoolbox\Learning\Assessment\Module::buildAuthRuleCanViewSummary`,
@@ -539,6 +540,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filesystem.storageProxy'),
             $turnitinFileApi,
+            $this->injector->get('filesystem.receiver'),
+            $this->injector->get('returnDataSource'),
         );
     }
 

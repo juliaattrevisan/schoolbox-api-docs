@@ -1293,7 +1293,19 @@ class Controller extends Assessment\Controller
             $response->setSubmittedAt(Alaress_Date_Format::now());
 
             // Kami worksheet
-            // export students document to pdf, store this to this attempt
+            if ($kamiModel) {
+                // export students document to pdf, store this to this attempt
+                $this->kamiConnector->initiatePollingForKamiDownload(
+                    $kamiModel,
+                    'submission',
+                    $this->routeGenerator,
+                    $this->messageFactory,
+                    $this->getUser(),
+                    $this->httpFactory,
+                    $this->baseUrl,
+                    $this->messageProducer
+                );
+            }
         }
 
         // Save the response before attempting to save any feedback: we need a response ID to be able to attach the feedback

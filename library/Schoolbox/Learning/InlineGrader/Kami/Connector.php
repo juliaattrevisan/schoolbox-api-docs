@@ -877,4 +877,40 @@ class Connector implements IConnector
         }
         throw new Exception\NotFound("Kami Worksheet not cloned", $request, $response);
     }
+
+
+
+    public function initiatePollingForKamiDownload(Document $document, string $action, $routeGenerator,
+        $messageFactory,
+        $getUser,
+        $httpFactory,
+        $baseUrl,
+        $messageProducer,): void
+    {
+        $route = $routeGenerator->generate(
+            'learningDueWorkResponse.postPollKamiDownload',
+            [
+                'kamiId'    => $document->getId(),
+                'kami'      => $document,
+                'action'    => $action,
+            ]
+        );
+        $message = $messageFactory
+            ->setUser($getUser())
+            ->setRequest(
+                $httpFactory
+                    ->createRequest(
+                        'POST',
+                        $baseUrl->withPath($route),
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->build();
+
+        $messageProducer->send(
+            $message,
+            delay: 5,
+            maxRequeues: 10,
+        );
+    }
 }

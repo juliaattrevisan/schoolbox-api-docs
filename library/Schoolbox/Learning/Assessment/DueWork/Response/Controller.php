@@ -13,6 +13,8 @@ use Alaress\Web\Controller\Base;
 use DomainException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as FeedbackFileMapper;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Fetcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -44,6 +46,7 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -100,6 +103,8 @@ class Controller extends Base
         Access $access,
         private FilesystemProxy $filesystemProxy,
         private ?Turnitin\File\Api $turnitinFileApi,
+        private Receiver $filesystemReceiver,
+        private DueWorkFeedbackMapperProxy $feedbackMapperProxy
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -387,6 +392,92 @@ class Controller extends Base
                                ->withHeader('Pragma', 'public')
                                ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
         ;
+    }
+
+    /**
+     * Polls a kami export request to see if we can download and save to the attached student submission.
+     * @api POST /learning/kami/{kamiId}/poll
+     * @since 24.0
+     *
+     * @param Kami\Model $kami
+     * @param string $action // enum of what action we are working with, student submit, or teacher feedback
+     * @throws Kami\Exception\EmptyApiKeyException If Kami is not enabled
+     * @throws Kami\Exception\NotFound If unable to find the document in Kami
+     * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
+     */
+    public function postPollKamiDownload(Kami\Model $kami, string $action): void
+    {
+        /**
+         * use the kami export system to attempt a download of a kami doc to either
+         * we have 2 actions to download to a kami file as PDF;
+         * on student submission (save the current kami to the student submission file)
+         * on teacher feedback published (save the current kami to the teacher feedback file)
+         */
+
+        // Less overhead in sleeping the server process, than spinning it up per client poll.
+        // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
+        $maxPolls  = 10;
+        $exponent  = 2;
+        $sleep     = 500000; // 0.5 seconds initial back-off
+        $pollCount = 0;
+        $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
+        while ($export->isStatusPending()) {
+            if ($pollCount >= $maxPolls) {
+                break;
+            }
+            usleep($sleep);
+            $sleep  *= $exponent; // exponential back-off.
+            $export = $this->kamiConnector->getExport($export->getId());
+            $pollCount++;
+        }
+
+        // Let the browser know that the synchronous request has finished (either success or failure)
+        $token = $this->requestQuery->get('token');
+
+        // TODO consider adding cookie setting method in response factory
+        $fqdn = \trim("{$this->getConfigLoader()->get('site_hostname')}.{$this->getConfigLoader()->get('site_domain')}");
+
+        setcookie('kamiExportToken', $token, 0, '/', $fqdn, true, false);
+        setcookie('kamiExportStatus', $export->getStatus(), 0, '/', $fqdn, true, false);
+
+        // Unable to generate the export? (either due to error or timeout)
+        if (!$export->isStatusDone()) {
+            // Don't change browser viewport
+            $this->response = $this->responseAsJson(['error' => $export->getErrorType()])->withStatus(400);
+            return;
+        }
+
+        // grab the file and save to storage
+        $filename           = $kami->getStudentSubmissionFile()->getBasename();
+        $guzzleResponse     = (new Client())->get($export->getFileUrl());
+        $storage = $this->filesystemReceiver->acceptStream(
+            $filename,
+            $guzzleResponse->getBody(),
+            uploadingUser: $this->getUser()
+        );
+
+        // different logic for either saving to the existing student submission, or attaching to the teacher feedback
+        switch ($action) {
+            case 'submission':
+                $kami->getStudentSubmissionFile()->setStorage($storage);
+                $this->kamiMapper->save($kami);
+                break;
+            case 'feedback':
+                // find the feedback object
+                $submission = $kami->getStudentSubmissionFile()->getSubmission();
+                $lastFeedback = $submission->getAllFeedback()->filter(function (Feedback $feedback) {
+                    return $feedback->isInstructorGiven() && $feedback->isPublished();
+                })->last();
+                // create a feedback file object
+                $lastFeedback->getAllFiles()->add(
+                    FeedbackFileMapper::getInstance()->createModel()
+                        ->setStorage($storage)
+                        ->setFilename($filename)
+                );
+                // save the things
+                $this->feedbackMapperProxy->save($lastFeedback);
+                break;
+        }
     }
 
 
