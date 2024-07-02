@@ -34,9 +34,9 @@ use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
+use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
-use Schoolbox\Learning\Learnosity\QuizFetcher;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -2367,35 +2367,12 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
-     * @throws DebugBarException
-     * @throws \RuntimeException
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
      */
     public function getExportAttempts(QuizDomainObject $assessment): void
     {
-        /* Get the quiz equivalent
-         */
-        $quizId = $this->quizFetcher->findByAssessmentId($assessment->getId())->getId();
-
-        /* Get a list of all the attempts that were made
-         */
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quizId)->indexBy('learnosityReference');
-
-        $learnosityReferences = $attempts->keys();
-
-        /* Ask learnosity about the questions in this quiz
-         */
-        $results = $this->api->dataGetRequest('/sessions/responses', [
-            'session_id' => $learnosityReferences
-        ]);
-
-        /* Index by learnosity reference, for a quick correlation
-         */
-        $learnositySessions = array_fill_keys($learnosityReferences, null);
-
-        foreach ($results['data'] as $result) {
-            $learnositySessions[$result['session_id']] = $result;
-        }
-
-        new \Alaress_Probe($learnosityReferences, $learnositySessions);
+        (new Processor($this->api, $this->quizFetcher, $this->attemptMapper))->export($assessment);
     }
 }
