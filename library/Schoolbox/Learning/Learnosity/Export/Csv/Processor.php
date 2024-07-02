@@ -20,6 +20,19 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper;
 class Processor
 {
     /**
+     * These always appear in the csv
+     */
+    private const MANDATORY_COLUMNS = [
+        'External ID',
+        'User ID',
+        'Last Name',
+        'First Name',
+        'Start',
+        'Finish',
+    ];
+
+
+    /**
      * Constructor.
      *
      * @param Api $api
