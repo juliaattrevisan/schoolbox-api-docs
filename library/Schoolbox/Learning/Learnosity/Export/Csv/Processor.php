@@ -284,7 +284,7 @@ class Processor
             $row[] = \Scrub::html2text($data['stimulus']);
         }
 
-        fputcsv($output, $row);
+        fputcsv($output, $row, ',', '"');
     }
 
 
@@ -320,7 +320,7 @@ class Processor
                 $row[] = $responseData[$itemReference] ?? '';
             }
 
-            fputcsv($output, $row);
+            fputcsv($output, $row, ',', '"');
         }
     }
 
