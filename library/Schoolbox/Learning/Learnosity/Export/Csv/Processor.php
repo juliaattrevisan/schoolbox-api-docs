@@ -78,7 +78,12 @@ class Processor
          */
         $learnositySessions = $this->getLearnositySessions($attempts);
 
-        new \Alaress_Probe($structure, $learnositySessions);
+        /* Translate meanings and make more succinct each learnosity session,
+         * using $structure as a lookup where needed for mcq etc.
+         */
+        $sessions = $this->compileHumanReadable($learnositySessions, $structure);
+
+        new \Alaress_Probe($structure, $sessions);
     }
 
 
@@ -214,5 +219,39 @@ class Processor
         }
 
         return $learnositySessions;
+    }
+
+
+    /**
+     * Swap learnosity identifiers for human-readable equivalents
+     * This approach seems like complete insanity to me, but whatever
+     *
+     * @param array $learnositySessions
+     * @param array $structure
+     * @return array
+     */
+    private function compileHumanReadable(array $learnositySessions, array $structure): array
+    {
+        $sessions = [];
+
+        foreach ($learnositySessions as $sessionReference => $learnositySession) {
+            foreach ($learnositySession['responses'] as $response) {
+                /* TODO Factory/Strategy this, as needed
+                 */
+                if ('mcq' === $response['question_type']) {
+                    $vals = [];
+
+                    foreach ($response['response']['value'] as $val) {
+                        $vals[] = $structure[$response['item_reference']]['data'][$val];
+                    }
+
+                    $sessions[$sessionReference][$response['item_reference']] = implode(', ', $vals);
+                } elseif ('shorttext' === $response['question_type']) {
+                    $sessions[$sessionReference][$response['item_reference']] = $response['response']['value'];
+                }
+            }
+        }
+
+        return $sessions;
     }
 }
