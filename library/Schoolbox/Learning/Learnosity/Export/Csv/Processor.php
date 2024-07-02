@@ -110,6 +110,24 @@ class Processor
             }
         }
 
+        /* Find some info about each item
+         */
+        $questions = $this->api->dataGetRequest('/itembank/questions', [
+            'item_references' => array_keys($structure)
+        ])['data'] ?? [];
+
+        /* Augment the structure so we know what each response means.
+         *
+         * This has got to be the most roundabout way to find the human-readable equivalents
+         * of what students responded with.
+         */
+        foreach ($questions as $itemReference => $data) {
+            $structure[$itemReference] = [
+                'type' => $data[0]['data']['type'],
+                'data' => $data[0]['data']['options']
+            ];
+        }
+
         return $structure;
     }
 
