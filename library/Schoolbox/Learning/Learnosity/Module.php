@@ -217,6 +217,10 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/rescore', 'postRescoreAttempts', $instructorPerms, $preloadAssessment);
 
+        /* CSV Export of students' most recent response
+         */
+        $this->register('GET', '/{assessmentId}/attempts/csv', 'getExportAttempts', $instructorPerms, $preloadAssessment);
+
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
