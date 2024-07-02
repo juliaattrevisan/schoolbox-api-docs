@@ -593,7 +593,6 @@
                             currentPermission === "default" &&
                             ![null, "denied", "removed"].includes(window.localStorage.getItem("notification"))
                         ) {
-                            alert("override");
                             currentPermission = "granted"; // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
                         }
 
