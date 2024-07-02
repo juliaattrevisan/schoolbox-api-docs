@@ -625,6 +625,23 @@
                             });
                             {# wait for toggle change #}
                         }
+
+                        {# on iOS, Notification.permission is completely unreliable until we have used
+                         # Notification.requestPermission at least once. If a user initially denies notifications,
+                         # but then turns them on in settings, iOS will still return 'denied' for Notification.permission
+                         # even if you navigate between pages or refresh the whole app sometimes...
+                         # We can't just auto re-request permission because Notification.requestPermission() requires a user gesture
+                         #
+                         # To work around this, we provide a button on the blocked message that the user can click to
+                         # trigger Notification.requestPermission() again and then reload the page to get the reflected UI changes
+                         #}
+                        document.querySelectorAll('[data-pwa-action="retryNotifPrompt"]').forEach( (element) => {
+                            element?.addEventListener('click', async () => {
+                                await Notification.requestPermission();
+                                window.location.reload();
+                            });
+                        });
+
                         let prompted = false;
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
                             element?.addEventListener('click', async () => {
