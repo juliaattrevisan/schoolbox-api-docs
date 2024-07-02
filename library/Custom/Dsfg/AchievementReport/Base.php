@@ -60,6 +60,14 @@ abstract class Base
 
 
     /**
+     * Table heading suffix
+     *
+     * @var string
+     */
+    protected $headingSuffix = '';
+
+
+    /**
      * The year for which to obtain data
      *
      * @var string|null
@@ -119,6 +127,14 @@ abstract class Base
         $this->db = $db;
         $this->year = $year;
         $this->currentYear = date('Y');
+
+        $reportYear = (
+            // The report date is the most recently passed 31st of January.
+            // So if the current month is January, the report year is the previous year.  Else it is the current year.
+            (strtotime(date('M') === 'Jan') ? $this->currentYear - 1 : $this->currentYear
+        );
+        $this->heading = 'Literacy/Numeracy';
+        $this->headingSuffix = "as at 31 January $reportYear";
     }
 
 
@@ -158,6 +174,7 @@ abstract class Base
      */
     protected function getExternalUserId()
     {
+return 201;
         return $this->externalUser['StudentID'];
     }
 
@@ -186,6 +203,17 @@ abstract class Base
     public function getHeading(): string
     {
         return $this->heading;
+    }
+
+
+    /**
+     * Get heading
+     *
+     * @return string
+     */
+    public function getHeadingSuffix(): string
+    {
+        return $this->headingSuffix;
     }
 
 

@@ -33,6 +33,12 @@ class LiteracyNumeracyCheckbox extends Base
             'id4' => $this->getExternalUserId(),
             'id5' => $this->getExternalUserId(),
         ];
+return [
+    'UE Literacy' => 1,
+    'UE Numeracy' => 1,
+    'Level 1 Literacy' => 1,
+    'Level 1 Numeracy' => 1,
+];
 
         $query = "
             SELECT

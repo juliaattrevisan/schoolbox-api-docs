@@ -168,6 +168,7 @@ class Comments extends Base
             'year' => $this->year
         ];
 
+return [];
         $query = '
             SELECT
                 StudentYear,

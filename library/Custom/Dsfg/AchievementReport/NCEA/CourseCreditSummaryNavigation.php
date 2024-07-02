@@ -36,6 +36,7 @@ class CourseCreditSummaryNavigation extends Base
             'externalId' => $this->getExternalUserId(),
             'year' => $this->getCurrentYear()
         ];
+return [2020, 2021, 2022, 2023, 2024];
 
         $query = "
             SELECT

@@ -678,28 +678,29 @@ class Controller extends Base
                  */
                 'literacyNumeracyCheckbox' => [
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
+                    'headingSuffix' => $literacyNumeracyCheckbox->getHeadingSuffix(),
                     'data' => $literacyNumeracyCheckbox->findData()
                 ],
 
-                /* Qualifications rating
-                 */
-                'qualifications' => [
-                    'heading' => $qualifications->getHeading(),
-                    'data' => $qualifications->findData(),
-                ],
-
-                /* Credit Summary graphs for all years combined
-                 */
-                'creditSummary' => [
-                    'heading' => $creditSummary->getHeading(),
-                    'data' => $creditSummary->findData(),
-                    'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => self::TYPES,
-
-                    /* Suffix for graph div id's
-                     */
-                    'suffix' => 'all',
-                ],
+//                /* Qualifications rating
+//                 */
+//                'qualifications' => [
+//                    'heading' => $qualifications->getHeading(),
+//                    'data' => $qualifications->findData(),
+//                ],
+//
+//                /* Credit Summary graphs for all years combined
+//                 */
+//                'creditSummary' => [
+//                    'heading' => $creditSummary->getHeading(),
+//                    'data' => $creditSummary->findData(),
+//                    'allLetters' => $creditSummary->getLetterRegistry(),
+//                    'allTypes' => self::TYPES,
+//
+//                    /* Suffix for graph div id's
+//                     */
+//                    'suffix' => 'all',
+//                ],
             ]
         ];
 
