@@ -453,6 +453,41 @@
                         deviceId = 'Android';
                     }
 
+                    {# Determine whether or not the sidebar is empty (has no install button or notification message)
+                     # This is useful when hiding parts of the sidebar prompt contents so that we don't end up with
+                     # weird padding or the "Later" button floating in the middle of nowhere...
+                     #}
+                    function isSidebarPromptEmpty() {
+                        return Array.from(document.querySelectorAll('[data-pwa="sidebarPrompt"]')).some((sidebarElement) => {
+                            if (sidebarElement.classList.contains('hide')) {
+                                return true; // The whole sidebar prompt is hidden, so it's effectively empty
+                            }
+
+                            // Check install section
+                            if (Array.from(sidebarElement.querySelectorAll('[data-pwa="install"]')).some((installSectionElement) => {
+                                if (installSectionElement.classList.contains('hide')) {
+                                    return false; // The install section is hidden
+                                }
+
+                                // If any install button is visible, then the sidebar prompt is not empty
+                                return Array.from(installSectionElement.querySelectorAll('[data-pwa-action]')).some((installActionElement) => {
+                                    return !installActionElement.classList.contains('hide');
+                                });
+                            })) {
+                                return false; // An install button is visible, so the sidebar prompt is not empty
+                            };
+
+                            // Check notification section
+                            if (Array.from(sidebarElement.querySelectorAll('[data-pwa-notif]')).some((notifSectionElement) => {
+                                return !notifSectionElement.classList.contains('hide');
+                            })) {
+                                return false; // A notification message is visible, so the sidebar prompt is not empty
+                            }
+
+                            return true;
+                        });
+                    }
+
                     {# Allow the user to dismiss our request for them to install the app/enable notifications
                      # in the notifications panel. If they've previously dismissed it, don't show it again.
                      #}
@@ -571,6 +606,13 @@
                                             element.classList.add('hide');
                                         });
 
+                                        // Hide the sidebar prompt if it's now empty
+                                        if (isSidebarPromptEmpty()) {
+                                            document.querySelectorAll('[data-pwa="sidebarPrompt"]').forEach((element) => {
+                                                element.classList.add('hide');
+                                            });
+                                        }
+
                                         const result = await promptEvent.userChoice;
 
                                         {% if config.debug_mode %}
@@ -612,7 +654,7 @@
 
                         if (currentPermission === "granted") {
                             {# Only show the notification enabled message outside the sidebar when granted on initial page load #}
-                            document.querySelectorAll('[data-pwa-page="settings"] [data-pwa="notifEnabledMessage"]').forEach((element) => {
+                            document.querySelectorAll('[data-pwa-page="settings"] [data-pwa-notif="notifEnabledMessage"]').forEach((element) => {
                                 element.classList.remove('hide');
                             });
 
@@ -624,7 +666,7 @@
                             }
                         } else if (currentPermission === "denied") {
                             {# Show the blocked message #}
-                            document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa-notif="notifBlocked"]').forEach( (element)=>{
                                 element.classList.remove('hide');
                             });
 
@@ -636,7 +678,7 @@
                         } else {
                             {# The user hasn't been prompted yet, show them the button to enable notifs
                              #}
-                            document.querySelectorAll('[data-pwa="enableNotifPrompt"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa-notif="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.remove('hide');
                             });
 
@@ -644,7 +686,7 @@
                              # iOS requires the user to be in the PWA to before enabling notifications.
                              #}
                             if (iOS() && !isPWA) {
-                                document.querySelectorAll('[data-pwa="iOSHomePrompt"]').forEach((element) => {
+                                document.querySelectorAll('[data-pwa-notif="iOSHomePrompt"]').forEach((element) => {
                                     element.classList.remove('hide');
                                 });
 
@@ -683,7 +725,7 @@
 
                                 {# Hide the enable button, as we'll either show the granted or blocked message next
                                  #}
-                                document.querySelectorAll('[data-pwa="enableNotifPrompt"]').forEach( (element)=>{
+                                document.querySelectorAll('[data-pwa-notif="enableNotifPrompt"]').forEach( (element)=>{
                                     element.classList.add('hide');
                                 });
 
@@ -697,7 +739,7 @@
                                      # Notable difference to page load behaviour here, we do want to show the message on the sidebar
                                      # as the user has just enabled notifications, so find all elements instead of excluding some this time.
                                      #}
-                                    document.querySelectorAll('[data-pwa="notifEnabledMessage"]').forEach( (element)=>{
+                                    document.querySelectorAll('[data-pwa-notif="notifEnabledMessage"]').forEach( (element)=>{
                                         element.classList.remove('hide');
                                     });
 
@@ -737,7 +779,7 @@
                                     {% endif %}
 
                                     {# Show the blocked message #}
-                                    document.querySelectorAll('[data-pwa="notifBlocked"]').forEach( (element)=> {
+                                    document.querySelectorAll('[data-pwa-notif="notifBlocked"]').forEach( (element)=> {
                                         element.classList.remove('hide');
                                     });
 
