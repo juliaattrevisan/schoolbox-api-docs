@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Export\Csv;
 
-use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
@@ -50,15 +49,16 @@ class Processor
 
 
     /**
+     * Make a csv containing each attempt's details, corresponding to the current quiz's questions.
+     *
      * @param QuizDomainObject $assessment
-     * @return array
-     * @throws DebugBarException
-     * @throws \JsonException
-     * @throws ValidationException
-     * @throws \RuntimeException
+     * @return void
      * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function export(QuizDomainObject $assessment): array
+    public function export(QuizDomainObject $assessment): void
     {
         /* Known questions in the current incarnation of $assessment
          *
@@ -71,7 +71,6 @@ class Processor
          * to represent student responses, but we want to show the human-readable equivalent.
          */
         $structure = $this->buildMeanings($structure);
-
         /* Get a list of all the attempts that were made
          */
         $attempts = $this->getAttempts($assessment);
@@ -83,19 +82,11 @@ class Processor
         /* Translate meanings and make more succinct each learnosity session,
          * using $structure as a lookup where needed for mcq etc.
          */
-        $sessions = $this->compileHumanReadable($learnositySessions, $structure);
+        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
 
-        /* Slam together a header row, but you need to compile the questions' text first
-         * TODO fgetcsv as you build, so you don't need to store this in mem
+        /* Send it
          */
-        $header = $this->buildHeaderRow($structure);
-
-        /* Start building rows
-         * TODO fgetcsv as you build, so you don't need to store this in mem
-         */
-        $rows = $this->buildDataRows($attempts, $sessions, $structure);
-
-        new \Alaress_Probe($structure, $sessions, $header, $rows);
+        $this->outputData($structure, $attempts, $sessions);
     }
 
 
@@ -243,11 +234,11 @@ class Processor
      * Swap learnosity identifiers for human-readable equivalents
      * This approach seems like complete insanity to me, but whatever
      *
-     * @param array $learnositySessions
      * @param array $structure
+     * @param array $learnositySessions
      * @return array
      */
-    private function compileHumanReadable(array $learnositySessions, array $structure): array
+    private function compileHumanReadable(array $structure, array $learnositySessions): array
     {
         $sessions = [];
 
@@ -277,11 +268,12 @@ class Processor
      * Manufacture header row, whose columns consist of questions' stimuli
      *
      * @param array $structure
-     * @return string[]
+     * @param resource $output
+     * @return void
      */
-    private function buildHeaderRow(array $structure): array
+    private function buildHeaderRow(array $structure, $output): void
     {
-        $header = self::MANDATORY_COLUMNS;
+        $row = self::MANDATORY_COLUMNS;
 
         /* Augment with items' stimulus, replacing html with text equivalent
          *
@@ -289,28 +281,28 @@ class Processor
          *  since you can have multiple questions per item now)
          */
         foreach ($structure as $itemReference => $data) {
-            $header[] = \Scrub::html2text($data['stimulus']);
+            $row[] = \Scrub::html2text($data['stimulus']);
         }
 
-        return $header;
+        fputcsv($output, $row);
     }
 
 
     /**
      * Build actual csv rows
      *
+     * @param array $structure
      * @param GenericCollection $attempts
      * @param array $sessions
-     * @param array $structure
-     * @return array
+     * @param resource $output
+     * @return void
      */
     private function buildDataRows(
+        array $structure,
         \Schoolbox\GenericCollection $attempts,
         array $sessions,
-        array $structure
-    ): array {
-        $rows = [];
-
+        $output
+    ): void {
         foreach ($sessions as $sessionReference => $responseData) {
             /** @var Model $attempt **/
             $attempt = $attempts[$sessionReference];
@@ -328,11 +320,36 @@ class Processor
                 $row[] = $responseData[$itemReference] ?? '';
             }
 
-            /* TODO I guess you can dump this to csv via fgetcsv as you build it, really
-             */
-            $rows[] = $row;
+            fputcsv($output, $row);
         }
+    }
 
-        return $rows;
+
+    /**
+     * Facade method for making a csv and headers etc.
+     *
+     * @param array $structure
+     * @param GenericCollection $attempts
+     * @param array $sessions
+     * @return void
+     */
+    private function outputData(
+        array $structure,
+        \Schoolbox\GenericCollection $attempts,
+        array $sessions
+    ): void {
+        /* Start generating output to stream
+         */
+        $output = fopen('php://output', 'rw');
+
+        /* Slam together a header row, but you need to compile the questions' text first
+         */
+        $this->buildHeaderRow($structure, $output);
+
+        /* Start building rows
+         */
+        $this->buildDataRows($structure, $attempts, $sessions, $output);
+
+        fclose($output);
     }
 }
