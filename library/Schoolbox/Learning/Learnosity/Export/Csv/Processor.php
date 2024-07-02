@@ -83,6 +83,22 @@ class Processor
          */
         $sessions = $this->compileHumanReadable($learnositySessions, $structure);
 
+        /* Start building rows
+         */
+        foreach ($sessions as $sessionReference => $responseData) {
+            $row = [
+                'external id',
+                'user id',
+                'lastname',
+                'firstname',
+                'start time',
+                'finish time'
+            ];
+
+            foreach ($structure as $itemReference => $data) {
+//                $session[$itemReference
+            }
+        }
         new \Alaress_Probe($structure, $sessions);
     }
 
@@ -109,6 +125,8 @@ class Processor
 
         $structure = [];
 
+        /* Item references are in the reverse chronological order...wth
+         */
         foreach ($itemReferences as $itemReference) {
             /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
              * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
@@ -136,7 +154,9 @@ class Processor
      */
     private function buildMeanings(array $structure): array
     {
-        $meanings = [];
+        /* Maintain same ordering
+         */
+        $meanings = array_fill_keys(array_keys($structure), null);
 
         /* Find some info about each item
          */
