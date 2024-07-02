@@ -85,10 +85,13 @@ class Processor
          */
         $sessions = $this->compileHumanReadable($learnositySessions, $structure);
 
+        /* TODO Slam together a header row, but you need to compile the questions' text first
+         */
+
         /* Start building rows
+         * TODO fgetcsv as you build, so you don't need to store this in mem
          */
         $rows = $this->buildRows($attempts, $sessions, $structure);
-
 
         new \Alaress_Probe($structure, $sessions, $rows);
     }
