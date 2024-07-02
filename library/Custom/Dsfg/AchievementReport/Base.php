@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 abstract class Base
 {
-
     /**
      * Initialised array of term indices
      */
