@@ -478,57 +478,6 @@
                     {# Are we currently installed and inside a PWA? #}
                     const isPWA = window.matchMedia('(display-mode: standalone)').matches;
 
-                    {# dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox #}
-                    // Initialize deferredPrompt for use later to show browser install prompt.
-                    window.addEventListener('beforeinstallprompt', (event) => {
-                        // Prevent the mini-infobar from appearing on mobile.
-                        event.preventDefault();
-                        {% if config.debug_mode %}
-                        console.log('👍', 'beforeinstallprompt', event);
-                        {% endif %}
-                        // Stash the event so it can be triggered later.
-                        window.deferredPrompt = event;
-                        // Remove the 'hide' class from the install button container.
-                        document.querySelectorAll('[data-pwa="install"]').forEach((element) => {
-                            element.classList.remove('hide');
-                        });
-                    });
-
-                    document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                        element.addEventListener('click', async () => {
-                            {% if config.debug_mode %}
-                            console.log('👍', 'butInstall-clicked');
-                            {% endif %}
-                            const promptEvent = window.deferredPrompt;
-                            if (!promptEvent) {
-                                // The deferred prompt isn't available.
-                                return;
-                            }
-                            // Show the install prompt.
-                            promptEvent.prompt();
-                            // Log the result
-                            const result = await promptEvent.userChoice;
-                            {% if config.debug_mode %}
-                            console.log('👍', 'userChoice', result);
-                            {% endif %}
-                            // Reset the deferred prompt variable, since
-                            // prompt() can only be called once.
-                            window.deferredPrompt = null;
-                            // Hide the install button.
-                            document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.classList.add('hide');
-                            });
-                        });
-                    });
-
-                    window.addEventListener('appinstalled', (event) => {
-                        {% if config.debug_mode %}
-                        console.log('👍', 'appinstalled', event);
-                        {% endif %}
-                        // Clear the deferredPrompt so it can be garbage collected
-                        window.deferredPrompt = null;
-                    });
-
                     {# If on iOS and digistorm app exists, show digistorm and not PWA #}
                     if (
                         iOS() &&
@@ -563,9 +512,102 @@
                         console.log('Normal PWA');
                         {% endif %}
 
-                        document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWA"]').forEach((element) => {
-                            element.classList.remove('hide');
-                        });
+                        if (iOS()) {
+                            {# We can't use beforeinstallprompt on iOS, so we'll show our own prompt and
+                             # guide the user with instructions on how to add to home screen instead...
+                             #}
+
+                            {# Show the install button #}
+                            document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWA"]').forEach((element) => {
+                                element.classList.remove('hide');
+                            });
+
+                            {# When the user clicks the install button, show the instructions #}
+                            {# TODO #}
+                        } else {
+                            {# Otherwise, rely on beforeinstallprompt to detect browser compatibility before showing the install button
+                             # This event is not widely supported, so we either need to provide a manual guide (e.g. iOS) or wait for
+                             # the event to tell us that the browser is capable of installing the PWA.
+                             #
+                             # If we don't do this, the install button will end up showing on browsers that don't support it, and do nothing upon click...
+                             #
+                             # Dupe from https://web.dev/articles/codelab-make-installable and changes to use inside schoolbox
+                             #}
+
+                            window.addEventListener('beforeinstallprompt', (event) => {
+                                {% if config.debug_mode %}
+                                    console.log('👍', 'beforeinstallprompt', event);
+                                {% endif %}
+
+                                {# If the user has already installed the app, don't prompt them to install it again
+                                 # There exists navigator.getInstalledRelatedApps(), but it isn't widely supported yet and
+                                 # currently doesn't work for our app, so this method is a bit more reliable for now instead.
+                                 #}
+                                if (window.localStorage.getItem("PWAIsInstalled") === "true") {
+                                    return;
+                                }
+
+                                {# Prevent the mini-infobar from appearing on mobile. #}
+                                event.preventDefault();
+
+                                {# Stash the event so it can be used later #}
+                                window.deferredPrompt = event;
+
+                                {# The browser is capable of directly installing the PWA, so show the install button #}
+                                document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWA"]').forEach((element) => {
+                                    element.classList.remove('hide');
+                                });
+
+                                {# When the user clicks the install button, use the deferredPrompt we just made #}
+                                document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
+                                    element.addEventListener('click', async () => {
+                                        {% if config.debug_mode %}
+                                        console.log('👍', 'butInstall-clicked');
+                                        {% endif %}
+                                        const promptEvent = window.deferredPrompt;
+                                        if (!promptEvent) return; // The deferred prompt isn't available.
+
+                                        // Show the install prompt.
+                                        promptEvent.prompt();
+
+                                        // Reset the deferred prompt variable, since
+                                        // prompt() can only be called once.
+                                        window.deferredPrompt = null;
+
+                                        // Hide the install button
+                                        document.querySelectorAll('[data-pwa="install"]').forEach((element) => {
+                                            element.classList.add('hide');
+                                        });
+
+                                        const result = await promptEvent.userChoice;
+
+                                        {# If the user chose to install the app, then keep track of this so we do not show the install button again #}
+                                        if (result.outcome === 'accepted') {
+                                            window.localStorage.setItem("PWAIsInstalled", "true");
+                                        }
+
+                                        {% if config.debug_mode %}
+                                        // Log the result
+                                        console.log('👍', 'userChoice', result);
+                                        {% endif %}
+                                    });
+                                });
+                            });
+
+                            window.addEventListener('appinstalled', (event) => {
+                                {% if config.debug_mode %}
+                                console.log('👍', 'appinstalled', event);
+                                {% endif %}
+
+                                {# Clear the deferredPrompt so it can be garbage collected #}
+                                window.deferredPrompt = null;
+
+                                {# If the user chose to install the app, then keep track of this so we do not show the install button again #}
+                                if (result.outcome === 'accepted') {
+                                    window.localStorage.setItem("PWAIsInstalled", "true");
+                                }
+                            });
+                        }
                     }
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
@@ -610,7 +652,8 @@
                             window.localStorage.setItem("notification", "denied");
                             window.localStorage.removeItem("notifToken");
                         } else {
-                            {# The user hasn't been prompted yet, show them the button to enable notifs #}
+                            {# The user hasn't been prompted yet, show them the button to enable notifs
+                             #}
                             document.querySelectorAll('[data-pwa="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.remove('hide');
                             });
@@ -656,7 +699,8 @@
                                 {# Use await instead of .then to avoid iOS treating as a non-interaction and failing #}
                                 const permission = await Notification.requestPermission();
 
-                                {# Hide the enable button, as we'll either show the granted or blocked message next #}
+                                {# Hide the enable button, as we'll either show the granted or blocked message next
+                                 #}
                                 document.querySelectorAll('[data-pwa="enableNotifPrompt"]').forEach( (element)=>{
                                     element.classList.add('hide');
                                 });
@@ -752,7 +796,7 @@
                          # so we can hit the event listener in the firebase file at the bottom of the file.
                          # This is calling the above function which calls the firebase event, but is not passing through the data,
                          # and there is probably a better way of doing this anyhow...
-                        #}
+                         #}
                         if (document.readyState !== 'loading') {
                             reAuthNotif();
                         } else {
