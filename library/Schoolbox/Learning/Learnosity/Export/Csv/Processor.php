@@ -166,6 +166,7 @@ class Processor
         foreach ($questions as $itemReference => $data) {
             $meanings[$itemReference] = [
                 'type' => $data[0]['data']['type'],
+                'stimulus' => \Scrub::html2text($data[0]['data']['stimulus']),
                 'data' => null
             ];
 
