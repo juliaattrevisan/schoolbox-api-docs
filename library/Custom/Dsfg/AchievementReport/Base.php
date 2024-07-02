@@ -131,7 +131,7 @@ abstract class Base
         $reportYear = (
             // The report date is the most recently passed 31st of January.
             // So if the current month is January, the report year is the previous year.  Else it is the current year.
-            (strtotime(date('M') === 'Jan') ? $this->currentYear - 1 : $this->currentYear
+            strtotime(date('M') === 'Jan') ? $this->currentYear - 1 : $this->currentYear
         );
         $this->heading = 'Literacy/Numeracy';
         $this->headingSuffix = "as at 31 January $reportYear";
