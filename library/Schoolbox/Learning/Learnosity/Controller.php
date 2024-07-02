@@ -2370,6 +2370,7 @@ class Controller extends Base
      * @throws ApiException
      * @throws ValidationException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function getExportAttempts(QuizDomainObject $assessment): void
     {
