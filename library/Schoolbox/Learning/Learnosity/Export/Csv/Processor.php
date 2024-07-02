@@ -85,15 +85,17 @@ class Processor
          */
         $sessions = $this->compileHumanReadable($learnositySessions, $structure);
 
-        /* TODO Slam together a header row, but you need to compile the questions' text first
+        /* Slam together a header row, but you need to compile the questions' text first
+         * TODO fgetcsv as you build, so you don't need to store this in mem
          */
+        $header = $this->buildHeaderRow($structure);
 
         /* Start building rows
          * TODO fgetcsv as you build, so you don't need to store this in mem
          */
-        $rows = $this->buildRows($attempts, $sessions, $structure);
+        $rows = $this->buildDataRows($attempts, $sessions, $structure);
 
-        new \Alaress_Probe($structure, $sessions, $rows);
+        new \Alaress_Probe($structure, $sessions, $header, $rows);
     }
 
 
@@ -272,6 +274,29 @@ class Processor
 
 
     /**
+     * Manufacture header row, whose columns consist of questions' stimuli
+     *
+     * @param array $structure
+     * @return string[]
+     */
+    private function buildHeaderRow(array $structure): array
+    {
+        $header = self::MANDATORY_COLUMNS;
+
+        /* Augment with items' stimulus, replacing html with text equivalent
+         *
+         * TODO disenfranchise questions from their items (we should be working on question references
+         *  since you can have multiple questions per item now)
+         */
+        foreach ($structure as $itemReference => $data) {
+            $header[] = \Scrub::html2text($data['stimulus']);
+        }
+
+        return $header;
+    }
+
+
+    /**
      * Build actual csv rows
      *
      * @param GenericCollection $attempts
@@ -279,7 +304,7 @@ class Processor
      * @param array $structure
      * @return array
      */
-    private function buildRows(
+    private function buildDataRows(
         \Schoolbox\GenericCollection $attempts,
         array $sessions,
         array $structure
