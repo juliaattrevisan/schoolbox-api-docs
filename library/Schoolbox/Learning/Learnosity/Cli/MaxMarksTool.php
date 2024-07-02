@@ -310,7 +310,7 @@ HELP;
                 }
 
                 $activityData = $activity['data'] ?? [];
-                $itemReferencesBatch = $activityData['items']; // Might be null.
+                $itemReferencesBatch = $activityData['items'] ?? null;
 
                 if (is_array($itemReferencesBatch)) {
                     // Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258, we have to
