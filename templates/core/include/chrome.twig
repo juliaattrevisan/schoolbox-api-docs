@@ -580,7 +580,24 @@
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
                     if (("Notification" in window)) {
-                        if (Notification.permission === "granted") {
+                        {# As Notification.permission cannot be trusted on iOS, we can use localStorage
+                         # to avoid showing "Enable Notifications" again if we think the user should already
+                         # have them enabled...
+                         # If the browser is saying notifications are blocked, respect that, even though it may be wrong
+                         # as we handle this separately by providing a button to re-request permission instead.
+                         #}
+                        let currentPermission = Notification.permission;
+
+                        if (
+                            iOS() &&
+                            currentPermission === "default" &&
+                            ![null, "denied", "removed"].includes(window.localStorage.getItem("notification"))
+                        ) {
+                            alert("override");
+                            currentPermission = "granted"; // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
+                        }
+
+                        if (currentPermission === "granted") {
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('checked', true);
                             });
@@ -607,7 +624,7 @@
                                 window.localStorage.setItem("notification", "requesting");
                             }
 
-                        } else if (Notification.permission === "denied") {
+                        } else if (currentPermission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
                             });
