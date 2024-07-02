@@ -65,6 +65,11 @@ class Processor
          */
         $structure = $this->buildStructure($assessment);
 
+        /* Find human-readable meanings for options. Multiple choice questions will have numeric values
+         * to represent student responses, but we want to show the human-readable equivalent.
+         */
+        $meanings = $this->buildMeanings($structure);
+
         /* Get a list of all the attempts that were made
          */
         $attempts = $this->getAttempts($assessment);
@@ -73,7 +78,7 @@ class Processor
          */
         $learnositySessions = $this->getLearnositySessions($attempts);
 
-        new \Alaress_Probe($structure, $learnositySessions);
+        new \Alaress_Probe($structure, $meanings, $learnositySessions);
     }
 
 
@@ -110,6 +115,24 @@ class Processor
             }
         }
 
+        return $structure;
+    }
+
+
+    /**
+     * Cross reference values to human-readable equivalents
+     * Only applies to some question types
+     *
+     * @param array $structure
+     * @return array
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     */
+    private function buildMeanings(array $structure): array
+    {
+        $meanings = [];
+
         /* Find some info about each item
          */
         $questions = $this->api->dataGetRequest('/itembank/questions', [
@@ -122,13 +145,25 @@ class Processor
          * of what students responded with.
          */
         foreach ($questions as $itemReference => $data) {
-            $structure[$itemReference] = [
+            $meanings[$itemReference] = [
                 'type' => $data[0]['data']['type'],
-                'data' => $data[0]['data']['options']
+                'data' => null
             ];
+
+            /* TODO Factory/Strategy this, as needed
+             */
+            if ('mcq' === $data[0]['data']['type']) {
+                $lookup = [];
+
+                foreach ($data[0]['data']['options'] as $option) {
+                    $lookup[$option['value']] = $option['label'];
+                }
+
+                $meanings[$itemReference]['data'] = $lookup;
+            }
         }
 
-        return $structure;
+        return $meanings;
     }
 
 
