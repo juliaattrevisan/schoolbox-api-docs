@@ -11,11 +11,13 @@ namespace Schoolbox\Learning\Learnosity\Export\Csv;
 
 use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\QuizFetcher;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
+use Schoolbox\Learning\Quiz\Attempt\Model;
 
 class Processor
 {
@@ -85,21 +87,10 @@ class Processor
 
         /* Start building rows
          */
-        foreach ($sessions as $sessionReference => $responseData) {
-            $row = [
-                'external id',
-                'user id',
-                'lastname',
-                'firstname',
-                'start time',
-                'finish time'
-            ];
+        $rows = $this->buildRows($attempts, $sessions, $structure);
 
-            foreach ($structure as $itemReference => $data) {
-//                $session[$itemReference
-            }
-        }
-        new \Alaress_Probe($structure, $sessions);
+
+        new \Alaress_Probe($structure, $sessions, $rows);
     }
 
 
@@ -273,5 +264,46 @@ class Processor
         }
 
         return $sessions;
+    }
+
+
+    /**
+     * Build actual csv rows
+     *
+     * @param GenericCollection $attempts
+     * @param array $sessions
+     * @param array $structure
+     * @return array
+     */
+    private function buildRows(
+        \Schoolbox\GenericCollection $attempts,
+        array $sessions,
+        array $structure
+    ): array {
+        $rows = [];
+
+        foreach ($sessions as $sessionReference => $responseData) {
+            /** @var Model $attempt **/
+            $attempt = $attempts[$sessionReference];
+
+            $row = [
+                $attempt->getUser()->getExternalId(),
+                $attempt->getUser()->getId(),
+                $attempt->getUser()->getLastname(),
+                $attempt->getUser()->getFirstname(),
+                $attempt->getStart()->getShort(),
+                $attempt->getFinish()?->getShort()
+            ];
+
+            foreach ($structure as $itemReference => $data) {
+                $row[] = $responseData[$itemReference] ?? '';
+            }
+
+            /* TODO I guess you can dump this to csv via fgetcsv as you build it, really
+             */
+            $rows[] = $row;
+        }
+
+        return $rows;
     }
 }
