@@ -539,14 +539,6 @@
                                     console.log('👍', 'beforeinstallprompt', event);
                                 {% endif %}
 
-                                {# If the user has already installed the app, don't prompt them to install it again
-                                 # There exists navigator.getInstalledRelatedApps(), but it isn't widely supported yet and
-                                 # currently doesn't work for our app, so this method is a bit more reliable for now instead.
-                                 #}
-                                if (window.localStorage.getItem("PWAIsInstalled") === "true") {
-                                    return;
-                                }
-
                                 {# Prevent the mini-infobar from appearing on mobile. #}
                                 event.preventDefault();
 
@@ -581,11 +573,6 @@
 
                                         const result = await promptEvent.userChoice;
 
-                                        {# If the user chose to install the app, then keep track of this so we do not show the install button again #}
-                                        if (result.outcome === 'accepted') {
-                                            window.localStorage.setItem("PWAIsInstalled", "true");
-                                        }
-
                                         {% if config.debug_mode %}
                                         // Log the result
                                         console.log('👍', 'userChoice', result);
@@ -601,11 +588,6 @@
 
                                 {# Clear the deferredPrompt so it can be garbage collected #}
                                 window.deferredPrompt = null;
-
-                                {# If the user chose to install the app, then keep track of this so we do not show the install button again #}
-                                if (result.outcome === 'accepted') {
-                                    window.localStorage.setItem("PWAIsInstalled", "true");
-                                }
                             });
                         }
                     }
