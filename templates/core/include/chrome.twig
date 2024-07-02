@@ -168,7 +168,6 @@
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
     <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
-
         {% set dockTitle = 'Pin side menu' %}
         {% set undockTitle = 'Unpin side menu' %}
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
@@ -456,9 +455,9 @@
                         {% endif %}
                         // Stash the event so it can be triggered later.
                         window.deferredPrompt = event;
-                        // Remove the 'hidden' class from the install button container.
+                        // Remove the 'hide' class from the install button container.
                         document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
-                            element.classList.toggle('display', 'none');
+                            element.classList.remove('hide');
                         });
                     });
 
@@ -484,7 +483,7 @@
                             window.deferredPrompt = null;
                             // Hide the install button.
                             document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.classList.toggle('display', 'block');
+                                element.classList.add('hide');
                             });
                         });
                     });
