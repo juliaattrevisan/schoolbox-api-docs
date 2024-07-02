@@ -68,7 +68,7 @@ class Processor
         /* Find human-readable meanings for options. Multiple choice questions will have numeric values
          * to represent student responses, but we want to show the human-readable equivalent.
          */
-        $meanings = $this->buildMeanings($structure);
+        $structure = $this->buildMeanings($structure);
 
         /* Get a list of all the attempts that were made
          */
@@ -78,7 +78,7 @@ class Processor
          */
         $learnositySessions = $this->getLearnositySessions($attempts);
 
-        new \Alaress_Probe($structure, $meanings, $learnositySessions);
+        new \Alaress_Probe($structure, $learnositySessions);
     }
 
 
