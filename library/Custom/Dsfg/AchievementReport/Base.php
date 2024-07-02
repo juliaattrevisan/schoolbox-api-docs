@@ -173,7 +173,7 @@ abstract class Base
      */
     protected function getExternalUserId()
     {
-        return $this->externalUser['StudentID'];
+        return $this->externalUser['StudentID'] ?? null;
     }
 
 
