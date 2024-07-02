@@ -2378,8 +2378,24 @@ class Controller extends Base
 
         /* Get a list of all the attempts that were made
          */
-        $attempts = $this->attemptMapper->findByColumn('assess_id', $quizId);
+        $attempts = $this->attemptMapper->findByColumn('assess_id', $quizId)->indexBy('learnosityReference');
 
-        new \Alaress_Probe($attempts);
+        $learnosityReferences = $attempts->keys();
+
+        /* Ask learnosity about the questions in this quiz
+         */
+        $results = $this->api->dataGetRequest('/sessions/responses', [
+            'session_id' => $learnosityReferences
+        ]);
+
+        /* Index by learnosity reference, for a quick correlation
+         */
+        $learnositySessions = array_fill_keys($learnosityReferences, null);
+
+        foreach ($results['data'] as $result) {
+            $learnositySessions[$result['session_id']] = $result;
+        }
+
+        new \Alaress_Probe($learnosityReferences, $learnositySessions);
     }
 }
