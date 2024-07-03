@@ -318,7 +318,7 @@ class Processor
                 $attempt->getUser()->getLastname(),
                 $attempt->getUser()->getFirstname(),
                 $attempt->getStart()->getShort(),
-                $attempt->getFinish()?->getShort()
+                $attempt->getFinish() ? $attempt->getFinish()->getShort() : 'Incomplete'
             ];
 
             foreach ($structure as $itemReference => $data) {
