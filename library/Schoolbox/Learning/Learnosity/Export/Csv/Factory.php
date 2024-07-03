@@ -75,6 +75,18 @@ class Factory
             /* Charts
              */
             'simplechart' => new Simplechart(),
+            /* Chemistry
+             * These are all formula editors -_-
+             */
+            'imageclozechemistry' => new NotApplicable(),
+            'chemistryessayV2' => new NotApplicable(),
+            'clozechemistry' => new NotApplicable(),
+            'chemistry' => new NotApplicable(),
+            /* Unknown thing encountered; might be:
+             *     a new feature, or
+             *     Math Question Generator, or
+             *     Image Annotation Upload
+             */
             default => null,
         };
     }
