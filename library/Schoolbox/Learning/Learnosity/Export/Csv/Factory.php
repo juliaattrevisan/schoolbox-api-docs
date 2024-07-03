@@ -18,7 +18,6 @@ class Factory
      * @return IStrategy|null
      */
     public function produce(string $questionType): ?IStrategy {
-//        new \Alaress_Probe($questionType);
         return match ($questionType) {
             /* Multiple Choice
              */
@@ -73,6 +72,9 @@ class Factory
             'clozeformula' => new NotApplicable(),
             'imageclozeformula' => new NotApplicable(),
             'formulaessayV2' => new NotApplicable(),
+            /* Charts
+             */
+            'simplechart' => new Simplechart(),
             default => null,
         };
     }
