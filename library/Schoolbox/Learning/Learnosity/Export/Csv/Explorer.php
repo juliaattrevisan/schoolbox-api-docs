@@ -11,14 +11,28 @@ namespace Schoolbox\Learning\Learnosity\Export\Csv;
 
 class Explorer implements IStrategy
 {
-
+    /**
+     * @inheritDoc
+     *
+     * @param array $question
+     * @return array|null
+     */
     public function findMeaning(array $question): ?array
     {
         new \Alaress_Probe($question);
+        return [];
     }
 
+
+    /**
+     * @inheritDoc
+     *
+     * @param array $response
+     * @return string|null
+     */
     public function findHumanReadable(array $structure, array $response): ?string
     {
         new \Alaress_Probe($response);
+        return null;
     }
 }

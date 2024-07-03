@@ -52,6 +52,14 @@ class Factory
             'tokenhighlight' => new Tokenhighlight(),
             'simpleshading' => new Simpleshading(),
             'drawing' => new NotApplicable(),
+            /* Graphing
+             * It's possible to encode graphplotting into serialized data but it'll be so weirdly
+             * convoluted that nobody but us would figure out how to really take advantage of it.
+             * It'll be too hard for people to comprehend any encoding scheme we devise here.
+             */
+            'graphplotting' => new NotApplicable(),
+            'numberline' => new Numberline(),
+            'numberlineplot' => new Numberlineplot(),
             default => null,
         };
     }
