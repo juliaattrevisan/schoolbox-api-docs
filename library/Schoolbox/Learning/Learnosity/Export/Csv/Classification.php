@@ -38,7 +38,7 @@ class Classification implements IStrategy
 
             /* Represent each column specially
              */
-            foreach ($data as $val) {
+            foreach ($data ?? [] as $val) {
                 $column[] = $structure[$response['question_reference']]['data'][$val];
             }
 
