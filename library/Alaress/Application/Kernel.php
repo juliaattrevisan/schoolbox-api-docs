@@ -1663,10 +1663,10 @@ abstract class Kernel
             'apiHost'           => $config->get(ConfigMapper::NAME_KAMI_API_HOST),
             'apiKey'            => $config->get(ConfigMapper::NAME_KAMI_API_KEY),
             'siteSchoolCode'    => $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
-            'messageFactory'    => $di->get('taskd.httpRequestMessageFactory'),
-            'httpFactory'       => $di->get('httpFactory'),
+            'messageFactory'    => $di->lazyGet('taskd.httpRequestMessageFactory'),
+            'httpFactory'       => $di->lazyGet('httpFactory'),
             'baseUrl'           => (new \Schoolbox\Url\Factory($config))->buildFullyQualified(),
-            'messageProducer'   => $di->get('taskd.messageProducer'),
+            'messageProducer'   => $di->lazyGet('taskd.messageProducer'),
             'routeGenerator'    => $di->lazyGet('router.generator')
 
         ]));
