@@ -18,11 +18,11 @@ class Factory
      * @return IStrategy|null
      */
     public function produce(string $questionType): ?IStrategy {
-        switch ($questionType) {
-            case 'mcq': return new Mcq();
-            case 'choicematrix': return new Choicematrix();
-            case 'shorttext': return new Shorttext();
-            default: return null;
-        }
+        return match ($questionType) {
+            'mcq' => new Mcq(),
+            'choicematrix' => new Choicematrix(),
+            'shorttext' => new Shorttext(),
+            default => null,
+        };
     }
 }
