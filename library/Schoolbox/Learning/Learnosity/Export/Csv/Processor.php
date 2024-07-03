@@ -165,43 +165,18 @@ class Processor
          *
          * sigh
          */
+        $factory = new Factory();
+
         foreach ($itemRefs as $itemRef) {
             foreach ($questions[$itemRef] as $question) {
-                $meaning = [
+                $structure[$question['reference']] = [
                     'type' => $question['data']['type'],
                     'stimulus' => \Scrub::html2text($question['data']['stimulus']),
-                    'data' => null
-                ];
-
-                /* Cross reference values to human-readable equivalents
-                 * (Only applies to some question types)
-                 */
-                /* TODO Factory/Strategy this, as needed
-                 */
-                if ('mcq' === $question['data']['type']) {
-                    /* Find human-readable meanings for options. Multiple choice questions will have numeric values
-                     * to represent student responses, but we want to show the human-readable equivalent.
+                    /* Cross reference values to human-readable equivalents
+                     * (Only applies to some question types)
                      */
-                    $lookup = [];
-
-                    foreach ($question['data']['options'] as $option) {
-                        $lookup[$option['value']] = $option['label'];
-                    }
-
-                    $meaning['data'] = $lookup;
-                } elseif ('choicematrix' === $question['data']['type']) {
-                    $lookup = [];
-
-                    foreach ($question['data']['options'] as $value => $label) {
-                        $lookup[$value] = $label;
-                    }
-
-                    $meaning['data'] = $lookup;
-                } elseif ('shorttext' === $question['data']['type']) {
-                    $meaning['data'] = null;
-                }
-
-                $structure[$question['reference']] = $meaning;
+                    'data' => $factory->produce($question['data']['type'])?->findMeaning($question)
+                ];
             }
         }
 
@@ -282,29 +257,11 @@ class Processor
          * of "foreach() on null" issues; this is because learnosity is still transacting and
          * will only last a moment. By the time the average user gets here it should be ready
          */
+        $factory = new Factory();
+
         foreach ($learnositySessions as $sessionReference => $learnositySession) {
             foreach ($learnositySession['responses'] as $response) {
-                /* TODO Factory/Strategy this, as needed
-                 */
-                if ('mcq' === $response['question_type']) {
-                    $vals = [];
-
-                    foreach ($response['response']['value'] as $val) {
-                        $vals[] = $structure[$response['question_reference']]['data'][$val];
-                    }
-
-                    $sessions[$sessionReference][$response['question_reference']] = implode(', ', $vals);
-                } elseif ('choicematrix' === $response['question_type']) {
-                    $vals = [];
-
-                    foreach ($response['response']['value'] as $val) {
-                        $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
-                    }
-
-                    $sessions[$sessionReference][$response['question_reference']] = implode(', ', $vals);
-                } elseif ('shorttext' === $response['question_type']) {
-                    $sessions[$sessionReference][$response['question_reference']] = $response['response']['value'];
-                }
+                $sessions[$sessionReference][$response['question_reference']] = $factory->produce($response['question_type'])?->findHumanReadable($structure, $response);
             }
         }
 

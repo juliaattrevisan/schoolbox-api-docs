@@ -26,8 +26,9 @@ interface IStrategy
      * Convert the integer response that a student gave,
      * finding its human-readable equivalent
      *
+     * @param array $structure
      * @param array $response
      * @return string|null
      */
-    public function findHumanReadable(array $response): ?string;
+    public function findHumanReadable(array $structure, array $response): ?string;
 }

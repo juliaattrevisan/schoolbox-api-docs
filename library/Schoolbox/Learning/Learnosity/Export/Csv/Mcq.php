@@ -19,7 +19,16 @@ class Mcq implements IStrategy
      */
     public function findMeaning(array $question): ?array
     {
-        // TODO: Implement findMeaning() method.
+        /* Find human-readable meanings for options. Multiple choice questions will have numeric values
+         * to represent student responses, but we want to show the human-readable equivalent.
+         */
+        $lookup = [];
+
+        foreach ($question['data']['options'] as $option) {
+            $lookup[$option['value']] = $option['label'];
+        }
+
+        return $lookup;
     }
 
 
@@ -29,8 +38,14 @@ class Mcq implements IStrategy
      * @param array $response
      * @return string|null
      */
-    public function findHumanReadable(array $response): ?string
+    public function findHumanReadable(array $structure, array $response): ?string
     {
-        // TODO: Implement findHumanReadable() method.
+        $vals = [];
+
+        foreach ($response['response']['value'] as $val) {
+            $vals[] = $structure[$response['question_reference']]['data'][$val];
+        }
+
+        return implode(', ', $vals);
     }
 }

@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Learnosity\Export\Csv;
-
-use Schoolbox\Learning\Learnosity\Export\Csv\IStrategy;
+namespace Schoolbox\Learning\Learnosity\Export\Csv;
 
 class Factory
 {
@@ -20,6 +18,11 @@ class Factory
      * @return IStrategy|null
      */
     public function produce(string $questionType): ?IStrategy {
-
+        switch ($questionType) {
+            case 'mcq': return new Mcq();
+            case 'choicematrix': return new Choicematrix();
+            case 'shorttext': return new Shorttext();
+            default: return null;
+        }
     }
 }
