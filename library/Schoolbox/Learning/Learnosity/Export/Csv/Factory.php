@@ -46,6 +46,12 @@ class Factory
             'shorttext' => new Shorttext(),
             'audio' => new NotApplicable(),
             'video' => new NotApplicable(),
+            /* Highlight and Drawing
+             */
+            'hotspot' => new NotApplicable(),
+            'tokenhighlight' => new Tokenhighlight(),
+            'simpleshading' => new Simpleshading(),
+            'drawing' => new NotApplicable(),
             default => null,
         };
     }

@@ -45,6 +45,6 @@ class Classification implements IStrategy
             $vals[] = implode(IStrategy::IMPLODER, $column);
         }
 
-        return implode(' | ', $vals);
+        return implode(IStrategy::TOKENISER, $vals);
     }
 }

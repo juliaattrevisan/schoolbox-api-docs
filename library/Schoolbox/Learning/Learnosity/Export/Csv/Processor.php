@@ -79,7 +79,7 @@ class Processor
          * using $structure as a lookup where needed for mcq etc.
          */
         $sessions = $this->compileHumanReadable($structure, $learnositySessions);
-        new \Alaress_Probe($structure, $sessions);
+
         /* Send it
          */
         $this->outputData($structure, $attempts, $sessions);
