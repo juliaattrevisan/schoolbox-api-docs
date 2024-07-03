@@ -258,6 +258,10 @@ class Processor
     {
         $sessions = [];
 
+        /* Note that if you complete a quiz then quickly load this screen you'll get a bunch
+         * of "foreach() on null" issues; this is because learnosity is still transacting and
+         * will only last a moment. By the time the average user gets here it should be ready
+         */
         foreach ($learnositySessions as $sessionReference => $learnositySession) {
             foreach ($learnositySession['responses'] as $response) {
                 /* TODO Factory/Strategy this, as needed
