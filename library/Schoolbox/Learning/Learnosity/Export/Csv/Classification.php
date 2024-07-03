@@ -33,7 +33,7 @@ class Classification implements IStrategy
     {
         $vals = [];
 
-        foreach ($response['response']['value'] as $data) {
+        foreach ($response['response']['value'] ?? [] as $data) {
             $column = [];
 
             /* Represent each column specially

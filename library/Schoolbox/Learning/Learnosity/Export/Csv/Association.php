@@ -31,6 +31,6 @@ class Association implements IStrategy
      */
     public function findHumanReadable(array $structure, array $response): ?string
     {
-        return implode(IStrategy::IMPLODER, $response['response']['value']);
+        return implode(IStrategy::IMPLODER, $response['response']['value'] ?? []);
     }
 }

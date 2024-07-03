@@ -33,7 +33,7 @@ class Choicematrix implements IStrategy
     {
         $vals = [];
 
-        foreach ($response['response']['value'] as $val) {
+        foreach ($response['response']['value'] ?? [] as $val) {
             $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
         }
 

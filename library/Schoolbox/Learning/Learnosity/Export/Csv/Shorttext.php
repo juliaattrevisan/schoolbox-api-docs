@@ -31,6 +31,6 @@ class Shorttext implements IStrategy
      */
     public function findHumanReadable(array $structure, array $response): ?string
     {
-        return $response['response']['value'];
+        return $response['response']['value'] ?? '';
     }
 }
