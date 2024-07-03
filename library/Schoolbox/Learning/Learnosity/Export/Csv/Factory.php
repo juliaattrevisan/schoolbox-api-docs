@@ -41,7 +41,11 @@ class Factory
             'sortlist' => new Orderlist(),
             /* Written and Recorded
              */
+            'longtextV2' => new NotApplicable(),
+            'plaintext' => new NotApplicable(),
             'shorttext' => new Shorttext(),
+            'audio' => new NotApplicable(),
+            'video' => new NotApplicable(),
             default => null,
         };
     }
