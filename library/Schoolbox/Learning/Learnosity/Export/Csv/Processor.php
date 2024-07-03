@@ -189,6 +189,16 @@ class Processor
                     }
 
                     $meaning['data'] = $lookup;
+                } elseif ('choicematrix' === $question['data']['type']) {
+                    $lookup = [];
+
+                    foreach ($question['data']['options'] as $value => $label) {
+                        $lookup[$value] = $label;
+                    }
+
+                    $meaning['data'] = $lookup;
+                } elseif ('shorttext' === $question['data']['type']) {
+                    $meaning['data'] = null;
                 }
 
                 $structure[$question['reference']] = $meaning;
@@ -281,6 +291,14 @@ class Processor
 
                     foreach ($response['response']['value'] as $val) {
                         $vals[] = $structure[$response['question_reference']]['data'][$val];
+                    }
+
+                    $sessions[$sessionReference][$response['question_reference']] = implode(', ', $vals);
+                } elseif ('choicematrix' === $response['question_type']) {
+                    $vals = [];
+
+                    foreach ($response['response']['value'] as $val) {
+                        $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
                     }
 
                     $sessions[$sessionReference][$response['question_reference']] = implode(', ', $vals);
