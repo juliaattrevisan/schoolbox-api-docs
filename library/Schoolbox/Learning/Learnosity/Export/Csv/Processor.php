@@ -67,24 +67,22 @@ class Processor
          */
         $structure = $this->buildStructure($assessment);
 
-        new \Alaress_Probe($structure);
-//
-//        /* Get a list of all the attempts that were made
-//         */
-//        $attempts = $this->getAttempts($assessment);
-//
-//        /* Get the learnosity equivalent of our attempts
-//         */
-//        $learnositySessions = $this->getLearnositySessions($attempts);
-//
-//        /* Translate meanings and make more succinct each learnosity session,
-//         * using $structure as a lookup where needed for mcq etc.
-//         */
-//        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
-//
-//        /* Send it
-//         */
-//        $this->outputData($structure, $attempts, $sessions);
+        /* Get a list of all the attempts that were made
+         */
+        $attempts = $this->getAttempts($assessment);
+
+        /* Get the learnosity equivalent of our attempts
+         */
+        $learnositySessions = $this->getLearnositySessions($attempts);
+
+        /* Translate meanings and make more succinct each learnosity session,
+         * using $structure as a lookup where needed for mcq etc.
+         */
+        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
+
+        /* Send it
+         */
+        $this->outputData($structure, $attempts, $sessions);
     }
 
 
@@ -204,6 +202,13 @@ class Processor
      */
     private function getLearnositySessions(\Schoolbox\GenericCollection $attempts): array
     {
+        /* No attempts? Exit early; sending an empty array to learnosity
+         * results in getting EVERYTHING back
+         */
+        if (!$attempts->count()) {
+            return [];
+        }
+
         $learnosityReferences = $attempts->keys();
 
         /* Ask learnosity about the questions in this quiz
@@ -244,12 +249,12 @@ class Processor
                     $vals = [];
 
                     foreach ($response['response']['value'] as $val) {
-                        $vals[] = $structure[$response['item_reference']]['data'][$val];
+                        $vals[] = $structure[$response['question_reference']]['data'][$val];
                     }
 
-                    $sessions[$sessionReference][$response['item_reference']] = implode(', ', $vals);
+                    $sessions[$sessionReference][$response['question_reference']] = implode(', ', $vals);
                 } elseif ('shorttext' === $response['question_type']) {
-                    $sessions[$sessionReference][$response['item_reference']] = $response['response']['value'];
+                    $sessions[$sessionReference][$response['question_reference']] = $response['response']['value'];
                 }
             }
         }
