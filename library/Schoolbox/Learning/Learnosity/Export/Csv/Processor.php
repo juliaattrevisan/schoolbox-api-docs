@@ -109,16 +109,30 @@ class Processor
 
         /* Use item references to enforce order of appearance for questions
          */
-        $refs = [];
+        $itemRefs = [];
 
         foreach ($itemReferences as $itemReference) {
             /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
              * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
              */
             if (!is_array($itemReference)) {
-                $refs[$itemReference] = null;
+                $itemRefs[] = $itemReference;
             } else {
-                $refs[$itemReference['reference']] = null;
+                $itemRefs[] = $itemReference['reference'];
+            }
+        }
+
+        /* We need this to determine the order of appearance of questions in each item
+         */
+        $structure = [];
+
+        $items = $this->api->dataGetRequest('/itembank/items', [
+            'references' => $itemRefs
+        ])['data'] ?? [];
+
+        foreach ($items as $item) {
+            foreach ($item['questions'] as $question) {
+                $structure[$question['reference']] = $question['type'];
             }
         }
 
@@ -126,7 +140,7 @@ class Processor
          * Note that an item potentially contains multiple questions.
          */
         $questions = $this->api->dataGetRequest('/itembank/questions', [
-            'item_references' => array_keys($refs),
+            'item_references' => $itemRefs,
         ])['data'] ?? [];
 
         /* Multiple Questions inside an item might appear in some arbitrary order
@@ -134,12 +148,15 @@ class Processor
          * which we can sort. There's only created and updated timestamps but this
          * is useless for recreating what you see on screen
          *
-         * For now, group them logically as best we can (sry)
+         * For now, group them logically as best we can (sry) by using multiple api
+         * calls to infer how the ui might be built. This is because you can reuse
+         * questions in various items in any other quiz; the only known order is
+         * what you get out of the /itembank/items api call, for a given quiz.
+         *
+         * sigh
          */
-        $structure = [];
-
-        foreach ($refs as $itemReference => $data) {
-            foreach ($questions[$itemReference] as $question) {
+        foreach ($itemRefs as $itemRef) {
+            foreach ($questions[$itemRef] as $question) {
                 $meaning = [
                     'type' => $question['data']['type'],
                     'stimulus' => \Scrub::html2text($question['data']['stimulus']),
