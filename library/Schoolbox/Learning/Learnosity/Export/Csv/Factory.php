@@ -17,7 +17,8 @@ class Factory
      * @param string $questionType
      * @return IStrategy|null
      */
-    public function produce(string $questionType): ?IStrategy {
+    public function produce(string $questionType): ?IStrategy
+    {
         return match ($questionType) {
             /* Multiple Choice
              */
