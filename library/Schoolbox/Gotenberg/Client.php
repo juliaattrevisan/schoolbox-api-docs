@@ -85,7 +85,7 @@ class Client
         $params    = [];
         $converter = new Chromium($this->apiHost);
         if (isset($sessionHash)) {
-            $params['Cookie'] = sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash);
+            $params['Cookie'] = sprintf('%s=%s', session_name(), $sessionHash);
             return $converter->extraHttpHeaders($params);
         }
         return $converter;
