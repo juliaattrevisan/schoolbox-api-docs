@@ -18,6 +18,12 @@ use Schoolbox\Learning\Learnosity\QuizFetcher;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 
+/**
+ * Exports every attempt's actual responses to csv
+ *
+ * It takes ages to compile each question type into a quiz, but I made this for you:
+ * fd6cf47f-2f37-4e69-9db4-b9d196a19c95
+ */
 class Processor
 {
     /**
