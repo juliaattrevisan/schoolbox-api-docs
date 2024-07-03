@@ -88,7 +88,7 @@ class Processor
 
         /* Send it
          */
-        $this->outputData($structure, $attempts, $sessions);
+        $this->outputData($assessment, $structure, $attempts, $sessions);
     }
 
 
@@ -339,18 +339,29 @@ class Processor
     /**
      * Facade method for making a csv and headers etc.
      *
+     * @param QuizDomainObject $assessment
      * @param array $structure
      * @param GenericCollection $attempts
      * @param array $sessions
      * @return void
      */
     private function outputData(
+        QuizDomainObject $assessment,
         array $structure,
         \Schoolbox\GenericCollection $attempts,
         array $sessions
     ): void {
         /* Start generating output to stream
          */
+        $filename = sprintf(
+            'exported_responses_%s.csv',
+            $assessment->getId()
+        );
+
+        header('Cache-Control: private');
+        header('Content-type: text/ascii');
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
+
         $output = fopen('php://output', 'rw');
 
         /* Slam together a header row, but you need to compile the questions' text first
