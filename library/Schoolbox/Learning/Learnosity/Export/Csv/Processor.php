@@ -124,14 +124,22 @@ class Processor
 
         /* We need this to determine the order of appearance of questions in each item
          */
-        $structure = [];
-
         $items = $this->api->dataGetRequest('/itembank/items', [
             'references' => $itemRefs
         ])['data'] ?? [];
 
+        /* Reindex items to enforce item order
+         */
+        $indexedItems = [];
+
         foreach ($items as $item) {
-            foreach ($item['questions'] as $question) {
+            $indexedItems[$item['reference']] = $item;
+        }
+
+        $structure = [];
+
+        foreach ($itemRefs as $itemRef) {
+            foreach ($indexedItems[$itemRef]['questions'] as $question) {
                 $structure[$question['reference']] = $question['type'];
             }
         }
@@ -143,7 +151,9 @@ class Processor
             'item_references' => $itemRefs,
         ])['data'] ?? [];
 
-        /* Multiple Questions inside an item might appear in some arbitrary order
+        /* Enforce question order
+         *
+         * Multiple Questions inside an item might appear in some arbitrary order
          * compared to what users saw on screen; there's no sequence column upon
          * which we can sort. There's only created and updated timestamps but this
          * is useless for recreating what you see on screen
