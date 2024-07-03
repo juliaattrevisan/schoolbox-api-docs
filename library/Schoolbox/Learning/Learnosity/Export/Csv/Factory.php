@@ -24,6 +24,7 @@ class Factory
             'mcq' => new Mcq(),
             'choicematrix' => new Choicematrix(),
             /* Fill in the blanks (cloze)
+             * Note that clozeassociation and clozedropdown happen to behave synonymously
              */
             'clozeassociation' => new Clozeassociation(),
             'clozedropdown' => new Clozeassociation(),
@@ -31,6 +32,13 @@ class Factory
             'imageclozeassociationV2' => new ImageclozeassociationV2(),
             'imageclozedropdown' => new Imageclozedropdown(),
             'imageclozetext' => new Imageclozetext(),
+            /* Classify, Match, Order
+             * Note that orderlist and sortlist happen to behave synonymously
+             */
+            'classification' => new Classification(),
+            'association' => new Association(),
+            'orderlist' => new Orderlist(),
+            'sortlist' => new Orderlist(),
             /* Written and Recorded
              */
             'shorttext' => new Shorttext(),
