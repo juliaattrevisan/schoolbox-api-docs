@@ -19,13 +19,7 @@ class Choicematrix implements IStrategy
      */
     public function findMeaning(array $question): ?array
     {
-        $lookup = [];
-
-        foreach ($question['data']['options'] as $value => $label) {
-            $lookup[$value] = $label;
-        }
-
-        return $lookup;
+        return $question['data']['options'];
     }
 
 

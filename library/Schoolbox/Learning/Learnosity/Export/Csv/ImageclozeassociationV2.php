@@ -19,13 +19,7 @@ class ImageclozeassociationV2 implements IStrategy
      */
     public function findMeaning(array $question): ?array
     {
-        $lookup = [];
-
-        foreach ($question['data']['possible_responses'] as $key => $val) {
-            $lookup[$key] = $val;
-        }
-
-        return $lookup;
+        return $question['data']['possible_responses'];
     }
 
 
