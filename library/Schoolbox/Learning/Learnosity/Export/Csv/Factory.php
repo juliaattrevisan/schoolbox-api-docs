@@ -18,6 +18,7 @@ class Factory
      * @return IStrategy|null
      */
     public function produce(string $questionType): ?IStrategy {
+//        new \Alaress_Probe($questionType);
         return match ($questionType) {
             /* Multiple Choice
              */
@@ -62,6 +63,16 @@ class Factory
             'graphplotting' => new NotApplicable(),
             'numberline' => new Numberline(),
             'numberlineplot' => new Numberlineplot(),
+            /* Math
+             * I couldn't figure out how to get Math Question Generator to spawn, too many weird ui bugs
+             * Anyway, disregard all of these, because that's way too much hankypanky. Maybe one day we
+             * will figure out a sane/meaningful way to render this for people.
+             */
+            'clozeformulaV2' => new NotApplicable(),
+            'imageclozeformulaV2' => new NotApplicable(),
+            'clozeformula' => new NotApplicable(),
+            'imageclozeformula' => new NotApplicable(),
+            'formulaessayV2' => new NotApplicable(),
             default => null,
         };
     }
