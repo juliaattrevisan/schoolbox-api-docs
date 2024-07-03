@@ -37,6 +37,6 @@ class ImageclozeassociationV2 implements IStrategy
             $vals[] = $data[0];
         }
 
-        return implode(', ', $vals);
+        return implode(IStrategy::IMPLODER, $vals);
     }
 }

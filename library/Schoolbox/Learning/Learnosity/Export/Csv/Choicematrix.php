@@ -37,6 +37,6 @@ class Choicematrix implements IStrategy
             $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
         }
 
-        return implode(', ', $vals);
+        return implode(IStrategy::IMPLODER, $vals);
     }
 }

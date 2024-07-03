@@ -12,6 +12,12 @@ namespace Schoolbox\Learning\Learnosity\Export\Csv;
 interface IStrategy
 {
     /**
+     * Used to serialize multi-variate responses
+     */
+    public const IMPLODER = ', ';
+
+
+    /**
      * Find the human-readable equivalent of students' responses which are often
      * given to you as an int so you have to cross-reference to find what that
      * integer really means to a human

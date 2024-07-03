@@ -37,6 +37,6 @@ class Orderlist implements IStrategy
             $vals[] = $structure[$response['question_reference']]['data'][$val];
         }
 
-        return implode(', ', $vals);
+        return implode(IStrategy::IMPLODER, $vals);
     }
 }

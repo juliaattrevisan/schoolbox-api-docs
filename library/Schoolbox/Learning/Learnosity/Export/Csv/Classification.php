@@ -42,7 +42,7 @@ class Classification implements IStrategy
                 $column[] = $structure[$response['question_reference']]['data'][$val];
             }
 
-            $vals[] = implode(', ', $column);
+            $vals[] = implode(IStrategy::IMPLODER, $column);
         }
 
         return implode(' | ', $vals);
