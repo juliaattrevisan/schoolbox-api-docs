@@ -67,32 +67,31 @@ class Processor
          */
         $structure = $this->buildStructure($assessment);
 
-        /* Find human-readable meanings for options. Multiple choice questions will have numeric values
-         * to represent student responses, but we want to show the human-readable equivalent.
-         */
-        $structure = $this->buildMeanings($structure);
-        /* Get a list of all the attempts that were made
-         */
-        $attempts = $this->getAttempts($assessment);
-
-        /* Get the learnosity equivalent of our attempts
-         */
-        $learnositySessions = $this->getLearnositySessions($attempts);
-
-        /* Translate meanings and make more succinct each learnosity session,
-         * using $structure as a lookup where needed for mcq etc.
-         */
-        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
-
-        /* Send it
-         */
-        $this->outputData($structure, $attempts, $sessions);
+        new \Alaress_Probe($structure);
+//
+//        /* Get a list of all the attempts that were made
+//         */
+//        $attempts = $this->getAttempts($assessment);
+//
+//        /* Get the learnosity equivalent of our attempts
+//         */
+//        $learnositySessions = $this->getLearnositySessions($attempts);
+//
+//        /* Translate meanings and make more succinct each learnosity session,
+//         * using $structure as a lookup where needed for mcq etc.
+//         */
+//        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
+//
+//        /* Send it
+//         */
+//        $this->outputData($structure, $attempts, $sessions);
     }
 
 
     /**
-     * Build an ordered list of items in the current incarnation of $assessment,
-     * a learnosity quiz
+     * Build an ordered list of question references in the current incarnation of $assessment,
+     * a learnosity quiz, as best we can. There's no sequencing in the api that reflects what
+     * you see in their ui; there's only sorting by created or updated time which is useless.
      *
      * @param QuizDomainObject $assessment
      * @return array
@@ -107,76 +106,71 @@ class Processor
         $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
             'references' => [
                 $assessment->getLearnosityReference()
-            ]
+            ],
         ])['data'][0]['data']['items'] ?? [];
 
-        $structure = [];
-
-        /* Item references are in the reverse chronological order...wth
+        /* Use item references to enforce order of appearance for questions
          */
+        $refs = [];
+
         foreach ($itemReferences as $itemReference) {
             /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
              * we have to accommodate $itemReference being a string (lol) as well as an array (lol)
              */
             if (!is_array($itemReference)) {
-                $structure[$itemReference] = null;
+                $refs[$itemReference] = null;
             } else {
-                $structure[$itemReference['reference']] = null;
+                $refs[$itemReference['reference']] = null;
+            }
+        }
+
+        /* Once you have the items, look for the questions inside them.
+         * Note that an item potentially contains multiple questions.
+         */
+        $questions = $this->api->dataGetRequest('/itembank/questions', [
+            'item_references' => array_keys($refs),
+        ])['data'] ?? [];
+
+        /* Multiple Questions inside an item might appear in some arbitrary order
+         * compared to what users saw on screen; there's no sequence column upon
+         * which we can sort. There's only created and updated timestamps but this
+         * is useless for recreating what you see on screen
+         *
+         * For now, group them logically as best we can (sry)
+         */
+        $structure = [];
+
+        foreach ($refs as $itemReference => $data) {
+            foreach ($questions[$itemReference] as $question) {
+                $meaning = [
+                    'type' => $question['data']['type'],
+                    'stimulus' => \Scrub::html2text($question['data']['stimulus']),
+                    'data' => null
+                ];
+
+                /* Cross reference values to human-readable equivalents
+                 * (Only applies to some question types)
+                 */
+                /* TODO Factory/Strategy this, as needed
+                 */
+                if ('mcq' === $question['data']['type']) {
+                    /* Find human-readable meanings for options. Multiple choice questions will have numeric values
+                     * to represent student responses, but we want to show the human-readable equivalent.
+                     */
+                    $lookup = [];
+
+                    foreach ($question['data']['options'] as $option) {
+                        $lookup[$option['value']] = $option['label'];
+                    }
+
+                    $meaning['data'] = $lookup;
+                }
+
+                $structure[$question['reference']] = $meaning;
             }
         }
 
         return $structure;
-    }
-
-
-    /**
-     * Cross reference values to human-readable equivalents
-     * Only applies to some question types
-     *
-     * @param array $structure
-     * @return array
-     * @throws ApiException
-     * @throws ValidationException
-     * @throws \JsonException
-     */
-    private function buildMeanings(array $structure): array
-    {
-        /* Maintain same ordering
-         */
-        $meanings = array_fill_keys(array_keys($structure), null);
-
-        /* Find some info about each item
-         */
-        $questions = $this->api->dataGetRequest('/itembank/questions', [
-            'item_references' => array_keys($structure)
-        ])['data'] ?? [];
-
-        /* Augment the structure so we know what each response means.
-         *
-         * This has got to be the most roundabout way to find the human-readable equivalents
-         * of what students responded with.
-         */
-        foreach ($questions as $itemReference => $data) {
-            $meanings[$itemReference] = [
-                'type' => $data[0]['data']['type'],
-                'stimulus' => \Scrub::html2text($data[0]['data']['stimulus']),
-                'data' => null
-            ];
-
-            /* TODO Factory/Strategy this, as needed
-             */
-            if ('mcq' === $data[0]['data']['type']) {
-                $lookup = [];
-
-                foreach ($data[0]['data']['options'] as $option) {
-                    $lookup[$option['value']] = $option['label'];
-                }
-
-                $meanings[$itemReference]['data'] = $lookup;
-            }
-        }
-
-        return $meanings;
     }
 
 
