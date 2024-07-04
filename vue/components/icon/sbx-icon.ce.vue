@@ -45,7 +45,7 @@ const computedSize = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="sbx-icon" aria-hidden="true" data-test="sbx-icon">
+    <span class="sbx-icon" aria-hidden="true" data-test="sbx-icon">
         <slot>
             <svg
                 v-if="props.name === 'add'"
@@ -1734,7 +1734,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
         </slot>
-    </div>
+    </span>
 </template>
 
 <style lang="scss" scoped>
@@ -1752,6 +1752,7 @@ const computedSize = window.Vue.computed(() => {
 ::slotted(svg) {
     fill: currentColor;
     height: v-bind(computedSize);
+    vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
     width: v-bind(computedSize);
 }
 </style>
