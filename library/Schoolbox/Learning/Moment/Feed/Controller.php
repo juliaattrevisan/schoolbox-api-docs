@@ -16,6 +16,8 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray\Factory as DueWorkFeedbackTranslatorFactory;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Translator\ModelToArray\Factory as QuizFeedbackTranslatorFactory;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
@@ -49,13 +51,14 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param EvidenceMapper             $evidenceMapper
-     * @param BadgeAwardMapper           $badgeAwardMapper
-     * @param CommentMapper              $commentMapper
-     * @param IConnector                 $database
+     * @param EvidenceMapper $evidenceMapper
+     * @param BadgeAwardMapper $badgeAwardMapper
+     * @param CommentMapper $commentMapper
+     * @param IConnector $database
      * @param DueWorkFeedbackMapperProxy $returnDataSource
-     * @param AssessmentMapperProxy      $assessmentDataSource
-     * @param Visibility                 $visibility
+     * @param QuizFeedbackMapperProxy $attemptDataSource
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Visibility $visibility
      */
     public function __construct(
         private EvidenceMapper $evidenceMapper,
@@ -63,6 +66,7 @@ class Controller extends Base
         private CommentMapper $commentMapper,
         private IConnector $database,
         private DueWorkFeedbackMapperProxy $returnDataSource,
+        private QuizFeedbackMapperProxy $attemptDataSource,
         private AssessmentMapperProxy $assessmentDataSource,
         private Visibility $visibility
     ) {
@@ -95,6 +99,7 @@ class Controller extends Base
             $this->evidenceMapper,
             $this->badgeAwardMapper,
             $this->returnDataSource,
+            $this->attemptDataSource,
             $this->assessmentDataSource,
             $this->visibility,
             $this->getUser()
@@ -115,6 +120,11 @@ class Controller extends Base
                 $prefixGenerator,
             ))->build(),
             (new DueWorkFeedbackTranslatorFactory(
+                $this->routeGenerator,
+                $this->authorizer,
+                $this->getUser(),
+            ))->build(),
+            (new QuizFeedbackTranslatorFactory(
                 $this->routeGenerator,
                 $this->authorizer,
                 $this->getUser(),

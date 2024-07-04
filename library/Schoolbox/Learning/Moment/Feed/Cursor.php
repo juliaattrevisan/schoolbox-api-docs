@@ -55,6 +55,14 @@ class Cursor implements ICursor
      */
     public const DISCRIMINATOR_DUE_WORK_FEEDBACK = 'dueWorkFeedback';
 
+
+    /**
+     * Discriminator value for identifying that a retrieved result points to a
+     * quiz feedback.
+     */
+    public const DISCRIMINATOR_QUIZ_FEEDBACK = 'quizFeedback';
+
+
     /**
      * This is the set of feed item types that we expect to receive from the client.
      *
@@ -138,7 +146,7 @@ class Cursor implements ICursor
      * This returns null for now, until there's a need for the current cursor.
      *
      * @param Collection $collection
-     * @return null
+     * @return null|string
      */
     public function current(Collection $collection): ?string
     {
@@ -172,6 +180,12 @@ class Cursor implements ICursor
             [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQueryAndParams(countOnly: true);
             if ($dueWorkFeedbackCountQuery !== null) {
                 $result = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
+                $count += (int)$result->fetchColumn();
+            }
+
+            [$quizFeedbackCountQuery, $quizFeedbackCountParams] = $this->getQuizFeedbackQueryAndParams(countOnly: true);
+            if ($quizFeedbackCountQuery !== null) {
+                $result = $this->database->executeQuery($quizFeedbackCountQuery, $quizFeedbackCountParams);
                 $count += (int)$result->fetchColumn();
             }
         }
@@ -208,6 +222,12 @@ class Cursor implements ICursor
             if ($dueWorkFeedbackQuery !== null) {
                 $queriesToBeUnioned[] = $dueWorkFeedbackQuery;
                 $params = array_merge($params, $dueWorkFeedbackParams);
+            }
+
+            [$quizFeedbackQuery, $quizFeedbackParams] = $this->getQuizFeedbackQueryAndParams(countOnly: false);
+            if ($quizFeedbackQuery !== null) {
+                $queriesToBeUnioned[] = $quizFeedbackQuery;
+                $params = array_merge($params, $quizFeedbackParams);
             }
         }
 
@@ -457,6 +477,87 @@ class Cursor implements ICursor
 
         return [$query, $params];
     }
+
+
+    /**
+     * Returns query to get quiz feedback.
+     *
+     * @param bool $countOnly
+     * @return array containing query and associated params.
+     * @throws UnexpectedValueException
+     */
+    private function getQuizFeedbackQueryAndParams(bool $countOnly): array
+    {
+        $includeQuizFeedback = (
+            count($this->filter['filterNames']) === 0 ||
+            in_array('feedback', $this->filter['filterNames'], true)
+        );
+
+        if (
+            !$includeQuizFeedback ||
+            trim($this->filter['tag']) !== '' // Quiz feedback cannot have tags, so if a tag filter exists, return no results.
+        ) {
+            return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
+        }
+
+        // Determine work type and mark visibility.
+        $filterWorkType = false;
+        if ($this->viewer->getRole()->isStaff()) {
+            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+        } elseif ($this->viewer->getRole()->isStudent()) {
+            $visibility     = IAssessable::MARK_VISIBILITY_STUDENT;
+            $filterWorkType = true;
+        } elseif ($this->viewer->getRole()->isParent()) {
+            $visibility     = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            $filterWorkType = true;
+        } else {
+            throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
+        }
+
+        $query = 'SELECT ';
+        $params = [];
+
+        if ($countOnly) {
+            $query .= 'COUNT(*) ';
+        } else {
+            $query .= ("
+                assess_attempt.attempt_id      AS id,
+                :discriminatorQuizFeedback AS discriminator,
+                assess_attempt.reviewed_at AS date 
+            ");
+
+            $params['discriminatorQuizFeedback'] = self::DISCRIMINATOR_QUIZ_FEEDBACK;
+        }
+
+        $query .= ("
+            FROM `assess_attempt`
+            JOIN `assess` ON `assess_attempt`.`assess_id` = `assess`.`assess_id`
+            JOIN `assessment` ON `assessment`.`id` = `assess`.`assessment_id`
+            WHERE `assess_attempt`.`reviewed_at` IS NOT NULL
+            AND `assess_attempt`.`user_id` = :userIdQuizFeedback
+            AND `assess`.`mark_visibility` >= :markVisibility
+            AND `assess_attempt`.`deleted_at` IS NULL
+            AND `assessment`.`deleted_at` IS NULL
+        ");
+        $params['userIdQuizFeedback'] = $this->viewee->getId();
+        $params['markVisibility']     = $visibility;
+
+        if ($filterWorkType) {
+            $query .= ("
+                AND (
+                    assessment.work_type_id IS NULL OR
+                    assessment.work_type_id IN (
+                        SELECT `id` FROM `lu_work_type`
+                        WHERE `staff_or_instructor_visible_only` = 0
+                        AND `deleted_at` IS NULL
+                    )
+                )
+            ");
+        }
+
+        return [$query, $params];
+    }
+
 
     /**
      * Validate that parameter 'filter' meets the API spec: https://api.schoolbox.com.au/#post-/api/register/-provider-

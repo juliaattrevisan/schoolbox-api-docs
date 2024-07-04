@@ -75,6 +75,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CommentMapper::class),
             $this->injector->get('databaseInternal'),
             $this->injector->get('returnDataSource'),
+            $this->injector->get('reviewDataSource'),
             $this->injector->get('assessmentDataSource'),
             new Visibility($this->getMapperFactory()->get(Access::class))
         );
