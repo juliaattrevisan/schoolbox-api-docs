@@ -40,6 +40,12 @@ class Processor
 
 
     /**
+     * String to indicate when an attempt was never finished
+     */
+    private const ATTEMPT_INCOMPLETE = 'Incomplete';
+
+
+    /**
      * Constructor.
      *
      * @param Api $api
@@ -321,7 +327,7 @@ class Processor
                 $attempt->getUser()->getLastname(),
                 $attempt->getUser()->getFirstname(),
                 $attempt->getStart()->getShort(),
-                $attempt->getFinish() ? $attempt->getFinish()->getShort() : 'Incomplete'
+                $attempt->getFinish() ? $attempt->getFinish()->getShort() : self::ATTEMPT_INCOMPLETE
             ];
 
             foreach ($structure as $itemReference => $data) {
