@@ -415,11 +415,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
-        //Show not found page if assessment is already got deleted
-        if ($assessment->isDeleted()) {
-            throw new MapperException\NotFound();
-        }
-
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
