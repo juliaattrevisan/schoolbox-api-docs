@@ -536,7 +536,7 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
-     * @throws \Exception
+     * @throws \Exception If not found or deleted
      */
     protected function preloadAssessment(array $params, User $student = null): array
     {
