@@ -1040,12 +1040,8 @@ class Controller extends Assessment\Controller
                      *
                      * I will go with option 3.
                      * we will cache the kami ID for the student. (which we already have as $kamiFile)
-                     * clear the student submission from the old attempt, and move along
+                     * (then in the save function) clear the student submission from the old attempt, and move along
                      */
-                    $lastResponse->setAllFiles($lastResponse->getAllFiles()->filter(function (SubmissionFile $file) {
-                        return !$file->getIsWorksheet();
-                    }));
-                    $this->dueWorkResponseMapper->save($lastResponse);
                 }
             }
 
@@ -1245,7 +1241,11 @@ class Controller extends Assessment\Controller
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
 
             try {
+                /** @var Kami\Model $kamiModel */
                 $kamiModel = $this->kamiMapper->findOneByColumn('kami_document_id', $kamiFileId);
+                // remove the worksheet flag from the submission file object
+                $oldSubFile = clone $kamiModel->getStudentSubmissionFile();
+                $this->submissionFileMapper->save($oldSubFile->setIsWorksheet(false)->setKami(null));
             } catch (Deleted $e) {
                 /** @var Kami\Model $kamiModel */
                 $kamiModel = $e->getDeletedObject();
