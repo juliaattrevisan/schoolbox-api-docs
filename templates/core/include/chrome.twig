@@ -823,6 +823,20 @@
                         } else {
                             document.addEventListener('DOMContentLoaded', reAuthNotif);
                         }
+                    } else {
+                        {# If the browser doesn't support notifications
+                         # and we are on iOS outside of the PWA, show the iOS home prompt.
+                         # iOS requires the user to be in the PWA to before enabling notifications.
+                         #}
+                        if (iOS() && !isPWA) {
+                            document.querySelectorAll('[data-pwa-notif="iOSHomePrompt"]').forEach((element) => {
+                                element.classList.remove('hide');
+                            });
+
+                            document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach((element) => {
+                                element.toggleAttribute('disabled', true);
+                            });
+                        }
                     }
                 </script>
                 {% endautoescape %}
