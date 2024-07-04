@@ -552,13 +552,10 @@
                              # guide the user with instructions on how to add to home screen instead...
                              #}
 
-                            {# Show the install button #}
-                            document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWA"]').forEach((element) => {
+                            {# Show the iOS install button, which has a reveal modal connected to it for "add to homescreen" instructions #}
+                            document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWAiOS"]').forEach((element) => {
                                 element.classList.remove('hide');
                             });
-
-                            {# When the user clicks the install button, show the instructions #}
-                            {# TODO #}
                         } else {
                             {# Otherwise, rely on beforeinstallprompt to detect browser compatibility before showing the install button
                              # This event is not widely supported, so we either need to provide a manual guide (e.g. iOS) or wait for

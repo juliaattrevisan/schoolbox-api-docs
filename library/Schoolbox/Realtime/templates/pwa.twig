@@ -36,6 +36,34 @@
         {% endif %}
 
         <a data-pwa-action="installPWA" class="button hide" href="#">Install</a>
+        <a data-pwa-action="installPWAiOS" data-reveal-id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="button hide">Install</a>
+
+        <div data-reveal id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="reveal-modal">
+            <h1>Add the Schoolbox web app to your home screen</h1>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            <p>To receive push notifications and enjoy a better experience, install the Schoolbox web app on your device.<p>
+
+            <ol>
+                <li>
+                    Tap the
+                    <strong>
+                        <sbx-icon name="share-apple" inline></sbx-icon>
+                        Share
+                    </strong>
+                    button in the menu bar of your browser
+                </li>
+                <li>
+                    From the list of options, choose <strong>Add to Home Screen</strong>.
+                </li>
+            </ol>
+
+            <p>
+                If you don't see Add to Home Screen, you can add it.
+                <br>Scroll down to the bottom of the list, tap <strong>Edit Actions</strong>, then tap <strong>Add to Home Screen</strong>.
+            </p>
+
+            <p>Once you've added the Schoolbox web app to your home screen, you return to this screen to enable notifications.</p>
+        </div>
     </div>
 
     {% if pushEnabled %}
