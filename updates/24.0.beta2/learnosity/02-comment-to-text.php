@@ -78,7 +78,7 @@ HELP;
         /* We only need attempts which had comments
          */
         $attemptQuery = "
-            SELECT * 
+            SELECT *
             FROM assess_attempt
             WHERE LENGTH(`comment`) > 0
         ";
@@ -129,4 +129,4 @@ HELP;
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();
