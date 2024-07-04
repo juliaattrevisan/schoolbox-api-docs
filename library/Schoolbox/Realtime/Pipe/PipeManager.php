@@ -164,10 +164,24 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         }
 
         // Extract the instance ID, and inject into pipe
-        $instanceConfig = $this->instanceRepository->fetchConfigForHostname(
-            Pipe::extractWebSocketRequest($conn)->getUri()->getHost()
-        );
-        $pipe = new Pipe($conn, $instanceConfig->instanceId);
+        try {
+            $instanceConfig = $this->instanceRepository->fetchConfigForHostname(
+                Pipe::extractWebSocketRequest($conn)->getUri()->getHost()
+            );
+            $pipe           = new Pipe($conn, $instanceConfig->instanceId);
+        } catch (\OutOfBoundsException $e) {
+            /**
+             * \Schoolbox\MultiInstance\InstanceRepository::fetchConfigForInstance also throws
+             * OutOfBoundsException, however, I think it should be safe to assume it is thrown when
+             * hostname is unknown as the $instanceId should always be set since it's loaded from the array
+             */
+            $this->log->error('Should exit and wait for daemon to restart. ' . $e->getMessage());
+            /**
+             * Exit with EX_NOHOST code
+             * Wait for the systemd to restart the daemon to reload hostname
+             */
+            exit(68);
+        }
 
         try {
             $this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));
