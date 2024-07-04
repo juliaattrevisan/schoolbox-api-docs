@@ -386,7 +386,12 @@ Data:
                         <div class="small-12 island">
                             <section>
                                 <div class="content">
-                                    {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: kamiSession.viewerUrl, allow: '', dataAttributes: {}} only %}
+                                    {% include 'sub/iframeResponsive.twig' with {
+                                        id: 'kami-viewport',
+                                        src: kamiSession.viewerUrl,
+                                        allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
+                                        dataAttributes: {}
+                                    } only %}
                                 </div>
                             </section>
                         </div>
