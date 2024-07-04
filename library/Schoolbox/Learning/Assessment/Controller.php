@@ -45,6 +45,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
+use Twig\Error\Error;
 use UnexpectedValueException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -408,12 +409,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException|Error
      * @api   /learning/assessments/:assessmentId/modify
      * @since 165
      */
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
+        //Show not found page if assessment is already got deleted
+        if ($assessment->isDeleted()) {
+            throw new MapperException\NotFound();
+        }
+
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
