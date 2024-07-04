@@ -286,12 +286,9 @@ class Processor
     {
         $row = self::MANDATORY_COLUMNS;
 
-        /* Augment with items' stimulus, replacing html with text equivalent
-         *
-         * TODO disenfranchise questions from their items (we should be working on question references
-         *  since you can have multiple questions per item now)
+        /* Augment with questions' stimulus, replacing html with text equivalent
          */
-        foreach ($structure as $itemReference => $data) {
+        foreach ($structure as $questionReference => $data) {
             $row[] = \Scrub::html2text($data['stimulus']);
         }
 
