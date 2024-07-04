@@ -536,13 +536,12 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
+     * @throws \Exception
      */
     protected function preloadAssessment(array $params, User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
-        } catch (MapperException\Deleted $e) {
-            $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
