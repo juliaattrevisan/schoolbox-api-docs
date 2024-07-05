@@ -423,8 +423,6 @@ class Module extends BaseModule
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
-        } catch (MapperException\Deleted $e) {
-            $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
