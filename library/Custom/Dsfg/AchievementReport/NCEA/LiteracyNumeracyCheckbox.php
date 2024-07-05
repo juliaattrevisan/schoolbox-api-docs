@@ -8,6 +8,9 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\User;
+
 class LiteracyNumeracyCheckbox extends Base
 {
 
@@ -16,7 +19,28 @@ class LiteracyNumeracyCheckbox extends Base
      *
      * @var string
      */
-    protected $heading = '';
+    protected $heading = 'Literacy/Numeracy';
+
+
+    /**
+     * Constructor
+     *
+     * @param User        $user
+     * @param array       $externalUser
+     * @param IConnector  $db
+     * @param string|null $year
+     */
+    public function __construct(User $user, array $externalUser, IConnector $db, $year)
+    {
+        parent::__construct($user, $externalUser, $db, $year);
+
+        $reportYear = (
+            // The report date is the most recently passed 31st of January.
+            // So if the current month is January, the report year is the previous year.  Else it is the current year.
+            strtotime(date('M') === 'Jan') ? $this->currentYear - 1 : $this->currentYear
+        );
+        $this->headingSuffix = "as at 31 January $reportYear";
+    }
 
 
     /**
