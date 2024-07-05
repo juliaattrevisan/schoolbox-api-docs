@@ -551,13 +551,13 @@ class Helper
      */
     public function findAvailableMarks(string $learnosityReference): float
     {
+        $available = 0.00;
+
         $itemReferences = $this->api->dataGetRequest('/itembank/activities', [
             'references' => [
                 $learnosityReference
             ]
         ])['data'][0]['data']['items'] ?? null;
-
-        $itemReferenceList = [];
 
         if (null !== $itemReferences) {
             /* Due to learnosity behaviour https://help.learnosity.com/hc/en-us/requests/23258
@@ -572,24 +572,22 @@ class Helper
                  */
                 $itemReferenceList = $itemReferences;
             }
-        }
 
-        /* Maybe this max_score isn't available everywhere, due to the Short Answer fiasco
-         * where validation.score isn't the same as max_score. It *seems* to still just work though?
-         */
-        $items = $this->api->dataGetRequest('/itembank/items', [
-            'references' => $itemReferenceList,
-            'include' => [
-                'items' => ['max_score']
-            ]
-        ])['data'] ?? null;
+            /* Maybe this max_score isn't available everywhere, due to the Short Answer fiasco
+             * where validation.score isn't the same as max_score. It *seems* to still just work though?
+             */
+            $items = $this->api->dataGetRequest('/itembank/items', [
+                'references' => $itemReferenceList,
+                'include' => [
+                    'items' => ['max_score']
+                ]
+            ])['data'] ?? null;
 
-        /* Add it all up for the guys who haven't attempted yet
-         */
-        $available = 0.00;
-
-        foreach ($items as $item) {
-            $available += $item['max_score'];
+            /* Add it all up for the guys who haven't attempted yet
+             */
+            foreach ($items as $item) {
+                $available += $item['max_score'];
+            }
         }
 
         return $available;
