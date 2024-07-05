@@ -82,7 +82,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     protected static function dieGracefullyIfInMaintenanceMode(ConfigLoader $config): void
     {
         if ($config->get(ConfigMapper::NAME_MAINTENANCE_MODE)) {
-            echo "Exiting because this instance is in maintenance mode.\n";
+            printf(
+                "Exiting script \"%s\" because this instance is in maintenance mode.\n",
+                str_replace(SITE_root, '', $_SERVER['SCRIPT_FILENAME']),
+            );
             exit(self::EXIT_STATUS_APP_ERROR);
         }
     }
