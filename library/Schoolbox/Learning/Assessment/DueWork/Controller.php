@@ -1012,9 +1012,11 @@ class Controller extends Assessment\Controller
             //if this is an existing attempt, then fetch the kami file
             if ($latestResponse) {
                 // Kami Worksheet - fetch Kami Doc
-                $kamiFile = $latestResponse->getAllFiles()->filter(function (SubmissionFile $file) {
-                    return $file->getIsWorksheet();
-                })->first()?->getKami()?->getKamiDocumentId();
+                foreach ($latestResponse->getAllFiles() as $file) {
+                    if ($file->getIsWorksheet()) {
+                        $kamiFile = $file->getKami()?->getKamiDocumentId();
+                    }
+                }
             }
             if (!$kamiFile) {
                 // the latest response has no kami worksheet, or there was no previous response.
@@ -1022,9 +1024,11 @@ class Controller extends Assessment\Controller
                 // try and use the last attempt (published)
                 /** @var Submission|null $lastResponse */
                 $lastResponse = $participant->findMostRecentResponse();
-                $kamiFile = $lastResponse?->getAllFiles()->filter(function (SubmissionFile $file) {
-                    return $file->getIsWorksheet();
-                })->first()?->getKami()?->getKamiDocumentId();
+                foreach ($lastResponse->getAllFiles() as $file) {
+                    if ($file->getIsWorksheet()) {
+                        $kamiFile = $file->getKami()?->getKamiDocumentId();
+                    }
+                }
 
                 // if still no kami file from a previous attempt, just spawn a new one
                 if (!$kamiFile) {
