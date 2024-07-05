@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class LiteracyNumeracyCheckbox extends Base
 {
-
     /**
      * Heading
      *
