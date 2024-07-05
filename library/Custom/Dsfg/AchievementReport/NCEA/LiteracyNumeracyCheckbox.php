@@ -23,6 +23,14 @@ class LiteracyNumeracyCheckbox extends Base
 
 
     /**
+     * Table heading suffix
+     *
+     * @var string
+     */
+    protected string $headingSuffix = '';
+
+
+    /**
      * Constructor
      *
      * @param User        $user
@@ -40,6 +48,17 @@ class LiteracyNumeracyCheckbox extends Base
             strtotime(date('M') === 'Jan') ? $this->currentYear - 1 : $this->currentYear
         );
         $this->headingSuffix = "as at 31 January $reportYear";
+    }
+
+
+    /**
+     * Get heading suffix
+     *
+     * @return string
+     */
+    public function getHeadingSuffix(): string
+    {
+        return $this->headingSuffix;
     }
 
 

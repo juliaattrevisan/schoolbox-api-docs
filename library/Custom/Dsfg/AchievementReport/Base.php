@@ -59,14 +59,6 @@ abstract class Base
 
 
     /**
-     * Table heading suffix
-     *
-     * @var string
-     */
-    protected $headingSuffix = '';
-
-
-    /**
      * The year for which to obtain data
      *
      * @var string|null
@@ -193,17 +185,6 @@ abstract class Base
     public function getHeading(): string
     {
         return $this->heading;
-    }
-
-
-    /**
-     * Get heading
-     *
-     * @return string
-     */
-    public function getHeadingSuffix(): string
-    {
-        return $this->headingSuffix;
     }
 
 
