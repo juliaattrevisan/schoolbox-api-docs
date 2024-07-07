@@ -168,7 +168,6 @@
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
     <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
-
         {% set dockTitle = 'Pin side menu' %}
         {% set undockTitle = 'Unpin side menu' %}
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
@@ -456,9 +455,9 @@
                         {% endif %}
                         // Stash the event so it can be triggered later.
                         window.deferredPrompt = event;
-                        // Remove the 'hidden' class from the install button container.
+                        // Remove the 'hide' class from the install button container.
                         document.querySelectorAll('[data-pwa-action="install"]').forEach((element) => {
-                            element.classList.toggle('display', 'none');
+                            element.classList.remove('hide');
                         });
                     });
 
@@ -484,7 +483,7 @@
                             window.deferredPrompt = null;
                             // Hide the install button.
                             document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
-                                element.classList.toggle('display', 'block');
+                                element.classList.add('hide');
                             });
                         });
                     });
@@ -581,7 +580,23 @@
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
                     if (("Notification" in window)) {
-                        if (Notification.permission === "granted") {
+                        {# As Notification.permission cannot be trusted on iOS, we can use localStorage
+                         # to avoid showing "Enable Notifications" again if we think the user should already
+                         # have them enabled...
+                         # If the browser is saying notifications are blocked, respect that, even though it may be wrong
+                         # as we handle this separately by providing a button to re-request permission instead.
+                         #}
+                        let currentPermission = Notification.permission;
+
+                        if (
+                            iOS() &&
+                            currentPermission === "default" &&
+                            ![null, "denied", "removed"].includes(window.localStorage.getItem("notification"))
+                        ) {
+                            currentPermission = "granted"; // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
+                        }
+
+                        if (currentPermission === "granted") {
                             document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=>{
                                 element.setAttribute('checked', true);
                             });
@@ -608,7 +623,7 @@
                                 window.localStorage.setItem("notification", "requesting");
                             }
 
-                        } else if (Notification.permission === "denied") {
+                        } else if (currentPermission === "denied") {
                             document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=>{
                                 element.classList.add('hide');
                             });
@@ -626,6 +641,23 @@
                             });
                             {# wait for toggle change #}
                         }
+
+                        {# on iOS, Notification.permission is completely unreliable until we have used
+                         # Notification.requestPermission at least once. If a user initially denies notifications,
+                         # but then turns them on in settings, iOS will still return 'denied' for Notification.permission
+                         # even if you navigate between pages or refresh the whole app sometimes...
+                         # We can't just auto re-request permission because Notification.requestPermission() requires a user gesture
+                         #
+                         # To work around this, we provide a button on the blocked message that the user can click to
+                         # trigger Notification.requestPermission() again and then reload the page to get the reflected UI changes
+                         #}
+                        document.querySelectorAll('[data-pwa-action="retryNotifPrompt"]').forEach( (element) => {
+                            element?.addEventListener('click', async () => {
+                                await Notification.requestPermission();
+                                window.location.reload();
+                            });
+                        });
+
                         let prompted = false;
                         document.querySelectorAll('[data-pwa-action="enableNotifPrompt"]').forEach( (element)=> {
                             element?.addEventListener('click', async () => {

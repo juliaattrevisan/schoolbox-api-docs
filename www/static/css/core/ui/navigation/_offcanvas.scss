@@ -253,20 +253,14 @@ $menu-slide: "transform 500ms ease" !default;
     padding: 0;
 
     li {
-        #notification-toggle-full {
-            background: $off-canvas-label-bg;
-            border-bottom: $off-canvas-label-border-bottom;
-            border-top: $off-canvas-label-border-top;
-            color: $off-canvas-label-color;
-            display: block;
-            font-size: $off-canvas-label-font-size;
-            font-weight: $off-canvas-label-font-weight;
-            margin: $off-canvas-label-margin;
-            padding: $off-canvas-label-padding;
-            text-transform: $off-canvas-label-text-transform;
-        }
-        a {
-            border-bottom: $off-canvas-link-border-bottom;
+        // All links in the off-canvas menu except for the retryNotifPrompt should look like buttons
+        // The retryNotifPrompt is a special case where we want an inline <a> link instead.
+        a:not([data-pwa-action="retryNotifPrompt"]) {
+            // Avoid specificity overwrite with .button.load-more, as it has no background, we do actually want a border
+            &:not(.button.load-more) {
+                border-bottom: $off-canvas-link-border-bottom;
+            }
+
             color: $off-canvas-link-color;
             display: block;
             padding: $off-canvas-link-padding;
