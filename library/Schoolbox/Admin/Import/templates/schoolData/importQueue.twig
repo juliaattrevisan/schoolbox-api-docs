@@ -1,0 +1,33 @@
+{##
+ # Import Queue
+ #
+ # Show some metadata about a Perform Live Sync request that a user made.
+ # Show who requested it, and when. Note that we only allow one request
+ # at a time; this was designed to emulate the php detached process web
+ # request that kept encountering weird limits in memory and time.
+ #
+ # @param array $importQueue.script    Always initiated by users at the moment (MANUAL_SIS_SCRIPT_NAME)
+ # @param array $importQueue.instance  An ImportQueue\Model instance made by the user for the cli to run an import.
+ #}
+{% if importQueue.instance ?? null %}
+{%- apply spaceless -%}
+    <div class="scrollable">
+        <table>
+            <thead>
+            <tr>
+                <th>Data Source</th>
+                <th>User</th>
+                <th>Requested</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ importQueue.script }}</td>
+                    <td>{{ importQueue.instance.user.fullname }}</td>
+                    <td>{{ importQueue.instance.createdAt.local }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{%- endapply -%}
+{% endif %}

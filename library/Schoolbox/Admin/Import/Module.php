@@ -68,11 +68,11 @@ class Module extends BaseModule
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
             $this->getMapperFactory()->get(\Schoolbox\External\Connector\Log\Mapper::class),
-            $this->injector->get('redis.storage'),
             $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\External\ClassEntryMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Resource\File\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\External\Connector\ImportQueue\Mapper::class),
         );
     }
 

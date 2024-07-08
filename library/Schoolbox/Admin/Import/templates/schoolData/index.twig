@@ -242,49 +242,60 @@
             {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
 
             <div class="small-12 island" id="status-island">
-                <div class="row">
-                    {% if hasIndicator %}
-                        <div class="small-12 island">
-                            <h3 class="subheader">Status</h3>
+                {% if hasIndicator %}
+                    <h3 class="subheader">Status</h3>
 
-                            <section class="content">
-                                <div id="status-indicator-container">
-                                    <div class="loader"></div>
-                                </div>
-
-                                <script>
-                                    $(function() {
-                                        $.get('{{ statusIndicatorRoute }}', function(response) {
-                                            $('#status-indicator-container').html(response);
-                                        });
-                                    });
-                                </script>
-
-                                <p>
-                                    Find out more about your
-                                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
-                                </p>
-                            </section>
+                    <section class="content">
+                        <div id="status-indicator-container">
+                            <div class="loader"></div>
                         </div>
-                    {% endif %}
-                </div>
+
+                        <script>
+                            $(function() {
+                                $.get('{{ statusIndicatorRoute }}', function(response) {
+                                    $('#status-indicator-container').html(response);
+                                });
+                            });
+                        </script>
+
+                        <p>
+                            Find out more about your
+                            <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
+                        </p>
+                    </section>
+                {% endif %}
             </div>
         </div>
+        {% if importQueue.instance %}
+            <div class="small-12 island scheduled-imports">
+                <h3 class="subheader">Scheduled Imports</h3>
+                <p class="meta">Note that you can only schedule one sync at a time.</p>
+                <section>
+                    {% include '@adminImportIndex/schoolData/importQueue.twig' with {
+                        importQueue: importQueue
+                    } %}
+                </section>
+            </div>
+        {% endif %}
 
         {% if importLogs|length %}
             <div class="small-12 island" id="previous">
                 <h3 class="subheader">Previous Imports</h3>
+                <section>
                     {% include '@adminImportIndex/schoolData/importLog.twig' with {
                         importLogs: importLogs
                     } %}
+                </section>
             </div>
         {% endif %}
 
         {% if lissInputPayloads.all|length %}
             <div class="small-12 island liss-input-payloads" id="liss-input-payloads">
-                {% include '@adminImportIndex/schoolData/lissInputPayloads.twig' with {
-                    lissInputPayloads: lissInputPayloads
-                } %}
+                <section>
+                    {% include '@adminImportIndex/schoolData/lissInputPayloads.twig' with {
+                        lissInputPayloads: lissInputPayloads
+                    } %}
+                </section>
             </div>
         {% endif %}
 

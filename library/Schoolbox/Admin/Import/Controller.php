@@ -10,9 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
-use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Queue\Composite;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\InstanceLockFactory;
@@ -21,7 +18,6 @@ use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
-use Predis\ClientInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -35,21 +31,13 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
-use Schoolbox\External\Connector\Log\Mapper;
-use Schoolbox\External\Connector\ValidStrats;
-use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Export\Classes;
 use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
-use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\MessageList\Listed;
-use Schoolbox\Realtime\MessageList\Unread;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Symfony\Component\Lock\LockInterface;
 use Twig\Error\Error;
 use UnexpectedValueException;
@@ -77,12 +65,12 @@ class Controller extends ConfigController
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param Rebuilder $rebuilder
      * @param CacheInterface $oidcCache
-     * @param Mapper $importLogMapper
-     * @param ClientInterface $redisStorage
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      * @param \Schoolbox\Resource\File\Mapper $fileMapper
+     * @param \Schoolbox\External\Connector\ImportQueue\Mapper $importQueueMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -90,11 +78,11 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
-        private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper,
-        private \Schoolbox\Resource\File\Mapper $fileMapper
+        private \Schoolbox\Resource\File\Mapper $fileMapper,
+        private \Schoolbox\External\Connector\ImportQueue\Mapper $importQueueMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -182,6 +170,12 @@ class Controller extends ConfigController
                 'hasIndicator' => $hasIndicator,
                 'statusIndicatorRoute' => $this->routeGenerator->generate('adminImportIndex.getStatusIndicator'),
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
+                /* A list of user-initiated syncs
+                 */
+                'importQueue' => [
+                    'script' => Scheduler::MANUAL_SIS_SCRIPT_NAME,
+                    'instance' => $this->importQueueMapper->findAll()->first()
+                ],
                 /* Find any LISS input payloads that we might have logged
                  */
                 'lissInputPayloads' => $lissInputPayloads,
@@ -343,202 +337,20 @@ class Controller extends ConfigController
             throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        $queuedRequests = $this->importQueueMapper->findAll();
+
+        /* Only allow one request at a time, per strat (TODO: implement per-strat limitation)
+         * but that's a future evolution; for now, just mimic what we used to have, for Civica
+         */
+        if (0 === $queuedRequests->count()) {
+            $importQueue = $this->importQueueMapper->createModel()
+                ->setUser($this->getUser());
+
+            $this->importQueueMapper->save($importQueue);
+        }
+
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->response = $this->redirectFound($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'));
-
-        /* Spawn a logger out of darkness
-         * Was there a particular way to do this?
-         */
-        $logger = $this->spawnLogger();
-
-        // Not the best place to put it but it will do for now
-        $this->postOutputCallbacks[] = function () use ($logger) {
-            $this->syncCallback($logger);
-        };
-
-        $this->response = $this->responseEmpty();
-    }
-
-
-    /**
-     * Performs an actual sync.
-     */
-    public function syncCallback(LoggerInterface $logger): void
-    {
-        /* Disable the mapper cache universally, by imitating a cli request.
-         *
-         * The mapper cache is disabled in the cli, but not in a web request.
-         * $cacheEnabled and disableCache() are protected methods by strict
-         * intent, to avoid a change to the base mapper, I can instead
-         * do a little code cosplay here. Unhygienic but the alternative is
-         * just as disgusting to contemplate
-         */
-        unset($_SERVER['REQUEST_METHOD']);
-
-        try {
-            $host        = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
-            $key         = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
-            $frequency   = Scheduler::HOURLY;
-            $customHours = [];
-            $type        = $this->getConfigLoader()->get('schooldata_import_data_source');
-            $file        = null;
-            $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
-
-            /* LISS Additive Mode
-             *
-             * If on, liss data will be **added** to whatever the sis gave to us. We don't actually
-             * know whether liss data should add, or replace, existing data; only the school can know
-             * what they meant by having their liss data here.
-             *
-             * Turning it on lets us skip the Prepare and Cleanup strats from the liss factory.
-             * It's off by default.
-             */
-            $lissAdditiveMode = (bool)$this->getConfigLoader()->get('external_liss_additive_mode');
-
-            /* Cannot do this with No Data Source
-             * Exit early if selected
-             */
-            if ('' === $type) {
-                return;
-            }
-
-            /* Nobody is on the watchlist in this context
-             */
-            $watchlist = (new Watchlist())->filter('');
-
-            try {
-                $lock = $this->acquireLock($logger, Scheduler::LOCK_NAME, $timeout);
-            } catch (\RuntimeException $e) {
-                return;
-            }
-
-            /* Explicitly set a time limit to conclude this sync
-             * while running in a detached process. runPostOutputCallbacks()
-             * arbitrarily sets a time limit so you have to override that
-             */
-            set_time_limit((int)$timeout);
-
-            /* Get this particular db instance
-             */
-            $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
-
-            /* Split the transaction in half for suds connectors that can actually do that
-             * Otherwise just import everything like it always did
-             */
-            if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
-                $splitStrats = [
-                    ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
-                    ValidStrats::TIMETABLE
-                ];
-            } else {
-                $splitStrats = [''];
-            }
-
-            /* The time when both parts of the import ran
-             * Could do REQUEST_TIME but this is good enough
-             */
-            $time = time();
-
-            /* This is needed to process liss data from storage files
-             */
-            /** @var FilesystemProxy $filesystemProxy */
-            $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
-            foreach ($splitStrats as $currentStrat) {
-                /* Each part of a Segregated Import gets its own run id
-                 */
-                $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
-
-                /* ValidStrats is now a cli option
-                 */
-                $validStrats = new ValidStrats($currentStrat);
-
-                /* Execute scheduler: sis stuff
-                 */
-                $sisFactory = new Factory(
-                    $host,
-                    $key,
-                    true,
-                    $lissAdditiveMode,
-                    $logger,
-                    $watchlist,
-                    $validStrats,
-                    $filesystemProxy
-                );
-
-                /* Importer strat gets suffixed onto the end
-                 */
-                $subtitle = '';
-
-                if ('' !== $currentStrat) {
-                    $subtitle = " ({$currentStrat})";
-                }
-
-                (new Scheduler(
-                    $importLogMapper->getDatabase(),
-                    $frequency,
-                    $customHours,
-                    $sisFactory,
-                    $type,
-                    $file,
-                    $logger,
-                    $importLogMapper
-                ))->run($time, $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . $subtitle);
-            }
-
-            /* Execute scheduler: calendar stuff
-             * Not all connectivities contain a calendar importer, just some
-             */
-            $calendarFactory = new Endpoint\CalendarFactory($host, $key, true, $logger);
-
-            (new Scheduler(
-                $importLogMapper->getDatabase(),
-                $frequency,
-                $customHours,
-                $calendarFactory,
-                $type,
-                $file,
-                $logger,
-                $importLogMapper
-            ))->run($time, $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
-
-            /* Go to the "Previous Imports" area of SUDS Control Panel
-             */
-            $redirect = $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
-
-            /* Arbitrarily inject and broadcast a notification,
-             * bypassing all the usual Mr Matt mechanisms
-             *
-             * As recommended (for now) by Mr Sannang and Tomoko
-             */
-            $title = sprintf(
-                'School Data Sync Live Run has finished at %s',
-                \Alaress_Date_Format::now()->getLocal()
-            );
-
-            $bob  = new NotificationInstanceBuilder();
-            $bob->setTitle($title)
-                ->setAllowSelfSend(true)
-                ->setSeverity(\Monolog\Logger::INFO)
-                /* Alternatively I could make my own namespace...but should I?
-                 * Namespace controls the icon selection but that's about it...?
-                 */
-                ->setNamespace(NSMapper::NS_MESSAGE)
-                ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_MESSAGE)
-                /* Go to suds import log
-                 */
-                ->setHref($redirect)
-                ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
-
-            $composite = new Composite(
-                new Listed($this->redisStorage, INSTANCE_ID, $this->getUser()->getId()),
-                new Unread($this->redisStorage, INSTANCE_ID, $this->getUser()->getId())
-            );
-
-            $composite->push($bob->build());
-        } catch (\Exception $e) {
-            // the client has already detached - not much we can do
-        }
     }
 
 
