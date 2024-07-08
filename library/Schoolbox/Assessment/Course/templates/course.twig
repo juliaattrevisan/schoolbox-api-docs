@@ -369,10 +369,10 @@ Usage:
             var element = $(this);
 
             element.confirmDialog({
-                header: "Are you sure you wish to re apply the framework?",
-                text: '<span class="warning alert-box"><b>WARNING</b> Re applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of framework selection.</span>',
+                header: "Are you sure you wish to Re-apply the framework?",
+                text: '<span class="warning alert-box"><b>WARNING</b> Re-applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of re-applying the framework.</span>',
                 format: "html",
-                confirmLabel: "Yes, re apply",
+                confirmLabel: "Yes, Re-apply",
                 cancelLabel: "No",
                 confirmEvent: function (element) {
                     var toaster = $('[data-relation="ajax-response"]');
@@ -389,13 +389,13 @@ Usage:
                             element.closest("[data-unit]").remove();
 
                             toaster.toastTimeout({
-                                text: "Framework successfully re applied.",
+                                text: "Framework successfully Re-applied.",
                                 css: "pop success",
                             });
                         })
                         .fail(function () {
                             toaster.toastTimeout({
-                                text: "Framework could not be re applied.",
+                                text: "Framework could not be Re-applied.",
                                 css: "pop alert",
                             });
                         });
@@ -443,7 +443,7 @@ Usage:
             </li>
         {% endif %}
         <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
-        <li><a href="{{ routeLookup('course.reApplyFramework', {id: courseSpec.id, courseSpec: courseSpec}) }}" class="icon-refresh" data-action="reapply-framework">Re Apply Framework</a></li>
+        <li><a href="{{ routeLookup('course.reApplyFramework', {id: courseSpec.id, courseSpec: courseSpec}) }}" class="icon-refresh" data-action="reapply-framework">Re-apply framework</a></li>
     </ul>
     {% endif %}
 </div>
