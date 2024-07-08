@@ -82,7 +82,7 @@ class RemoteLogin
             return null;
         }
 
-        $cookieName = PipeManager::PHP_SESSION_PREFIX;
+        $cookieName = session_name();
         foreach ($response->getHeader('Set-Cookie') as $cookieString) {
             if (preg_match("/^{$cookieName}=([a-z0-9]+);/", $cookieString, $matches)) {
                 return $matches[1];

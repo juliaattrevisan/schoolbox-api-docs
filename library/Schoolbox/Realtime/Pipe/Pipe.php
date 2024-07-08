@@ -92,7 +92,7 @@ class Pipe
      */
     public function getSession(): string
     {
-        return $this->getCookie(PipeManager::PHP_SESSION_PREFIX);
+        return $this->getCookie(session_name());
     }
 
     /**
