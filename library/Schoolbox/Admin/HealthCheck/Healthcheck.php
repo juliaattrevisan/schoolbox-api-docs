@@ -750,7 +750,6 @@ class Healthcheck
             "TimetablePeriod",
             "TimetableDate",
             "TimetableBlockInstance",
-            "PeriodExpand"
         ];
 
         $this->selectTest($fcTables, null, 'fc');
