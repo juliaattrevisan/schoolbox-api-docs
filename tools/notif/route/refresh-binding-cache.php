@@ -14,33 +14,63 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel(
-    'Binding Calculator',
-    [
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['userId:', 'instance:'],
-    ]
+$kernel = new CliTool\Kernel(
+    new class extends CliTool\App
+    {
+        /**
+         * If provided: run for this instance ID. Default to `INSTANCE_ID`.
+         */
+        private const OPT_LONG_INSTANCE = 'instance:';
+
+        /**
+         * If provided: run for this user only. Default to all users.
+         */
+        private const OPT_LONG_USER_ID  = 'userId:';
+
+        /**
+         * @inheritdoc
+         */
+        public function getLongOpts(): array
+        {
+            return [
+                self::OPT_LONG_INSTANCE,
+                self::OPT_LONG_USER_ID,
+            ];
+        }
+
+        /**
+         * @inheritdoc
+         */
+        public function run(): void
+        {
+            $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
+            $userId     = $this->getOpt(self::OPT_LONG_USER_ID);
+
+            /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
+            $cache = $this->getDi()->get('subscriptionCache');
+            $cache->setLog($this->getLogger());
+
+            if ($userId) {
+                $cache->cacheUsers($instanceId, [$userId]);
+            } else {
+                $cache->cacheAllUsers($instanceId);
+            }
+        }
+
+        /**
+         * May run as root or not.
+         */
+        public function runAsRoot(): ?bool
+        {
+            return null;
+        }
+    },
+    [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
+    true,
 );
-
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
-
-    // If no instance ID is provided, fall back to default if it exists
-    $instanceId = $opts['instance'] ?? INSTANCE_ID;
-    $userId     = $opts['userId'] ?? null;
-
-    /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
-    $cache = $di->get('subscriptionCache');
-    $cache->setLog($log);
-
-    if ($userId) {
-        $cache->cacheUsers($instanceId, [$userId]);
-    } else {
-        $cache->cacheAllUsers($instanceId);
-    }
-});
+$kernel->runApp();

@@ -1,6 +1,6 @@
 INSERT INTO config SET
 name       ='maintenance_mode',
-value      =0,
+value      =1,
 title      ='Maintenance Mode',
 description='Turn this on to prevent access to Schoolbox during maintenance periods.',
 field_id   =(SELECT id FROM lu_config_field WHERE field='boolean'),

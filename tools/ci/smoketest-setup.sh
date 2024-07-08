@@ -111,7 +111,12 @@ cd tools || exit 1
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
 ./set-plan.php --plan=elite
 ./build-sql-update.sh
+
+# Enter/exit maintenance mode before/after update
+./maintenance/site_down.sh
 ./update-sql-nocheck.sh
+./maintenance/site_up.sh
+
 ./schema/charset.php --perform
 echo "enabling summative report exporter"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = 'summative_report_enabled';"
