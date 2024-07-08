@@ -1,7 +1,12 @@
 {% if literacyNumeracyCheckbox.data|length %}
+<style>
+.subheader-suffix {
+    text-transform: none;
+}
+</style>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Literacy/Numeracy</h2>
+        <h2 class="subheader">{{ literacyNumeracyCheckbox.heading }} <span class="subheader-suffix">{{ literacyNumeracyCheckbox.headingSuffix }}</span></h2>
         <section>
             <ul class="information-list">
                 {% for checkboxName, selected in literacyNumeracyCheckbox.data %}

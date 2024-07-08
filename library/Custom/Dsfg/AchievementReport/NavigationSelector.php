@@ -205,14 +205,16 @@ class NavigationSelector
             ];
         }
 
-        /* Conditionally add Standardised Test option
-         */
-        $availableNavigation[self::STANDARDISEDTEST_KEY] = [
-            'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
-                'externalUserId' => $this->externalUser['StudentID'],
-            ]),
-            'label' => 'Standardised Tests'
-        ];
+        if (isset($this->externalUser['StudentID'])) {
+            /* Conditionally add Standardised Test option
+             */
+            $availableNavigation[self::STANDARDISEDTEST_KEY] = [
+                'url' => $this->routeGenerator->generate('achievementreport.getStandardisedTests', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'Standardised Tests'
+            ];
+        }
 
         /* Conditionally add Comment option
          */
@@ -255,6 +257,10 @@ class NavigationSelector
      */
     private function hasComments(): bool
     {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
@@ -276,6 +282,10 @@ class NavigationSelector
      */
     private function hasSchoolGrades(): bool
     {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
@@ -297,6 +307,10 @@ class NavigationSelector
      */
     private function hasNcea(): bool
     {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
@@ -318,6 +332,10 @@ class NavigationSelector
      */
     private function hasIb(): bool
     {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];

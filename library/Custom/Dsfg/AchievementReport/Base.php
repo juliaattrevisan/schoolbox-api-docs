@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 abstract class Base
 {
-
     /**
      * Initialised array of term indices
      */
@@ -158,7 +157,7 @@ abstract class Base
      */
     protected function getExternalUserId()
     {
-        return $this->externalUser['StudentID'];
+        return $this->externalUser['StudentID'] ?? null;
     }
 
 

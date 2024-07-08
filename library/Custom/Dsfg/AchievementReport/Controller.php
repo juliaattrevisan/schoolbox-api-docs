@@ -678,6 +678,7 @@ class Controller extends Base
                  */
                 'literacyNumeracyCheckbox' => [
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
+                    'headingSuffix' => $literacyNumeracyCheckbox->getHeadingSuffix(),
                     'data' => $literacyNumeracyCheckbox->findData()
                 ],
 
