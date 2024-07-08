@@ -3,4 +3,4 @@
 UPDATE course_implementation ci
 JOIN folder f ON f.id = ci.folder_id
 SET ci.deleted_at = f.deleted_at
-WHERE f.deleted_at IS NOT NULL;
+WHERE f.deleted_at IS NOT NULL AND ci.deleted_at IS NULL;
