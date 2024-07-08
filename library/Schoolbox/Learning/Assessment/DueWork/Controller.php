@@ -1024,9 +1024,11 @@ class Controller extends Assessment\Controller
                 // try and use the last attempt (published)
                 /** @var Submission|null $lastResponse */
                 $lastResponse = $participant->findMostRecentResponse();
-                foreach ($lastResponse->getAllFiles() as $file) {
-                    if ($file->getIsWorksheet()) {
-                        $kamiFile = $file->getKami()?->getKamiDocumentId();
+                if ($lastResponse) {
+                    foreach ($lastResponse->getAllFiles() as $file) {
+                        if ($file->getIsWorksheet()) {
+                            $kamiFile = $file->getKami()?->getKamiDocumentId();
+                        }
                     }
                 }
 
