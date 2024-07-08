@@ -86,6 +86,8 @@ if ($action == 'delete') {
     $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
     try {
         $homepageTemplateMapper->create($homepageTemplate);
+        // navigate to the new template
+        SitePage::localRedir(sprintf("/adminv2/homepage#%d", $homepageTemplate->getId()));
     } catch (UnexpectedValueException $e) {
         throw new SchoolboxException($e->getMessage(), 0, $e);
     }
