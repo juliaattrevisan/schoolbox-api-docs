@@ -311,12 +311,21 @@ HELP;
             // hit learnosity and fetch them all
             $this->fetchActivity($learnosityReferences);
 
+            /* Nice counter for cli watching zzz
+             */
+            $i = 0;
+            $n = \count($schoolboxQuizzes);
+
             /**
              * check each learnosity activity (from the cache)
              * check if they have items and a title, if not log it
              */
             foreach ($schoolboxQuizzes as $row) {
-                $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
+                /* Preincrement for this loop
+                 */
+                ++$i;
+
+                $this->getLogger()->debug(sprintf("%d/%d Checking Quiz '%s' (Assessment Id: %s)", $i, $n, $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
                     // quiz broken
                     $brokenQuizzes++;
