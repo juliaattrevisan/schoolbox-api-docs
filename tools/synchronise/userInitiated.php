@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Log\Guid;
 use Schoolbox\External\Connector\ValidStrats;
@@ -89,7 +89,7 @@ HELP;
         $hasRequested = $importQueueMapper->countAll();
 
         if (!$hasRequested) {
-            exit(1);
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
         /* Spawn scheduler based on args
