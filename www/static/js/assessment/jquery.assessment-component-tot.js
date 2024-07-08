@@ -162,5 +162,46 @@
                     });
             }
         );
+
+        // Re apply course framework
+        component.on("click.assessmentTotInstance", 'a[data-action="reapply-framework"]', function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            element.confirmDialog({
+                header: "Are you sure you wish to re apply the framework?",
+                text: '<span class="alert alert-box"><b>WARNING</b>Re applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of framework selection.</span>',
+                format: "html",
+                confirmLabel: "Yes, re apply",
+                cancelLabel: "No",
+                confirmEvent: function (element) {
+                    var toaster = component.find("[data-alert]");
+                    toaster.toastActivate({ text: "Syncing framework..." });
+
+                    /* The list element containing this row
+                     */
+                    $.ajax(element.attr("href"), {
+                        dataType: "json",
+                        type: "POST",
+                    })
+                        .done(function () {
+                            // Delete this unit from the list
+                            element.closest("[data-unit]").remove();
+
+                            toaster.toastTimeout({
+                                text: "Framework successfully re applied.",
+                                css: "pop success",
+                            });
+                        })
+                        .fail(function () {
+                            toaster.toastTimeout({
+                                text: "Framework could not be re applied.",
+                                css: "pop alert",
+                            });
+                        });
+                },
+            });
+        });
     };
 })(jQuery);

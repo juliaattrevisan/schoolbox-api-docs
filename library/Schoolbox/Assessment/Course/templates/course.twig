@@ -402,6 +402,7 @@ Usage:
             </li>
         {% endif %}
         <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
+        <li><a href="{{ routeLookup('course.reApplyFramework', {id: courseSpec.id, courseSpec: courseSpec}) }}" class="icon-refresh" data-action="reapply-framework">Re Apply Framework</a></li>
     </ul>
     {% endif %}
 </div>
