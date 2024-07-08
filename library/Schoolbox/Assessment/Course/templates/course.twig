@@ -375,7 +375,7 @@ Usage:
                 confirmLabel: "Yes, re apply",
                 cancelLabel: "No",
                 confirmEvent: function (element) {
-                    var toaster = component.find("[data-alert]");
+                    var toaster = $('[data-relation="ajax-response"]');
                     toaster.toastActivate({ text: "Syncing framework..." });
 
                     /* The list element containing this row
