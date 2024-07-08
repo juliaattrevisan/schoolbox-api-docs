@@ -53,7 +53,10 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
         try {
             const response = await window.fetch(activityToDelete.value._links.delete, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
             });
 
             if (!response.ok) {
