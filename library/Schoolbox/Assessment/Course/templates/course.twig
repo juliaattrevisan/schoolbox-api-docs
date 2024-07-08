@@ -361,6 +361,47 @@ Usage:
                 ui.placeholder.css('height', '');
             }
         });
+
+        // Re apply course framework
+        $('a[data-action="reapply-framework"]').on('click', function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            element.confirmDialog({
+                header: "Are you sure you wish to re-apply the framework?",
+                text: '<span class="alert-box warning icon-alert">Re-applying the course framework will merge content and affect how it displays on your homepages. New content may appear as a result of re-applying the framework.</span>',
+                format: "html",
+                confirmLabel: "Yes, Re-apply",
+                cancelLabel: "No",
+                confirmEvent: function (element) {
+                    var toaster = $('[data-relation="ajax-response"]');
+                    toaster.toastActivate({ text: "Syncing framework..." });
+
+                    /* The list element containing this row
+                     */
+                    $.ajax(element.attr("href"), {
+                        dataType: "json",
+                        type: "POST",
+                    })
+                        .done(function () {
+                            // Delete this unit from the list
+                            element.closest("[data-unit]").remove();
+
+                            toaster.toastTimeout({
+                                text: "Framework successfully re-applied.",
+                                css: "pop success",
+                            });
+                        })
+                        .fail(function () {
+                            toaster.toastTimeout({
+                                text: "Framework could not be re-applied.",
+                                css: "pop alert",
+                            });
+                        });
+                },
+            });
+        });
     });
 </script>
 {% endautoescape %}
@@ -402,6 +443,7 @@ Usage:
             </li>
         {% endif %}
         <li><a href="{{ routeLookup('coursePlan.getPlan', {id: courseSpec.id}) }}" class="icon-project">Unit Planner</a></li>
+        <li><a href="{{ routeLookup('course.reApplyFramework', {id: courseSpec.id, courseSpec: courseSpec}) }}" class="icon-refresh" data-action="reapply-framework">Re-apply Framework</a></li>
     </ul>
     {% endif %}
 </div>

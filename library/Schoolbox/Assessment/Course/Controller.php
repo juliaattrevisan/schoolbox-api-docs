@@ -1346,6 +1346,27 @@ class Controller extends Base\Base
         );
     }
 
+
+    /**
+     * Re applies the course framework / template onto the specified course and its child units.
+     *
+     * @api POST /course/reapply/{id}
+     * @since 24.0
+     *
+     * @param CourseSpecification $courseSpec
+     * @return void
+     */
+    public function reApplyFramework(CourseSpecification $courseSpec)
+    {
+        try {
+            // update existing units / course with the new templates
+            $this->updateExistingFolders($courseSpec, $courseSpec->getTemplate());
+        } catch (MapperException $e) {
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])->withStatus(400);
+        }
+        $this->response = $this->responseAsJson(['message' => 'success'])->withStatus(200);
+    }
+
     /**
      * Update Spec Course and Unit homepage templates
      * This will purge all components from the homepage and re create only the ones from the selected template

@@ -23,6 +23,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -91,6 +92,9 @@ class Module extends BaseModule
         };
 
         $preloadCourseSpec = function (array $params) {
+            if (isset($params['courseSpec']) && $params['unitSpec'] instanceof CourseSpecificationModel) {
+                return ['courseSpec' => $params['courseSpec']];
+            }
             try {
                 return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
@@ -128,6 +132,7 @@ class Module extends BaseModule
         $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
         $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
         $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
+        $this->register('POST', '/reapply/{id}', 'reApplyFramework', null, $preloadCourseSpec);
         $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitImpl);
     }
 
