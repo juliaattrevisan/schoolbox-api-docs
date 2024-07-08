@@ -1993,8 +1993,9 @@ class Controller extends Assessment\Controller
         if (!($assessment instanceof Model && $assessment->getKamiWorksheetTemplate())) {
             throw new MapperException\NotFound();
         }
+        $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
         $session = $this->kamiConnector->viewSessionForGroup(
-            $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(),
+            $kamiGroup,
             $this->getUser(),
             true,
         );

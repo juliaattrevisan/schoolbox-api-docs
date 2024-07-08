@@ -850,7 +850,11 @@ class Connector implements IConnector
         $request  = new Request('POST', $this->apiHost . 'embed/sessions');
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
-            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+            if (isset($documentId)) {
+                throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+            } elseif (isset($documentGroupId)) {
+                throw new Exception\NotFound("Kami Document not found. Group Id: $documentGroupId", $request, $response);
+            }
         }
         return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
     }
