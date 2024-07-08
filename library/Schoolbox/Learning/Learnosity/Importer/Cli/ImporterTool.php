@@ -403,7 +403,9 @@ HELP;
          */
         $this->assessmentId = $this->assessmentId ?: $this->getOpt(self::OPT_LONG_ASSESSMENT_ID);
 
-        $this->getLogger()->debug("ass: " . print_r($this->assessmentId, true));
+        if (null !== $this->assessmentId) {
+            $this->getLogger()->debug(sprintf("Assessment ID: %d", $this->assessmentId));
+        }
 
         /* Check mandatory args first
          */
