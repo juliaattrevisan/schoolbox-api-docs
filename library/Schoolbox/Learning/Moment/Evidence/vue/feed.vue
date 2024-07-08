@@ -767,7 +767,7 @@ export default {
                                         </a>
                                     </div>
                                 </template>
-                                <template v-if="evidence.discriminator === 'dueWorkFeedback'">
+                                <template v-if="evidence.discriminator === 'dueWorkFeedback' || evidence.discriminator === 'quizFeedback'">
                                     <div class="flex-grade">
                                         <div class="small-12 card columns">
                                             <div>

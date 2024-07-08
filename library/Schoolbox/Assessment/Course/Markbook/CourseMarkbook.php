@@ -579,7 +579,7 @@ class CourseMarkbook
                 $authAnyFeedback       = $participant->getAuthoritativeFeedback(false);
                 $authPublishedFeedback = $participant->getAuthoritativeFeedback(true);
 
-                if ($aImpl instanceof DueWork\Model && $authPublishedFeedback) {
+                if (($aImpl instanceof DueWork\Model || $aImpl instanceof \Schoolbox\Learning\Assessment\Quiz\Model) && $authPublishedFeedback) {
                     // Store due-work feedback published comments
                     $this->studentComments[$courseImplId][$userId][$aId] = $authPublishedFeedback->getComment();
                 }

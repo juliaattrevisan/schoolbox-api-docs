@@ -13,6 +13,7 @@ use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray as BadgeAwardTranslator;
 use Schoolbox\Learning\Moment\Feed\Cursor;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray as DueWorkFeedbackTranslator;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Translator\ModelToArray as QuizFeedbackTranslator;
 
 /**
  * Class ModelToArray
@@ -22,14 +23,16 @@ class ModelToArray
     /**
      * Constructor
      *
-     * @param Composite                 $evidenceTranslator
-     * @param BadgeAwardTranslator      $badgeAwardTranslator
+     * @param Composite $evidenceTranslator
+     * @param BadgeAwardTranslator $badgeAwardTranslator
      * @param DueWorkFeedbackTranslator $dueWorkFeedbackTranslator
+     * @param QuizFeedbackTranslator $quizFeedbackTranslator
      */
     public function __construct(
         private Composite $evidenceTranslator,
         private BadgeAwardTranslator $badgeAwardTranslator,
-        private DueWorkFeedbackTranslator $dueWorkFeedbackTranslator
+        private DueWorkFeedbackTranslator $dueWorkFeedbackTranslator,
+        private QuizFeedbackTranslator $quizFeedbackTranslator
     ) {
     }
 
@@ -57,6 +60,11 @@ class ModelToArray
 
             case Cursor::DISCRIMINATOR_DUE_WORK_FEEDBACK:
                 $return['object'] = $this->dueWorkFeedbackTranslator->__invoke($result['object']);
+                $return['date']   = $return['object']['publishedAt'];
+                break;
+
+            case Cursor::DISCRIMINATOR_QUIZ_FEEDBACK:
+                $return['object'] = $this->quizFeedbackTranslator->__invoke($result['object']);
                 $return['date']   = $return['object']['publishedAt'];
                 break;
 

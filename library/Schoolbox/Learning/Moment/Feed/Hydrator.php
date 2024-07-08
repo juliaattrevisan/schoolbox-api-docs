@@ -13,11 +13,13 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\User;
 
 /**
@@ -28,17 +30,19 @@ class Hydrator
     /**
      * Constructor
      *
-     * @param EvidenceMapper             $evidenceMapper
-     * @param BadgeAwardMapper           $badgeAwardMapper
+     * @param EvidenceMapper $evidenceMapper
+     * @param BadgeAwardMapper $badgeAwardMapper
      * @param DueWorkFeedbackMapperProxy $returnDataSource
-     * @param MapperProxy                $assessmentDataSource
-     * @param Visibility                 $visibility
-     * @param User                       $viewer
+     * @param QuizFeedbackMapperProxy $attemptDataSource
+     * @param MapperProxy $assessmentDataSource
+     * @param Visibility $visibility
+     * @param User $viewer
      */
     public function __construct(
         private EvidenceMapper $evidenceMapper,
         private BadgeAwardMapper $badgeAwardMapper,
         private DueWorkFeedbackMapperProxy $returnDataSource,
+        private QuizFeedbackMapperProxy $attemptDataSource,
         private MapperProxy $assessmentDataSource,
         private Visibility $visibility,
         private User $viewer,
@@ -91,6 +95,10 @@ class Hydrator
                     $dueWorkFeedbackIds[] = $result['id'];
                     break;
 
+                case Cursor::DISCRIMINATOR_QUIZ_FEEDBACK:
+                    $quizFeedbackIds[] = $result['id'];
+                    break;
+
                 default:
                     // nothing happens
                     break;
@@ -115,9 +123,21 @@ class Hydrator
         $dueWorkFeedbackResults = !empty($dueWorkFeedbackIds)
             ? $this->returnDataSource->findByColumnList(['id' => $dueWorkFeedbackIds])->indexBy('id')
             : new GenericCollection(DueWorkFeedback::class);
+
+        $quizFeedbackResults = !empty($quizFeedbackIds)
+            ? $this->attemptDataSource->findByColumnList(['attempt_id' => $quizFeedbackIds])->indexBy('id')
+            : new GenericCollection(QuizFeedback::class);
+
         $assessmentIds          = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
             return $feedback->getAssessable()->getId();
         });
+
+        /* Add the quiz ones too
+         */
+        $assessmentIds = $assessmentIds->merge($quizFeedbackResults->map(static function (QuizFeedback $feedback) {
+            return $feedback->getAssessable()->getId();
+        }));
+
         $assessments            = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
         $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
 
@@ -159,6 +179,26 @@ class Hydrator
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
                         'object'        => $dueWorkFeedback,
+                    ];
+                    break;
+
+                case Cursor::DISCRIMINATOR_QUIZ_FEEDBACK:
+                    /** @var QuizFeedback $quizFeedback */
+                    $quizFeedback = $quizFeedbackResults->offsetGet((int)$result['id']);
+                    /** @var IAssessable|null $assessment */
+                    $assessment = $assessments->offsetGet($quizFeedback->getAssessable()->getId());
+                    if (
+                        !$assessment
+                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$assessment->isFeedbackVisibleToUser($this->viewer)
+                    ) {
+                        break;
+                    }
+                    // hydrate assessment
+                    $quizFeedback->setAssessable($assessment);
+                    $return[$i] = [
+                        'discriminator' => $result['discriminator'],
+                        'object'        => $quizFeedback,
                     ];
                     break;
 
