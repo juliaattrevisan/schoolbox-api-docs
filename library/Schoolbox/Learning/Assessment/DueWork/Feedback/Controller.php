@@ -352,7 +352,9 @@ class Controller extends Base
 
         $feedback      = $dueWorkFeedbackFactory->produce();
         $isNewFeedback = $feedback->getId() === null;
-        if ($isNewFeedback) {
+
+        // if we are publishing, snapshot the kami
+        if ('1' === ($postVars['publish'] ?? null)) {
             // Find the Kami worksheet (if it exists)
             /** @var DueWork\Response\Model $response */
             $response = $feedback->getResponse();
@@ -363,7 +365,7 @@ class Controller extends Base
                 // Save the kami doc to the feedback object
                 $this->kamiConnector->initiatePollingForKamiDownload(
                     $kamiModel,
-                    'submission',
+                    'feedback',
                     $this->getUser(),
                 );
             }
