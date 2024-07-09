@@ -15,6 +15,7 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use Http\Discovery\Psr17Factory;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
@@ -33,6 +34,7 @@ use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
+use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -171,6 +173,12 @@ class Controller extends Base
 
 
     /**
+     * @var QuizFetcher
+     */
+    private QuizFetcher $quizFetcher;
+
+
+    /**
      * Controller constructor.
      *
      * @param Factory $urlFactory
@@ -224,6 +232,10 @@ class Controller extends Base
         );
 
         $this->helper = new Helper($this->api, $this->logger);
+
+        /* A convenient thing to have lying around
+         */
+        $this->quizFetcher = new QuizFetcher($this->quizMapper);
     }
 
 
@@ -2324,7 +2336,7 @@ class Controller extends Base
         $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
 
         // TODO as with posting a feedback:
-        //      what kind of error should we present to users? It's asynchronous
+        //  what kind of error should we present to users? It's asynchronous
         if (!$existingResponse) {
             return;
         }
@@ -2345,5 +2357,23 @@ class Controller extends Base
         $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
 
         $this->attemptMapper->save($attempt);
+    }
+
+
+    /**
+     * Export each student's latest response for a given quiz $assessment
+     * in csv format. Each question type needs its own way of find and rendering
+     * what should appear in the csv.
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function getExportAttempts(QuizDomainObject $assessment): void
+    {
+        (new Processor($this->api, $this->quizFetcher, $this->attemptMapper))->export($assessment);
     }
 }
