@@ -44,13 +44,16 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
 
+{##
+The grade below is inserted into the quiz-feedback Vue DOM structure then displayed
+#}
 <div id="grade-container-{{ participant.user.id }}" class="hide">
     <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
         <label>{{ locale.grades.proper }}
             {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                 assessment:  assessment,
                 participant: participant,
-                feedback:    latestFeedback ?? null,
+                feedback:    participant.findMostRecentInstructorGivenFeedback ?? null,
                 markScheme:  assessment.markScheme,
                 limit:       maxMarks,
                 tabIndex:    1,
