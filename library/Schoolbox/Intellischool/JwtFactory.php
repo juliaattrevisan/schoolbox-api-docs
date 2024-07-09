@@ -215,7 +215,7 @@ class JwtFactory
 
         $defaultClaims = [
             'iss'                                                           => $this->jwtIssuer,
-            'aud'                                                           => 'https://core.intellischool.net/auth/lti',
+            'aud'                                                           => 'https://intellischool.id/auth/lti',
             'https://purl.imsglobal.org/spec/lti/claim/version'             => '1.3.0',
             'https://purl.imsglobal.org/spec/lti/claim/message_type'        => 'LtiResourceLinkRequest',
             'https://purl.imsglobal.org/spec/lti/claim/deployment_id'       => $this->deploymentId,
