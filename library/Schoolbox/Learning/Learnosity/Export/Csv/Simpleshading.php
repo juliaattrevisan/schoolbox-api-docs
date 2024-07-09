@@ -31,8 +31,14 @@ class Simpleshading implements IStrategy
      */
     public function findHumanReadable(array $structure, array $response): ?string
     {
-        /* This is the wildest ride, but it seems like the 1th element indicates
-         * which one was selected. The shaded boxes were 1st, 5th and 6th boxes.
+        /* This is the wildest ride, but the array elements here correspond to coordinates.
+         * Simple Shading by default gives you one row, but you can expand it to have multiple rows/columns.
+         *
+         * Each element of $value represents a shaded square.
+         * 0th element corresponds to a row and the 1th element corresponds to a column, both of which describe
+         * the coordinates of shaded square. This is an annoying (and unconventional) expression of (y,x)
+         *
+         * In this example below, the shaded boxes were 1st, 5th and 6th boxes.
          * Take a guess for now, as best we can
          *
             [response] => Array
@@ -61,9 +67,17 @@ class Simpleshading implements IStrategy
         $vals = [];
 
         foreach ($response['response']['value'] ?? [] as $data) {
-            $vals[] = $data[1];
+            /* Forcibly represent as (x,y) corresponding to (column, row)
+             */
+            $vals[] = sprintf(
+                '(%s,%s)',
+                $data[1],
+                $data[0]
+            );
         }
 
+        /* Maybe use TOKENISER instead, so there are distinct characters...one day
+         */
         return implode(IStrategy::IMPLODER, $vals);
     }
 }
