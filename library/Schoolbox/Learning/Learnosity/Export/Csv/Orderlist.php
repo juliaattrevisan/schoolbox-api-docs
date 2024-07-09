@@ -34,7 +34,11 @@ class Orderlist implements IStrategy
         $vals = [];
 
         foreach ($response['response']['value'] ?? [] as $key => $val) {
-            $vals[] = $structure[$response['question_reference']]['data'][$val];
+            if ('' === trim((string)$val)) {
+                $vals[] = '';
+            } else {
+                $vals[] = $structure[$response['question_reference']]['data'][$val];
+            }
         }
 
         return implode(IStrategy::IMPLODER, $vals);
