@@ -24,6 +24,7 @@ use Schoolbox\Learning\Turnitin;
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

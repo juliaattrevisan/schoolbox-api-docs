@@ -1312,8 +1312,11 @@ class Controller extends Assessment\Controller
         // Save the response before attempting to save any feedback: we need a response ID to be able to attach the feedback
         $this->dueWorkResponseMapper->save($response);
 
-        // re save the kami file, now with the submission file object id
+        // re save the kami file and submission file with all things attached
         if (isset($kamiModel, $kamiFile)) {
+            // force the worksheet to be true (we are a kami worksheet file), and this was being dropped, somehow..
+            $kamiFile->setIsWorksheet(true);
+            $this->submissionFileMapper->save($kamiFile);
             $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($kamiFile));
         }
 
