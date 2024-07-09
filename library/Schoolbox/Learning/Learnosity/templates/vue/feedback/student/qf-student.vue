@@ -3,7 +3,7 @@
  * Display a single student's responses
  */
 
-import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
@@ -60,7 +60,7 @@ function onAttemptCommentUpdated(comment: string) {
                 class="l-flex-col l-gap-s"
             >
                 <h2 class="subheader f-no-margins">Overall Comment</h2>
-                <student-attempt-comment
+                <student-attempt-response
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
                     @updated-comment="onAttemptCommentUpdated"

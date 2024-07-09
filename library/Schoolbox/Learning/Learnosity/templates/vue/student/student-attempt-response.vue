@@ -15,7 +15,7 @@ const props = defineProps<Props>();
 
 const gradeEl = window.Vue.ref<HTMLDivElement | null>(null);
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = window.Vue.ref(props.student.attemptComment.comment ?? "");
+const comment = window.Vue.ref(props.student.attemptResponse.comment ?? "");
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
@@ -65,7 +65,7 @@ async function saveComment() {
     if (isSaving.value) {
         return;
     }
-    if (comment.value === props.student.attemptComment.comment) {
+    if (comment.value === props.student.attemptResponse.comment) {
         return;
     }
     if (props.student.urls === undefined) {
@@ -138,26 +138,32 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-gap-m l-pad-m">
-        <div>
-            <p
-                v-if="
-                    (props.isReadOnly && props.student.attemptComment.comment === null) ||
-                    (props.isReadOnly && props.student.attemptComment.comment === '')
-                "
-            >
-                <em>No comment added.</em>
-            </p>
-            <p v-else-if="props.isReadOnly && props.student.attemptComment.comment !== ''">
-                {{ props.student.attemptComment.comment }}
-            </p>
-            <template v-else>
-                <label :for="editorId">Comment</label>
-                <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
-                <div class="save-container l-grid">
-                    <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
-                            <em>{{ saveText }}</em>
+    <div class="c-island l-pad-m">
+        <div class="l-flex-row l-gap-m">
+            <div ref="gradeEl"></div>
+            <div>
+                <p
+                    v-if="
+                        (props.isReadOnly && props.student.attemptResponse.comment === null) ||
+                        (props.isReadOnly && props.student.attemptResponse.comment === '')
+                    "
+                >
+                    <em>No comment added.</em>
+                </p>
+                <div
+                    v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''"
+                    v-html="props.student.attemptResponse.comment"
+                ></div>
+                <template v-else>
+                    <label :for="editorId">Comment</label>
+                    <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
+                    <div class="save-container l-grid">
+                        <div class="save-container__inner-container">
+                            <div
+                                :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`"
+                            >
+                                <em>{{ saveText }}</em>
+                            </div>
                         </div>
                     </div>
                 </template>
