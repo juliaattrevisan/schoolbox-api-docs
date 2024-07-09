@@ -44,23 +44,6 @@ export default {
         };
     },
 
-    computed: {
-        /**
-         * To change when processing
-         *
-         * @return { String }
-         */
-        updateButtonText() {
-            if (this.isProcessing) {
-                return `<em>Processing, please wait...</em>`;
-            } else if (this.courses.length > 0) {
-                return `Update Selected`;
-            } else {
-                return 'Provision Selected';
-            }
-        },
-    },
-
     mounted() {
         this.setDefaultSelection();
     },
@@ -159,7 +142,7 @@ export default {
                     <div v-if="hasDataError" class="alert-box alert">
                         Error occurred. Further details are logged below.
                     </div>
-                    <textarea v-html="logData"></textarea>
+                    <textarea v-model="logData"></textarea>
                 </div>
                 <div>
                     <button @click.prevent="onCloseSelected" class="button submit">Close</button>
@@ -188,12 +171,11 @@ export default {
                     </div>
                 </div>
                 <div>
-                    <button
-                        @click.prevent="onUpdateUsersSelected"
-                        class="button submit"
-                        :disabled="isProcessing"
-                        v-html="updateButtonText"
-                    ></button>
+                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing">
+                        <em v-if="isProcessing">Processing, please wait..</em>
+                        <template v-else-if="courses.length > 0">Update Selected</template>
+                        <template v-else>Provision Selected</template>
+                    </button>
                 </div>
             </div>
         </Transition>
