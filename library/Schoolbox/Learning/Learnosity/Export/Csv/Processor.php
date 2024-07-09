@@ -301,6 +301,12 @@ class Processor
             $row[] = \Scrub::html2text($data['stimulus']);
         }
 
+        /* Add attempt marks and commentary as a backup
+         */
+        $row[] = 'Mark';
+        $row[] = 'Normalised Mark';
+        $row[] = 'Comment';
+
         fputcsv($output, $row, ',', '"');
     }
 
@@ -336,6 +342,12 @@ class Processor
             foreach ($structure as $itemReference => $data) {
                 $row[] = $responseData[$itemReference] ?? '';
             }
+
+            /* Attempt outcomes, as a backup
+             */
+            $row[] = $attempt->getMark();
+            $row[] = $attempt->getNormalisedMark();
+            $row[] = \Scrub::html2text($attempt->getComment() ?? '');
 
             fputcsv($output, $row, ',', '"');
         }
