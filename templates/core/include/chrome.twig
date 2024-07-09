@@ -663,7 +663,7 @@
                             }
                         } else if (currentPermission === "denied") {
                             {# Show the blocked message #}
-                            document.querySelectorAll('[data-pwa-notif="notifBlocked"]').forEach( (element)=>{
+                            document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa-notif="notifBlocked"]').forEach( (element)=>{
                                 element.classList.remove('hide');
                             });
 
