@@ -34,7 +34,11 @@ class ImageclozeassociationV2 implements IStrategy
         $vals = [];
 
         foreach ($response['response']['value'] ?? [] as $data) {
-            $vals[] = $data[0];
+            if (!isset($data[0])) {
+                $vals[] = '';
+            } else {
+                $vals[] = $data[0];
+            }
         }
 
         return implode(IStrategy::IMPLODER, $vals);
