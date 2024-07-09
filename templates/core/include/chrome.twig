@@ -453,6 +453,43 @@
                         deviceId = 'Android';
                     }
 
+                    {# Check if any of the PWA installer buttons are visible in a given section
+                     # @param {HTMLElement} sectionWrapper - The parent element of the PWA installer buttons (e.g. sidebar prompt or element with data-pwa-page)
+                     # @returns {boolean} - Whether or not the PWA installer buttons are visible in the given section
+                     #}
+                    function isPWAInstallPromptVisible(sectionWrapper) {
+                        // Check install section
+                        if (Array.from(sectionWrapper.querySelectorAll('[data-pwa="install"]')).some((installSectionElement) => {
+                            console.log(installSectionElement, installSectionElement.classList.contains('hide'));
+                            if (installSectionElement.classList.contains('hide')) {
+                                console.log("false");
+                                return false; // The install section is hidden
+                            }
+
+                            console.log("BB")
+                            // If any install button is visible, return true
+                            return Array.from(installSectionElement.querySelectorAll('[data-pwa-action]')).some((installActionElement) => {
+                                console.log("B", installActionElement, installActionElement.classList.contains('hide'));
+                                return !installActionElement.classList.contains('hide');
+                            });
+                        })) {
+                            console.log("ISTRUE")
+                            return true; // An install button is visible
+                        };
+
+                        return false; // No install button is visible
+                    }
+
+                    {# Check if any of the notification buttons/messages are visible in a given section
+                     # @param {HTMLElement} sectionWrapper - The parent element of the notification messages (e.g. sidebar prompt or element with data-pwa-page)
+                     # @returns {boolean} - Whether or not the notification messages are visible in the given section
+                     #}
+                    function isPWANotifPromptVisible(sectionWrapper) {
+                        return Array.from(sectionWrapper.querySelectorAll('[data-pwa-notif]')).some((notifSectionElement) => {
+                            return !notifSectionElement.classList.contains('hide'); // If any of them don't have a "hide" class, return true
+                        });
+                    }
+
                     {# Determine whether or not the sidebar is empty (has no install button or notification message)
                      # This is useful when hiding parts of the sidebar prompt contents so that we don't end up with
                      # weird padding or the "Later" button floating in the middle of nowhere...
@@ -464,25 +501,14 @@
                             }
 
                             // Check install section
-                            if (Array.from(sidebarElement.querySelectorAll('[data-pwa="install"]')).some((installSectionElement) => {
-                                if (installSectionElement.classList.contains('hide')) {
-                                    return false; // The install section is hidden
-                                }
-
-                                // If any install button is visible, then the sidebar prompt is not empty
-                                return Array.from(installSectionElement.querySelectorAll('[data-pwa-action]')).some((installActionElement) => {
-                                    return !installActionElement.classList.contains('hide');
-                                });
-                            })) {
+                            if (isPWAInstallPromptVisible(sidebarElement)) {
                                 return false; // An install button is visible, so the sidebar prompt is not empty
                             };
 
                             // Check notification section
-                            if (Array.from(sidebarElement.querySelectorAll('[data-pwa-notif]')).some((notifSectionElement) => {
-                                return !notifSectionElement.classList.contains('hide');
-                            })) {
-                                return false; // A notification message is visible, so the sidebar prompt is not empty
-                            }
+                            if (isPWANotifPromptVisible(sidebarElement)) {
+                                return false; // A notification button/message is visible, so the sidebar prompt is not empty
+                            };
 
                             return true;
                         });
@@ -710,8 +736,8 @@
                         });
 
                         let prompted = false;
-                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (element)=> {
-                            element?.addEventListener('click', async () => {
+                        document.querySelectorAll('[data-pwa-action="enableNotif"]').forEach( (enableNotifElement)=> {
+                            enableNotifElement.addEventListener('click', async () => {
                                 if (prompted) {
                                     return; {# only prompt once #}
                                 }
@@ -738,6 +764,17 @@
                                      #}
                                     document.querySelectorAll('[data-pwa-notif="notifEnabledMessage"]').forEach( (element)=>{
                                         element.classList.remove('hide');
+                                    });
+
+                                    {# If the PWA install button does not exist, such that the notifiation granted message is the only
+                                     # element left, hide the "Later" button in the sidebar prmopt, as it's now unnecessary.
+                                     #}
+                                    document.querySelectorAll('[data-pwa="sidebarPrompt"]').forEach((sidebarPromptElement) => {
+                                        if (!isPWAInstallPromptVisible(sidebarPromptElement)) {
+                                            sidebarPromptElement.querySelectorAll('[data-pwa="sidebarPromptDelay"]').forEach((element) => {
+                                                element.classList.add('hide');
+                                            });
+                                        };
                                     });
 
                                     {# Attempt to register the device for notifications #}
