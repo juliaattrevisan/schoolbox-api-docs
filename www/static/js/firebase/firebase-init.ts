@@ -1,18 +1,19 @@
-import { initializeApp } from '@firebase/app';
-import { getMessaging, getToken, deleteToken, onMessage } from '@firebase/messaging';
+import { initializeApp } from "@firebase/app";
+import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
 
 window.sbProps.firebaseApps.forEach((app) => {
     if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
         const firebaseApp = initializeApp(app.publicConfiguration);
 
-        // Ask for notification permission I guess?
-        if ('Notification' in window) {
-            // Register I guess?
+        // Check if the browser supports notifications
+        if ("Notification" in window) {
+            // Retrieve the current Firebase Messaging instance.
             const messaging = getMessaging(firebaseApp);
 
             // Receipt of a message
             onMessage(messaging, (payload) => {
-                console.log('Message received. ', payload);
+                console.log("Message received. ", payload);
+
                 const notificationOptions = {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
@@ -20,7 +21,7 @@ window.sbProps.firebaseApps.forEach((app) => {
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
                 };
-                if (payload.notification.timestamp !== '0') {
+                if (payload.notification.timestamp !== "0") {
                     notificationOptions.timestamp = payload.notification.timestamp;
                 }
                 let notif = new Notification(payload.notification.title, notificationOptions);
@@ -44,7 +45,6 @@ window.sbProps.firebaseApps.forEach((app) => {
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- *
  * @param { CustomEvent } event - Information about the event.
  */
 function requestNotif(event: CustomEvent) {
@@ -56,18 +56,18 @@ function requestNotif(event: CustomEvent) {
             const messaging = getMessaging(firebaseApp);
             // Generate a new token, and store it in Schoolbox's
             // mobile app registration.
-            getToken(messaging, {vapidKey: app.webPushPublicKey})
-                .then((currentToken) => {
-                    if('denied' === window.localStorage.getItem("notification")) {
-                        //If notification blocked while requesting, should stop registering attempt
-                        throw new Error('Notification blocked. Stop registering attempts.');
+            getToken(messaging, { vapidKey: app.webPushPublicKey })
+                .then(async (currentToken) => {
+                    if ("denied" === window.localStorage.getItem("notification")) {
+                        // If notification blocked while requesting, should stop registering attempt
+                        throw new Error("Notification blocked. Stop registering attempts.");
                     }
                     window.localStorage.setItem("notification", "registering");
                     window.localStorage.setItem("notifToken", currentToken);
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
-                        console.log('Current token: ' + currentToken);
+                        console.log(`Current token: ${currentToken}`);
                     }
 
                     // The Firebase app may one day be a separate
@@ -75,21 +75,21 @@ function requestNotif(event: CustomEvent) {
                     // happen, the registration will be pushed to some
                     // other place.
                     // For now, just push it to the Firebase app.
-                    let formData = new FormData();
-                    formData.append('appId', app.appIdentifier);
-                    formData.append('token', currentToken);
-                    formData.append('deviceId', deviceId);
-                    fetch('/api/register/Firebase', {
-                        method: 'POST',
-                        body: formData,
-                    }).then((response) => {
-                        window.localStorage.setItem("notification", "registered");
-                    })
+                    const formData = new FormData();
+                    formData.append("appId", app.appIdentifier);
+                    formData.append("token", currentToken);
+                    formData.append("deviceId", deviceId);
 
+                    await fetch("/api/register/Firebase", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    window.localStorage.setItem("notification", "registered");
                 })
                 .catch((error) => {
                     if (debug) {
-                        console.log('Error on getting token: ' + error);
+                        console.log(`Error on getting token: ${error}`);
                     }
                 });
         }
@@ -109,10 +109,10 @@ function denyNotif(event: CustomEvent) {
             const messaging = getMessaging(firebaseApp);
             // Generate a new token, and store it in Schoolbox's
             // mobile app registration.
-            getToken(messaging, {vapidKey: app.webPushPublicKey})
-                .then((currentToken) => {
-                    //delete the token from firebase
-                    deleteToken(messaging)
+            getToken(messaging, { vapidKey: app.webPushPublicKey })
+                .then(async (currentToken) => {
+                    // delete the token from firebase
+                    void deleteToken(messaging);
                     // delete the local cache token
                     window.localStorage.removeItem("notifToken");
                     window.localStorage.setItem("notification", "removing");
@@ -120,7 +120,7 @@ function denyNotif(event: CustomEvent) {
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
-                        console.log('Current token: ' + currentToken);
+                        console.log(`Current token: ${currentToken}`);
                     }
 
                     // The Firebase app may one day be a separate
@@ -128,19 +128,20 @@ function denyNotif(event: CustomEvent) {
                     // happen, the registration will be pushed to some
                     // other place.
                     // For now, just push it to the Firebase app.
-                    let formData = new FormData();
-                    formData.append('appId', app.appIdentifier);
-                    formData.append('token', currentToken);
-                    fetch('/api/register/Firebase', {
-                        method: 'DELETE',
+                    const formData = new FormData();
+                    formData.append("appId", app.appIdentifier);
+                    formData.append("token", currentToken);
+
+                    await fetch("/api/register/Firebase", {
+                        method: "DELETE",
                         body: formData,
-                    }).then((response) => {
-                        window.localStorage.setItem("notification", "removed");
                     });
+
+                    window.localStorage.setItem("notification", "removed");
                 })
                 .catch((error) => {
                     if (debug) {
-                        console.log('Error on getting token: ' + error);
+                        console.log(`Error on getting token: ${error}`);
                     }
                 });
         }

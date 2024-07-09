@@ -95,7 +95,7 @@ module.exports = {
             "./www/static/js/calendar/jquery.getExportCalendarLink.js",
 
             // Global property storage
-            "./www/static/js/global/sbProps.js",
+            "./www/static/js/global/sbProps.ts",
         ],
         masonry: {
             import: ["./www/static/js/masonry/masonry.js"],

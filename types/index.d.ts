@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import type { DefineComponent } from "vue";
 import type { Editor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
+import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 
 declare global {
     interface Window {
@@ -28,6 +29,7 @@ declare global {
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
             imageSlideshows: { [key: string]: any };
+            injectScriptsIfNotLoaded: typeof injectScriptsIfNotLoaded;
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
