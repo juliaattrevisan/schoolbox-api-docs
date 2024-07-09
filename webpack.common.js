@@ -246,9 +246,6 @@ module.exports = {
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
 
-        // Firebase demo
-        firebaseDemo: "./www/static/js/firebase/firebaseDemo.ts",
-
         //Sass
         core: "./www/static/css/core/core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
