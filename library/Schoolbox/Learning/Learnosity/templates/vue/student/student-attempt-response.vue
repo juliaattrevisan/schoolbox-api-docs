@@ -165,7 +165,7 @@ window.Vue.onUnmounted(async () => {
     <div class="c-island l-pad-m">
         <div class="l-flex-row l-gap-m">
             <div ref="gradeEl"></div>
-            <div>
+            <div class="l-flex__item--1-grow">
                 <p
                     v-if="
                         (props.isReadOnly && props.student.attemptResponse.comment === null) ||

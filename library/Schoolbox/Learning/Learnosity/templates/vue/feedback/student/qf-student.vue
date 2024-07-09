@@ -67,7 +67,7 @@ function onAttemptMarkUpdated(mark: string) {
                 v-if="store.hasMarkVisibility && (props.student.isReviewed || !store.isReadOnly)"
                 class="l-flex-col l-gap-s"
             >
-                <h2 class="subheader f-no-margins">Overall Comment</h2>
+                <h2 class="subheader f-no-margins">Overall Feedback</h2>
                 <student-attempt-response
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
