@@ -5,7 +5,7 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
@@ -17,7 +17,7 @@ interface Props {
     student: Student; // the student who has attempted the quiz
     reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptComment: StudentAttemptComment; // StudentAttemptComment all the overall attempt comments for the quiz
+    attemptComment: StudentAttemptResponse; // StudentAttemptResponse all the overall attempt comments for the quiz
     isReadOnly: boolean; // whether is in feedback mode, where the teacher can provide feedback to the student
     isReviewed: boolean; // whether the teacher has reviewed the attempt
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user

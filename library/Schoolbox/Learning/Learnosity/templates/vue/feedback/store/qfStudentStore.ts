@@ -7,7 +7,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import {
     getItemQuestions,
@@ -46,16 +46,16 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * store any passed through properties
      * @param {Student} $student - the student
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptComment} $attemptComment - the attempt responses
+     * @param {StudentAttemptResponse} $attemptComment - the attempt responses
      * @param {StudentUrls} $urls - the urls
      * @param {boolean} $isReviewed - whether the attempt has been reviewed
      */
     function init(
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
-        $attemptComment: StudentAttemptComment,
+        $attemptComment: StudentAttemptResponse,
         $urls?: StudentUrls,
-        $isReviewed?: boolean
+        $isReviewed?: boolean,
     ) {
         student.value = {
             ...$student,
@@ -134,7 +134,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(
-            ($question) => ($question.response as StudentItemQuestionResponse)?.maxScore === null
+            ($question) => ($question.response as StudentItemQuestionResponse)?.maxScore === null,
         );
         questionsWithoutMaxScore.forEach(($question) => {
             ($question.response as StudentItemQuestionResponse).isMarked = true;

@@ -3,7 +3,7 @@
  * Display a single student's responses
  */
 
-import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
@@ -50,7 +50,7 @@ function onAttemptCommentUpdated(comment: string) {
                         :key="item.reference"
                         :student="props.student"
                         :item="item"
-                        :container="(responseContentEl as HTMLDivElement)"
+                        :container="responseContentEl as HTMLDivElement"
                     />
                     <qf-student-all-marked />
                 </div>

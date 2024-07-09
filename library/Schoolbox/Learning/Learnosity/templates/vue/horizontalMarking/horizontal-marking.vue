@@ -6,7 +6,7 @@
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
@@ -23,7 +23,7 @@ interface Props {
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptComments: StudentAttemptComment[]; // all the overall attempt comments for the quiz
+    attemptComments: StudentAttemptResponse[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
     postFeedback: string; // the URL to post the feedback to

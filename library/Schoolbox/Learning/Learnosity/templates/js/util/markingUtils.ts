@@ -6,7 +6,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 
 /**
@@ -39,12 +39,12 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
 
 /**
  * Get the response for a student attempt
- * @param {StudentAttemptComment[]} attemptComments - the attempt comments to get the response from
+ * @param {StudentAttemptResponse[]} attemptComments - the attempt comments to get the response from
  * @param {number} studentId - the student id to get the response for
- * @returns {StudentAttemptComment} - the response attempt
+ * @returns {StudentAttemptResponse} - the response attempt
  */
-export function getAttemptResponse(attemptComments: StudentAttemptComment[], studentId: number) {
-    return attemptComments.find((attemptComment) => attemptComment.studentId === studentId) as StudentAttemptComment;
+export function getAttemptResponse(attemptComments: StudentAttemptResponse[], studentId: number) {
+    return attemptComments.find((attemptComment) => attemptComment.studentId === studentId) as StudentAttemptResponse;
 }
 
 /**
