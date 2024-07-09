@@ -22,6 +22,7 @@ const hasError = window.Vue.ref(false);
 
 const emit = defineEmits<{
     updatedComment: [comment: string];
+    updatedMark: [mark: string];
 }>();
 
 /**
@@ -108,6 +109,19 @@ watchDebounced(
 );
 
 /**
+ * @param {HTMLElement} gradeContainer - the container to get the mark from
+ */
+function getMark(gradeContainer: HTMLElement) {
+    const input = gradeContainer.querySelector("input");
+    if (input !== null) {
+        emit("updatedMark", input.value);
+        // input.addEventListener("input", () => {
+        //     comment.value = input.value;
+        // });
+    }
+}
+
+/**
  * The grade field utilises a considerable pre-existing twig/JS structure that we can't easily replicate in Vue,
  * see for example: library/Schoolbox/Learning/MarkScheme/templates/TotalMarkFractional.twig.
  * Rather than trying to rewrite the whole thing for a Vue context, we just store the grade field outside of Vue,
@@ -118,6 +132,7 @@ function getGradeContainer() {
     if (gradeContainer !== null) {
         gradeEl.value?.append(gradeContainer);
         gradeContainer.classList.remove("hide"); // now remove the hide class to show the grade
+        getMark(gradeContainer);
     }
 }
 

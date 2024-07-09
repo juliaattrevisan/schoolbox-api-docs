@@ -27,6 +27,14 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
 function onAttemptCommentUpdated(comment: string) {
     useStudentStore().updateAttemptComment(props.student, comment);
 }
+
+/**
+ * To notify of a change in the mark
+ * @param {string} mark - the mark to save
+ */
+function onAttemptMarkUpdated(mark: string) {
+    useStudentStore().updateAttemptMark(props.student, mark);
+}
 </script>
 
 <template>
@@ -64,6 +72,7 @@ function onAttemptCommentUpdated(comment: string) {
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
                     @updated-comment="onAttemptCommentUpdated"
+                    @updated-mark="onAttemptMarkUpdated"
                 />
             </div>
         </template>
