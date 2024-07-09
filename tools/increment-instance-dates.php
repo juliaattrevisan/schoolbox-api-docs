@@ -232,7 +232,7 @@ $app = new class extends CliTool\App {
                 JOIN INFORMATION_SCHEMA.COLUMNS c ON c.TABLE_NAME = t.TABLE_NAME
                 WHERE t.TABLE_SCHEMA = :schema
                 AND TABLE_TYPE = 'BASE TABLE'
-                AND c.DATA_TYPE IN ('date','datetime')
+                AND c.DATA_TYPE IN ('date','datetime', 'timestamp')
                 ORDER BY c.TABLE_NAME, c.COLUMN_NAME
             ",
             ['schema' => $this->database->getDatabase()],
