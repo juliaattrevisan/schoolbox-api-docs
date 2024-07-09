@@ -34,7 +34,12 @@ class Choicematrix implements IStrategy
         $vals = [];
 
         foreach ($response['response']['value'] ?? [] as $val) {
-            $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
+            // No value selected? Just output empty string
+            if (!isset($val[0])) {
+                $vals[] = '';
+            } else {
+                $vals[] = $structure[$response['question_reference']]['data'][$val[0]];
+            }
         }
 
         return implode(IStrategy::IMPLODER, $vals);
