@@ -527,13 +527,12 @@
                         });
                     }
 
-                    const installDelayCookie = window.localStorage.getItem("installDelayCookie");
-                    if (installDelayCookie) {
+                    if (window.sbProps.pwaConfig.hasClickedInstallLater) {
                         removeSidebarPrompt();
                     } else {
                         document.querySelectorAll('[data-pwa="sidebarPromptDelay"]').forEach((element) => {
                             element.addEventListener('click', () => {
-                                window.localStorage.setItem("installDelayCookie", "installLater");
+                                window.sbProps.pwaConfig.hasClickedInstallLater = true;
                                 removeSidebarPrompt();
                             });
                         });
@@ -662,9 +661,8 @@
 
                     {# if notifications have been disabled show prompt, and disable allow notif switch #}
                     if ("Notification" in window) {
-                        {# As Notification.permission cannot be trusted on iOS, we can use localStorage
-                         # to avoid showing "Enable Notifications" again if we think the user should already
-                         # have them enabled...
+                        {# As Notification.permission cannot be trusted on iOS, we can use the PWA config to determine
+                         # if we should avoid showing "Enable Notifications" again when the user has already enabled them
                          # If the browser is saying notifications are blocked, respect that, even though it may be wrong
                          # as we handle this separately by providing a button to re-request permission instead.
                          #}
@@ -673,7 +671,7 @@
                         if (
                             iOS() &&
                             currentPermission === "default" &&
-                            ![null, "denied", "removed"].includes(window.localStorage.getItem("notification"))
+                            ![null, "denied", "removed"].includes(window.sbProps.pwaConfig.notificationState)
                         ) {
                             currentPermission = "granted"; // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
                         }
@@ -687,8 +685,8 @@
                             {# If this device is now allowing notifications but we haven't registered it yet,
                              # then attempt to register the device now...
                              #}
-                            if ([null, 'denied', 'removed'].includes(window.localStorage.getItem("notification"))) {
-                                window.localStorage.setItem("notification", "requesting");
+                            if ([null, 'denied', 'removed'].includes(window.sbProps.pwaConfig.notificationState)) {
+                                window.sbProps.pwaConfig.notificationState = "requesting";
                             }
                         } else if (currentPermission === "denied") {
                             {# Show the blocked message #}
@@ -699,8 +697,8 @@
                             {# As the user has now blocked notifications, keep track of this
                              # and remove any previous token (if any) as it's no longer applicable
                              #}
-                            window.localStorage.setItem("notification", "denied");
-                            window.localStorage.removeItem("notifToken");
+                            window.sbProps.pwaConfig.notificationState = "denied";
+                            window.sbProps.pwaConfig.notificationToken = null;
                         } else {
                             {# The user hasn't been prompted yet, show them the button to enable notifs
                              #}
@@ -756,7 +754,7 @@
                                 });
 
                                 if (permission === 'granted') {
-                                    window.localStorage.setItem("notification", "requesting");
+                                    window.sbProps.pwaConfig.notificationState = "requesting";
                                     {% if config.debug_mode %}
                                     console.info('Notification permission granted');
                                     {% endif %}
@@ -810,7 +808,6 @@
                                         })
                                     }
                                 } else if (permission === 'denied') {
-                                    window.localStorage.setItem("notification", "denied");
                                     {% if config.debug_mode %}
                                     console.warn('Notification permission denied');
                                     {% endif %}
@@ -823,8 +820,8 @@
                                     {# As the user has now blocked notifications, keep track of this
                                      # and remove any previous token (if any) as it's no longer applicable
                                      #}
-                                    window.localStorage.setItem("notification", "denied");
-                                    window.localStorage.removeItem("notifToken");
+                                    window.sbProps.pwaConfig.notificationState = "denied";
+                                    window.sbProps.pwaConfig.notificationToken = null;
 
                                     {# turn notifications off... #}
                                     document.dispatchEvent(
@@ -840,8 +837,7 @@
 
                         {# sometimes the service worker is not running when we prompt attempt to register notifications, try again if we failed... #}
                         reAuthNotif = function () {
-                            let winNotif = window.localStorage.getItem("notification");
-                            if (['requesting','registering'].includes(winNotif)) {
+                            if (['requesting','registering'].includes(window.sbProps.pwaConfig.notificationState)) {
                                 document.dispatchEvent(
                                     new CustomEvent("PWA_NOTIFICATION_ALLOW", {
                                         detail: {

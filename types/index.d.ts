@@ -9,6 +9,7 @@ import type { DefineComponent } from "vue";
 import type { Editor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
+import type { pwaUserConfig } from "@js/global/pwaConfig";
 
 declare global {
     interface Window {
@@ -33,6 +34,7 @@ declare global {
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
+            pwaConfig: typeof pwaUserConfig;
             firebaseApps: Array<{
                 appIdentifier: string;
                 publicConfiguration: { [key: string]: any };

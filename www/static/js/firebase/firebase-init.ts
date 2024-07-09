@@ -58,12 +58,14 @@ function requestNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, { vapidKey: app.webPushPublicKey })
                 .then(async (currentToken) => {
-                    if ("denied" === window.localStorage.getItem("notification")) {
+                    if (window.sbProps.pwaConfig.notificationState === "denied") {
                         // If notification blocked while requesting, should stop registering attempt
                         throw new Error("Notification blocked. Stop registering attempts.");
                     }
-                    window.localStorage.setItem("notification", "registering");
-                    window.localStorage.setItem("notifToken", currentToken);
+
+                    window.sbProps.pwaConfig.notificationState = "registering";
+                    window.sbProps.pwaConfig.notificationToken = currentToken;
+
                     // Post this token to Schoolbox,
                     // registering it for the current user.
                     if (debug) {
@@ -85,7 +87,7 @@ function requestNotif(event: CustomEvent) {
                         body: formData,
                     });
 
-                    window.localStorage.setItem("notification", "registered");
+                    window.sbProps.pwaConfig.notificationState = "registered";
                 })
                 .catch((error) => {
                     if (debug) {
@@ -98,7 +100,6 @@ function requestNotif(event: CustomEvent) {
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- *
  * @param { CustomEvent } event - Information about the event.
  */
 function denyNotif(event: CustomEvent) {
@@ -114,8 +115,8 @@ function denyNotif(event: CustomEvent) {
                     // delete the token from firebase
                     void deleteToken(messaging);
                     // delete the local cache token
-                    window.localStorage.removeItem("notifToken");
-                    window.localStorage.setItem("notification", "removing");
+                    window.sbProps.pwaConfig.notificationToken = null;
+                    window.sbProps.pwaConfig.notificationState = "removing";
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -137,7 +138,7 @@ function denyNotif(event: CustomEvent) {
                         body: formData,
                     });
 
-                    window.localStorage.setItem("notification", "removed");
+                    window.sbProps.pwaConfig.notificationState = "removed";
                 })
                 .catch((error) => {
                     if (debug) {

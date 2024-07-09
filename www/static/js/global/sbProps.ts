@@ -10,6 +10,7 @@
 
 import { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import { RosettaStone } from "@js/terminology/rosettaStone";
+import { pwaUserConfig } from "@js/global/pwaConfig";
 
 window.sbProps = {
     ...window.sbProps, // keep any existing properties if they exist
@@ -17,5 +18,6 @@ window.sbProps = {
     MAX_BYTES_MYSQL_MEDIUMTEXT: 16_777_215, // Maximum bytes storable in a MySQL `mediumtext` field.
     MAX_BYTES_MYSQL_TEXT: 65_535, // Maximum bytes storable in a MySQL `text` field.
     l10n: new RosettaStone([]), // A helper object for translating terminology
+    pwaConfig: pwaUserConfig,
     injectScriptsIfNotLoaded,
 };
