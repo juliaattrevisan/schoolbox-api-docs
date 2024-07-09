@@ -23,7 +23,7 @@ class Tokenhighlight implements IStrategy
          */
         preg_match_all('#<?span class="lrn_token">(.*?)</span\b[^>]*>#ms', $question['data']['template'], $matches);
 
-        return $matches[0];
+        return $matches[1];
     }
 
 
