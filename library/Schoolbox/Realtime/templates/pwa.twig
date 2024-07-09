@@ -81,23 +81,21 @@
         </div>
     </div>
 
-    {% if pushEnabled %}
-        <div data-pwa-notif="iOSHomePrompt" class="alert-box warning hide">
-            To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
-        </div>
+    <div data-pwa-notif="iOSHomePrompt" class="alert-box warning hide">
+        To enable notifications on your iOS device, you must install the Schoolbox web app on your device and add it to your device's home screen.
+    </div>
 
-        <div data-pwa-notif="notifBlocked" class="alert-box warning hide">
-            You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
-            <a data-pwa-action="retryNotifPrompt" href="#">Try again</a>
-        </div>
+    <div data-pwa-notif="notifBlocked" class="alert-box warning hide">
+        You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
+        <a data-pwa-action="retryNotifPrompt" href="#">Try again</a>
+    </div>
 
-        <div data-pwa-notif="notifEnabledMessage" class="alert-box success hide">
-            You have notifications enabled for this device
-        </div>
+    <div data-pwa-notif="notifEnabledMessage" class="alert-box success hide">
+        You have notifications enabled for this device
+    </div>
 
-        <div data-pwa-notif="enableNotifPrompt" class="l-flex-col l-gap-s f-no-margins hide">
-            <p>Enable notifications on your device:</p>
-            <a data-pwa-action="enableNotif" class="button" href="#">Enable Notifications</a>
-        </div>
-    {% endif %}
+    <div data-pwa-notif="enableNotifPrompt" class="l-flex-col l-gap-s f-no-margins hide">
+        <p>Enable notifications on your device:</p>
+        <a data-pwa-action="enableNotif" class="button" href="#">Enable Notifications</a>
+    </div>
 </div>
