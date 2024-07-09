@@ -211,7 +211,7 @@ class Controller extends Base
             // store anything in the registry
             $token = $provider === Registry::PROVIDER_DIGISTORM
                 ? $sessionUser->getUsername()
-                : $this->requestPost->get('token');
+                : $this->request->getParsedBody()["token"];
             if (!empty($token)) {
                 try {
                     $registry = $this->registryMapper->findByTokenAndProviderForUser(

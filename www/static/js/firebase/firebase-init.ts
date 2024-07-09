@@ -129,13 +129,15 @@ function denyNotif(event: CustomEvent) {
                     // happen, the registration will be pushed to some
                     // other place.
                     // For now, just push it to the Firebase app.
-                    const formData = new FormData();
-                    formData.append("appId", app.appIdentifier);
-                    formData.append("token", currentToken);
-
                     await fetch("/api/register/Firebase", {
                         method: "DELETE",
-                        body: formData,
+                        body: JSON.stringify({
+                            appId: app.appIdentifier,
+                            token: currentToken,
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                     });
 
                     window.sbProps.pwaConfig.notificationState = "removed";
