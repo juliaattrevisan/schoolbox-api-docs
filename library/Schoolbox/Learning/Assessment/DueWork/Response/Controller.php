@@ -461,7 +461,12 @@ class Controller extends Base
         // different logic for either saving to the existing student submission, or attaching to the teacher feedback
         switch ($action) {
             case 'submission':
-                $kami->getStudentSubmissionFile()->setStorage($storage);
+                // update the worksheet entry to not use the original worksheet template, but the downloaded kami annotated file
+                $response->getAllFiles()->filter(function (SubmissionFile $file) use ($kami) {
+                    return $kami->getStudentSubmissionFile()->getId() === $file->getId();
+                })->first()->setStorage($storage);
+                $this->responseDataSource->save($response);
+                // re save kami, or that entry is purged...
                 $this->kamiMapper->save($kami);
                 break;
             case 'feedback':
