@@ -41,7 +41,6 @@ use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
