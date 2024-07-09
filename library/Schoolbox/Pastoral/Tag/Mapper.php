@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class Mapper extends BaseMapper implements UsableAsTagSource
 {
-
     /**
      * When you click into Filter By Tags it suggests the top N most commonly
      * used pastoral tags across all non-deleted pastoral records
