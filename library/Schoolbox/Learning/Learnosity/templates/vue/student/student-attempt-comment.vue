@@ -12,6 +12,8 @@ interface Props {
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
 }
 const props = defineProps<Props>();
+
+const gradeEl = window.Vue.ref<HTMLDivElement | null>(null);
 const editorId = `final-review-comment-${props.student.elementId}`;
 const comment = window.Vue.ref(props.student.attemptComment.comment ?? "");
 const isSaving = window.Vue.ref(false);
@@ -106,14 +108,24 @@ watchDebounced(
 );
 
 /**
- * Retrieve the grade container from outside Vue context
+ * The grade field utilises a considerable pre-existing twig/JS structure that we can't easily replicate in Vue,
+ * see for example: library/Schoolbox/Learning/MarkScheme/templates/TotalMarkFractional.twig.
+ * Rather than trying to rewrite the whole thing for a Vue context, we just store the grade field outside of Vue,
+ * and then append it into the Vue component when it's mounted.
  */
-function getGradeContainer() {}
+function getGradeContainer() {
+    const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
+    if (gradeContainer !== null) {
+        gradeEl.value?.append(gradeContainer);
+        gradeContainer.classList.remove("hide"); // now remove the hide class to show the grade
+    }
+}
 
 /**
- * Retrieve the grade field from outside Vue context
+ * To add the grade field in
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
     getGradeContainer();
 });
 
