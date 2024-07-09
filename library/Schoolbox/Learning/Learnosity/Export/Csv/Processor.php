@@ -183,7 +183,10 @@ class Processor
             foreach ($questions[$itemRef] as $question) {
                 $structure[$question['reference']] = [
                     'type' => $question['data']['type'],
-                    'stimulus' => \Scrub::html2text($question['data']['stimulus']),
+                    /* Not entirely sure how it's possible, but stimulus might not exist
+                     * Null coalesce for safety, for now
+                     */
+                    'stimulus' => \Scrub::html2text($question['data']['stimulus'] ?? ''),
                     /* Cross reference values to human-readable equivalents
                      * (Only applies to some question types)
                      */
