@@ -450,6 +450,9 @@ class Controller extends Base
 
         // grab the file and save to storage ensuring it is a pdf, as that is what we get from kami
         $filename           = sprintf("%s.pdf", $kami->getStudentSubmissionFile()->getFilename());
+        if ('feedback' === $action) {
+            $filename           = sprintf("%s - Feedback.pdf", $kami->getStudentSubmissionFile()->getFilename());
+        }
         $guzzleResponse     = (new Client())->get($export->getFileUrl());
 
         $storage = $this->filesystemReceiver->acceptStream(
