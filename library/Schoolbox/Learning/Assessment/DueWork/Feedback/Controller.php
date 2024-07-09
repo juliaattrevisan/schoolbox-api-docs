@@ -525,7 +525,7 @@ class Controller extends Base
             // Save the kami doc to the feedback object
             $this->kamiConnector->initiatePollingForKamiDownload(
                 $kamiModel,
-                'submission',
+                'feedback',
                 $this->getUser(),
             );
         }
