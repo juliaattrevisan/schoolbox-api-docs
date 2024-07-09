@@ -23,7 +23,7 @@ interface Props {
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptComments: StudentAttemptResponse[]; // all the overall attempt comments for the quiz
+    attemptResponses: StudentAttemptResponse[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
     postFeedback: string; // the URL to post the feedback to
@@ -48,7 +48,7 @@ const hasStudents = window.Vue.computed(() => {
 window.Vue.onMounted(async () => {
     store.init(props.postFeedback, props.statusPage);
     itemsStore.init(props.items);
-    useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
+    useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReports(props.reportPayloads);
 });

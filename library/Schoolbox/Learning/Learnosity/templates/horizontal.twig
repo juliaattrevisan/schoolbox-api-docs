@@ -23,7 +23,7 @@
         :items="{{ itemReferences|json_encode }}"
         :students="{{ students|json_encode }}"
         :item-responses="{{ itemResponses|json_encode }}"
-        :attempt-comments="{{ attemptComments|json_encode }}"
+        :attempt-responses="{{ attemptComments|json_encode }}"
         :urls="{{ urls|json_encode }}"
         :report-payloads="{{ reportPayloads }}"
         post-feedback="{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}"

@@ -5,7 +5,7 @@
 
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
@@ -99,7 +99,7 @@ function onAttemptCommentUpdated(comment: string) {
                     :item="item"
                     :container="responseContentEl as HTMLElement"
                 />
-                <student-attempt-comment
+                <student-attempt-response
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
                     :is-read-only="false"

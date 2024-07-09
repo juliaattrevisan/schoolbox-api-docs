@@ -24,7 +24,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
-    const attemptComments = window.Vue.ref<StudentAttemptResponse[]>([]); // all attempt comments from the backend
+    const attemptResponses = window.Vue.ref<StudentAttemptResponse[]>([]); // all attempt comments from the backend
     const urls = window.Vue.ref<StudentUrls[]>([]); // the urls for each student to save score, comment and attempt comment
     const showReviewedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been reviewed
     const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
@@ -35,13 +35,13 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * store any passed through properties
      * @param {object} $students - the students
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptResponse[]} $attemptComments - the attempt responses
+     * @param {StudentAttemptResponse[]} $attemptResponses - the attempt responses
      * @param {StudentUrls[]} $urls - the urls
      */
     function init(
         $students: Student[],
         $itemResponses: StudentItemQuestionResponse[],
-        $attemptComments: StudentAttemptResponse[],
+        $attemptResponses: StudentAttemptResponse[],
         $urls: StudentUrls[],
     ) {
         $students.forEach((student) => {
@@ -53,7 +53,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             });
         });
         itemResponses.value = $itemResponses;
-        attemptComments.value = $attemptComments;
+        attemptResponses.value = $attemptResponses;
         urls.value = $urls;
     }
 
@@ -83,7 +83,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 item.isMarked = getItemIsMarked(item);
             });
             student.isMarked = getStudentIsMarked(student);
-            student.attemptComment = getAttemptResponse(attemptComments.value, student.id);
+            student.attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
             student.urls = getUrls(urls.value, student.id);
         }
     }
@@ -196,7 +196,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {string} comment - the comment to update
      */
     function updateAttemptComment(student: Student, comment: string) {
-        student.attemptComment.comment = comment;
+        student.attemptResponse.comment = comment;
     }
 
     return {

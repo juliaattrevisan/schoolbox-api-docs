@@ -39,12 +39,14 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
 
 /**
  * Get the response for a student attempt
- * @param {StudentAttemptResponse[]} attemptComments - the attempt comments to get the response from
+ * @param {StudentAttemptResponse[]} attemptResponses - the attempt comments to get the response from
  * @param {number} studentId - the student id to get the response for
  * @returns {StudentAttemptResponse} - the response attempt
  */
-export function getAttemptResponse(attemptComments: StudentAttemptResponse[], studentId: number) {
-    return attemptComments.find((attemptComment) => attemptComment.studentId === studentId) as StudentAttemptResponse;
+export function getAttemptResponse(attemptResponses: StudentAttemptResponse[], studentId: number) {
+    return attemptResponses.find(
+        (attemptResponse) => attemptResponse.studentId === studentId,
+    ) as StudentAttemptResponse;
 }
 
 /**
