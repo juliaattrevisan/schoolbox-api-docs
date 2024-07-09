@@ -77,21 +77,6 @@ export default {
         };
     },
 
-    computed: {
-        /**
-         * To change when processing
-         *
-         * @return { String }
-         */
-        updateButtonText() {
-            if (this.isProcessing) {
-                return `<em>Processing, please wait...</em>`;
-            } else {
-                return `Update Selected`;
-            }
-        },
-    },
-
     mounted() {
         this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
     },
@@ -112,7 +97,9 @@ export default {
             try {
                 this.onCloseSelected();
                 this.isProcessing = true;
-                let response, responses = [], responsesOk = true;
+                let response,
+                    responses = [],
+                    responsesOk = true;
                 const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
                 for (let i = 0; i < repeat; i += 1) {
                     response = await fetch(this.srcUserModify, {
@@ -163,16 +150,15 @@ export default {
          * @param responsesOk
          */
         checkUpdateResponse(responses, responsesOk) {
-            let logData, hasDataError = !responsesOk;
+            let logData,
+                hasDataError = !responsesOk;
             if (responsesOk) {
                 logData = responses.join(""); // join the responses together;
             } else {
-                let errors = responses.map((response) => response['title'] ?? "");
-                logData = [
-                    errors.join("\n"),
-                ];
+                let errors = responses.map((response) => response["title"] ?? "");
+                logData = [errors.join("\n")];
             }
-            this.$emit("log", {logData, hasDataError});
+            this.$emit("log", { logData, hasDataError });
         },
 
         /**
@@ -334,12 +320,10 @@ export default {
                     </div>
                 </div>
                 <div class="new-values__full-width">
-                    <button
-                        @click.prevent="onUpdateUsersSelected"
-                        class="button submit"
-                        :disabled="isProcessing"
-                        v-html="updateButtonText"
-                    ></button>
+                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing">
+                        <em v-if="isProcessing">Processing, please wait..</em>
+                        <template v-else>Update Selected</template>
+                    </button>
                 </div>
             </div>
         </Transition>
