@@ -130,7 +130,9 @@ export default {
         @focus="mouseOverResult"
         @click.prevent="selectResult"
     >
+        <!-- eslint-disable-next-line vue/no-v-html | the title is text we create -->
         <h4 class="result-title" v-html="highlightTitleSearch"></h4>
+        <!-- eslint-disable-next-line vue/no-v-html | the description is text we create -->
         <p class="result-description" v-if="result.description" v-html="highlightDescriptionSearch"></p>
     </a>
 </template>
