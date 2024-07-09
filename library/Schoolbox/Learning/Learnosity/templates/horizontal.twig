@@ -16,6 +16,7 @@
 <script src="https://reports-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
 
 <div id="horizontal-marking-container">
     <horizontal-marking
@@ -31,3 +32,23 @@
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
+
+{##
+The grades below are inserted into the quiz-feedback Vue DOM structure then displayed
+#}
+{# <div id="grade-container-{{ participant.user.id }}" class="hide">
+    <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+        <label>{{ locale.grades.proper }}
+            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                assessment:  assessment,
+                participant: participant,
+                feedback:    participant.findMostRecentInstructorGivenFeedback ?? null,
+                markScheme:  assessment.markScheme,
+                limit:       maxMarks,
+                tabIndex:    1,
+                errors:      errors,
+                readonly:    false,
+            } only %}
+        </label>
+    </form>
+</div> #}
