@@ -460,20 +460,15 @@
                     function isPWAInstallPromptVisible(sectionWrapper) {
                         // Check install section
                         if (Array.from(sectionWrapper.querySelectorAll('[data-pwa="install"]')).some((installSectionElement) => {
-                            console.log(installSectionElement, installSectionElement.classList.contains('hide'));
                             if (installSectionElement.classList.contains('hide')) {
-                                console.log("false");
                                 return false; // The install section is hidden
                             }
 
-                            console.log("BB")
                             // If any install button is visible, return true
                             return Array.from(installSectionElement.querySelectorAll('[data-pwa-action]')).some((installActionElement) => {
-                                console.log("B", installActionElement, installActionElement.classList.contains('hide'));
                                 return !installActionElement.classList.contains('hide');
                             });
                         })) {
-                            console.log("ISTRUE")
                             return true; // An install button is visible
                         };
 
