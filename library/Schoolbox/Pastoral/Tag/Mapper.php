@@ -28,10 +28,10 @@ class Mapper extends BaseMapper implements UsableAsTagSource
 {
 
     /**
-     * When you click into Filter By Tags it suggests the top ten most commonly
+     * When you click into Filter By Tags it suggests the top N most commonly
      * used pastoral tags across all non-deleted pastoral records
      */
-    private const DEFAULT_SUGGESTION_MAX_ITEMS = 10;
+    private const DEFAULT_SUGGESTION_MAX_ITEMS = 200;
 
 
     /**
@@ -124,7 +124,7 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
     {
-        /* Default list of 10 keywords, sorted by number of usages across pastoral records
+        /* Default list of N keywords, sorted by number of usages across pastoral records
          * If tags have the same number of occurrences, subsort those alphabetically
          */
         if ((string)$keyword === '') {
