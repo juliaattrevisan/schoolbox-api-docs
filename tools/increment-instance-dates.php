@@ -111,12 +111,12 @@ $app = new class extends CliTool\App {
 
     /**
      * These are the names of columns whose date or datetime values should always be in the past.
-     * Valutes
      */
     private const HISTORIC_COLUMN_NAMES_AS_KEYS = [
         'accepted_at'    => null,
         'awarded_at'     => null,
         'created_at'     => null,
+        'date_of_birth'  => null,
         'deleted_at'     => null,
         'last_accessed'  => null,
         'last_post_date' => null,
