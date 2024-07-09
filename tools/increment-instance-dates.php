@@ -114,20 +114,20 @@ $app = new class extends CliTool\App {
      * Valutes
      */
     private const HISTORIC_COLUMN_NAMES_AS_KEYS = [
+        'accepted_at'    => null,
+        'awarded_at'     => null,
         'created_at'     => null,
-        'updated_at'     => null,
         'deleted_at'     => null,
+        'last_accessed'  => null,
+        'last_post_date' => null,
+        'last_visit'     => null,
         'modified_at'    => null,
-        'reviewed_at'    => null,
         'published_at'   => null,
         'reasoned_at'    => null,
-        'awarded_at'     => null,
-        'viewed_on'      => null,
-        'accepted_at'    => null,
         'rejected_at'    => null,
-        'last_visit'     => null,
-        'last_post_date' => null,
-        'last_accessed'  => null
+        'reviewed_at'    => null,
+        'updated_at'     => null,
+        'viewed_on'      => null,
     ];
 
     private \Alaress\Database\Connector\IConnector $database;
