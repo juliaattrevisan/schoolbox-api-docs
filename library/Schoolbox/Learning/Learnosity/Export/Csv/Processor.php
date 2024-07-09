@@ -306,6 +306,7 @@ class Processor
         $row[] = 'Mark';
         $row[] = 'Normalised Mark';
         $row[] = 'Comment';
+        $row[] = 'Reviewed At';
 
         fputcsv($output, $row, ',', '"');
     }
@@ -348,6 +349,7 @@ class Processor
             $row[] = $attempt->getMark();
             $row[] = $attempt->getNormalisedMark();
             $row[] = \Scrub::html2text($attempt->getComment() ?? '');
+            $row[] = $attempt->getReviewed()?->getShort();
 
             fputcsv($output, $row, ',', '"');
         }
