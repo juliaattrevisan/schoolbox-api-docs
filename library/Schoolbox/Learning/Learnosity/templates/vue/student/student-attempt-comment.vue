@@ -106,6 +106,18 @@ watchDebounced(
 );
 
 /**
+ * Retrieve the grade container from outside Vue context
+ */
+function getGradeContainer() {}
+
+/**
+ * Retrieve the grade field from outside Vue context
+ */
+window.Vue.onMounted(() => {
+    getGradeContainer();
+});
+
+/**
  * Save any unsaved changes
  */
 window.Vue.onUnmounted(async () => {
@@ -136,8 +148,8 @@ window.Vue.onUnmounted(async () => {
                             <em>{{ saveText }}</em>
                         </div>
                     </div>
-                </div>
-            </template>
+                </template>
+            </div>
         </div>
     </div>
 </template>
