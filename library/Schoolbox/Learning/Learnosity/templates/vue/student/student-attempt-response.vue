@@ -109,15 +109,24 @@ watchDebounced(
 );
 
 /**
+ * Here we retrieve the current mark by observing the input field
+ * As the input and validation are handled outside of Vue,
+ * we need to observe the input field to update the mark
  * @param {HTMLElement} gradeContainer - the container to get the mark from
  */
 function getMark(gradeContainer: HTMLElement) {
     const input = gradeContainer.querySelector("input");
     if (input !== null) {
         emit("updatedMark", input.value);
-        // input.addEventListener("input", () => {
-        //     comment.value = input.value;
-        // });
+        // we need to observe the input value to update the mark when it changes
+        const observer = new MutationObserver(() => {
+            if (input.getAttribute("aria-invalid") === "true") {
+                // check if it's a valid update
+                return;
+            }
+            emit("updatedMark", input.value); // and if so update the mark
+        });
+        observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
     }
 }
 
