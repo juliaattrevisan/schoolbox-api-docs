@@ -109,6 +109,27 @@ $app = new class extends CliTool\App {
         'user'                                     => ['created_at', 'updated_at'],
     ];
 
+    /**
+     * These are the names of columns whose date or datetime values should always be in the past.
+     * Valutes
+     */
+    private const HISTORIC_COLUMN_NAMES_AS_KEYS = [
+        'created_at'     => null,
+        'updated_at'     => null,
+        'deleted_at'     => null,
+        'modified_at'    => null,
+        'reviewed_at'    => null,
+        'published_at'   => null,
+        'reasoned_at'    => null,
+        'awarded_at'     => null,
+        'viewed_on'      => null,
+        'accepted_at'    => null,
+        'rejected_at'    => null,
+        'last_visit'     => null,
+        'last_post_date' => null,
+        'last_accessed'  => null
+    ];
+
     private \Alaress\Database\Connector\IConnector $database;
 
     public function runAsRoot(): ?bool
@@ -240,14 +261,19 @@ $app = new class extends CliTool\App {
                 ? 'DESC'
                 : 'ASC';
 
+            // Dates/times in historic columns should never be incremented past the present date/time.
+            $dateAddSql = (
+                array_key_exists($column, self::HISTORIC_COLUMN_NAMES_AS_KEYS)
+                ? "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff DAY))"
+                : "DATE_ADD(`$column`, INTERVAL :diff DAY)"
+            );
+
             $this->getLogger()->info("Incrementing dates for: $tableName.$column");
             $updateQuery = $this->database->prepareQuery(
-                "
-            UPDATE `$tableName`
-            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff DAY)
-            $whereNotDeleted
-            ORDER BY `$column` $order
-        "
+                "UPDATE `$tableName`
+                SET `$column` = $dateAddSql
+                $whereNotDeleted
+                ORDER BY `$column` $order"
             );
             $updateQuery->execute([':diff' => $diffDays]);
         }
@@ -298,15 +324,19 @@ $app = new class extends CliTool\App {
 
         foreach ($dateColumns as $column) {
             $this->getLogger()->info("Incrementing year for: $tableName.$column");
-            // name column
+
+            // Dates/times in historic columns should never be incremented past the present date/time.
+            $dateAddSql = (
+                array_key_exists($column, self::HISTORIC_COLUMN_NAMES_AS_KEYS)
+                ? "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff YEAR))"
+                : "DATE_ADD(`$column`, INTERVAL :diff YEAR)"
+            );
 
             $updateQuery = $this->database->prepareQuery(
-                "
-            UPDATE `$tableName`
-            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff YEAR)
-            $whereNotDeleted
-            ORDER BY `$column` DESC
-        "
+                "UPDATE `$tableName`
+                SET `$column` = $dateAddSql
+                $whereNotDeleted
+                ORDER BY `$column` DESC"
             );
             $updateQuery->execute([':diff' => $diffYears]);
         }
