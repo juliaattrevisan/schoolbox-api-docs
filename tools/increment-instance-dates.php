@@ -309,15 +309,19 @@ $app = new class extends CliTool\App {
                 ? 'DESC'
                 : 'ASC';
 
-            // Dates/times in historic columns should never be incremented past the present date/time.
-            $dateAddSql = (
+            $dateAddSql = "DATE_ADD(`$column`, INTERVAL :diff DAY)";
+            $logMessageSuffix = '';
+
+            if (
                 array_key_exists($column, self::HISTORIC_COLUMN_NAMES_AS_KEYS) ||
                 array_key_exists("$tableName.$column", self::HISTORIC_COLUMN_NAMES_AS_KEYS)
-                ? "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff DAY))"
-                : "DATE_ADD(`$column`, INTERVAL :diff DAY)"
-            );
+            ) {
+                // Dates/times in historic columns should never be incremented past the present date/time.
+                $dateAddSql = "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff DAY))";
+                $logMessageSuffix = ' (not beyond the current date)';
+            }
 
-            $this->getLogger()->info("Incrementing dates for: $tableName.$column");
+            $this->getLogger()->info("Incrementing dates for: $tableName.$column$logMessageSuffix");
             $updateQuery = $this->database->prepareQuery(
                 "UPDATE `$tableName`
                 SET `$column` = $dateAddSql
@@ -372,15 +376,17 @@ $app = new class extends CliTool\App {
         }
 
         foreach ($dateColumns as $column) {
-            $this->getLogger()->info("Incrementing year for: $tableName.$column");
+            $dateAddSql = "DATE_ADD(`$column`, INTERVAL :diff YEAR)";
+            $logMessageSuffix = '';
 
-            // Dates/times in historic columns should never be incremented past the present date/time.
-            $dateAddSql = (
+            if (
                 array_key_exists($column, self::HISTORIC_COLUMN_NAMES_AS_KEYS) ||
                 array_key_exists("$tableName.$column", self::HISTORIC_COLUMN_NAMES_AS_KEYS)
-                ? "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff YEAR))"
-                : "DATE_ADD(`$column`, INTERVAL :diff YEAR)"
-            );
+            ) {
+                // Dates/times in historic columns should never be incremented past the present date/time.
+                $dateAddSql = "LEAST(NOW(), DATE_ADD(`$column`, INTERVAL :diff YEAR))";
+                $logMessageSuffix = ' (not beyond the current date)';
+            }
 
             $updateQuery = $this->database->prepareQuery(
                 "UPDATE `$tableName`
@@ -388,6 +394,8 @@ $app = new class extends CliTool\App {
                 $whereNotDeleted
                 ORDER BY `$column` DESC"
             );
+
+            $this->getLogger()->info("Incrementing year for: $tableName.$column$logMessageSuffix");
             $updateQuery->execute([':diff' => $diffYears]);
         }
     }
