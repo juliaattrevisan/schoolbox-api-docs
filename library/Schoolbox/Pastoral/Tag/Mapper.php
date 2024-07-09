@@ -123,20 +123,22 @@ class Mapper extends BaseMapper implements UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0): GenericCollection
     {
-        /* Default list of N keywords, sorted by number of usages across pastoral records
-         * If tags have the same number of occurrences, subsort those alphabetically
+        /* Default list of N keywords, sorted by number of usages across pastoral records.
+         * If tags have the same number of occurrences, subsort those alphabetically.
+         * Tags that have not been used are included in this list.
          */
         if ((string)$keyword === '') {
             $query = "
-                SELECT
-                    t.*,
-                    COUNT(*) AS numUsages
-                FROM {$this->getTable()} t
-                INNER JOIN pastoral_tags pt ON t.id = pt.tag_id
-                WHERE t.`deleted_at` IS NULL
-                GROUP BY pt.tag_id
-                ORDER BY numUsages DESC, t.name
-                LIMIT :limit
+                SELECT lut.*, dummy.numUses
+                FROM {$this->getTable()} lut
+                LEFT JOIN (
+                    SELECT tag_id, COUNT(*) AS numUses
+                    FROM pastoral_tags
+                    GROUP BY tag_id
+                ) dummy ON dummy.tag_id = lut.id
+                WHERE lut.deleted_at IS NULL
+                ORDER BY dummy.numUses DESC, lut.name ASC
+                LIMIT :limit;
             ";
 
             $statement = $this->getDatabase()->prepare($query);
