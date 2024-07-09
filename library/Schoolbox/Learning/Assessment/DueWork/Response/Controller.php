@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 use Alaress\Exception\UnreachableException;
 use Alaress\Web\Controller\Base;
 use DomainException;
+use GuzzleHttp\Exception\GuzzleException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as FeedbackFileMapper;
@@ -29,6 +30,7 @@ use Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -396,16 +398,21 @@ class Controller extends Base
 
     /**
      * Polls a kami export request to see if we can download and save to the attached student submission.
-     * @api POST /learning/kami/{kamiId}/poll
-     * @since 24.0
-     *
      * @param Kami\Model $kami
      * @param string $action // enum of what action we are working with, student submit, or teacher feedback
-     * @throws Kami\Exception\EmptyApiKeyException If Kami is not enabled
-     * @throws Kami\Exception\NotFound If unable to find the document in Kami
-     * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
+     * @param DueWork|null $assessment
+     * @param User|null $student
+     * @param DueWorkResponse|null $response
+     * @param Feedback|null $feedback
+     * @throws Exception
+     * @throws Exception/Deleted
+     * @throws GuzzleException
+     * @throws \Schoolbox\File\Exception
+     * @api POST /kami/{kamiId:\d+}/{action:\w+}/poll
+     * @since 24.0
+     *
      */
-    public function postPollKamiDownload(Kami\Model $kami, string $action): void
+    public function postPollKamiDownload(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null): void
     {
         /**
          * use the kami export system to attempt a download of a kami doc to either
@@ -441,9 +448,10 @@ class Controller extends Base
             return;
         }
 
-        // grab the file and save to storage
-        $filename           = $kami->getStudentSubmissionFile()->getBasename();
+        // grab the file and save to storage ensuring it is a pdf, as that is what we get from kami
+        $filename           = sprintf("%s.pdf", $kami->getStudentSubmissionFile()->getFilename());
         $guzzleResponse     = (new Client())->get($export->getFileUrl());
+
         $storage = $this->filesystemReceiver->acceptStream(
             $filename,
             $guzzleResponse->getBody(),
@@ -457,19 +465,14 @@ class Controller extends Base
                 $this->kamiMapper->save($kami);
                 break;
             case 'feedback':
-                // find the feedback object
-                $submission = $kami->getStudentSubmissionFile()->getSubmission();
-                $lastFeedback = $submission->getAllFeedback()->filter(function (Feedback $feedback) {
-                    return $feedback->isInstructorGiven() && $feedback->isPublished();
-                })->last();
                 // create a feedback file object
-                $lastFeedback->getAllFiles()->add(
+                $feedback->getAllFiles()->add(
                     FeedbackFileMapper::getInstance()->createModel()
                         ->setStorage($storage)
                         ->setFilename($filename)
                 );
                 // save the things
-                $this->feedbackMapperProxy->save($lastFeedback);
+                $this->feedbackMapperProxy->save($feedback);
                 break;
         }
     }
