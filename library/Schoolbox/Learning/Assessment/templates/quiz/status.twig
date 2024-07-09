@@ -42,7 +42,18 @@
 
                     $(this).confirmDialog({
                         header: 'Rescore attempts',
-                        text: "If you’ve altered the scoring method of a question (such as changing a <em>Scoring Type</em> option, or changing the amount a question is worth) after students have made attempts, the attempts might not tally in the intended manner. Using this tool will update everyone’s attempt on this quiz and recalculate their scores according to the current questions' setup. It might take a little while to process; results aren’t always immediately available.<br /><br />After using this rescoring feature you should review the feedback you’ve provided for students' attempts.",
+                        text: "If you’ve altered the scoring method of a question (such as changing a <em>Scoring Type option</em>, " +
+                              "or changing the amount a question is worth) after students have made attempts, the attempts " +
+                              "might not tally in the intended manner. Using this tool will update everyone’s attempt " +
+                              "on this quiz and recalculate their scores according to the current questions' setup. " +
+                              "It might take a little while to process; results aren’t always immediately available." +
+                              "<br /><br />" +
+                              "After using this rescoring feature you should review the feedback you’ve provided for " +
+                              "students' attempts." +
+                              "<br /><br />" +
+                              "Be aware that running the rescore tool will remove all manually input or updated scores " +
+                              "(but not the feedback comment) from all questions. Please also download a csv of answers " +
+                              "before rescoring.",
                         format: 'html',
                         confirmLabel: 'Rescore',
                         confirmEvent: function() {
