@@ -175,7 +175,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
              * OutOfBoundsException, however, I think it should be safe to assume it is thrown when
              * hostname is unknown as the $instanceId should always be set since it's loaded from the array
              */
-            $this->log->error('Should exit and wait for daemon to restart. ' . $e->getMessage());
+            $this->log->error('Connection from unknown hostname, exiting:  ' . $e->getMessage());
             /**
              * Exit with EX_NOHOST code
              * Wait for the systemd to restart the daemon to reload hostname
