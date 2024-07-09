@@ -73,7 +73,7 @@ export const Slot: Story = {
     render: () => ({
         components: { StorybookSlot },
         template: `
-            <sbx-icon name="" size="100px">
+            <sbx-icon size="100px">
                 <svg viewBox="0 0 200 200" width="400"  height="400" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="100" cy="100" fill="yellow" r="78" stroke="black" stroke-width="3"/>
                     <g class="eyes">

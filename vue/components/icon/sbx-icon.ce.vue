@@ -7,7 +7,7 @@ interface Props {
     /**
      * The name of the icon
      */
-    name: string;
+    name?: string;
     /**
      * The size of the icon
      */
