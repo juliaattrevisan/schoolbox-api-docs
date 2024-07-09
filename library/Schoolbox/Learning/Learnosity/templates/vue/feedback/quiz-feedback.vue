@@ -17,7 +17,7 @@ interface Props {
     student: Student; // the student who has attempted the quiz
     reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptComment: StudentAttemptResponse; // StudentAttemptResponse all the overall attempt comments for the quiz
+    attemptResponse: StudentAttemptResponse; // StudentAttemptResponse all the overall attempt comments for the quiz
     isReadOnly: boolean; // whether is in feedback mode, where the teacher can provide feedback to the student
     isReviewed: boolean; // whether the teacher has reviewed the attempt
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
@@ -36,7 +36,7 @@ const studentStore = useStudentStore();
  */
 window.Vue.onMounted(async () => {
     store.init(props.isReadOnly, props.hasMarkVisibility, props.postFeedback, props.statusPage);
-    useStudentStore().init(props.student, props.itemResponses, props.attemptComment, props.urls, props.isReviewed);
+    useStudentStore().init(props.student, props.itemResponses, props.attemptResponse, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions, props.hasMarkVisibility);
 });

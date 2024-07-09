@@ -27,7 +27,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         isReportLoaded: false,
         isMarked: false,
         items: [],
-        attemptComment: {
+        attemptResponse: {
             learnosityReference: "",
             studentId: 0,
         },
@@ -46,14 +46,14 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * store any passed through properties
      * @param {Student} $student - the student
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptResponse} $attemptComment - the attempt responses
+     * @param {StudentAttemptResponse} $attemptResponse - the attempt responses
      * @param {StudentUrls} $urls - the urls
      * @param {boolean} $isReviewed - whether the attempt has been reviewed
      */
     function init(
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
-        $attemptComment: StudentAttemptResponse,
+        $attemptResponse: StudentAttemptResponse,
         $urls?: StudentUrls,
         $isReviewed?: boolean,
     ) {
@@ -61,7 +61,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             ...$student,
             isReportLoaded: false,
             items: [],
-            attemptComment: $attemptComment,
+            attemptResponse: $attemptResponse,
             urls: $urls === undefined ? undefined : $urls,
             showMarked: true,
             isReviewed: $isReviewed === undefined ? undefined : $isReviewed,
@@ -148,7 +148,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * @param {string} comment - the comment to update
      */
     function updateAttemptComment($student: Student, comment: string) {
-        $student.attemptComment.comment = comment;
+        $student.attemptResponse.comment = comment;
     }
 
     return {

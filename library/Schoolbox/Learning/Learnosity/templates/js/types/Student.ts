@@ -15,7 +15,7 @@ export type Student = {
     isReportLoaded: boolean; // whether the report has been loaded from the Learnosity API
     isExpanded?: boolean; // whether the student is expanded in the UI
     items: StudentItem[];
-    attemptComment: StudentAttemptResponse;
+    attemptResponse: StudentAttemptResponse;
     urls?: StudentUrls;
     isMarked?: boolean; // whether all items (and all questions within each item) have been marked
     showMarked?: boolean; // whether to show the marked items
