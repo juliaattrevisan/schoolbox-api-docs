@@ -639,6 +639,53 @@ class Classes implements IStrategy
                         $classCode
                     );
 
+                    /* Compare this subject's TO_DATE to $startAt
+                      * Subjects that aren't actually relevant to this date still appear here
+                      * for us to manually deduce validity (thanks tass)
+                      *
+                      * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
+                      * or not even here, despite what the docs say: Undefined array key "TO_DATE"
+                      */
+
+                    /* If TO_DATE is before $startDate, it is no longer occurring and we can
+                     * skip over it
+                     */
+                    $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
+                    $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
+
+                    if ('' !== $subjectTo) {
+                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
+
+                        if ($subjectToADF->lt($startAt)) {
+                            $this->log->debug(sprintf(
+                                '%s %s is an expired class which went until %s; skipping',
+                                $title,
+                                $classCode,
+                                $subjectTo
+                            ));
+
+                            continue;
+                        }
+                    }
+
+                    /* If FROM_DATE is after $startDate, it's not yet occurring and we can
+                     * skip over it
+                     */
+                    if ('' !== $subjectFrom) {
+                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
+
+                        if ($subjectFromADF->gt($finishAt)) {
+                            $this->log->debug(sprintf(
+                                '%s %s is an upcoming class which starts on %s; skipping',
+                                $title,
+                                $classCode,
+                                $subjectFrom
+                            ));
+
+                            continue;
+                        }
+                    }
+
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
                      * Otherwise create a new one
@@ -757,69 +804,6 @@ class Classes implements IStrategy
                      */
                     if (self::STAFF === $roleType) {
                         $this->saveStaffInvolvement($event, $classEntry, $name, $person['external_id']);
-                    }
-
-                    /* Compare this subject's TO_DATE to $startAt
-                     * Subjects that aren't actually relevant to this date still appear here
-                     * for us to manually deduce validity (thanks tass)
-                     *
-                     * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
-                     * or not even here, despite what the docs say: Undefined array key "TO_DATE"
-                     */
-
-                    /* If TO_DATE is before $startDate, it is no longer occurring and we can
-                     * skip over it
-                     */
-                    $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
-                    $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
-
-                    if ('' !== $subjectTo) {
-                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectToADF->lt($startAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an expired class which went until %s; applying SUBTRACT override',
-                                $title,
-                                $classCode,
-                                $subjectTo
-                            ));
-
-                            $subtractOverride = $this->overridesMapper->createModel()
-                                ->setEventId($event->getId())
-                                ->setExternalId($person['external_id'])
-                                ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
-                                ->setSequence(2);
-
-                            if ($this->perform) {
-                                $this->overridesMapper->save($subtractOverride);
-                            }
-                        }
-                    }
-
-                    /* If FROM_DATE is after $startDate, it's not yet occurring and we can
-                     * skip over it
-                     */
-                    if ('' !== $subjectFrom) {
-                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
-
-                        if ($subjectFromADF->gt($finishAt)) {
-                            $this->log->debug(sprintf(
-                                '%s %s is an upcoming class which starts on %s; applying SUBTRACT override',
-                                $title,
-                                $classCode,
-                                $subjectFrom
-                            ));
-
-                            $subtractOverride = $this->overridesMapper->createModel()
-                                ->setEventId($event->getId())
-                                ->setExternalId($person['external_id'])
-                                ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
-                                ->setSequence(2);
-
-                            if ($this->perform) {
-                                $this->overridesMapper->save($subtractOverride);
-                            }
-                        }
                     }
                 }
             }
