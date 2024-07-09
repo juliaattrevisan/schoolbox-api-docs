@@ -14,6 +14,7 @@ external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
 force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
+node_version="18"
 declare phpversion_supported                                # Must be specified via script arg
 
 if [[ $# -ne 12 ]]; then
@@ -48,6 +49,13 @@ if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]];
   exit 1
 fi
 
+if ! which nvm; then
+  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing nvm"
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  sudo -u vagrant bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash'
+fi
+sudo -u vagrant bash -c "source /home/vagrant/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}"
+source /root/.nvm/nvm.sh && nvm install ${node_version} && nvm use ${node_version}
 # Does this environment use the systemd-wrapped taskd service?
 declare taskd_systemd_service_installed
 if [[ $taskd_build_from_local == "0" ]];then
