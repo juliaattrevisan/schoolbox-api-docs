@@ -45,7 +45,7 @@ window.Vue.watch(
         } else {
             modalEl.value?.close();
         }
-    }
+    },
 );
 
 /**
@@ -59,7 +59,8 @@ function getFormData() {
         formData.append(`scores[${item.reference}]`, getItemScore(item).toString());
         formData.append(`comment[${item.reference}]`, item.questions[0].response?.comment ?? "");
     });
-    formData.append(`attempt-comment`, studentStore.student.attemptComment.comment ?? ""); //
+    formData.append(`attempt-comment`, studentStore.student.attemptResponse.comment ?? "");
+    // formData.append(`attempt-mark`, studentStore.student.attemptResponse.mark ?? "");
     return formData;
 }
 

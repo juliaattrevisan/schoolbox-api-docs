@@ -33,7 +33,7 @@ window.Vue.watch(
         } else {
             modalEl.value?.close();
         }
-    }
+    },
 );
 
 /**
@@ -44,7 +44,7 @@ function getFormData() {
     const formData = new FormData();
     // add the reference for each attempt
     studentsStore.students.forEach((student) => {
-        formData.append("learnosityReferences[]", student.attemptComment.learnosityReference);
+        formData.append("learnosityReferences[]", student.attemptResponse.learnosityReference);
     });
     return formData;
 }
