@@ -43,13 +43,19 @@ window.sbProps.firebaseApps.forEach((app) => {
     }
 });
 
+interface RequestNotifEvent extends CustomEvent {
+    detail: {
+        debug: boolean;
+        deviceId: string;
+    };
+}
+
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param { CustomEvent } event - Information about the event.
+ * @param { RequestNotifEvent } event - Information about the event.
  */
-function requestNotif(event: CustomEvent) {
+function requestNotif(event: RequestNotifEvent) {
     const debug = event.detail.debug as boolean;
-    const deviceId = event.detail.deviceId as string;
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
             const firebaseApp = initializeApp(app.publicConfiguration);
@@ -58,13 +64,13 @@ function requestNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, { vapidKey: app.webPushPublicKey })
                 .then(async (currentToken) => {
-                    if (window.sbProps.pwaConfig.notificationState === "denied") {
+                    if (window.sbProps.pwaConfig.user.notificationState === "removing") {
                         // If notification blocked while requesting, should stop registering attempt
                         throw new Error("Notification blocked. Stop registering attempts.");
                     }
 
-                    window.sbProps.pwaConfig.notificationState = "registering";
-                    window.sbProps.pwaConfig.notificationToken = currentToken;
+                    window.sbProps.pwaConfig.user.notificationState = "registering";
+                    window.sbProps.pwaConfig.user.notificationToken = currentToken;
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -80,14 +86,14 @@ function requestNotif(event: CustomEvent) {
                     const formData = new FormData();
                     formData.append("appId", app.appIdentifier);
                     formData.append("token", currentToken);
-                    formData.append("deviceId", deviceId);
+                    formData.append("deviceId", event.detail.deviceId);
 
                     await fetch("/api/register/Firebase", {
                         method: "POST",
                         body: formData,
                     });
 
-                    window.sbProps.pwaConfig.notificationState = "registered";
+                    window.sbProps.pwaConfig.user.notificationState = "registered";
                 })
                 .catch((error) => {
                     if (debug) {
@@ -98,11 +104,17 @@ function requestNotif(event: CustomEvent) {
     });
 }
 
+interface DenyEvent extends CustomEvent {
+    detail: {
+        debug: boolean;
+    };
+}
+
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param { CustomEvent } event - Information about the event.
+ * @param { DenyEvent } event - Information about the event.
  */
-function denyNotif(event: CustomEvent) {
+function denyNotif(event: DenyEvent) {
     const debug = event.detail.debug as boolean;
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
@@ -112,11 +124,13 @@ function denyNotif(event: CustomEvent) {
             // mobile app registration.
             getToken(messaging, { vapidKey: app.webPushPublicKey })
                 .then(async (currentToken) => {
-                    // delete the token from firebase
                     void deleteToken(messaging);
-                    // delete the local cache token
-                    window.sbProps.pwaConfig.notificationToken = null;
-                    window.sbProps.pwaConfig.notificationState = "removing";
+
+                    // delete the local cache token for the user
+                    window.sbProps.pwaConfig.user.notificationToken = null;
+
+                    // Set notificationState to "removing" so if the page is reloaded we can re-trigger the event
+                    window.sbProps.pwaConfig.user.notificationState = "removing";
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -128,7 +142,7 @@ function denyNotif(event: CustomEvent) {
                     // service to the other mobile apps: should that
                     // happen, the registration will be pushed to some
                     // other place.
-                    // For now, just push it to the Firebase app.
+                    // For now, just push it to the Firebase app
                     await fetch("/api/register/Firebase", {
                         method: "DELETE",
                         body: JSON.stringify({
@@ -140,7 +154,7 @@ function denyNotif(event: CustomEvent) {
                         },
                     });
 
-                    window.sbProps.pwaConfig.notificationState = "removed";
+                    window.sbProps.pwaConfig.user.notificationState = null;
                 })
                 .catch((error) => {
                     if (debug) {

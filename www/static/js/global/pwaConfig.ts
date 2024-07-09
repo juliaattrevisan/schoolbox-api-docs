@@ -24,7 +24,11 @@ interface PWAConfig {
             // Whether the user has clicked the "Later" button on the PWA install prompt and we should not show the install prompt again
             hasClickedInstallLater: boolean;
             // Track what state we are in for registering notifications for the user in case the page is reloaded and we need to re-register
-            notificationState: null | "registering" | "registered" | "removing" | "removed" | "denied";
+            // - null: No registration has been attempted
+            // - "registering": Currently in the process of registering, or page was reloaded mid-registration and should retry
+            // - "registered": The user has granted permission and the device is registered in firebase
+            // - "removing": Currently in the process of removing, or page was reloaded mid-removal and should retry
+            notificationState: null | "registering" | "registered" | "removing";
             // The Firebase Cloud Messaging registration token that can be used to send push messages to that Messaging instance.
             notificationToken: null | string;
         }
@@ -48,25 +52,25 @@ const defaultPWAConfig: PWAConfig = {
 };
 
 const existingPWAConfig = localStorage.getItem(localStorageKey);
-let pwaConfig = existingPWAConfig !== null ? (JSON.parse(existingPWAConfig) as PWAConfig) : defaultPWAConfig;
+let localPWAConfig = existingPWAConfig !== null ? (JSON.parse(existingPWAConfig) as PWAConfig) : defaultPWAConfig;
 
 // If the version has changed, invalidate the cache and reset the config
 // You could also choose to make a migration here based on two version numbers if you don't want to reset the config and break existing user's notifications
-if (pwaConfig.version === undefined || pwaConfig.version !== defaultPWAConfig.version) {
+if (localPWAConfig.version === undefined || localPWAConfig.version !== defaultPWAConfig.version) {
     localStorage.removeItem(localStorageKey);
-    pwaConfig = defaultPWAConfig;
+    localPWAConfig = defaultPWAConfig;
 }
 
 // If the current user does not have a config, create one for them
-if (Object.prototype.hasOwnProperty.call(pwaConfig.users, currentUserId) === false) {
-    pwaConfig.users[currentUserId] = defaultPWAUserConfig;
+if (Object.prototype.hasOwnProperty.call(localPWAConfig.users, currentUserId) === false) {
+    localPWAConfig.users[currentUserId] = defaultPWAUserConfig;
 }
 
 // Create a reactive object to later allow watching for changes to the user config
 // (It is safe to use Vue here as we are certain it is loaded on all pages before this script is run)
 const reactivePWAConfig = window.Vue.ref({
-    config: pwaConfig,
-    user: pwaConfig.users[currentUserId], // Intentionally reference the object (not clone) so modifictations are directly linked back to pwaConfig
+    config: localPWAConfig,
+    user: localPWAConfig.users[currentUserId], // Intentionally reference the object (not clone) so modifictations are directly linked back to localPWAConfig
 });
 
 /**
@@ -82,4 +86,4 @@ window.Vue.watch(
     { deep: true },
 );
 
-export const pwaUserConfig = reactivePWAConfig.value.user;
+export const pwaConfig = reactivePWAConfig.value;
