@@ -137,6 +137,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setResponse(
                     (new QuizResponseDomainObject())
                         ->setId($attempt->getId())
+                        ->setNormalisedMark($attempt->getNormalisedMark())
+                        ->setHumanReadableMark($attempt->getMark())
+                        ->setComment($attempt->getComment())
                 )
                 ->setReviewee($attempt->getUser())
                 ->setReviewer($attempt->getReviewer())
@@ -144,25 +147,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
+                ->setNormalisedMark($attempt->getNormalisedMark())
+                ->setHumanReadableMark($attempt->getMark())
                 ->setComment($attempt->getComment())
             ;
 
             // TODO populate individual answers
             $quizResponses->add($response);
         }
-
-//        // Populate the marks available and marks given for each attempt
-//        $markSets = $this->getMapper()->findSupplementaryInformation($ids);
-//        foreach ($quizResponses as $response) {
-//            if (isset($markSets[$response->getId()])) {
-//                $markSet = $markSets[$response->getId()];
-//                $response
-//                    ->setMarksGiven($markSet['mark'])
-//                    ->setMarksAvailable($markSet['max_mark'])
-//                    ->setFirstSectionId($markSet['first_section'])
-//                ;
-//            }
-//        }
 
         return $quizResponses;
     }
@@ -188,6 +180,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setDeleted($domainObject->getDeletedAt())
                 ->setReviewer($domainObject->getReviewer())
                 ->setReviewed($domainObject->getPublishedAt())
+                ->setMark($domainObject->getHumanReadableMark())
+                ->setNormalisedMark($domainObject->getNormalisedMark())
                 ->setComment($domainObject->getComment());
             $dataModels->add($dataModel);
         }
