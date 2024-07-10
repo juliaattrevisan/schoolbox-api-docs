@@ -83,9 +83,15 @@ class Api
         $response = null;
         $failed = 0;
 
+        $externalId = $this->paperlyUser->getExternalId();
+
+        if ('' === (string)$externalId) {
+            throw new RuntimeException('External id is not configured');
+        }
+
         $paperlyAPIEndpoint = sprintf(
             self::PAPERLY_API_VIEW_IFRAME,
-            $this->paperlyUser->getId(),
+            $externalId,
             $this->paperlyUser->getRole()->isStaff() ? 'teacher' : $this->paperlyUser->getRole()->getType()
         );
 
