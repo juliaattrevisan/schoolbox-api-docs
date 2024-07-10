@@ -103,16 +103,6 @@ export default {
             return dayjs(this.event.dates.start).format("DD");
         },
 
-        byLine: function () {
-            if (this.event.author.id && this.event.author.fullName)
-                return (
-                    "By " + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + "</a>"
-                );
-            if (!this.event.author.id && this.data.author.fullName) return "By " + this.event.author.fullName;
-
-            return "";
-        },
-
         audiencesMeta: function () {
             let result = [],
                 campusCount = this.event.audiences.campus.length,
@@ -369,7 +359,7 @@ export default {
                     this.event.attendance.payload.currentUser.user.id,
                     this.currentAttendanceStatus,
                     this.numMax,
-                    this.numAvailable
+                    this.numAvailable,
                 ) ||
                 (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
                 (this.canModify() && !this.isAttendanceLevelNone()) ||
@@ -470,7 +460,7 @@ export default {
                     new URLSearchParams({
                         query: query,
                         groupID: 0,
-                    })
+                    }),
             )
                 .then((response) => response.json())
                 .then((data) => {
@@ -509,7 +499,14 @@ export default {
                     </div>
                 </div>
                 <div class="meta">
-                    <span v-html="byLine"></span>
+                    <span>
+                        <template v-if="event.author.id && event.author.fullName">
+                            By <a :href="`/search/user/${event.author.id}`">{{ event.author.fullName }}</a>
+                        </template>
+                        <template v-else-if="!event.author.id && data.author.fullName">
+                            By {{ event.author.fullName }}
+                        </template>
+                    </span>
                     <template v-if="audiencesMeta">
                         |
                         <span v-if="this.isCampusEvent"
@@ -550,7 +547,7 @@ export default {
                             this.event.attendance.payload.currentUser.user.id,
                             this.currentAttendanceStatus,
                             this.numMax,
-                            this.numAvailable
+                            this.numAvailable,
                         )
                     "
                 >
