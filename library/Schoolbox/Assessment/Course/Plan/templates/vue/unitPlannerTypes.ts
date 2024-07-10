@@ -68,6 +68,8 @@ export interface UnitTemplateTextboxComponent extends UnitTemplateComponent {
  * and which are just components added to a home page
  */
 export type UnitTemplate = {
+    textboxDefId: null|number; // the textbox component definition ID
+    curriculumDefId: null|number; // the curriculum component definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
 };

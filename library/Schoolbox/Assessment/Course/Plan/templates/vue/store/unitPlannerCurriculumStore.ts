@@ -100,14 +100,19 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      * @param {Column} column - the column to create the component for
      */
     async function createComponent(unit: Unit, column: Column) {
+        const unitPlannerStore = useUnitPlannerStore();
+        const componentDefinition = unitPlannerStore.template.curriculumDefId;
+
+        if (null === componentDefinition) {
+            throw new Error("No Textboxes exist on the template,");
+        }
+
         activate("Creating curriculum...");
         try {
-            const unitPlannerStore = useUnitPlannerStore();
-
             // First create a new component
             const createFormData = new FormData();
             createFormData.append("cid", unit.folderId.toString());
-            createFormData.append("add", "86"); // TODO: Grab this (curriculum overview component definition ID) from the backend instead. See SA-17537
+            createFormData.append("add", componentDefinition.toString());
 
             const createResponse = await fetch("/homepage/configForm.php", {
                 method: "POST",
