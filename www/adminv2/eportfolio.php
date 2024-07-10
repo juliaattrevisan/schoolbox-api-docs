@@ -65,7 +65,7 @@ foreach ($templateList as $template) {
 $componentFactory     = new Component_Eportfolio_Factory($this->getDi()->get('session')->get('user'), $this, true);
 $occupiedPositionList = [];
 $componentCounts      = [];
-foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $component) {
+foreach ($componentFactory->buildComponentList($templateList->first()->getId()) as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_id   = $component->getInstance()->getId();
     $position_no   = $component->getInstance()->getPosition();
