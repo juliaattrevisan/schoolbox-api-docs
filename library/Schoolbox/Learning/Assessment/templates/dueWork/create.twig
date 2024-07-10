@@ -137,6 +137,13 @@
                     <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per due work that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
                     <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
+
+                    {# Forcibly untick this checkbox to fool the validator #}
+                    <script>
+                        $(function() {
+                            $('#worksheet').prop('checked', false);
+                        })
+                    </script>
                 </li>
                 {% endif %}
                 <li>
