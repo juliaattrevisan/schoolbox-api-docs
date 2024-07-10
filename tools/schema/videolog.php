@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      James Leckie <james.leckie@schoolbox.education>
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
