@@ -137,6 +137,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setResponse(
                     (new QuizResponseDomainObject())
                         ->setId($attempt->getId())
+                        ->setNormalisedMark($attempt->getNormalisedMark())
+                        ->setHumanReadableMark($attempt->getMark())
                         ->setComment($attempt->getComment())
                 )
                 ->setReviewee($attempt->getUser())
@@ -145,26 +147,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setCreatedAt($attempt->getStart())
                 ->setDeletedAt($attempt->getDeleted())
                 ->setUpdatedAt($attempt->getFinish())
+                ->setNormalisedMark($attempt->getNormalisedMark())
+                ->setHumanReadableMark($attempt->getMark())
                 ->setComment($attempt->getComment())
             ;
 
             // TODO populate individual answers
             $quizResponses->add($response);
-        }
-
-        // Populate the marks available and marks given for each attempt
-        $markSets = $this->getMapper()->findSupplementaryInformation($ids);
-        foreach ($quizResponses as $response) {
-            if (isset($markSets[$response->getId()])) {
-                $markSet = $markSets[$response->getId()];
-                $response
-                    ->setHumanReadableMark($markSet['mark'])
-                    ->setNormalisedMark($markSet['norm_mark'])
-                    ->getResponse()
-                        ->setHumanReadableMark($markSet['mark'])
-                        ->setNormalisedMark($markSet['norm_mark'])
-                ;
-            }
         }
 
         return $quizResponses;
