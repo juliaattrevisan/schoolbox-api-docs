@@ -246,6 +246,12 @@ class ConfigMapper extends Mapper
     public const NAME_PAPERLY_API_KEY = 'paperly_iframe_api_key';
 
     public const NAME_KAMI_ENABLED = 'kami_enabled';
+
+    /* Kami Worksheets might not be available at v24 release
+     * This feature flag is used to quietly hide this from users
+     */
+    public const NAME_KAMI_WORKSHEETS_ENABLED = 'kami_worksheets_enabled';
+
     public const NAME_KAMI_API_HOST = 'kami_api_host';
     public const NAME_KAMI_API_KEY = 'kami_api_key';
 
