@@ -8,7 +8,7 @@
  */
 
 // we should not be in SitePage context for this
-use Schoolbox\Database\Factory;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (isset($this)) {
@@ -57,24 +57,33 @@ switch ($action) {
 }
 
 // if we're here, all above is valid
-
+$eportfolioTemplateMapper = new Eportfolio\TemplateMapper();
 if ($action == 'delete') {
-    $sql[0] = "DELETE FROM `component_instance` WHERE `module` = 'eportfolio_template' AND `identifier` = :templateID";
-    $vars[0] = array('templateID' => $templateID);
-
-    $sql[1] = "DELETE FROM `eportfolioTemplate` WHERE `id` = :templateID";
-    $vars[1] = array('templateID' => $templateID);
+    try {
+        $eportfolioTemplate = $eportfolioTemplateMapper->findById($templateID);
+        $eportfolioTemplateMapper->delete($eportfolioTemplate);
+    } catch (Schoolbox\Mapper\Exception $e) {
+    }
 } elseif ($action == 'rename') {
-    $sql[0] = "UPDATE `eportfolioTemplate` SET `name` = :name WHERE `id` = :templateID";
-    $vars[0] = array('templateID' => $templateID, 'name' => $name);
-} else {
-    $sql[0] = "INSERT INTO `eportfolioTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.5','29.5')";
-    $vars[0] = array('name' => $name);
-}
+    $eportfolioTemplate = $eportfolioTemplateMapper->findById($templateID);
+    $eportfolioTemplate->setName($name);
 
-for ($i = 0; $i < count($sql); $i++) {
-    $stmt = Factory::getInstanceInternal()->prepare($sql[$i]);
-    $stmt->execute($vars[$i]);
+    try {
+        $eportfolioTemplateMapper->save($eportfolioTemplate);
+    } catch (UnexpectedValueException $e) {
+        throw new SchoolboxException($e->getMessage(), 0, $e);
+    }
+} else {
+    $eportfolioTemplate = $eportfolioTemplateMapper->createModel();
+    $eportfolioTemplate->setName($name)->setLayout(1)->setLeftColumnWidth(69.5)->setRightColumnWidth(29.5);
+
+    try {
+        $eportfolioTemplateMapper->create($eportfolioTemplate);
+        // navigate to the new template
+        SitePage::localRedir(sprintf("/adminv2/eportfolio#%d", $eportfolioTemplate->getId()));
+    } catch (UnexpectedValueException $e) {
+        throw new SchoolboxException($e->getMessage(), 0, $e);
+    }
 }
 
 $sitePage->backToTheFuture(1);

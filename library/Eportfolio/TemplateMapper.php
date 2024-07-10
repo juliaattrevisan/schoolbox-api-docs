@@ -14,6 +14,7 @@ use Schoolbox;
 
 /**
  * @method Template findById($identifierValue)
+ * @method Template createModel($idValue = null)
  */
 class TemplateMapper extends Schoolbox\Mapper
 {
@@ -28,6 +29,7 @@ class TemplateMapper extends Schoolbox\Mapper
         $this->hasModel(Template::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('layout', self::TYPE_INTEGER);
         $this->uses('left_column_width', self::TYPE_DECIMAL);
         $this->uses('right_column_width', self::TYPE_DECIMAL);
     }
