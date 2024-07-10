@@ -16,16 +16,32 @@ const props = defineProps<Props>();
  */
 const href = window.Vue.computed(() => {
     if (props.componentData.prependHref) {
-        return `${props.componentData.prependHref}${props.rowData[props.componentData.text] as string}`;
+        const textValue = props.rowData[props.componentData.text];
+        if (typeof textValue === "string") {
+            return `${props.componentData.prependHref}${textValue}`;
+        }
     }
-    return props.rowData[props.componentData.href];
+    const hrefValue = props.rowData[props.componentData.href];
+    if (typeof hrefValue === "string") {
+        return hrefValue;
+    }
+    return undefined;
+});
+/**
+ * Check if the link exists
+ */
+const linkExists = window.Vue.computed(() => {
+    return !!href.value;
 });
 </script>
 
 <template>
-    <a :href="(href as string)" :title="props.componentData.title" :data-no-wrap="props.componentData.hasNoWrap">
-        {{ props.rowData[componentData.text] }}
+    <a v-if="linkExists" :href="href" :title="props.componentData.title" :data-no-wrap="props.componentData.hasNoWrap">
+        {{ props.rowData[props.componentData.text] }}
     </a>
+    <span v-else :data-no-wrap="props.componentData.hasNoWrap">
+        {{ props.rowData[props.componentData.text] }}
+    </span>
 </template>
 
 <style scoped>
