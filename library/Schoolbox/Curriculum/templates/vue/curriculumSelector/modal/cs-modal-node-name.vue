@@ -4,7 +4,7 @@
  * will also highlight any matches in the current search query when search is active
  */
 
-import { escapeRegExp } from "@js/util/jsUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
@@ -120,37 +120,6 @@ function onNameSelected() {
         modalViewNodesStore.setNextSelected(props.node.id);
     }
 }
-
-/**
- * To highlight any search selections in the code / title
- *
- * @returns { HTML }
- */
-const highlightTitleSearch = window.Vue.computed(() => {
-    if (modalSearchStore.isActive) {
-        return highlightSearchInElement(props.title);
-    } else {
-        return props.title;
-    }
-});
-
-/**
- * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node
- *
- * @params { String } the string to find all instanced of the current search string in
- *
- * @returns { String } string for v-html with <mark></mark> wrapped around each found result
- */
-function highlightSearchInElement(toHighlight) {
-    let highlighted = toHighlight;
-    modalSearchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
-            return `<mark>${match}</mark>`;
-        });
-    });
-    return highlighted;
-}
 </script>
 
 <template>
@@ -165,7 +134,12 @@ function highlightSearchInElement(toHighlight) {
         {{ props.title }}
     </button>
     <div v-else class="name">
-        <span v-html="highlightTitleSearch"></span>
+        <show-matches
+            tag="span"
+            :text="props.title"
+            :query="modalSearchStore.query"
+            :is-searching="modalSearchStore.isActive"
+        />
     </div>
 </template>
 

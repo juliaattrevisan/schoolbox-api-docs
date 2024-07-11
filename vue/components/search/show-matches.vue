@@ -9,6 +9,7 @@ interface Props {
     tag: string; // the result to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
+    isSearching: boolean; // whether the search is currently active
     href?: string | undefined; // the href to navigate to
     class?: string | undefined; // the classes to apply to the elements
 }
@@ -36,6 +37,7 @@ const emit = defineEmits<{
     <!-- eslint-disable vue/no-v-text-v-html-on-component | props.tag is passed through  -->
     <component
         :is="props.tag"
+        v-if="props.isSearching"
         :href="props.href ? props.href : undefined"
         :class="props.class ? props.class : undefined"
         @click.prevent="emit('click')"
@@ -43,6 +45,14 @@ const emit = defineEmits<{
     ></component>
     <!-- eslint-enable vue/no-v-html -->
     <!-- eslint-enable vue/no-v-text-v-html-on-component -->
+    <component
+        :is="props.tag"
+        v-else
+        :href="props.href ? props.href : undefined"
+        :class="props.class ? props.class : undefined"
+        @click.prevent="emit('click')"
+        >{{ props.text }}</component
+    >
 </template>
 
 <style scoped></style>
