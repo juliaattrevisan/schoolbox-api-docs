@@ -33,7 +33,7 @@ window.Vue.watch(
             load();
             isActive.value = true;
         }
-    }
+    },
 );
 
 /**
@@ -95,6 +95,7 @@ const breadcrumbs = window.Vue.computed(() => {
         <template v-else>
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
+            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
             <div v-html="node.description"></div>
         </template>
     </div>
