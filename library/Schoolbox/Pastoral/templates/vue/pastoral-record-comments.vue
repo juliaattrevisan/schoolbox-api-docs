@@ -199,7 +199,7 @@ export default {
                                     title="Delete comment"
                                 ></a>
                             </nav>
-                            <media-article v-html="comment.body"></media-article>
+                            <media-article :content="comment.body"></media-article>
                         </li>
                     </transition-group>
                 </div>
@@ -221,7 +221,9 @@ export default {
 
 <style scoped>
 .list-complete-item {
-    transition: opacity 0.5s, transform 0.5s;
+    transition:
+        opacity 0.5s,
+        transform 0.5s;
 }
 
 .list-complete-enter,
