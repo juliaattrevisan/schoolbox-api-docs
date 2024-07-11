@@ -52,8 +52,8 @@ export default {
     <div>
         <reveal-modal ref="outputLogModal">
             <div class="output-log">
-                <div v-if="hasDataError" v-html="errorMessage" class="alert-box alert"></div>
-                <textarea v-html="logData"></textarea>
+                <div v-if="hasDataError" class="alert-box alert">{{ errorMessage }}</div>
+                <textarea v-model="logData"></textarea>
             </div>
             <div>
                 <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
