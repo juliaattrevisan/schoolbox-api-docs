@@ -62,7 +62,6 @@ foreach (range(0, 23) as $hour) {
 /** @var IConfigLoader $config */
 $config  = $this->getDi()->get('config');
 $enabled = $config->get('messaging_enabled');
-$pushing = $config->get('push_notifications_enabled');
 
 if ($enabled) {
     $this->setVar(array(
@@ -161,15 +160,8 @@ if ($enabled) {
         $this->setVar('day_check_block', '');
     }
 
-    if ($pushing) {
         $this->parse('push_online_block', 'push_online');
         $this->setVar('push_offline_block', '');
-    } else {
-        // messaging online, but push offline:
-        $this->setVar('push_online_block', '');
-        $this->setVar('PUSH_OFFLINE', 'Enable push notifications to set app settings.');
-        $this->parse('push_offline_block', 'push_offline');
-    }
 
     $this->parse('digest_online_block', 'digest_online');
     $this->setVar('digest_offline_block', '');
@@ -188,7 +180,7 @@ if ($enabled) {
     $this->parse('global_offline_block', 'global_offline');
     $this->setVar('global_online_block', '');
 
-    $this->setVar('PUSH_OFFLINE', 'Enable messaging and push notifications to set to set app settings.');
+    $this->setVar('PUSH_OFFLINE', 'Enable messaging to set app settings.');
     $this->parse('push_offline_block', 'push_offline');
     $this->setVar('push_online_block', '');
 }

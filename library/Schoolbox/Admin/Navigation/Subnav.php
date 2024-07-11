@@ -207,7 +207,7 @@ class Subnav
                     ],
                     '/adminv2/engagement/index/mobile'        => [
                         'name'        => 'Mobile Apps',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_MOBILE_PUSH_NOTIF_ENABLED),
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
                         'description' => 'Statistics related to the use of mobile apps by users to access the system.',
                     ],
@@ -618,13 +618,13 @@ class Subnav
                     ],
                     '/adminv2/notifications/apps'      => [
                         'name'        => 'Delivery Providers',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_MOBILE_PUSH_NOTIF_ENABLED),
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure and review how push notifications are delivered to mobile phones.',
                     ],
                     '/adminv2/notifications/puush'     => [
                         'name'        => 'Mobile App Registrations',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_MOBILE_PUSH_NOTIF_ENABLED),
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
                         'description' => 'Review the list of mobile devices that have registered to receive notifications.',
                     ],

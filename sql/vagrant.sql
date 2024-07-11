@@ -17,7 +17,6 @@ WHERE name IN (
     'debug_mode',
     'debug_xhprof',
     'resource_booking_enabled',
-    'push_notifications_enabled',
     'pastoral_enabled',
     'ups_groups_enabled',
     'eotc_enabled',

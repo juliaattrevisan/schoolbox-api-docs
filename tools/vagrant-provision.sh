@@ -233,7 +233,6 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config office365_tenant "'alaressteam'" \
 --config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
 --config pastoral_enabled "'1'" \
---config push_notifications_enabled "'1'" \
 --config qr_login_enabled "'1'" \
 --config redis_url "'tcp://127.0.0.1:6379'" \
 --config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
