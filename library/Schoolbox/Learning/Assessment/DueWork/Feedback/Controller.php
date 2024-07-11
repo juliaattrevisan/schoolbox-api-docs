@@ -191,7 +191,7 @@ class Controller extends Base
 
                     // Find the Kami worksheet (if it exists)
                     if ($submissionReturn->getSubmission()) {
-                        $responses = $this->responseDataSource->findForStudent($submissionReturn->getSubmission()->getOwner());
+                        $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
                         $response = null;
                         foreach ($responses as $responseCurrent) {
                             if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
