@@ -402,7 +402,7 @@ export default window.Vue.defineComponent({
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
-                        :query-word-list="queryWordList"
+                        :query="query"
                         :active-index="activeIndex"
                         @on-mouse-over-result="onMouseOverResult"
                         @on-selected-result="onSelectedResult"

@@ -9,7 +9,8 @@ interface Props {
     tag: string; // the result to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
-    href?: string | undefined; //
+    href?: string | undefined; // the href to navigate to
+    class?: string | undefined; // the classes to apply to the elements
 }
 
 const props = defineProps<Props>();
@@ -36,6 +37,7 @@ const emit = defineEmits<{
     <component
         :is="props.tag"
         :href="props.href ? props.href : undefined"
+        :class="props.class ? props.class : undefined"
         @click.prevent="emit('click')"
         v-html="addMarks(props.text, queryWordList)"
     ></component>

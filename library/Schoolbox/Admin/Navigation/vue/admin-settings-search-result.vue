@@ -5,10 +5,14 @@
  *
  */
 
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { getIndex } from "@js/util/domUtils";
 import { escapeRegExp } from "@js/util/jsUtils";
 
 export default {
+    components: {
+        ShowMatches,
+    },
     props: {
         result: {
             type: Object,
@@ -23,11 +27,11 @@ export default {
                 };
             },
         },
-        queryWordList: {
-            //current word list in the query
-            type: Array,
+        query: {
+            // the current search query
+            type: String,
             required: true,
-            default: [],
+            default: "",
         },
         activeIndex: {
             //to know whether this result is currently active
@@ -42,16 +46,6 @@ export default {
             itemIndex: -1,
             isActive: false,
         };
-    },
-
-    computed: {
-        highlightTitleSearch() {
-            return this.highlightSearchInElement(this.result.title);
-        },
-
-        highlightDescriptionSearch() {
-            return this.highlightSearchInElement(this.result.description);
-        },
     },
 
     watch: {
@@ -87,24 +81,6 @@ export default {
         },
 
         /**
-         * To highlight where the search string matches within the settings result
-         * (?![^>]*>) is used to check we are not inside an element node
-         *
-         * @params { String } the string to find all instanced of the current search string in
-         *
-         * @returns { String } string for v-html with <mark></mark> wrapped around each found result
-         */
-        highlightSearchInElement(toHighlight) {
-            let highlighted = toHighlight;
-            this.queryWordList.forEach((wordInSearch) => {
-                highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, "ig"), (match) => {
-                    return `<mark>${match}</mark>`;
-                });
-            });
-            return highlighted;
-        },
-
-        /**
          * so mouse selection takes precendence over the arrow/enter selection
          */
         mouseOverResult() {
@@ -130,14 +106,18 @@ export default {
         @focus="mouseOverResult"
         @click.prevent="selectResult"
     >
-        <!-- eslint-disable-next-line vue/no-v-html | the title is text we create -->
-        <h4 class="result-title" v-html="highlightTitleSearch"></h4>
-        <!-- eslint-disable-next-line vue/no-v-html | the description is text we create -->
-        <p class="result-description" v-if="result.description" v-html="highlightDescriptionSearch"></p>
+        <show-matches tag="h4" class="result-title" :text="result.title" :query="query" />
+        <show-matches
+            v-if="result.description"
+            tag="p"
+            class="result-description"
+            :text="result.description"
+            :query="query"
+        />
     </a>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "www/static/css/core/base/_variables.scss";
 
 .search-result {
