@@ -1002,7 +1002,7 @@ class Controller extends Assessment\Controller
 
 
         // Kami Interactive Worksheet
-        if ($this->kamiConnector->isOnline() && $assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId()) {
+        if ($this->kamiConnector->isOnline() && $assessment->getKamiWorksheetTemplate() && $assessment->getKamiWorksheetTemplate()->getKamiDocumentId() && $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_WORKSHEETS_ENABLED)) {
             // kami string if needed.
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
             $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
@@ -1240,7 +1240,7 @@ class Controller extends Assessment\Controller
         }
 
         // Kami worksheet - save / update
-        if ($requestPost->get('kamiFileId')) {
+        if ($requestPost->get('kamiFileId') && $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_WORKSHEETS_ENABLED)) {
             $kamiFileId = $requestPost->get('kamiFileId');
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
 
