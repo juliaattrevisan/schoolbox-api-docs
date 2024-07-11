@@ -428,7 +428,7 @@ class Processor
 
         header('Cache-Control: private');
         header('Content-type: text/ascii');
-//        header("Content-disposition: attachment; filename=\"{$filename}\"");
+        header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $output = fopen('php://output', 'rw');
 
