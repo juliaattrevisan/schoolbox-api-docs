@@ -52,15 +52,18 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
+        $maxSlideshowImages = (int)$this->getConfigLoader()->get('image_slideshow_max');
+
         // Load images for the current homepage
         $opts = [
             'filter' => 'image',
-            'size' => (int)$this->getConfigLoader()->get('image_slideshow_max'),
+            'size' => $maxSlideshowImages + 1, // +1 to check if we have more than the max
             'sort' => $this->getConfig('sort'),
             'sortdir' => $this->getConfig('sortdir')
         ];
 
         $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
+        $limitedFiles = $allFiles->limit($maxSlideshowImages);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESLIDESHOW_CATEGORY_ID', $this->getSource()->getId());
@@ -68,7 +71,7 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'has_images', 'has_images_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        if (count($allFiles) === 0) {
+        if (count($limitedFiles) === 0) {
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }
@@ -85,6 +88,7 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             $this->setBlock('has_images', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_images', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'submit_image_slideshow', 'submit_image_slideshow_block');
+            $this->setBlock('source_folder_exists', 'exceeds_max_images_warning', 'exceeds_max_images_warning_block');
             $this->setBlock('source_folder_exists', 'image_slideshow', 'image_slideshow_block');
             $this->setBlock('image_slideshow', 'show_caption', 'show_caption_block');
             $this->setBlock('image_slideshow', 'linked_image', 'linked_image_block');
@@ -93,6 +97,17 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             $this->setVar('empty_state_block', '');
 
             $this->setVar('source_folder_deleted_block', '');
+
+            $this->setVar('exceeds_max_images_warning_block', '');
+
+            // Check if we have more than the max images, only show for people who can edit
+            if (
+                count($allFiles) > $maxSlideshowImages
+                && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+            ) {
+                $this->parse('exceeds_max_images_warning_block', 'exceeds_max_images_warning');
+                $this->setVar('IMAGESLIDESHOW_MAX_IMAGES', $maxSlideshowImages);
+            }
 
             // Set up component name
             $this->setComponentName(strlen(trim($this->getConfig('componentname')))
@@ -117,7 +132,7 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             $this->setVar('image_slideshow_block', '');
 
             if ($this->getConfig('randomStartingSlide')) {
-                $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
+                $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($limitedFiles) - 1));
             } else {
                 $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
             }
@@ -130,7 +145,7 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             }
 
             // Iterate
-            foreach ($allFiles as $currentFile) {
+            foreach ($limitedFiles as $currentFile) {
                 $url = '';
 
                 // sanitise url
