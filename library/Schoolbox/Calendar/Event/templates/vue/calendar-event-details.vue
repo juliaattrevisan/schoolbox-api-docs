@@ -1,5 +1,6 @@
 <script>
 import AudiencesModal from "./audiences-modal";
+import MediaArticle from "@schoolboxVue/components/media-article";
 import debounce from "lodash/debounce";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
@@ -31,6 +32,7 @@ export default {
 
     components: {
         AudiencesModal,
+        MediaArticle,
         vSelect,
     },
 
@@ -500,8 +502,7 @@ export default {
                         </span>
                     </template>
                 </div>
-                <!-- eslint-disable-next-line vue/no-v-html | initial textboxes are scrubbed -->
-                <article v-html="event.detail"></article>
+                <media-article :content="event.detail"></media-article>
             </section>
         </div>
 
