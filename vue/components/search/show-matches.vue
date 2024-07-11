@@ -6,7 +6,7 @@
 import { addMarks } from "@js/util/domUtils";
 
 interface Props {
-    tag: string; // the result to display
+    tag: string; // the element to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
     isSearching?: boolean; // whether the search is currently active
