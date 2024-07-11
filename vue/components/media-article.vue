@@ -7,6 +7,7 @@
 
 interface Props {
     content: string; // the content to display
+    dataTest?: string; // the data-test attribute
 }
 
 const props = defineProps<Props>();
@@ -26,5 +27,5 @@ window.Vue.onMounted(() => {
 
 <template>
     <!-- eslint-disable-next-line vue/no-v-html | text is scrubbed -->
-    <article ref="articleEl" v-html="props.content"></article>
+    <article ref="articleEl" v-html="props.content" :data-test="props.dataTest ? props.dataTest : undefined"></article>
 </template>

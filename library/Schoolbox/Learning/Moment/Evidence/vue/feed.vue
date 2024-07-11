@@ -678,12 +678,11 @@ export default {
                                         </article>
 
                                         <!-- Display evidence body, with media players initialised -->
-                                        <media-article v-if="evidence.object.body">
-                                            <div
-                                                data-test="learning-moment-evidence-body"
-                                                v-html="evidence.object.body"
-                                            />
-                                        </media-article>
+                                        <media-article
+                                            v-if="evidence.object.body"
+                                            data-test="learning-moment-evidence-body"
+                                            :content="evidence.object.body"
+                                        ></media-article>
 
                                         <!-- Display curriculum codes and tags -->
                                         <div class="tags">
@@ -767,7 +766,12 @@ export default {
                                         </a>
                                     </div>
                                 </template>
-                                <template v-if="evidence.discriminator === 'dueWorkFeedback' || evidence.discriminator === 'quizFeedback'">
+                                <template
+                                    v-if="
+                                        evidence.discriminator === 'dueWorkFeedback' ||
+                                        evidence.discriminator === 'quizFeedback'
+                                    "
+                                >
                                     <div class="flex-grade">
                                         <div class="small-12 card columns">
                                             <div>
