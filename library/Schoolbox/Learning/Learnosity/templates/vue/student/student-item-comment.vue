@@ -120,7 +120,7 @@ watchDebounced(
     () => {
         void saveComment();
     },
-    { debounce: 1000 }
+    { debounce: 1000 },
 );
 
 /**
@@ -142,6 +142,7 @@ window.Vue.onUnmounted(async () => {
         >
             <div v-if="props.hasMarkVisibility" class="comment-container l-pad-m--top">
                 <label>Comment</label>
+                <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
                 <div v-html="props.item.questions[0].response.comment"></div>
             </div>
         </template>
