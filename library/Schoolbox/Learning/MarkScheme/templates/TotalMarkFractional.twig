@@ -39,12 +39,13 @@
 } only %}
 
 {% if not readonly %}
-
     <script type="text/javascript">
         $(function() {
             $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
 
-            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').alaressValidate(
+            let participantForm = $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]');
+
+            participantForm.alaressValidate(
                 {
                     rules: {
                         mark: {
@@ -53,14 +54,14 @@
                     },
                     messages: {
                         mark: {
-                            withinRange: 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.'
+                            withinRange: 'The grade must be between 0 and ' + participantForm.find('input[name="mark"]').attr('data-validation-limit') + '.'
                         }
                     }
                 }
             );
 
             {# Always run upon load #}
-            $('[data-feedback-form="' + '{{ participant.user.id }}' + '"]').valid();
+            participantForm.valid();
         });
     </script>
 {% endif %}

@@ -225,8 +225,8 @@ class Controller extends Assessment\Controller
                     $maxMarks[$participant->getUser()->getId()] = null;
                 } elseif (!$mostRecentResponse->isSubmitted()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
-                } elseif (!$mostRecentResponse->getMarksAvailable()) {
-                    $maxMarks[$participant->getUser()->getId()] = null;
+                } else {
+                    $maxMarks[$participant->getUser()->getId()] = $mostRecentResponse->getMarksAvailable();
                 }
             }
         }
@@ -258,7 +258,9 @@ class Controller extends Assessment\Controller
             /* Now assign it to them
              */
             foreach ($maxMarks as $userId => $value) {
-                $maxMarks[$userId] = $available;
+                if (null === $value) {
+                    $maxMarks[$userId] = $available;
+                }
             }
         }
 
