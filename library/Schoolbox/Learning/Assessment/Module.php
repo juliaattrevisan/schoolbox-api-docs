@@ -149,15 +149,15 @@ class Module extends BaseModule
 
         /* Specifically made to accommodate kami_worksheets_enabled config
          */
-        $canModifyWorksheet = new Rule\Any(
-            $isSuper,
-            new Rule\All(
+        $canModifyWorksheet = new Rule\All(
+            new Rule\IsConfigSetTo(
+                ConfigMapper::NAME_KAMI_WORKSHEETS_ENABLED,
+                true,
+                $this->getConfig(),
+            ),
+            new Rule\Any(
                 $canModify,
-                new Rule\IsConfigSetTo(
-                    ConfigMapper::NAME_KAMI_WORKSHEETS_ENABLED,
-                    true,
-                    $this->getConfig(),
-                ),
+                $isSuper
             )
         );
 
