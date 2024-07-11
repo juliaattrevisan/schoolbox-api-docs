@@ -24,7 +24,7 @@ class Document
      * Kami Worksheet title format
      * there is no reference to a character limit, so lets concat (assessment title, student name)
      */
-    const WORKSHEET_TITLE = '%s_%s';
+    const WORKSHEET_TITLE = '%s - %s';
 
     /**
      * Kami Worksheet Group format
