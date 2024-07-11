@@ -249,7 +249,7 @@ export default {
                 .delete(
                     "/discussion/comms/" + this.articleId + "/comments/" + commentIdToDelete,
                     {},
-                    { headers: this.postHeaders }
+                    { headers: this.postHeaders },
                 )
                 .then(() => {
                     this.comments.splice(this.commentIndexToDelete, 1);
@@ -378,6 +378,7 @@ export default {
                                     title="Delete comment"
                                 ></a>
                             </nav>
+                            <!-- eslint-disable-next-line vue/no-v-html | textbox content is scrubbed -->
                             <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
