@@ -8,19 +8,22 @@
     editable:      bool
 #}
 {% extends '@settings/fieldType/input.twig' %}
+{% block extraWrapperClasses %}c-form-element c-input-range{% endblock %}
 {% block inputType %}range{% endblock %}
-{% block extraAttributes %}
+{% block extraInputAttributes %}
     min="{{ min }}"
     max="{{ max }}"
     step="{{ step }}"
     class="c-input-range__input"
 {% endblock %}
 
+{# Add the value after the title so the user can see what it is set to #}
+{% block title %}{{ title }}: <span id="{{ name }}-label-title-value">{{ value }}</span>{% endblock %}
+
 {% block extraContent %}
-<script>
-    document.getElementById('{{ name }}-field').addEventListener('input', function() {
-        document.querySelector('#{{ name }} [data-config-label-title]').innerText = `{{ title }}: ${this.value}`;
-    });
-    document.querySelector('#{{ name }} [data-config-label-title]').innerText = `{{ title }}: {{ value }}`
-</script>
+    <script>
+        document.getElementById('{{ name }}-field').addEventListener('input', function() {
+            document.getElementById('{{ name }}-label-title-value').innerText = this.value;
+        });
+    </script>
 {% endblock %}

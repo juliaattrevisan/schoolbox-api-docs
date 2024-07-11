@@ -1,0 +1,8 @@
+<div class="small-12 columns {% block extraWrapperClasses %}{% endblock %}">
+    <label id="{{ name }}" for="{{ name }}-field" class="inline-block">
+        <span {{ required and editable ? 'class="required-with-tip"' }}>{% block title %}{{ title }}{% endblock %}</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ description|replace({'<': '&lt;'}) }}">?</span>
+    </label>
+    {% block inputElement %}{% endblock %}
+    {% block extraContent %}{% endblock %}
+</div>

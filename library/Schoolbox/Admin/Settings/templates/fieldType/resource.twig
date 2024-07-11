@@ -3,18 +3,23 @@
     value:         string
     required:      bool
 #}
-<script>
-    $(function() {
-        $('#modalLinkButton-{{ name }}').schoolboxLink({
-            allowedFiles: false,
-            allowedFilesystems: 'folder',
-            onSelect: function(url, name, mime, dialog) {
-                $('#{{ name }}-field').val(url);
-            }
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block extraContent %}
+    <script>
+        $(function() {
+            $('#modalLinkButton-{{ name }}').schoolboxLink({
+                allowedFiles: false,
+                allowedFilesystems: 'folder',
+                onSelect: function(url, name, mime, dialog) {
+                    $('#{{ name }}-field').val(url);
+                }
+            });
         });
-    });
-</script>
-<div class="input-group">
-    <input id="{{ name }}-field" {{  required ? 'required ' }} type="text" name="{{ name }}" value="{{ value }}" />
-    <a id="modalLinkButton-{{ name }}" class="button icon-link">Browse</a>
-</div>
+    </script>
+{% endblock %}
+{% block inputElement %}
+    <div class="input-group">
+        <input id="{{ name }}-field" {{  required ? 'required ' }} type="text" name="{{ name }}" value="{{ value }}" />
+        <a id="modalLinkButton-{{ name }}" class="button icon-link">Browse</a>
+    </div>
+{% endblock %}

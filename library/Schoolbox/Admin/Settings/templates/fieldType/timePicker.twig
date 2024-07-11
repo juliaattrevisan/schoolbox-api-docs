@@ -2,11 +2,14 @@
     name:          string
     value:         string
 #}
-<input id="{{ name }}-field"
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    <input id="{{ name }}-field"
        type="time"
        list="time-steps"
        name="{{ name }}"
        value="{{ value }}"
        {{ required ? 'required ' }}
        {% if not editable %}disabled="disabled"{% endif %}
-/>
+    />
+{% endblock %}

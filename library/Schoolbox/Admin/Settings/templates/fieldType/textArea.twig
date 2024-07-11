@@ -3,4 +3,7 @@
     value:         string
     required:      bool
 #}
-<textarea id="{{ name }}-field" {{ required ? 'required ' }} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %} {% if not editable %}disabled="disabled"{% endif %}>{{ value }}</textarea>
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    <textarea id="{{ name }}-field" {{ required ? 'required ' }} name="{{ name }}" rows="5" {% block extraInputAttributes %}{% endblock %} {% if not editable %}disabled="disabled"{% endif %}>{{ value }}</textarea>
+{% endblock %}

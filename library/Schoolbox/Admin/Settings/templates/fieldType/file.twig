@@ -1,12 +1,15 @@
-{% if not editable %}
-    {% for attachment in attachzone.attachments %}
-        {% if attachment.isImage %}
-            <p><img src="{{ attachment.preview }}"></p>
-        {% else %}
-            <p>{{ attachment.name }}</p>
-        {% endif %}
-    {% endfor %}
-{% else %}
-<input type="hidden" name="{{ name }}" value="" />
-{% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
-{% endif %}
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    {% if not editable %}
+        {% for attachment in attachzone.attachments %}
+            {% if attachment.isImage %}
+                <p><img src="{{ attachment.preview }}"></p>
+            {% else %}
+                <p>{{ attachment.name }}</p>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <input type="hidden" name="{{ name }}" value="" />
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+    {% endif %}
+{% endblock %}

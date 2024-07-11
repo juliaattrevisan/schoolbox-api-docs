@@ -3,12 +3,15 @@
     value:         string
     required:      bool
 #}
-<input id="{{ name }}-field"
-       {{ required ? 'required ' }}
-       type="{% block inputType %}text{% endblock %}"
-       name="{{ name }}"
-       value="{{ value }}"
-       {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}
-       {% if not editable %}disabled="disabled"{% endif %}
-       {% block extraAttributes %}{% endblock %}
-/>
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    <input id="{{ name }}-field"
+        {{ required ? 'required ' }}
+        type="{% block inputType %}text{% endblock %}"
+        name="{{ name }}"
+        value="{{ value }}"
+        {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}
+        {% if not editable %}disabled="disabled"{% endif %}
+        {% block extraInputAttributes %}{% endblock %}
+    />
+{% endblock %}
