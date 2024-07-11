@@ -1,10 +1,12 @@
 <script>
 import Paginate from "vuejs-paginate-next";
+import MediaArticle from "@schoolboxVue/components/media-article";
 import { fetchAsJson } from "@js/fetch/fetch";
 
 export default {
     components: {
         Paginate,
+        MediaArticle,
     },
     props: {
         pageNumber: Number, // The start page on the pagination
@@ -224,8 +226,7 @@ export default {
                             </div>
                         </div>
                         <article>
-                            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-                            <div v-html="article.blurb"></div>
+                            <media-article tag="div" :content="article.blurb"></media-article>
                             <div v-if="article.readMore.available" class="article-read-more">
                                 <a :href="article._links.self.href">{{ article.readMore.string }}</a>
                             </div>
