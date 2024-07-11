@@ -35,7 +35,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
      */
     async function createTextbox(unitId: number, column: Column) {
         const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
-        const componentDefinition = unitPlannerStore.template.textboxDefId;
+        const componentDefinition = unitPlannerStore.template?.textboxDefId ?? null;
 
         if (null === componentDefinition) {
             throw new Error("No Textboxes exist on the template,");

@@ -101,7 +101,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
      */
     async function createComponent(unit: Unit, column: Column) {
         const unitPlannerStore = useUnitPlannerStore();
-        const componentDefinition = unitPlannerStore.template.curriculumDefId;
+        const componentDefinition = unitPlannerStore.template?.curriculumDefId ?? null;
 
         if (null === componentDefinition) {
             throw new Error("No Curriculum components exist on the template,");
