@@ -291,10 +291,12 @@ export default {
                                     @click.prevent="showDeleteModal(index)"
                                 />
                             </nav>
+                            <!-- eslint-disable vue/no-v-html | textboxes scrubbed -->
                             <media-article
                                 data-test="learning-moment-evidence-comment-thread-comment"
                                 v-html="comment.content"
                             ></media-article>
+                            <!-- eslint-enable vue/no-v-html -->
                         </li>
                     </ul>
                     <template
