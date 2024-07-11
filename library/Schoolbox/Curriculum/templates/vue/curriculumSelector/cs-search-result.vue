@@ -3,7 +3,7 @@
  * A single search result that be selected / unselected with a checkbox status
  */
 
-import { escapeRegExp } from "@js/util/jsUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useSearchStore } from "./store/csSearchStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 
@@ -46,31 +46,6 @@ const title = window.Vue.computed(() => {
 });
 
 /**
- * To highlight any search selections in the code / title
- *
- * @returns { HTML }
- */
-const highlightTitleSearch = window.Vue.computed(() => highlightSearchInElement(title.value));
-
-/**
- * To highlight where the search string matches within the settings result
- * (?![^mark>]*mark>) is used to check we are not inside an element node
- *
- * @params { String } the string to find all instanced of the current search string in
- *
- * @returns { String } string for v-html with <mark></mark> wrapped around each found result
- */
-function highlightSearchInElement(toHighlight) {
-    let highlighted = toHighlight;
-    searchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
-            return `<mark>${match}</mark>`;
-        });
-    });
-    return highlighted;
-}
-
-/**
  * To determine whether the checkbox is currently selected
  * based on whether it's in the selected list
  *
@@ -101,7 +76,7 @@ function onSelected() {
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
-            <span v-html="highlightTitleSearch"></span>
+            <show-matches tag="span" :text="title" :query="searchStore.query" />
         </div>
     </button>
 </template>
