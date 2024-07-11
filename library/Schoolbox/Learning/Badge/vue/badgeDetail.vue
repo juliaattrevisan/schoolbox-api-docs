@@ -80,6 +80,7 @@ export default {
             Curriculum Codes:
             <codes-list :nodes="curriculumNodesWithCode" @selected="onCodeSelected" />
         </p>
+        <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
         <article v-if="badge.body" v-html="badge.body"></article>
     </div>
 </template>
