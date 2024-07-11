@@ -164,9 +164,13 @@ class Controller extends Base
         $class = CurriculumOverviewController::class;
         $curriculumnTemplate = [];
         $curriculumnKey = [];
+        $curriculumDefId = null;
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
         foreach ($unitCurricComp as $curricComponent) {
+            // grab the component ID, for use later
+            $curriculumDefId = $curricComponent->getDefinitionId();
+
             if ('' !== (string)$curricComponent->getConfigByKey('componentname')->getValue()) {
                 // if there is a value set for the component use that
                 $heading = trim($curricComponent->getConfigByKey('componentname')->getValue());
@@ -204,9 +208,13 @@ class Controller extends Base
         $class = TextboxComponentController::class;
         $textboxTemplate = [];
         $textboxKey = [];
+        $textboxDefId = null;
         $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
         foreach ($unitTextboxComp as $textboxComponent) {
+            // grab the component ID, for use later
+            $textboxDefId = $textboxComponent->getDefinitionId();
+
             if ('' !== (string)$textboxComponent->getConfigByKey('componentname')->getValue()) {
                 // if there is a value set for the component use that
                 $heading = trim($textboxComponent->getConfigByKey('componentname')->getValue());
@@ -263,6 +271,8 @@ class Controller extends Base
             'units' => $units,
             'unitPlannerLocales' => $unitPlannerLocales,
             'template'  => [
+                'textboxDefId' => $textboxDefId,
+                'curriculumDefId' => $curriculumDefId,
                 'textboxes' => $textboxTemplate,
                 'curriculum' => $curriculumnTemplate,
             ]

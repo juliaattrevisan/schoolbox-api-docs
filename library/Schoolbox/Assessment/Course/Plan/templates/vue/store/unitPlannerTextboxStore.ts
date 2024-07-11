@@ -35,6 +35,12 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
      */
     async function createTextbox(unitId: number, column: Column) {
         const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
+        const componentDefinition = unitPlannerStore.template?.textboxDefId ?? null;
+
+        if (componentDefinition === null) {
+            throw new Error("No Textboxes exist on the template,");
+        }
+
         if (!storeUnit) {
             throw new Error("Unit not found");
         }
@@ -50,7 +56,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             // First create a new component
             const formData = new FormData();
             formData.append("cid", storeUnit.folderId.toString());
-            formData.append("add", "44"); // TODO: Grab this (textbox component definition ID) from the backend instead. See SA-17537
+            formData.append("add", componentDefinition.toString());
 
             const responseComponent = await fetch("/homepage/configForm.php", {
                 method: "POST",
