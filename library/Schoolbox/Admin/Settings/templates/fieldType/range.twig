@@ -1,0 +1,26 @@
+{#
+    name:          string
+    value:         string
+    min:           number
+    max:           number
+    step:          number
+    required:      bool
+    editable:      bool
+#}
+{% extends '@settings/fieldType/input.twig' %}
+{% block inputType %}range{% endblock %}
+{% block extraAttributes %}
+    min="{{ min }}"
+    max="{{ max }}"
+    step="{{ step }}"
+    class="c-input-range__input"
+{% endblock %}
+
+{% block extraContent %}
+<script>
+    document.getElementById('{{ name }}-field').addEventListener('input', function() {
+        document.querySelector('#{{ name }} [data-config-label-title]').innerText = `{{ title }}: ${this.value}`;
+    });
+    document.querySelector('#{{ name }} [data-config-label-title]').innerText = `{{ title }}: {{ value }}`
+</script>
+{% endblock %}

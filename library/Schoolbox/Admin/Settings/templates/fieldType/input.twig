@@ -10,4 +10,5 @@
        value="{{ value }}"
        {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}
        {% if not editable %}disabled="disabled"{% endif %}
+       {% block extraAttributes %}{% endblock %}
 />
