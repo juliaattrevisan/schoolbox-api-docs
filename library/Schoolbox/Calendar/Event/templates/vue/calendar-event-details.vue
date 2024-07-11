@@ -528,9 +528,9 @@ export default {
                             {{ window.dayjs(event.dates.end).format("dddd, MMMM DD, YYYY h:mma") }}
                         </template>
                     </p>
-                    <div v-if="this.event.location">
+                    <div v-if="event.location">
                         <h2 class="subheader">Location</h2>
-                        <p v-html="this.event.location"></p>
+                        <p>{{ event.location }}</p>
                     </div>
                 </div>
             </section>
