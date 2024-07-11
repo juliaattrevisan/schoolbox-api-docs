@@ -9,14 +9,20 @@ interface Props {
     tag: string; // the result to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
-    isSearching: boolean; // whether the search is currently active
+    isSearching?: boolean; // whether the search is currently active
     href?: string | undefined; // the href to navigate to
     class?: string | undefined; // the classes to apply to the elements
     title?: string | undefined; // the title to display
     disabled?: boolean | undefined; // whether the element is disabled
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    isSearching: true,
+    href: undefined,
+    class: undefined,
+    title: undefined,
+    disabled: undefined,
+});
 
 /**
  * the search string broken into words, to search for each word
