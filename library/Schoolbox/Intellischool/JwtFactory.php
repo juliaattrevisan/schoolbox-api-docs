@@ -23,7 +23,7 @@ class JwtFactory
      * LTI endpoint for Intellischool services: this remains constant for all
      * Schoolbox instances.
      */
-    public const LTI_ENDPOINT = 'https://core.intellischool.net/auth/lti';
+    public const LTI_ENDPOINT = 'https://intellischool.id/auth/lti';
 
     private const COHORT_PREFIX_CLASS = 'class';
     private const COHORT_PREFIX_SUBJECT = 'subject';
@@ -215,7 +215,7 @@ class JwtFactory
 
         $defaultClaims = [
             'iss'                                                           => $this->jwtIssuer,
-            'aud'                                                           => 'https://core.intellischool.net/auth/lti',
+            'aud'                                                           => 'https://intellischool.id/auth/lti',
             'https://purl.imsglobal.org/spec/lti/claim/version'             => '1.3.0',
             'https://purl.imsglobal.org/spec/lti/claim/message_type'        => 'LtiResourceLinkRequest',
             'https://purl.imsglobal.org/spec/lti/claim/deployment_id'       => $this->deploymentId,
