@@ -103,7 +103,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         const unitPlannerStore = useUnitPlannerStore();
         const componentDefinition = unitPlannerStore.template?.curriculumDefId ?? null;
 
-        if (null === componentDefinition) {
+        if (componentDefinition === null) {
             throw new Error("No Curriculum components exist on the template,");
         }
 
