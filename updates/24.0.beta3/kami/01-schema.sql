@@ -7,7 +7,6 @@ UPDATE config c
 WHERE lct.type = 'Modules'
     AND c.sequence > (SELECT c2.sequence FROM config c2 WHERE c2.name='kami_enabled' LIMIT 1);
 
-
 -- Enable Kami Worksheets
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
