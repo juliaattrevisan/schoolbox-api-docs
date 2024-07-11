@@ -14,6 +14,7 @@ interface Props {
     class?: string | undefined; // the classes to apply to the elements
     title?: string | undefined; // the title to display
     disabled?: boolean | undefined; // whether the element is disabled
+    for?: string | undefined; // the for attribute
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     class: undefined,
     title: undefined,
     disabled: undefined,
+    for: undefined,
 });
 
 /**
@@ -48,6 +50,9 @@ const emit = defineEmits<{
         v-if="props.isSearching"
         :href="props.href ? props.href : undefined"
         :class="props.class ? props.class : undefined"
+        :title="props.title ? props.title : undefined"
+        :disabled="props.disabled ? props.disabled : undefined"
+        :for="props.for ? props.for : undefined"
         @click.prevent="emit('click')"
         v-html="addMarks(props.text, queryWordList)"
     ></component>
@@ -58,6 +63,9 @@ const emit = defineEmits<{
         v-else
         :href="props.href ? props.href : undefined"
         :class="props.class ? props.class : undefined"
+        :title="props.title ? props.title : undefined"
+        :disabled="props.disabled ? props.disabled : undefined"
+        :for="props.for ? props.for : undefined"
         @click.prevent="emit('click')"
         >{{ props.text }}</component
     >
