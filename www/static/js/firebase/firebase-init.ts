@@ -54,10 +54,49 @@ interface RequestNotifEvent extends CustomEvent {
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
  * @param { RequestNotifEvent } event - Information about the event.
  */
-function requestNotif(event: RequestNotifEvent) {
+async function requestNotif(event: RequestNotifEvent) {
     const debug = event.detail.debug as boolean;
-    window.sbProps.firebaseApps.forEach((app) => {
-        if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
+
+    /**
+     * Currently there'll usually only be at most one Firebase app, but if we start supporting
+     * multiple apps, then we may need to start indexing the pwaConfig by app.appIdentifier too...
+     */
+    await Promise.all(
+        window.sbProps.firebaseApps.map(async (app) => {
+            if (!app.publicConfiguration || !app.webPushPublicKey || !app.appIdentifier) {
+                return; // Skip this app if it doesn't have the required configuration.
+            }
+
+            /**
+             * When the same device is re-registered, Firebase will invalidate all old devices automatically.
+             * However, this doesn't remove the entry from Schoolbox's mobile app registrations.
+             *
+             * Ideally we would remove all tokens associated with this device, however, user A is not allowed to
+             * delete user B's token in our API, so instead we just check if the user we are now registering
+             * previously had a token, and if so, remove it from Schoolbox. This should be sufficient to
+             * clean up the majority of old registratons but will leave at least one behind per device.
+             */
+            if (window.sbProps.pwaConfig.user.notificationToken) {
+                // It's possible Schoolbox already realised this token was invalid and removed it,
+                // so this may throw a 400 "Unable to find app registration", but that's fine.
+                await fetch("/api/register/Firebase", {
+                    method: "DELETE",
+                    body: JSON.stringify({
+                        appId: app.appIdentifier,
+                        token: window.sbProps.pwaConfig.user.notificationToken,
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                window.sbProps.pwaConfig.user.notificationToken = null;
+            }
+
+            // Set the current user's notification state to "registering" so we can retry if the page is reloaded before the registration is complete.
+            window.sbProps.pwaConfig.user.notificationState = "registering";
+
+            // Then, register the user's device with Firebase and Schoolbox.
             const firebaseApp = initializeApp(app.publicConfiguration);
             const messaging = getMessaging(firebaseApp);
             // Generate a new token, and store it in Schoolbox's
@@ -66,10 +105,10 @@ function requestNotif(event: RequestNotifEvent) {
                 .then(async (currentToken) => {
                     if (window.sbProps.pwaConfig.user.notificationState === "removing") {
                         // If notification blocked while requesting, should stop registering attempt
+                        window.sbProps.pwaConfig.user.notificationState = null;
                         throw new Error("Notification blocked. Stop registering attempts.");
                     }
 
-                    window.sbProps.pwaConfig.user.notificationState = "registering";
                     window.sbProps.pwaConfig.user.notificationToken = currentToken;
 
                     // Post this token to Schoolbox,
@@ -100,8 +139,8 @@ function requestNotif(event: RequestNotifEvent) {
                         console.log(`Error on getting token: ${error}`);
                     }
                 });
-        }
-    });
+        }),
+    );
 }
 
 interface DenyEvent extends CustomEvent {
@@ -166,7 +205,7 @@ function denyNotif(event: DenyEvent) {
 }
 
 document.addEventListener("PWA_NOTIFICATION_ALLOW", (event) => {
-    requestNotif(event as CustomEvent);
+    void requestNotif(event as CustomEvent);
 });
 
 document.addEventListener("PWA_NOTIFICATION_DENY", (event) => {

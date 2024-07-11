@@ -15,7 +15,7 @@
  */
 
 const localStorageKey = "schoolboxPWAConfig"; // The key to use in localStorage to store the PWA config
-const currentUserId = window.schoolboxUser.id; // The current user's ID, loaded from chrome.twig
+const currentUserId = window.schoolboxUser?.id ?? -1; // The current user's ID, loaded from chrome.twig, or -1 if not available (logged out)
 
 interface PWAConfig {
     users: Record<

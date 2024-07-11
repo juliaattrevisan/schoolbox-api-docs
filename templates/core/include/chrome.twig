@@ -664,11 +664,13 @@
                      # and if so, invalidate their registration locally so we can re-register them when they next log in.
                      #
                      # NOTE: We should NOT send PWA_NOTIFICATION_DENY in this case, as it will de-register the current user too!
+                     #
+                     # We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
+                     # the schoolbox mobile app registration database. See firebase-init for more details about this scenario.
                      #}
                     for (const [userId, pwaUserConfig] of Object.entries(window.sbProps.pwaConfig.config.users)) {
                         if (userId.toString() !== window.schoolboxUser.id.toString()) {
                             pwaUserConfig.notificationState = null;
-                            pwaUserConfig.notificationToken = null;
                         }
                     };
 
