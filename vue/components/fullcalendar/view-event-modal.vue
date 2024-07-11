@@ -224,7 +224,7 @@ export default {
                     this.eventExtendedProps.attendance.payload.currentUser.user.id,
                     this.eventExtendedProps.attendance.payload.currentUser.status,
                     this.eventExtendedProps.attendance.payload.attendees.max,
-                    this.eventExtendedProps.attendance.payload.attendees.available
+                    this.eventExtendedProps.attendance.payload.attendees.available,
                 )
             );
         },
@@ -252,7 +252,7 @@ export default {
                     if (!this.isTransacting) {
                         this.rsvp(
                             ATTENDANCE_STATUS.DECLINED,
-                            ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)
+                            ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId),
                         );
                     }
                 }
@@ -416,7 +416,7 @@ export default {
                             toolbar: EditorToolbar.SIMPLE,
                             removeFromToolbar: ["link"],
                         },
-                    })
+                    }),
                 );
             });
         },
@@ -684,7 +684,7 @@ export default {
                     efficacy: efficacy,
                 }),
                 cancelActionUrl = this.eventExtendedProps.booking.actions.find(
-                    (action) => action.action === "cancel"
+                    (action) => action.action === "cancel",
                 ).href;
             fetch(cancelActionUrl, {
                 method: "POST",
@@ -721,7 +721,7 @@ export default {
                     efficacy: efficacy,
                 }),
                 approveActionUrl = this.eventExtendedProps.booking.actions.find(
-                    (action) => action.action === "approve"
+                    (action) => action.action === "approve",
                 ).href;
             fetch(approveActionUrl, {
                 method: "POST",
@@ -758,7 +758,7 @@ export default {
                     efficacy: efficacy,
                 }),
                 rejectActionUrl = this.eventExtendedProps.booking.actions.find(
-                    (action) => action.action === "reject"
+                    (action) => action.action === "reject",
                 ).href;
             fetch(rejectActionUrl, {
                 method: "POST",
@@ -892,7 +892,7 @@ export default {
                                 eventExtendedProps.attendance.payload.currentUser.user.id,
                                 eventExtendedProps.attendance.payload.currentUser.status,
                                 eventExtendedProps.attendance.payload.attendees.max,
-                                eventExtendedProps.attendance.payload.attendees.available
+                                eventExtendedProps.attendance.payload.attendees.available,
                             ) && this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
                         "
                     >
@@ -917,9 +917,8 @@ export default {
                     >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
                 >
             </meta-list>
-            <article>
-                <span v-html="eventExtendedProps.detail"></span>
-            </article>
+            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
+            <article v-html="eventExtendedProps.detail"></article>
 
             <template v-if="eventExtendedProps.booking.related.length">
                 <h3>Related Bookings</h3>
@@ -949,7 +948,7 @@ export default {
                                     eventExtendedProps.attendance.payload.currentUser.user.id,
                                     eventExtendedProps.attendance.payload.currentUser.status,
                                     eventExtendedProps.attendance.payload.attendees.max,
-                                    eventExtendedProps.attendance.payload.attendees.available
+                                    eventExtendedProps.attendance.payload.attendees.available,
                                 )
                             "
                         >
@@ -962,7 +961,7 @@ export default {
                                         :class="{
                                             button: true,
                                             accepted: this.isAccepted(
-                                                eventExtendedProps.attendance.payload.currentUser.status
+                                                eventExtendedProps.attendance.payload.currentUser.status,
                                             ),
                                             disabled: this.isTransacting,
                                         }"
@@ -978,7 +977,7 @@ export default {
                                             button: true,
                                             disabled: this.isTransacting,
                                             declined: this.isDeclined(
-                                                eventExtendedProps.attendance.payload.currentUser.status
+                                                eventExtendedProps.attendance.payload.currentUser.status,
                                             ),
                                         }"
                                         data-rsvp="decline"
