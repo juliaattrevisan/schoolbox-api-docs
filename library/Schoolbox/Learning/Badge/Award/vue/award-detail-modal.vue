@@ -402,6 +402,7 @@ export default {
                             <codes-list :nodes="award.badge.curriculumNodes" @selected="onCodeSelected" />
                         </p>
                     </template>
+                    <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
                     <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <div class="component-action">
                         <section>
