@@ -123,16 +123,17 @@ function onNameSelected() {
 </script>
 
 <template>
-    <button
-        type="button"
+    <show-matches
         v-if="isButton"
+        tag="button"
         class="button-name"
         :title="`View ${props.title}`"
         :disabled="isDisabled"
-        @click.prevent="onNameSelected"
-    >
-        {{ props.title }}
-    </button>
+        :text="props.title"
+        :query="modalSearchStore.query"
+        :is-searching="modalSearchStore.isActive"
+        @click="onNameSelected"
+    />
     <div v-else class="name">
         <show-matches
             tag="span"
@@ -143,7 +144,7 @@ function onNameSelected() {
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .button-name {
     background: none;
     font-size: 1rem;

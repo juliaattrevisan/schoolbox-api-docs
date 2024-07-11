@@ -12,6 +12,8 @@ interface Props {
     isSearching: boolean; // whether the search is currently active
     href?: string | undefined; // the href to navigate to
     class?: string | undefined; // the classes to apply to the elements
+    title?: string | undefined; // the title to display
+    disabled?: boolean | undefined; // whether the element is disabled
 }
 
 const props = defineProps<Props>();
