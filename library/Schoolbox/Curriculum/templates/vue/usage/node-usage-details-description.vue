@@ -3,28 +3,17 @@
  * To display a nodes description
  */
 
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+
 interface Props {
     node: Node; // the assigned node to display
 }
 const props = defineProps<Props>();
-
-const descriptionEl = window.Vue.ref<HTMLDivElement | null>(null);
-
-/**
- * Check if the decription contains any videos that
- * we need to apply the media player to
- */
-window.Vue.onMounted(async () => {
-    await window.Vue.nextTick();
-    $.fn.schoolboxResource_ReplaceAll($(descriptionEl.value));
-    await window.Vue.nextTick();
-    $.fn.schoolboxResource_InitialiseMediaElementPlayer($(descriptionEl.value));
-});
 </script>
 
 <template>
-    <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-    <div ref="descriptionEl" v-html="props.node.description"></div>
+    <media-article tag="div" :content="props.node.description as string"></media-article>
 </template>
 
 <style scoped></style>
