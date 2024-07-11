@@ -248,10 +248,11 @@ class Module extends BaseModule
                 static function (array $params = [], User $user = null) {
                     // students who own the kami worksheet, can always view the state of the draft feedback
                     if (isset($params['kami'])) {
-                        /** @var Kami\Model $params['kami'] */
+                        /** @var Kami\Model $kamiModel */
+                        $kamiModel = $params['kami'];
                         if (
-                            $params['kami']->getStudentSubmissionFile()->getFilename() === sprintf(Kami\Document::WORKSHEET_TITLE, $params['assessment']->getTitle(), $params['student']->getFullName()) &&
-                            $user->getId() === $params['student']->getId()
+                            $kamiModel->getStudentSubmissionFile()?->getIsWorksheet() &&
+                            $user?->getId() === $params['student']->getId()
                         ) {
                             return;
                         }
