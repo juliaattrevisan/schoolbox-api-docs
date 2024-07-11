@@ -140,9 +140,9 @@ export default {
                     <template v-if="article.readMore.available">
                         <a
                             :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
-                            v-html="article.readMore.string"
                             class="article-read-more"
-                        ></a>
+                            >{{ article.readMore.string }}</a
+                        >
                     </template>
 
                     <div class="card-spacer"></div>
