@@ -186,7 +186,7 @@ class Controller extends ConfigController
                 continue;
             }
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
-            $newValue        = $valueSerializer->serializeValue($value);
+            $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
             if ($newValue !== $existingConfig->getValue()) {
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_ROUTED, true)) {

@@ -17,7 +17,7 @@ class ValueSerializer extends File\ValueSerializer
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
         try {
             $newValue = '';

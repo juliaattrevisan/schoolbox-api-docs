@@ -17,7 +17,7 @@ class ValueSerializer implements IFieldValueSerializer
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
         $value = trim($value);
         if ($value === '') {

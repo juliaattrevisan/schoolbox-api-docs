@@ -18,7 +18,7 @@ class ValueSerializer implements IFieldValueSerializer
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
         return (string)Alaress_Byte_Format::stringToBytes($value);
     }

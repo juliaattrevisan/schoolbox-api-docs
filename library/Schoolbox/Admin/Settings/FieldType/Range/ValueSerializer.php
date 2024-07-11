@@ -11,8 +11,10 @@ class ValueSerializer implements IFieldValueSerializer
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
+        $options = $this->buildOptions($config->getOptions());
+
         return $value;
     }
 }
