@@ -378,8 +378,7 @@ export default {
                                     title="Delete comment"
                                 ></a>
                             </nav>
-                            <!-- eslint-disable-next-line vue/no-v-html | textbox content is scrubbed -->
-                            <media-article v-html="comment.content"></media-article>
+                            <media-article :content="comment.content"></media-article>
                         </li>
                     </ul>
                     <button v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">
