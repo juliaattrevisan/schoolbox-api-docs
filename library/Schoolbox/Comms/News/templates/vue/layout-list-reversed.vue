@@ -171,10 +171,10 @@ export default {
                     <template v-if="article.readMore.available">
                         <div class="article-read-more">
                             <a
-                                :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
                                 v-if="!isCompactMode"
-                                v-html="article.readMore.string"
-                            ></a>
+                                :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
+                                >{{ article.readMore.string }}</a
+                            >
                         </div>
                     </template>
                 </article>
