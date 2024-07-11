@@ -133,6 +133,7 @@ export default {
                         </template>
                     </p>
 
+                    <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
                     <article v-if="!isCompactMode" v-html="article.blurb"></article>
                 </div>
                 <div class="card-actions">
