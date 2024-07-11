@@ -134,14 +134,14 @@ function onNameSelected() {
         :is-searching="modalSearchStore.isActive"
         @click="onNameSelected"
     />
-    <div v-else class="name">
-        <show-matches
-            tag="span"
-            :text="props.title"
-            :query="modalSearchStore.query"
-            :is-searching="modalSearchStore.isActive"
-        />
-    </div>
+    <show-matches
+        v-else
+        tag="span"
+        class="name"
+        :text="props.title"
+        :query="modalSearchStore.query"
+        :is-searching="modalSearchStore.isActive"
+    />
 </template>
 
 <style lang="scss">
