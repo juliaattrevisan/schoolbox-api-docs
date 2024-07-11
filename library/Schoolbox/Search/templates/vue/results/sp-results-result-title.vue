@@ -3,7 +3,7 @@
  * To display the search results title
  */
 
-import { addMarks } from "@js/util/domUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 import { useQueryStore } from "../store/spQueryStore";
@@ -26,27 +26,24 @@ const queryStore = useQueryStore();
 <template>
     <template v-if="props.isSubResult">
         <h6 v-if="props.result.url">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <a :href="props.result.url" v-html="addMarks(props.result.title, queryStore.queryWordList)"></a>
+            <show-matches tag="a" :href="props.result.url" :text="props.result.title" :query="queryStore.activeQuery" />
         </h6>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <h6 v-else v-html="addMarks(props.result.title, queryStore.queryWordList)"></h6>
+        <show-matches v-else tag="h6" :text="props.result.title" :query="queryStore.activeQuery" />
     </template>
     <template v-else>
         <h3 v-if="props.result.type === ResultTypes.BADGE">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <a
+            <show-matches
+                tag="a"
                 href="#open-badge-modal"
-                @click.prevent="emit('badgeSelected', props.result)"
-                v-html="addMarks(props.result.title, queryStore.queryWordList)"
-            ></a>
+                :text="props.result.title"
+                :query="queryStore.activeQuery"
+                @click="emit('badgeSelected', props.result)"
+            />
         </h3>
         <h3 v-else-if="props.result.url">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <a :href="props.result.url" v-html="addMarks(props.result.title, queryStore.queryWordList)"></a>
+            <show-matches tag="a" :href="props.result.url" :text="props.result.title" :query="queryStore.activeQuery" />
         </h3>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <h3 v-else v-html="addMarks(props.result.title, queryStore.queryWordList)"></h3>
+        <show-matches v-else tag="h3" :text="props.result.title" :query="queryStore.activeQuery" />
     </template>
 </template>
 
