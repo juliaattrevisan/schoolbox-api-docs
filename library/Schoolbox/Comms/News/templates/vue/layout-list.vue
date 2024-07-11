@@ -159,6 +159,7 @@ export default {
                     </p>
 
                     <article v-if="!isCompactMode">
+                        <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
                         <div v-html="article.blurb"></div>
 
                         <template v-if="article.readMore.available">
