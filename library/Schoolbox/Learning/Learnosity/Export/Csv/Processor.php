@@ -301,7 +301,12 @@ class Processor
 
         foreach ($learnositySessions as $sessionReference => $learnositySession) {
             foreach ($learnositySession['responses'] as $response) {
-                $sessions[$sessionReference][$response['question_reference']] = $factory->produce($response['question_type'])?->findHumanReadable($structure, $response);
+                /* Only include an attempt's question response if it exists in the quiz's current
+                 * set of non-deleted questions
+                 */
+                if (isset($structure[$response['question_reference']])) {
+                    $sessions[$sessionReference][$response['question_reference']] = $factory->produce($response['question_type'])?->findHumanReadable($structure, $response);
+                }
             }
         }
 
@@ -423,7 +428,7 @@ class Processor
 
         header('Cache-Control: private');
         header('Content-type: text/ascii');
-        header("Content-disposition: attachment; filename=\"{$filename}\"");
+//        header("Content-disposition: attachment; filename=\"{$filename}\"");
 
         $output = fopen('php://output', 'rw');
 
