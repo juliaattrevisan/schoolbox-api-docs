@@ -104,7 +104,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
         const componentDefinition = unitPlannerStore.template.curriculumDefId;
 
         if (null === componentDefinition) {
-            throw new Error("No Textboxes exist on the template,");
+            throw new Error("No Curriculum components exist on the template,");
         }
 
         activate("Creating curriculum...");
