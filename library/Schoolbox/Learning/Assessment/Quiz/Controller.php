@@ -226,7 +226,7 @@ class Controller extends Assessment\Controller
                 } elseif (!$mostRecentResponse->isSubmitted()) {
                     $maxMarks[$participant->getUser()->getId()] = null;
                 } else {
-                    $maxMarks[$participant->getUser()->getId()] = $mostRecentResponse?->getMarksAvailable();
+                    $maxMarks[$participant->getUser()->getId()] = $mostRecentResponse->getMarksAvailable();
                 }
             }
         }
