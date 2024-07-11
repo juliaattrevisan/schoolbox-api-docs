@@ -18,7 +18,7 @@ window.Vue.watch(
         if (hasActiveNode) {
             modalEl.value.open();
         }
-    }
+    },
 );
 
 /**
@@ -61,6 +61,7 @@ function onModalClosed() {
         <template v-if="selectedNodesStore.hasActiveNode">
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
+            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
             <div v-html="selectedNodesStore.activeNode.description"></div>
         </template>
     </reveal-modal>
