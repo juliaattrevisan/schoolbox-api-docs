@@ -3,6 +3,7 @@
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
+import MediaArticle from "@schoolboxVue/components/media-article";
 import { getBreadcrumbs, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({
@@ -95,8 +96,7 @@ const breadcrumbs = window.Vue.computed(() => {
         <template v-else>
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-            <div v-html="node.description"></div>
+            <media-article tag="div" :content="node.description"></media-article>
         </template>
     </div>
 </template>
