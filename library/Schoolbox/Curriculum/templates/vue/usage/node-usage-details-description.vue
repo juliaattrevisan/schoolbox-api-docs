@@ -23,6 +23,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
+    <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
     <div ref="descriptionEl" v-html="props.node.description"></div>
 </template>
 
