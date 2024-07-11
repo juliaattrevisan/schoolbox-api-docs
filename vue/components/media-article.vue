@@ -2,7 +2,7 @@
 /**
  * Media article: on initialization, any content within it with the
  * `data-schoolboxresource-type` attribute will have the appropriate media
- * player applied to it.
+ * player applied to it if it's not applied already.
  */
 
 interface Props {
@@ -16,13 +16,13 @@ const articleEl = window.Vue.ref<HTMLElement | null>(null);
 /**
  * To apply the media player to any content within the article
  */
-window.Vue.onMounted(() => {
-    const $el = window.jQuery(articleEl.value as HTMLElement);
-    $.fn.schoolboxResource_ReplaceAll($el);
-    window.Vue.nextTick(() => {
-        $.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
-    });
-});
+// window.Vue.onMounted(() => {
+//     const $el = window.jQuery(articleEl.value as HTMLElement);
+//     $.fn.schoolboxResource_ReplaceAll($el);
+//     window.Vue.nextTick(() => {
+//         $.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
+//     });
+// });
 </script>
 
 <template>
