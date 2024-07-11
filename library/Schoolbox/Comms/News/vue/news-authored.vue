@@ -183,7 +183,12 @@ export default {
 <template>
     <div>
         <section>
-            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId" v-bind:style="(isArticlesLoaded && !allArticles.length) ? 'display:none' : ''">
+            <dl
+                v-if="isArticlesLoaded"
+                class="tabs"
+                :id="topicContainerId"
+                v-bind:style="isArticlesLoaded && !allArticles.length ? 'display:none' : ''"
+            >
                 <dd
                     v-for="(statusCount, status) in activeStatuses"
                     :class="{ active: activeTabSelected === status }"
@@ -219,6 +224,7 @@ export default {
                             </div>
                         </div>
                         <article>
+                            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
                             <div v-html="article.blurb"></div>
                             <div v-if="article.readMore.available" class="article-read-more">
                                 <a :href="article._links.self.href">{{ article.readMore.string }}</a>
