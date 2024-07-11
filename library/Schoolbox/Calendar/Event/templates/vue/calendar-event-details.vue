@@ -519,7 +519,8 @@ export default {
                         </span>
                     </template>
                 </div>
-                <article v-html="this.event.detail"></article>
+                <!-- eslint-disable-next-line vue/no-v-html | initial textboxes are scrubbed -->
+                <article v-html="event.detail"></article>
             </section>
         </div>
 
