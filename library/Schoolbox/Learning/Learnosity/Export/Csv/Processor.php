@@ -72,6 +72,8 @@ class Processor
      */
     public function export(QuizDomainObject $assessment): void
     {
+        $sessions = [];
+
         /* Known questions in the current incarnation of $assessment
          *
          * Note we don't support variations between attempts: we use the current quiz questions
@@ -85,12 +87,16 @@ class Processor
 
         /* Get the learnosity equivalent of our attempts
          */
-        $learnositySessions = $this->getLearnositySessions($attempts);
+        if ($attempts->count()) {
+            $learnositySessions = $this->getLearnositySessions($attempts);
 
-        /* Translate meanings and make more succinct each learnosity session,
-         * using $structure as a lookup where needed for mcq etc.
-         */
-        $sessions = $this->compileHumanReadable($structure, $learnositySessions);
+            /* Translate meanings and make more succinct each learnosity session,
+             * using $structure as a lookup where needed for mcq etc.
+             */
+            if (\count($learnositySessions)) {
+                $sessions = $this->compileHumanReadable($structure, $learnositySessions);
+            }
+        }
 
         /* Send it
          */
@@ -213,8 +219,11 @@ class Processor
         $quizId = $this->quizFetcher->findByAssessmentId($assessment->getId())->getId();
 
         /* Get a list of all the attempts that were made
+         *
+         * Note that some attempts might not have a meaningful learnosity_reference: they could have been created
+         * via Quiz Quickmark to contain a Submission State.
          */
-        return $this->attemptMapper->findByColumn('assess_id', $quizId)->indexBy('learnosityReference');
+        return $this->attemptMapper->findByColumn('assess_id', $quizId);
     }
 
 
@@ -236,7 +245,23 @@ class Processor
             return [];
         }
 
-        $learnosityReferences = $attempts->keys();
+        /* Disregard non-meaningful learnosity_reference values which are possible to spawn
+         * by using Quiz Quickmark, which creates attempts without a learnosity reference.
+         */
+        $learnosityReferences = [];
+
+        foreach ($attempts as $attempt) {
+            if (null !== $attempt->getLearnosityReference()) {
+                $learnosityReferences[] = $attempt->getLearnosityReference();
+            }
+        }
+
+        /* No learnosity references? No trabajo
+         * But be careful managing empty payloads
+         */
+        if (!\count($learnosityReferences)) {
+            return [];
+        }
 
         /* Ask learnosity about the questions in this quiz
          */
@@ -327,10 +352,7 @@ class Processor
         array $sessions,
         $output
     ): void {
-        foreach ($sessions as $sessionReference => $responseData) {
-            /** @var Model $attempt **/
-            $attempt = $attempts[$sessionReference];
-
+        foreach ($attempts as $attempt) {
             $row = [
                 $attempt->getUser()->getExternalId(),
                 $attempt->getUser()->getId(),
@@ -340,15 +362,36 @@ class Processor
                 $attempt->getFinish() ? $attempt->getFinish()->getShort() : self::ATTEMPT_INCOMPLETE
             ];
 
+            /* If this attempt was created via Quiz Quickmark, it won't have a session reference
+             * (learnosity_reference) in learnosity itself: treat it differently
+             */
+            $sessionReference = $attempt->getLearnosityReference();
+            $responseData = [];
+
+            /* Load up whatever learnosity knows, if a sessionReference was meaningful
+             * Otherwise, fill cells with emptiness from the abyss
+             */
+            if (null !== $sessionReference) {
+                $responseData = $sessions[$sessionReference];
+            }
+
             foreach ($structure as $itemReference => $data) {
                 $row[] = $responseData[$itemReference] ?? '';
             }
 
             /* Attempt outcomes, as a backup
+             * Only show published marks and commentary
              */
-            $row[] = $attempt->getMark();
-            $row[] = $attempt->getNormalisedMark();
-            $row[] = \Scrub::html2text($attempt->getComment() ?? '');
+            if (null === $attempt->getReviewed()) {
+                $row[] = '';
+                $row[] = '';
+                $row[] = '';
+            } else {
+                $row[] = $attempt->getMark();
+                $row[] = $attempt->getNormalisedMark();
+                $row[] = \Scrub::html2text($attempt->getComment() ?? '');
+            }
+
             $row[] = $attempt->getReviewed()?->getShort();
 
             fputcsv($output, $row, ',', '"');
