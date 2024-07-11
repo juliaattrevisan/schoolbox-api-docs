@@ -39,7 +39,6 @@ $app = new class extends CliTool\App {
     /* These columns can have any of their date components adjusted
      * by incrementation - days, months, years...can all change */
     private const WHITELISTED_COLUMNS = [
-        'allowedFileTypes'       => ['deleted'],
         'assess'                 => ['finish', 'start', 'deleted'],
         'assessment'             => ['close_date', 'due_date', 'open_date', 'publish_date'],
         'assessment_participant' => ['due_date', 'open_date'],
