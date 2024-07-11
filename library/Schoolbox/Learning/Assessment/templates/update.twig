@@ -124,6 +124,9 @@
                             // No confirmation dialog required - I promise to submit the form!
                             resolve();
                         }
+                    }).fail(function(response) {
+                        //If error encountered, end process gracefully with error response
+                        reject(response);
                     });
 
                 });
