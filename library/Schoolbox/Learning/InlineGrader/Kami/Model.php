@@ -123,6 +123,18 @@ class Model implements ISoftDeletable
      */
     private ?Alaress_Date_Format $kamiCreatedAt = null;
 
+    /**
+     * The number of times the Kami endpoint has been polled.
+     * @var int|null
+     */
+    private ?int $pollCount = null;
+
+    /**
+     * The job reference for polling the kami download endpoint
+     *
+     * @var string|null
+     */
+    private ?string $jobReference = null;
 
     /**
      * @return self::TYPE_*
@@ -381,5 +393,41 @@ class Model implements ISoftDeletable
     {
         $this->kamiCreatedAt = $kamiCreatedAt;
         return $this;
+    }
+
+    /**
+     * @param int|null $pollCount
+     * @return Model
+     */
+    public function setPollCount(?int $pollCount): self
+    {
+        $this->pollCount = $pollCount;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPollCount(): ?int
+    {
+        return $this->pollCount;
+    }
+
+    /**
+     * @param string|null $jobReference
+     * @return Model
+     */
+    public function setJobReference(?string $jobReference): self
+    {
+        $this->jobReference = $jobReference;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getJobReference(): ?string
+    {
+        return $this->jobReference;
     }
 }
