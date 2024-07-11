@@ -76,25 +76,6 @@ export default {
         window: () => window,
         jQuery: () => window.jQuery,
 
-        dateTimeDisplay: function () {
-            if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
-
-            let startDate = dayjs(this.event.dates.start),
-                endDate = dayjs(this.event.dates.end);
-
-            if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
-                return (
-                    startDate.format(FORMAT_LONG_DATE) +
-                    "<br />" +
-                    startDate.format(FORMAT_TIME_ONLY) +
-                    " - " +
-                    endDate.format(FORMAT_TIME_ONLY)
-                );
-            }
-
-            return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + " - " + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
-        },
-
         monthDisplay: function () {
             return dayjs(this.event.dates.start).format("MMM");
         },
@@ -528,7 +509,25 @@ export default {
             <section class="detail">
                 <div class="content">
                     <h2 class="subheader">Date and Time</h2>
-                    <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
+                    <p class="event-datetime-display">
+                        <template v-if="event.options.allDay">{{
+                            window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY")
+                        }}</template>
+                        <template
+                            v-else-if="
+                                window.dayjs(event.dates.start).format('MM-DD-YYYY') ===
+                                window.dayjs(event.dates.end).format('MM-DD-YYYY')
+                            "
+                        >
+                            {{ window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY") }}<br />{{
+                                window.dayjs(event.dates.end).format("h:mma")
+                            }}
+                        </template>
+                        <template v-else>
+                            {{ window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY h:mma") }} -
+                            {{ window.dayjs(event.dates.end).format("dddd, MMMM DD, YYYY h:mma") }}
+                        </template>
+                    </p>
                     <div v-if="this.event.location">
                         <h2 class="subheader">Location</h2>
                         <p v-html="this.event.location"></p>
