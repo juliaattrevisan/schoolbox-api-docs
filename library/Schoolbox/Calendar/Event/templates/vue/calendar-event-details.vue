@@ -108,15 +108,9 @@ export default {
                 campusCount = this.event.audiences.campus.length,
                 rolesCount = this.event.audiences.roles.length;
 
-            if (this.isPersonalEvent) return "Personal";
-            if (this.isGroupEvent)
-                return (
-                    '<a href="/homepage/' +
-                    this.event.audiences.folders[0].id +
-                    '">' +
-                    this.event.audiences.folders[0].name +
-                    "</a>"
-                );
+            if (this.isPersonalEvent || this.isGroupEvent) {
+                return true;
+            }
 
             if (campusCount) {
                 let suffix = campusCount > 1 ? " Campuses" : " Campus";
@@ -512,9 +506,13 @@ export default {
                         <span v-if="this.isCampusEvent"
                             ><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span
                         >
-                        <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
-                        <span v-else-if="this.isGroupEvent">
-                            <span v-html="audiencesMeta"></span>
+                        <span v-else-if="isPersonalEvent">Personal</span>
+                        <span v-else-if="isGroupEvent">
+                            <span>
+                                <a :href="`/homepage/${event.audiences.folders[0].id}`">{{
+                                    event.audiences.folders[0].name
+                                }}</a>
+                            </span>
                             <span v-if="this.event.audiences.folders.length > 1">
                                 and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span
                             >
