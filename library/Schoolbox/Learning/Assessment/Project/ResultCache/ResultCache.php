@@ -62,11 +62,11 @@ class ResultCache
      */
     public function retrieveMultiple(IAssessable $project, array $userIds): \Schoolbox\GenericCollection
     {
-        /* Find a record for the (project id, user) tuple
+        /* Find a record for the (assessment_id, user_id) tuple
          * and returns a model instance for it
          */
         return $this->mapper->findByColumnList([
-            'project_id' => $project->getId(),
+            'assessment_id' => $project->getId(), // This assignment is fine, because a project is an assessment.
             'user_id' => $userIds
         ]);
     }
@@ -89,7 +89,7 @@ class ResultCache
          */
         try {
             return $this->mapper->findOneByColumnList([
-                'project_id' => $project->getId(),
+                'assessment_id' => $project->getId(), // This assignment is fine, because a project is an assessment.
                 'user_id' => $user->getId()
             ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -145,7 +145,7 @@ class ResultCache
 
         if (null === $model) {
             $model = $this->mapper->createModel()
-                ->setProjectId($project->getId())
+                ->setAssessmentId($project->getId()) // This assignment is fine, because a project is an assessment.
                 ->setUser($participant->getUser())
                 ->setHumanReadableMark(null)
                 ->setNormalisedMark(null);

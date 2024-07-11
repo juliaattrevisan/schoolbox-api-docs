@@ -327,7 +327,7 @@ class Payload
             INNER JOIN assessment a ON p.assessment_id = a.id
             INNER JOIN userAccess ua ON f1.id = ua.sid
             INNER JOIN `user` u ON ua.uid = u.id
-            LEFT JOIN project_result prc ON p.assessment_id = prc.project_id AND uid = prc.user_id 
+            LEFT JOIN project_result prc ON p.assessment_id = prc.assessment_id AND uid = prc.user_id
             WHERE ci.course_specification_id = :courseId
             AND cui.deleted_at IS NULL
             AND cus.deleted_at IS NULL
