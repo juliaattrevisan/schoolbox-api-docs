@@ -53,13 +53,14 @@ class MessageFactory
     /**
      * Build a message.
      *
-     * @param string      $task
-     * @param array       $params
-     * @param string|null $callbackUrl
-     * @param array|null  $callbackParams
-     * @param string|null $failureCallbackUrl
-     * @param array|null  $failureCallbackParams
-     * @param User|null   $effector
+     * @param string                   $task
+     * @param array                    $params
+     * @param string|null              $callbackUrl
+     * @param array|null               $callbackParams
+     * @param string|null              $failureCallbackUrl
+     * @param array|null               $failureCallbackParams
+     * @param User|null                $effector
+     * @param Alaress_Date_Format|null $tokenExpiry
      * @return Message
      */
     public function build(
@@ -69,10 +70,11 @@ class MessageFactory
         ?array $callbackParams,
         ?string $failureCallbackUrl,
         ?array $failureCallbackParams,
-        ?User $effector
+        ?User $effector,
+        ?Alaress_Date_Format $tokenExpiry = null,
     ): Message {
         // Convert the instance to an intermediary format
-        $token = $effector ? $this->tokenBuilder->generate($effector) : null;
+        $token = $effector ? $this->tokenBuilder->generate($effector, $tokenExpiry) : null;
         return new Message(
             $task,
             $params,
