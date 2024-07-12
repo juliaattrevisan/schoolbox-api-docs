@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Textbox;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -81,7 +82,10 @@ class Module extends BaseModule
                         return $params['folderId'];
                     }
 
-                    throw new \DomainException('Unknown folder identifier in folderAuth.');
+                    /* Neither a folder instance nor a folderId was provided
+                     * Can't determine where you're trying to go; kick you out
+                     */
+                    throw new Unauthorized();
                 },
                 Access::getInstance()
             )
