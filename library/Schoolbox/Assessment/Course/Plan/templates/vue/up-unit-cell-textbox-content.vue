@@ -6,6 +6,7 @@ import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 import { Column } from "./unitPlannerConfig";
@@ -32,6 +33,7 @@ const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].bo
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
+const editorId = `unit-planner-textbox-${props.unit.id}-${props.column.id}`;
 const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
@@ -120,9 +122,9 @@ function initEditor() {
 
     useEditor(
         editorContent,
-        editorContentEl.value,
+        `#${editorId}`,
         {
-            targetElements: [editorContentEl.value],
+            targetElements: [`#${editorId}`],
             type: EditorType.INLINE,
         },
         true,
@@ -135,15 +137,19 @@ window.Vue.onMounted(initEditor);
 
 <template>
     <div class="editor-wrapper" :style="{ display: textboxIsCreated ? 'block' : 'none' }">
-        <!-- eslint-disable vue/no-v-html | initial textboxes are scrubbed-->
-        <div ref="editorContentEl" class="editor-content" v-html="props.unit.textboxes[props.column.label].body"></div>
-        <!-- eslint-enable vue/no-v-html -->
+        <media-article
+            :id="editorId"
+            ref="editorContentEl"
+            tag="div"
+            class="editor-content"
+            :content="props.unit.textboxes[props.column.label].body"
+        ></media-article>
     </div>
 </template>
 
-<style scoped lang="scss">
+<style>
 .editor-wrapper {
-    z-index: 1;
+    z-index: var(--depth-default);
 }
 .editor-content {
     border: 0 !important;
@@ -151,7 +157,7 @@ window.Vue.onMounted(initEditor);
     z-index: auto !important; /* so any content inside the editor sits within the cell and doesn't sit above the View more button */
 }
 
-// Specificity to override the CKEditor border, we handle it in the parent vue component instead
+/* Specificity to override the CKEditor border, we handle it in the parent vue component instead */
 .editor-content.ck.ck-content.ck-editor__editable.ck-focused,
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     border: 0 !important;

@@ -10,12 +10,16 @@ interface Props {
     content: string; // the content to display
     dataTest?: string; // the data-test attribute
     tag?: string; // when you wish to use a different tag than article
+    id?: string; // the id of the element
+    class?: string; // the classes to apply to the element
 }
 
 const props = withDefaults(defineProps<Props>(), {
     content: "",
     dataTest: undefined,
     tag: "article",
+    id: undefined,
+    class: undefined,
 });
 
 const articleEl = window.Vue.ref<HTMLElement | null>(null);
@@ -58,7 +62,9 @@ window.Vue.onMounted(() => {
     <!-- eslint-disable vue/no-v-text-v-html-on-component | props.tag is passed through  -->
     <component
         :is="props.tag"
+        :id="props.id ? props.id : undefined"
         ref="articleEl"
+        :class="props.class ? props.class : undefined"
         :data-test="props.dataTest ? props.dataTest : undefined"
         v-html="
             sanitizeHtml(props.content, {
