@@ -69,11 +69,17 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function ($params): int {
+                    if (isset($params['folder'])) {
+                        return $params['folder']->getId();
+                    }
+
+                    /* In unit planner you might know of a folder id, but
+                     * not have its instance; it was multiplayer deleted
+                     * or otherwise not hydrated into $params[folder]
+                     */
                     if (isset($params['folderId'])) {
                         return $params['folderId'];
                     }
-
-                    return $params['folder']->getId();
                 },
                 Access::getInstance()
             )
