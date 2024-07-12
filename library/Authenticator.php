@@ -70,6 +70,12 @@ class Authenticator
     public function createSession(string $username, ?User\Token\Model $userToken = null, ?bool $bypassIpTracking = false): bool
     {
         $session = new Session();
+
+        // Also bypass logging if bypassing IP tracking.
+        if ($bypassIpTracking) {
+            $session->disableLoginLog();
+        }
+
         if (!$session->create($username, $userToken?->getJwtId(), $bypassIpTracking)) {
             throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
         }

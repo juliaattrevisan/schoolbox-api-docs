@@ -470,11 +470,12 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * exists.
      *
      * @param string|null $authHeader
-     * @return User|null
+     * @return array{?User, bool}       User (if found) + whether to IP track
+     *                                  the session.
      * @throws JwtParser\Exception\Base if a header exists and is recognised,
      *                                  but is rejected for whatever reason
      */
-    public function extractUserFromAuthHeader(?string $authHeader): ?User
+    public function extractUserFromAuthHeader(?string $authHeader): array
     {
         if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
@@ -483,10 +484,10 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             $tokenParser = $this->get('user.jwtParser');
 
             if ($tokenParser->accepts($token)) {
-                return $tokenParser->determineUser($token);
+                return [$tokenParser->determineUser($token), $tokenParser->bypassIpTracking()];
             }
         }
-        return null;
+        return [null, false];
     }
 
     /**
@@ -497,11 +498,12 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * logged in, or destroy the session completely if nobody was logged in.
      *
      * @param User $user
+     * @param bool $bypassIpTracking If true: bypass IP tracking of the session.
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws JwtParser\Exception\InvalidIdentity if the user could not be authenticated
      */
-    public function authenticateUserForThisRequestOnly(User $user): void
+    public function authenticateUserForThisRequestOnly(User $user, bool $bypassIpTracking): void
     {
         // Block expired users right away
         if (!$user->getEnabled()) {
@@ -534,7 +536,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // Now authenticate the given user
         $authenticated = true;
         try {
-            $authenticated = $authenticator->createSession($user->getUsername());
+            $authenticated = $authenticator->createSession($user->getUsername(), null, $bypassIpTracking);
         } catch (SchoolboxNotAuthenticatedException $e) {
             // noop: convert this unauthenticated error into another
         }
