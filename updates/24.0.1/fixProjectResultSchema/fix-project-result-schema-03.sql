@@ -15,7 +15,7 @@ ALTER TABLE project_result ADD CONSTRAINT fk_project_result_user_id FOREIGN KEY 
 # Create Table: CREATE TABLE `project_result` (
 #   `id` int(11) NOT NULL AUTO_INCREMENT,
 #   `assessment_id` int(10) unsigned NOT NULL,
-#   `_project_id` int(11) NOT NULL,
+#   `_project_id` int(11) DEFAULT NULL,
 #   `user_id` int(4) unsigned NOT NULL,
 #   `_marker_id` int(11) DEFAULT NULL,
 #   `mark` varchar(64) NOT NULL,
