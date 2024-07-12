@@ -58,7 +58,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <!-- eslint-disable vue/no-v-html | text is scrubbed -->
+    <!-- eslint-disable vue/no-v-html | text is scrubbed both on input, and here with sanitize-html -->
     <!-- eslint-disable vue/no-v-text-v-html-on-component | props.tag is passed through  -->
     <component
         :is="props.tag"
@@ -68,7 +68,7 @@ window.Vue.onMounted(() => {
         :data-test="props.dataTest ? props.dataTest : undefined"
         v-html="
             sanitizeHtml(props.content, {
-                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed']),
             })
         "
     ></component>
