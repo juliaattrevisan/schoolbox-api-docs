@@ -45,7 +45,11 @@ class Module extends BaseModule
         };
 
         $componentPreload = function ($params) use ($folderPreload): array {
-            $result = $folderPreload($params);
+            try {
+                $result = $folderPreload($params);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                throw new NotFound('Folder was deleted or does not exist.');
+            }
 
             /** @var Component_InstanceMapper $componentMapper */
             $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
