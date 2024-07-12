@@ -33,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('project_result');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('project_id', self::TYPE_INTEGER);
+        $this->uses('assessment_id', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('mark', self::TYPE_STRING, null, 'humanReadableMark', 'humanReadableMark');
         $this->uses('norm_mark', self::TYPE_DECIMAL, null, 'normalisedMark', 'normalisedMark');

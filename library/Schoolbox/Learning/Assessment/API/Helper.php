@@ -572,7 +572,7 @@ class Helper
                 `prr`.`norm_mark`    AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
-            from `project_result` `prr` join `project` `pr` on (`prr`.`project_id` = `pr`.`assessment_id`)
+            from `project_result` `prr` join `project` `pr` on (`prr`.`assessment_id` = `pr`.`assessment_id`)
                 LEFT JOIN `user` `participant` on `prr`.`user_id`  = `participant`.`id`
                 LEFT JOIN `user` `reviewer`    on FALSE
             where
