@@ -410,7 +410,7 @@ class Controller extends Base
     {
         $responseCode = 400;
         // check if we have a kami job reference
-        if (!$kami->getJobReference()) {
+        if (!$kami->getJobReference() || Kami\Model::STATUS_DONE === $kami->getStatus()) {
             // if no reference spawn a job
             $exportJob = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
             $kami->setJobReference($exportJob->getId());
@@ -428,8 +428,9 @@ class Controller extends Base
             $responseCode = 202;
         } elseif ($export->isStatusDone()) {
             $responseCode = 200;
-            $kami->setStatus($export->getStatus());
         }
+        $kami->setStatus($status);
+        $this->kamiMapper->save($kami);
 
         // respond with correct status code
         // Respond with code:
