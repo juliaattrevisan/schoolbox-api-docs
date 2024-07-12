@@ -1,9 +1,7 @@
 <script setup lang="ts">
 /**
- * Media article, typically contains content created with CKEditor:
- * On initialization, any content within it with the
- * `data-schoolboxresource-type` attribute will have the appropriate media
- * player applied to it if it's not applied already.
+ * A media article, which typically contains content created with CKEditor,
+ * so we need to ensure that any media elements within are correctly initialised.
  */
 
 import sanitizeHtml from "sanitize-html";
@@ -23,14 +21,35 @@ const props = withDefaults(defineProps<Props>(), {
 const articleEl = window.Vue.ref<HTMLElement | null>(null);
 
 /**
- * To apply the media player to any content within the article
+ * Ensure any content within it with the
+ * `data-schoolboxresource-type` attribute will have the appropriate media
+ * player applied to it if it's not applied already.
  */
-window.Vue.onMounted(() => {
+function initMediaElementPlayer() {
     const $el = window.jQuery(articleEl.value as HTMLElement);
     $.fn.schoolboxResource_ReplaceAll($el);
     window.Vue.nextTick(() => {
         $.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
     });
+}
+
+/**
+ * Ensure any iframely embeds are displayed correctly
+ */
+function initIframely() {
+    articleEl.value
+        ?.querySelectorAll("oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))")
+        .forEach((oEmbedEl) => {
+            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+        });
+}
+
+/**
+ * To properly display any media within the content
+ */
+window.Vue.onMounted(() => {
+    initMediaElementPlayer();
+    initIframely();
 });
 </script>
 
