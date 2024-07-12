@@ -485,7 +485,8 @@ abstract class Kernel
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
-                    return new HttpRequestMessageFactory($instance, $tokenBuilder);
+                    return (new HttpRequestMessageFactory($instance, $tokenBuilder))
+                        ->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
         );
@@ -509,7 +510,7 @@ abstract class Kernel
                         FILTER_VALIDATE_INT,
                         FILTER_NULL_ON_FAILURE,
                     );
-                    return new DownloadPagesMessageFactory(
+                    return (new DownloadPagesMessageFactory(
                         $instance,
                         $tokenBuilder,
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
@@ -521,7 +522,7 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
-                    );
+                    ))->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
         );
