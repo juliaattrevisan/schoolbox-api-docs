@@ -9,6 +9,7 @@
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 
@@ -142,8 +143,7 @@ window.Vue.onUnmounted(async () => {
         >
             <div v-if="props.hasMarkVisibility" class="comment-container l-pad-m--top">
                 <label>Comment</label>
-                <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-                <div v-html="props.item.questions[0].response.comment"></div>
+                <media-article tag="div" :content="props.item.questions[0].response.comment"></media-article>
             </div>
         </template>
         <template v-else-if="!props.isReadOnly">
