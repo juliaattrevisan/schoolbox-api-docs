@@ -88,7 +88,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface, IHomepageCle
     {
         return "FROM
                 `{$this->getTable()}`
-                JOIN {$this->getJoinSql('owner', 'blog', 'u')}
+                JOIN {$this->getJoinSql('owner', 'blog', 'u', true)}
                 LEFT JOIN {$this->getJoinSql('owner.pronoun', 'u', 'op')}
         ";
     }
