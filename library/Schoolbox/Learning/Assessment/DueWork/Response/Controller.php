@@ -396,9 +396,54 @@ class Controller extends Base
     }
 
     /**
+     * Polls a kami export request to see if we can download the file
+     *
+     * @param Kami\Model $kami
+     * @throws Exception
+     * @throws Exception/Deleted
+     * @throws GuzzleException
+     * @api POST /kami/{kamiId:\d+}/poll
+     * @since 24.0
+     *
+     */
+    public function postPollKamiDownload(Kami\Model $kami): void
+    {
+        $responseCode = 400;
+        // check if we have a kami job reference
+        if (!$kami->getJobReference()) {
+            // if no reference spawn a job
+            $exportJob = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
+            $kami->setJobReference($exportJob->getId());
+            $kami->setStatus($exportJob->getStatus());
+            $this->kamiMapper->save($kami);
+            $this->response = $this
+                ->responseAsJson(['status' => $exportJob->getStatus()])
+                ->withStatus(202); // still processing
+            return;
+        }
+        // else check job status
+        $export = $this->kamiConnector->getExport($kami->getJobReference());
+        $status = $export->getStatus();
+        if ($export->isStatusPending()) {
+            $responseCode = 202;
+        } elseif ($export->isStatusDone()) {
+            $responseCode = 200;
+        }
+
+        // respond with correct status code
+        // Respond with code:
+        // * 200 if complete
+        // * 202 if still processing (this tells polling process to try again)
+        // * 400 if failed
+        $this->response = $this
+            ->responseAsJson(['status' => $status])
+            ->withStatus($responseCode);
+    }
+
+    /**
      * Polls a kami export request to see if we can download and save to the attached student submission.
      * @param Kami\Model $kami
-     * @param string $action // enum of what action we are working with, student submit, or teacher feedback
+     * @param string $action // enum of what action we are working with, student submit(submission), teacher feedback(feedback), download(download)
      * @param DueWork|null $assessment
      * @param User|null $student
      * @param DueWorkResponse|null $response
@@ -411,84 +456,57 @@ class Controller extends Base
      * @since 24.0
      *
      */
-    public function postPollKamiDownload(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null): void
+    public function postKamiDownloadCallback(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null)
     {
-        // check if we have a kami job reference
-        // if no reference spawn a job
-        // else check job
-        // respond with correct status code
-        // Respond with code:
-        // * 200 if complete
-        // * 202 if still processing (this tells polling process to try again)
-        // * 400 if failed
-
-        /**
-         * use the kami export system to attempt a download of a kami doc to either
-         * we have 2 actions to download to a kami file as PDF;
-         * on student submission (save the current kami to the student submission file)
-         * on teacher feedback published (save the current kami to the teacher feedback file)
-         */
-
-        // Less overhead in sleeping the server process, than spinning it up per client poll.
-        // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
-        $maxPolls  = 10;
-        $exponent  = 2;
-        $sleep     = 500000; // 0.5 seconds initial back-off
-        $pollCount = 0;
-        $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
-        while ($export->isStatusPending()) {
-            if ($pollCount >= $maxPolls) {
-                break;
-            }
-            usleep($sleep);
-            $sleep  *= $exponent; // exponential back-off.
-            $export = $this->kamiConnector->getExport($export->getId());
-            $pollCount++;
+        // kami is ready to download
+        $export = $this->kamiConnector->getExport($kami->getJobReference());
+        $expiryAt = null;
+        $uploadingUser = $this->getUser();
+        $filename = sprintf("%s.pdf", $kami->getStudentSubmissionFile()?->getFilename() ?? 'Student Submission');
+        // if action is download, save to storage for a 2 week auto delete
+        if ('download' === $action) {
+            $expiryAt = \Alaress_Date_Format::now()->addWeeks(2);
         }
-
-        // Let the browser know that the synchronous request has finished (either success or failure)
-        $token = $this->requestQuery->get('token');
-
-        // Unable to generate the export? (either due to error or timeout)
-        if (!$export->isStatusDone()) {
-            // Don't change browser viewport
-            $this->response = $this->responseAsJson(['error' => $export->getErrorType()])->withStatus(400);
-            return;
-        }
-
+        // else store for all time
         // grab the file and save to storage ensuring it is a pdf, as that is what we get from kami
-        $filename           = sprintf("%s.pdf", $kami->getStudentSubmissionFile()->getFilename());
         if ('feedback' === $action) {
-            $filename           = sprintf("%s - Feedback.pdf", $kami->getStudentSubmissionFile()->getFilename());
+            $filename = sprintf("%s - Feedback.pdf", $kami->getStudentSubmissionFile()?->getFilename());
         }
         $guzzleResponse     = (new Client())->get($export->getFileUrl());
-
         $storage = $this->filesystemReceiver->acceptStream(
             $filename,
             $guzzleResponse->getBody(),
-            uploadingUser: $this->getUser()
+            expiryAt: $expiryAt,
+            uploadingUser: $uploadingUser
         );
 
-        // different logic for either saving to the existing student submission, or attaching to the teacher feedback
+        // depending on the action, depends on where we save / send the file
         switch ($action) {
-            case 'submission':
-                // update the worksheet entry to not use the original worksheet template, but the downloaded kami annotated file
-                $response->getAllFiles()->filter(function (SubmissionFile $file) use ($kami) {
-                    return $kami->getStudentSubmissionFile()->getId() === $file->getId();
-                })->first()->setStorage($storage);
-                $this->responseDataSource->save($response);
-                // re save kami, or that entry is purged...
-                $this->kamiMapper->save($kami);
+            case 'download':
+                // taskd notify the user
                 break;
-            case 'feedback':
-                // create a feedback file object
-                $feedback->getAllFiles()->add(
-                    FeedbackFileMapper::getInstance()->createModel()
-                        ->setStorage($storage)
-                        ->setFilename($filename)
-                );
-                // save the things
-                $this->feedbackMapperProxy->save($feedback);
+            case 'submission': // student submission (save the current kami to the student submission file)
+                if ($response) {
+                    // update the worksheet entry to not use the original worksheet template, but the downloaded kami annotated file
+                    $response->getAllFiles()->filter(function (SubmissionFile $file) use ($kami) {
+                        return $kami->getStudentSubmissionFile()?->getId() === $file->getId();
+                    })->first()?->setStorage($storage);
+                    $this->responseDataSource->save($response);
+                    // re save kami, or that entry is purged...
+                    $this->kamiMapper->save($kami);
+                }
+                break;
+            case 'feedback': // teacher feedback published (save the current kami to the newly created teacher feedback file)
+                if ($feedback) {
+                    // create a feedback file object
+                    $feedback->getAllFiles()->add(
+                        FeedbackFileMapper::getInstance()->createModel()
+                            ->setStorage($storage)
+                            ->setFilename($filename)
+                    );
+                    // save the things
+                    $this->feedbackMapperProxy->save($feedback);
+                }
                 break;
         }
     }

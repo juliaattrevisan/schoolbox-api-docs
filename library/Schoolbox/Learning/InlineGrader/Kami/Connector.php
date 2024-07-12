@@ -919,49 +919,22 @@ class Connector implements IConnector
             [
                 'kamiId'    => $document->getId(),
                 'kami'      => $document,
-                'action'    => $action,
-            ]
-        );
-        $message = $this->messageFactory
-            ->setUser($getUser)
-            ->setRequest(
-                $this->httpFactory
-                    ->createRequest(
-                        'POST',
-                        $this->baseUrl->withPath($route),
-                    )
-                    ->withHeader('accept', 'application/json')
-            )
-            ->build();
-
-        $this->messageProducer->send(
-            $message,
-            delay: 5,
-            maxRequeues: 10,
-        );
-
-        $route = $this->routeGenerator->generate(
-            'learnosity.postPollQuizAttemptStatus',
-            [
-                'assessmentId'               => $assessment->getId(),
-                'studentId'                  => $existingAttempt->getUser()->getId(),
-                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
             ]
         );
 
         /* Update schoolbox when we're done
          */
         $callbackUrl = $this->routeGenerator->generate(
-            'learnosity.postRescoreAttemptsCallback',
+            'learningDueWorkResponse.postKamiDownloadCallback',
             [
-                'assessmentId'               => $assessment->getId(),
-                'studentId'                  => $existingAttempt->getUser()->getId(),
-                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
+                'kamiId'    => $document->getId(),
+                'kami'      => $document,
+                'action'    => $action,
             ]
         );
 
         $message = $this->messageFactory
-            ->setUser($user)
+            ->setUser($getUser)
             ->setRequest(
                 $this->httpFactory
                     ->createRequest(
