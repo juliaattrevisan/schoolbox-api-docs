@@ -146,17 +146,30 @@ function onNameSelected() {
 </template>
 
 <style lang="scss">
-@import "./style/mcViewNode";
-
 .name-container {
     width: 100%;
 }
 
 .button-name {
-    @extend .button;
+    background: none;
+    font-size: 1rem;
+    margin: 0;
+    min-height: 42px;
+    min-width: 40px;
     padding-left: 0.25rem;
+    text-align: left;
     transition: background 0.2s;
     width: 100%;
+    &:hover {
+        background: var(--content-ui-background);
+    }
+    &:disabled {
+        opacity: 0.2;
+    }
+    @media (max-width: 700px) {
+        font-size: 0.8rem;
+        padding: 0.25rem;
+    }
 }
 
 .name {
