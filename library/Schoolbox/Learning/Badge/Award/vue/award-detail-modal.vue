@@ -9,6 +9,7 @@ import axios from "axios";
 import { animateBadgeImage } from "../js/animateBadgeImage";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import MediaArticle from "@schoolboxVue/components/media-article";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
@@ -62,6 +63,7 @@ export default {
         SequentialRevealModal,
         CodesList,
         NodeDetails,
+        MediaArticle,
     },
 
     /**
@@ -402,8 +404,7 @@ export default {
                             <codes-list :nodes="award.badge.curriculumNodes" @selected="onCodeSelected" />
                         </p>
                     </template>
-                    <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-                    <article v-if="award.badge.body" v-html="award.badge.body"></article>
+                    <media-article v-if="award.badge.body" :content="award.badge.body"></media-article>
                     <div class="component-action">
                         <section>
                             <a
