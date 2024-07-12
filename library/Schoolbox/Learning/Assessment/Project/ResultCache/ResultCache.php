@@ -145,7 +145,7 @@ class ResultCache
 
         if (null === $model) {
             $model = $this->mapper->createModel()
-                ->setProjectId($project->getId())
+                ->setAssessmentId($project->getId()) // This assignment is fine, because a project is an assessment.
                 ->setUser($participant->getUser())
                 ->setHumanReadableMark(null)
                 ->setNormalisedMark(null);

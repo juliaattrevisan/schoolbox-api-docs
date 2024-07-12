@@ -22,7 +22,7 @@ class Model implements ISoftDeletable
     use ModelTrait\DeletedAtDate;
 
     /**
-     * The identifier for the project
+     * The identifier for the project (project_result.assessment_id).
      * It's specifically an int so you can skip hydration
      * to obtain the important parts: the marks
      *
@@ -34,7 +34,7 @@ class Model implements ISoftDeletable
      *
      * @var int
      */
-    private int $projectId;
+    private int $assessmentId;
 
 
     /**
@@ -84,19 +84,19 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getProjectId(): int
+    public function getAssessmentId(): int
     {
-        return $this->projectId;
+        return $this->assessmentId;
     }
 
 
     /**
-     * @param int $projectId
+     * @param int $assessmentId
      * @return Model
      */
-    public function setProjectId(int $projectId): self
+    public function setAssessmentId(int $assessmentId): self
     {
-        $this->projectId = $projectId;
+        $this->assessmentId = $assessmentId;
         return $this;
     }
 
