@@ -69,6 +69,7 @@ class Mapper extends BaseMapper
                 Model::STATUS_PROCESSING,
                 Model::STATUS_DONE,
                 Model::STATUS_ERROR,
+                Model::STATUS_PENDING,
             ],
         );
         $this->uses('job_reference', self::TYPE_STRING);

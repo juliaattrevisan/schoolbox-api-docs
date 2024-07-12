@@ -38,6 +38,7 @@ class Model implements ISoftDeletable
     public const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
     public const STATUS_DONE = 'done';              // As reported by Kami. End state.
     public const STATUS_ERROR = 'error';            // As reported by Kami. Probably an end state.
+    public const STATUS_PENDING = 'pending';            // As reported by Kami. Process starting or processing. Transient state.
 
     /**
      * Types for this Kami upload:

@@ -3,4 +3,5 @@ alter table student_submission_file
 
 alter table kami_document
     add job_reference VARCHAR(255) NULL after kami_document_id,
-    add poll_count tinyint unsigned null after job_reference;
+    add poll_count tinyint unsigned null after job_reference,
+    modify status enum ('queued', 'uploading', 'failed', 'processing', 'done', 'error', 'pending') not null;

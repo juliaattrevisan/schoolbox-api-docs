@@ -428,6 +428,7 @@ class Controller extends Base
             $responseCode = 202;
         } elseif ($export->isStatusDone()) {
             $responseCode = 200;
+            $kami->setStatus($export->getStatus());
         }
 
         // respond with correct status code
