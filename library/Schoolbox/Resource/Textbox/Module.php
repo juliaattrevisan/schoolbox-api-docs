@@ -80,6 +80,8 @@ class Module extends BaseModule
                     if (isset($params['folderId'])) {
                         return $params['folderId'];
                     }
+
+                    throw new \DomainException('Unknown folder identifier in folderAuth.');
                 },
                 Access::getInstance()
             )
