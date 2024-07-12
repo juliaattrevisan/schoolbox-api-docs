@@ -11,7 +11,7 @@ WHERE lct.type = 'Modules'
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'kami_worksheets_enabled',
-    '1',
+    '0',
     'Enable Kami Worksheets',
     "If toggled to 'ON', the Kami Worksheets will be available in Due Work. If toggled to 'OFF', it will be unavailable for all users.",
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
