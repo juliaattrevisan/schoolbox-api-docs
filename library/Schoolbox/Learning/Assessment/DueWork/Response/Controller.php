@@ -413,6 +413,15 @@ class Controller extends Base
      */
     public function postPollKamiDownload(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null): void
     {
+        // check if we have a kami job reference
+        // if no reference spawn a job
+        // else check job
+        // respond with correct status code
+        // Respond with code:
+        // * 200 if complete
+        // * 202 if still processing (this tells polling process to try again)
+        // * 400 if failed
+
         /**
          * use the kami export system to attempt a download of a kami doc to either
          * we have 2 actions to download to a kami file as PDF;

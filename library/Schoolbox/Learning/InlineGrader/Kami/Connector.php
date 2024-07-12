@@ -939,5 +939,44 @@ class Connector implements IConnector
             delay: 5,
             maxRequeues: 10,
         );
+
+        $route = $this->routeGenerator->generate(
+            'learnosity.postPollQuizAttemptStatus',
+            [
+                'assessmentId'               => $assessment->getId(),
+                'studentId'                  => $existingAttempt->getUser()->getId(),
+                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
+            ]
+        );
+
+        /* Update schoolbox when we're done
+         */
+        $callbackUrl = $this->routeGenerator->generate(
+            'learnosity.postRescoreAttemptsCallback',
+            [
+                'assessmentId'               => $assessment->getId(),
+                'studentId'                  => $existingAttempt->getUser()->getId(),
+                'learnositySessionReference' => $existingAttempt->getLearnosityReference(),
+            ]
+        );
+
+        $message = $this->messageFactory
+            ->setUser($user)
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $this->baseUrl->withPath($route),
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->setCallbackUrl((string)$this->baseUrl->withPath($callbackUrl))
+            ->build();
+
+        $this->messageProducer->send(
+            $message,
+            delay: 5,
+            maxRequeues: 10,
+        );
     }
 }
