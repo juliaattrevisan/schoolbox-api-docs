@@ -13,7 +13,6 @@ use Schoolbox\Admin\Settings\IFieldValueSerializer;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /**
      * @inheritdoc
      */

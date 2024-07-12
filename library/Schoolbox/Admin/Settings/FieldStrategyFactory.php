@@ -18,7 +18,6 @@ use UnexpectedValueException;
 
 class FieldStrategyFactory
 {
-
     /** @var MapperFactory */
     private $mapperFactory;
 

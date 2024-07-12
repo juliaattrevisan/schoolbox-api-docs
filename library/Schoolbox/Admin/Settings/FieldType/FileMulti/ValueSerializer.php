@@ -13,7 +13,6 @@ use Schoolbox\Admin\Settings\FieldType\File;
 
 class ValueSerializer extends File\ValueSerializer
 {
-
     /**
      * @inheritdoc
      */

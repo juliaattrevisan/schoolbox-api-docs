@@ -14,7 +14,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /** @var CollectorFactory */
     private $collectorFactory;
 

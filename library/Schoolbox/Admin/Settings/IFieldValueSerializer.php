@@ -16,7 +16,6 @@ use Schoolbox\Config\Config;
  */
 interface IFieldValueSerializer
 {
-
     /**
      * @param mixed $value
      * @param Config $config
