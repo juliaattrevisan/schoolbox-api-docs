@@ -32,8 +32,8 @@ const props = withDefaults(defineProps<Props>(), {
  */
 const queryWordList = window.Vue.computed(() => {
     const queryTrimmed = props.query.trim(); // remove any front or back white space
-    const regularExpression = /\s*(?:,|$)\s*/; // adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
-    const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a comma separated list
+    const regularExpression = /[^a-zA-Z0-9]+/; // match any non-alphanumeric characters
+    const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a list of words
     return commaSeparated.filter((word) => word.length > 0); // and ensure each contains a character
 });
 
