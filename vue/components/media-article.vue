@@ -24,6 +24,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const articleEl = window.Vue.ref<HTMLElement | null>(null);
 
+const allowedAttributes = {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    oembed: ["url"],
+};
+
 /**
  * Ensure any content within it with the
  * `data-schoolboxresource-type` attribute will have the appropriate media
@@ -54,6 +59,7 @@ function initIframely() {
 window.Vue.onMounted(() => {
     initMediaElementPlayer();
     initIframely();
+    console.warn(sanitizeHtml.defaults);
 });
 </script>
 
@@ -68,7 +74,8 @@ window.Vue.onMounted(() => {
         :data-test="props.dataTest ? props.dataTest : undefined"
         v-html="
             sanitizeHtml(props.content, {
-                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed', 'iframe']),
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed']),
+                allowedAttributes,
             })
         "
     ></component>
