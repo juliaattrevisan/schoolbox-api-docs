@@ -132,6 +132,10 @@ export default {
         this.isAccepted = checks.isAccepted;
         this.isDeclined = checks.isDeclined;
         this.isLimitedAttendance = checks.isLimitedAttendance;
+        this.FORMAT_LONG_DATE = FORMAT_LONG_DATE;
+        this.FORMAT_LONG_DATE_WITH_TIME = FORMAT_LONG_DATE_WITH_TIME;
+        this.FORMAT_DATE_ONLY = FORMAT_DATE_ONLY;
+        this.FORMAT_TIME_ONLY = FORMAT_TIME_ONLY;
     },
 
     methods: {
@@ -512,21 +516,21 @@ export default {
                     <h2 class="subheader">Date and Time</h2>
                     <p class="event-datetime-display">
                         <template v-if="event.options.allDay">{{
-                            window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY")
+                            window.dayjs(event.dates.start).format(FORMAT_LONG_DATE)
                         }}</template>
                         <template
                             v-else-if="
-                                window.dayjs(event.dates.start).format('MM-DD-YYYY') ===
-                                window.dayjs(event.dates.end).format('MM-DD-YYYY')
+                                window.dayjs(event.dates.start).format(FORMAT_DATE_ONLY) ===
+                                window.dayjs(event.dates.end).format(FORMAT_DATE_ONLY)
                             "
                         >
-                            {{ window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY") }}<br />{{
-                                window.dayjs(event.dates.end).format("h:mma")
+                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE) }}<br />{{
+                                window.dayjs(event.dates.end).format(FORMAT_TIME_ONLY)
                             }}
                         </template>
                         <template v-else>
-                            {{ window.dayjs(event.dates.start).format("dddd, MMMM DD, YYYY h:mma") }} -
-                            {{ window.dayjs(event.dates.end).format("dddd, MMMM DD, YYYY h:mma") }}
+                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE_WITH_TIME) }} -
+                            {{ window.dayjs(event.dates.end).format(FORMAT_LONG_DATE_WITH_TIME) }}
                         </template>
                     </p>
                     <div v-if="event.location">
