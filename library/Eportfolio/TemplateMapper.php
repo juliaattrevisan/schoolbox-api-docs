@@ -11,9 +11,11 @@
 namespace Eportfolio;
 
 use Schoolbox;
+use Schoolbox\Mapper\Exception;
 
 /**
  * @method Template findById($identifierValue)
+ * @method Template createModel($idValue = null)
  */
 class TemplateMapper extends Schoolbox\Mapper
 {
@@ -28,6 +30,7 @@ class TemplateMapper extends Schoolbox\Mapper
         $this->hasModel(Template::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('layout', self::TYPE_INTEGER);
         $this->uses('left_column_width', self::TYPE_DECIMAL);
         $this->uses('right_column_width', self::TYPE_DECIMAL);
     }
@@ -94,5 +97,32 @@ class TemplateMapper extends Schoolbox\Mapper
                 }
             }
         }
+    }
+
+    /**
+     * Deletes a component instance and its config in a single call
+     *
+     * @param Template $object
+     * @return bool
+     * @throws Exception
+     */
+    public function delete($object)
+    {
+
+        /* Deletes all config instances related to this eportfolio template */
+        $query = "DELETE ci, cci FROM component_instance ci
+                  LEFT JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+                  WHERE ci.module = :module
+                  AND identifier = :identifier";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(
+            array(
+                'module'     => 'eportfolio_template',
+                'identifier' => $object->getId(),
+            )
+        );
+
+        return parent::delete($object);
     }
 }

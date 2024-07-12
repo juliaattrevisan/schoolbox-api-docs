@@ -39,8 +39,8 @@ $this->setBlock('content', 'component', 'component_block');
     ->generateBreadcrumbsHtml($this, '/adminv2/eportfolio');
 
 // Get list of templates
-$templateHandler = new EportfolioTemplate();
-$templateList    = $templateHandler->getAll('name') ?: [];
+$eportfolioTemplateMapper = \Eportfolio\TemplateMapper::getInstance();
+$templateList    = $eportfolioTemplateMapper->findAll(['order' => ['name' => 'asc']]);
 if (count($templateList)) {
     $this->parse('content_block', 'content', true);
     $this->setVar('empty_block', '');
@@ -54,8 +54,8 @@ if (count($templateList)) {
 foreach ($templateList as $template) {
     $this->setVar(
         [
-            'template.id'   => $template['id'],
-            'template.name' => $template['name'],
+            'template.id'   => $template->getId(),
+            'template.name' => $template->getName(),
         ]
     );
     $this->parse('template_block', 'template', true);
@@ -65,7 +65,7 @@ foreach ($templateList as $template) {
 $componentFactory     = new Component_Eportfolio_Factory($this->getDi()->get('session')->get('user'), $this, true);
 $occupiedPositionList = [];
 $componentCounts      = [];
-foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $component) {
+foreach ($componentFactory->buildComponentList($templateList->first()->getId()) as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_id   = $component->getInstance()->getId();
     $position_no   = $component->getInstance()->getPosition();

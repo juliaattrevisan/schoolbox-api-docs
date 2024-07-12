@@ -61,16 +61,15 @@ switch ($action) {
 
 
 // if we're here, all above is valid
+$homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
 
 if ($action == 'delete') {
-    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
     try {
         $homepageTemplate = $homepageTemplateMapper->findById($templateID);
         $homepageTemplateMapper->delete($homepageTemplate);
     } catch (Schoolbox\Mapper\Exception $e) {
     }
 } elseif ($action == 'rename') {
-    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
     $homepageTemplate = $homepageTemplateMapper->findById($templateID);
     $homepageTemplate->setName($name);
 
@@ -80,12 +79,13 @@ if ($action == 'delete') {
         throw new SchoolboxException($e->getMessage(), 0, $e);
     }
 } else {
-    $homepageTemplate = new \Schoolbox\Resource\HomepageTemplate();
+    $homepageTemplate = $homepageTemplateMapper->createModel();
     $homepageTemplate->setName($name)->setLeftColumnWidth(69.5)->setRightColumnWidth(29.5);
 
-    $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
     try {
         $homepageTemplateMapper->create($homepageTemplate);
+        // navigate to the new template
+        SitePage::localRedir(sprintf("/adminv2/homepage#%d", $homepageTemplate->getId()));
     } catch (UnexpectedValueException $e) {
         throw new SchoolboxException($e->getMessage(), 0, $e);
     }

@@ -12,7 +12,6 @@ namespace Eportfolio;
 
 class Template
 {
-
     /**
      * The primary key
      *
@@ -41,6 +40,12 @@ class Template
      */
     private $rightColumnWidth;
 
+    /**
+     * TODO: Is this even used?
+     * @var int|null
+     */
+    private ?int $layout;
+
     /* Getters/Setters
      */
 
@@ -48,10 +53,12 @@ class Template
      * Set id
      *
      * @param int $id
+     * @return self
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -68,10 +75,12 @@ class Template
      * Set left column width
      *
      * @param float $leftColumnWidth
+     * @return self
      */
-    public function setLeftColumnWidth($leftColumnWidth)
+    public function setLeftColumnWidth($leftColumnWidth): self
     {
         $this->leftColumnWidth = $leftColumnWidth;
+        return $this;
     }
 
     /**
@@ -88,10 +97,12 @@ class Template
      * Set name
      *
      * @param string $name
+     * @return self
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -108,10 +119,12 @@ class Template
      * Set right column width
      *
      * @param string $rightColumnWidth
+     * @return self
      */
-    public function setRightColumnWidth($rightColumnWidth)
+    public function setRightColumnWidth($rightColumnWidth): self
     {
         $this->rightColumnWidth = $rightColumnWidth;
+        return $this;
     }
 
     /**
@@ -122,5 +135,23 @@ class Template
     public function getRightColumnWidth()
     {
         return $this->rightColumnWidth;
+    }
+
+    /**
+     * @param int|null $layout
+     * @return self
+     */
+    public function setLayout(?int $layout): self
+    {
+        $this->layout = $layout;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLayout(): ?int
+    {
+        return $this->layout;
     }
 }
