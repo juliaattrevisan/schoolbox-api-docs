@@ -65,6 +65,10 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function ($params): int {
+                    if (isset($params['folderId'])) {
+                        return $params['folderId'];
+                    }
+
                     return $params['folder']->getId();
                 },
                 Access::getInstance()
