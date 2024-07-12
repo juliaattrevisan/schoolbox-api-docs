@@ -13,6 +13,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    content: "",
     dataTest: undefined,
     tag: "article",
 });

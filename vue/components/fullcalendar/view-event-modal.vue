@@ -2,6 +2,7 @@
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import MetaList from "@schoolboxVue/components/meta/list";
 import MetaItem from "@schoolboxVue/components/meta/item";
+import MediaArticle from "@schoolboxVue/components/media-article";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
@@ -55,6 +56,7 @@ export default {
         MetaItem,
         MetaList,
         RevealModal,
+        MediaArticle,
     },
 
     mixins: [fullCalendarHelper],
@@ -917,8 +919,7 @@ export default {
                     >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
                 >
             </meta-list>
-            <!-- eslint-disable-next-line vue/no-v-html | textboxes scrubbed -->
-            <article v-html="eventExtendedProps.detail"></article>
+            <media-article :content="eventExtendedProps.detail"></media-article>
 
             <template v-if="eventExtendedProps.booking.related.length">
                 <h3>Related Bookings</h3>
