@@ -36,7 +36,8 @@ ALTER TABLE project_result DROP KEY project_id_user_id;
 ALTER TABLE project_result DROP KEY project_id_user_id_marker_id;
 
 # Deprecate project_id
-ALTER TABLE project_result CHANGE project_id _project_id int(11) NOT NULL;
+# (note must allow nulls and set default value too so that existing insert queries will not fail)
+ALTER TABLE project_result CHANGE project_id _project_id int(11) DEFAULT NULL;
 
 # Create project_result.assessment_id
 ALTER TABLE project_result ADD COLUMN assessment_id int(10) unsigned NOT NULL AFTER id;
