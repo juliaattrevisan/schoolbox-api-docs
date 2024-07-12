@@ -312,6 +312,9 @@ class ListController extends Web\Controller\Base
                 $assessmentInfo['relocated'],
                 true
             ));
+        } catch (InvalidArgumentException $e) {
+            $this->sendError('Course and/or units were invalid; they might have been deleted.', [], 400, $e->getCode());
+            return;
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
@@ -667,6 +670,11 @@ class ListController extends Web\Controller\Base
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+        } catch (\InvalidArgumentException $e) {
+            /* InvalidArgumentException is thrown when a valid context is missing
+             * such as it's been deleted, never existed, or bad data
+             */
+            throw $e;
         } catch (\Exception $e) {
             $db->rollback();
             // cast
