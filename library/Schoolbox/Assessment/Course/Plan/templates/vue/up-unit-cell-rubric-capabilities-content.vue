@@ -27,11 +27,11 @@ defineExpose({ isEmpty });
         <tbody>
             <template v-for="capability in props.rubricCapabilities" :key="capability.id">
                 <tr>
-                    <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, is wrapped in <p></p> -->
+                    <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                     <th class="markdown border-none" v-html="capability.name"></th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                    <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, is wrapped in <p></p> -->
+                    <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
                     <td class="markdown border-none" v-html="indicator.name"></td>
                 </tr>
             </template>

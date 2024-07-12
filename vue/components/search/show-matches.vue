@@ -9,7 +9,7 @@ interface Props {
     tag: string; // the element to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
-    isSearching?: boolean; // whether the search is currently active
+    isSearching?: boolean; // whether the search is currently active, if not we don't need to use v-html
     href?: string | undefined; // the href to navigate to
     class?: string | undefined; // the classes to apply to the elements
     title?: string | undefined; // the title to display
