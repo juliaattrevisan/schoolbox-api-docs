@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Module\Registry;
 use Alaress\Web;
+use Alaress\Web\Controller\Exception;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use DomainException;
@@ -36,6 +37,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
@@ -274,14 +276,14 @@ class ListController extends Web\Controller\Base
      * Create a new assessment in the given context
      *
      * @api   POST /learning/{:contextType}/{:contextId}/assessments
-     * @since 165
-     *
      * @param AssessmentContext $context
-     * @throws LogicException
-     * @throws Mapper\DefinitionException
+     * @throws ContainerExceptionInterface
+     * @throws Deleted
+     * @throws MapperException
+     * @throws NotFoundExceptionInterface
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
-     * @throws Web\Controller\Exception
+     * @throws Exception
+     * @since 165
      */
     public function postCreateAssessment(AssessmentContext $context)
     {
@@ -608,6 +610,9 @@ class ListController extends Web\Controller\Base
      * @param array|Traversable $postData
      * @param IAssessable|null  $assessment
      * @return array
+     * @throws MapperException
+     * @throws Deleted
+     * @throws DomainException
      */
     protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
     {
