@@ -25,6 +25,12 @@
 {% set readonly = interactionLocked and not USER.superUser %}
 
 {% block headerOptions %}
+    {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
+        <li>
+            <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">View Worksheets</a>
+        </li>
+    {% endif %}
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
