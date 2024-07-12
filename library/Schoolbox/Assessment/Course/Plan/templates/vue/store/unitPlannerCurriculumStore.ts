@@ -150,7 +150,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             });
 
             if (!configResponse.ok) {
-                throw new Error(await extractErrorMessage(createResponse));
+                throw new Error(await extractErrorMessage(configResponse));
             }
 
             const newComponent: CurriculumOverviewComponent = {

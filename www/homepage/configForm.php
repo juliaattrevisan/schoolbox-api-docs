@@ -141,7 +141,12 @@ if (is_numeric($_REQUEST['cid'])) {
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-            $folder                          = $folderMapper->findById($config['cid']);
+            try {
+                $folder                          = $folderMapper->findById($config['cid']);
+            } catch (Schoolbox\Mapper\Exception $e) {
+                $page->outputJson('folder was deleted or does not exist', false, 400);
+                return;
+            }
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
                 'component_definition_id',
