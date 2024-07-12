@@ -68,7 +68,7 @@ window.Vue.onMounted(() => {
         :data-test="props.dataTest ? props.dataTest : undefined"
         v-html="
             sanitizeHtml(props.content, {
-                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed']),
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed', 'iframe']),
             })
         "
     ></component>
