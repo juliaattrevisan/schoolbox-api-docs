@@ -212,7 +212,11 @@ window.Vue.onBeforeUnmount(async () => {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <media-article tag="div" :content="props.question.metadata.sample_answer"></media-article>
+                    <media-article
+                        tag="div"
+                        :content="props.question.metadata.sample_answer"
+                        :sanitize="true"
+                    ></media-article>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--

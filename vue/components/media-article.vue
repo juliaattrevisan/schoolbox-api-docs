@@ -12,6 +12,7 @@ interface Props {
     tag?: string; // when you wish to use a different tag than article
     id?: string; // the id of the element
     class?: string; // the classes to apply to the element
+    sanitize?: boolean; // the sanitizeHtml function to use
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,14 +21,26 @@ const props = withDefaults(defineProps<Props>(), {
     tag: "article",
     id: undefined,
     class: undefined,
+    sanitize: undefined,
 });
 
 const articleEl = window.Vue.ref<HTMLElement | null>(null);
 
-const allowedAttributes = {
-    ...sanitizeHtml.defaults.allowedAttributes,
-    oembed: ["url"],
-};
+/**
+ * Get the content to display, optionally sanitising it.
+ * Currently sanitizeHtml is only used for:
+ * library/Schoolbox/Learning/Learnosity/templates/vue/student/student-item-question-display.vue
+ * As this is coming from Learnosity directly to the front-end
+ * @returns {string} the content to display
+ */
+function getContent() {
+    if (props.sanitize) {
+        return sanitizeHtml(props.content, {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]), // allow img tags
+        });
+    }
+    return props.content;
+}
 
 /**
  * Ensure any content within it with the
@@ -47,7 +60,7 @@ function initMediaElementPlayer() {
  */
 function initIframely() {
     articleEl.value
-        ?.querySelectorAll("oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))")
+        ?.querySelectorAll("oembed[url]:not(:has(iframe)), div[data-oembed-url]:not(:has(iframe))")
         .forEach((oEmbedEl) => {
             window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
         });
@@ -59,7 +72,6 @@ function initIframely() {
 window.Vue.onMounted(() => {
     initMediaElementPlayer();
     initIframely();
-    console.warn(sanitizeHtml.defaults);
 });
 </script>
 
@@ -72,12 +84,7 @@ window.Vue.onMounted(() => {
         ref="articleEl"
         :class="props.class ? props.class : undefined"
         :data-test="props.dataTest ? props.dataTest : undefined"
-        v-html="
-            sanitizeHtml(props.content, {
-                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'oembed']),
-                allowedAttributes,
-            })
-        "
+        v-html="getContent()"
     ></component>
     <!-- eslint-enable vue/no-v-html -->
     <!-- eslint-enable vue/no-v-text-v-html-on-component -->
