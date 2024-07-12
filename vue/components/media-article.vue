@@ -6,6 +6,8 @@
  * player applied to it if it's not applied already.
  */
 
+import sanitizeHtml from "sanitize-html";
+
 interface Props {
     content: string; // the content to display
     dataTest?: string; // the data-test attribute
@@ -39,7 +41,11 @@ window.Vue.onMounted(() => {
         :is="props.tag"
         ref="articleEl"
         :data-test="props.dataTest ? props.dataTest : undefined"
-        v-html="props.content"
+        v-html="
+            sanitizeHtml(props.content, {
+                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+            })
+        "
     ></component>
     <!-- eslint-enable vue/no-v-html -->
     <!-- eslint-enable vue/no-v-text-v-html-on-component -->
