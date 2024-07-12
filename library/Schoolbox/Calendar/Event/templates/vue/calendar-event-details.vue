@@ -524,9 +524,10 @@ export default {
                                 window.dayjs(event.dates.end).format(FORMAT_DATE_ONLY)
                             "
                         >
-                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE) }}<br />{{
-                                window.dayjs(event.dates.end).format(FORMAT_TIME_ONLY)
-                            }}
+                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE) }}<br />
+                            {{ window.dayjs(event.dates.start).format(FORMAT_TIME_ONLY) }}
+                            -
+                            {{ window.dayjs(event.dates.end).format(FORMAT_TIME_ONLY) }}
                         </template>
                         <template v-else>
                             {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE_WITH_TIME) }} -
