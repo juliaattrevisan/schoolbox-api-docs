@@ -437,6 +437,11 @@ class Module extends BaseModule
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
+        } catch (MapperException\Deleted $e) {
+            throw new MapperException\Deleted(
+                'Sorry, the activity could not be updated. Please ensure the activity ' .
+                'still exists and contact your support if the problem persists.'
+            );
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);

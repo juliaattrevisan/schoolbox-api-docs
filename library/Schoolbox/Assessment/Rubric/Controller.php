@@ -441,7 +441,15 @@ class Controller extends BaseController
 
 
         // Load the current assessment and grid
-        $currentAssessment = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        try {
+            $currentAssessment = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            $this->sendError(
+                "Sorry, the activity could not be updated. Please ensure the " .
+                "activity still exists and contact your support if the problem persists."
+            );
+            return;
+        }
         if (!$currentAssessment instanceof DueWork) {
             $this->sendError('Can only determine mark invalidation for due work');
             return;

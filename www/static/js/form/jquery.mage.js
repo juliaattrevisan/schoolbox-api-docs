@@ -395,7 +395,12 @@ import { getLoadedHTML } from "@js/util/domUtils";
                 // send it off
                 xhrSend.call(self, method, action, target);
             },
-            function () {
+            function (xhr = null) {
+                //Rejected promise should display the error if given
+                if (null !== xhr) {
+                    const errorMessage = parseError(xhr, self);
+                    xhrFail.call(self, self.options.onXhrFail, self.findSubmittable(elem), errorMessage);
+                }
                 // Re-enable form and remove "loading" text if Promise is rejected
                 xhrAfter.call(self);
             }
@@ -486,12 +491,8 @@ import { getLoadedHTML } from "@js/util/domUtils";
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
             .fail(function (xhr /*, status, error*/) {
-                xhrFail.call(
-                    mage,
-                    mage.options.onXhrFail,
-                    targetElement,
-                    parseJSON(xhr.responseText) || mage.options.defaultErrorMessage
-                );
+                const errorMessage = parseError(xhr, mage);
+                xhrFail.call(mage, mage.options.onXhrFail, targetElement, errorMessage);
             })
             .always(function (/*xhrOrData, status, xhrOrError*/) {
                 xhrAlways.call(mage, mage.options.onXhrAlways);
@@ -537,6 +538,30 @@ import { getLoadedHTML } from "@js/util/domUtils";
             // ...otherwise, just throw back whatever we were passed
             return ambiguousData;
         }
+    }
+
+    /**
+     * Attempt to extract the error message from object
+     *
+     * @param xhr
+     * @param mage
+     * @returns {Object|String}
+     */
+    function parseError(xhr, mage) {
+        let jsonResponse = parseJSON(xhr.responseText) || mage.options.defaultErrorMessage;
+
+        //Exit early if it's not able to process further
+        if (!(jsonResponse instanceof Object)) {
+            return jsonResponse;
+        }
+
+        // Check if the object has already been deleted
+        if (410 === xhr.status) {
+            if (jsonResponse.hasOwnProperty("error")) {
+                return jsonResponse.error;
+            }
+        }
+        return jsonResponse;
     }
 
     /**
