@@ -22,5 +22,6 @@ WHERE name IN (
     'eotc_enabled',
     'fixtures_enabled',
     'qr_login_enabled',
-    'summative_report_enabled'
+    'summative_report_enabled',
+    'kami_worksheets_enabled'
 );
