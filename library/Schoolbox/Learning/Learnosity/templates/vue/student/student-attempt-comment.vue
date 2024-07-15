@@ -124,10 +124,9 @@ window.Vue.onUnmounted(async () => {
             >
                 <em>No comment added.</em>
             </p>
-            <div
-                v-else-if="props.isReadOnly && props.student.attemptComment.comment !== ''"
-                v-html="props.student.attemptComment.comment"
-            ></div>
+            <p v-else-if="props.isReadOnly && props.student.attemptComment.comment !== ''">
+                {{ props.student.attemptComment.comment }}
+            </p>
             <template v-else>
                 <label :for="editorId">Comment</label>
                 <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>

@@ -194,9 +194,7 @@ export default {
                                 </p>
 
                                 <!-- Display evidence body, with media players initialised -->
-                                <media-article v-if="evidence.body">
-                                    <div v-html="evidence.body" />
-                                </media-article>
+                                <media-article v-if="evidence.body" :content="evidence.body"></media-article>
                             </section>
                         </div>
 

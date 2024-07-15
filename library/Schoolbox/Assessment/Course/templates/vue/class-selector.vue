@@ -453,7 +453,7 @@ function onClearAllSelected() {
                             :result="result"
                             :is-all-results-selected="isAllResultsSelected"
                             :is-some-results-selected="isSomeResultsSelected"
-                            :query-word-list="queryWordList"
+                            :query="query"
                             @select="onSelectResult"
                         />
                     </li>

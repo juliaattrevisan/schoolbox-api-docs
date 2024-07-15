@@ -5,6 +5,7 @@
 
 import { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
+import SpResultsResultImageWrapper from "./sp-results-result-image-wrapper.vue";
 
 interface Props {
     result: Result; // the result to display
@@ -27,21 +28,6 @@ const isImgRounded = window.Vue.computed(() => {
     }
     return false;
 });
-
-/**
- * Get the image or icon, to avoid repeating in the template
- * @returns {string} the image or icon as html
- */
-function getImg() {
-    if (props.result.image) {
-        return `<img
-                    src="${props.result.image}"
-                    :alt="Photo of ${props.result.title}"
-                    title="${props.result.typeTitle}"
-                />`;
-    }
-    return `<div class="icon icon-${props.result.icon as string}" title="${props.result.typeTitle}"></div>`;
-}
 </script>
 
 <template>
@@ -51,13 +37,13 @@ function getImg() {
             href="#open-badge-modal"
             @click.prevent="emit('badgeSelected', props.result)"
         >
-            <div class="c-img__wrapper" v-html="getImg()"></div>
+            <sp-results-result-image-wrapper :result="props.result" />
         </a>
         <a v-else-if="props.result.url" :href="props.result.url">
-            <div class="c-img__wrapper" v-html="getImg()"></div>
+            <sp-results-result-image-wrapper :result="props.result" />
         </a>
         <div v-else>
-            <div class="c-img__wrapper" v-html="getImg()"></div>
+            <sp-results-result-image-wrapper :result="props.result" />
         </div>
     </div>
 </template>

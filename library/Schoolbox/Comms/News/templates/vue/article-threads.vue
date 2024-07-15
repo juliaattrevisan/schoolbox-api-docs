@@ -249,7 +249,7 @@ export default {
                 .delete(
                     "/discussion/comms/" + this.articleId + "/comments/" + commentIdToDelete,
                     {},
-                    { headers: this.postHeaders }
+                    { headers: this.postHeaders },
                 )
                 .then(() => {
                     this.comments.splice(this.commentIndexToDelete, 1);
@@ -378,7 +378,7 @@ export default {
                                     title="Delete comment"
                                 ></a>
                             </nav>
-                            <media-article v-html="comment.content"></media-article>
+                            <media-article :content="comment.content"></media-article>
                         </li>
                     </ul>
                     <button v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">

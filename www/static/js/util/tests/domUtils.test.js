@@ -1,4 +1,4 @@
-import { getIndex, removeAllFromElement, hideAllChildren } from "../domUtils";
+import { getIndex, removeAllFromElement, hideAllChildren, addMarks } from "../domUtils";
 
 describe("getIndex()", () => {
     test("first child to return an index of 1", () => {
@@ -81,5 +81,34 @@ describe("hideAllChildren()", () => {
         hideAllChildren(div);
         expect(firstChild.style.display).toBe("none");
         expect(thirdChild.style.display).toBe("none");
+    });
+});
+
+describe("addMarks()", () => {
+    test("no marks added", () => {
+        const marksAdded = addMarks("this is a test", ["apple", "pear"]);
+        expect(marksAdded).toBe("this is a test");
+    });
+
+    test("single mark added", () => {
+        const marksAdded = addMarks("this is a test", ["test"]);
+        expect(marksAdded).toBe("this is a <mark>test</mark>");
+    });
+
+    test("single mark added", () => {
+        const marksAdded = addMarks("this is a test", ["test", "test"]);
+        expect(marksAdded).toBe("this is a <mark>test</mark>");
+    });
+
+    test("two marks added", () => {
+        const marksAdded = addMarks("this is a test", ["this", "test"]);
+        expect(marksAdded).toBe("<mark>this</mark> is a <mark>test</mark>");
+    });
+
+    test("tags to be escaped", () => {
+        const marksAdded = addMarks("<a onmouseover='alert(document.domain)'>Mouse over this</a>", ["this"]);
+        expect(marksAdded).toBe(
+            "&lt;a onmouseover=&#39;alert(document.domain)&#39;&gt;Mouse over <mark>this</mark>&lt;/a&gt;",
+        );
     });
 });

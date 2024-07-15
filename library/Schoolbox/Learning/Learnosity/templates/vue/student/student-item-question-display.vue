@@ -3,10 +3,10 @@
  * Contains a students response to a question and will save the score if updated
  */
 
-import sanitizeHtml from "sanitize-html";
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { removeClasses } from "@js/util/cssUtils";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
@@ -93,7 +93,7 @@ async function saveScore() {
         const formData = new FormData();
         formData.append(
             "learnosityReference",
-            (props.question.response as StudentItemQuestionResponse).learnosityReference
+            (props.question.response as StudentItemQuestionResponse).learnosityReference,
         );
         formData.append("score", score.value);
         const response = await fetch(props.student.urls.score, {
@@ -151,7 +151,7 @@ watchDebounced(
         }
         void saveScore();
     },
-    { debounce: 300 }
+    { debounce: 300 },
 );
 
 /**
@@ -179,12 +179,12 @@ window.Vue.onMounted(() => {
         // Find any oembeds and load them
         responsesEl.value
             ?.querySelectorAll(
-                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))"
+                "oembed[url]:not(:has(.iframely-embed)), div[data-oembed-url]:not(:has(.iframely-embed))",
             )
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
-                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url")
+                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
                 );
             });
     }
@@ -197,7 +197,7 @@ window.Vue.onMounted(() => {
 window.Vue.onBeforeUnmount(async () => {
     if (props.question.response) {
         const response = responsesEl.value?.querySelector(
-            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`
+            `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`,
         ) as HTMLDivElement;
         props.container.appendChild(response);
         await saveScore();
@@ -212,13 +212,11 @@ window.Vue.onBeforeUnmount(async () => {
             <template v-if="props.showFeedback">
                 <div v-if="props.question.metadata.sample_answer" class="f-no-margins">
                     <label>Sample answer</label>
-                    <div
-                        v-html="
-                            sanitizeHtml(props.question.metadata.sample_answer, {
-                                allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-                            })
-                        "
-                    ></div>
+                    <media-article
+                        tag="div"
+                        :content="props.question.metadata.sample_answer"
+                        :sanitize="true"
+                    ></media-article>
                 </div>
                 <div v-if="props.question.response?.maxScore" class="f-no-margins">
                     <!--

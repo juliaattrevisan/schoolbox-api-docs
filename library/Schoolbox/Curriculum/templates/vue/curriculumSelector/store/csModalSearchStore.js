@@ -42,18 +42,6 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         },
 
         /**
-         * the search string broken into words, to search for each word
-         *
-         * @returns { Array } the search string broken into single words
-         */
-        queryWordList() {
-            const queryTrimmed = this.query.trim(); //remove any front or back white space
-            const re = /\s*(?:,|$)\s*/; //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
-            const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
-            return commaSeparated.filter((word) => word.length > 0); //and ensure each contains a character
-        },
-
-        /**
          * To show that no nodes match the current search
          *
          * @return { Boolean }
@@ -86,7 +74,7 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                    }
+                    },
                 );
                 this.results = await response.json();
                 const selectedNodesStore = useSelectedNodesStore();

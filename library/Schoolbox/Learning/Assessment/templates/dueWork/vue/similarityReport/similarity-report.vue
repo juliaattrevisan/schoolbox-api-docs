@@ -285,24 +285,6 @@ export default {
         },
 
         /**
-         * Format the submission status display label
-         *
-         * @param { String }
-         *
-         * @return { String }
-         */
-        getFormattedStatus(status) {
-            const statusOptions = {
-                failed: '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
-                pending:
-                    '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
-                reviewed:
-                    '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
-            };
-            return statusOptions[status];
-        },
-
-        /**
          * to keep track of selected rows
          *
          * @param { Object }
@@ -342,7 +324,7 @@ export default {
                     fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
                         method: "POST",
                         body: this.getFormData(),
-                    })
+                    }),
                 );
             });
             return fetchList;
@@ -460,7 +442,20 @@ export default {
                 <template #status="props">
                     <div class="status title-on-single-column" data-title="Status">
                         <div class="status__column">
-                            <p class="meta" v-html="getFormattedStatus(props.row.submission.status)"></p>
+                            <p class="meta">
+                                <template v-if="props.row.submission.status === 'failed'">
+                                    <span class="progress-tick no-text tiny failed" title="Resubmission required"></span
+                                    ><span>Resubmission required</span>
+                                </template>
+                                <template v-else-if="props.row.submission.status === 'pending'">
+                                    <span class="progress-tick no-text tiny pending" title="Mark required"></span
+                                    ><span>Marking required</span>
+                                </template>
+                                <template v-else-if="props.row.submission.status === 'reviewed'">
+                                    <span class="progress-tick no-text tiny reviewed" title="Reviewed"></span
+                                    ><span>Reviewed</span>
+                                </template>
+                            </p>
                         </div>
                         <div class="status__column">
                             <a

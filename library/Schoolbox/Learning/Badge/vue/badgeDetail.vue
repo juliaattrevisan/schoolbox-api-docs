@@ -1,6 +1,7 @@
 <script>
 import BadgeImage from "./badge-image";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
+import MediaArticle from "@schoolboxVue/components/media-article";
 
 import { translateDaysToExpiryLabel } from "./expiry-helper";
 
@@ -8,6 +9,7 @@ export default {
     components: {
         BadgeImage,
         CodesList,
+        MediaArticle,
     },
     props: {
         /**
@@ -80,6 +82,6 @@ export default {
             Curriculum Codes:
             <codes-list :nodes="curriculumNodesWithCode" @selected="onCodeSelected" />
         </p>
-        <article v-if="badge.body" v-html="badge.body"></article>
+        <media-article v-if="badge.body" :content="badge.body"></media-article>
     </div>
 </template>

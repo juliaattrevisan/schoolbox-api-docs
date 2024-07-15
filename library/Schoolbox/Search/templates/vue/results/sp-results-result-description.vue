@@ -3,7 +3,7 @@
  * To display the search results description
  */
 
-import { addMarks } from "@js/util/domUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { Result } from "../../js/types/Result";
 import { useQueryStore } from "../store/spQueryStore";
 
@@ -17,8 +17,8 @@ const queryStore = useQueryStore();
 
 <template>
     <article>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <p v-html="addMarks(props.result.description as string, queryStore.queryWordList)"></p>
+        <!-- though this is CKEditor content, only text is returned in this context, so <media-article> is not required  -->
+        <show-matches tag="p" :text="props.result.description as string" :query="queryStore.activeQuery" />
     </article>
 </template>
 

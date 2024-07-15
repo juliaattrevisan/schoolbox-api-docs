@@ -293,7 +293,7 @@ export default {
                             </nav>
                             <media-article
                                 data-test="learning-moment-evidence-comment-thread-comment"
-                                v-html="comment.content"
+                                :content="comment.content"
                             ></media-article>
                         </li>
                     </ul>

@@ -31,18 +31,6 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     const filteredResults = window.Vue.computed(() => (isActive.value ? (results.value as Node[]) : []));
 
     /**
-     * the search string broken into words, to search for each word
-     *
-     * @returns { string[] } the search string broken into single words
-     */
-    const queryWordList = window.Vue.computed(() => {
-        const queryTrimmed = query.value.trim(); // remove any front or back white space
-        const regularExpression = /\s*(?:,|$)\s*/; // adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
-        const commaSeparated = queryTrimmed.split(regularExpression) ?? []; // split the string into a comma separated list
-        return commaSeparated.filter((word) => word.length > 0); // and ensure each contains a character
-    });
-
-    /**
      * To show that no nodes match the current search
      *
      * @returns { boolean }
@@ -75,7 +63,7 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                }
+                },
             );
             results.value = (await response.json()) as Node[];
         } catch (error) {
@@ -100,7 +88,6 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
         results,
         isActive,
         filteredResults,
-        queryWordList,
         hasNoResults,
         enableSearch,
         search,

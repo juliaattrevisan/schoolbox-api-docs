@@ -3,7 +3,7 @@
  * A single search result that can be selected / unselected with a checkbox status
  */
 
-import { addMarks } from "@js/util/domUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import type { Result } from "./types/Result";
 
 interface Props {
@@ -39,12 +39,16 @@ function onSelected() {
 
 <template>
     <button class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-if="props.isSingleSelect" v-html="addMarks(props.result.name, [props.query])"></span>
+        <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <label :for="`checkbox-${result.id}`" v-html="addMarks(props.result.name, [props.query])"></label>
+            <show-matches
+                v-if="props.isSingleSelect"
+                tag="label"
+                :for="`checkbox-${result.id}`"
+                :text="props.result.name"
+                :query="props.query"
+            />
         </div>
     </button>
 </template>

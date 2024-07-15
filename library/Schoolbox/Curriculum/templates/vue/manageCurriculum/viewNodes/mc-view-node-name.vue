@@ -4,7 +4,7 @@
  * will also highlight any matches in the current search query when search is active
  */
 
-import { escapeRegExp } from "@js/util/jsUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
 import { useSearchStore } from "../store/mcSearchStore";
@@ -119,60 +119,57 @@ function onNameSelected() {
         viewNodesStore.setNextSelected(props.node.id);
     }
 }
-
-/**
- * To highlight any search selections in the code / title
- *
- * @returns { string } - the highlighted title
- */
-const highlightTitleSearch = window.Vue.computed(() => {
-    if (searchStore.isActive) {
-        return highlightSearchInElement(props.title);
-    }
-    return props.title;
-});
-
-/**
- * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node
- *
- * @param { string } toHighlight - the string to find all instanced of the current search string in
- * @returns { string } string for v-html with <mark></mark> wrapped around each found result
- */
-function highlightSearchInElement(toHighlight: string) {
-    let highlighted = toHighlight;
-    searchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
-            return `<mark>${match}</mark>`;
-        });
-    });
-    return highlighted;
-}
 </script>
 
 <template>
-    <button
-        v-if="isButton"
-        class="button-name"
-        :title="`Expand ${props.title}`"
-        :disabled="isDisabled"
-        @click.prevent="onNameSelected"
-    >
-        <span v-html="highlightTitleSearch"></span>
-    </button>
-    <div v-else class="name">
-        <span v-html="highlightTitleSearch"></span>
+    <div class="name-container">
+        <show-matches
+            v-if="isButton"
+            tag="button"
+            class="button-name"
+            :title="`Expand ${props.title}`"
+            :disabled="isDisabled"
+            :text="props.title"
+            :query="searchStore.query"
+            :is-searching="searchStore.isActive"
+            @click="onNameSelected"
+        />
+        <show-matches
+            v-else
+            tag="span"
+            class="name"
+            :text="props.title"
+            :query="searchStore.query"
+            :is-searching="searchStore.isActive"
+        />
     </div>
 </template>
 
-<style lang="scss" scoped>
-@import "./style/mcViewNode";
+<style lang="scss">
+.name-container {
+    width: 100%;
+}
 
 .button-name {
-    @extend .button;
+    background: none;
+    font-size: 1rem;
+    margin: 0;
+    min-height: 42px;
+    min-width: 40px;
     padding-left: 0.25rem;
+    text-align: left;
     transition: background 0.2s;
     width: 100%;
+    &:hover {
+        background: var(--content-ui-background);
+    }
+    &:disabled {
+        opacity: 0.2;
+    }
+    @media (max-width: 700px) {
+        font-size: 0.8rem;
+        padding: 0.25rem;
+    }
 }
 
 .name {

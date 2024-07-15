@@ -1,5 +1,6 @@
 <script>
 import articleListMixin from "./article-list-mixin";
+import MediaArticle from "@schoolboxVue/components/media-article";
 
 export default {
     name: "layout-card",
@@ -18,7 +19,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: {},
+    components: { MediaArticle },
     data() {
         return {};
     },
@@ -133,15 +134,15 @@ export default {
                         </template>
                     </p>
 
-                    <article v-if="!isCompactMode" v-html="article.blurb"></article>
+                    <media-article v-if="!isCompactMode" :content="article.blurb"></media-article>
                 </div>
                 <div class="card-actions">
                     <template v-if="article.readMore.available">
                         <a
                             :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
-                            v-html="article.readMore.string"
                             class="article-read-more"
-                        ></a>
+                            >{{ article.readMore.string }}</a
+                        >
                     </template>
 
                     <div class="card-spacer"></div>

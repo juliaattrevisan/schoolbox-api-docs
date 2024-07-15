@@ -1,5 +1,6 @@
 <script>
 import AudiencesModal from "./audiences-modal";
+import MediaArticle from "@schoolboxVue/components/media-article";
 import debounce from "lodash/debounce";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
@@ -31,6 +32,7 @@ export default {
 
     components: {
         AudiencesModal,
+        MediaArticle,
         vSelect,
     },
 
@@ -76,25 +78,6 @@ export default {
         window: () => window,
         jQuery: () => window.jQuery,
 
-        dateTimeDisplay: function () {
-            if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
-
-            let startDate = dayjs(this.event.dates.start),
-                endDate = dayjs(this.event.dates.end);
-
-            if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
-                return (
-                    startDate.format(FORMAT_LONG_DATE) +
-                    "<br />" +
-                    startDate.format(FORMAT_TIME_ONLY) +
-                    " - " +
-                    endDate.format(FORMAT_TIME_ONLY)
-                );
-            }
-
-            return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + " - " + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
-        },
-
         monthDisplay: function () {
             return dayjs(this.event.dates.start).format("MMM");
         },
@@ -103,30 +86,14 @@ export default {
             return dayjs(this.event.dates.start).format("DD");
         },
 
-        byLine: function () {
-            if (this.event.author.id && this.event.author.fullName)
-                return (
-                    "By " + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + "</a>"
-                );
-            if (!this.event.author.id && this.data.author.fullName) return "By " + this.event.author.fullName;
-
-            return "";
-        },
-
         audiencesMeta: function () {
             let result = [],
                 campusCount = this.event.audiences.campus.length,
                 rolesCount = this.event.audiences.roles.length;
 
-            if (this.isPersonalEvent) return "Personal";
-            if (this.isGroupEvent)
-                return (
-                    '<a href="/homepage/' +
-                    this.event.audiences.folders[0].id +
-                    '">' +
-                    this.event.audiences.folders[0].name +
-                    "</a>"
-                );
+            if (this.isPersonalEvent || this.isGroupEvent) {
+                return true;
+            }
 
             if (campusCount) {
                 let suffix = campusCount > 1 ? " Campuses" : " Campus";
@@ -165,6 +132,10 @@ export default {
         this.isAccepted = checks.isAccepted;
         this.isDeclined = checks.isDeclined;
         this.isLimitedAttendance = checks.isLimitedAttendance;
+        this.FORMAT_LONG_DATE = FORMAT_LONG_DATE;
+        this.FORMAT_LONG_DATE_WITH_TIME = FORMAT_LONG_DATE_WITH_TIME;
+        this.FORMAT_DATE_ONLY = FORMAT_DATE_ONLY;
+        this.FORMAT_TIME_ONLY = FORMAT_TIME_ONLY;
     },
 
     methods: {
@@ -369,7 +340,7 @@ export default {
                     this.event.attendance.payload.currentUser.user.id,
                     this.currentAttendanceStatus,
                     this.numMax,
-                    this.numAvailable
+                    this.numAvailable,
                 ) ||
                 (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
                 (this.canModify() && !this.isAttendanceLevelNone()) ||
@@ -470,7 +441,7 @@ export default {
                     new URLSearchParams({
                         query: query,
                         groupID: 0,
-                    })
+                    }),
             )
                 .then((response) => response.json())
                 .then((data) => {
@@ -509,22 +480,33 @@ export default {
                     </div>
                 </div>
                 <div class="meta">
-                    <span v-html="byLine"></span>
+                    <span>
+                        <template v-if="event.author.id && event.author.fullName">
+                            By <a :href="`/search/user/${event.author.id}`">{{ event.author.fullName }}</a>
+                        </template>
+                        <template v-else-if="!event.author.id && data.author.fullName">
+                            By {{ event.author.fullName }}
+                        </template>
+                    </span>
                     <template v-if="audiencesMeta">
                         |
                         <span v-if="this.isCampusEvent"
                             ><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span
                         >
-                        <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
-                        <span v-else-if="this.isGroupEvent">
-                            <span v-html="audiencesMeta"></span>
+                        <span v-else-if="isPersonalEvent">Personal</span>
+                        <span v-else-if="isGroupEvent">
+                            <span>
+                                <a :href="`/homepage/${event.audiences.folders[0].id}`">{{
+                                    event.audiences.folders[0].name
+                                }}</a>
+                            </span>
                             <span v-if="this.event.audiences.folders.length > 1">
                                 and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span
                             >
                         </span>
                     </template>
                 </div>
-                <article v-html="this.event.detail"></article>
+                <media-article :content="event.detail"></media-article>
             </section>
         </div>
 
@@ -532,10 +514,29 @@ export default {
             <section class="detail">
                 <div class="content">
                     <h2 class="subheader">Date and Time</h2>
-                    <p class="event-datetime-display" v-html="dateTimeDisplay"></p>
-                    <div v-if="this.event.location">
+                    <p class="event-datetime-display">
+                        <template v-if="event.options.allDay">{{
+                            window.dayjs(event.dates.start).format(FORMAT_LONG_DATE)
+                        }}</template>
+                        <template
+                            v-else-if="
+                                window.dayjs(event.dates.start).format(FORMAT_DATE_ONLY) ===
+                                window.dayjs(event.dates.end).format(FORMAT_DATE_ONLY)
+                            "
+                        >
+                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE) }}<br />
+                            {{ window.dayjs(event.dates.start).format(FORMAT_TIME_ONLY) }}
+                            -
+                            {{ window.dayjs(event.dates.end).format(FORMAT_TIME_ONLY) }}
+                        </template>
+                        <template v-else>
+                            {{ window.dayjs(event.dates.start).format(FORMAT_LONG_DATE_WITH_TIME) }} -
+                            {{ window.dayjs(event.dates.end).format(FORMAT_LONG_DATE_WITH_TIME) }}
+                        </template>
+                    </p>
+                    <div v-if="event.location">
                         <h2 class="subheader">Location</h2>
-                        <p v-html="this.event.location"></p>
+                        <p>{{ event.location }}</p>
                     </div>
                 </div>
             </section>
@@ -550,7 +551,7 @@ export default {
                             this.event.attendance.payload.currentUser.user.id,
                             this.currentAttendanceStatus,
                             this.numMax,
-                            this.numAvailable
+                            this.numAvailable,
                         )
                     "
                 >

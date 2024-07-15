@@ -1,4 +1,5 @@
 <script>
+import MediaArticle from "@schoolboxVue/components/media-article";
 import articleListMixin from "./article-list-mixin";
 
 export default {
@@ -18,7 +19,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: {},
+    components: { MediaArticle },
     data() {
         return {};
     },
@@ -159,14 +160,13 @@ export default {
                     </p>
 
                     <article v-if="!isCompactMode">
-                        <div v-html="article.blurb"></div>
+                        <media-article tag="div" :content="article.blurb"></media-article>
 
                         <template v-if="article.readMore.available">
                             <div class="article-read-more">
-                                <a
-                                    :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
-                                    v-html="article.readMore.string"
-                                ></a>
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{
+                                    article.readMore.string
+                                }}</a>
                             </div>
                         </template>
                     </article>

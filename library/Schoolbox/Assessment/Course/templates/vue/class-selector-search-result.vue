@@ -6,7 +6,7 @@
  * results currently shown
  */
 
-import { escapeRegExp } from "@js/util/jsUtils";
+import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 
 const emit = defineEmits(["select"]);
 
@@ -34,35 +34,13 @@ const props = defineProps({
         required: true,
         default: false,
     },
-    queryWordList: {
-        //current word list in the query
-        type: Array,
+    query: {
+        // current search query
+        type: String,
         required: true,
-        default: [],
+        default: "",
     },
 });
-
-const highlightTitleSearch = window.Vue.computed(() => {
-    return highlightSearchInElement(props.result.name);
-});
-
-/**
- * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node
- *
- * @params { String } the string to find all instanced of the current search string in
- *
- * @returns { String } string for v-html with <mark></mark> wrapped around each found result
- */
-function highlightSearchInElement(toHighlight) {
-    let highlighted = toHighlight;
-    props.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, "ig"), (match) => {
-            return `<mark>${match}</mark>`;
-        });
-    });
-    return highlighted;
-}
 
 /**
  * To determine the check display of the checkbox
@@ -87,7 +65,7 @@ function onSelect() {
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
-        <span v-html="highlightTitleSearch"></span>
+        <show-matches tag="span" :text="props.result.name" :query="props.query" />
     </button>
 </template>
 
