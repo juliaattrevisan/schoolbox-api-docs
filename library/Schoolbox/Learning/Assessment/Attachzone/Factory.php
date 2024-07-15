@@ -182,12 +182,23 @@ class Factory
             ->setMulti(true)
             ->setAttachmentsLabel('');
 
+        $files = [];
+
         if ($feedback instanceof Feedback) {
             /* Sort files alphabetically
              */
             $feedback->getAllFiles()->sortBy('filename', 'asc');
 
-            $zone->attachFiles($feedback->getAllFiles());
+            foreach ($feedback->getAllFiles() as $file) {
+                /* Ignore accumulation of:
+                 * kami worksheets
+                 */
+                if (!$file->getIsWorksheet()) {
+                    $files[] = $file;
+                }
+            }
+
+            $zone->attachFiles($files);
         }
         return $zone;
     }
