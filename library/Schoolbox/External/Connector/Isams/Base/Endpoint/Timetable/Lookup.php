@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
@@ -114,13 +115,14 @@ class Lookup
      */
     private function initPeriodLookup(): array
     {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $timetableCycleTable = TimetableCycleMapper::getInstance()->getTable();
+        $periodStatement     = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT
                 cycle.cycle_identifier,
                 period.day, period.id, period.title
-            FROM sis_timetable_cycle cycle
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-        ');
+            FROM {$timetableCycleTable} cycle
+            LEFT JOIN {$this->timetablePeriodMapper->getTable()} period ON cycle.id = period.cycle_id
+        ");
 
         $periods = [];
 
