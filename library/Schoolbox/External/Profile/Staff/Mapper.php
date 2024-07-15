@@ -56,7 +56,7 @@ class Mapper extends \Schoolbox\Mapper
     protected function getSelectString(): string
     {
         return "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('baseProfile', 'bp')}
         ";
@@ -115,9 +115,9 @@ class Mapper extends \Schoolbox\Mapper
     public function findByExternalId(string $externalId): Model
     {
         $query = "
-            SELECT * 
+            SELECT *
             FROM {$this->getTable()} staff
-            INNER JOIN sis_user_profile profile ON staff.sis_user_profile_id = profile.id
+            INNER JOIN {$this->getJoinMapper('baseProfile')->getTable()} profile ON staff.sis_user_profile_id = profile.id
             WHERE profile.external_id = :externalId
         ";
 
@@ -156,7 +156,7 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
             SELECT external_id
             FROM {$this->getTable()} staff
-            INNER JOIN sis_user_profile profile ON staff.sis_user_profile_id = profile.id
+            INNER JOIN {$this->getJoinMapper('baseProfile')->getTable()} profile ON staff.sis_user_profile_id = profile.id
         ";
 
         $statement = $this->database->prepare($query);

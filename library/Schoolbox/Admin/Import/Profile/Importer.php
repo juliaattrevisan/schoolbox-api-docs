@@ -744,13 +744,13 @@ class Importer
         $statement = $this->database->prepareQuery("
             SELECT id, external_id AS externalId, firstname, lastname, \"" . Role::PARENT . "\" AS roleType
             FROM {$this->baseProfileMapper->getTable()} profile
-            INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
+            INNER JOIN {$this->parentProfileMapper->getTable()} parent ON profile.id = parent.sis_user_profile_id
 
             UNION
 
             SELECT id, external_id AS externalId, firstname, lastname, \"" . Role::STUDENT . "\" AS roleType
             FROM {$this->baseProfileMapper->getTable()} profile
-            INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
+            INNER JOIN {$this->studentProfileMapper->getTable()} student ON profile.id = student.sis_user_profile_id
 
 
             ORDER BY id

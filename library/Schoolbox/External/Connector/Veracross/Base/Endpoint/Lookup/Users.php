@@ -52,10 +52,12 @@ class Users
      */
     private function initStudentLookup(): array
     {
+        $userProfileTable    = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
         $userStatement = $this->eventMapper->getDatabase()->query("
             SELECT external_id, firstname, lastname
-            FROM sis_user_profile sup
-            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
+            FROM {$userProfileTable} sup
+            INNER JOIN {$studentProfileTable} sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL
         ");
 

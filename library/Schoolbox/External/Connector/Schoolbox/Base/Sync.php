@@ -22,6 +22,8 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
+        $userProfileTable    = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
         $query = "
             SELECT
                 sup.external_id          AS student_id,
@@ -40,8 +42,8 @@ class Sync extends Base implements ISync
                 sups.boarding_status     AS student_boarder,
                 sups.boarding_house_name AS student_boarding_house,
                 sups.campus_name         AS student_campus
-            FROM        `sis_user_profile` `sup`
-            JOIN        `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
+            FROM        {$userProfileTable} `sup`
+            JOIN        {$studentProfileTable} sups ON sup.id = sups.sis_user_profile_id
             WHERE       (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
             ORDER BY    sup.external_id ASC
         ";
@@ -56,7 +58,11 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
-        $query = '
+        $userProfileTable     = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $studentProfileTable  = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
+        $parentProfileTable   = \Schoolbox\External\Profile\Parent\Mapper::getInstance()->getTable();
+        $relationProfileTable = \Schoolbox\External\Profile\Relationship\Mapper::getInstance()->getTable();
+        $query = "
             SELECT
                 supp.username              AS student_contact_network_login,
                 parent.external_id         AS student_contact_id,
@@ -76,14 +82,14 @@ class Sync extends Base implements ISync
                 sups.gender                AS student_gender,
                 child.firstname            AS student_preferred,
                 child.lastname             AS student_surname
-            FROM sis_user_profile_parent supp
-            INNER JOIN sis_user_profile parent ON supp.sis_user_profile_id = parent.id
-            LEFT JOIN sis_user_profile_relation supr ON supr.user_profile_id = parent.id
-            LEFT JOIN sis_user_profile `child` ON supr.child_profile_id = child.id
-            LEFT JOIN sis_user_profile_student sups ON sups.sis_user_profile_id = child.id
+            FROM {$parentProfileTable} supp
+            INNER JOIN {$userProfileTable} parent ON supp.sis_user_profile_id = parent.id
+            LEFT JOIN {$relationProfileTable} supr ON supr.user_profile_id = parent.id
+            LEFT JOIN {$userProfileTable} `child` ON supr.child_profile_id = child.id
+            LEFT JOIN {$studentProfileTable} sups ON sups.sis_user_profile_id = child.id
             WHERE (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
             ORDER BY parent.external_id ASC
-        ';
+        ";
 
         return new Iterator\Guardian(
             $this->databaseExternal->getQueryIterator($query, ['now' => Alaress_Date_Format::now()->getDatabaseDate()])
@@ -95,6 +101,8 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
+        $userProfileTable   = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $staffProfileTable  = \Schoolbox\External\Profile\Staff\Mapper::getInstance()->getTable();
         $query = "
             SELECT    sup.external_id          AS staff_id,
                       sups.username            AS network_login,
@@ -116,8 +124,8 @@ class Sync extends Base implements ISync
                       ''                       AS staff_year_level,
                       ''                       AS staff_year_level_description,
                       ''                       AS staff_house
-            FROM      `sis_user_profile` sup
-            JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
+            FROM      {$userProfileTable} sup
+            JOIN      {$staffProfileTable} sups ON sup.id = sups.sis_user_profile_id
             ORDER BY  sup.external_id ASC
         ";
 

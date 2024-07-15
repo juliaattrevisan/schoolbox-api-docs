@@ -78,13 +78,15 @@ class Lookup
      */
     private function initUserLookup(): array
     {
+        $staffProfileTable   = \Schoolbox\External\Profile\Staff\Mapper::getInstance()->getTable();
+        $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
         $userStatement = $this->baseProfileMapper->getDatabase()->query("
             (SELECT
                 external_id AS externalId,
                 title,
                 firstname,
                 lastname
-            FROM sis_user_profile_staff sups
+            FROM {$staffProfileTable} sups
             INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
             WHERE external_id IS NOT NULL)
 
@@ -95,7 +97,7 @@ class Lookup
                 title,
                 firstname,
                 lastname
-            FROM sis_user_profile_student sups
+            FROM {$studentProfileTable} sups
             INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
             WHERE external_id IS NOT NULL)
         ");
