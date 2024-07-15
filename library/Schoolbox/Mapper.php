@@ -139,6 +139,11 @@ abstract class Mapper implements IMapper
     public const SORT_ORDER_DESC = 'desc';
 
     /**
+     * Prefix for a mapper's shadow table.
+     */
+    private const SHADOW_PREFIX = 'shadow__';
+
+    /**
      * @var IConnector
      */
     protected IConnector $database;
@@ -154,6 +159,8 @@ abstract class Mapper implements IMapper
      * @var string
      */
     protected $table;
+
+    protected bool $useShadowTable = false;
 
     /**
      * Class name of the model to associate with this mapper.
@@ -1981,11 +1988,56 @@ abstract class Mapper implements IMapper
     }
 
     /**
+     * Return the table name, respecting shadow table if enabled.
+     *
      * @return string
      */
-    public function getTable()
+    public function getTable(): string
+    {
+        return $this->useShadowTable ? $this->getShadowTableName() : $this->getBaseTableName();
+    }
+
+    /**
+     * Return the table name, ignoring shadow table.
+     *
+     * @return string
+     */
+    public function getBaseTableName(): string
     {
         return $this->table;
+    }
+
+    /**
+     * Return the shadow table name, regardless of whether it's in use.
+     *
+     * @return string
+     */
+    public function getShadowTableName(): string
+    {
+        return self::SHADOW_PREFIX . $this->table;
+    }
+
+    /**
+     * Enable shadow tables: this will cause this mapper to use the shadow table
+     * for all reads and writes.
+     *
+     * @return self
+     */
+    public function enableShadowTable(): self
+    {
+        $this->useShadowTable = true;
+        return $this;
+    }
+
+    /**
+     * Disable shadow tables.
+     *
+     * @return $this
+     */
+    public function disableShadowTable(): self
+    {
+        $this->useShadowTable = false;
+        return $this;
     }
 
     /**
