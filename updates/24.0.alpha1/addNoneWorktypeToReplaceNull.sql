@@ -16,15 +16,15 @@ INSERT INTO lu_work_type (
     deleted_at
 )
 SELECT
-'None',    # name,
-NULL,      # external_result_type,
-0,         # show_on_grades_page,
-0,         # staff_or_instructor_visible_only,
-0,         # sequence,
-1,         # updated_by,
-NOW(),     # created_at,
-NOW(),     # updated_at,
-NULL       # deleted_at
+'None',                                           # name,
+NULL,                                             # external_result_type,
+0,                                                # show_on_grades_page,
+0,                                                # staff_or_instructor_visible_only,
+0,                                                # sequence,
+(SELECT id FROM user WHERE username = 'alaress'), # updated_by,
+NOW(),                                            # created_at,
+NOW(),                                            # updated_at,
+NULL                                              # deleted_at
 WHERE NOT EXISTS (
     SELECT *
     FROM lu_work_type
