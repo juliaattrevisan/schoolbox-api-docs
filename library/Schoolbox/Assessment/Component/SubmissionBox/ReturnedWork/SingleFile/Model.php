@@ -33,6 +33,13 @@ class Model implements IFile, ISoftDeletable
     protected $return;
 
     /**
+     * Is this file feedback for the student kami worksheet?
+     * this is to prevent this file from continuing through all subsequent feedbacks
+     * @var bool
+     */
+    private $isWorksheet = false;
+
+    /**
      * @return ReturnedWork
      */
     public function getReturn()
@@ -56,5 +63,23 @@ class Model implements IFile, ISoftDeletable
     public function getOwner()
     {
         return $this->getReturn()->getOwner();
+    }
+
+    /**
+     * @param bool $isWorksheet
+     * @return Model
+     */
+    public function setIsWorksheet(bool $isWorksheet): self
+    {
+        $this->isWorksheet = $isWorksheet;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsWorksheet(): bool
+    {
+        return $this->isWorksheet;
     }
 }

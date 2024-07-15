@@ -510,6 +510,7 @@ class Controller extends Base
                         FeedbackFileMapper::getInstance()->createModel()
                             ->setStorage($storage)
                             ->setFilename($filename)
+                            ->setIsWorksheet(true)
                     );
                     // save the things
                     $this->feedbackMapperProxy->save($feedback);

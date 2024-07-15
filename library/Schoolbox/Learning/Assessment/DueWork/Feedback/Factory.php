@@ -174,7 +174,10 @@ class Factory
             if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
                 $filesToCopy = new Collection();
                 foreach ($this->mostRecentFeedback->getAllFiles() as $attachment) {
-                    $filesToCopy->add($attachment);
+                    // DO NOT COPY ACROSS worksheet feedbacks
+                    if (!$attachment->getIsWorksheet()) {
+                        $filesToCopy->add($attachment);
+                    }
                 }
                 $feedback->setAllFiles($filesToCopy);
             }

@@ -21,6 +21,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  * A mapper for a single file within a return (ie Teacher Feedback)
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
@@ -37,6 +38,7 @@ class Mapper extends BaseMapper
         $this->joins('submission_return_id', ReturnedWorkMapper::class, 'id', null, null, 'return', 'return');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
+        $this->uses('is_worksheet', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
