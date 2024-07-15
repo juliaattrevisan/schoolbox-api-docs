@@ -409,9 +409,14 @@ class Controller extends Base
     public function postPollKamiDownload(Kami\Model $kami): void
     {
         $responseCode = 400;
-        // check if we have a kami job reference
+        /**
+         * If there is no job reference, or if the (previous job has finished) status is done
+         * spawn a new export job (so we can capture the latest annotations)
+         *
+         * else just poll to see if the current job has finished or failed.
+         */
         if (!$kami->getJobReference() || Kami\Model::STATUS_DONE === $kami->getStatus()) {
-            // if no reference spawn a job
+            // spawn new export job on kami's side
             $exportJob = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
             $kami->setJobReference($exportJob->getId());
             $kami->setStatus($exportJob->getStatus());
