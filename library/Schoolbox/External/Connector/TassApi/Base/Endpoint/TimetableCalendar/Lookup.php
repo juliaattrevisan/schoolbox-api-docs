@@ -132,13 +132,15 @@ class Lookup
      */
     private function initClassInvolvementLookup(): array
     {
-        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $classEntryTable           = \Schoolbox\External\ClassEntryMapper::getInstance()->getTable();
+        $classInvolvementTable     = \Schoolbox\External\ClassInvolvementMapper::getInstance()->getTable();
+        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT
                 scu.external_id,
                 sc.name, sc.code
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc on scu.class_id = sc.id
-        ');
+            FROM {$classInvolvementTable} scu
+            INNER JOIN {$classEntryTable} sc on scu.class_id = sc.id
+        ");
 
         $involvements = [];
 

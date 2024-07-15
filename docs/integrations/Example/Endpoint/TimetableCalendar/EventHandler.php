@@ -156,7 +156,7 @@ class EventHandler
             $query .= ' SET updated_at = :updatedAt';
         }
 
-        $query .= ' WHERE sis_event.id = :id';
+        $query .= " WHERE {$this->eventMapper->getTable()}.id = :id";
 
         /* Slap it into prepared statement
          */
