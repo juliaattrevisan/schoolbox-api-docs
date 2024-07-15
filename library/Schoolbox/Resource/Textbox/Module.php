@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Textbox;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -45,7 +46,11 @@ class Module extends BaseModule
         };
 
         $componentPreload = function ($params) use ($folderPreload): array {
-            $result = $folderPreload($params);
+            try {
+                $result = $folderPreload($params);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                throw new NotFound('Folder was deleted or does not exist.');
+            }
 
             /** @var Component_InstanceMapper $componentMapper */
             $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
@@ -65,7 +70,22 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function ($params): int {
-                    return $params['folder']->getId();
+                    if (isset($params['folder'])) {
+                        return $params['folder']->getId();
+                    }
+
+                    /* In unit planner you might know of a folder id, but
+                     * not have its instance; it was multiplayer deleted
+                     * or otherwise not hydrated into $params[folder]
+                     */
+                    if (isset($params['folderId'])) {
+                        return $params['folderId'];
+                    }
+
+                    /* Neither a folder instance nor a folderId was provided
+                     * Can't determine where you're trying to go; kick you out
+                     */
+                    throw new Unauthorized();
                 },
                 Access::getInstance()
             )
