@@ -29,6 +29,8 @@
                     </div>
                 </div>
 
+                <hr />
+
                 <div class="row">
                     <div class="small-12 columns">
                         <label>Parent</label>
@@ -78,6 +80,34 @@
                                         <label for="dsnSentralOptionsParentRelationIds-{{ id }}">{{ name }}</label>
                                     </li>
                                 {% endfor %}
+                            </ul>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>Receives Portal Access Flag</label>
+                        <span class="meta">
+                            Elect whether to also strictly adhere to this flag when deciding which contacts will be
+                            identified as parents of students. This operates in conjunction with the contact types that
+                            you've selected above.
+                        </span>
+
+                        <fieldset class="checklist">
+                            <ul class="option-list">
+                                <li>
+                                    <input name="dsn[sentral][options][receivesPortalAccess]" type="hidden" value="0" />
+                                    <input id="dsnSentralOptionsReceivesPortalAccess"
+                                           name="dsn[sentral][options][receivesPortalAccess]"
+                                           value="1"
+                                           type="checkbox"
+                                           {% if options.receivesPortalAccess ?? false %}checked{% endif%}
+                                    >
+                                    <label for="dsnSentralOptionsReceivesPortalAccess">Adhere to Receives Portal Access flag</label>
+                                </li>
                             </ul>
                         </fieldset>
                     </div>

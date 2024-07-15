@@ -967,6 +967,10 @@ class Profile implements IStrategy
         // Get default relationIds, if no options selected in config
         $allowedRelationshipIds = $this->api->getOptions()['parentRelationIds'] ?? self::DEFAULT_ALLOWED_RELATIONSHIP_IDS;
 
+        /* Decide if "Receives Portal Access" plays a part in filtering contacts out
+         */
+        $requiresReceivesPortalAccess = $this->api->getOptions()['receivesPortalAccess'] ?? false;
+
         /* Each student comes with a set of Contacts
          * Some are Emergency Contacts, some are not
          */
@@ -982,6 +986,17 @@ class Profile implements IStrategy
              * If it does, it's an emergency contact and we don't need it
              */
             if (!$this->isParent($contact)) {
+                continue;
+            }
+
+            /* "Receives Portal Access" is required
+             */
+            if ($requiresReceivesPortalAccess && !$contact['attributes']['receivesPortalAccess']) {
+                $this->log->debug(sprintf(
+                    'Person id %s does not have portal access - skipping.',
+                    $contact['attributes']['personId']
+                ));
+
                 continue;
             }
 
