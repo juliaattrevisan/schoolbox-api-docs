@@ -16,22 +16,15 @@ const props = defineProps<Props>();
  */
 const href = window.Vue.computed(() => {
     if (props.componentData.prependHref) {
-        const textValue = props.rowData[props.componentData.text];
-        if (typeof textValue === "string") {
-            return `${props.componentData.prependHref}${textValue}`;
-        }
+        return `${props.componentData.prependHref}${props.rowData[props.componentData.text] as string}`;
     }
-    const hrefValue = props.rowData[props.componentData.href];
-    if (typeof hrefValue === "string") {
-        return hrefValue;
-    }
-    return undefined;
+    return props.rowData[props.componentData.href];
 });
 </script>
 
 <template>
     <a
-        v-if="href"
+        v-if="props.componentData.href && props.rowData[props.componentData.href]"
         :href="href as string"
         :title="props.componentData.title"
         :data-no-wrap="props.componentData.hasNoWrap"
