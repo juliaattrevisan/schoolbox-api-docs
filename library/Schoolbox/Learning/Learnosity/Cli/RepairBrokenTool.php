@@ -46,6 +46,16 @@ class RepairBrokenTool extends CliTool\App
      */
     private array $learnosityActivity = [];
 
+    /**
+     * helper to not memory leak multiple importer classes when bulk repairing
+     */
+    private ?ImporterTool $importerTool = null;
+
+    /**
+     * helper to not memory leak multiple cli apps when bulk repairing
+     */
+    private ?CliTool\Kernel $importerApp = null;
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -142,13 +152,17 @@ class RepairBrokenTool extends CliTool\App
         }
 
         /**
-         * spawn the original learnosity importer tool (rather than re build its functionality)
+         * use the original learnosity importer tool (rather than re build its functionality)
          * and get that to re import the single assessment it requires the --assessment=... entry also, and will also use the -p flags
          */
-        $app = new ImporterTool();
+        $this->importerTool->setAssessmentId($assessmentId);
         $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
-        (new CliTool\Kernel($app, $options))->runApp();
+        // if we don't have a importerApp spawned, spawn that now, so we don't keep spawning every time
+        if (null === $this->importerApp) {
+            $this->importerApp = new CliTool\Kernel($this->importerTool, $options);
+        }
+        $this->importerApp->runApp();
 
         // wait for learnosity to persist the data to where it needs to be
         // just set a random number (15sec may be enough..)
@@ -219,6 +233,11 @@ HELP;
             $this->getLogger(),
         );
 
+        // if repairing, spawn the repair app and cache that.
+        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+            $this->importerTool = new ImporterTool();
+        }
+
         // if assessment (no search)
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
@@ -266,14 +285,6 @@ HELP;
                 }
             }
         } else {
-            /**
-             * just scanning for possible broken quizzes (no repair available currently...)
-             */
-            if ($this->getOpt(self::OPT_LONG_REPAIR)) {
-                $this->getLogger()->error("Unable to bulk repair, either scan for issues, or repair a single");
-                exit;
-            }
-
             $brokenQuizzes = 0;
             // find all learnosity references
             $query = $this->getDatabaseInternal()->executeQuery(
@@ -300,12 +311,21 @@ HELP;
             // hit learnosity and fetch them all
             $this->fetchActivity($learnosityReferences);
 
+            /* Nice counter for cli watching zzz
+             */
+            $i = 0;
+            $n = \count($schoolboxQuizzes);
+
             /**
              * check each learnosity activity (from the cache)
              * check if they have items and a title, if not log it
              */
             foreach ($schoolboxQuizzes as $row) {
-                $this->getLogger()->debug(sprintf("Checking Quiz '%s' (Assessment Id: %s)", $row['title'], $row['assessment_id']));
+                /* Preincrement for this loop
+                 */
+                ++$i;
+
+                $this->getLogger()->debug(sprintf("%d/%d Checking Quiz '%s' (Assessment Id: %s)", $i, $n, $row['title'], $row['assessment_id']));
                 if (!$this->hasItems($row['learnosity_reference'])) {
                     // quiz broken
                     $brokenQuizzes++;
@@ -322,12 +342,16 @@ HELP;
 
                         // in future we may be auto repairing the broken learnosity quizzes, this continue is here to ensure we don't repair learnosity only quizzes
                     } else {
-                        $this->getLogger()->notice(
-                            sprintf(
-                                "This quiz may be repaired by running this command with the flags: `--repair --assessment=%d`",
-                                $row['assessment_id'],
-                            )
-                        );
+                        if ($this->getOpt(self::OPT_LONG_REPAIR)) {
+                            $this->repair((string)$row['assessment_id'], $row['title']);
+                        } else {
+                            $this->getLogger()->notice(
+                                sprintf(
+                                    "This quiz may be repaired by running this command with the flags: `--repair --assessment=%d`",
+                                    $row['assessment_id'],
+                                )
+                            );
+                        }
                     }
 
                     // this is where we would auto repair the quizzes (not something that we want to do just yet)
