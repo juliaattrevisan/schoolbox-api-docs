@@ -150,6 +150,13 @@ class Controller extends Base
                 $normalisedMark = $code->getNormaliseAs();
                 $humanReadableMark = $mark;
             }
+        } catch (\DomainException $e) {
+            /* This occurs if your quiz is worth null. That happens when you don't assign a score
+             * to any of the questions in your quiz. This sends null to the total mark markscheme
+             * (TotalMarkAbstract) which promptly throws DomainException.
+             *
+             * In this case, accept the feedback, decline any numerical mark trying to be assigned.
+             */
         }
 
         /* Update the deets and save it
