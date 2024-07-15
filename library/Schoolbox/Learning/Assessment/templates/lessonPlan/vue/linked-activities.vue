@@ -22,6 +22,10 @@ const toastEl = window.Vue.ref<Toast | null>(null);
 
 const store = useLinkedActivitiesStore();
 
+const unitLocale = window.sbProps.l10n.get("unit");
+const activityLocale = window.sbProps.l10n.get("activity");
+const lessonPlanLocale = window.sbProps.l10n.get("lessonPlan");
+
 /**
  * Check if the unit is open (Between open and close date)
  * @param {Unit} unit The unit to check
@@ -77,12 +81,12 @@ function getUnitUrgency(unit: Unit): string {
  */
 function getUnitCompletion(unit: Unit): string {
     if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {
-        return `This unit will open ${unit.relativeOpenDateFormatted}`;
+        return `This ${unitLocale.singular()} will open ${unit.relativeOpenDateFormatted}`;
     }
     if (isUnitOpen(unit)) {
-        return `This unit will close ${unit.relativeCloseDateFormatted}`;
+        return `This ${unitLocale.singular()} will close ${unit.relativeCloseDateFormatted}`;
     }
-    return `This unit closed ${unit.relativeCloseDateFormatted}`;
+    return `This ${unitLocale.singular()} closed ${unit.relativeCloseDateFormatted}`;
 }
 
 const linkedActivitiesButtonText = window.Vue.computed(() => {
@@ -90,16 +94,16 @@ const linkedActivitiesButtonText = window.Vue.computed(() => {
     const removedActivitiesCount = store.getRemovedActivities().length;
 
     if (addedActivitiesCount === 0 && removedActivitiesCount === 0) {
-        return "No Activities to Link";
+        return `No ${activityLocale.properPlural()} to Link`;
     }
     if (addedActivitiesCount > 0 && removedActivitiesCount === 0) {
-        return `Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+        return `Link ${addedActivitiesCount} ${activityLocale.translate(addedActivitiesCount > 1, true)}`;
     }
     if (addedActivitiesCount === 0 && removedActivitiesCount > 0) {
-        return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+        return `Unlink ${removedActivitiesCount} ${activityLocale.translate(removedActivitiesCount > 1, true)}`;
     }
-    return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}
-            and Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+    return `Unlink ${removedActivitiesCount} ${activityLocale.translate(removedActivitiesCount > 1, true)}
+            and Link ${addedActivitiesCount} ${activityLocale.translate(addedActivitiesCount > 1, true)}`;
 });
 
 const sortedUnitsByDate = window.Vue.computed(() => {
@@ -116,7 +120,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <h3 v-if="props.canModify || store.linkedActivities.length > 0" class="subheader">Activities</h3>
+    <h3 v-if="props.canModify || store.linkedActivities.length > 0" class="subheader">{{ activityLocale.proper() }}</h3>
     <section v-if="store.linkedActivities.length > 0">
         <ul class="information-list">
             <li v-for="activity in store.linkedActivities" :key="activity.id" class="actions-small-1">
@@ -129,16 +133,17 @@ window.Vue.onMounted(() => {
         </ul>
         <div v-if="props.canModify" class="component-action">
             <section>
-                <a class="button" @click.prevent="store.isOpen = true">Link Activities</a>
+                <a class="button" @click.prevent="store.isOpen = true">Link {{ activityLocale.properPlural() }}</a>
             </section>
         </div>
     </section>
     <div v-else-if="props.canModify" class="empty-state">
         <i class="icon-link"></i>
         <p>
-            There are currently no activities linked to this lesson. You may
-            <a @click.prevent="store.isOpen = true">link existing activities</a> to this lesson for students to complete
-            as part of this lesson.
+            There are currently no {{ activityLocale.plural() }} linked to this {{ lessonPlanLocale.singular() }}. You
+            may <a @click.prevent="store.isOpen = true">link existing {{ activityLocale.plural() }}</a> to this
+            {{ lessonPlanLocale.singular() }} for students to complete as part of this
+            {{ lessonPlanLocale.singular() }}.
         </p>
     </div>
 
@@ -157,7 +162,7 @@ window.Vue.onMounted(() => {
     >
         <template #sequence-1>
             <section>
-                <h1>Link Activities</h1>
+                <h1>Link {{ activityLocale.properPlural() }}</h1>
                 <ul class="information-list expandable-card">
                     <li
                         v-for="unit in sortedUnitsByDate"
