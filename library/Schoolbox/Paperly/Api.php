@@ -18,7 +18,7 @@ use Schoolbox\User;
 
 class Api
 {
-    private const PAPERLY_API_VIEW_IFRAME = '/api/v1/schoolbox/dashboard-widget?externalId=%u&role=%s';
+    private const PAPERLY_API_VIEW_IFRAME = '/api/v1/schoolbox/dashboard-widget?externalId=%s&role=%s';
     private const MAX_RETRY = 5;
     private const NAP_TIMEOUT = 3;
     private Client $client;
