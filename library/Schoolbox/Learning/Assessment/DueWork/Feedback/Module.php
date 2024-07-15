@@ -210,6 +210,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class),
+            $this->injector->get('kamiConnector')
         );
     }
 

@@ -152,6 +152,8 @@ class Module extends BaseModule
         );
         $this->register('GET', '/kami/{kamiId:\d+}', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
+        $this->register('POST', '/kami/{kamiId:\d+}/poll', 'postPollKamiDownload', $canAccessKami, $preloadKami);
+        $this->register('POST', '/kami/{kamiId:\d+}/{action:\w+}', 'postKamiDownloadCallback', $canAccessKami, $preloadKami);
 
         // This rule is a simplified version of the rule from
         // `\Schoolbox\Learning\Assessment\Module::buildAuthRuleCanViewSummary`,
@@ -230,6 +232,7 @@ class Module extends BaseModule
      * * SuperUser,
      * * Have WRITE+ perm to assessment's folder
      * * Student who submitted the file and students can view feedback
+     * * Student who submitted the file and the file is the kami student worksheet
      * * Parent of student who submitted file, and parents can view feedback
      *
      * @return Rule\IAuthorizationRule
@@ -242,6 +245,22 @@ class Module extends BaseModule
         return new Rule\Any(
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
+            new Rule\Callback(
+                static function (array $params = [], User $user = null) {
+                    // students who own the kami worksheet, can always view the state of the draft feedback
+                    if (isset($params['kami'])) {
+                        /** @var Kami\Model $kamiModel */
+                        $kamiModel = $params['kami'];
+                        if (
+                            $kamiModel->getStudentSubmissionFile()?->getIsWorksheet() &&
+                            $user?->getId() === $params['student']->getId()
+                        ) {
+                            return;
+                        }
+                    }
+                    throw new Unauthorized();
+                }
+            ),
             //Student who submitted the feedback and and their parents can view feedback, so long as the feedback is not a self-assessment
             new Rule\All(
                 new Rule\Any(
@@ -523,6 +542,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filesystem.storageProxy'),
             $turnitinFileApi,
+            $this->injector->get('filesystem.receiver'),
+            $this->injector->get('returnDataSource'),
         );
     }
 

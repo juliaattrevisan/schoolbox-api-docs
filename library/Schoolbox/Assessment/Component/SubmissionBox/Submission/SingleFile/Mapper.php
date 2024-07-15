@@ -24,6 +24,7 @@ use Schoolbox\Learning\Turnitin;
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
@@ -40,6 +41,7 @@ class Mapper extends BaseMapper
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('editable_inline', self::TYPE_BOOLEAN);
+        $this->uses('is_worksheet', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

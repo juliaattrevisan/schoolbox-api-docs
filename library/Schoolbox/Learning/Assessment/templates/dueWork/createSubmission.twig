@@ -31,6 +31,7 @@ Data:
         let $form              = $('#editor-form'),
             $formSaveLabel     = $form.find('[data-save-draft]'),
             acceptsOnline      = {{ acceptsOnline ? 'true' : 'false' }},
+            hasKamiFile        = {{ kamiFileId ? 'true' : 'false' }},
             hasPolicy          = {{ (policy | length) > 0 ? 'true' : 'false' }},
             requiresReflection = {{ requiresReflection ? 'true' : 'false' }},
             submitOnBehalfOf   = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
@@ -69,7 +70,7 @@ Data:
         let autosavePresubmit = function () {
 
             // Has anything changed? If not check again later (re-init the autosave counter)
-            currentSubmissionContent = window.sbProps.editors['editor-body'].getData(); //start with grabbing the ckeditor content
+            currentSubmissionContent = window.sbProps.editors['editor-body']?.getData(); //start with grabbing the ckeditor content
             const formData = new FormData(document.getElementById('editor-form')); //then retrieve any dropzone, rubric and self-assessment changes
             formData.forEach((value) => currentSubmissionContent += value); //loop through and grab all the form values, creating a single string
 
@@ -139,10 +140,14 @@ Data:
          * * There's content in the inline editor
          * * There's at least one file uploaded
          * * The "Submitted in person" checkbox is checked
+         * * There's a Kami document (which we assume the user has edited)
          *
          * @return Boolean
          */
         let allowSubmit = function() {
+            if (hasKamiFile) {
+                return true;
+            }
             if (!acceptsOnline) {
                 return true;
             }
@@ -310,6 +315,21 @@ Data:
                 $('#editor-body').attr('disabled', false);
             }
         });
+
+        /* If there is a kami file, start with an autosave
+         */
+        // Listen to Kami events here
+        let kamiViewport = document.querySelector("#kami-viewport");
+        window.addEventListener("message", function (event) {
+            if (
+                kamiViewport &&
+                event.source === kamiViewport.contentWindow &&
+                event.data.type === "kamiembedding" &&
+                (event.data.event_name === "createdAnnotation" || event.data.event_name === "deletedAnnotation")
+            ) {
+                autosaveAjaxSubmit();
+            }
+        });
     });
 </script>
 {% endautoescape %}
@@ -357,8 +377,26 @@ Data:
              #}
             <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
             <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
+            <input type="hidden" name="kamiFileId" value="{{ kamiFileId }}"/>
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
+
+                {% if kamiSession %}
+                    <div class="row">
+                        <div class="small-12 island">
+                            <section>
+                                <div class="content">
+                                    {% include 'sub/iframeResponsive.twig' with {
+                                        id: 'kami-viewport',
+                                        src: kamiSession.viewerUrl,
+                                        allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
+                                        dataAttributes: {}
+                                    } only %}
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                {% endif %}
 
                 {% if not isSubmitOnBehalfOf %}
                     <div class="row">

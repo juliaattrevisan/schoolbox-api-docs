@@ -20,6 +20,18 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException;
  */
 class Document
 {
+    /**
+     * Kami Worksheet title format
+     * there is no reference to a character limit, so lets concat (assessment title, student name)
+     */
+    const WORKSHEET_TITLE = '%s - %s';
+
+    /**
+     * Kami Worksheet Group format
+     * kami example format "#{school_id}_#{course_id}_#{assignment_id}_#{attachment_id}"
+     * Used format (Instance_ID, assessment folder ID, assessment ID)
+     */
+    const WORKSHEET_GROUP = '%s_%d_%d';
 
     // Intentionally distinct from the Kami Model definitions to ensure changes to
     // Kami's API do not require changes to Schoolbox's schema.

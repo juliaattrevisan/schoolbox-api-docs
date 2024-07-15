@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use PDOException;
 use RangeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -29,6 +30,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -61,14 +63,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IFeedbackDataSource   $feedbackDataSource
+     * @param IFeedbackDataSource $feedbackDataSource
      * @param ParticipantDataSource $participantDataSource
-     * @param AssessmentDataSource  $assessmentDataSource
-     * @param ResponseDataSource    $responseDataSource
-     * @param UserMapper            $userMapper
-     * @param RubricDataSource      $rubricMapper
-     * @param ReturnedWorkMapper    $returnedWorkMapper
-     * @param Mapper                $projectResultCacheMapper
+     * @param AssessmentDataSource $assessmentDataSource
+     * @param ResponseDataSource $responseDataSource
+     * @param UserMapper $userMapper
+     * @param RubricDataSource $rubricMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
+     * @param Mapper $projectResultCacheMapper
+     * @param Connector $kamiConnector
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -78,7 +81,8 @@ class Controller extends Base
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
-        private Project\ResultCache\Mapper $projectResultCacheMapper
+        private Project\ResultCache\Mapper $projectResultCacheMapper,
+        private Connector $kamiConnector,
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -184,6 +188,34 @@ class Controller extends Base
                 try {
                     $this->returnedWorkMapper->save($submissionReturn);
                     $publishSuccess = true;
+
+                    // Find the Kami worksheet (if it exists)
+                    if ($submissionReturn->getSubmission()) {
+                        $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
+                        $response = null;
+                        foreach ($responses as $responseCurrent) {
+                            if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
+                                $response = $responseCurrent;
+                                break;
+                            }
+                        }
+
+                        // attempt to clean as we go
+                        unset($responses);
+
+                        /** @var ?DueWork\Response\Model $response */
+                        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+                            return $file->getIsWorksheet();
+                        })->first()?->getKami();
+                        if ($kamiModel) {
+                            // Save the kami doc to the feedback object
+                            $this->kamiConnector->initiatePollingForKamiDownload(
+                                $kamiModel,
+                                'feedback',
+                                $this->getUser(),
+                            );
+                        }
+                    }
 
                     /* Update project result cache when Publish All is used
                      */
@@ -348,6 +380,24 @@ class Controller extends Base
 
         $feedback      = $dueWorkFeedbackFactory->produce();
         $isNewFeedback = $feedback->getId() === null;
+
+        // if we are publishing, snapshot the kami
+        if ('1' === ($postVars['publish'] ?? null)) {
+            // Find the Kami worksheet (if it exists)
+            /** @var DueWork\Response\Model $response */
+            $response = $feedback->getResponse();
+            $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+                return $file->getIsWorksheet();
+            })->first()?->getKami();
+            if ($kamiModel) {
+                // Save the kami doc to the feedback object
+                $this->kamiConnector->initiatePollingForKamiDownload(
+                    $kamiModel,
+                    'feedback',
+                    $this->getUser(),
+                );
+            }
+        }
         if (!$hasRubric && !$isNewFeedback && $feedback->isEmpty()) {
             $this->getFeedbackDataSource()->delete($feedback);
         } else {
@@ -464,6 +514,21 @@ class Controller extends Base
         // Update project mark as the published feedback may affect the project cache
         (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
             ->refresh($this->assessmentDataSource, $assessment, $student);
+
+        // Find the Kami worksheet (if it exists)
+        /** @var DueWork\Response\Model $response */
+        $response = $feedback->getResponse();
+        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+            return $file->getIsWorksheet();
+        })->first()?->getKami();
+        if ($kamiModel) {
+            // Save the kami doc to the feedback object
+            $this->kamiConnector->initiatePollingForKamiDownload(
+                $kamiModel,
+                'feedback',
+                $this->getUser(),
+            );
+        }
 
         $data = [
             'success' => true,

@@ -1658,11 +1658,17 @@ abstract class Kernel
 
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
-            'client'         => $di->lazyGet('httpClient'),
-            'enabled'        => $config->get(ConfigMapper::NAME_KAMI_ENABLED),
-            'apiHost'        => $config->get(ConfigMapper::NAME_KAMI_API_HOST),
-            'apiKey'         => $config->get(ConfigMapper::NAME_KAMI_API_KEY),
-            'siteSchoolCode' => $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+            'client'            => $di->lazyGet('httpClient'),
+            'enabled'           => $config->get(ConfigMapper::NAME_KAMI_ENABLED),
+            'apiHost'           => $config->get(ConfigMapper::NAME_KAMI_API_HOST),
+            'apiKey'            => $config->get(ConfigMapper::NAME_KAMI_API_KEY),
+            'siteSchoolCode'    => $config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+            'messageFactory'    => $di->lazyGet('taskd.httpRequestMessageFactory'),
+            'httpFactory'       => $di->lazyGet('httpFactory'),
+            'baseUrl'           => (new \Schoolbox\Url\Factory($config))->buildFullyQualified(),
+            'messageProducer'   => $di->lazyGet('taskd.messageProducer'),
+            'routeGenerator'    => $di->lazyGet('router.generator')
+
         ]));
 
         // PDF generator

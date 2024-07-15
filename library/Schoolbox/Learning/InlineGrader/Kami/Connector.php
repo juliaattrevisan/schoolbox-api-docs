@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
+use Aura\Router\Generator;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
+use Http\Discovery\Psr17Factory;
 use League\Flysystem\FilesystemException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -24,6 +26,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use SensitiveParameter;
 use stdClass;
@@ -41,6 +46,7 @@ class Connector implements IConnector
     public const PATH_LIST_DOCUMENTS = 'embed/documents';
     public const PATH_GET_DOCUMENT = 'embed/documents/';
     public const PATH_DELETE_DOCUMENT = 'embed/documents/';
+    public const PATH_CREATE_FROM_TEMPLATE = 'embed/documents';
 
     // How long should view sessions last for by default?
     public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
@@ -81,6 +87,11 @@ class Connector implements IConnector
      * @param null|bool       $enabled Will be null when invoked by update scripts prior to config addition
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
+     * @param MessageFactory $messageFactory
+     * @param Psr17Factory $httpFactory
+     * @param Uri $baseUrl
+     * @param Producer $messageProducer
+     * @param Generator $routeGenerator
      */
     public function __construct(
         ClientInterface $client,
@@ -88,6 +99,11 @@ class Connector implements IConnector
         ?string $apiHost,
         #[SensitiveParameter] ?string $apiKey,
         ?string $siteSchoolCode,
+        private ?MessageFactory $messageFactory = null,
+        private ?Psr17Factory $httpFactory = null,
+        private ?Uri $baseUrl = null,
+        private ?Producer $messageProducer = null,
+        private ?Generator $routeGenerator = null
     ) {
         $this->client         = $client;
         $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
@@ -834,8 +850,106 @@ class Connector implements IConnector
         $request  = new Request('POST', $this->apiHost . 'embed/sessions');
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
-            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+            if (isset($documentId)) {
+                throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+            } elseif (isset($documentGroupId)) {
+                throw new Exception\NotFound("Kami Document not found. Group Id: $documentGroupId", $request, $response);
+            }
         }
         return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
+    }
+
+    /**
+     * hit the kami api and clone a kami template for a student to use in a class
+     * @see https://kamiapiproposed.docs.apiary.io/#reference/embedding/uploads/create-a-document-from-a-template
+     *
+     * @param string $name the name of the document
+     * @param string $templateId the kami id of the template we are cloning
+     * @param string $groupReference the reference to the assessment collection, so teachers can see all these worksheets at once
+     * @return Document
+     * @throws GuzzleException
+     */
+    public function cloneWorksheet(string $name, string $templateId, string $groupReference): Document
+    {
+        $this->assertEnabled();
+
+        // this kami endpoint accepts json
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => json_encode([
+                'name' => $name,
+                'template_document_id' => $templateId,
+                'document_groups' => [$groupReference],
+            ]),
+        ];
+        $request  = new Request('POST', self::PATH_CREATE_FROM_TEMPLATE);
+        $response = $this->client->send($request, $this->getOptions($options));
+
+        if ($this->isSuccessful($response)) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        throw new Exception\NotFound("Kami Worksheet not cloned", $request, $response);
+    }
+
+
+
+    public function initiatePollingForKamiDownload(
+        Model $document,
+        string $action,
+        User $getUser,
+    ): void {
+        // if any of these are not set, then error out
+        if (
+            null === $this->routeGenerator ||
+            null === $this->messageFactory ||
+            null === $this->httpFactory ||
+            null === $this->baseUrl ||
+            null === $this->messageProducer
+        ) {
+            trigger_error("No Kami Connection.");
+        }
+        $route = $this->routeGenerator->generate(
+            'learningDueWorkResponse.postPollKamiDownload',
+            [
+                'kamiId'    => $document->getId(),
+                'kami'      => $document,
+            ]
+        );
+
+        /* Update schoolbox when we're done
+         */
+        $callbackUrl = $this->routeGenerator->generate(
+            'learningDueWorkResponse.postKamiDownloadCallback',
+            [
+                'kamiId'    => $document->getId(),
+                'kami'      => $document,
+                'action'    => $action,
+            ]
+        );
+
+        $message = $this->messageFactory
+            ->setUser($getUser)
+            ->setRequest(
+                $this->httpFactory
+                    ->createRequest(
+                        'POST',
+                        $this->baseUrl->withPath($route),
+                    )
+                    ->withHeader('accept', 'application/json')
+            )
+            ->setCallbackUrl((string)$this->baseUrl->withPath($callbackUrl))
+            ->build();
+
+        $this->messageProducer->send(
+            $message,
+            delay: 5,
+            maxRequeues: 10,
+        );
     }
 }

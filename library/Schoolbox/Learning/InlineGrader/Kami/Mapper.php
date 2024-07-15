@@ -69,8 +69,11 @@ class Mapper extends BaseMapper
                 Model::STATUS_PROCESSING,
                 Model::STATUS_DONE,
                 Model::STATUS_ERROR,
+                Model::STATUS_PENDING,
             ],
         );
+        $this->uses('job_reference', self::TYPE_STRING);
+        $this->uses('poll_count', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('kami_created_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

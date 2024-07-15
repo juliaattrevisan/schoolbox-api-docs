@@ -11,8 +11,11 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 use Alaress\Exception\UnreachableException;
 use Alaress\Web\Controller\Base;
 use DomainException;
+use GuzzleHttp\Exception\GuzzleException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper as FeedbackFileMapper;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Fetcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -27,6 +30,7 @@ use Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -37,13 +41,13 @@ use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -100,6 +104,8 @@ class Controller extends Base
         Access $access,
         private FilesystemProxy $filesystemProxy,
         private ?Turnitin\File\Api $turnitinFileApi,
+        private Receiver $filesystemReceiver,
+        private DueWorkFeedbackMapperProxy $feedbackMapperProxy
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -387,6 +393,130 @@ class Controller extends Base
                                ->withHeader('Pragma', 'public')
                                ->withHeader('Content-Length', $guzzleResponse->getHeader('Content-Length')[0])
         ;
+    }
+
+    /**
+     * Polls a kami export request to see if we can download the file
+     *
+     * @param Kami\Model $kami
+     * @throws Exception
+     * @throws Exception/Deleted
+     * @throws GuzzleException
+     * @api POST /kami/{kamiId:\d+}/poll
+     * @since 24.0
+     *
+     */
+    public function postPollKamiDownload(Kami\Model $kami): void
+    {
+        $responseCode = 400;
+        /**
+         * If there is no job reference, or if the (previous job has finished) status is done
+         * spawn a new export job (so we can capture the latest annotations)
+         *
+         * else just poll to see if the current job has finished or failed.
+         */
+        if (!$kami->getJobReference() || Kami\Model::STATUS_DONE === $kami->getStatus()) {
+            // spawn new export job on kami's side
+            $exportJob = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
+            $kami->setJobReference($exportJob->getId());
+            $kami->setStatus($exportJob->getStatus());
+            $this->kamiMapper->save($kami);
+            $this->response = $this
+                ->responseAsJson(['status' => $exportJob->getStatus()])
+                ->withStatus(202); // still processing
+            return;
+        }
+        // else check job status
+        $export = $this->kamiConnector->getExport($kami->getJobReference());
+        $status = $export->getStatus();
+        if ($export->isStatusPending()) {
+            $responseCode = 202;
+        } elseif ($export->isStatusDone()) {
+            $responseCode = 200;
+        }
+        $kami->setStatus($status);
+        $this->kamiMapper->save($kami);
+
+        // respond with correct status code
+        // Respond with code:
+        // * 200 if complete
+        // * 202 if still processing (this tells polling process to try again)
+        // * 400 if failed
+        $this->response = $this
+            ->responseAsJson(['status' => $status])
+            ->withStatus($responseCode);
+    }
+
+    /**
+     * Polls a kami export request to see if we can download and save to the attached student submission.
+     * @param Kami\Model $kami
+     * @param string $action // enum of what action we are working with, student submit(submission), teacher feedback(feedback), download(download)
+     * @param DueWork|null $assessment
+     * @param User|null $student
+     * @param DueWorkResponse|null $response
+     * @param Feedback|null $feedback
+     * @throws Exception
+     * @throws Exception/Deleted
+     * @throws GuzzleException
+     * @throws \Schoolbox\File\Exception
+     * @api POST /kami/{kamiId:\d+}/{action:\w+}/poll
+     * @since 24.0
+     *
+     */
+    public function postKamiDownloadCallback(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null)
+    {
+        // kami is ready to download
+        $export = $this->kamiConnector->getExport($kami->getJobReference());
+        $expiryAt = null;
+        $uploadingUser = $this->getUser();
+        $filename = sprintf("%s.pdf", $kami->getStudentSubmissionFile()?->getFilename() ?? 'Student Submission');
+        // if action is download, save to storage for a 2 week auto delete
+        if ('download' === $action) {
+            $expiryAt = \Alaress_Date_Format::now()->addWeeks(2);
+        }
+        // else store for all time
+        // grab the file and save to storage ensuring it is a pdf, as that is what we get from kami
+        if ('feedback' === $action) {
+            $filename = sprintf("%s - Feedback.pdf", $kami->getStudentSubmissionFile()?->getFilename());
+        }
+        $guzzleResponse     = (new Client())->get($export->getFileUrl());
+        $storage = $this->filesystemReceiver->acceptStream(
+            $filename,
+            $guzzleResponse->getBody(),
+            expiryAt: $expiryAt,
+            uploadingUser: $uploadingUser
+        );
+
+        // depending on the action, depends on where we save / send the file
+        switch ($action) {
+            case 'download':
+                // taskd notify the user
+                break;
+            case 'submission': // student submission (save the current kami to the student submission file)
+                if ($response) {
+                    // update the worksheet entry to not use the original worksheet template, but the downloaded kami annotated file
+                    $response->getAllFiles()->filter(function (SubmissionFile $file) use ($kami) {
+                        return $kami->getStudentSubmissionFile()?->getId() === $file->getId();
+                    })->first()?->setStorage($storage);
+                    $this->responseDataSource->save($response);
+                    // re save kami, or that entry is purged...
+                    $this->kamiMapper->save($kami);
+                }
+                break;
+            case 'feedback': // teacher feedback published (save the current kami to the newly created teacher feedback file)
+                if ($feedback) {
+                    // create a feedback file object
+                    $feedback->getAllFiles()->add(
+                        FeedbackFileMapper::getInstance()->createModel()
+                            ->setStorage($storage)
+                            ->setFilename($filename)
+                            ->setIsWorksheet(true)
+                    );
+                    // save the things
+                    $this->feedbackMapperProxy->save($feedback);
+                }
+                break;
+        }
     }
 
 

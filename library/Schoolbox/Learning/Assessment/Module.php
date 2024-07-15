@@ -604,7 +604,7 @@ class Module extends BaseModule
                     $dueWorkDownloadMessageFactory,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
                 );
 
             case Assessment\Project\Controller::class:
