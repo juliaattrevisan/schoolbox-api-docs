@@ -23,9 +23,15 @@ const href = window.Vue.computed(() => {
 </script>
 
 <template>
-    <a :href="(href as string)" :title="props.componentData.title" :data-no-wrap="props.componentData.hasNoWrap">
-        {{ props.rowData[componentData.text] }}
+    <a
+        v-if="props.componentData.href && props.rowData[props.componentData.href]"
+        :href="href as string"
+        :title="props.componentData.title"
+        :data-no-wrap="props.componentData.hasNoWrap"
+    >
+        {{ props.rowData[props.componentData.text] }}
     </a>
+    <span v-else data-no-wrap="props.componentData.hasNoWrap">{{ props.rowData[componentData.text] }}</span>
 </template>
 
 <style scoped>

@@ -14,7 +14,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <template v-if="props.componentData.src && props.componentData.href">
+    <template v-if="props.componentData.src && props.componentData.href && props.rowData[props.componentData.href]">
         <a :href="(props.rowData[props.componentData.href] as string)" :title="props.componentData.title">
             <div :class="`c-img ${props.componentData.imgClass as string}`">
                 <div class="c-img__wrapper">
