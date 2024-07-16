@@ -115,12 +115,12 @@
 
                     {% if templateCreateRoute %}
                         <p>
-                            No lesson plan templates have been created.
-                            <a href="{{ templateCreateRoute }}">Click here</a> to build a lesson plan template.
+                            No {{ locale.lessonPlan }} templates have been created.
+                            <a href="{{ templateCreateRoute }}">Click here</a> to build a {{ locale.lessonPlan }} template.
                         </p>
                     {% else %}
                         <p>
-                            There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
+                            There are no available {{ locale.lessonPlan }} templates. Please contact a Superuser at your school if you wish to use {{ locale.lessonPlan.plural }}, as you will require a template
                         </p>
                     {% endif %}
                 </div>

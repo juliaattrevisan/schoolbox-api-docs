@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\Navigation;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Config\Type\Model as ConfigType;
 use Schoolbox\Filter\Page\AvailabilityChecker;
 use Schoolbox\Filter\Page\LabelBuilder;
@@ -111,6 +113,9 @@ class Subnav
                         : 0;
                 }
             );
+
+        // Grab the rosettaStone for translations
+        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
 
         $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
         $filterLabelBuilder        = new LabelBuilder();
@@ -390,10 +395,10 @@ class Subnav
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
                     '/adminv2/lesson-plan/template'          => [
-                        'name'        => 'Lesson Plan Templates',
+                        'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
-                        'description' => 'Configure lesson plan templates.',
+                        'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
                     ],
                     '/adminv2/setting/LMS%20Policy'          => [
                         'name'        => 'LMS Policy',

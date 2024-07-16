@@ -139,7 +139,7 @@ class Controller extends Base
             $subTypes = [
                 ["title" => $rosettaStone->translate("dueWork", false, true), "value" => "assessment.dueWork"],
                 ["title" => $rosettaStone->translate("project", false, true), "value" => "assessment.project"],
-                ["title" => "Lesson Plan", "value" => "assessment.lessonPlan"],
+                ["title" => $rosettaStone->translate("lessonPlan", false, true), "value" => "assessment.lessonPlan"],
                 ["title" => "Quiz", "value" => "assessment.quiz"],
                 ["title" => "Task", "value" => "assessment.task"],
             ];

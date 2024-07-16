@@ -2,6 +2,7 @@
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 import linkedActivitiesItem from "./linked-activities-item.vue";
 import LinkedActivitiesUnlink from "./linked-activities-unlink.vue";
@@ -77,12 +78,12 @@ function getUnitUrgency(unit: Unit): string {
  */
 function getUnitCompletion(unit: Unit): string {
     if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {
-        return `This unit will open ${unit.relativeOpenDateFormatted}`;
+        return `This ${locale.unit.singular()} will open ${unit.relativeOpenDateFormatted}`;
     }
     if (isUnitOpen(unit)) {
-        return `This unit will close ${unit.relativeCloseDateFormatted}`;
+        return `This ${locale.unit.singular()} will close ${unit.relativeCloseDateFormatted}`;
     }
-    return `This unit closed ${unit.relativeCloseDateFormatted}`;
+    return `This ${locale.unit.singular()} closed ${unit.relativeCloseDateFormatted}`;
 }
 
 const linkedActivitiesButtonText = window.Vue.computed(() => {
@@ -90,16 +91,16 @@ const linkedActivitiesButtonText = window.Vue.computed(() => {
     const removedActivitiesCount = store.getRemovedActivities().length;
 
     if (addedActivitiesCount === 0 && removedActivitiesCount === 0) {
-        return "No Activities to Link";
+        return `No ${locale.activity.properPlural()} to Link`;
     }
     if (addedActivitiesCount > 0 && removedActivitiesCount === 0) {
-        return `Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+        return `Link ${addedActivitiesCount} ${locale.activity.translate(addedActivitiesCount > 1, true)}`;
     }
     if (addedActivitiesCount === 0 && removedActivitiesCount > 0) {
-        return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+        return `Unlink ${removedActivitiesCount} ${locale.activity.translate(removedActivitiesCount > 1, true)}`;
     }
-    return `Unlink ${removedActivitiesCount} ${removedActivitiesCount > 1 ? "Activities" : "Activity"}
-            and Link ${addedActivitiesCount} ${addedActivitiesCount > 1 ? "Activities" : "Activity"}`;
+    return `Unlink ${removedActivitiesCount} ${locale.activity.translate(removedActivitiesCount > 1, true)}
+            and Link ${addedActivitiesCount} ${locale.activity.translate(addedActivitiesCount > 1, true)}`;
 });
 
 const sortedUnitsByDate = window.Vue.computed(() => {
@@ -116,7 +117,9 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <h3 v-if="props.canModify || store.linkedActivities.length > 0" class="subheader">Activities</h3>
+    <h3 v-if="props.canModify || store.linkedActivities.length > 0" class="subheader">
+        {{ locale.activity.proper() }}
+    </h3>
     <section v-if="store.linkedActivities.length > 0">
         <ul class="information-list">
             <li v-for="activity in store.linkedActivities" :key="activity.id" class="actions-small-1">
@@ -129,16 +132,17 @@ window.Vue.onMounted(() => {
         </ul>
         <div v-if="props.canModify" class="component-action">
             <section>
-                <a class="button" @click.prevent="store.isOpen = true">Link Activities</a>
+                <a class="button" @click.prevent="store.isOpen = true">Link {{ locale.activity.properPlural() }}</a>
             </section>
         </div>
     </section>
     <div v-else-if="props.canModify" class="empty-state">
         <i class="icon-link"></i>
         <p>
-            There are currently no activities linked to this lesson. You may
-            <a @click.prevent="store.isOpen = true">link existing activities</a> to this lesson for students to complete
-            as part of this lesson.
+            There are currently no {{ locale.activity.plural() }} linked to this {{ locale.lessonPlan.singular() }}. You
+            may <a @click.prevent="store.isOpen = true">link existing {{ locale.activity.plural() }}</a> to this
+            {{ locale.lessonPlan.singular() }} for students to complete as part of this
+            {{ locale.lessonPlan.singular() }}.
         </p>
     </div>
 
@@ -157,7 +161,7 @@ window.Vue.onMounted(() => {
     >
         <template #sequence-1>
             <section>
-                <h1>Link Activities</h1>
+                <h1>Link {{ locale.activity.properPlural() }}</h1>
                 <ul class="information-list expandable-card">
                     <li
                         v-for="unit in sortedUnitsByDate"

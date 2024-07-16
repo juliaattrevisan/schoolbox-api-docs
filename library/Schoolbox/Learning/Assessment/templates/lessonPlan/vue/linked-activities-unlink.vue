@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
+import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 const store = useLinkedActivitiesStore();
@@ -20,10 +21,11 @@ const activitiesToRemove = window.Vue.computed(() => {
 </script>
 
 <template>
-    <h2>Unlink {{ activitiesToRemove.length > 1 ? "activities" : "activity" }}?</h2>
+    <h2>Unlink {{ locale.activity.translate(activitiesToRemove.length > 1, false) }}?</h2>
     <p>
         Are you sure you wish to unlink the following
-        {{ activitiesToRemove.length > 1 ? "activities" : "activity" }} from this lesson plan?
+        {{ locale.activity.translate(activitiesToRemove.length > 1, false) }}
+        from this {{ locale.lessonPlan.singular() }}?
     </p>
     <p v-for="activity in activitiesToRemove" :key="activity.id">
         <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>

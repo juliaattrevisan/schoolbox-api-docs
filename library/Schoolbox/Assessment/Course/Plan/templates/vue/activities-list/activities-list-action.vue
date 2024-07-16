@@ -3,6 +3,7 @@
  * A component-action that can be used alongside the activities list
  * Currently has the ability to create a new activity via a dropdown of activity types
  */
+import locale from "@js/terminology/rosettaStone";
 import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListActionCreateInner from "./activities-list-action-create-inner.vue";
@@ -14,8 +15,6 @@ interface Props {
 const props = defineProps<Props>();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
-
-const activityLocale = window.sbProps.l10n.get("activity");
 </script>
 
 <template>
@@ -23,7 +22,7 @@ const activityLocale = window.sbProps.l10n.get("activity");
         <section>
             <sbx-pop-out
                 :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
-                :button-text="`Create ${activityLocale.proper()}`"
+                :button-text="`Create ${locale.activity.proper()}`"
                 move-to="#unitplanner-dropdown-container"
                 is-component-action
             ></sbx-pop-out>

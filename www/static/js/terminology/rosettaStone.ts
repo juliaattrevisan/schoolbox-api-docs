@@ -8,7 +8,7 @@ import { IL10n, L10n } from "@js/terminology/l10n";
  * A class to manage a dictionary of terms
  */
 export class RosettaStone {
-    private dictionary: Record<string, L10n> = {};
+    readonly dictionary: Record<string, L10n> = {};
 
     /**
      * Initialise the RosettaStone object
@@ -77,3 +77,7 @@ export class RosettaStone {
         return this.dictionary[term];
     }
 }
+
+// Allow importing of the current dictionary directly
+// This may not exist yet if accessed prior to sbProps.ts, so default to an empty object... We shouldn't use it there anyway
+export default window.sbProps?.l10n?.dictionary || {};

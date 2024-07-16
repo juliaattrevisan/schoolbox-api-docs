@@ -2,12 +2,12 @@
 /**
  * The empty state for an activities list when there are no activities present
  */
-const activityLocale = window.sbProps.l10n.get("activity");
+import locale from "@js/terminology/rosettaStone";
 </script>
 
 <template>
     <i class="icon-due-work"></i>
-    <p>No {{ activityLocale.singular() }} have been added to this unit yet</p>
+    <p>No {{ locale.activity.singular() }} has been added to this unit yet</p>
 </template>
 
 <style scoped></style>
