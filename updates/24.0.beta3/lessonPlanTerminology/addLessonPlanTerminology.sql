@@ -8,7 +8,7 @@ INSERT INTO
         indefinite_article
     )
 VALUES (
-        'lessonplan',
+        'lessonPlan',
         'Lesson Plan',
         'lesson plan',
         'lesson plans',
