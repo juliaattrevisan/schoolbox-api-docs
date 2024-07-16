@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -124,14 +125,32 @@ class Factory
             $bus
                 /* Purge previously-imported profile relationships and classes
                  */
-                ->add(new Profile\Prepare(
+//                ->add(new Profile\Prepare(
+//                    $this->log,
+//                    $this->perform,
+//                    $this->baseProfileMapper,
+//                    $this->studentProfileMapper,
+//                    $this->parentProfileMapper,
+//                    $this->staffProfileMapper,
+//                    $this->relationshipMapper
+//                ))
+                ->add(new Base\Prepare\All(
                     $this->log,
                     $this->perform,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper
+                    $this->relationshipMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->overridesMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    null,
+                    null,
+                    null,
+                    null,
                 ))
                 ->add(new Profile\Profile(
                     $this->validStrats,
@@ -145,31 +164,32 @@ class Factory
                     $this->staffProfileMapper,
                     $this->relationshipMapper
                 ))
-                ->add(new Profile\Cleanup(
-                    $this->log,
-                    $this->perform,
-                    $this->baseProfileMapper,
-                    $this->studentProfileMapper,
-                    $this->parentProfileMapper,
-                    $this->staffProfileMapper,
-                    $this->relationshipMapper
-                ));
+//                ->add(new Profile\Cleanup(
+//                    $this->log,
+//                    $this->perform,
+//                    $this->baseProfileMapper,
+//                    $this->studentProfileMapper,
+//                    $this->parentProfileMapper,
+//                    $this->staffProfileMapper,
+//                    $this->relationshipMapper
+//                ))
+            ;
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
             $bus
                 /* SUDS Timetable Events
                  */
-                ->add(new TimetableCalendar\Prepare(
-                    $this->log,
-                    $this->perform,
-                    $this->eventMapper,
-                    $this->classEntryMapper,
-                    $this->classInvolvementMapper,
-                    $this->classPeriodMapper,
-                    $this->periodMapper,
-                    $this->overridesMapper
-                ))
+//                ->add(new TimetableCalendar\Prepare(
+//                    $this->log,
+//                    $this->perform,
+//                    $this->eventMapper,
+//                    $this->classEntryMapper,
+//                    $this->classInvolvementMapper,
+//                    $this->classPeriodMapper,
+//                    $this->periodMapper,
+//                    $this->overridesMapper
+//                ))
                 ->add(new TimetableCalendar\Classes(
                     $this->log,
                     $this->perform,
@@ -182,14 +202,33 @@ class Factory
                     $from,
                     $to
                 ))
-                ->add(new TimetableCalendar\Cleanup(
-                    $this->log,
-                    $this->perform,
-                    $this->eventMapper
-                ));
+//                ->add(new TimetableCalendar\Cleanup(
+//                    $this->log,
+//                    $this->perform,
+//                    $this->eventMapper
+//                ))
+            ;
         }
 
         $bus
+            ->add(new Base\Cleanup\All(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->overridesMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                null,
+                null,
+                null,
+                null,
+            ))
             ->add(new ApiStatistics(
                 $this->log,
                 $api
