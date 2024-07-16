@@ -16,9 +16,9 @@ LEFT JOIN task t                    ON av.assessment_id = t.assessment_id
 LEFT JOIN assess a                  ON av.assessment_id = a.assessment_id
 LEFT JOIN lesson_plan lp            ON av.assessment_id = lp.assessment_id
 SET av.feedback_was_visible = IF(
-    vaf.published_at <= av.last_visit, # Feedback existed at time of view.
-    # Feedback existed at the time of the view, so feedback_was_visible
-    # should be true if assess.mark_visible includes the viewer's user type.
+    vaf.published_at <= av.last_visit,
+    # Published feedback existed at the time of the last visit,
+    # so feedback_was_visible is true if assess.mark_visible includes the viewer's user type.
     (
         SELECT CASE (
             COALESCE(
@@ -39,5 +39,6 @@ SET av.feedback_was_visible = IF(
             ELSE FALSE
         END
     ),
+    # Feedback did not exist at the time of the last visit, so feedback_was_visible is false.
     FALSE
 );
