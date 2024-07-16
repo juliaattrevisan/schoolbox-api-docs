@@ -101,6 +101,6 @@ class ShadowTable
             $queryParts[] = sprintf($renamePart, $mapper->getShadowTableName(), $mapper->getBaseTableName());
             $queryParts[] = sprintf($renamePart, $mapper->getBaseTableName() . self::TEMP_SUFFIX, $mapper->getShadowTableName());
         }
-        $database->execute('RENAME TABLE ' . implode(', ', $queryParts) . ' TO ' . implode(', ', $queryParts));
+        $database->execute('RENAME TABLE ' . implode(', ', $queryParts));
     }
 }
