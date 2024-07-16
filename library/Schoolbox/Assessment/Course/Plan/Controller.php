@@ -248,28 +248,9 @@ class Controller extends Base
             $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
         }
 
-        // Locales required to translate terms in the activities list components
-        $activityComponentLocales = [
-            $this->rosettaStone->__get('project')->toArray(),
-            $this->rosettaStone->__get('dueWork')->toArray(),
-            $this->rosettaStone->__get('activity')->toArray(),
-        ];
-
-        // Locales required to translate terms in the rubric capability list components
-        $rubricCapabilityComponentLocales = [
-            $this->rosettaStone->__get('rubricGroup')->toArray(),
-        ];
-
-        // All locales required by the unit planner (compile the above together)
-        $unitPlannerLocales = [
-            ...$activityComponentLocales,
-            ...$rubricCapabilityComponentLocales,
-        ];
-
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
             'course' => $course,
             'units' => $units,
-            'unitPlannerLocales' => $unitPlannerLocales,
             'template'  => [
                 'textboxDefId' => $textboxDefId,
                 'curriculumDefId' => $curriculumDefId,
