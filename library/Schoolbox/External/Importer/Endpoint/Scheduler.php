@@ -149,7 +149,7 @@ class Scheduler
                     'Beginning transaction'
                 ));
 
-                $this->db->beginTransaction();
+//                $this->db->beginTransaction();
 
                 foreach ($composites as $composite) {
                     $composite->import();
@@ -175,11 +175,11 @@ class Scheduler
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
 
-                $this->logger->debug(sprintf(
-                    'Rollback transaction'
-                ));
-
-                $this->db->rollBack();
+//                $this->logger->debug(sprintf(
+//                    'Rollback transaction'
+//                ));
+//
+//                $this->db->rollBack();
 
                 /* Something happened with the api; log it
                  */
@@ -187,11 +187,11 @@ class Scheduler
             } catch (\Throwable | \Exception $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
 
-                $this->logger->debug(sprintf(
-                    'Rollback transaction'
-                ));
-
-                $this->db->rollBack();
+//                $this->logger->debug(sprintf(
+//                    'Rollback transaction'
+//                ));
+//
+//                $this->db->rollBack();
 
                 /* Some kind of unexpected fatal; log it
                  */
