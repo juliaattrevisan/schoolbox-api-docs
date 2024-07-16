@@ -88,7 +88,9 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             $this->setBlock('has_images', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_images', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'submit_image_slideshow', 'submit_image_slideshow_block');
-            $this->setBlock('source_folder_exists', 'exceeds_max_images_warning', 'exceeds_max_images_warning_block');
+            $this->setBlock('source_folder_exists', 'image_slideshow_action_select_image', 'image_slideshow_action_select_image_block');
+            $this->setBlock('source_folder_exists', 'image_slideshow_action_view_gallery', 'image_slideshow_action_view_gallery_block');
+            $this->setBlock('source_folder_exists', 'image_slideshow_action', 'image_slideshow_action_block');
             $this->setBlock('source_folder_exists', 'image_slideshow', 'image_slideshow_block');
             $this->setBlock('image_slideshow', 'show_caption', 'show_caption_block');
             $this->setBlock('image_slideshow', 'linked_image', 'linked_image_block');
@@ -97,17 +99,6 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
             $this->setVar('empty_state_block', '');
 
             $this->setVar('source_folder_deleted_block', '');
-
-            $this->setVar('exceeds_max_images_warning_block', '');
-
-            // Check if we have more than the max images, only show for people who can edit
-            if (
-                count($allFiles) > $maxSlideshowImages
-                && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
-            ) {
-                $this->parse('exceeds_max_images_warning_block', 'exceeds_max_images_warning');
-                $this->setVar('IMAGESLIDESHOW_MAX_IMAGES', $maxSlideshowImages);
-            }
 
             // Set up component name
             $this->setComponentName(strlen(trim($this->getConfig('componentname')))
@@ -137,11 +128,25 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
                 $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
             }
 
+            $this->setVar('image_slideshow_action_select_image_block', '');
+            $this->setVar('image_slideshow_action_view_gallery_block', '');
+            $this->setVar('image_slideshow_action_block', '');
+            $this->setVar('submit_image_slideshow_block', '');
+
             // Controls such as Post Images
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->setVar("submit_image_slideshow_block", "");
-            } else {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse("submit_image_slideshow_block", "submit_image_slideshow");
+                $this->parse("image_slideshow_action_select_image_block", "image_slideshow_action_select_image");
+            }
+
+            // Check if we have more than the max images, and show the view gallery button to everyone
+            if (count($allFiles) > $maxSlideshowImages) {
+                $this->parse('image_slideshow_action_view_gallery_block', 'image_slideshow_action_view_gallery');
+            }
+
+            // If either of the slideshow actions are available, show the action block
+            if (count($allFiles) > $maxSlideshowImages || $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $this->parse('image_slideshow_action_block', 'image_slideshow_action');
             }
 
             // Iterate

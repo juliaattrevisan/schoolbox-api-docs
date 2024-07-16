@@ -188,21 +188,20 @@
                     </ul>
                 </div>
 
-                <!-- BEGIN exceeds_max_images_warning -->
-                <div data-alert class="alert-box warning no-margin">
-                    The number of images in this Slideshow exceeds the limit of {IMAGESLIDESHOW_MAX_IMAGES}.
-                    Images beyond this limit will not be displayed.
-                    Please consider using the Image Gallery component if you wish to show more images.
-                </div>
-                <!-- END exceeds_max_images_warning -->
-
-                <!-- BEGIN submit_image_slideshow -->
+                <!-- BEGIN image_slideshow_action -->
                 <div class="component-action">
                     <section>
+                        <!-- BEGIN image_slideshow_action_select_image -->
                         <p><a href="/cms/file/new/{IMAGESLIDESHOW_CATEGORY_ID}">Select an image</a> or drag and drop multiple onto this component</p>
+                        <!-- END image_slideshow_action_select_image -->
+                        <!-- BEGIN image_slideshow_action_view_gallery -->
+                        <a href="/cms/imageGallery/{IMAGESLIDESHOW_CATEGORY_ID}?returnId={ID}" class="button">View Full Gallery</a>
+                        <!-- END image_slideshow_action_view_gallery -->
                     </section>
                 </div>
+                <!-- END image_slideshow_action -->
 
+                <!-- BEGIN submit_image_slideshow -->
                 <script type="text/javascript">
                     $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                         wrapClass: 'dragging',

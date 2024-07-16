@@ -64,6 +64,7 @@ class Component_Dashboard_SlideshowController extends Component_Dashboard_Contro
         $this->setBlock('image_slideshow', 'unlinked_image', 'unlinked_image_block');
         $this->setBlock('image_slideshow', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'has_header', 'has_header_block');
+        $this->setBlock($templateHandle, 'image_slideshow_action_view_gallery', 'image_slideshow_action_view_gallery_block');
 
         /* Hide header bar if desired
          */
@@ -102,18 +103,21 @@ class Component_Dashboard_SlideshowController extends Component_Dashboard_Contro
          */
         $this->setVar('image_slideshow_block', '');
 
+        $maxSlideshowImages = (int)$this->getConfigLoader()->get('image_slideshow_max');
+
         // Load images for the current homepage
         $opts = [
             'filter' => 'image',
-            'size' => (int)$this->getConfigLoader()->get('image_slideshow_max'),
+            'size' => $maxSlideshowImages + 1, // +1 to check if we have more than the max
             'sort' => $this->getConfig('sort'),
             'sortdir' => $this->getConfig('sortdir')
         ];
 
         $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
+        $limitedFiles = $allFiles->limit($maxSlideshowImages);
 
         if ($this->getConfig('randomStartingSlide')) {
-            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
+            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($limitedFiles) - 1));
         } else {
             $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
         }
@@ -122,11 +126,18 @@ class Component_Dashboard_SlideshowController extends Component_Dashboard_Contro
         $this->setVar('IMAGESLIDESHOW_CATEGORY_ID', $this->getSource()->getId());
 
         // Iterate
-        if (!$allFiles->count()) {
+        if (!$limitedFiles->count()) {
             return false; // No images to display
         }
 
-        foreach ($allFiles as $currentFile) {
+        $this->setVar('image_slideshow_action_view_gallery_block', '');
+
+        // Check if we have more than the max images, and show the view gallery button to everyone
+        if (count($allFiles) > $maxSlideshowImages) {
+            $this->parse('image_slideshow_action_view_gallery_block', 'image_slideshow_action_view_gallery');
+        }
+
+        foreach ($limitedFiles as $currentFile) {
             $url = '';
 
             // sanitise url
