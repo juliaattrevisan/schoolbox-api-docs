@@ -137,7 +137,7 @@
         </p>
     {% elseif not not readOnly and not hasCourses %}
         <p>
-            {{ locale.lessonPlan.properPlural }} must be connected to a course. To start using {{ locale.lessonPlan.properPlural }} please
+            {{ locale.lessonPlan.plural |capitalize }} must be connected to a course. To start using {{ locale.lessonPlan.plural }} please
             <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: component.getContext.getFolder.getId }) }}" data-course-selector>
                 import a course
             </a>
