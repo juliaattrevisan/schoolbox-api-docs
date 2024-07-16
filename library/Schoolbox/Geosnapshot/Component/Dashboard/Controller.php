@@ -21,7 +21,6 @@ use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var string
      */

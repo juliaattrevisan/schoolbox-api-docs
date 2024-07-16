@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var string|null
      */
