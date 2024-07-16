@@ -1,3 +1,4 @@
+import locale from "@js/terminology/rosettaStone";
 import type { UnitTemplate, UnitTemplateComponent } from "./unitPlannerTypes";
 
 // All types of content that can be shown in a column
@@ -45,12 +46,12 @@ const tabConfig: TabConfig[] = [
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
     {
         id: "activities",
-        label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
+        label: `Learning ${locale.activity.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES],
     },
     {
         id: "rubric-capabilities",
-        label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
+        label: `Rubric ${locale.rubricGroup.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.RUBRIC_CAPABILITIES],
     },
     {
@@ -95,11 +96,11 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.ACTIVITIES]: {
-        label: `Learning ${window.sbProps.l10n.get("activity").properPlural()}`,
+        label: `Learning ${locale.activity.properPlural()}`,
         fixedLeft: false,
     },
     [ColumnType.RUBRIC_CAPABILITIES]: {
-        label: `Rubric ${window.sbProps.l10n.get("rubricGroup").properPlural()}`,
+        label: `Rubric ${locale.rubricGroup.properPlural()}`,
         fixedLeft: false,
     },
     [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings

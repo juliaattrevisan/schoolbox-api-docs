@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
+import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 const store = useLinkedActivitiesStore();
-
-const activityLocale = window.sbProps.l10n.get("activity");
-const lessonPlanLocale = window.sbProps.l10n.get("lessonPlan");
 
 /**
  * Cancel the unlink modal
@@ -23,11 +21,11 @@ const activitiesToRemove = window.Vue.computed(() => {
 </script>
 
 <template>
-    <h2>Unlink {{ activityLocale.translate(activitiesToRemove.length > 1, false) }}?</h2>
+    <h2>Unlink {{ locale.activity.translate(activitiesToRemove.length > 1, false) }}?</h2>
     <p>
         Are you sure you wish to unlink the following
-        {{ activityLocale.translate(activitiesToRemove.length > 1, false) }}
-        from this {{ lessonPlanLocale.singular() }}?
+        {{ locale.activity.translate(activitiesToRemove.length > 1, false) }}
+        from this {{ locale.lessonPlan.singular() }}?
     </p>
     <p v-for="activity in activitiesToRemove" :key="activity.id">
         <span :class="'icon-' + kebabCase(activity.assessmentType)"></span>

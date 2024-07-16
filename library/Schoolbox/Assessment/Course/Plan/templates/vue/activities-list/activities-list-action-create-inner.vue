@@ -4,6 +4,7 @@
  * Should be wrapped in a ul
  * sbx-pop-out is not created here, as it may need to be customised by the parent component
  */
+import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 
 interface Props {
@@ -13,23 +14,18 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const activityTypeLocale = {
-    project: window.sbProps.l10n.get("project"),
-    dueWork: window.sbProps.l10n.get("dueWork"),
-};
 </script>
 
 <template>
     <ul :id="props.contentId" class="f-dropdown" data-dropdown-content>
         <li>
             <a :href="getReturnUrl(`${props.createRoute}?type=project`)" class="icon-project">
-                {{ activityTypeLocale.project.proper() }}
+                {{ locale.project.proper() }}
             </a>
         </li>
         <li>
             <a :href="getReturnUrl(`${props.createRoute}?type=dueWork`)" class="icon-due-work">
-                {{ activityTypeLocale.dueWork.proper() }}
+                {{ locale.dueWork.proper() }}
             </a>
         </li>
         <li>
@@ -42,7 +38,9 @@ const activityTypeLocale = {
             <a :href="getReturnUrl(`${props.createRoute}?type=lti`)" class="icon-lti">3rd Party Assessment</a>
         </li>
         <li>
-            <a :href="getReturnUrl(`${props.createRoute}?type=lessonPlan`)" class="icon-lesson-plan">Lesson Plan</a>
+            <a :href="getReturnUrl(`${props.createRoute}?type=lessonPlan`)" class="icon-lesson-plan">
+                {{ locale.lessonPlan.proper() }}
+            </a>
         </li>
     </ul>
 </template>
