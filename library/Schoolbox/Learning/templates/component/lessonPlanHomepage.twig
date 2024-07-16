@@ -131,13 +131,13 @@
     <i class="icon-lesson-plan"></i>
     {% if not readOnly and (hasUnitSpec or hasCourseSpec) %}
         <p>
-            This component only works on class pages as lesson plans must be connected to a course.
+            This component only works on class pages as {{ locale.lessonPlan.plural }} must be connected to a course.
             This page is {{ locale.unit.indefiniteArticle }} {{ hasCourseSpec ? "course" : locale.unit }} page so the component doesn't work here.
             <a href="#remove-component" data-target="delete">Remove this component</a>.
         </p>
     {% elseif not not readOnly and not hasCourses %}
         <p>
-            Lesson plans must be connected to a course. To start using lesson plans please
+            {{ locale.lessonPlan.properPlural }} must be connected to a course. To start using {{ locale.lessonPlan.properPlural }} please
             <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: component.getContext.getFolder.getId }) }}" data-course-selector>
                 import a course
             </a>
@@ -145,11 +145,11 @@
         </p>
     {% else %}
         <p>
-            You currently have no scheduled lesson plans available. You may wish to
+            You currently have no scheduled {{ locale.lessonPlan.plural }} available. You may wish to
             <a href="{{ routeLookup('lessonPlanActivities.getHomepageComponent', {folderId: component.getContext.getFolder.getId, componentId: component.instance.id}) }}">
                 view all
             </a>
-            lesson plans
+            {{ locale.lessonPlan.plural }}
         </p>
     {% endif %}
 </div>
