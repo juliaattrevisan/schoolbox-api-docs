@@ -1,4 +1,4 @@
-ALTER TABLE assessment_view ADD COLUMN feedback_was_visible tinyint(1) unsigned NOT NULL DEFAULT FALSE;
+ALTER TABLE assessment_view ADD COLUMN feedback_was_visible tinyint(1) unsigned NOT NULL DEFAULT FALSE COMMENT "True if feedback existed and was visible to user at the time the assessment was viewed.";
 
 # Values defined in Assessment/Component/SubmissionBox.php.
 SET @MARK_VISIBILITY_STAFF_ONLY           = 0;
