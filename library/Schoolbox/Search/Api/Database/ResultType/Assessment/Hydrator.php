@@ -390,7 +390,7 @@ class Hydrator extends BaseHydrator
         return match ($type) {
             'assessment' => $rosettaStone->translate('assessment', false, true),
             'assessment.dueWork' => $rosettaStone->translate('dueWork', false, true),
-            'assessment.lessonPlan' => 'Lesson plan',
+            'assessment.lessonPlan' => $rosettaStone->translate('lessonPlan', false, true),
             'assessment.project' => $rosettaStone->translate('project', false, true),
             'assessment.lti' => 'LTI',
             'assessment.task' => 'Task',
