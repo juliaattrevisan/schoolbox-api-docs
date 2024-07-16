@@ -19,11 +19,11 @@
                 <div class="row actions-small-1">
                     <div class="list-item">
                         <div class="small-12 island">
-                            <h2 class="subheader">Lesson Plan Template List</h2>
+                            <h2 class="subheader">{{ locale.lessonPlan.proper }} Template List</h2>
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ createRoute }}" class="icon-add" title="Add a lesson plan template"></a>
+                        <a href="{{ createRoute }}" class="icon-add" title="Add a {{ locale.lessonPlan }} template"></a>
                     </nav>
                 </div>
                 <section>
@@ -132,7 +132,7 @@
                                                     let element = $(this);
 
                                                     element.confirmDialog({
-                                                        text: 'Are you sure you want to delete this lesson plan template?',
+                                                        text: 'Are you sure you want to delete this {{ locale.lessonPlan }} template?',
                                                         confirmEvent: function() {
                                                             /* Activate indicator label
                                                             */
@@ -178,9 +178,9 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-lesson-plan"></i>
-                <p>No lesson plan templates have been created.</p>
+                <p>No {{ locale.lessonPlan }} templates have been created.</p>
                 {% if createRoute %}
-                    <p><a href="{{ createRoute }}">Click here</a> to build a lesson plan template.</p>
+                    <p><a href="{{ createRoute }}">Click here</a> to build a {{ locale.lessonPlan }} template.</p>
                 {% endif %}
             </div>
         {% endif %}
