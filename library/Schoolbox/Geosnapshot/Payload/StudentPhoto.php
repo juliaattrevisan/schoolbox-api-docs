@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot\Payload;
 
+use League\Flysystem\FilesystemException;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
@@ -38,10 +39,11 @@ class StudentPhoto
      * Builds a payload for getting pictures with $viewee's face in them
      *
      * @param User $viewee
+     * @param User $viewer
      * @return array
-     * @throws \RuntimeException
+     * @throws FilesystemException
      */
-    public function build(User $viewee): array
+    public function build(User $viewee, User $viewer): array
     {
         if (!$viewee->getPortrait()) {
             throw new \RuntimeException(sprintf(
@@ -51,7 +53,8 @@ class StudentPhoto
         }
 
         return [
-            'face_image' => base64_encode($this->filesystemProxy->read($viewee->getPortrait()))
+            'face_image' => base64_encode($this->filesystemProxy->read($viewee->getPortrait())),
+            'ext_user_id' => INSTANCE_ID . '.' . $viewer->getId(),
         ];
     }
 }

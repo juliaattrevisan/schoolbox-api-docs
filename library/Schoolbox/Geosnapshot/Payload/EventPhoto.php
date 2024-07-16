@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot\Payload;
 
+use Schoolbox\User;
+
 /**
  * Class EventPhoto
  *
@@ -19,17 +21,18 @@ namespace Schoolbox\Geosnapshot\Payload;
  */
 class EventPhoto
 {
-
     /**
      * Builds a payload for getting events' pictures matching $eventName
      *
      * @param string $eventName
+     * @param User   $viewer
      * @return array
      */
-    public function build(string $eventName): array
+    public function build(string $eventName, User $viewer): array
     {
         return [
-            'event_name' => trim($eventName)
+            'event_name' => trim($eventName),
+            'ext_user_id' => INSTANCE_ID . '.' . $viewer->getId(),
         ];
     }
 }

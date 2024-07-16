@@ -61,7 +61,7 @@ class Controller extends Base
         try {
             $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-            $response = $api->retrieveStudentPhotos($viewee, $this->filesystemProxy);
+            $response = $api->retrieveStudentPhotos($viewee, $this->getUser(), $this->filesystemProxy);
         } catch (\RuntimeException | \DomainException $e) {
             /* RuntimeException is thrown when student doesn't have a profile pic
              * DomainException is thrown when json can't be decoded

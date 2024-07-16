@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
@@ -99,17 +101,16 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param User            $viewee
+     * @param User            $viewer
      * @param FilesystemProxy $filesystemProxy
      * @return array
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws GuzzleException
      * @throws \JsonException
-     * @throws \RuntimeException
+     * @throws FilesystemException
      */
-    public function retrieveStudentPhotos(User $viewee, FilesystemProxy $filesystemProxy): array
+    public function retrieveStudentPhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee, $viewer));
     }
 
 
@@ -119,16 +120,14 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param string $eventName
+     * @param User   $viewer
      * @return array
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws GuzzleException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
-    public function retrieveEventPhotos(string $eventName): array
+    public function retrieveEventPhotos(string $eventName, User $viewer): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName, $viewer));
     }
 
 
