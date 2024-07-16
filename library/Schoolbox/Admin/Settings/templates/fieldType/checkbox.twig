@@ -2,12 +2,14 @@
     name:          string
     value:         string
 #}
-
-<div class="switch">
-    <input name="{{ name }}" value="0" type="hidden">
-    <input id="{{ name }}-field" {{ required ? 'required ' }}name="{{ name }}" {% if value %}checked="checked"{% endif %} value="1" type="checkbox" {% if not editable %}disabled="disabled"{% endif %}>
-    <label for="{{ name }}-field">
-        <span>On</span>
-        <span>Off</span>
-    </label>
-</div>
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    <div class="switch">
+        <input name="{{ name }}" value="0" type="hidden">
+        <input id="{{ name }}-field" {{ required ? 'required ' }}name="{{ name }}" {% if value %}checked="checked"{% endif %} value="1" type="checkbox" {% if not editable %}disabled="disabled"{% endif %}>
+        <label for="{{ name }}-field">
+            <span>On</span>
+            <span>Off</span>
+        </label>
+    </div>
+{% endblock %}

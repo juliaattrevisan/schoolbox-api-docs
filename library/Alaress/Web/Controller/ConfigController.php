@@ -108,7 +108,7 @@ abstract class ConfigController extends Base
             }
             $existingConfig  = $existingConfigs[$name];
             $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($existingConfig->getFieldId());
-            $newValue        = $valueSerializer->serializeValue($value);
+            $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
             if ($newValue !== $existingConfig->getValue()) {
                 $existingConfig->setValue($newValue);

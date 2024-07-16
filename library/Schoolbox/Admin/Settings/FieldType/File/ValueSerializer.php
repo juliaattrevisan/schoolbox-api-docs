@@ -14,7 +14,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /** @var CollectorFactory */
     private $collectorFactory;
 
@@ -31,7 +30,7 @@ class ValueSerializer implements IFieldValueSerializer
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
         try {
             $result   = $this->collectorFactory->build([$value])->getFirst();

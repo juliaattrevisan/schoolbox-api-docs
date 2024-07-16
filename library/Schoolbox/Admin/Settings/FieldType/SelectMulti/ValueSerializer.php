@@ -13,11 +13,10 @@ use Schoolbox\Admin\Settings\IFieldValueSerializer;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /**
      * @inheritdoc
      */
-    public function serializeValue($value): string
+    public function serializeValue($value, $config): string
     {
         if ($value === '') {
             return '';

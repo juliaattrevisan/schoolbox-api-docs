@@ -67,6 +67,7 @@ class ConfigMapper extends Mapper
     public const FIELD_SELECT_MULTI  = 17;
     public const FIELD_SELECT_DATE   = 18;
     public const FIELD_URI           = 19;
+    public const FIELD_RANGE         = 20;
 
     // Type enum
     public const TYPE_SITE          =  1;
@@ -253,6 +254,11 @@ class ConfigMapper extends Mapper
 
     public const NAME_KAMI_API_HOST = 'kami_api_host';
     public const NAME_KAMI_API_KEY = 'kami_api_key';
+
+    /**
+     * Components
+     */
+    public const NAME_IMAGE_SLIDESHOW_MAX = 'image_slideshow_max';
 
     /**
      * Skin Config Fields

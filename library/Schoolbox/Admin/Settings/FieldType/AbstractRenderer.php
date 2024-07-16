@@ -18,7 +18,6 @@ use Schoolbox\Admin\Settings\IConfigRenderer;
  */
 abstract class AbstractRenderer implements IConfigRenderer
 {
-
     /**
      * @inheritdoc
      * @throws FieldTypeMismatchException

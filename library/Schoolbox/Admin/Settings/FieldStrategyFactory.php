@@ -18,7 +18,6 @@ use UnexpectedValueException;
 
 class FieldStrategyFactory
 {
-
     /** @var MapperFactory */
     private $mapperFactory;
 
@@ -124,6 +123,8 @@ class FieldStrategyFactory
                 return new FieldType\Date\Renderer();
             case ConfigMapper::FIELD_URI:
                 return new FieldType\URI\Renderer();
+            case ConfigMapper::FIELD_RANGE:
+                return new FieldType\Range\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -161,6 +162,8 @@ class FieldStrategyFactory
                 return new FieldType\SelectMulti\ValueSerializer();
             case ConfigMapper::FIELD_URI:
                 return new FieldType\URI\ValueSerializer();
+            case ConfigMapper::FIELD_RANGE:
+                return new FieldType\Range\ValueSerializer();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
         throw new UnexpectedValueException("Unable to find a field value serializer for config field '{$fieldId}'");

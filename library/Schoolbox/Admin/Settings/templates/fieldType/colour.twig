@@ -3,6 +3,9 @@
     value:         string
     required:      bool
 #}
-<div>
-    <input id="{{ name }}-field" type="text" value="{{ value }}" name="{{ name }}" {{ required ? 'required ' }}data-colour-picker {% if not editable %}disabled="disabled"{% endif %} />
-</div>
+{% extends '@settings/fieldTypeBase.twig' %}
+{% block inputElement %}
+    <div>
+        <input id="{{ name }}-field" type="text" value="{{ value }}" name="{{ name }}" {{ required ? 'required ' }}data-colour-picker {% if not editable %}disabled="disabled"{% endif %} />
+    </div>
+{% endblock %}
