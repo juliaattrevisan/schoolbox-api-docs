@@ -90,9 +90,9 @@ Usage:
             {% endif %}
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=lessonPlan&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new lesson plan"
+                   title="Create a new {{ locale.lessonPlan }}"
                    class="button icon-lesson-plan"
-                >New Lesson Plan</a></li>
+                >New {{ locale.lessonPlan.proper }}</a></li>
         </ul>
     </div>
 </li>

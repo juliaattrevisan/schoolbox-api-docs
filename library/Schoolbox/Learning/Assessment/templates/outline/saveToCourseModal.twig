@@ -51,14 +51,14 @@
             {% endif %}
             {% if (assessment.assessables | filter(a => a is lessonPlan)) is not empty %}
                 <p>
-                    As this project contains lesson plans,
+                    As this project contains {{ locale.lessonPlan.plural }},
                     any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
                 </p>
             {% endif %}
         {% endif %}
         {% if assessment is lessonPlan %}
             <p>
-                As this {{ locale.translate('activity') }} is a lesson plan,
+                As this {{ locale.translate('activity') }} is a {{ locale.lessonPlan }},
                 any linked {{ locale.translate('activity', true) }} must be in the destination for the link to remain.
             </p>
         {% endif %}
