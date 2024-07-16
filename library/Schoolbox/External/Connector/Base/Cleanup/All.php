@@ -56,6 +56,7 @@ class All implements IStrategy
      * Constructor
      *
      * @param LoggerInterface                 $log
+     * @param bool                            $perform
      * @param UserProfile\Mapper              $userProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -73,6 +74,7 @@ class All implements IStrategy
      */
     public function __construct(
         private LoggerInterface $log,
+        private bool $perform,
         private UserProfile\Mapper $userProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -95,6 +97,10 @@ class All implements IStrategy
      */
     public function import(): void
     {
+        if (!$this->perform) {
+            return;
+        }
+
         /** @var array<Mapper> $mappers */
         $mappers = [
             $this->userProfileMapper,
