@@ -68,10 +68,10 @@ class All implements IStrategy
      * @param Event\Overrides\Mapper          $classInvolvementOverridesMapper
      * @param ClassPeriodMapper               $classPeriodMapper
      * @param TimetablePeriodMapper           $periodMapper
-     * @param Event\Mapper                    $eventMapper
-     * @param Event\User\Mapper               $eventUserMapper
-     * @param Event\Campus\Mapper             $eventCampusMapper
-     * @param Event\Roletype\Mapper           $eventRoleTypeMapper
+     * @param Event\Mapper|null               $eventMapper
+     * @param Event\User\Mapper|null          $eventUserMapper
+     * @param Event\Campus\Mapper|null        $eventCampusMapper
+     * @param Event\Roletype\Mapper|null      $eventRoleTypeMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -86,10 +86,10 @@ class All implements IStrategy
         private Event\Overrides\Mapper $classInvolvementOverridesMapper,
         private ClassPeriodMapper $classPeriodMapper,
         private TimetablePeriodMapper $periodMapper,
-        private Event\Mapper $eventMapper,
-        private Event\User\Mapper $eventUserMapper,
-        private Event\Campus\Mapper $eventCampusMapper,
-        private Event\Roletype\Mapper $eventRoleTypeMapper,
+        private ?Event\Mapper $eventMapper,
+        private ?Event\User\Mapper $eventUserMapper,
+        private ?Event\Campus\Mapper $eventCampusMapper,
+        private ?Event\Roletype\Mapper $eventRoleTypeMapper,
     ) {
     }
 
@@ -103,7 +103,7 @@ class All implements IStrategy
         }
 
         /** @var array<Mapper> $mappers */
-        $mappers = [
+        $mappers = array_filter([
             $this->userProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,
@@ -118,7 +118,7 @@ class All implements IStrategy
             $this->eventUserMapper,
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
-        ];
+        ]);
         $this->log->info('Preparing: configuring mappers to write to shadow tables');
         foreach ($mappers as $mapper) {
             $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getBaseTableName(), $mapper->getShadowTableName()));
