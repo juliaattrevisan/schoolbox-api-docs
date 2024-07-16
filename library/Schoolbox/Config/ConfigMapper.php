@@ -256,6 +256,11 @@ class ConfigMapper extends Mapper
     public const NAME_KAMI_API_KEY = 'kami_api_key';
 
     /**
+     * Components
+     */
+    public const NAME_IMAGE_SLIDESHOW_MAX = 'image_slideshow_max';
+
+    /**
      * Skin Config Fields
      */
     public const NAME_HOMEPAGE_COLOUR_HEAD_FONT = 'homepage_colour_head_font';

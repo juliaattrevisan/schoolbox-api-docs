@@ -10,6 +10,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
@@ -103,7 +104,7 @@ class Component_Dashboard_SlideshowController extends Component_Dashboard_Contro
          */
         $this->setVar('image_slideshow_block', '');
 
-        $maxSlideshowImages = (int)$this->getConfigLoader()->get('image_slideshow_max');
+        $maxSlideshowImages = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_IMAGE_SLIDESHOW_MAX);
 
         // Load images for the current homepage
         $opts = [

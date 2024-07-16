@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
@@ -52,7 +53,7 @@ class Component_Homepage_SlideshowController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        $maxSlideshowImages = (int)$this->getConfigLoader()->get('image_slideshow_max');
+        $maxSlideshowImages = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_IMAGE_SLIDESHOW_MAX);
 
         // Load images for the current homepage
         $opts = [
