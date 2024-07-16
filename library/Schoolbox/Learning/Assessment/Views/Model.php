@@ -42,6 +42,11 @@ class Model
     private \Alaress_Date_Format $lastVisit;
 
     /**
+     * @var bool Feedback was visible to user at the time the assessment was viewed.
+     */
+    private bool $feedbackWasVisible;
+
+    /**
      * @return int
      */
     public function getAssessmentId(): int
@@ -158,6 +163,25 @@ class Model
     public function setLastVisit(\Alaress_Date_Format $lastVisit): self
     {
         $this->lastVisit = $lastVisit;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getFeedbackWasVisible(): bool
+    {
+        return $this->feedbackWasVisible;
+    }
+
+    /**
+     * @param bool $feedbackWasVisible
+     * @return $this
+     *
+     */
+    public function setFeedbackWasVisible(bool $feedbackWasVisible): self
+    {
+        $this->feedbackWasVisible = $feedbackWasVisible;
         return $this;
     }
 }

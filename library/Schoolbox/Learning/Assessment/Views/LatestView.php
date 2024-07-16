@@ -59,10 +59,17 @@ class LatestView
                 ->setUser($user);
         }
 
+        $feedbackIsVisibleToUser = match ($assessment->getMarkVisibility()) {
+            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
+            IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
+            IAssessable::MARK_VISIBILITY_PRIVATE => $user->getRole()->isStaff(),
+            default => false
+        };
+
         /**
-         * update time to now
+         * Update last visit time to now, and set whether feedback was visible on this visit.
          */
-        $lastView->setLastVisit(\Alaress_Date_Format::now());
+        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($feedbackIsVisibleToUser);
 
         /**
          * check if use is either that student or the parents, then save
@@ -134,19 +141,10 @@ class LatestView
          */
         $feedback = null;
         if (null !== $studentView) {
-            /**
-             * student has viewed the assessment
-             */
             $views['student']['status'] = 'has viewed';
+            $views['student']['date'] = $studentView->getLastVisit()->getLong();
 
-            $studentDate = $studentView->getLastVisit();
-            $views['student']['date'] = $studentDate->getLong();
-
-            $feedback = $participant->getAuthoritativeFeedback(true);
-            if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
-                /**
-                 * was the last student view after feedback?
-                 */
+            if ($studentView->getFeedbackWasVisible()) {
                 $views['student']['object'] = 'feedback';
             }
         }
@@ -173,14 +171,10 @@ class LatestView
             /** @var Model|null $parentView */
             $parentView = $lastViews->getOffset($parent->getId());
             if (null !== $parentView) {
-                $parentDate = $parentView->getLastVisit();
-                $view['date'] = $parentDate->getLong();
+                $view['date'] = $parentView->getLastVisit()->getLong();
                 $view['status'] = 'has viewed';
-                /**
-                 * check if view after feedback?
-                 */
-                if (null !== $feedback && $feedback->getPublishedAt() < $parentDate) {
-                    //parent viewed after feedback was published
+
+                if ($parentView->getFeedbackWasVisible()) {
                     $view['object'] = 'feedback';
                 }
             }
