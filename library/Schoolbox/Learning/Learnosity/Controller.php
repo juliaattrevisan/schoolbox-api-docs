@@ -1034,6 +1034,15 @@ class Controller extends Base
             'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
         ];
 
+        /* Find this attempt's MapperProxy equivalent from something we already obtained
+         */
+        $feedback = $assessment->getParticipant($student)
+            ->getAllFeedbacks()
+            ->filter(static function ($model) use ($attempt) {
+                return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+            })
+            ->first();
+
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'student' => $this->getStudentData($attempt),
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
@@ -1046,7 +1055,7 @@ class Controller extends Base
             /* For Submission States
              */
             'participant' => $assessment->getParticipant($student),
-            'feedback' => $attempt,
+            'feedback' => $feedback,
             'maxMarks' => $attempt->getMaxMark(),
             'errors' => $this->stateMapper->listDisplayValues(),
         ], sprintf(

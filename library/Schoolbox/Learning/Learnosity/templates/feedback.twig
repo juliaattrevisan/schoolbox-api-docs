@@ -1,19 +1,18 @@
 {##
  # Give feedback for an attempt
  #
- # @param object student                     The student's data
+ # @param User           $student            The student's data
  # @param string|array   $reportInitOptions  Learnosity API initialisation object
- # @param IAssessable    $assessment         Our schoolbgox quiz instance
- # @param array          $breadcrumbs        A context trail at the top of the screeen
  # @param IAssessable    $assessment         Our schoolbox quiz instance
+ # @param array          $breadcrumbs        A context trail at the top of the screeen
  # @param Attempt\Model  $attempt            The student's attempt from our local db
  # @param string         $itemResponses      A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
  # @param string         $attemptComment     The overall comment for the attempt
- # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
  # @param object         $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #
  # These are needed for Submission States
  # @param Participant/Model $participant     The student who did the attempt
+ # @param Attempt\Model     $feedback        The student's attempt from our local db
  # @param float             $maxMarks        Maximum available marks in this attempt
  # @param array             $errors          A list of submission states that can be chosen
  #}
@@ -53,7 +52,7 @@ The grade below is inserted into the quiz-feedback Vue DOM structure then displa
             {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
                 assessment:  assessment,
                 participant: participant,
-                feedback:    participant.findMostRecentInstructorGivenFeedback ?? null,
+                feedback:    feedback,
                 markScheme:  assessment.markScheme,
                 limit:       maxMarks,
                 tabIndex:    1,
