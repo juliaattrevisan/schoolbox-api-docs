@@ -167,11 +167,11 @@ class Scheduler
                  */
                 $this->importLogMapper->prune();
 
-                $this->logger->debug(sprintf(
-                    'Committing transaction'
-                ));
-
-                $this->db->commit();
+//                $this->logger->debug(sprintf(
+//                    'Committing transaction'
+//                ));
+//
+//                $this->db->commit();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
 
