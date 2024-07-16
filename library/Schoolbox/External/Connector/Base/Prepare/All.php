@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Base\Prepare;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -16,6 +17,7 @@ use Schoolbox\External\Event;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\ShadowTable;
 
 /**
@@ -54,6 +56,7 @@ class All implements IStrategy
     /**
      * Constructor
      *
+     * @param LoggerInterface                 $log
      * @param UserProfile\Mapper              $userProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -70,6 +73,7 @@ class All implements IStrategy
      * @param Event\Roletype\Mapper           $eventRoleTypeMapper
      */
     public function __construct(
+        private LoggerInterface $log,
         private UserProfile\Mapper $userProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -92,7 +96,8 @@ class All implements IStrategy
      */
     public function import(): void
     {
-        $shadowTable = new ShadowTable(
+        /** @var array<Mapper> $mappers */
+        $mappers = [
             $this->userProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,
@@ -107,7 +112,13 @@ class All implements IStrategy
             $this->eventUserMapper,
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
-        );
+        ];
+        $this->log->info('Preparing: configuring mappers to write to shadow tables');
+        foreach ($mappers as $mapper) {
+            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getBaseTableName(), $mapper->getShadowTableName()));
+        }
+
+        $shadowTable = new ShadowTable(...$mappers);
         $shadowTable->createShadowTables();
         $shadowTable->enable();
     }

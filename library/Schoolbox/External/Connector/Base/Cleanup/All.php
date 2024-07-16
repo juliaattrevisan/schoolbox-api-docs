@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Base\Cleanup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -16,7 +17,7 @@ use Schoolbox\External\Event;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetablePeriodMapper;
-use Schoolbox\Mapper\ShadowTable;
+use Schoolbox\Mapper;
 
 /**
  * Cleans up all SUDS mapper data, by migrating from the shadow table to the
@@ -54,6 +55,7 @@ class All implements IStrategy
     /**
      * Constructor
      *
+     * @param LoggerInterface                 $log
      * @param UserProfile\Mapper              $userProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -70,6 +72,7 @@ class All implements IStrategy
      * @param Event\Roletype\Mapper           $eventRoleTypeMapper
      */
     public function __construct(
+        private LoggerInterface $log,
         private UserProfile\Mapper $userProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -92,7 +95,8 @@ class All implements IStrategy
      */
     public function import(): void
     {
-        $shadowTable = new ShadowTable(
+        /** @var array<Mapper> $mappers */
+        $mappers = [
             $this->userProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,
@@ -107,7 +111,13 @@ class All implements IStrategy
             $this->eventUserMapper,
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
-        );
+        ];
+        $this->log->info('Cleaning up: disabling shadow tables for mappers, swapping shadow tables to base tables');
+        foreach ($mappers as $mapper) {
+            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getShadowTableName(), $mapper->getBaseTableName()));
+        }
+
+        $shadowTable = new Mapper\ShadowTable(...$mappers);
         $shadowTable->disable();
         $shadowTable->swapShadowWithBase();
     }
