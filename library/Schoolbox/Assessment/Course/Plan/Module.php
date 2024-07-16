@@ -105,7 +105,6 @@ class Module extends BaseModule
             $this->getRubricIndicatorMapper(),
             $this->getNodeMapper(),
             $this->getComponentInstanceMapper(),
-            $this->injector->get('l10n'),
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
         );

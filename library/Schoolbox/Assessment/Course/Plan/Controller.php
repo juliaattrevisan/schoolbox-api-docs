@@ -21,7 +21,6 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -31,7 +30,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
-use Schoolbox\L10n\RosettaStone;
 use Scrub;
 use Twig\Error\Error;
 
@@ -46,25 +44,18 @@ class Controller extends Base
     private \Alaress\Database\Statement\Query\Base|IQuery $rubricStatement;
 
     /**
-     * @var RosettaStone
-     */
-    private $rosettaStone;
-
-    /**
      * Controller constructor.
      *
      * @param AssessmentMapperProxy $assessmentMapper
      * @param RubricIndicatorMapper $rubricIndicatorMapper
      * @param Mapper $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
-     * @param RosettaStone $rosettaStone
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapper,
         private RubricIndicatorMapper $rubricIndicatorMapper,
         private Node\Mapper $nodeMapper,
         private \Component_InstanceMapper $componentInstanceMapper,
-        RosettaStone $rosettaStone,
         private CourseConfigMapper $courseConfigMapper,
         private UnitSpecificationMapper $unitSpecificationMapper
     ) {
@@ -135,8 +126,6 @@ class Controller extends Base
             AND sb.use_rubric = 1
             ORDER BY rc.id, riu.sequence, ri.name
         ");
-
-        $this->rosettaStone = $rosettaStone;
     }
 
 
