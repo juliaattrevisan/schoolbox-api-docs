@@ -31,12 +31,12 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('learning.getClasses') }}">Learning</a></li>
     <li><a href="/homepage/{{ folder.id }}">{{ folder.getNameWithCodes() }}</a></li>
-    <li class="active"><span>Lesson Plans</span></li>
+    <li class="active"><span>{{ locale.lessonPlan.properPlural }}</span></li>
 </ul>
 
 <div class="row">
     <div class="small-12">
-        <h1>View All Lesson Plans</h1>
+        <h1>View All {{ locale.lessonPlan.properPlural }}</h1>
     </div>
 </div>
 
@@ -46,9 +46,9 @@
         <i class="icon-lesson-plan"></i>
         <p>
         {% if readOnly %}
-            You have no scheduled lesson plans.
+            You have no scheduled {{ locale.lessonPlan.properPlural }}.
         {% else %}
-            Lesson plans must be connected to a course. To start using lesson plans please
+            {{ locale.lessonPlan.properPlural }} must be connected to a course. To start using {{ locale.lessonPlan.properPlural }} please
         <a href="{{ routeLookup('courseImport.getImport', { courseSpecId: 0, folderId: folder.id }) }}" data-course-selector>
             import a course
         </a>
@@ -94,7 +94,7 @@
                                                 <sbx-pop-out content-id="unit-options{{ unit.id }}"></sbx-pop-out>
                                             </nav>
                                             <ul data-dropdown-content class="f-dropdown" id="unit-options{{ unit.id }}">
-                                                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create Lesson Plan</a></li>
+                                                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">Create {{ locale.lessonPlan.proper }}</a></li>
                                             </ul>
                                         {% endif %}
                                     </div>
