@@ -35,12 +35,11 @@ class Model
      */
     private User $userId;
     private User $user;
-//    private int $userId;
 
     /**
      * last Visit
      */
-    private \Alaress_Date_Format $last_visit;
+    private \Alaress_Date_Format $lastVisit;
 
     /**
      * @return int
@@ -49,7 +48,6 @@ class Model
     {
         return $this->assessmentId;
     }
-
 
     /**
      * @param IAssessable $assessment
@@ -80,7 +78,6 @@ class Model
         return $this->participantId;
     }
 
-
     /**
      * @return User
      */
@@ -88,7 +85,6 @@ class Model
     {
         return $this->participant;
     }
-
 
     /**
      * @param User $participant
@@ -99,7 +95,6 @@ class Model
         $this->participant = $participant;
         return $this;
     }
-
 
     /**
      * @param int $participantId
@@ -152,18 +147,17 @@ class Model
      */
     public function getLastVisit(): \Alaress_Date_Format
     {
-        return $this->last_visit;
+        return $this->lastVisit;
     }
 
-
     /**
-     * @param \Alaress_Date_Format $last_visit
+     * @param \Alaress_Date_Format $lastVisit
      * @return $this
      *
      */
-    public function setLastVisit(\Alaress_Date_Format $last_visit): self
+    public function setLastVisit(\Alaress_Date_Format $lastVisit): self
     {
-        $this->last_visit = $last_visit;
+        $this->lastVisit = $lastVisit;
         return $this;
     }
 }
