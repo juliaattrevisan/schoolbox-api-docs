@@ -384,18 +384,23 @@ class Controller extends Base
         // if we are publishing, snapshot the kami
         if ('1' === ($postVars['publish'] ?? null)) {
             // Find the Kami worksheet (if it exists)
-            /** @var DueWork\Response\Model $response */
+            /** @var null|DueWork\Response\Model $response */
             $response = $feedback->getResponse();
-            $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
-                return $file->getIsWorksheet();
-            })->first()?->getKami();
-            if ($kamiModel) {
-                // Save the kami doc to the feedback object
-                $this->kamiConnector->initiatePollingForKamiDownload(
-                    $kamiModel,
-                    'feedback',
-                    $this->getUser(),
-                );
+            /* there may be no student response... and even if there is a response
+             *  there may be no files...
+             */
+            if ($response?->getAllFiles()->count()) {
+                $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+                    return $file->getIsWorksheet();
+                })->first()?->getKami();
+                if ($kamiModel) {
+                    // Save the kami doc to the feedback object
+                    $this->kamiConnector->initiatePollingForKamiDownload(
+                        $kamiModel,
+                        'feedback',
+                        $this->getUser(),
+                    );
+                }
             }
         }
         if (!$hasRubric && !$isNewFeedback && $feedback->isEmpty()) {

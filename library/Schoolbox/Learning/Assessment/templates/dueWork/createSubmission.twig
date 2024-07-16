@@ -381,17 +381,22 @@ Data:
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 
-                {% if kamiSession %}
+                {% if config.kami_worksheets_enabled and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
                     <div class="row">
                         <div class="small-12 island">
                             <section>
                                 <div class="content">
-                                    {% include 'sub/iframeResponsive.twig' with {
-                                        id: 'kami-viewport',
-                                        src: kamiSession.viewerUrl,
-                                        allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
-                                        dataAttributes: {}
-                                    } only %}
+                                    {% if kamiSession %}
+                                        {% include 'sub/iframeResponsive.twig' with {
+                                            id: 'kami-viewport',
+                                            src: kamiSession.viewerUrl,
+                                            allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
+                                            dataAttributes: {}
+                                        } only %}
+                                    {% else %}
+                                        {# if kami is enabled, and we have a worksheet, but no kami iframe, we should show some help text... #}
+                                        Worksheet is still uploading... Please try again soon
+                                    {% endif %}
                                 </div>
                             </section>
                         </div>
