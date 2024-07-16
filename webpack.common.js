@@ -95,7 +95,7 @@ module.exports = {
             "./www/static/js/calendar/jquery.getExportCalendarLink.js",
 
             // Global property storage
-            "./www/static/js/global/sbProps.js",
+            "./www/static/js/global/sbProps.ts",
         ],
         masonry: {
             import: ["./www/static/js/masonry/masonry.js"],
@@ -245,9 +245,6 @@ module.exports = {
 
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
-
-        // Firebase demo
-        firebaseDemo: "./www/static/js/firebase/firebaseDemo.ts",
 
         //Sass
         core: "./www/static/css/core/core.scss",
