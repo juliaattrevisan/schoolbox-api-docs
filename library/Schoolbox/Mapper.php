@@ -1992,7 +1992,7 @@ abstract class Mapper implements IMapper
      *
      * @return string
      */
-    public function getTable()
+    public function getTable(): string
     {
         return $this->useShadowTable ? $this->getShadowTableName() : $this->getBaseTableName();
     }
@@ -2002,7 +2002,7 @@ abstract class Mapper implements IMapper
      *
      * @return string
      */
-    public function getBaseTableName()
+    public function getBaseTableName(): string
     {
         return $this->table;
     }
@@ -2012,9 +2012,9 @@ abstract class Mapper implements IMapper
      *
      * @return string
      */
-    public function getShadowTableName()
+    public function getShadowTableName(): string
     {
-        return isset($this->table) ? (self::SHADOW_PREFIX . $this->table) : null;
+        return self::SHADOW_PREFIX . $this->table;
     }
 
     /**
