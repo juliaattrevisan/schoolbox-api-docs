@@ -22,48 +22,61 @@ const colours = [
     "#bf1f2e",
 ];
 
+export type StarInitProps = {
+    y: number;
+    x: number;
+    radius: number;
+};
+
 export default class Star {
+    x: number; // the current x position of the streamer
+
+    y: number; // the current y position of the streamer
+
+    radius: number; // the radius (size) of the streamer
+
+    color: string; // the colour of the streamer
+
+    rotation: number; // the rotation of the streamer
+
     /**
      * Store the properties for reference within draw
-     *
-     * @param { x, y, radius }
+     * @param {StarInitProps} init - the properties of the streamer
      */
-    constructor(init) {
+    constructor(init: StarInitProps) {
         this.x = init.x;
         this.y = init.y;
         this.radius = init.radius;
-        this.color = this.getRandomColour();
+        this.color = Star.getRandomColour();
         this.rotation = 0;
     }
 
     /**
      * Get a random colour
-     *
-     * @returns { String }
+     * @returns {string} - the colour of the streamer
      */
-    getRandomColour() {
+    static getRandomColour() {
         return colours[Math.floor(Math.random() * colours.length)];
     }
 
     /**
      * Draw the star as specified by the current properties
-     *
-     * @param { CanvasRenderingContext2D } https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+     * @param {CanvasRenderingContext2D} context -see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
      */
-    draw(context) {
-        context.save(); //save the default state prior to rotation
+    draw(context: CanvasRenderingContext2D) {
+        context.save(); // save the default state prior to rotation
 
-        context.translate(this.x, this.y); //to rotate the canvas
+        context.translate(this.x, this.y); // to rotate the canvas
         context.rotate((this.rotation * Math.PI) / 180);
         context.translate(-this.x, -this.y);
 
         context.beginPath();
-        //5 point star from: https://stackoverflow.com/questions/14580033/algorithm-for-drawing-a-5-point-star
-        const alpha = (2 * Math.PI) / 10; //the angle of rotation to draw the line
+        // 5 point star from: https://stackoverflow.com/questions/14580033/algorithm-for-drawing-a-5-point-star
+        const alpha = (2 * Math.PI) / 10; // the angle of rotation to draw the line
         let rotation;
         let omega;
-        for (var i = 11; i != 0; i--) {
-            //there's 11 points to the star, so we draw 11 lines
+        for (let i = 11; i !== 0; i -= 1) {
+            // there's 11 points to the star, so we draw 11 lines
             rotation = (this.radius * ((i % 2) + 1)) / 2;
             omega = alpha * i;
             context.lineTo(rotation * Math.sin(omega) + this.x, rotation * Math.cos(omega) + this.y);
@@ -71,8 +84,8 @@ export default class Star {
         context.closePath();
 
         context.fillStyle = this.color;
-        context.fill(); //then fill it with the colour specified
+        context.fill(); // then fill it with the colour specified
 
-        context.restore(); //restore to original top/left translation
+        context.restore(); // restore to original top/left translation
     }
 }

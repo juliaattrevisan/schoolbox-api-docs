@@ -1,57 +1,57 @@
 /**
- * animate the birthday notification streamers
+ * animate the birthday notification stars
  */
 
 import { gsap, Physics2DPlugin } from "gsap/all";
 import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
 import type { CanvasDimensions } from "@js/util/canvasUtils";
 import type GSAPTimeline from "gsap";
-import Streamer from "./Streamer";
-// import { getStreamerCount } from "../animateBadgeImage";
+import Star from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/Star";
+// import { getStarCount } from "../animateBadgeImage";
 
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
 /**
- * Set up an array of Streamers
+ * Set up an array of Stars
  * Put them in the centre width of the Canvas and spread them along the vertical axis a bit so they can 'flick' out
- * @param { HTMLCanvasElement} canvas - the canvas element to draw the streamers on
- * @returns {Streamer[]} - the streamers to animate
+ * @param { HTMLCanvasElement} canvas - the canvas element to draw the stars on
+ * @returns {Star[]} - the stars to animate
  */
-function getStreamers(canvas: HTMLCanvasElement) {
-    const streamers = [];
+function getStars(canvas: HTMLCanvasElement) {
+    const stars = [];
     const canvasDimensions = getCanvasDimensions(canvas);
-    let streamer; // reuse reference in loop
+    let star; // reuse reference in loop
     for (let i = 0; i < 50; i += 1) {
-        streamer = new Streamer({
+        star = new Star({
             x: gsap.utils.random(0, canvasDimensions.width),
             y: -50,
             radius: gsap.utils.random(6, 12),
         });
-        streamers.push(streamer);
+        stars.push(star);
     }
-    return streamers;
+    return stars;
 }
 
 /**
- * Each streamer needs to be removed and redrawn each 'tick'
- * @param {Streamer[]} streamers - the streamers to redraw
- * @param {CanvasRenderingContext2D} context - the context to draw the streamers on
+ * Each star needs to be removed and redrawn each 'tick'
+ * @param {Star[]} stars - the stars to redraw
+ * @param {CanvasRenderingContext2D} context - the context to draw the stars on
  * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
  */
-function redrawStreamers(streamers: Streamer[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions) {
+function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions) {
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
-    streamers.forEach((streamer) => streamer.draw(context));
+    stars.forEach((star) => star.draw(context));
 }
 
 /**
- * Each streamer has an animation, and the properties to animate are specified within
+ * Each star has an animation, and the properties to animate are specified within
  * Through the onUpdate of the timeline, the properties are updated each tick
  * @param {GSAPTimeline} timeline - the timeline to add the animations to
- * @param {Streamer} streamer - the streamer to animate
+ * @param {Star} star - the star to animate
  */
-function addStreamerAnimation(timeline: GSAPTimeline, streamer: Streamer) {
+function addStarAnimation(timeline: GSAPTimeline, star: Star) {
     timeline.to(
-        streamer,
+        star,
         {
             delay: "random(0, 3)",
             duration: "random(3.5, 6.5)",
@@ -65,26 +65,26 @@ function addStreamerAnimation(timeline: GSAPTimeline, streamer: Streamer) {
 }
 
 /**
- * Get all the streamers, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
- * @param {HTMLCanvasElement} canvas - the canvas element to draw the streamers on
+ * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
+ * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
  */
-function animateStreamers(canvas: HTMLCanvasElement) {
-    const streamers = getStreamers(canvas);
+function animateStars(canvas: HTMLCanvasElement) {
+    const stars = getStars(canvas);
     const context = getContext(canvas) as CanvasRenderingContext2D;
     const canvasDimensions = getCanvasDimensions(canvas);
     const timeline = gsap.timeline({
         // https://greensock.com/docs/v3/GSAP/gsap.timeline()
-        delay: 0.2, // wait prior to animating the streamers ot best sync to the badge animation
+        delay: 0.2, // wait prior to animating the stars ot best sync to the badge animation
         repeat: 0,
-        onUpdate: () => redrawStreamers(streamers, context, canvasDimensions), // to draw the new position of the streamers each tick
+        onUpdate: () => redrawStars(stars, context, canvasDimensions), // to draw the new position of the stars each tick
     });
-    streamers.forEach((streamer) => addStreamerAnimation(timeline, streamer, canvasDimensions));
+    stars.forEach((star) => addStarAnimation(timeline, star, canvasDimensions));
 }
 
 /**
- * Set up both the badge and the streamers animations
- * @param {HTMLCanvasElement} canvas - the canvas element to draw the streamers on
+ * Set up both the badge and the stars animations
+ * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
  */
 export function init(canvas: HTMLCanvasElement) {
-    animateStreamers(canvas);
+    animateStars(canvas);
 }
