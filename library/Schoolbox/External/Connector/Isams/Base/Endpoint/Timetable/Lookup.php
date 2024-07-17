@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
  */
 class Lookup
 {
-
     /**
      * @var TimetablePeriodMapper
      */
