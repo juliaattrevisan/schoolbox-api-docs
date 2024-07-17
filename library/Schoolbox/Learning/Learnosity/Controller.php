@@ -37,6 +37,7 @@ use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -1815,6 +1816,68 @@ class Controller extends Base
         /* Save it
          */
         $this->attemptMapper->save($attempt);
+    }
+
+
+    /**
+     * Post the human-readable overall mark for an Attempt into assess_attempt.mark
+     *
+     * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws Deleted
+     * @throws DebugBarException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postFeedbackAttemptScore(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $mark = 'Not Submitted';
+
+        if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            try {
+                $assessment->getMarkScheme()->setTotalMark((float)($attempt->getMaxMark()));
+            } catch (\RangeException $e) {
+                // This is thrown if you haven't assigned question scores in learnosity
+            }
+        }
+
+        /* Default values
+         * Note that $mark might be empty string at this point:
+         * this occurs when you add a comment before the grade, in the Quiz Quickmark screen
+         */
+        $normalisedMark = null;
+        $humanReadableMark = null;
+
+        /* Apparently this is how you detect a Submission State: an exception is thrown
+         * trying to interpret it as one of the Mark Schemes. No wonder it was classified
+         * as the $errors var. Wild!
+         *
+         * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
+         */
+        try {
+            $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark($mark);
+            $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        } catch (\InvalidArgumentException $e) {
+            if ('' !== $mark) {
+                /* If it's a Submission State, save the text as the human readable mark
+                 * and derive its normalised mark from the uh Lists in admin
+                 */
+                $code = $this->stateMapper->findOneByColumn('display_as', $mark);
+
+                $normalisedMark = $code->getNormaliseAs();
+                $humanReadableMark = $mark;
+            }
+        }
+
+        new \Alaress_Probe(sprintf(
+            'Normalised: %s<br />Human-readable: %s',
+            $normalisedMark,
+            $humanReadableMark
+        ));
     }
 
 
