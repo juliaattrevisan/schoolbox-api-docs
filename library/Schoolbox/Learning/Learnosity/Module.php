@@ -154,7 +154,7 @@ class Module extends BaseModule
 
         /* Persist feedback to a student's attempt
          */
-        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
+//        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Start horizontal marking using a Learnosity Report
          */
@@ -164,17 +164,29 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/horizontal', 'postHorizontalMarking', $instructorPerms, $preloadAssessment);
 
-        /* Provide updated score for a particular student response
+        /* Each part of the process where teacher provides feedback now has granular endpoints
+         * There's a unique endpoint for:
+         *     - updating the score for a particular Question
+         *     - updating the comment for a particular Question
+         *     - updating the overall comment for a particular Attempt
+         *     - updating the overall score for a particular Attempt
+         *
+         * The conversion to vue for horizontal marking meant all these vue components became
+         * really granular and ended up having their own behaviours. A full synchronous endpoint
+         * is no longer required, which is what postFeedback() used to be.
+         */
+
+        /* Provide updated score for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
         $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
 
-        /* Provide updated comment for a particular student response
+        /* Provide updated comment for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
         $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
 
-        /* Provide updated comment for a particular student attempt
+        /* Provide updated overall attempt comment for a particular student attempt
          * (used predominantly in horizontal marking)
          */
         $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
