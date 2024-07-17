@@ -4,19 +4,23 @@
  */
 
 import { gsap } from "gsap/all";
+import { init } from "./birthdayNotificationStreamers";
 
 /**
  * Animate streamers behind the birthday bell
  */
-function animateStreamers() {}
+function animateStreamers() {
+    const streamersCanvas = document.querySelector("[data-birthday-bell-streamers]");
+    init(streamersCanvas);
+}
 
 /**
  * Animate the birthday bell
  */
 function animateBell() {
-    const birthdayBell = document.querySelector("[data-birthday-bell]");
-    gsap.set(birthdayBell, { rotate: 50 });
-    gsap.to(birthdayBell, {
+    const bell = document.querySelector("[data-birthday-bell]");
+    gsap.set(bell, { rotate: 50 });
+    gsap.to(bell, {
         rotate: -50,
         duration: 1.6,
         ease: "power2.inOut",
@@ -35,7 +39,7 @@ window.Vue.onMounted(() => {
 <template>
     <div class="c-birthday-notification">
         <div class="c-birthday-notification__background">
-            <canvas width="72" height="72"></canvas>
+            <canvas width="72" height="72" data-birthday-bell-streamers></canvas>
         </div>
         <div class="c-birthday-notification__foreground l-flex l-flex--center">
             <sbx-icon
