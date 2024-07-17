@@ -181,6 +181,16 @@
                 clearInterval(ii);
                 ii = setInterval(updateRelativeTimes, 9000);
 
+                // if we have badge support, then set the unread count of notifications
+                if ('setAppBadge' in navigator) {
+                    // Display the number of unread messages.
+                    if (unreadTotal > 0) {
+                        navigator.setAppBadge(unreadTotal);
+                    } else {
+                        navigator.clearAppBadge();
+                    }
+                }
+
                 // if we haven't run this yet, then auto read the messages
                 if (!settings.autoReadNotif) {
                     self.autoUnread();
