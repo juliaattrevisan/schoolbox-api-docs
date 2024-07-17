@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>();
 
 const notificationEl = window.Vue.ref<HTMLDivElement | null>(null);
+const duration = window.Vue.ref(1.5);
 
 /**
  * Append the birthday notification to the notifications list
@@ -36,7 +37,7 @@ function animateBell() {
     gsap.set(bell, { rotate: 50 });
     gsap.to(bell, {
         rotate: -50,
-        duration: 1.5,
+        duration: duration.value,
         ease: "power2.inOut",
         transformOrigin: "center top",
         repeat: -1,
@@ -48,6 +49,7 @@ function animateBell() {
  * Handle the click event when the notification is selected
  */
 function onSelected() {
+    notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
     emit("selected");
 }
 
