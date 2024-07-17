@@ -163,7 +163,7 @@ class Module extends BaseModule
         /* Each part of the process where teacher provides feedback now has granular endpoints
          * There's a unique endpoint for:
          *     - updating the score for a particular Question
-         *     - updating the comment for a particular Question
+         *     - updating the comment for a particular Item
          *     - updating the overall comment for a particular Attempt
          *     - updating the overall score for a particular Attempt
          *
@@ -184,8 +184,6 @@ class Module extends BaseModule
 
         /* Provide updated overall attempt score for a particular student attempt
          * (used predominantly in horizontal marking)
-         *
-         * TODO switch it back to post
          */
         $this->register('POST', '/{assessmentId}/feedback/{studentId}/attempt/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
 
