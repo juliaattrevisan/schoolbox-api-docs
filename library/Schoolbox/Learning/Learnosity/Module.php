@@ -187,7 +187,7 @@ class Module extends BaseModule
          *
          * TODO switch it back to post
          */
-        $this->register('GET', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
 
         /* Provide updated overall attempt comment for a particular student attempt
          * (used predominantly in horizontal marking)
