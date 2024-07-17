@@ -123,7 +123,7 @@ class DataRestorer
             $this->executeIfPersisting($sql);
         }
 
-        $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDb->getCanvasDbName()}.{$tableName}";
+        $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA LOCAL INFILE '$tableFile' INTO TABLE {$this->canvasDb->getCanvasDbName()}.{$tableName}";
         if ($ignoreFirstLine) {
             $sql .= ' IGNORE 1 LINES';
         }
