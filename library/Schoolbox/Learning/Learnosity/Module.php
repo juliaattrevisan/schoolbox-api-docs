@@ -175,24 +175,24 @@ class Module extends BaseModule
         /* Provide updated score for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/question/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
 
         /* Provide updated comment for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/item/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
 
         /* Provide updated overall attempt score for a particular student attempt
          * (used predominantly in horizontal marking)
          *
          * TODO switch it back to post
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/attempt/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
 
         /* Provide updated overall attempt comment for a particular student attempt
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/attempt/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
 
         /* polld endpoints: these exist to combat learnosity's universally asynchronous nature.
          *
