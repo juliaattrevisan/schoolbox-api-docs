@@ -1835,7 +1835,7 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $mark = 'Not Submitted';
+        $mark = '10 / 12';
 
         if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
             try {
@@ -1878,6 +1878,12 @@ class Controller extends Base
             $normalisedMark,
             $humanReadableMark
         ));
+
+        /* Update the deets and save it
+         */
+        $attempt->setMark($humanReadableMark)->setNormalisedMark($normalisedMark);
+
+        $this->attemptMapper->save($attempt);
     }
 
 
