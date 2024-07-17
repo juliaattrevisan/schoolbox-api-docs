@@ -22,12 +22,10 @@ const colours = [
     "#bf1f2e",
 ];
 
-export type StreamerProps = {
+export type StreamerInitProps = {
     y: number;
     x: number;
     radius: number;
-    color: string;
-    rotation: number;
 };
 
 export default class Streamer {
@@ -43,9 +41,9 @@ export default class Streamer {
 
     /**
      * Store the properties for reference within draw
-     * @param {StreamerProps} init - the properties of the streamer
+     * @param {StreamerInitProps} init - the properties of the streamer
      */
-    constructor(init: StreamerProps) {
+    constructor(init: StreamerInitProps) {
         this.x = init.x;
         this.y = init.y;
         this.radius = init.radius;

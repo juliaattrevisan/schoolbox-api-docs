@@ -4,16 +4,18 @@
 
 import { gsap, Physics2DPlugin } from "gsap/all";
 import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
+import type { CanvasDimensions } from "@js/util/canvasUtils";
+import type GSAPTimeline from "gsap";
 import Streamer from "./Streamer";
 // import { getStreamerCount } from "../animateBadgeImage";
 
-gsap.registerPlugin(Physics2DPlugin);
+gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
 /**
  * Set up an array of Streamers
  * Put them in the centre width of the Canvas and spread them along the vertical axis a bit so they can 'flick' out
  * @param { HTMLCanvasElement} canvas - the canvas element to draw the streamers on
- * @returns { Array }
+ * @returns {Streamer[]} - the streamers to animate
  */
 function getStreamers(canvas: HTMLCanvasElement) {
     const streamers = [];
@@ -32,11 +34,11 @@ function getStreamers(canvas: HTMLCanvasElement) {
 
 /**
  * Each streamer needs to be removed and redrawn each 'tick'
- * @param { Array }
- * @param { CanvasRenderingContext2D }
- * @param { width, height }
+ * @param {Streamer[]} streamers - the streamers to redraw
+ * @param {CanvasRenderingContext2D} context - the context to draw the streamers on
+ * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
  */
-function redrawStreamers(streamers, context, canvasDimensions) {
+function redrawStreamers(streamers: Streamer[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions) {
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
     streamers.forEach((streamer) => streamer.draw(context));
 }
@@ -46,9 +48,9 @@ function redrawStreamers(streamers, context, canvasDimensions) {
  * Through the onUpdate of the timeline, the properties are updated each tick
  * @param {GSAPTimeline} timeline - the timeline to add the animations to
  * @param {Streamer} streamer - the streamer to animate
- * @param { width, height }
+ * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
  */
-function addStreamerAnimation(timeline: GSAPTimeline, streamer, canvasDimensions) {
+function addStreamerAnimation(timeline: GSAPTimeline, streamer: Streamer, canvasDimensions: CanvasDimensions) {
     timeline.to(
         streamer,
         {
@@ -76,7 +78,7 @@ function addStreamerAnimation(timeline: GSAPTimeline, streamer, canvasDimensions
  */
 function animateStreamers(canvas: HTMLCanvasElement) {
     const streamers = getStreamers(canvas);
-    const context = getContext(canvas);
+    const context = getContext(canvas) as CanvasRenderingContext2D;
     const canvasDimensions = getCanvasDimensions(canvas);
     const timeline = gsap.timeline({
         // https://greensock.com/docs/v3/GSAP/gsap.timeline()
