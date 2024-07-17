@@ -412,12 +412,6 @@
                             debug: Boolean({{ config.debug_mode }})
                         });
 
-                        // if we have badge support, then set the unread count of notifications
-                        if (navigator.setAppBadge) {
-                            // Display the number of unread messages.
-                            navigator.setAppBadge(Number('{{ ws.unread }}'));
-                        }
-
                         $('#alert-dialog').on('click', 'a.action', function (e) {
                             e.preventDefault();
                         });
