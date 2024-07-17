@@ -1837,7 +1837,14 @@ class Controller extends Base
         \Schoolbox\User $student,
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
-        $mark = '10 / 12';
+        $postData = $this->requestPost->getArrayCopy();
+        $postData['mark'] = 'Pending';
+
+        /* If this is an actual grade, try to interpret the pieces:
+         *     - Human-readable mark, from the combobox
+         *     - Normalised mark derived from the human-readable mark
+         */
+        $mark = trim((string)$postData['mark']);
 
         if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
             try {
