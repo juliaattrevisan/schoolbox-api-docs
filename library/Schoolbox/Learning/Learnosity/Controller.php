@@ -667,12 +667,17 @@ class Controller extends Base
      * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
+     * @throws ApiException
      * @throws Deleted
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
      * @throws NotFound
+     * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \Interop\Queue\Exception
+     * @throws \InvalidArgumentException
      * @throws \JsonException
      * @throws \PDOException
-     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -1644,6 +1649,7 @@ class Controller extends Base
      * @param string $learnosityReference
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function getArchiveReference(string $learnosityReference): void
@@ -1714,14 +1720,18 @@ class Controller extends Base
      * @param QuizDomainObject $source
      * @param QuizDomainObject $destination
      * @return void
-     * @throws RouteNotFound
+     * @throws Deleted
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws SourceAssociationException
      * @throws ValidationException
      * @throws \DomainException
      * @throws \Interop\Queue\Exception
-     * @throws InvalidDestinationException
-     * @throws InvalidMessageException
-     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
@@ -1751,6 +1761,9 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws Exception
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function postPollQuizStatus(QuizDomainObject $assessment): void
     {
@@ -1791,9 +1804,16 @@ class Controller extends Base
      * @since 23.1
      *
      * @param QuizDomainObject $assessment
-     * @param User             $student
-     * @param Model            $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postPollQuizAttemptStatus(
         QuizDomainObject $assessment,
