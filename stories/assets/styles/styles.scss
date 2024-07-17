@@ -60,3 +60,7 @@ body {
 .l-gap--0 {
     gap: 0;
 }
+
+p {
+    font-size: 1rem !important; // to override the default font size
+}

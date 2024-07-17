@@ -7,7 +7,6 @@ import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
 import type { CanvasDimensions } from "@js/util/canvasUtils";
 import type GSAPTimeline from "gsap";
 import Star from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/Star";
-// import { getStarCount } from "../animateBadgeImage";
 
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
@@ -78,7 +77,7 @@ function animateStars(canvas: HTMLCanvasElement) {
         repeat: 0,
         onUpdate: () => redrawStars(stars, context, canvasDimensions), // to draw the new position of the stars each tick
     });
-    stars.forEach((star) => addStarAnimation(timeline, star, canvasDimensions));
+    stars.forEach((star) => addStarAnimation(timeline, star));
 }
 
 /**

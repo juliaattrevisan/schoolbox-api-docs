@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import BirthdayNotification from "./birthday-notification.vue";
 
 /**
- * Animation that appears over the notification bell when it is the user's birthday
+ * Animation that appears over the notification bell when it is the user's birthday.
+ * Selecting the notification will display the birthday modal.
  */
 const meta: Meta<typeof BirthdayNotification> = {
     component: BirthdayNotification,

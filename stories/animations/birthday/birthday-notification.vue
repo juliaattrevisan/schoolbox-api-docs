@@ -10,7 +10,7 @@ import { init } from "./birthdayNotificationStreamers";
  * Animate streamers behind the birthday bell
  */
 function animateStreamers() {
-    const streamersCanvas = document.querySelector("[data-birthday-bell-streamers]");
+    const streamersCanvas = document.querySelector("[data-birthday-bell-streamers]") as HTMLCanvasElement;
     init(streamersCanvas);
 }
 
@@ -22,7 +22,7 @@ function animateBell() {
     gsap.set(bell, { rotate: 50 });
     gsap.to(bell, {
         rotate: -50,
-        duration: 1.6,
+        duration: 1.5,
         ease: "power2.inOut",
         transformOrigin: "center top",
         repeat: -1,
@@ -30,6 +30,9 @@ function animateBell() {
     });
 }
 
+/**
+ * Initialize the animations when the component is mounted
+ */
 window.Vue.onMounted(() => {
     animateStreamers();
     animateBell();
