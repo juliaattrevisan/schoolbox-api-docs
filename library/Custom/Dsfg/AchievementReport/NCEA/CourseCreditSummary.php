@@ -29,6 +29,7 @@ class CourseCreditSummary extends Base
             'externalId' => $this->getExternalUserId(),
             'year' => $this->year
         ];
+return [];
 
         $query = '
             SELECT

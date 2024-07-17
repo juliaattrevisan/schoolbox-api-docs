@@ -601,6 +601,7 @@ class Controller extends Base
          * could fiddle with the url to get illegal values
          */
         $allYears = (new IB\Navigation($user, $externalUser, $db, $year))->findData();
+$allYears = [2022, 2023, 2024];
 
         /* If $year wasn't provided, go with the most recent year we have
          */
@@ -653,6 +654,7 @@ class Controller extends Base
      */
     public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
+$externalUser = ['StudentID' => 201]; // 201 is jreed's user.synergy_id.
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
@@ -710,6 +712,7 @@ class Controller extends Base
          */
         $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
         $allYears = $navigation->findData();
+$allYears = [2022, 2023, 2024];
 
         if (\count($allYears)) {
             /* Course Credit Summary year selectors
@@ -784,6 +787,7 @@ class Controller extends Base
          * could fiddle with the url to get illegal values
          */
         $allYears = (new Comments\CommentsNavigation($user, $externalUser, $db, $year))->findData();
+$allYears = [2022, 2023, 2024];
 
         /* If $year wasn't provided, go with the most recent year we have
          */

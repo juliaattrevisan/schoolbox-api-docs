@@ -35,7 +35,82 @@ class Base extends AchievementReportBase
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,
         ];
+return [
+    'data' => [
+        'L&L:EL' => [
+            'topics'     => [
+                'A Wealth of Connections'      => ['A' => null, 'B' => null, 'C' => null, 'D' => null],
+                'Books as Mirrors and Windows' => ['A' => null, 'B' => null, 'C' => null, 'D' => null],
+                'Keep it Short, Sweetie'       => ['A' => 4   , 'B' => 5   , 'C' => null, 'D' => null],
+                'Who is Billy Shakespeare'     => ['A' => null, 'B' => null, 'C' => 6   , 'D' => 4   ],
+            ],
+            'overview'   => 'This is the subject overview for L&L:EL.',
+            'comments'   => [
+                [
+                    'comment' => 'Term 2 - Molly is a capable and focused student. She is producing work at a high level in both writing and speaking. Her essay last term presented ideas clearly and logically. Her writing was confident and mainly accurate. In the recent monologue assessment, Molly performed in-role as Kate, using language well and connecting to themes from the play. Her delivery was clear, though eye contact was limited, because she relied too heavily on cue cards and she spoke quickly. These are important aspects to remember before the next opportunity to present. Overall, she is having a positive year in English and it is a pleasure to teach her.',
+                    'staffName' => 'Mr A Jones',
+                    'staffEmail' => 'ajones@email.com',
+                ]
+            ],
+            'staffName'  => 'Mr A Jones',
+            'staffEmail' => 'ajones@email.com',
+        ],
+        'D:FDT' => [
+        'topics'     => [
+            'Chef Savvy'                   => ['A' => null, 'B' => 5   , 'C' => 7   , 'D' => null],
+            'Day of the Dead'              => ['A' => null, 'B' => null, 'C' => null, 'D' => null],
+            'Eat Street - Day of the Dead' => ['A' => 4   , 'B' => 5   , 'C' => null, 'D' => null],
+        ],
+        'overview'   => 'This is the subject overview for D:FDT.',
+        'comments'   => [
+            [
+                'comment' => 'Term 2 - Molly works collaboratively in a group environment where she demonstrates increasing proficiency in her knife handling skills. She has continued to develop confidence as she accepts more complex technical challenges, thus becoming more intuitive in her practice. In the poke bowl assessment, she demonstrated her understanding of design principles and began to apply them to her concept drawings. Adding more detailed annotations would enhance her work. Molly is a pleasure to teach.',
+                'staffName' => 'Miss H Peterson',
+                'staffEmail' => 'hpeterson@email.com',
+            ]
+        ],
+        'staffName'  => 'Miss H Peterson',
+        'staffEmail' => 'ajones@email.com',
+    ]
+    ],
+    'headings' => [
+        'L&L:EL' => [
+            'subjectName'   => 'Language and Literature: English Literature',
+            'staffName'     => 'Mr A Jones',
+            'staffEmail'    => 'ajones@email.com',
+            'topicHeadings' => [
+                'A Wealth of Connections',
+                'Books as Mirrors and Windows',
+                'Keep it Short, Sweetie',
+                'Who is Billy Shakespeare',
+            ],
+            'shortHeadings' => [
+                'A' => 'Analysing',
+                'B' => 'Organising',
+                'C' => 'Producing text',
+                'D' => 'Using language'
+            ],
+        ],
+        'D:FDT' => [
+            'subjectName'   => 'Design: Food Design Technology',
+            'staffName'     => 'Miss H Peterson',
+            'staffEmail'    => 'hpeterson@email.com',
+            'topicHeadings' => [
+                'Chef Savvy',
+                'Day of the Dead',
+                'Eat Street - Day of the Dead'
+            ],
+            'shortHeadings' => [
+                'A' => 'Inquiring and analysing',
+                'B' => 'Developing ideas',
+                'C' => 'Creating the solution',
+                'D' => 'Evaluating'
+            ]
+        ]
+    ]
+];
 
+// TODO: Get FileSemester in the query below, and use its value somehow to determine which Overview to display.
         $query = "
             SELECT
                 ID,
@@ -176,6 +251,7 @@ class Base extends AchievementReportBase
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,
         ];
+return [];
 
         $query = "
             SELECT
