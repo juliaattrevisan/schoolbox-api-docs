@@ -156,10 +156,16 @@ abstract class Mapper implements IMapper
     protected IConnector $databaseRead;
 
     /**
-     * @var string
+     * The mapper's table: may be null if it maps something which isn't a table.
      */
-    protected $table;
+    protected ?string $table = null;
 
+    /**
+     * Are shadow tables in use for this mapper?
+     *
+     * If so, `$this->getTable()` returns `$this->table` prefixed with
+     * `self::SHADOW_PREFIX`.
+     */
     protected bool $useShadowTable = false;
 
     /**
@@ -1990,9 +1996,9 @@ abstract class Mapper implements IMapper
     /**
      * Return the table name, respecting shadow table if enabled.
      *
-     * @return string
+     * @return string|null
      */
-    public function getTable(): string
+    public function getTable(): ?string
     {
         return $this->useShadowTable ? $this->getShadowTableName() : $this->getBaseTableName();
     }
@@ -2000,9 +2006,9 @@ abstract class Mapper implements IMapper
     /**
      * Return the table name, ignoring shadow table.
      *
-     * @return string
+     * @return string|null
      */
-    public function getBaseTableName(): string
+    public function getBaseTableName(): ?string
     {
         return $this->table;
     }
@@ -2010,11 +2016,11 @@ abstract class Mapper implements IMapper
     /**
      * Return the shadow table name, regardless of whether it's in use.
      *
-     * @return string
+     * @return string|null
      */
-    public function getShadowTableName(): string
+    public function getShadowTableName(): ?string
     {
-        return self::SHADOW_PREFIX . $this->table;
+        return isset($this->table) ? (self::SHADOW_PREFIX . $this->table) : null;
     }
 
     /**
