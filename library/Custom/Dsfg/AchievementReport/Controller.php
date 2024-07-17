@@ -859,12 +859,13 @@ $allYears = [2022, 2023, 2024];
      */
     public function getMyp(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
+$loggedInUserId = $this->getUser()->getId();
         /* Default to this year if none specified
          */
         $currentYear  = (int)date('Y');
         $selectedYear = $year ?? $currentYear;
         $mypBase      = new MYP\Base($user, $externalUser, $db, $selectedYear);
-        $mypData      = $mypBase->findData();
+        $mypData      = $mypBase->findData($loggedInUserId);
 
         // get historical data
         $currentYearLevel = (int)$user->getYear()->getName();
@@ -876,7 +877,7 @@ $allYears = [2022, 2023, 2024];
             $historicalYear              = $currentYear - ($currentYearLevel - $yearLevel);
             $historicalMypBase           = new MYP\Base($user, $externalUser, $db, $historicalYear);
             $historical[$historicalYear] = [
-                'subjects' => $historicalMypBase->findData(),
+                'subjects' => $historicalMypBase->findData($loggedInUserId),
                 'grades'   => $historicalMypBase->getMYPGrade(),
             ];
         }
