@@ -1838,7 +1838,6 @@ class Controller extends Base
         \Schoolbox\Learning\Quiz\Attempt\Model $attempt
     ): void {
         $postData = $this->requestPost->getArrayCopy();
-        $postData['mark'] = 'Pending';
 
         /* If this is an actual grade, try to interpret the pieces:
          *     - Human-readable mark, from the combobox
@@ -1881,12 +1880,6 @@ class Controller extends Base
                 $humanReadableMark = $mark;
             }
         }
-
-        new \Alaress_Probe(sprintf(
-            'Normalised: %s<br />Human-readable: %s',
-            $normalisedMark,
-            $humanReadableMark
-        ));
 
         /* Update the deets and save it
          */
