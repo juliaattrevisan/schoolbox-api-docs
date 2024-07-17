@@ -22,16 +22,34 @@ const colours = [
     "#bf1f2e",
 ];
 
+export type StreamerProps = {
+    y: number;
+    x: number;
+    radius: number;
+    color: string;
+    rotation: number;
+};
+
 export default class Streamer {
+    x: number; // the current x position of the streamer
+
+    y: number; // the current y position of the streamer
+
+    radius: number; // the radius (size) of the streamer
+
+    color: string; // the colour of the streamer
+
+    rotation: number; // the rotation of the streamer
+
     /**
      * Store the properties for reference within draw
-     * @param { x, y, radius }
+     * @param {StreamerProps} init - the properties of the streamer
      */
-    constructor(init) {
+    constructor(init: StreamerProps) {
         this.x = init.x;
         this.y = init.y;
         this.radius = init.radius;
-        this.color = this.getRandomColour();
+        this.color = Streamer.getRandomColour();
         this.rotation = 0;
     }
 
@@ -39,7 +57,7 @@ export default class Streamer {
      * Get a random colour
      * @returns {string} - the colour of the streamer
      */
-    getRandomColour() {
+    static getRandomColour() {
         return colours[Math.floor(Math.random() * colours.length)];
     }
 
