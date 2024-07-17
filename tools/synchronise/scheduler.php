@@ -222,7 +222,6 @@ HELP;
             }
 
             (new Endpoint\Scheduler(
-                $randomMapper->getDatabase(),
                 $frequency,
                 $customHours,
                 $sisFactory,
@@ -239,7 +238,6 @@ HELP;
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
 
         (new Endpoint\Scheduler(
-            $randomMapper->getDatabase(),
             $frequency,
             $customHours,
             $calendarFactory,

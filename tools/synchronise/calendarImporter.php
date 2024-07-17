@@ -112,9 +112,7 @@ NULLTYPE;
          */
         $factory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
 
-        $randomMapper = UserMapper::getInstance();
         (new Endpoint\Scheduler(
-            $randomMapper->getDatabase(),
             $frequency,
             $customHours,
             $factory,
