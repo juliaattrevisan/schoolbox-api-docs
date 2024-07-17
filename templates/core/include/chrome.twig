@@ -287,6 +287,10 @@
                                 <a class="right-off-canvas-toggle icon-notifications" id="notification-toggle" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
+                                <div id="birthday-surprise-container">
+                                    <birthday-surprise />
+                                </div>
+                                <script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
                             </section>
                         {% endif %}
                     {% endblock messaging %}
