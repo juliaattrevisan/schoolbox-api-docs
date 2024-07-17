@@ -89,7 +89,7 @@ export default {
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
-                            return row.campuses.includes(query); //need to flatten the campuses array then check
+                            return row.campuses.includes(query); // check for a match in the campuses array
                         },
                     },
                     {
@@ -110,13 +110,13 @@ export default {
                     {
                         name: FilterEvents.TOKEN,
                         callback: (row, query) => {
-                            return row.token === Number(query);
+                            return row.token === Number(query); // cast to number to match
                         },
                     },
                     {
                         name: FilterEvents.EPORTFOLIO,
                         callback: (row, query) => {
-                            return row.eportfolio_enabled === Number(query);
+                            return row.eportfolio_enabled === Number(query); // cast to number to match
                         },
                     },
                 ],
@@ -146,7 +146,7 @@ export default {
                 },
                 orderBy: {
                     ascending: false,
-                    column: "Surname", //TODO ??
+                    column: "Surname",
                 },
                 perPage: 25,
                 perPageValues: [25, 50, 100, 150, 200],
