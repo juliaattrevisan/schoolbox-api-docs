@@ -11,11 +11,21 @@ namespace Schoolbox\Mapper;
 
 use Schoolbox\Mapper;
 
+/**
+ * Management class for shadow tables.
+ *
+ * This class provides convenience methods for performing the following with a
+ * collection of mappers:
+ * * enabling/disabling usage of shadow tables
+ * * creating shadow tables
+ * * copying data from base to shadow
+ * * swapping shadow and base tables, so that the shadow becomes the new base
+ */
 class ShadowTable
 {
     /**
-     * Suffix for temporary table names: used only when copying the shadow table
-     * to the base table name.
+     * Suffix for temporary table names: used only when swapping the shadow
+     * table with the base table.
      */
     private const TEMP_SUFFIX = '__temp';
 
