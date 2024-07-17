@@ -17,6 +17,7 @@ use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
 use PDO;
+use Schoolbox\Config\Loader;
 
 use function in_array;
 
@@ -126,6 +127,7 @@ class Broker extends Base
      */
     public function getDsn()
     {
+        $config = new Loader();
         $portString = '';
 
         if (!empty($this->connector->getPort())) {
@@ -141,6 +143,7 @@ class Broker extends Base
         return
             "sqlsrv:Server={$this->connector->getHostname()}{$portString};" .
             "Database={$this->connector->getDatabase()};" .
+            "Encrypt={$config->get('external_db_encryption')};" .
             "LoginTimeout=" . self::LOGIN_TIMEOUT . ";" .                // Give the connector 5 seconds to login- so we can default back to Offline connector
             "MultipleActiveResultSets={$multipleActiveResultsSets};";    // Disable Multiple Active Result Sets (aka. MARS) for performance reasons
     }
