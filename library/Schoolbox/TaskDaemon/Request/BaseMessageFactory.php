@@ -46,6 +46,11 @@ abstract class BaseMessageFactory
     private ?User $effector = null;
 
     /**
+     * The expiry of the login token created for `$effector`, if there is one.
+     */
+    private ?Alaress_Date_Format $tokenExpiry = null;
+
+    /**
      * Constructor
      *
      * @param Instance    $instance     Information about the Schoolbox instance.
@@ -150,13 +155,35 @@ abstract class BaseMessageFactory
     }
 
     /**
+     * Set the expiry time of the token for `$this->effector`.
+     *
+     * The token created for them won't be valid after this date.
+     *
+     * @param Alaress_Date_Format|null $tokenExpiry
+     * @return $this
+     */
+    public function setTokenExpiry(?Alaress_Date_Format $tokenExpiry): static
+    {
+        $clone = clone $this;
+        $clone->tokenExpiry = $tokenExpiry;
+        return $clone;
+    }
+
+    /**
      * Build the request to send to taskd.
      *
      * @return Message
      */
     public function build(): Message
     {
-        $token  = $this->effector ? $this->tokenBuilder->generate($this->effector, null, null, [SelfIssued::CUSTOM_CLAIM_TASKD => 1]) : null;
+        $token  = $this->effector
+            ? $this->tokenBuilder->generate(
+                $this->effector,
+                $this->tokenExpiry,
+                null,
+                [SelfIssued::CUSTOM_CLAIM_TASKD => 1],
+            )
+            : null;
         $params = $this->buildParams();
         if (isset($token)) {
             $params['token'] = $token;

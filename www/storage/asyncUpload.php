@@ -23,9 +23,9 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 // Init the session from auth header if it's there
-$user = $kernel->extractUserFromAuthHeader($_SERVER['HTTP_AUTHORIZATION'] ?? null);
+[$user, $bypassIpTracking] = $kernel->extractUserFromAuthHeader($_SERVER['HTTP_AUTHORIZATION'] ?? null);
 if ($user) {
-    $kernel->authenticateUserForThisRequestOnly($user);
+    $kernel->authenticateUserForThisRequestOnly($user, $bypassIpTracking);
 }
 
 /** @var PrefixGenerator $prefixGenerator */

@@ -133,11 +133,11 @@ class Kernel extends WebKernelAbstract
         $route = $matcher->match($request);
 
         try {
-            $authHeaderUser = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
+            [$authHeaderUser, $bypassIpTracking] = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
             if ($route instanceof Route) {
-                $this->outputAuraContent($route, $authHeaderUser);
+                $this->outputAuraContent($route, $authHeaderUser, $bypassIpTracking);
             } else {
-                $this->outputSitepageContent($path, $authHeaderUser);
+                $this->outputSitepageContent($path, $authHeaderUser, $bypassIpTracking);
             }
         } catch (Unauthenticated $e) {
             // Unauthenticated response - redirect to a login page.
@@ -230,16 +230,19 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Aura-based content.
      *
-     * @param Route     $route          the route to render: the controller and
-     *                                  action are extracted from its name.
-     * @param User|null $authHeaderUser A user from the `Authorization` header,
-     *                                  if provided and valid.
+     * @param Route     $route            the route to render:
+     *                                    the controller and action are
+     *                                    extracted from its name.
+     * @param User|null $authHeaderUser   User from the `Authorization` header
+     *                                    (if provided and valid).
+     * @param bool      $bypassIpTracking If true: bypass IP tracking of the
+     *                                    session.
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
      * @throws Throwable
      */
-    private function outputAuraContent(Route $route, ?User $authHeaderUser): void
+    private function outputAuraContent(Route $route, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -259,7 +262,7 @@ class Kernel extends WebKernelAbstract
         // you aren't making requests with a JWT when you are already logged in.
         $session = null;
         if ($authHeaderUser) {
-            $this->authenticateUserForThisRequestOnly($authHeaderUser);
+            $this->authenticateUserForThisRequestOnly($authHeaderUser, $bypassIpTracking);
             $user = $authHeaderUser;
         } else {
             /** @var \Alaress\Session\Session $session */
@@ -432,13 +435,15 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Sitepage-based content.
      *
-     * @param string|null $path           the base path that was requested
-     * @param User|null   $authHeaderUser A user authenticated from the
-     *                                    `Authorization` header, if provided
-     *                                    and valid.
+     * @param string|null $path             the base path that was requested
+     * @param User|null   $authHeaderUser   User from the `Authorization` header
+     *                                      (if provided and valid).
+     * @param bool        $bypassIpTracking If true: bypass IP tracking of the
+     *                                      session.
+     *
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    private function outputSitepageContent(?string $path, ?User $authHeaderUser): void
+    private function outputSitepageContent(?string $path, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
         // we shall assume that if a specific page is requested,
         // the user just be sent to that page regardless of device
@@ -453,7 +458,7 @@ class Kernel extends WebKernelAbstract
         // Currently, this destroys all previous session data: but we presume
         // you aren't making requests with a JWT when you are already logged in.
         if ($authHeaderUser) {
-            $this->authenticateUserForThisRequestOnly($authHeaderUser);
+            $this->authenticateUserForThisRequestOnly($authHeaderUser, $bypassIpTracking);
         }
 
         // Time to start the session
