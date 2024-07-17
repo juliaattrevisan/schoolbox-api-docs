@@ -78,6 +78,8 @@ class PipeCollection implements Countable
                 $userId = $this->validator->findUserIdByRememberMe($instanceId, $remember);
             }
         } catch (SessionException $e) {
+            // notify the websocket of the auth error.
+            $pipe->send(json_encode(['error' => 'no session', 'code' => 401]));
             $this->unregisterPipe($socketKey);
             $pipe->close();
             // rethrow
