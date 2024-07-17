@@ -16,7 +16,6 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\QuizFetcher;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\Model;
 
 /**
  * Exports every attempt's actual responses to csv
