@@ -652,7 +652,7 @@ import {ToastEvent} from "@schoolboxVue/components/toast/sbxToastEvent";
                         // A toast
                         document.dispatchEvent(
                             new CustomEvent(ToastEvent.ACTIVATE, {
-                                detail: { text: "Logged out. Please login again" },
+                                detail: { text: "Logged out ", link: { href: "/login", text: "Please login again." } },
                             }),
                         );
                         break;
