@@ -89,7 +89,7 @@ export default {
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
-                            return row.campuses.join().includes(query); //need to flatten the campuses array then check
+                            return row.campuses.includes(query); //need to flatten the campuses array then check
                         },
                     },
                     {
@@ -110,13 +110,13 @@ export default {
                     {
                         name: FilterEvents.TOKEN,
                         callback: (row, query) => {
-                            return row.token === query;
+                            return row.token === Number(query);
                         },
                     },
                     {
                         name: FilterEvents.EPORTFOLIO,
                         callback: (row, query) => {
-                            return row.eportfolio_enabled === query;
+                            return row.eportfolio_enabled === Number(query);
                         },
                     },
                 ],
@@ -166,10 +166,10 @@ export default {
                         return row.campuses.join(", ");
                     },
                     token: (h, row, index) => {
-                        return row.token === "1" ? "Set" : "Not set";
+                        return row.token === 1 ? "Set" : "Not set";
                     },
                     eportfolio_enabled: (h, row, index) => {
-                        return row.eportfolio_enabled === "1" ? "Enabled" : "Disabled";
+                        return row.eportfolio_enabled === 1 ? "Enabled" : "Disabled";
                     },
                 },
                 texts: {
@@ -246,7 +246,7 @@ export default {
                 const response = await fetch(this.srcUserList, {
                     method: "POST",
                     body: JSON.stringify(this.getRowsBody()),
-                    headers: {'content-type': 'application/json'},
+                    headers: { "content-type": "application/json" },
                 });
                 this.rows = await response.json();
             } catch (error) {
@@ -345,16 +345,18 @@ export default {
                 usersToModifyIDList.forEach((item) => {
                     formData.append("users[]", item);
                 });
-                let response, responses = [], responsesOk = true;
+                let response,
+                    responses = [],
+                    responsesOk = true;
                 const repeat = Math.ceil(usersToModifyIDList.length / MAX_LENGTH);
                 for (let i = 0; i < repeat; i += 1) {
-                      response = await fetch(this.srcUserDelete, {
-                            headers: {
-                                Accept: "application/json",
-                            },
-                            method: "POST",
-                            body: formData,
-                        });
+                    response = await fetch(this.srcUserDelete, {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                        method: "POST",
+                        body: formData,
+                    });
                     responsesOk = responsesOk && response.ok;
                     responses.push(await response.json());
                 }
@@ -406,10 +408,8 @@ export default {
                 this.$refs.table.resetSelectedRows();
             } else {
                 this.hasDataError = true;
-                let errors = responses.map((response) => response['title'] ?? "");
-                this.logData = [
-                    errors.join("\n"),
-                ];
+                let errors = responses.map((response) => response["title"] ?? "");
+                this.logData = [errors.join("\n")];
             }
         },
 
