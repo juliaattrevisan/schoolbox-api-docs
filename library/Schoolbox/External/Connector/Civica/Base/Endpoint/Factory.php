@@ -123,7 +123,7 @@ class Factory
 
         // Use shadow tables for the duration of the sync
         $bus->add(
-            new Base\Prepare\All(
+            new Base\ShadowTable\Enable(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
@@ -216,7 +216,7 @@ class Factory
 
         $bus
             // Revert back to the base tables
-            ->add(new Base\Cleanup\All(
+            ->add(new Base\ShadowTable\Disable(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,

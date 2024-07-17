@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Base\Cleanup;
+namespace Schoolbox\External\Connector\Base\ShadowTable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
@@ -18,10 +18,11 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\ShadowTable;
 
 /**
- * Cleans up all SUDS mapper data, by migrating from the shadow table to the
- * base table.
+ * Enable writing to shadow tables (instead of to the base tables) for all SUDS
+ * mappers, and copy the content of the base tables into the shadow tables.
  *
  * This includes mappers for:
  *
@@ -50,7 +51,7 @@ use Schoolbox\Mapper;
  * * `sis_import_queue`: this simply stores scheduled SIS import runs
  * * `sis_timetable_cycle`: this is updated in a separate process
  */
-class All implements IStrategy
+class Enable implements IStrategy
 {
     /**
      * Constructor
@@ -118,15 +119,18 @@ class All implements IStrategy
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
         ]);
-        $this->log->info('Configuring mappers to write to base tables');
+        $this->log->info('Configuring mappers to write to shadow tables');
         foreach ($mappers as $mapper) {
-            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getShadowTableName(), $mapper->getBaseTableName()));
+            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getBaseTableName(), $mapper->getShadowTableName()));
         }
 
-        $shadowTable = new Mapper\ShadowTable(...$mappers);
+        $shadowTable = new ShadowTable(...$mappers);
 
-        $this->log->info('Swapping shadow tables with base tables');
-        $shadowTable->swapShadowWithBase();
-        $shadowTable->disable();
+        $this->log->info('Creating shadow tables');
+        $shadowTable->createShadowTables();
+
+        $this->log->info('Copying existing data from base to shadow tables');
+        $shadowTable->copyBaseToShadow();
+        $shadowTable->enable();
     }
 }

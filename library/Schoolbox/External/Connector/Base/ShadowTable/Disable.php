@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Base\Prepare;
+namespace Schoolbox\External\Connector\Base\ShadowTable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
@@ -18,11 +18,10 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\ShadowTable;
 
 /**
- * Prepares all SUDS mappers for writing to shadow tables, instead of to the
- * base tables.
+ * Disable writing to shadow tables (instead of to the base tables) for all SUDS
+ * mappers, and update SUDS data by swapping the shadow and base tables in situ.
  *
  * This includes mappers for:
  *
@@ -51,7 +50,7 @@ use Schoolbox\Mapper\ShadowTable;
  * * `sis_import_queue`: this simply stores scheduled SIS import runs
  * * `sis_timetable_cycle`: this is updated in a separate process
  */
-class All implements IStrategy
+class Disable implements IStrategy
 {
     /**
      * Constructor
@@ -119,18 +118,15 @@ class All implements IStrategy
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
         ]);
-        $this->log->info('Configuring mappers to write to shadow tables');
+        $this->log->info('Configuring mappers to write to base tables');
         foreach ($mappers as $mapper) {
-            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getBaseTableName(), $mapper->getShadowTableName()));
+            $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getShadowTableName(), $mapper->getBaseTableName()));
         }
 
-        $shadowTable = new ShadowTable(...$mappers);
+        $shadowTable = new Mapper\ShadowTable(...$mappers);
 
-        $this->log->info('Creating shadow tables');
-        $shadowTable->createShadowTables();
-
-        $this->log->info('Copying existing data from base to shadow tables');
-        $shadowTable->copyBaseToShadow();
-        $shadowTable->enable();
+        $this->log->info('Swapping shadow tables with base tables');
+        $shadowTable->swapShadowWithBase();
+        $shadowTable->disable();
     }
 }
