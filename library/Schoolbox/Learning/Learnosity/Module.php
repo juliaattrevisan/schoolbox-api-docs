@@ -152,10 +152,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
 
-        /* Persist feedback to a student's attempt
-         */
-        //        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
-
         /* Start horizontal marking using a Learnosity Report
          */
         $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
