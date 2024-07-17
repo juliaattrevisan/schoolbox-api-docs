@@ -1826,9 +1826,11 @@ class Controller extends Base
      * @param User $student
      * @param Model $attempt
      * @return void
-     * @throws Deleted
      * @throws DebugBarException
+     * @throws Deleted
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postFeedbackAttemptScore(
         QuizDomainObject $assessment,
