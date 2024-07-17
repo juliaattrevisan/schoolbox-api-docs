@@ -287,10 +287,6 @@
                                 <a class="right-off-canvas-toggle icon-notifications" id="notification-toggle" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
-                                <div id="birthday-surprise-container">
-                                    <birthday-surprise />
-                                </div>
-                                <script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
                             </section>
                         {% endif %}
                     {% endblock messaging %}
@@ -906,5 +902,9 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
+<div id="birthday-surprise-container">
+    <birthday-surprise />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
 </body>
 </html>

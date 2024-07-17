@@ -6,6 +6,20 @@
 import { gsap } from "gsap/all";
 import { init } from "./birthdayNotificationStreamers";
 
+const emit = defineEmits<{
+    selected: [];
+}>();
+
+const notificationEl = window.Vue.ref<HTMLDivElement | null>(null);
+
+/**
+ * Append the birthday notification to the notifications list
+ */
+function appendToNotifications() {
+    const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
+    toggle.appendChild(notificationEl.value);
+}
+
 /**
  * Animate streamers behind the birthday bell
  */
@@ -31,35 +45,53 @@ function animateBell() {
 }
 
 /**
+ * Handle the click event when the notification is selected
+ */
+function onSelected() {
+    emit("selected");
+}
+
+/**
  * Initialize the animations when the component is mounted
  */
 window.Vue.onMounted(() => {
+    appendToNotifications();
     animateStreamers();
     animateBell();
 });
 </script>
 
 <template>
-    <div class="c-birthday-notification">
-        <div class="c-birthday-notification__background">
-            <canvas width="72" height="72" data-birthday-bell-streamers></canvas>
+    <button ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
+        <div class="birthday-container">
+            <div class="birthday-container__background">
+                <canvas width="72" height="72" data-birthday-bell-streamers></canvas>
+            </div>
+            <div class="birthday-container__foreground l-flex l-flex--center">
+                <sbx-icon
+                    name="notifications"
+                    color="var(--navigation-foreground)"
+                    size="2rem"
+                    data-birthday-bell
+                ></sbx-icon>
+            </div>
         </div>
-        <div class="c-birthday-notification__foreground l-flex l-flex--center">
-            <sbx-icon
-                name="notifications"
-                color="var(--navigation-foreground)"
-                size="2rem"
-                data-birthday-bell
-            ></sbx-icon>
-        </div>
-    </div>
+    </button>
 </template>
 
 <style lang="scss" scoped>
-.c-birthday-notification {
+.birthday-button {
+    margin: 0; // to remove the default button margin
+    padding: 0; // to remove the default button padding
+    position: absolute; // to overlay the notification bar
+    top: 0;
+}
+
+.birthday-container {
     background: var(--navigation-background);
     display: grid;
     height: 4.5rem;
+    line-height: normal;
     overflow: hidden;
     width: 4.5rem;
     &__background,
