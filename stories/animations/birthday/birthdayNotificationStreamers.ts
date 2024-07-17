@@ -55,7 +55,7 @@ function addStarAnimation(timeline: GSAPTimeline, star: Star) {
             delay: "random(0, 3)",
             duration: "random(3.5, 6.5)",
             radius: "random(0, 0.5)",
-            rotation: "random(0, 360)",
+            rotation: "random(360, 720)",
             repeat: -1,
             y: "random(100, 200)",
         },
