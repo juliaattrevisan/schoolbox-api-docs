@@ -21,11 +21,11 @@ function getStreamers(canvas: HTMLCanvasElement) {
     const streamers = [];
     const canvasDimensions = getCanvasDimensions(canvas);
     let streamer; // reuse reference in loop
-    for (let i = 0; i < 60; i += 1) {
+    for (let i = 0; i < 50; i += 1) {
         streamer = new Streamer({
-            x: canvasDimensions.width / 2,
-            y: gsap.utils.random(50, 300),
-            radius: gsap.utils.random(5, 30),
+            x: gsap.utils.random(0, canvasDimensions.width),
+            y: -50,
+            radius: gsap.utils.random(6, 12),
         });
         streamers.push(streamer);
     }
@@ -48,27 +48,19 @@ function redrawStreamers(streamers: Streamer[], context: CanvasRenderingContext2
  * Through the onUpdate of the timeline, the properties are updated each tick
  * @param {GSAPTimeline} timeline - the timeline to add the animations to
  * @param {Streamer} streamer - the streamer to animate
- * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
  */
-function addStreamerAnimation(timeline: GSAPTimeline, streamer: Streamer, canvasDimensions: CanvasDimensions) {
+function addStreamerAnimation(timeline: GSAPTimeline, streamer: Streamer) {
     timeline.to(
         streamer,
         {
-            delay: "random(0, 0.2)",
-            duration: "random(0.5, 3)",
+            delay: "random(0, 3)",
+            duration: "random(3.5, 6.5)",
+            radius: "random(0, 0.5)",
             rotation: "random(0, 360)",
-            x: Math.random() < 0.5 ? -100 : canvasDimensions.width + 100, // streamer moves either to the left or right edge
-            physics2D: {
-                // https://greensock.com/docs/v3/Plugins/Physics2DPlugin
-                acceleration: "random(0, 10)",
-                angle: "random(0, 360)",
-                accelerationAngle: "random(0, 0.5)",
-                friction: "random(0, 0.1)",
-                gravity: "random(100, 200)",
-                velocity: "random(800, 1000)",
-            },
+            repeat: -1,
+            y: "random(100, 200)",
         },
-        0, // 0 so there's no delay between the animations, otherwise each streamer would only animate after the previous is complete
+        0, // 0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
     );
 }
 
@@ -82,7 +74,7 @@ function animateStreamers(canvas: HTMLCanvasElement) {
     const canvasDimensions = getCanvasDimensions(canvas);
     const timeline = gsap.timeline({
         // https://greensock.com/docs/v3/GSAP/gsap.timeline()
-        delay: 0.5, // wait prior to animating the streamers ot best sync to the badge animation
+        delay: 0.2, // wait prior to animating the streamers ot best sync to the badge animation
         repeat: 0,
         onUpdate: () => redrawStreamers(streamers, context, canvasDimensions), // to draw the new position of the streamers each tick
     });
