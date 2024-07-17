@@ -118,13 +118,15 @@ class All implements IStrategy
             $this->eventCampusMapper,
             $this->eventRoleTypeMapper,
         ]);
-        $this->log->info('Cleaning up: disabling shadow tables for mappers, swapping shadow tables to base tables');
+        $this->log->info('Configuring mappers to write to base tables');
         foreach ($mappers as $mapper) {
             $this->log->info(sprintf('%s (%s => %s)', get_class($mapper), $mapper->getShadowTableName(), $mapper->getBaseTableName()));
         }
 
         $shadowTable = new Mapper\ShadowTable(...$mappers);
-        $shadowTable->disable();
+
+        $this->log->info('Swapping shadow tables with base tables');
         $shadowTable->swapShadowWithBase();
+        $shadowTable->disable();
     }
 }
