@@ -1,5 +1,7 @@
 /* Implmentation of Schoolbox Websocket Notifications */
 
+import {ToastEvent} from "@schoolboxVue/components/toast/sbxToastEvent";
+
 (function ($) {
     $.fn.notifier = function (options) {
         var settings = $.extend(
@@ -647,6 +649,12 @@
                     case 401:
                         console.warn("Either no session, or does not match parent.");
                         attemptReconnect = false;
+                        // A toast
+                        document.dispatchEvent(
+                            new CustomEvent(ToastEvent.ACTIVATE, {
+                                detail: { text: "Logged out. Please login again" },
+                            }),
+                        );
                         break;
                     case 503:
                         console.warn("Service is unavailable: " + !!data.retry ? "cannot retry" : "can retry");
