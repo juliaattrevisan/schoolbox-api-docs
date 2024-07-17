@@ -65,7 +65,7 @@ class LatestView
             IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
             IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
             IAssessable::MARK_VISIBILITY_PRIVATE => (
-                // Note class instructors may not be staff members, but should see feedback on this class' assessments.
+                // Note class instructors can see feedback on that class' assessments.
                 $user->getRole()->isStaff() || $this->access->isInstructor($user, $assessment->getContext()->getFolder())
             ),
             default => false
