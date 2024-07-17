@@ -154,7 +154,7 @@ class Module extends BaseModule
 
         /* Persist feedback to a student's attempt
          */
-//        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
+        //        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
 
         /* Start horizontal marking using a Learnosity Report
          */
@@ -191,9 +191,14 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
 
-        /* Archive a set of reference identifiers in Learnosity
+        /* polld endpoints: these exist to combat learnosity's universally asynchronous nature.
+         *
+         * Sometimes learnosity misinforms you because it hasn't finished some asynchronous task.
+         * You have to keep asking it if it's finished processing whatever it's doing before
+         * telling users the outcome.
+         *
+         * They won't tell you unless you've asked. And you have to ask a lot.
          */
-        $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
 
         // Async callback for copying contents from one quiz to another
         $this->register(
@@ -233,12 +238,19 @@ class Module extends BaseModule
         /* CSV Export of students' most recent response
          */
         $this->register('GET', '/{assessmentId}/attempts/csv', 'getExportAttempts', $instructorPerms, $preloadAssessment);
+        /* TODO: Miscellaneous endpoints that we can probably look at culling soon
+         *  These were originally early explorations in how their api worked.
+         */
 
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
         $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
+
+        /* Archive a set of reference identifiers in Learnosity
+         */
+        $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
     }
 
 
