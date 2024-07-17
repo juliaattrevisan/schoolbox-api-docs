@@ -15,16 +15,18 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
 class LatestView
 {
     /**
      * Constructor
+     * @param Access $access
      * @param Mapper $mapper
      * @param \Schoolbox\External\User $externalUser
      */
-    public function __construct(private Mapper $mapper, private \Schoolbox\External\User $externalUser)
+    public function __construct(private Access $access, private Mapper $mapper, private \Schoolbox\External\User $externalUser)
     {
     }
 
@@ -62,7 +64,10 @@ class LatestView
         $feedbackIsVisibleToUser = match ($assessment->getMarkVisibility()) {
             IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
             IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
-            IAssessable::MARK_VISIBILITY_PRIVATE => $user->getRole()->isStaff(),
+            IAssessable::MARK_VISIBILITY_PRIVATE => (
+                // Note class instructors may not be staff members, but should see feedback on this class' assessments.
+                $user->getRole()->isStaff() || $this->access->isInstructor($user, $assessment->getContext()->getFolder())
+            ),
             default => false
         };
 
