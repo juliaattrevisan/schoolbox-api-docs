@@ -121,36 +121,40 @@ class Factory
 
         $bus = new GenericCollection(IStrategy::class);
 
+        // Use shadow tables for the duration of the sync
+        $bus->add(
+            new Base\Prepare\All(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->overridesMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                null,
+                null,
+                null,
+                null,
+            )
+        );
+
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus
                 /* Purge previously-imported profile relationships and classes
                  */
-//                ->add(new Profile\Prepare(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->baseProfileMapper,
-//                    $this->studentProfileMapper,
-//                    $this->parentProfileMapper,
-//                    $this->staffProfileMapper,
-//                    $this->relationshipMapper
-//                ))
-                ->add(new Base\Prepare\All(
+                ->add(new Profile\Prepare(
                     $this->log,
                     $this->perform,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper,
-                    $this->classEntryMapper,
-                    $this->classInvolvementMapper,
-                    $this->overridesMapper,
-                    $this->classPeriodMapper,
-                    $this->periodMapper,
-                    null,
-                    null,
-                    null,
-                    null,
+                    $this->relationshipMapper
                 ))
                 ->add(new Profile\Profile(
                     $this->validStrats,
@@ -164,15 +168,15 @@ class Factory
                     $this->staffProfileMapper,
                     $this->relationshipMapper
                 ))
-//                ->add(new Profile\Cleanup(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->baseProfileMapper,
-//                    $this->studentProfileMapper,
-//                    $this->parentProfileMapper,
-//                    $this->staffProfileMapper,
-//                    $this->relationshipMapper
-//                ))
+                ->add(new Profile\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
             ;
         }
 
@@ -180,16 +184,16 @@ class Factory
             $bus
                 /* SUDS Timetable Events
                  */
-//                ->add(new TimetableCalendar\Prepare(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper,
-//                    $this->classPeriodMapper,
-//                    $this->periodMapper,
-//                    $this->overridesMapper
-//                ))
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper
+                ))
                 ->add(new TimetableCalendar\Classes(
                     $this->log,
                     $this->perform,
@@ -202,15 +206,16 @@ class Factory
                     $from,
                     $to
                 ))
-//                ->add(new TimetableCalendar\Cleanup(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper
-//                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ))
             ;
         }
 
         $bus
+            // Revert back to the base tables
             ->add(new Base\Cleanup\All(
                 $this->log,
                 $this->perform,

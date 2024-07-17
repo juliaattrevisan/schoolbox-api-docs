@@ -70,10 +70,27 @@ class ShadowTable
     public function createShadowTables(): void
     {
         foreach ($this->mappers as $mapper) {
-            $database = $mapper->getDatabase();
-            $database->execute(
+            $mapper->getDatabase()->execute(
                 sprintf(
                     'CREATE OR REPLACE TABLE %s LIKE %s',
+                    $mapper->getShadowTableName(),
+                    $mapper->getBaseTableName(),
+                )
+            );
+        }
+    }
+
+    /**
+     * Copy data from base to shadow tables.
+     *
+     * @return void
+     */
+    public function copyBaseToShadow(): void
+    {
+        foreach ($this->mappers as $mapper) {
+            $mapper->getDatabase()->execute(
+                sprintf(
+                    'INSERT INTO %s SELECT * FROM %s',
                     $mapper->getShadowTableName(),
                     $mapper->getBaseTableName(),
                 )

@@ -126,6 +126,7 @@ class All implements IStrategy
 
         $shadowTable = new ShadowTable(...$mappers);
         $shadowTable->createShadowTables();
+        $shadowTable->copyBaseToShadow();
         $shadowTable->enable();
     }
 }
