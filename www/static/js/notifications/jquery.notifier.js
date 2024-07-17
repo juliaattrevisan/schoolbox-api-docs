@@ -86,7 +86,8 @@
                 if (attemptReconnect && backoff < settings.maxRetry) {
                     jitter = parseInt(
                         Math.random() *
-                            Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout),
+                            settings.timeout *
+                            Math.min(settings.maxRetry, Math.pow(2, backoff++)),
                     );
 
                     if (settings.debug) {
