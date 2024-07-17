@@ -5,8 +5,6 @@
  */
 class HouseResidentialMapper extends Schoolbox\Mapper
 {
-    protected $table = 'luResidentialHouse';
-
     protected function mapping()
     {
         $this->hasTable('luResidentialHouse');

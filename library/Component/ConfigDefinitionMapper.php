@@ -14,9 +14,6 @@
  */
 class Component_ConfigDefinitionMapper extends Schoolbox\Mapper
 {
-
-    protected $table = 'component_config_definition';
-
     protected function mapping()
     {
         $this->hasTable('component_config_definition');
