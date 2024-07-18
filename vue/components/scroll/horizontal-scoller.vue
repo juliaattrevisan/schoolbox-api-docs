@@ -1,4 +1,9 @@
 <script lang="ts">
+// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
+// @ts-nocheck
+
 /**
  * To scroll a list of items horizontally
  */

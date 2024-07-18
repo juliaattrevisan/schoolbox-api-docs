@@ -5,7 +5,7 @@
 
 import type { Ref } from "vue";
 import { EditorEvent, type EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
-import { isScriptAdded, injectScript } from "@js/util/domUtils";
+import { injectScript } from "@js/util/domUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
@@ -23,7 +23,7 @@ export function useEditor(
     editorConfig: EditorConfig,
     isMounted: boolean = false,
     callback?: (event: EditorCreatedEventInfo) => void,
-) {
+): Ref<string> {
     const currentValue = typeof $currentValue === "string" ? window.Vue.ref($currentValue) : $currentValue;
 
     /**
@@ -77,13 +77,13 @@ export function useEditor(
                 }),
             );
         } catch (error) {
-            throw new Error(error);
+            throw new Error((error as Error).message);
         }
     }
 
     if (isMounted === true) {
         loadCKEditor().catch((error) => {
-            throw new Error(error);
+            throw new Error((error as Error).message);
         });
     } else {
         window.Vue.onMounted(async () => {

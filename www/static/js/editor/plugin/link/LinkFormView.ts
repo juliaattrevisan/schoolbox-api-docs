@@ -9,6 +9,10 @@
  *  - Add resourceButtonView
  */
 
+// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
+
 /**
  * @license Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
@@ -175,7 +179,7 @@ export default class LinkFormView extends View {
                 accumulator[switchButton.name] = switchButton.isOn;
                 return accumulator;
             },
-            {} as Record<string, boolean>
+            {} as Record<string, boolean>,
         );
     }
 
@@ -207,6 +211,11 @@ export default class LinkFormView extends View {
 
         // Start listening for the keystrokes coming from #element.
         this.keystrokes.listenTo(this.element!);
+
+        // If no reference or target element is provided...
+        if (this.urlInputView.fieldView.element === null || this.resourceButtonView.element === null) {
+            throw new Error("LinkFormView#render(): The URL input or resource button element is not available.");
+        }
 
         // add the resource button after the url input
         insertElementAfter(this.urlInputView.fieldView.element, this.resourceButtonView.element);

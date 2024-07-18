@@ -311,8 +311,9 @@ export default window.Vue.defineComponent({
          * @param {() => void} done - to be called once animation is complete
          */
         onEnter(element: Element, done: () => void) {
-            const delay = element.dataset.index * 0.025;
-            gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay: delay, onComplete: done });
+            const elementIndex = element.getAttribute("index") ?? "0";
+            const delay = parseInt(elementIndex, 10) * 0.025;
+            gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay, onComplete: done });
         },
 
         /**
