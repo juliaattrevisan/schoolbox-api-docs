@@ -1038,6 +1038,12 @@ class Controller extends Base
             'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
             'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
             'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+            /* This is a special route name that doesn't actually exist: it's used to POST data to the
+             * Quiz Quickmark endpoint that will set the reviewed_at value, making feedback published.
+             * In the corresponding aura module/controller, it's called postModify: I've used postFinalisedAttempt
+             * to try and elucidate what we're trying to do here
+             */
+            'postFinaliseAttempt' => $this->router->getGenerator()->generate('learningQuizAttempt.postModify', $args),
         ];
 
         /* Find this attempt's MapperProxy equivalent from something we already obtained
@@ -1184,6 +1190,12 @@ class Controller extends Base
                     'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
                     'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
                     'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+                    /* This is a special route name that doesn't actually exist: it's used to POST data to the
+                     * Quiz Quickmark endpoint that will set the reviewed_at value, making feedback published.
+                     * In the corresponding aura module/controller, it's called postModify: I've used postFinalisedAttempt
+                     * to try and elucidate what we're trying to do here
+                     */
+                    'postFinaliseAttempt' => $this->router->getGenerator()->generate('learningQuizAttempt.postModify', $args),
                 ];
             }
         }
