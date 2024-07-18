@@ -7,7 +7,7 @@ export enum ToastEvent {
 }
 
 export type ToastLink = {
-    title: string;
+    text: string;
     href: string;
 }
 
