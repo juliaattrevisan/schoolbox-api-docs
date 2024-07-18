@@ -19,9 +19,9 @@ class Base extends AchievementReportBase
     /**
      * @inheritDoc
      */
-    public function findData($loggedInUserId): array
+    public function findData(): array
     {
-        return $this->findMYPResults($loggedInUserId);
+        return $this->findMYPResults();
     }
 
     /**
@@ -29,11 +29,8 @@ class Base extends AchievementReportBase
      *
      * @return array
      */
-    private function findMYPResults($loggedInUserId): array
+    private function findMYPResults(): array
     {
-if ($loggedInUserId === 1) {
-    // Show debugging info.
-}
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,

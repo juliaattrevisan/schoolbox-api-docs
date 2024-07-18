@@ -147,7 +147,7 @@ abstract class Base
      *
      * @return mixed
      */
-    abstract public function findData($loggedInUserId);
+    abstract public function findData();
 
 
     /**
