@@ -427,13 +427,13 @@ function onClearAllSelected() {
         <input id="import_folders" name="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
             v-if="isClassSelectorActive"
-            v-model="query"
             ref="queryInputEl"
+            v-model="query"
             type="text"
             class="search-input"
             :readonly="isLoading || hasLoadError"
             :placeholder="inputPlaceholder"
-            @input="$event.target.composing = false"
+            @input="query = $event.target.value /* Fix Android events SA-12170 */"
         />
         <div class="search-results-container">
             <div class="search-results">

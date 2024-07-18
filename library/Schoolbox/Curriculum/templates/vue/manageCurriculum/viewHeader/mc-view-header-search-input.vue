@@ -73,13 +73,13 @@ function onClearSearchSelected() {
         <label for="search">Search</label>
         <div class="input-group">
             <input
-                v-model="searchStore.query"
                 ref="queryInputEl"
+                v-model="searchStore.query"
                 type="text"
                 :disabled="isDisabled"
                 :placeholder="placeholder"
                 data-test-search-input
-                @input="$event.target.composing = false"
+                @input="searchStore.query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
             />
             <button
                 v-if="searchStore.query !== ''"

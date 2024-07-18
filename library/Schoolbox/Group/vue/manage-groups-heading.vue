@@ -69,7 +69,7 @@ export default {
                 [selectionTypes.ALL_GROUPS]: () => this.groups,
                 [selectionTypes.MY_FAVOURITE_GROUPS]: () =>
                     this.groups.filter(
-                        (group) => group.isFavourite && group.enrolmentStatus === enrolmentTypes.ENROLED
+                        (group) => group.isFavourite && group.enrolmentStatus === enrolmentTypes.ENROLED,
                     ),
                 [selectionTypes.GROUPS_IM_IN]: () =>
                     this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.ENROLED),
@@ -91,7 +91,7 @@ export default {
                 return this.currentGroups;
             } else {
                 return this.currentGroups.filter((group) =>
-                    group.name.toLowerCase().includes(this.query.toLowerCase())
+                    group.name.toLowerCase().includes(this.query.toLowerCase()),
                 );
             }
         },
@@ -164,9 +164,9 @@ export default {
             <div class="column small-12 medium-8">
                 <input
                     v-model="query"
-                    @input="$event.target.composing = false"
                     :placeholder="inputPlaceholder"
                     type="text"
+                    @input="query = $event.target.value /* Fix Android events SA-12170 */"
                 />
             </div>
         </div>

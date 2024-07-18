@@ -438,12 +438,12 @@ export default {
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
                     <input
-                        type="text"
                         id="filename"
-                        name="filename"
-                        v-model="newFilename"
-                        @input="$event.target.composing = false"
                         ref="filenameInput"
+                        v-model="newFilename"
+                        type="text"
+                        name="filename"
+                        @input="newFilename = $event.target.value /* Fix Android events SA-12170 */"
                     />
                     <div class="modal-actions">
                         <button

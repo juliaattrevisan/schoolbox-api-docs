@@ -378,8 +378,7 @@ export default window.Vue.defineComponent({
             :readonly="!isLoaded"
             :placeholder="inputPlaceholder"
             type="text"
-            class=""
-            @input="$event.target.composing = false"
+            @input="query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
         />
         <scroll-fade-wrapper wrapper-tag="div" slotted-element-selector="ul">
             <transition-group

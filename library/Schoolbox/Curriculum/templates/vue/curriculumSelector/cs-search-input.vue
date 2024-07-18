@@ -162,18 +162,18 @@ const isActive = window.Vue.computed(() => {
 <template>
     <div v-if="isActive" class="input-group" :data-is-small-container="store.isSmallContainer">
         <input
-            v-model="searchStore.query"
             ref="queryInputEl"
+            v-model="searchStore.query"
             type="text"
             class="search-input"
             :readonly="!store.hasLoadedOk"
             :placeholder="inputPlaceholder"
-            @input="$event.target.composing = false"
             data-search-select-search-input
+            @input="searchStore.query = $event.target.value /* Fix Android events SA-12170 */"
         />
         <button
-            type="button"
             v-if="store.hasLoadedOk"
+            type="button"
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"
             @click.prevent="onBrowseSelected"

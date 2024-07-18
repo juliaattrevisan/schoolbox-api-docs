@@ -50,7 +50,7 @@ window.Vue.watch(
             modalSearchStore.enableSearch();
             debounceSearch();
         }
-    }
+    },
 );
 
 /**
@@ -71,13 +71,13 @@ function onClearSearchSelected() {
 <template>
     <div class="input-group">
         <input
-            v-model="modalSearchStore.query"
             ref="queryInputEl"
+            v-model="modalSearchStore.query"
             type="text"
             class="search-input"
             :disabled="isDisabled"
             :placeholder="placeholder"
-            @input="$event.target.composing = false"
+            @input="modalSearchStore.query = $event.target.value /* Fix Android events SA-12170 */"
         />
         <button
             v-if="modalSearchStore.query !== ''"
