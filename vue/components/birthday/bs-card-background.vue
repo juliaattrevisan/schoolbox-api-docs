@@ -19,21 +19,22 @@ function setCanvasSize() {
 }
 
 /**
- * To sync up the canvas size with the size of the modal
- */
-function initResizeObserver() {
-    const resizeObserver = new ResizeObserver(() => {
-        setCanvasSize();
-    });
-    resizeObserver.observe(modalContainer);
-}
-
-/**
  * Animate stars behind the birthday cake and text
  */
 function animateStars() {
     const starsCanvas = document.querySelector("[data-birthday-card-stars]") as HTMLCanvasElement;
     init(starsCanvas);
+}
+
+/**
+ * To sync up the canvas size with the size of the modal
+ */
+function initResizeObserver() {
+    const resizeObserver = new ResizeObserver(() => {
+        setCanvasSize();
+        animateStars();
+    });
+    resizeObserver.observe(modalContainer);
 }
 
 /**
