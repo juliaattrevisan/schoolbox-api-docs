@@ -16,7 +16,7 @@ const hasSelectedNotification = window.Vue.ref(false);
 function onNotificationSelected() {
     hasSelectedNotification.value = true;
     modalEl.value.open();
-    // remove the notification and show the modal, updating the local storage
+    // update the local storage to prevent the modal from showing again
 }
 </script>
 

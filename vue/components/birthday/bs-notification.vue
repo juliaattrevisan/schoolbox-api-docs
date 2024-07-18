@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- * When it's a user's birthday, a notification will appear in the navigation bar.
+ * When it's a user's birthday, a special notification bell will appear in the navigation bar
+ * that can be selected to display a birthday message.
  */
 
 import { gsap } from "gsap/all";
@@ -22,7 +23,7 @@ function appendToNotifications() {
 }
 
 /**
- * Animate streamers behind the birthday bell
+ * Animate stars behind the birthday bell
  */
 function animateStreamers() {
     const streamersCanvas = document.querySelector("[data-birthday-bell-streamers]") as HTMLCanvasElement;
@@ -30,7 +31,7 @@ function animateStreamers() {
 }
 
 /**
- * Animate the birthday bell
+ * Animate the birthday bell, swinging it back and forth
  */
 function animateBell() {
     const bell = document.querySelector("[data-birthday-bell]");
@@ -46,7 +47,7 @@ function animateBell() {
 }
 
 /**
- * Handle the click event when the notification is selected
+ * Emit so the birthday modal can be shown
  */
 function onSelected() {
     notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
@@ -54,7 +55,8 @@ function onSelected() {
 }
 
 /**
- * Initialize the animations when the component is mounted
+ * Append the birthday notification to the
+ * notifications list and start animating
  */
 window.Vue.onMounted(() => {
     appendToNotifications();
