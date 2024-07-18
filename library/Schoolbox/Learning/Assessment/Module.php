@@ -127,7 +127,7 @@ class Module extends BaseModule
         // rules in use
         $isSuper                  = $this->getAuthRule('isSuperuser');
         $loggedIn                 = $this->getAuthRule('isLoggedIn');
-        $canWrite                 = $this->buildAuthRuleHasInstructorAccess();
+        $canWrite                 = $this->buildAuthRuleHasInstructorOrHomepageAccess();
         $canViewSummary           = $this->buildAuthRuleCanViewSummary();
         $canSubmit                = $this->buildAuthRuleCanSubmit();
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
@@ -934,7 +934,7 @@ class Module extends BaseModule
                             new IsImplementation()
                         ),
                         new Rule\All(
-                            $this->buildAuthRuleHasInstructorAccess(),
+                            $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                             new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
                         )
                     ),
@@ -974,7 +974,7 @@ class Module extends BaseModule
                     new CanRespondToAssessment($this->getAccess())
                 ),
                 new Rule\All(
-                    $this->buildAuthRuleHasInstructorAccess(),
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new CanRespondToAssessment($this->getAccess()),
                     new ParticipantHasNoInteractions()
@@ -1002,7 +1002,7 @@ class Module extends BaseModule
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
-            $this->buildAuthRuleHasInstructorAccess(),
+            $this->buildAuthRuleHasInstructorOrHomepageAccess(),
             /* Exclude Lesson Plans from the Status screen in Course Outline
              */
             new ValidAssessmentType([
@@ -1020,7 +1020,7 @@ class Module extends BaseModule
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT]),
                 new Rule\All(
                     new IsSpecification(),
-                    $this->buildAuthRuleHasInstructorAccess()
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess()
                 )
             )
         );
@@ -1043,15 +1043,14 @@ class Module extends BaseModule
 
 
     /**
-     * Prevent non-instructors from marking or modifying assessments.
-     *
-     * This uses the `IsInstructor` validator, which is the new standard for
-     * checking if a user has instructor permission over a folder.
+     * Prevent non-instructors from marking or modifying implementation
+     * assessments, and users without homepage write access from modifying spec
+     * assessments.
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
-    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
+    private function buildAuthRuleHasInstructorOrHomepageAccess(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
@@ -1098,7 +1097,7 @@ class Module extends BaseModule
             new Rule\Any(
                 // Instructor/staff viewing their own summary page
                 new Rule\All(
-                    $this->buildAuthRuleHasInstructorAccess(),
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     new Rule\IsUser('studentId')
                 ),
                 // Normal participants (whether explicit or dynamic):
