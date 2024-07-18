@@ -859,6 +859,7 @@ $allYears = [2022, 2023, 2024];
      */
     public function getMyp(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
+$_SESSION['loggedInUserIdForDebuggingPurposes'] = $this->getUser()->getId();
         /* Default to this year if none specified
          */
         $currentYear  = (int)date('Y');

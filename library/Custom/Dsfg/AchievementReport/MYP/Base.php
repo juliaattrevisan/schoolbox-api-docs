@@ -31,6 +31,9 @@ class Base extends AchievementReportBase
      */
     private function findMYPResults(): array
     {
+if ($_SESSION['loggedInUserIdForDebuggingPurposes'] ?? null === 1) {
+    // Dump debugging info.
+}
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,
