@@ -88,9 +88,10 @@ $(function () {
         accountMenu.toggleClass("open");
     });
 
-    $("#off-canvas-wrap").on("click", function () {
-        accountMenu.removeClass("open");
-    });
+    // If the user clicks anywhere in the document, close the account menu
+    // OR if the document gets blurred, close the account menu (Accounts for if users click inside an iframe)
+    document.addEventListener("click", () => accountMenu.removeClass("open"));
+    window.addEventListener("blur", () => accountMenu.removeClass("open"));
 
     /* Ensure modals always appear in a visible location
      *
