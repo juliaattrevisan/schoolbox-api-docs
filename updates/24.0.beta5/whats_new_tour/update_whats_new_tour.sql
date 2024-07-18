@@ -5,3 +5,4 @@ WHERE tour_step_uuid = (
     FROM tour
     WHERE title = '24.0 Release'
 );
+
