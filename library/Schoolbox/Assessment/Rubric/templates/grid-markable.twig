@@ -477,7 +477,11 @@
             if (previouslySelectedIndicatorDescriptor) {
                 currentRubricConfiguration[groupId][indicatorId][previouslySelectedIndicatorDescriptor.descriptorId].checked = false;
             }
-            currentRubricConfiguration[groupId][indicatorId][descriptorId].checked = $changed.prop('checked');
+
+            // As $changed can refer to either a checkbox or a select element (e.g. if ranged marks are being used for the descriptor)
+            // We must find the value of the descriptor by finding the checkbox element to ensure we can read :checked
+            const descriptorCheckbox = $rb[0].querySelector(`input[data-rubric-indicator="${indicatorId}"][data-rubric-descriptor="${descriptorId}"]`);
+            currentRubricConfiguration[groupId][indicatorId][descriptorId].checked = descriptorCheckbox.checked;
 
             // Find the new state of the descriptors so we can compare
             const currentlySelectedGroupDescriptors = findAllSelectedDescriptorsInCapability(groupId);
@@ -917,31 +921,6 @@
             });
 
             return descriptorSummation;
-        }
-
-
-        /**
-         * Are any of the selected descriptor values valueless? (i.e. have no defined point value)
-         * If so, we should not be overriding the user's custom mark
-         * @param {jQuery} $descriptorCheckboxes - the checkboxes to check
-         * @returns {boolean} - true if a valueless descriptor is selected, false otherwise
-         */
-        function hasSelectedValuelessDescriptor($descriptorCheckboxes) {
-            let hasValuelessDescriptor = false;
-
-            $descriptorCheckboxes.each(function () {
-                var $descriptorCheckbox = $(this);
-
-                if ($descriptorCheckbox.prop('checked')) {
-                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
-
-                    if (descriptorValue === null) {
-                        hasValuelessDescriptor = true;
-                    }
-                }
-            });
-
-            return hasValuelessDescriptor;
         }
 
         // Calculate the overall rubric mark from the scaled group marks
