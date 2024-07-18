@@ -838,16 +838,18 @@ class Connector implements IConnector
             ],
             'editable'       => $editable,
         ];
+        $uri = $this->apiHost . 'embed/sessions';
         if (isset($documentId)) {
             $body['document_identifier'] = $documentId;
         } elseif (isset($documentGroupId)) {
+            $uri = $this->apiHost . 'embed/group_sessions';
             $body['document_group_id'] = $documentGroupId;
         }
         $options  = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
             RequestOptions::BODY    => \GuzzleHttp\Utils::jsonEncode($body),
         ];
-        $request  = new Request('POST', $this->apiHost . 'embed/sessions');
+        $request  = new Request('POST', $uri);
         $response = $this->client->send($request, $this->getOptions($options));
         if ($this->isValidNotFound($response)) {
             if (isset($documentId)) {
