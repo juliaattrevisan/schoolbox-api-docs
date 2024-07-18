@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -121,25 +120,6 @@ class Factory
 
         $bus = new GenericCollection(IStrategy::class);
 
-        // Use shadow tables for the duration of the sync
-        $bus->add(
-            new Base\ShadowTable\Standard\Enable(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->overridesMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->eventMapper,
-            )
-        );
-
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus
                 /* Purge previously-imported profile relationships and classes
@@ -173,8 +153,7 @@ class Factory
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
                     $this->relationshipMapper
-                ))
-            ;
+                ));
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
@@ -207,27 +186,10 @@ class Factory
                     $this->log,
                     $this->perform,
                     $this->eventMapper
-                ))
-            ;
+                ));
         }
 
         $bus
-            // Revert back to the base tables
-            ->add(new Base\ShadowTable\Standard\Disable(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->overridesMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->eventMapper,
-            ))
             ->add(new ApiStatistics(
                 $this->log,
                 $api
