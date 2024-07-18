@@ -8,9 +8,9 @@
  * Types of sbProps are maintained in /types/index.d.ts and should be updated when properties are changed here.
  */
 
-import { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import { RosettaStone } from "@js/terminology/rosettaStone";
 import { pwaConfig } from "@js/global/pwaConfig";
+import { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 
 window.sbProps = {
     ...window.sbProps, // keep any existing properties if they exist
