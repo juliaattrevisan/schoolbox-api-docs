@@ -9,6 +9,16 @@
  # @param string $itemResponses            A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
  # @param string $attemptComments          A base64_encoded set of (student id, item reference, attempt comment) tuples that contain overall comments for a person's attempt
  # @param array $urls                      A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
+ #
+ # These are needed for Submission States
+ # @param array             $errors          A list of submission states that can be chosen
+ #
+ # @param data              array            An array containing info for the Submission States' combobox, indexed per user
+ #                                           These fields are listed below, allowing you to spawn unique implementations per user.
+ # @param Participant/Model $participant     The student who did the attempt
+ # @param Attempt\Model     $feedback        The student's attempt from our local db
+ # @param float             $maxMarks        Maximum available marks in this attempt
+ #
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -32,6 +42,26 @@
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
+
+{# TODO @donny move this into whatever Vue component should use it #}
+{% for userId, data in grading %}
+    <div id="grade-container-{{ data.participant.user.id }}" class="hide">
+        <form data-feedback-form="{{ data.participant.user.id }}" method="post" action="">
+            <label>{{ locale.grades.proper }}
+                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                    assessment:  assessment,
+                    participant: data.participant,
+                    feedback:    data.feedback,
+                    markScheme:  assessment.markScheme,
+                    limit:       data.maxMarks,
+                    tabIndex:    1,
+                    errors:      errors,
+                    readonly:    false,
+                } only %}
+            </label>
+        </form>
+    </div>
+{% endfor %}
 
 {##
 The grades below are inserted into the quiz-feedback Vue DOM structure then displayed

@@ -1124,7 +1124,9 @@ class Controller extends Base
         $reportPayloads = [];
         $attemptComments = [];
         $urls = [];
+        $grading = [];
 
+        /** @var Model $attempt */
         foreach ($attempts as $attempt) {
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
@@ -1196,6 +1198,23 @@ class Controller extends Base
                      * to try and elucidate what we're trying to do here
                      */
                     'postFinaliseAttempt' => $this->router->getGenerator()->generate('learningQuizAttempt.postModify', $args),
+                ];
+
+                /* Set up the grading ingredients for the submission states and comboboxes
+                 */
+                $participant = $assessment->getParticipant($attempt->getUser());
+
+                $feedback = $participant
+                    ->getAllFeedbacks()
+                    ->filter(static function ($model) use ($attempt) {
+                        return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+                    })
+                    ->first();
+
+                $grading[$attempt->getUser()->getId()] = [
+                    'participant' => $participant,
+                    'feedback' => $feedback,
+                    'maxMarks' => $attempt->getMaxMark(),
                 ];
             }
         }
@@ -1346,9 +1365,13 @@ class Controller extends Base
             'itemResponses' => $itemResponses,
             'attemptComments' => $attemptComments,
             'urls' => $urls,
+            'grading' => $grading,
+            /* A list of submission states
+             */
+            'errors' => $this->stateMapper->listDisplayValues(),
             /* This list of learnosity references is used for the finalisation step
              */
-            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR)
+            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
