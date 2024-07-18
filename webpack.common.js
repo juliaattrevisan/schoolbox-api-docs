@@ -160,6 +160,7 @@ module.exports = {
         horizontalMarking:
             "./library/Schoolbox/Learning/Learnosity/templates/vue/horizontalMarking/horizontalMarking.ts",
         quizFeedback: "./library/Schoolbox/Learning/Learnosity/templates/vue/feedback/quizFeedback.ts",
+        quizContent: "./library/Schoolbox/Learning/Learnosity/templates/js/quizContent.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
@@ -389,13 +390,14 @@ module.exports = {
                 ],
             },
             {
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+                // to process svg files in the ckeditor5/theme/icons folder as well as the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
+                test: /(ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$)|(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
                 use: ["raw-loader"],
             },
         ],
     },
     externals: {
-        vue: "Vue", // as Vue is loaded seperately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
+        vue: "Vue", // as Vue is loaded separately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
     },
     cache: true,
     resolve: {

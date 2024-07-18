@@ -720,6 +720,11 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     font-weight: 400;
 }
 
+/* to make the new image upload button the same size as the text it's inline with */
+.lrn .uppy-size--md .uppy-Dashboard-AddFiles-title button {
+    font-size: inherit;
+}
+
 /* update the pagination styles */
 .lrn .lrn-author-ui .lrn-pagination ul {
     background: var(--body-background);
