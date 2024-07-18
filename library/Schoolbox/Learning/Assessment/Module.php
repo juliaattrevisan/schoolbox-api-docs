@@ -1104,27 +1104,4 @@ class Module extends BaseModule
             )
         );
     }
-
-    /**
-     * Extract assessment context out of `$params` passed to an authorizer
-     * callback.
-     *
-     * @param array $params
-     * @return AssessmentContext
-     */
-    private function extractContext(array $params): AssessmentContext
-    {
-        if (isset($params['assessment'])) {
-            $ctx = $params['assessment']->getContext();
-        } elseif (isset($params['participant'])) {
-            $ctx = $params['participant']->getAssessable()->getContext();
-        } elseif (isset($params['context'])) {
-            $ctx = $params['context'];
-        } else {
-            throw new NotFound('No assessment or context preloaded');
-        }
-
-        return $ctx;
-    }
-
 }
