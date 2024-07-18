@@ -19,16 +19,16 @@ const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
 const text = window.Vue.ref("");
 const state = window.Vue.ref(STATE_HIDDEN);
-const link = window.Vue.ref("") as ToastLink;
+const link = window.Vue.ref<ToastLink | null>(null);
 const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
 const hidden = window.Vue.ref(true);
 
 /**
  * Activate this toast.
  * @param {string} $text - The text to put in it
- * @param {ToastLink} $link - The link object, what it should say, where it should go
+ * @param {ToastLink | null} $link - The link object, what it should say, where it should go
  */
-function activate($text: string, $link: ToastLink) {
+function activate($text: string, $link: ToastLink | null) {
     link.value = $link;
     text.value = $text;
     state.value = STATE_PENDING;
