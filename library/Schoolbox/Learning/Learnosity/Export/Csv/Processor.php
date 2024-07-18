@@ -16,7 +16,6 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\QuizFetcher;
 use Schoolbox\Learning\Quiz\Attempt\Mapper;
-use Schoolbox\Learning\Quiz\Attempt\Model;
 
 /**
  * Exports every attempt's actual responses to csv
@@ -186,6 +185,15 @@ class Processor
         $factory = new Factory();
 
         foreach ($itemRefs as $itemRef) {
+            /* $itemRef might be an Item containing a Feature, not a Question.
+             * Legacy quiz sections were converted to Feature Items - such Items
+             * will never contain a Question as part of our migration, and should
+             * be skipped.
+             */
+            if (!isset($questions[$itemRef])) {
+                continue;
+            }
+
             foreach ($questions[$itemRef] as $question) {
                 $structure[$question['reference']] = [
                     'type' => $question['data']['type'],
