@@ -4,7 +4,7 @@ import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const selectedNode = window.Vue.ref(getEmptyNode());
-const modalEl = window.Vue.ref(null);
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 interface Props {
     selectedNodeId?: number; // the assigned node to display
@@ -26,8 +26,11 @@ window.Vue.watch(
     () => props.selectedNodeId,
     () => {
         if (props.selectedNodeId !== UNSET_ID) {
-            selectedNode.value = { id: props.selectedNodeId };
-            modalEl.value.open();
+            selectedNode.value.id = props.selectedNodeId;
+
+            if (modalEl.value) {
+                modalEl.value.open();
+            }
         }
     },
 );
@@ -43,8 +46,11 @@ function onNodeLinkSelected(event: Event) {
     event.preventDefault();
     const { href } = event.currentTarget as HTMLAnchorElement;
     const selectedNodeId = parseInt(href.substring(href.indexOf("#") + 1, href.length), 10);
-    selectedNode.value = { id: selectedNodeId };
-    modalEl.value.open();
+    selectedNode.value.id = selectedNodeId;
+
+    if (modalEl.value) {
+        modalEl.value.open();
+    }
 }
 
 /**

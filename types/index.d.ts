@@ -41,6 +41,9 @@ declare global {
                 publicConfiguration: { [key: string]: any };
                 webPushPublicKey: string;
             }>;
+            // Curriculum nodes global storage
+            storedNodes?: string;
+            isStoringNodes?: boolean;
         };
         schoolboxUser: {
             id: number;

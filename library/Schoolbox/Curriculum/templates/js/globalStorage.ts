@@ -8,20 +8,18 @@ export const NODES_STORED = "sb_rootNodesStored";
 
 /**
  * check if the nodes are in the global storage
- *
  * @returns { boolean } - true if the nodes are in the global storage
  */
-export function hasStoredNodes() {
-    return window.sbProps.storedNodes;
+export function hasStoredNodes(): boolean {
+    return window.sbProps.storedNodes !== undefined;
 }
 
 /**
  * check if the nodes are being stored in the global storage
- *
  * @returns { boolean } - true if the nodes are being stored in the global storage
  */
-export function isStoringNodes() {
-    return window.sbProps.isStoringNodes;
+export function isStoringNodes(): boolean {
+    return window.sbProps.isStoringNodes ?? false;
 }
 
 /**
@@ -33,16 +31,14 @@ export function setIsStoringNodes() {
 
 /**
  * Return the root curriculum nodes
- *
- * @returns { JSON } - the root nodes of the curriculum
+ * @returns { Node[] } - the root nodes of the curriculum
  */
-export function getStoredNodes() {
+export function getStoredNodes(): Node[] {
     return JSON.parse(window.sbProps.storedNodes as string) as Node[]; // convert the saved string var back to JSON
 }
 
 /**
  * Set the root curriculum nodes
- *
  * @param { Node[] } nodes - the root nodes of the curriculum
  */
 export function setStoredNodes(nodes: Node[]) {
