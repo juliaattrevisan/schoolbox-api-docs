@@ -123,7 +123,7 @@ class Factory
 
         // Use shadow tables for the duration of the sync
         $bus->add(
-            new Base\ShadowTable\Enable(
+            new Base\ShadowTable\Standard\Enable(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
@@ -136,10 +136,7 @@ class Factory
                 $this->overridesMapper,
                 $this->classPeriodMapper,
                 $this->periodMapper,
-                null,
-                null,
-                null,
-                null,
+                $this->eventMapper,
             )
         );
 
@@ -216,7 +213,7 @@ class Factory
 
         $bus
             // Revert back to the base tables
-            ->add(new Base\ShadowTable\Disable(
+            ->add(new Base\ShadowTable\Standard\Disable(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
@@ -229,10 +226,7 @@ class Factory
                 $this->overridesMapper,
                 $this->classPeriodMapper,
                 $this->periodMapper,
-                null,
-                null,
-                null,
-                null,
+                $this->eventMapper,
             ))
             ->add(new ApiStatistics(
                 $this->log,
