@@ -40,7 +40,6 @@ function getMark(gradeContainer: HTMLElement) {
                 // ignore if the input is invalid
                 return;
             }
-            console.warn("oi");
             mark.value = input.value; // if it's valid, update the mark
         });
         observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
@@ -114,7 +113,7 @@ async function saveMark() {
         window.addEventListener("beforeunload", beforeUnloadHandler);
         const formData = new FormData();
         formData.append("mark", mark.value);
-        const response = await fetch(props.student.urls.attemptScore, {
+        const response = await fetch(props.student.urls.postFeedbackAttemptScore, {
             method: "POST",
             body: formData,
         });

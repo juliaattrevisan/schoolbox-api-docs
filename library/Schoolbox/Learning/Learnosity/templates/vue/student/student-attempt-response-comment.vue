@@ -75,7 +75,7 @@ async function saveComment() {
         window.addEventListener("beforeunload", beforeUnloadHandler);
         const formData = new FormData();
         formData.append("comment", comment.value);
-        const response = await fetch(props.student.urls.attemptComment, {
+        const response = await fetch(props.student.urls.postFeedbackAttemptComment, {
             method: "POST",
             body: formData,
         });

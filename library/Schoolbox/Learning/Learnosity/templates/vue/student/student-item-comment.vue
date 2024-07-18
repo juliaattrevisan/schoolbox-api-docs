@@ -91,7 +91,7 @@ async function saveComment() {
         const formData = new FormData();
         formData.append("learnosityReference", props.item.questions[0].response.learnosityReference);
         formData.append("comment", comment.value);
-        const response = await fetch(props.student.urls.comment, {
+        const response = await fetch(props.student.urls.postFeedbackComment, {
             method: "POST",
             body: formData,
         });

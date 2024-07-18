@@ -4,9 +4,9 @@
  */
 export type StudentUrls = {
     studentId: number;
-    score: string; // the url to update the individual score of an item
-    comment: string; // the url to update the individual comment of an item
-    attemptComment: string; // the url to update the overall attempt comment
-    attemptScore: string; // the url to update the overall attempt score (to override the calculated score, with a new mark, or 'Absent' for example)
-    teacherFeedback: string;
+    postFeedbackScore: string; // the url to update the individual score of an question
+    postFeedbackComment: string; // the url to update the individual comment of an question
+    postFeedbackAttemptComment: string; // the url to update the overall attempt comment
+    postFeedbackAttemptScore: string; // the url to update the overall attempt score (to override the calculated score, with a new mark, or 'Absent' for example)
+    getFeedback: string; // the url to provide feedback for an attempt
 };

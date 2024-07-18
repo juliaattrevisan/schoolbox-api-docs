@@ -1033,11 +1033,11 @@ class Controller extends Base
 
         $urls = [
             'studentId' => $attempt->getUser()->getId(),
-            'attemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
-            'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
-            'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
-            'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-            'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+            'postFeedbackAttemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
+            'postFeedbackAttemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+            'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+            'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+            'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
         ];
 
         /* Find this attempt's MapperProxy equivalent from something we already obtained
@@ -1179,10 +1179,11 @@ class Controller extends Base
 
                 $urls[$attempt->getUser()->getId()] = [
                     'studentId' => $attempt->getUser()->getId(),
-                    'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
-                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
-                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-                    'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+                    'postFeedbackAttemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
+                    'postFeedbackAttemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+                    'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
                 ];
             }
         }

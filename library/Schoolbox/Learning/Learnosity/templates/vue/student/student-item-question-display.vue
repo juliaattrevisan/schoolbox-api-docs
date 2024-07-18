@@ -96,7 +96,7 @@ async function saveScore() {
             (props.question.response as StudentItemQuestionResponse).learnosityReference,
         );
         formData.append("score", score.value);
-        const response = await fetch(props.student.urls.score, {
+        const response = await fetch(props.student.urls.postFeedbackScore, {
             method: "POST",
             body: formData,
         });
