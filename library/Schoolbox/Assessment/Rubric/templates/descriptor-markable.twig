@@ -61,6 +61,7 @@
             data-rubric="{{ rubricGrid.id }}"
             data-rubric-group="{{ groupUsage.capability.id }}"
             data-rubric-descriptor="{{ descriptor.id }}"
+            data-rubric-indicator="{{ indicatorId }}"
     >
         {# Selected value: if not provided, use max #}
         {% set selectedValue = isDescriptorSelected ? indicatorMark.value : descriptor.maxValue %}
