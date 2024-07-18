@@ -649,17 +649,6 @@ import {ToastEvent} from "@schoolboxVue/components/toast/sbxToastEvent";
                     case 401:
                         console.warn("Either no session, or does not match parent.");
                         attemptReconnect = false;
-                        let currentPage = window.location.href.replace(window.location.origin, '') ?? null;
-                        let loginUrl = '/login';
-                        if (currentPage) {
-                            loginUrl = loginUrl + '?page=' + currentPage;
-                        }
-                        // A toast
-                        document.dispatchEvent(
-                            new CustomEvent(ToastEvent.ACTIVATE, {
-                                detail: { text: "Logged out. ", link: { href: loginUrl , text: "Please login again" } },
-                            }),
-                        );
                         break;
                     case 503:
                         console.warn("Service is unavailable: " + !!data.retry ? "cannot retry" : "can retry");
