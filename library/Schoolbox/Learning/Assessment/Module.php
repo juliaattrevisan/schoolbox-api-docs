@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -35,6 +36,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
@@ -69,6 +71,7 @@ use Schoolbox\LTI\Provider\Mapper as LtiToolMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -1053,21 +1056,31 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
+                // Instructor access is only used if assessment is not a spec
                 new IsInstructor(
                     $this->getAccess(),
-                    static function (array $params): FolderModel {
-                        if (isset($params['assessment'])) {
-                            $ctx = $params['assessment']->getContext()->getFolder();
-                        } elseif (isset($params['participant'])) {
-                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
-                        } elseif (isset($params['context'])) {
-                            $ctx = $params['context']->getFolder();
-                        } else {
-                            throw new NotFound('No assessment or context preloaded');
+                    function (array $params): FolderModel {
+                        $ctx = $this->extractContext($params);
+                        if ($ctx->isSpecificationContext()) {
+                            // This rule is not applicable to spec contexts
+                            throw new InvalidPath('Instructor permission is not applicable to specification contexts');
                         }
 
-                        return $ctx;
+                        return $ctx->getFolder();
                     }
+                ),
+                // Homepage access is only used if the context is a spec
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    function (array $params) {
+                        $ctx = $this->extractContext($params);
+                        if (!$ctx->isSpecificationContext()) {
+                            throw new InvalidPath('This permission is only applicable to specification contexts');
+                        }
+
+                        return $ctx->getFolder()->getId();
+                    },
+                    $this->getAccess()
                 )
             )
         );
@@ -1106,4 +1119,27 @@ class Module extends BaseModule
             )
         );
     }
+
+    /**
+     * Extract assessment context out of `$params` passed to an authorizer
+     * callback.
+     *
+     * @param array $params
+     * @return AssessmentContext
+     */
+    private function extractContext(array $params): AssessmentContext
+    {
+        if (isset($params['assessment'])) {
+            $ctx = $params['assessment']->getContext();
+        } elseif (isset($params['participant'])) {
+            $ctx = $params['participant']->getAssessable()->getContext();
+        } elseif (isset($params['context'])) {
+            $ctx = $params['context'];
+        } else {
+            throw new NotFound('No assessment or context preloaded');
+        }
+
+        return $ctx;
+    }
+
 }
