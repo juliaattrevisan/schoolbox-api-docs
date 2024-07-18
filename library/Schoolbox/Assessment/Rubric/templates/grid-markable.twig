@@ -919,31 +919,6 @@
             return descriptorSummation;
         }
 
-
-        /**
-         * Are any of the selected descriptor values valueless? (i.e. have no defined point value)
-         * If so, we should not be overriding the user's custom mark
-         * @param {jQuery} $descriptorCheckboxes - the checkboxes to check
-         * @returns {boolean} - true if a valueless descriptor is selected, false otherwise
-         */
-        function hasSelectedValuelessDescriptor($descriptorCheckboxes) {
-            let hasValuelessDescriptor = false;
-
-            $descriptorCheckboxes.each(function () {
-                var $descriptorCheckbox = $(this);
-
-                if ($descriptorCheckbox.prop('checked')) {
-                    const descriptorValue = getDescriptorValue($descriptorCheckbox);
-
-                    if (descriptorValue === null) {
-                        hasValuelessDescriptor = true;
-                    }
-                }
-            });
-
-            return hasValuelessDescriptor;
-        }
-
         // Calculate the overall rubric mark from the scaled group marks
         function getTotalMark()
         {
