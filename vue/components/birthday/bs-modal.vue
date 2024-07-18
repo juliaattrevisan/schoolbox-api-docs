@@ -9,15 +9,17 @@ import BsModalBackground from "./bs-modal-background.vue";
 import BsModalForeground from "./bs-modal-foreground.vue";
 
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
+
+const hasRevealed = window.Vue.ref(false);
 </script>
 
 <template>
-    <div class="modal-container">
+    <div class="modal-container" data-modal-container>
         <div class="modal-container__background">
-            <bs-modal-background />
+            <bs-modal-background v-if="hasRevealed" />
         </div>
         <div class="modal-container__foreground">
-            <bs-modal-foreground />
+            <bs-modal-foreground @revealed="hasRevealed = true" />
         </div>
     </div>
 </template>
@@ -25,9 +27,7 @@ gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins ot
 <style lang="scss" scoped>
 .modal-container {
     display: grid;
-    // height: 100%;
     overflow: hidden;
-    // width: 100%;
     &__background,
     &__foreground {
         grid-area: 1/-1; // place the background/foreground on top of each other

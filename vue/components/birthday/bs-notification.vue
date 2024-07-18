@@ -5,7 +5,7 @@
  */
 
 import { gsap } from "gsap/all";
-import { init } from "./birthdayNotificationStreamers";
+import { init } from "./birthdayNotificationStars";
 
 const emit = defineEmits<{
     selected: [];
@@ -19,15 +19,15 @@ const duration = window.Vue.ref(1.5);
  */
 function appendToNotifications() {
     const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
-    toggle.appendChild(notificationEl.value);
+    toggle.appendChild(notificationEl.value as HTMLDivElement);
 }
 
 /**
  * Animate stars behind the birthday bell
  */
-function animateStreamers() {
-    const streamersCanvas = document.querySelector("[data-birthday-bell-streamers]") as HTMLCanvasElement;
-    init(streamersCanvas);
+function animateStars() {
+    const starsCanvas = document.querySelector("[data-birthday-bell-stars]") as HTMLCanvasElement;
+    init(starsCanvas);
 }
 
 /**
@@ -60,7 +60,7 @@ function onSelected() {
  */
 window.Vue.onMounted(() => {
     appendToNotifications();
-    animateStreamers();
+    animateStars();
     animateBell();
 });
 </script>
@@ -69,7 +69,7 @@ window.Vue.onMounted(() => {
     <button ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
         <div class="birthday-container">
             <div class="birthday-container__background">
-                <canvas width="72" height="72" data-birthday-bell-streamers></canvas>
+                <canvas width="72" height="72" data-birthday-bell-stars></canvas>
             </div>
             <div class="birthday-container__foreground l-flex l-flex--center">
                 <sbx-icon
@@ -110,3 +110,4 @@ window.Vue.onMounted(() => {
     }
 }
 </style>
+./birthdayNotificationStars

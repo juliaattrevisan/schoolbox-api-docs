@@ -52,7 +52,7 @@ function addStarAnimation(timeline: GSAPTimeline, star: Star) {
     timeline.to(
         star,
         {
-            delay: "random(0, 3)",
+            delay: "random(0, 6.5)",
             duration: "random(3.5, 6.5)",
             radius: "random(0, 0.5)",
             rotation: "random(360, 720)",
