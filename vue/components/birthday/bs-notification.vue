@@ -5,7 +5,7 @@
  */
 
 import { gsap } from "gsap/all";
-import { init } from "./birthdayNotificationStars";
+import { init } from "./bsNotificationStars";
 
 const emit = defineEmits<{
     selected: [];
@@ -110,4 +110,4 @@ window.Vue.onMounted(() => {
     }
 }
 </style>
-./birthdayNotificationStars
+./birthdayNotificationStars ./bsNotificationStars

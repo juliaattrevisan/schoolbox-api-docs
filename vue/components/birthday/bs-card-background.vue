@@ -3,7 +3,7 @@
  * To display the stars behind the cake and text in the birthday modal
  */
 
-import { init } from "./birthdayModalStars";
+import { init } from "./bsCardStars";
 
 const canvasWidth = window.Vue.ref(998);
 const canvasHeight = window.Vue.ref(840);
@@ -51,3 +51,4 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped></style>
+./bsModalStars

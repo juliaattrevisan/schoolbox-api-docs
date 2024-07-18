@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import BsModal from "../../../vue/components/birthday/bs-modal.vue";
+import BsModal from "../../../vue/components/birthday/bs-card.vue";
 
 /**
  * Animation that appears within the birthday modal when the birthday notification is selected.
@@ -17,7 +17,7 @@ export const Default: Story = {
             BsModal,
         },
         template: `
-                <bs-modal />
+                <bs-card />
             `,
     }),
 };

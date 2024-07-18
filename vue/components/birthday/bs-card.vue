@@ -5,8 +5,8 @@
  */
 
 import { gsap, CustomEase, CustomBounce } from "gsap/all";
-import BsModalBackground from "./bs-modal-background.vue";
-import BsModalForeground from "./bs-modal-foreground.vue";
+import BsCardBackground from "./bs-card-background.vue";
+import BsCardForeground from "./bs-card-foreground.vue";
 
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
 
@@ -16,10 +16,10 @@ const hasRevealed = window.Vue.ref(false);
 <template>
     <div class="modal-container" data-modal-container>
         <div class="modal-container__background">
-            <bs-modal-background v-if="hasRevealed" />
+            <bs-card-background v-if="hasRevealed" />
         </div>
         <div class="modal-container__foreground">
-            <bs-modal-foreground @revealed="hasRevealed = true" />
+            <bs-card-foreground @revealed="hasRevealed = true" />
         </div>
     </div>
 </template>

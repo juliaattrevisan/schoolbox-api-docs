@@ -5,7 +5,7 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import BsNotification from "./bs-notification.vue";
-import BsModal from "./bs-modal.vue";
+import BsCard from "./bs-card.vue";
 
 const modalEl = window.Vue.ref(null);
 const hasSelectedNotification = window.Vue.ref(false);
@@ -23,7 +23,7 @@ function onNotificationSelected() {
 <template>
     <bs-notification @selected="onNotificationSelected" />
     <reveal-modal ref="modalEl" :close-on-background-click="false" size="tiny">
-        <bs-modal v-if="hasSelectedNotification" />
+        <bs-card v-if="hasSelectedNotification" />
     </reveal-modal>
 </template>
 
