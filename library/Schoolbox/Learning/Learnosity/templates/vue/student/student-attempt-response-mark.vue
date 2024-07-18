@@ -57,6 +57,8 @@ function getGradeContainer() {
     if (gradeContainer !== null) {
         gradeEl.value?.append(gradeContainer);
         gradeContainer.classList.remove("hide"); // now remove the hide class to show the grade
+        const form = gradeContainer.querySelector("form") as HTMLFormElement;
+        form.style.marginBottom = "0"; // override the default margin so the save container is flush with the grade field
         getMark(gradeContainer);
     }
 }
@@ -161,7 +163,7 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div>
+    <div class="grade-container">
         <div ref="gradeEl"></div>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
