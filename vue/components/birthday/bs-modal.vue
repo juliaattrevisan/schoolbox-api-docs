@@ -11,8 +11,9 @@ gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins ot
  * Callback function when the cake animation is completed
  */
 function onCakeAnimated() {
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
-    tl.from("#happy-birthday", { duration: 2, scale: 0, ease: "elastic.out", delay: 0.5 });
+    const tl = gsap.timeline();
+    tl.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
+    tl.to("#cake", { duration: 2, scale: 1, ease: "elastic.out" }, "<3%");
 }
 
 /**
@@ -27,8 +28,8 @@ function animateCake() {
     });
 
     // see https://gsap.com/docs/v3/GSAP/Timeline/ for more information on timelines
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1, onComplete: onCakeAnimated }); // use while testing animation
-    // const tl = gsap.timeline({ delay: 0.5, onComplete: onCakeAnimated });
+    // const tl = gsap.timeline({ repeat: -1, repeatDelay: 1, onComplete: onCakeAnimated }); // use while testing animation
+    const tl = gsap.timeline({ delay: 0.5, onComplete: onCakeAnimated });
     tl.from("#cake__plate", {
         y: 100,
         scale: 0.8,
@@ -141,8 +142,10 @@ function animateCake() {
  * Initialize the animations when the component is mounted
  */
 window.Vue.onMounted(() => {
-    // animateCake();
-    onCakeAnimated();
+    gsap.set("#happy-birthday", { scale: 0 }); // hide the text for later reveal
+    gsap.set("#cake", { scale: 0.9 }); // to full scale when the text is revealed
+    animateCake();
+    // onCakeAnimated();
 });
 </script>
 
@@ -203,6 +206,9 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped>
+.modal-container {
+    overflow: hidden;
+}
 .happy-birthday-container {
     width: 400px;
     height: 360px;
