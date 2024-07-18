@@ -48,6 +48,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
@@ -1056,32 +1057,21 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                // Instructor access is only used if assessment is not a spec
-                new IsInstructor(
+                new IsInstructorOrHasHomepageAccess(
                     $this->getAccess(),
-                    function (array $params): FolderModel {
-                        $ctx = $this->extractContext($params);
-                        if ($ctx->isSpecificationContext()) {
-                            // This rule is not applicable to spec contexts
-                            throw new InvalidPath('Instructor permission is not applicable to specification contexts');
-                        }
-
-                        return $ctx->getFolder();
-                    }
-                ),
-                // Homepage access is only used if the context is a spec
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
                     function (array $params) {
-                        $ctx = $this->extractContext($params);
-                        if (!$ctx->isSpecificationContext()) {
-                            throw new InvalidPath('This permission is only applicable to specification contexts');
+                        if (isset($params['assessment'])) {
+                            $ctx = $params['assessment']->getContext();
+                        } elseif (isset($params['participant'])) {
+                            $ctx = $params['participant']->getAssessable()->getContext();
+                        } elseif (isset($params['context'])) {
+                            $ctx = $params['context'];
+                        } else {
+                            throw new NotFound('No assessment or context preloaded');
                         }
-
-                        return $ctx->getFolder()->getId();
+                        return $ctx;
                     },
-                    $this->getAccess()
-                )
+                ),
             )
         );
     }

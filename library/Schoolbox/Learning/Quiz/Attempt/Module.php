@@ -25,6 +25,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -85,22 +86,21 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(
+                new IsInstructorOrHasHomepageAccess(
                     $this->getAccess(),
-                    static function (array $params): FolderModel {
+                    function (array $params) {
                         if (isset($params['assessment'])) {
-                            $ctx = $params['assessment']->getContext()->getFolder();
+                            $ctx = $params['assessment']->getContext();
                         } elseif (isset($params['participant'])) {
-                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                            $ctx = $params['participant']->getAssessable()->getContext();
                         } elseif (isset($params['context'])) {
-                            $ctx = $params['context']->getFolder();
+                            $ctx = $params['context'];
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-
                         return $ctx;
-                    }
-                )
+                    },
+                ),
             )
         );
     }

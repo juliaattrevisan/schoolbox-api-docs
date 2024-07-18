@@ -33,6 +33,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
@@ -244,22 +245,21 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(
+                new IsInstructorOrHasHomepageAccess(
                     $this->getAccess(),
-                    static function (array $params): FolderModel {
+                    function (array $params) {
                         if (isset($params['assessment'])) {
-                            $ctx = $params['assessment']->getContext()->getFolder();
+                            $ctx = $params['assessment']->getContext();
                         } elseif (isset($params['participant'])) {
-                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                            $ctx = $params['participant']->getAssessable()->getContext();
                         } elseif (isset($params['context'])) {
-                            $ctx = $params['context']->getFolder();
+                            $ctx = $params['context'];
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-
                         return $ctx;
-                    }
-                )
+                    },
+                ),
             )
         );
     }
