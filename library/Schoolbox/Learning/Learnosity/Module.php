@@ -33,6 +33,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
@@ -63,7 +64,7 @@ class Module extends BaseModule
     {
         /* Instructors only
          */
-        $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
+        $instructorPerms = $this->buildAuthRuleHasInstructorOrHomepageAccess();
 
         /* Someone who can complete an attempt
          *
@@ -230,36 +231,34 @@ class Module extends BaseModule
 
 
     /**
-     * Prevent non-instructors from marking or modifying assessments.
-     *
-     * This uses the `IsInstructor` validator, which is the new standard for
-     * checking if a user has instructor permission over a folder.
+     * Prevent non-instructors from marking or modifying implementation
+     * assessments, and users without homepage write access from modifying spec
+     * assessments.
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
-    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
+    private function buildAuthRuleHasInstructorOrHomepageAccess(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(
+                new IsInstructorOrHasHomepageAccess(
                     $this->getAccess(),
-                    static function (array $params): FolderModel {
+                    function (array $params) {
                         if (isset($params['assessment'])) {
-                            $ctx = $params['assessment']->getContext()->getFolder();
+                            $ctx = $params['assessment']->getContext();
                         } elseif (isset($params['participant'])) {
-                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                            $ctx = $params['participant']->getAssessable()->getContext();
                         } elseif (isset($params['context'])) {
-                            $ctx = $params['context']->getFolder();
+                            $ctx = $params['context'];
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-
                         return $ctx;
-                    }
-                )
+                    },
+                ),
             )
         );
     }
@@ -334,7 +333,7 @@ class Module extends BaseModule
                  * or a student that adheres all the non-instructor criteria
                  */
                 new Rule\Any(
-                    $this->buildAuthRuleHasInstructorAccess(),
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     /* TODO I think there's a duplication between IsAssessmentOpen() and
                      *  canLearnerCreateResponse() in Quiz Model; the latter already
                      *  checks the former.
@@ -392,7 +391,7 @@ class Module extends BaseModule
                  * or a student that adheres all the non-instructor criteria
                  */
                 new Rule\Any(
-                    $this->buildAuthRuleHasInstructorAccess(),
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     /* TODO I think there's a duplication between IsAssessmentOpen() and
                      *  canLearnerCreateResponse() in Quiz Model; the latter already
                      *  checks the former.
@@ -497,7 +496,7 @@ class Module extends BaseModule
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    $this->buildAuthRuleHasInstructorAccess(),
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
                     new Rule\All(
                         // This section is the same as in buildAuthRuleCanAttempt().
                         // Note that the user referenced in the url need not be a student.  Some quizzes are designed for teachers.

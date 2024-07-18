@@ -24,12 +24,11 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
-use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -52,7 +51,7 @@ class Module extends BaseModule
     {
         /* Instructors only
          */
-        $instructorPerms = $this->buildAuthRuleHasInstructorAccess();
+        $instructorPerms = $this->buildAuthRuleHasInstructorOrHomepageAccess();
 
         $preloadParticipant = function ($params) {
             return $this->preloadAssessmentAndStudent($params);
@@ -71,36 +70,34 @@ class Module extends BaseModule
      *  Probably think about dissolving the Learnosity/Controller and Learnosity/Module
      *  into these Quiz* variants, since we aren't considering seriously divorcing them
      *
-     * Prevent non-instructors from marking or modifying assessments.
-     *
-     * This uses the `IsInstructor` validator, which is the new standard for
-     * checking if a user has instructor permission over a folder.
+     * Prevent non-instructors from marking or modifying implementation
+     * assessments, and users without homepage write access from modifying spec
+     * assessments.
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
-    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
+    private function buildAuthRuleHasInstructorOrHomepageAccess(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(
+                new IsInstructorOrHasHomepageAccess(
                     $this->getAccess(),
-                    static function (array $params): FolderModel {
+                    function (array $params) {
                         if (isset($params['assessment'])) {
-                            $ctx = $params['assessment']->getContext()->getFolder();
+                            $ctx = $params['assessment']->getContext();
                         } elseif (isset($params['participant'])) {
-                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                            $ctx = $params['participant']->getAssessable()->getContext();
                         } elseif (isset($params['context'])) {
-                            $ctx = $params['context']->getFolder();
+                            $ctx = $params['context'];
                         } else {
                             throw new NotFound('No assessment or context preloaded');
                         }
-
                         return $ctx;
-                    }
-                )
+                    },
+                ),
             )
         );
     }
