@@ -40,6 +40,7 @@ function getMark(gradeContainer: HTMLElement) {
                 // ignore if the input is invalid
                 return;
             }
+            console.warn("oi");
             mark.value = input.value; // if it's valid, update the mark
         });
         observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });

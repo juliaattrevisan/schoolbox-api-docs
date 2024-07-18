@@ -359,9 +359,9 @@ class Controller extends Base
                                  * Therefore: temporarily disabled until they fix this somehow.
                                  * I can't circumvent their implementation.
                                  */
-//                                 'none' => [
-//                                    $tagFactory->produceImplFlag()
-//                                ]
+                                //                                 'none' => [
+                                //                                    $tagFactory->produceImplFlag()
+                                //                                ]
                             ]
                         ]
                     ]
@@ -548,13 +548,12 @@ class Controller extends Base
                          *  as a source of truth instead of their server...lol. Re-enable this once learnosity
                          *  figures out how to accurately control attempt commencement
                          */
-//                        'type' => 'soft',
+                        //                        'type' => 'soft',
                         /* Note: Whilst looking into this, I also experimented with the "hard" type which requires a "value" prop.
                          * Learnosity wants this value given in UTC with an unusual format, which can be achieved with "Ymd-His"
                          * The Learnosity docs do not include seconds as a valid attribute, however, I found that this both works and is
                          * required to ensure that the start time is not off by a few seconds when starting the quiz
-                         */
-                    ]
+                         */]
                 ],
                 /* This is our Quiz title, I guess
                  */
@@ -946,15 +945,15 @@ class Controller extends Base
             $assessmentNode = [
                 $assessment->getTitle(),
                 $assessment->isImplementation()
-                ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                : null
+                    ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+                    : null
             ];
         } else {
             $assessmentNode = [
                 $assessment->getTitle(),
                 $assessment->isImplementation()
-                ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $student->getId()])
-                : null
+                    ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $student->getId()])
+                    : null
             ];
         }
 
@@ -1034,6 +1033,7 @@ class Controller extends Base
 
         $urls = [
             'studentId' => $attempt->getUser()->getId(),
+            'attemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
             'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
             'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
             'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
@@ -1830,7 +1830,7 @@ class Controller extends Base
         $responseCode = match ($status) {
             Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
             Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
-            // including failure
+                // including failure
             default => 400,
         };
         $this->response = $this
