@@ -101,7 +101,7 @@ window.Vue.onMounted(() => {
         :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
-      <a v-if="link?.text && link?.href" :href="link.href">{{ link.text }}</a>
+      <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
     </div>
 </template>
 
