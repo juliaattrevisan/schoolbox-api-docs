@@ -24,18 +24,15 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * This includes mappers for:
  *
- * Classes and timetables:
+ * Timetables and enrolment:
  * * `sis_class`
  * * `sis_class_period`
  * * `sis_class_user`
- * * `sis_class_user_overrides`
  * * `sis_timetable_period`
  *
- * SIS events:
+ * Timetabled classes:
+ * * `sis_class_user_overrides`
  * * `sis_event`
- * * `sis_event_campus`
- * * `sis_event_roletype`
- * * `sis_event_user`
  *
  * User profile tables:
  * * `sis_user_profile`
@@ -45,6 +42,9 @@ use Schoolbox\External\TimetablePeriodMapper;
  * * `sis_user_profile_student`
  *
  * This does _not_ include mappers for:
+ *  * `sis_event_campus`
+ *  * `sis_event_roletype`
+ *  * `sis_event_user`
  * * `sis_import_log`: this simply logs previous SIS import runs
  * * `sis_import_queue`: this simply stores scheduled SIS import runs
  * * `sis_timetable_cycle`: this is updated in a separate process
