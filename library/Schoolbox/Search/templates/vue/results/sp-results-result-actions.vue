@@ -4,7 +4,7 @@
  */
 
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
-import type { BadgeAward } from "@schoolboxBadge/types/BadgeAward";
+import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
 import { useBadgeStore } from "./store/spBadgeStore";
 import { Result } from "../../js/types/Result";
 

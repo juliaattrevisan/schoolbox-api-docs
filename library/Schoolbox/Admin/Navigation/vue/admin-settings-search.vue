@@ -86,8 +86,9 @@ export default window.Vue.defineComponent({
             if (this.query.length < this.minQueryLength) {
                 return [];
             }
-            const matchedTitleList = this.settingsList.filter(this.searchForTitle);
-            const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
+
+            const matchedTitleList = this.settingsList.filter(this.searchForTitle.bind(this));
+            const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription.bind(this));
             return matchedTitleList.concat(matchedNameAndDescriptionList); // so those that have title matches take precedence
         },
     },
@@ -321,15 +322,6 @@ export default window.Vue.defineComponent({
          */
         onLeave(element: Element, done: () => void) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done });
-        },
-
-        /**
-         * how the element animates off
-         */
-        onAfterLeave() {
-            this.$refs.searchResults.forEach((searchResult) => {
-                searchResult.test();
-            });
         },
 
         /**

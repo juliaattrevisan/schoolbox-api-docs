@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import Toast from "@schoolboxVue/components/toast.vue";
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { CourseTemplate, Permissions } from "../courseBuilderTypes";
 
 export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
@@ -13,7 +13,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
 
     const saveIsProcessing = window.Vue.ref<boolean>(false);
     const saveStatus = window.Vue.ref<string>("Save Changes");
-    const toastEl = window.Vue.ref<typeof Toast>(); // so we don't need to pass it all around as a prop
 
     /**
      * store any passed through properties
@@ -22,7 +21,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      * @param { Permissions } $unitPermissions - the unit permissions
      * @param { boolean } $courseInherit - the course inherit
      * @param { boolean } $unitInherit - the unit inherit
-     * @param {typeof Toast} toastElement - the toast element
      */
     function init(
         $courseTemplates: CourseTemplate[],
@@ -30,14 +28,12 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         $unitPermissions: Permissions,
         $courseInherit: boolean,
         $unitInherit: boolean,
-        toastElement: typeof Toast
     ) {
         courseTemplates.value = $courseTemplates;
         coursePermissions.value = $coursePermissions;
         unitPermissions.value = $unitPermissions;
         courseInherit.value = $courseInherit;
         unitInherit.value = $unitInherit;
-        toastEl.value = toastElement.value;
     }
 
     /**
@@ -57,7 +53,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      */
     async function deleteCourseTemplate(courseTemplate: CourseTemplate) {
         if (courseTemplate.id >= 0) {
-            toastEl.value.activate("Deleting...");
+            toast.activate("Deleting...");
             const response = await fetch(`/adminv2/course-builder/delete/${courseTemplate.id}`, { method: "DELETE" });
 
             if (!response.ok) {
@@ -70,11 +66,11 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                     responseText = responseJSON.title;
                 }
 
-                toastEl.value.timeout(responseText, false, 2000);
+                toast.timeout({ text: responseText, isSuccess: false });
                 return;
             }
 
-            toastEl.value.timeout("Deleted", true, 2000);
+            toast.timeout({ text: "Deleted", isSuccess: true });
         }
 
         const index = courseTemplates.value.findIndex((ct) => ct.id === courseTemplate.id);
@@ -98,12 +94,14 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         // Remove any permissions that are -1 (i.e. not set)
         formData.append(
             "coursePermissions",
-            JSON.stringify(Object.fromEntries(Object.entries(coursePermissions.value).filter((entry) => entry[1] >= 0)))
+            JSON.stringify(
+                Object.fromEntries(Object.entries(coursePermissions.value).filter((entry) => entry[1] >= 0)),
+            ),
         );
 
         formData.append(
             "unitPermissions",
-            JSON.stringify(Object.fromEntries(Object.entries(unitPermissions.value).filter((entry) => entry[1] >= 0)))
+            JSON.stringify(Object.fromEntries(Object.entries(unitPermissions.value).filter((entry) => entry[1] >= 0))),
         );
 
         return formData;
@@ -130,7 +128,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
             saveIsProcessing.value = true;
             saveStatus.value = "Saving...";
 
-            toastEl.value.activate("Saving...");
+            toast.activate("Saving...");
             const response = await fetch("/adminv2/course-builder/save", {
                 method: "POST",
                 body: getSaveAllFormData(),
@@ -139,16 +137,16 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                 },
             });
             if (response.ok) {
-                toastEl.value.timeout("Save successful", true, 2000);
+                toast.timeout({ text: "Save successful", isSuccess: true });
 
                 // reload the page to get the new data
                 window.location.reload();
             } else {
-                const responseText = await response.json() as { title: string; type: string; status: number };
-                toastEl.value.timeout(responseText.title, false, 2000);
+                const responseText = (await response.json()) as { title: string; type: string; status: number };
+                toast.timeout({ text: responseText.title, isSuccess: false });
             }
         } catch (error) {
-            toastEl.value(error.message, false, 2000);
+            toast.timeout({ text: (error as Error).message, isSuccess: false });
         } finally {
             await window.Vue.nextTick(() => {
                 saveIsProcessing.value = false;

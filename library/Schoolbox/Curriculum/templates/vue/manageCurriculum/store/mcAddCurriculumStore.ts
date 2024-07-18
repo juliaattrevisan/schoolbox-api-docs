@@ -12,7 +12,6 @@ const UNSET_ID = -1;
 
 /**
  * Pass empty fields to be added
- *
  * @returns { Partial<Node> } - a new Node to add
  */
 function getCurriculum(): Partial<Node> {
@@ -25,11 +24,10 @@ function getCurriculum(): Partial<Node> {
 
 /**
  * Get the data to pass to the backend
- *
  * @param { Node } node - the node with the fields to update
  * @returns { string } - the data to send to the backend
  */
-function getFormData(node: Partial<Node>) {
+function getFormData(node: Partial<Node>): string {
     return JSON.stringify({
         name: node.name,
         code: node.code,
@@ -60,32 +58,34 @@ export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
 
     /**
      * pass the new curriculum details to the backend
+     * @returns { Promise<{ id: number; message: string }> } - the id of the new curriculum and a message
      */
-    async function add() {
-        try {
-            isProcessing.value = true;
-            const response = await fetch(`${useStore().getApiEndpoint()}/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: getFormData(curriculum.value as Partial<Node>),
-            });
-            const responseJson = await response.json();
-            if (response.ok) {
-                const newCurriculum: Node = responseJson as Node;
-                id.value = newCurriculum.id;
-                const nodesStore = useNodesStore();
-                nodesStore.addNewCurriculum(newCurriculum);
-                useViewNodesStore().setSelected(0);
-                isProcessing.value = false;
-                cancel();
-                return { id: newCurriculum.id, message: "Curriculum successfully added" };
-            }
-            throw new Error(responseJson.title, { ...responseJson });
-        } catch (error) {
-            throw new Error(error.message, error.options);
+    async function add(): Promise<{ id: number; message: string }> {
+        isProcessing.value = true;
+        const response = await fetch(`${useStore().getApiEndpoint()}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: getFormData(curriculum.value as Partial<Node>),
+        });
+
+        const responseJson = (await response.json()) as Node | { title: string };
+
+        if (response.ok) {
+            const newCurriculum: Node = responseJson as Node;
+            id.value = newCurriculum.id;
+            const nodesStore = useNodesStore();
+            nodesStore.addNewCurriculum(newCurriculum);
+            useViewNodesStore().setSelected(0);
+            isProcessing.value = false;
+            cancel();
+            return { id: newCurriculum.id, message: "Curriculum successfully added" };
         }
+
+        // Throw the error message. Note handling the API response like this is not ideal and requires type casts...
+        const responseErrorInfo = responseJson as { title: string };
+        throw new Error(responseErrorInfo.title);
     }
 
     /**

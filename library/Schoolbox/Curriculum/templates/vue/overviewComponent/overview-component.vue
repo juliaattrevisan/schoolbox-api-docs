@@ -16,7 +16,6 @@ import FnList from "@schoolboxCurriculum/vue/folderNodes/fn-list.vue";
 import { useStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import FnActions from "@schoolboxCurriculum/vue/folderNodes/fn-actions.vue";
 import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vue";
-import Toast from "@schoolboxVue/components/toast.vue";
 import OcEmptyState from "./oc-empty-state.vue";
 
 interface Props {
@@ -106,5 +105,4 @@ function onModalClosed() {
     <fn-delete-node :folder-id="props.folderId" :component-instance-id="props.componentInstanceId" />
     <cs-modal v-if="selectorStore.hasLoadedOk" :starting-node-id="props.filter?.id" />
     <curriculum-details-modal :selected-node-id="store().selectedDetailsNodeId" @closed="onModalClosed" />
-    <toast ref="toastEl"></toast>
 </template>
