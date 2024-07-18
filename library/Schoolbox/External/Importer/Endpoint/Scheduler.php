@@ -142,10 +142,6 @@ class Scheduler
             $importLog = $this->importLogMapper->start($runId, $scriptName);
 
             try {
-                $this->logger->debug(sprintf(
-                    'Beginning transaction'
-                ));
-
                 foreach ($composites as $composite) {
                     $composite->import();
                 }
