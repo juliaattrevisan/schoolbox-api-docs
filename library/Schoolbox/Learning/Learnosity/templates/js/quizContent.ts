@@ -1,5 +1,7 @@
 /**
- *
+ * This contains code to display and tweak the Learnosity authoring app to our needs (displayed when modifying a quiz contents)
+ * It was originally written directly in `library/Schoolbox/Learning/Learnosity/templates/content.twig`
+ * but has been moved into a module so we can use the image compression on upload extension.
  */
 
 import { LT } from "@caspingus/lt/src/authoring/core";
