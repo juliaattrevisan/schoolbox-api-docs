@@ -1,7 +1,5 @@
 /* Implmentation of Schoolbox Websocket Notifications */
 
-import {ToastEvent} from "@schoolboxVue/components/toast/sbxToastEvent";
-
 (function ($) {
     $.fn.notifier = function (options) {
         var settings = $.extend(
