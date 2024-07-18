@@ -6,11 +6,17 @@ export enum ToastEvent {
     TIMEOUT = "TOAST__TIMEOUT", //
 }
 
+export type ToastLink = {
+    text: string;
+    href: string;
+}
+
 /**
  * The details passed with a ACTIVATE event
  */
 export type ToastActivateEventDetail = {
     text: string;
+    link?: ToastLink;
 };
 
 /**

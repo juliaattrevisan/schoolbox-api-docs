@@ -6,8 +6,7 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
-import type { ToastActivateEventDetail, ToastTimeoutEventDetail } from "./sbxToastEvent";
-import { ToastEvent } from "./sbxToastEvent";
+import {ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent} from "./sbxToastEvent";
 
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";
@@ -20,14 +19,17 @@ const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
 const text = window.Vue.ref("");
 const state = window.Vue.ref(STATE_HIDDEN);
+const link = window.Vue.ref<ToastLink | null>(null);
 const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
 const hidden = window.Vue.ref(true);
 
 /**
  * Activate this toast.
  * @param {string} $text - The text to put in it
+ * @param {ToastLink | null} $link - The link object, what it should say, where it should go
  */
-function activate($text: string) {
+function activate($text: string, $link: ToastLink | null) {
+    link.value = $link;
     text.value = $text;
     state.value = STATE_PENDING;
     hidden.value = false;
@@ -75,7 +77,7 @@ function timeout(
 window.Vue.onMounted(() => {
     document.addEventListener(ToastEvent.ACTIVATE, (event) => {
         const eventDetail = (event as CustomEvent).detail as ToastActivateEventDetail;
-        activate(eventDetail.text);
+        activate(eventDetail.text, eventDetail.link ?? null);
     });
     document.addEventListener(ToastEvent.TIMEOUT, (event) => {
         const eventDetail = (event as CustomEvent).detail as ToastTimeoutEventDetail;
@@ -99,6 +101,7 @@ window.Vue.onMounted(() => {
         :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
+      <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
     </div>
 </template>
 
