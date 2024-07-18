@@ -3,6 +3,8 @@
  * To provide a final mark response for a student
  */
 
+import { watchDebounced } from "@vueuse/core";
+import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
@@ -16,6 +18,10 @@ const emit = defineEmits<{
 }>();
 
 const gradeEl = window.Vue.ref<HTMLDivElement | null>(null);
+const mark = window.Vue.ref(props.student.attemptResponse.mark ?? "");
+const isSaving = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
 
 /**
  * Here we retrieve the current mark by observing the input field
@@ -26,14 +32,15 @@ const gradeEl = window.Vue.ref<HTMLDivElement | null>(null);
 function getMark(gradeContainer: HTMLElement) {
     const input = gradeContainer.querySelector("input");
     if (input !== null) {
-        emit("updatedMark", input.value);
+        mark.value = input.value;
+        emit("updatedMark", mark.value); // emit the initial value, as it's not currently returned in the initial payload
         // we need to observe the input value to update the mark when it changes
         const observer = new MutationObserver(() => {
             if (input.getAttribute("aria-invalid") === "true") {
-                // check if it's a valid update
+                // ignore if the input is invalid
                 return;
             }
-            emit("updatedMark", input.value); // and if so update the mark
+            mark.value = input.value; // if it's valid, update the mark
         });
         observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
     }
@@ -55,6 +62,96 @@ function getGradeContainer() {
 }
 
 /**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
+const saveText = window.Vue.computed(() => {
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    if (hasError.value) {
+        return "Grade could not be saved";
+    }
+    return "Grade saved";
+});
+
+/**
+ * To open and close the save status
+ * @returns {string} - the grid-template-rows
+ */
+const saveContainerHeight = window.Vue.computed(() => {
+    if (isSaving.value || hasSaved.value || hasError.value) {
+        return "1fr";
+    }
+    return "0fr";
+});
+
+/**
+ * To notify the user that they're leaving the page while data is being saved
+ * @param {BeforeUnloadEvent} event - the event to prevent
+ */
+function beforeUnloadHandler(event: BeforeUnloadEvent) {
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+/**
+ * Save the mark if it's changed
+ */
+async function saveMark() {
+    if (isSaving.value) {
+        return;
+    }
+    if (mark.value === props.student.attemptResponse.mark) {
+        return;
+    }
+    if (props.student.urls === undefined) {
+        return;
+    }
+    try {
+        isSaving.value = true;
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append("mark", mark.value);
+        const response = await fetch(props.student.urls.attemptScore, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            emit("updatedMark", mark.value);
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSaving.value = false;
+    } catch (error) {
+        hasError.value = true;
+    }
+    await timeout(2000);
+    hasSaved.value = false;
+    hasError.value = false;
+}
+
+/**
+ * save the mark when it's changed
+ */
+watchDebounced(
+    mark,
+    () => {
+        void saveMark();
+    },
+    { debounce: 1000 },
+);
+
+/**
+ * Save any unsaved changes
+ */
+window.Vue.onUnmounted(async () => {
+    await saveMark();
+});
+
+/**
  * To add the grade field in
  */
 window.Vue.onMounted(async () => {
@@ -64,7 +161,24 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
-    <div ref="gradeEl"></div>
+    <div>
+        <div ref="gradeEl"></div>
+        <div class="save-container l-grid">
+            <div class="save-container__inner-container">
+                <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
+                    <em>{{ saveText }}</em>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.save-container {
+    grid-template-rows: v-bind(saveContainerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
+</style>

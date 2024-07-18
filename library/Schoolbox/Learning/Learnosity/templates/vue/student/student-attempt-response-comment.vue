@@ -5,7 +5,6 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
-
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 
 interface Props {
