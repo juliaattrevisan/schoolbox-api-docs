@@ -5,6 +5,7 @@
  */
 
 import { gsap, CustomEase, CustomBounce } from "gsap/all";
+import type GSAPTimeline from "gsap";
 
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
 
@@ -12,43 +13,65 @@ const emit = defineEmits<{
     revealed: [];
 }>();
 
+let cakeTimeline: GSAPTimeline; // the timeline for the cake animation
+let afterCakeTimeline: GSAPTimeline; // the timeline triggered after (onComplete) the cake animation
+
 /**
  * Emit to start showing the stars in the background and pop up the happy birthday message,
  * also popping the modal and flicking the candles
  */
 function onCakeAnimated() {
     emit("revealed"); // to start showing the stars in the background
-    const tl = gsap.timeline();
-    tl.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
-    tl.to("#cake", { duration: 2, scale: 1, ease: "elastic.out" }, "<3%");
-    tl.to("[data-reveal]", { duration: 2, scale: 1.05, yoyo: true, repeat: 1, ease: "elastic.out" }, "<3%");
+    afterCakeTimeline = gsap.timeline();
+    afterCakeTimeline.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
+    afterCakeTimeline.to("#cake", { duration: 2, scale: 1, ease: "elastic.out" }, "<3%");
+    if (document.querySelector("[data-reveal]")) {
+        // pop out the modal
+        afterCakeTimeline.to(
+            "[data-reveal]",
+            { duration: 2, scale: 1.05, yoyo: true, repeat: 1, ease: "elastic.out" },
+            "<3%",
+        );
+    }
     // animate the candles flickering
-    gsap.to("#cake__middle-flame", {
-        duration: 0.3,
-        scaleY: 0.85,
-        opacity: 0.8,
-        yoyo: true,
-        repeat: -1,
-        delay: 0.1,
-        ease: "power2.inOut",
-    });
-    gsap.to("#cake__left-flame", {
-        duration: 0.3,
-        scaleY: 0.85,
-        opacity: 0.8,
-        yoyo: true,
-        repeat: -1,
-        ease: "power2.inOut",
-    });
-    gsap.to("#cake__right-flame", {
-        duration: 0.3,
-        scaleY: 0.85,
-        opacity: 0.8,
-        yoyo: true,
-        delay: 0.2,
-        repeat: -1,
-        ease: "power2.inOut",
-    });
+    afterCakeTimeline.to(
+        "#cake__middle-flame",
+        {
+            duration: 0.3,
+            scaleY: 0.85,
+            opacity: 0.8,
+            yoyo: true,
+            repeat: -1,
+            delay: 0.1,
+            ease: "power2.inOut",
+        },
+        0,
+    );
+    afterCakeTimeline.to(
+        "#cake__left-flame",
+        {
+            duration: 0.3,
+            scaleY: 0.85,
+            opacity: 0.8,
+            yoyo: true,
+            repeat: -1,
+            ease: "power2.inOut",
+        },
+        0,
+    );
+    afterCakeTimeline.to(
+        "#cake__right-flame",
+        {
+            duration: 0.3,
+            scaleY: 0.85,
+            opacity: 0.8,
+            yoyo: true,
+            delay: 0.2,
+            repeat: -1,
+            ease: "power2.inOut",
+        },
+        0,
+    );
 }
 
 /**
@@ -62,9 +85,9 @@ function animateCake() {
         squash: 0.3,
         squashID: "myBounce-squash",
     });
-    const tl = gsap.timeline({ delay: 0.5, onComplete: onCakeAnimated });
+    cakeTimeline = gsap.timeline({ delay: 0.5, onComplete: onCakeAnimated });
     // bring the cake plate up from the bottom
-    tl.from("#cake__plate", {
+    cakeTimeline.from("#cake__plate", {
         y: 100,
         scale: 0.8,
         rotate: 10,
@@ -73,7 +96,7 @@ function animateCake() {
         duration: 0.8,
     });
     // bring the cake slices down from the top
-    tl.from(
+    cakeTimeline.from(
         "#cake__base",
         {
             y: -350,
@@ -84,7 +107,7 @@ function animateCake() {
         },
         "<10%",
     );
-    tl.from(
+    cakeTimeline.from(
         "#cake__middle",
         {
             y: -350,
@@ -95,7 +118,7 @@ function animateCake() {
         },
         "<25%",
     );
-    tl.from(
+    cakeTimeline.from(
         "#cake__top",
         {
             y: -350,
@@ -107,7 +130,7 @@ function animateCake() {
         "<25%",
     );
     // pop up the candles
-    tl.from(
+    cakeTimeline.from(
         "#cake__middle-candle",
         {
             opacity: 0,
@@ -119,7 +142,7 @@ function animateCake() {
         },
         "<75%",
     );
-    tl.from(
+    cakeTimeline.from(
         "#cake__left-candle",
         {
             opacity: 0,
@@ -131,7 +154,7 @@ function animateCake() {
         },
         "<25%",
     );
-    tl.from(
+    cakeTimeline.from(
         "#cake__right-candle",
         {
             opacity: 0,
@@ -144,14 +167,14 @@ function animateCake() {
         "<25%",
     );
     // then light the candles
-    tl.from("#cake__middle-flame", {
+    cakeTimeline.from("#cake__middle-flame", {
         opacity: 0,
         scale: 0.7,
         ease: "power2.out",
         transformOrigin: "center bottom",
         duration: 0.5,
     });
-    tl.from(
+    cakeTimeline.from(
         "#cake__right-flame",
         {
             opacity: 0,
@@ -162,7 +185,7 @@ function animateCake() {
         },
         "<25%",
     );
-    tl.from(
+    cakeTimeline.from(
         "#cake__left-flame",
         {
             opacity: 0,
@@ -182,6 +205,14 @@ window.Vue.onMounted(() => {
     gsap.set("#happy-birthday", { scale: 0 }); // hide the text for later reveal
     gsap.set("#cake", { scale: 0.9 }); // to full scale when the text is revealed
     animateCake();
+});
+
+/**
+ * When the component is unmounted, ensure all the animations are cleared
+ */
+window.Vue.onBeforeUnmount(() => {
+    cakeTimeline.kill();
+    afterCakeTimeline.kill();
 });
 </script>
 

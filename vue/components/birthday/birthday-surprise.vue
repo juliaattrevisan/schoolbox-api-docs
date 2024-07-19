@@ -22,7 +22,7 @@ function onNotificationSelected() {
 
 <template>
     <bs-notification @selected="onNotificationSelected" />
-    <reveal-modal ref="modalEl" :close-on-background-click="false" size="tiny">
+    <reveal-modal ref="modalEl" :close-on-background-click="false" size="tiny" @closed="isModalActive = false">
         <bs-card v-if="isModalActive" />
     </reveal-modal>
 </template>
