@@ -82,18 +82,18 @@ class PayloadList
              * ...unless the school specified a ?source parameter in their Receiver all,
              * in which case it'll be that. Redlands used it.
              */
-            $source = $parts['source'];
+            $sourceName = $parts['sourceName'];
 
             /* Forcibly override storage's datetime
              */
             $lissPayload->setCreatedAt(new \Alaress_Date_Format($parts['date'], 'Ymd_His'));
 
             foreach (PayloadCache::PAYLOAD_ALL as $payloadName) {
-                $neverSeen = null === ($scheduled[$payloadName]['sources'][$source] ?? null);
+                $neverSeen = null === ($scheduled[$payloadName]['sources'][$sourceName] ?? null);
                 $matches = strpos($lissPayload->getFilename(), $payloadName) > -1;
 
                 if ($neverSeen && $matches) {
-                    $scheduled[$payloadName]['sources'][$source] = $lissPayload;
+                    $scheduled[$payloadName]['sources'][$sourceName] = $lissPayload;
                 }
             }
         }
