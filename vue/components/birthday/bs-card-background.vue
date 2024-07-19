@@ -9,6 +9,7 @@ const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
 const canvasWidth = window.Vue.ref(998);
 const canvasHeight = window.Vue.ref(840);
 const modalContainer = document.querySelector("[data-modal-container]") as HTMLDivElement;
+let resizeObserver: ResizeObserver;
 
 /**
  * Set the canvas size to the size of the modal
@@ -27,10 +28,23 @@ function animateStars() {
 }
 
 /**
+ * To sync up the canvas size with the size of the modal
+ */
+function initResizeObserver() {
+    resizeObserver = new ResizeObserver(() => {
+        setCanvasSize();
+        animateStars();
+    });
+    resizeObserver.observe(modalContainer);
+}
+
+/**
  * When the component is mounted, set the canvas size and animate the stars
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
     setCanvasSize();
+    initResizeObserver();
     animateStars();
 });
 
@@ -38,6 +52,7 @@ window.Vue.onMounted(() => {
  * When the component is unmounted, destroy the canvas
  */
 window.Vue.onBeforeUnmount(() => {
+    resizeObserver.disconnect();
     destroy(canvasEl.value as HTMLCanvasElement);
 });
 </script>

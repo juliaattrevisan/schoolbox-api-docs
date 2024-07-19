@@ -86,6 +86,10 @@ function animateStars(canvas: HTMLCanvasElement) {
  * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
  */
 export function init(canvas: HTMLCanvasElement) {
+    if (timeline !== undefined) {
+        // could be called multiple times on canvas resize, so kill the previous timeline
+        timeline.kill();
+    }
     animateStars(canvas);
 }
 
