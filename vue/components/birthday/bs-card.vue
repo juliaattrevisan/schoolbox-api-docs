@@ -14,7 +14,7 @@ const hasRevealed = window.Vue.ref(false);
 </script>
 
 <template>
-    <div class="modal-container" data-modal-container>
+    <div class="modal-container l-pad-m" data-modal-container>
         <div class="modal-container__background">
             <bs-card-background v-if="hasRevealed" />
         </div>

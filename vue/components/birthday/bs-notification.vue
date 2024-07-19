@@ -5,13 +5,14 @@
  */
 
 import { gsap } from "gsap/all";
-import { init } from "./bsNotificationStars";
+import { init, destroy } from "./bsNotificationStars";
 
 const emit = defineEmits<{
     selected: [];
 }>();
 
 const notificationEl = window.Vue.ref<HTMLDivElement | null>(null);
+const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
 const duration = window.Vue.ref(1.5);
 
 /**
@@ -26,8 +27,7 @@ function appendToNotifications() {
  * Animate stars behind the birthday bell
  */
 function animateStars() {
-    const starsCanvas = document.querySelector("[data-birthday-bell-stars]") as HTMLCanvasElement;
-    init(starsCanvas);
+    init(canvasEl.value as HTMLCanvasElement);
 }
 
 /**
@@ -50,6 +50,7 @@ function animateBell() {
  * Emit so the birthday modal can be shown
  */
 function onSelected() {
+    destroy(canvasEl.value as HTMLCanvasElement); // destroy the canvas so it doesn't keep animating
     notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
     emit("selected");
 }
@@ -69,7 +70,7 @@ window.Vue.onMounted(() => {
     <button ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
         <div class="birthday-container">
             <div class="birthday-container__background">
-                <canvas width="72" height="72" data-birthday-bell-stars></canvas>
+                <canvas ref="canvasEl" width="72" height="72"></canvas>
             </div>
             <div class="birthday-container__foreground l-flex l-flex--center">
                 <sbx-icon

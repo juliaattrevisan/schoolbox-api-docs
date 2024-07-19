@@ -8,13 +8,13 @@ import BsNotification from "./bs-notification.vue";
 import BsCard from "./bs-card.vue";
 
 const modalEl = window.Vue.ref(null);
-const hasSelectedNotification = window.Vue.ref(false);
+const isModalActive = window.Vue.ref(false);
 
 /**
  * To display the birthday modal
  */
 function onNotificationSelected() {
-    hasSelectedNotification.value = true;
+    isModalActive.value = true;
     modalEl.value.open();
     // update the local storage to prevent the modal from showing again
 }
@@ -23,7 +23,7 @@ function onNotificationSelected() {
 <template>
     <bs-notification @selected="onNotificationSelected" />
     <reveal-modal ref="modalEl" :close-on-background-click="false" size="tiny">
-        <bs-card v-if="hasSelectedNotification" />
+        <bs-card v-if="isModalActive" />
     </reveal-modal>
 </template>
 

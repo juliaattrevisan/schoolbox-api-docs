@@ -10,6 +10,8 @@ import Star from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/
 
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
+let timeline: GSAPTimeline;
+
 /**
  * Set up an array of Stars
  * Put them in the centre width of the Canvas and spread them along the vertical axis a bit so they can 'flick' out
@@ -45,11 +47,10 @@ function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDim
 /**
  * Each star has an animation, and the properties to animate are specified within
  * Through the onUpdate of the timeline, the properties are updated each tick
- * @param {GSAPTimeline} timeline - the timeline to add the animations to
  * @param {Star} star - the star to animate
  * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
  */
-function addStarAnimation(timeline: GSAPTimeline, star: Star, canvasDimensions: CanvasDimensions) {
+function addStarAnimation(star: Star, canvasDimensions: CanvasDimensions) {
     timeline.to(
         star,
         {
@@ -72,12 +73,12 @@ function animateStars(canvas: HTMLCanvasElement) {
     const stars = getStars(canvas);
     const context = getContext(canvas) as CanvasRenderingContext2D;
     const canvasDimensions = getCanvasDimensions(canvas);
-    const timeline = gsap.timeline({
+    timeline = gsap.timeline({
         // https://greensock.com/docs/v3/GSAP/gsap.timeline()
         repeat: 0,
         onUpdate: () => redrawStars(stars, context, canvasDimensions), // to draw the new position of the stars each tick
     });
-    stars.forEach((star) => addStarAnimation(timeline, star, canvasDimensions));
+    stars.forEach((star) => addStarAnimation(star, canvasDimensions));
 }
 
 /**
@@ -86,4 +87,14 @@ function animateStars(canvas: HTMLCanvasElement) {
  */
 export function init(canvas: HTMLCanvasElement) {
     animateStars(canvas);
+}
+
+/**
+ * Set up both the badge and the stars animations
+ * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
+ */
+export function destroy(canvas: HTMLCanvasElement) {
+    timeline.kill();
+    const context = getContext(canvas) as CanvasRenderingContext2D;
+    context.clearRect(0, 0, canvas.width, canvas.height);
 }

@@ -21,6 +21,33 @@ function onCakeAnimated() {
     tl.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
     tl.to("#cake", { duration: 2, scale: 1, ease: "elastic.out" }, "<3%");
     tl.to("[data-reveal]", { duration: 2, scale: 1.05, yoyo: true, repeat: 1, ease: "elastic.out" }, "<3%");
+
+    gsap.to("#cake__middle-flame", {
+        duration: 0.3,
+        scaleY: 0.85,
+        opacity: 0.8,
+        yoyo: true,
+        repeat: -1,
+        delay: 0.1,
+        ease: "power2.inOut",
+    });
+    gsap.to("#cake__left-flame", {
+        duration: 0.3,
+        scaleY: 0.85,
+        opacity: 0.8,
+        yoyo: true,
+        repeat: -1,
+        ease: "power2.inOut",
+    });
+    gsap.to("#cake__right-flame", {
+        duration: 0.3,
+        scaleY: 0.85,
+        opacity: 0.8,
+        yoyo: true,
+        delay: 0.2,
+        repeat: -1,
+        ease: "power2.inOut",
+    });
 }
 
 /**
