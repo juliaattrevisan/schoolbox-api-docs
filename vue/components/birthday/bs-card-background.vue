@@ -6,9 +6,9 @@
 import { init, destroy } from "./bsCardStars";
 
 const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
-const canvasWidth = window.Vue.ref(998);
-const canvasHeight = window.Vue.ref(840);
-const modalContainer = document.querySelector("[data-modal-container]") as HTMLDivElement;
+const canvasWidth = window.Vue.ref(0);
+const canvasHeight = window.Vue.ref(0);
+const modalContainer = document.querySelector("[data-modal-container-foreground]") as HTMLDivElement; // so we can keep the canvas size in sync
 let resizeObserver: ResizeObserver;
 
 /**

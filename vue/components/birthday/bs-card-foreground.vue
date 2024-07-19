@@ -217,7 +217,7 @@ window.Vue.onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="l-flex-col l-flex--align-center">
+    <div class="l-flex l-flex--align-center">
         <div class="svg-container l-flex l-flex--center">
             <svg id="happy-birthday" viewBox="14.4193 23.6069 464.2108 355.0969" xmlns="http://www.w3.org/2000/svg">
                 <path
