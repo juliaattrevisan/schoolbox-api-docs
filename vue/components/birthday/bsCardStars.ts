@@ -1,5 +1,5 @@
 /**
- * animate the birthday modal stars
+ * animate the birthday card stars
  */
 
 import { gsap, Physics2DPlugin } from "gsap/all";
@@ -10,7 +10,7 @@ import Star from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/
 
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
-let timeline: GSAPTimeline;
+let timeline: GSAPTimeline; // to be able to kill the timeline on destroy
 
 /**
  * Set up an array of Stars

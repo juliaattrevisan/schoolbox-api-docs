@@ -13,7 +13,8 @@ const emit = defineEmits<{
 }>();
 
 /**
- * Callback function when the cake animation is completed
+ * Emit to start showing the stars in the background and pop up the happy birthday message,
+ * also popping the modal and flicking the candles
  */
 function onCakeAnimated() {
     emit("revealed"); // to start showing the stars in the background
@@ -21,7 +22,7 @@ function onCakeAnimated() {
     tl.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
     tl.to("#cake", { duration: 2, scale: 1, ease: "elastic.out" }, "<3%");
     tl.to("[data-reveal]", { duration: 2, scale: 1.05, yoyo: true, repeat: 1, ease: "elastic.out" }, "<3%");
-
+    // animate the candles flickering
     gsap.to("#cake__middle-flame", {
         duration: 0.3,
         scaleY: 0.85,
@@ -52,6 +53,7 @@ function onCakeAnimated() {
 
 /**
  * Animate the cake
+ * see https://gsap.com/docs/v3/GSAP/Timeline/ for more information on timelines
  */
 function animateCake() {
     // create a custom bounce ease for the cake slices landing
@@ -60,10 +62,8 @@ function animateCake() {
         squash: 0.3,
         squashID: "myBounce-squash",
     });
-
-    // see https://gsap.com/docs/v3/GSAP/Timeline/ for more information on timelines
-    // const tl = gsap.timeline({ repeat: -1, repeatDelay: 1, onComplete: onCakeAnimated }); // use while testing animation
     const tl = gsap.timeline({ delay: 0.5, onComplete: onCakeAnimated });
+    // bring the cake plate up from the bottom
     tl.from("#cake__plate", {
         y: 100,
         scale: 0.8,
@@ -72,6 +72,7 @@ function animateCake() {
         ease: "power2.inOut",
         duration: 0.8,
     });
+    // bring the cake slices down from the top
     tl.from(
         "#cake__base",
         {
@@ -105,6 +106,7 @@ function animateCake() {
         },
         "<25%",
     );
+    // pop up the candles
     tl.from(
         "#cake__middle-candle",
         {
@@ -141,6 +143,7 @@ function animateCake() {
         },
         "<25%",
     );
+    // then light the candles
     tl.from("#cake__middle-flame", {
         opacity: 0,
         scale: 0.7,

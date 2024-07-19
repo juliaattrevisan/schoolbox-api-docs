@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * The modal that appears when it's a user's birthday, is triggered by selecting
- * the birthday notification bell in the navigation bar.
+ * The 'card' that appears within a modal when it's a user's birthday.
+ * It's triggered by selecting the birthday notification bell in the
+ * navigation bar.
  */
 
 import { gsap, CustomEase, CustomBounce } from "gsap/all";
@@ -14,7 +15,7 @@ const hasRevealed = window.Vue.ref(false);
 </script>
 
 <template>
-    <div class="modal-container l-pad-m" data-modal-container>
+    <div class="modal-container l-pad-s" data-modal-container>
         <div class="modal-container__background">
             <bs-card-background v-if="hasRevealed" />
         </div>

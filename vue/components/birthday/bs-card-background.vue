@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display the stars behind the cake and text in the birthday modal
+ * To display the stars behind the cake and text in the birthday card
  */
 
 import { init, destroy } from "./bsCardStars";
@@ -9,6 +9,7 @@ const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
 const canvasWidth = window.Vue.ref(998);
 const canvasHeight = window.Vue.ref(840);
 const modalContainer = document.querySelector("[data-modal-container]") as HTMLDivElement;
+let resizeObserver: ResizeObserver;
 
 /**
  * Set the canvas size to the size of the modal
@@ -30,7 +31,7 @@ function animateStars() {
  * To sync up the canvas size with the size of the modal
  */
 function initResizeObserver() {
-    const resizeObserver = new ResizeObserver(() => {
+    resizeObserver = new ResizeObserver(() => {
         setCanvasSize();
         animateStars();
     });
@@ -50,6 +51,7 @@ window.Vue.onMounted(() => {
  * When the component is unmounted, destroy the canvass
  */
 window.Vue.onBeforeUnmount(() => {
+    resizeObserver.disconnect();
     destroy(canvasEl.value as HTMLCanvasElement);
 });
 </script>
