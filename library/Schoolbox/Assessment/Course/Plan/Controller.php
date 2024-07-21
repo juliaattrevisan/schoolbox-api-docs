@@ -151,8 +151,8 @@ class Controller extends Base
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
         $class = CurriculumOverviewController::class;
-        $curriculumnTemplate = [];
-        $curriculumnKey = [];
+        $curriculumTemplate = [];
+        $curriculumKey = [];
         $curriculumDefId = null;
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
@@ -183,11 +183,11 @@ class Controller extends Base
             } else {
                 $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
             }
-            $curriculumnTemplate[] = [
+            $curriculumTemplate[] = [
                 'heading' => $heading,
                 'filter' => $curricFilter,
             ];
-            $curriculumnKey[] = strtolower($heading);
+            $curriculumKey[] = strtolower($heading);
         }
 
         /**
@@ -234,7 +234,13 @@ class Controller extends Base
          */
         foreach ($course->getUnits() as $unit) {
             // add this units data to the whole course units collection.
-            $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
+            $units[] = $this->getUnitData(
+                $unit,
+                $course->getTemplate()?->getUnitTemplate()->getId(),
+                $curriculumKey,
+                $textboxDefId,
+                $curriculumDefId,
+            );
         }
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
@@ -244,7 +250,7 @@ class Controller extends Base
                 'textboxDefId' => $textboxDefId,
                 'curriculumDefId' => $curriculumDefId,
                 'textboxes' => $textboxTemplate,
-                'curriculum' => $curriculumnTemplate,
+                'curriculum' => $curriculumTemplate,
             ]
         ], "Unit Planner - {$course->getTitle()}");
     }
@@ -494,8 +500,18 @@ class Controller extends Base
             $this->unitSpecificationMapper->save($unitSpec);
 
             // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-            [$curriculumnTemplate, $curriculumnKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
-            $this->response = $this->responseAsJson($this->getUnitData($unitSpec, $course->getTemplate()->getUnitTemplate()->getId(), $curriculumnKey))
+            [$curriculumTemplate, $curriculumKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
+            // Textbox and curriculum def ID can be null for now:
+            // AFAICT this is unused
+            $this->response = $this->responseAsJson(
+                $this->getUnitData(
+                    $unitSpec,
+                    $course->getTemplate()->getUnitTemplate()->getId(),
+                    $curriculumKey,
+                    null,
+                    null,
+                )
+            )
                 ->withStatus(201);
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
@@ -711,16 +727,23 @@ class Controller extends Base
 
     /**
      * helper common function to fetch the content of the unit and its components in a standard format
-     * @param Model $unit
-     * @param int $templateId // id of the homepage template used to standardize the unit
-     * @param array $curriculumnKey // what curriculum components titles exist in the component, if any
+     * @param Model    $unit
+     * @param int      $templateId      id of the homepage template used to standardize the unit
+     * @param array    $curriculumnKey  what curriculum components titles exist in the component, if any
+     * @param int|null $textboxDefId    The definition ID of the textbox component, if any
+     * @param int|null $curriculumDefId The definition ID of the curriculum component, if any
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    private function getUnitData(Model $unit, int $templateId, array $curriculumnKey)
-    {
+    private function getUnitData(
+        Model $unit,
+        int $templateId,
+        array $curriculumnKey,
+        ?int $textboxDefId,
+        ?int $curriculumDefId
+    ): array {
         /* Gather up the textboxes and extraTextboxes meta
              */
         $textboxData = $this->findTextboxes($templateId, $unit->getFolder()->getId());
