@@ -807,6 +807,25 @@ class Controller extends Base
             }
         }
 
+        // Rubric routes
+        $rubricRoutes = [
+            'manage' => [
+                "route"  => "rubricManager.getForm",
+                "params" => ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+            ],
+        ];
+        foreach ($rubricRoutes as $key => $link) {
+            if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
+                $rubricRoutes[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+            } else {
+                $rubricRoutes[$key] = null;
+            }
+        }
+
+        // Textbox routes
+
+        // Curriculum routes
+
         /* Aggregated data for each unit appears as a row in the Unit Planner
          * on the front end - this is basically the contract between back- and
          * front-end implementations and the basis of an api-first philosophy
@@ -837,6 +856,7 @@ class Controller extends Base
              * the assessment specs in this unit
              */
             'rubricCapabilities' => $rubricCapabilities,
+            'rubricRoutes'       => $rubricRoutes,
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,
