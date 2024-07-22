@@ -18,14 +18,12 @@ export const useStore = defineStore("quizFeedback", () => {
      * store any passed through properties
      * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
      * @param {boolean} $hasMarkVisibility - whether marks and feedback are visible to the user
-     * @param {string|undefined} $postFeedback - the feedback url to post to
      * @param {string|undefined} $maxMarks - the maximum marks for the quiz
      * @param {string|undefined} $statusPage - the link to the status page
      */
     function init(
         $isReadOnly: boolean,
         $hasMarkVisibility: boolean,
-        $postFeedback: string | undefined,
         $maxMarks: string | undefined,
         $statusPage: string | undefined,
     ) {
@@ -33,9 +31,6 @@ export const useStore = defineStore("quizFeedback", () => {
         hasMarkVisibility.value = $hasMarkVisibility;
         if ($maxMarks !== undefined) {
             maxMarks.value = $maxMarks;
-        }
-        if ($postFeedback !== undefined) {
-            postFeedback.value = $postFeedback;
         }
         if ($statusPage !== undefined) {
             statusPage.value = $statusPage;

@@ -22,7 +22,6 @@ interface Props {
     isReviewed: boolean; // whether the teacher has reviewed the attempt
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
-    postFeedback?: string; // the URL to post the feedback to
     statusPage?: string; // the status page to link to once user has finished marking
     maxMarks?: string; // the maximum marks available for the quiz
     responseId?: string; // the response id linked to the response
@@ -37,7 +36,7 @@ const studentStore = useStudentStore();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.isReadOnly, props.hasMarkVisibility, props.postFeedback, props.maxMarks, props.statusPage);
+    store.init(props.isReadOnly, props.hasMarkVisibility, props.maxMarks, props.statusPage);
     useStudentStore().init(
         props.student,
         props.itemResponses,
