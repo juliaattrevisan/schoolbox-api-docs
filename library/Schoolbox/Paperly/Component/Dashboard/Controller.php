@@ -17,7 +17,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        return true;
+        /**
+         * Should not render the component if the externalId is not set.
+         */
+        return !!$this->getUser()->getExternalId();
     }
 
     /**

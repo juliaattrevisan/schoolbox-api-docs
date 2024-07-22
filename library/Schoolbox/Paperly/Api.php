@@ -18,7 +18,7 @@ use Schoolbox\User;
 
 class Api
 {
-    private const PAPERLY_API_VIEW_IFRAME = '/api/v1/schoolbox/dashboard-widget?externalId=%u&role=%s';
+    private const PAPERLY_API_VIEW_IFRAME = '/api/v1/schoolbox/dashboard-widget?%s';
     private const MAX_RETRY = 5;
     private const NAP_TIMEOUT = 3;
     private Client $client;
@@ -85,14 +85,21 @@ class Api
 
         $externalId = $this->paperlyUser->getExternalId();
 
-        if ('' === (string)$externalId) {
-            throw new RuntimeException('External id is not configured');
+        /**
+         * Should exit quickly if external id is falsey (ie NULL, empty string or 0)
+         */
+        if (!$externalId) {
+            throw new DomainException('External id is not configured');
         }
 
         $paperlyAPIEndpoint = sprintf(
             self::PAPERLY_API_VIEW_IFRAME,
-            $externalId,
-            $this->paperlyUser->getRole()->isStaff() ? 'teacher' : $this->paperlyUser->getRole()->getType()
+            http_build_query(
+                [
+                    'externalId' => $externalId,
+                    'role' => $this->paperlyUser->getRole()->isStaff() ? 'teacher' : $this->paperlyUser->getRole()->getType()
+                ]
+            )
         );
 
         while ($failed < self::MAX_RETRY) {
