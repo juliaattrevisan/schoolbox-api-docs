@@ -28,8 +28,9 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMap
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
-use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Textbox;
 use Scrub;
 use Twig\Error\Error;
 
@@ -46,10 +47,13 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param AssessmentMapperProxy $assessmentMapper
-     * @param RubricIndicatorMapper $rubricIndicatorMapper
-     * @param Mapper $nodeMapper
+     * @param AssessmentMapperProxy     $assessmentMapper
+     * @param RubricIndicatorMapper     $rubricIndicatorMapper
+     * @param Mapper                    $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param Access                    $access
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapper,
@@ -57,7 +61,8 @@ class Controller extends Base
         private Node\Mapper $nodeMapper,
         private \Component_InstanceMapper $componentInstanceMapper,
         private CourseConfigMapper $courseConfigMapper,
-        private UnitSpecificationMapper $unitSpecificationMapper
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private Access $access,
     ) {
         /* Only prepare the textbox statement once
          */
@@ -194,7 +199,7 @@ class Controller extends Base
          * Grab the list of textbox components from the Unit Template
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = TextboxComponentController::class;
+        $class = Textbox\Component\Homepage\Controller::class;
         $textboxTemplate = [];
         $textboxKey = [];
         $textboxDefId = null;
@@ -212,7 +217,7 @@ class Controller extends Base
                 $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
             } else {
                 // Fallback of the php default title for textbox components
-                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+                $heading = trim(Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING);
             }
 
             // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
@@ -361,7 +366,7 @@ class Controller extends Base
          */
         $compTextQuery->execute(array_merge(
             [
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
             ],
             Builder::getArrayParameters(array_keys($units), 'units')
@@ -370,7 +375,7 @@ class Controller extends Base
             $componentName = $row['componentName'] ?? 'NULL';
             // if component is empty string, use the system default
             if (trim($componentName) === '') {
-                $componentName = TextboxComponentController::DEFAULT_COMPONENT_HEADING;
+                $componentName = Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING;
             }
             //build the row and send
             fputcsv($fp, [
@@ -425,7 +430,7 @@ class Controller extends Base
          */
         $textQuery->execute(array_merge(
             [
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
             ],
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
@@ -550,7 +555,7 @@ class Controller extends Base
          * Grab the list of textboxes from the Unit Template
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = TextboxComponentController::class;
+        $class = Textbox\Component\Homepage\Controller::class;
         $textboxes = [];
         $textboxesKeys = [];
         $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $unitTemplateId, $class);
@@ -564,7 +569,7 @@ class Controller extends Base
                 $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
             } else {
                 // Fallback of the php default title for textbox components
-                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+                $heading = trim(Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING);
             }
 
             // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
@@ -589,9 +594,9 @@ class Controller extends Base
         $this->textboxStatement->execute(
             [
                 'folderId' => $unitFolderId,
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                'homepageDefaultComponentHeading' => TextboxComponentController::DEFAULT_COMPONENT_HEADING,
+                'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
             ]
         );
 
@@ -830,24 +835,49 @@ class Controller extends Base
             }
         }
 
-        // Rubric routes
+        // Unit routes for rubrics
         $rubricRoutes = [
-            'manage' => [
-                "route"  => "rubricManager.getForm",
-                "params" => ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
-            ],
+            'manage' => $this->getRouteIfAuthorized(
+                'rubricManager.getForm',
+                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+            ) ?: null,
         ];
-        foreach ($rubricRoutes as $key => $link) {
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($link['route'], $link['params'], $this->getUser())) {
-                $rubricRoutes[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
-            } else {
-                $rubricRoutes[$key] = null;
+
+        // Unit routes for textboxes
+        $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
+        $textboxRoutes = [
+            'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'create'          => $this->getRouteIfAuthorized(
+                'textbox.createTextboxInFolder',
+                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+            ) ?: null,
+        ];
+
+        // Unit routes for curricula
+        $curriculumRoutes = [
+            'createComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'modify'          => $this->getRouteIfAuthorized(
+                'curriculumApiUsageFolder.postFolderUsage',
+                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+            ),
+        ];
+
+        // Routes for each textbox
+        $singleTextboxRoutes = [];
+        foreach ($textboxData['textboxes'] as $textbox) {
+            if ($textbox['id'] > 0) {
+                $singleTextboxRoutes[$textbox['id']]['modify'] = $this->getRouteIfAuthorized(
+                    'textbox.updateTextbox',
+                    [
+                        'folderId' => $unit->getFolder()->getId(),
+                        'folder'   => $unit->getFolder(),
+                        'id'       => $textbox['id'],
+                        'textbox'  => (new Textbox\Model())->setId($textbox['id']),
+                    ],
+                ) ?: null;
             }
         }
 
-        // Textbox routes
-
-        // Curriculum routes
 
         /* Aggregated data for each unit appears as a row in the Unit Planner
          * on the front end - this is basically the contract between back- and

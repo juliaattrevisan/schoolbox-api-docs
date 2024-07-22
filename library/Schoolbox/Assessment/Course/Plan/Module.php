@@ -107,6 +107,7 @@ class Module extends BaseModule
             $this->getComponentInstanceMapper(),
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 
