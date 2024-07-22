@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var string|null
      */
@@ -56,7 +55,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             try {
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-                $response = $api->retrieveEventPhotos($this->getConfig('eventName'));
+                $response = $api->retrieveEventPhotos($this->getConfig('eventName'), $this->getUser());
             } catch (\RuntimeException | \DomainException $e) {
                 /* DomainException is thrown when json can't be decoded
                  */

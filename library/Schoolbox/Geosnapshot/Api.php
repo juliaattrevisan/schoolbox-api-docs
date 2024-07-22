@@ -10,7 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
@@ -48,12 +51,6 @@ class Api
 
 
     /**
-     * @var string
-     */
-    private string $apiKey;
-
-
-    /**
      * Last payload we generated, so we can inspect it for diagnostic purposes
      *
      * @var array
@@ -66,9 +63,8 @@ class Api
      *
      * @param string $apiKey
      */
-    public function __construct(#[SensitiveParameter] string $apiKey)
+    public function __construct(#[SensitiveParameter] private string $apiKey)
     {
-        $this->apiKey = $apiKey;
     }
 
 
@@ -98,18 +94,20 @@ class Api
      *
      * Manufacture a payload with the necessary parts and send it out there
      *
-     * @param User            $viewee
+     * @param User $viewee
+     * @param User $viewer
      * @param FilesystemProxy $filesystemProxy
      * @return array
+     * @throws FilesystemException
+     * @throws GuzzleException
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveStudentPhotos(User $viewee, FilesystemProxy $filesystemProxy): array
+    public function retrieveStudentPhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee, $viewer));
     }
 
 
@@ -119,16 +117,17 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param string $eventName
+     * @param User $viewer
      * @return array
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveEventPhotos(string $eventName): array
+    public function retrieveEventPhotos(string $eventName, User $viewer): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName, $viewer));
     }
 
 
