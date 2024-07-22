@@ -289,7 +289,7 @@ $app = new class extends CliTool\App {
             'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
 
             //Mobile Users
-            'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry`',
+            'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',
             'mobile_digistorm'          => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Digistorm") WHERE mobile_app_registry.deleted_at is null',
             'mobile_firebase'           => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE mobile_app_registry.deleted_at is null',
             'mobile_firebase_android'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Android" AND mobile_app_registry.deleted_at is null',
