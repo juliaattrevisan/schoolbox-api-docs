@@ -59,6 +59,7 @@ $app = new class extends CliTool\App {
             'classes_with_course_implementations' => 'SELECT count(*) FROM folder f WHERE f.id IN (SELECT ci.folder_id FROM course_implementation ci WHERE ci.deleted_at IS NULL) AND f.id IN (SELECT folder_id FROM folder_code)',
             'class_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_folder af on assessment.id = af.assessment_id WHERE assessment.deleted_at IS NULL',
             'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
+            'student_submissions_worksheet' => 'SELECT COUNT(*) FROM student_submission LEFT join student_submission_file on student_submission.id = student_submission_file.student_submission_id WHERE student_submission.deleted_at IS NULL AND student_submission_file.deleted_at IS NULL AND student_submission_file.is_worksheet = 1',
             'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
             'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
             'assessment_student_views'    => 'SELECT COUNT(*) FROM assessment_view WHERE user_id = participant_id',
@@ -86,6 +87,11 @@ $app = new class extends CliTool\App {
             'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
             'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
             'due_work_common_assessment' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND course_managed = 1',
+            'due_work_interactive_worksheet' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_worksheet = 1',
+            'due_work_in_person' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_offline = 1',
+            'due_work_use_text' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_text = 1',
+            'due_work_use_files' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_files = 1',
+            'due_work_show_policy' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND enable_policy = 1',
             'due_work_seb'      => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND seb_enabled = 1',
             'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
             'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
@@ -289,7 +295,12 @@ $app = new class extends CliTool\App {
             'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
 
             //Mobile Users
-            'mobile_registrations' => 'SELECT count(*) FROM `mobile_app_registry`',
+            'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',
+            'mobile_digistorm'          => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Digistorm") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase'           => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase_android'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Android" AND mobile_app_registry.deleted_at is null',
+            'mobile_firebase_browser'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Browser" AND mobile_app_registry.deleted_at is null',
+            'mobile_firebase_ios'       => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "iOS" AND mobile_app_registry.deleted_at is null',
 
             //Calendar
             'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_CAMPUS . ' AND deleted_at IS NULL',
