@@ -392,6 +392,7 @@ class Factory implements IFactory
                     ClassInvolvementMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                     ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetableCycleMapper::getInstance()->disableCache(),
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                 )
@@ -415,6 +416,7 @@ class Factory implements IFactory
                     ClassInvolvementMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                     ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetableCycleMapper::getInstance()->disableCache(),
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                 )

@@ -15,7 +15,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Base\ShadowTable\BaseEnable;
 use Schoolbox\External\Event;
-use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 
 /**
@@ -28,10 +28,8 @@ use Schoolbox\External\TimetablePeriodMapper;
  * * `sis_class_user`
  * * `sis_class_user_overrides`
  * * `sis_event`
+ * * `sis_timetable_cycle`
  * * `sis_timetable_period`
- *
- * This does _not_ include the mapper for `sis_timetable_cycle`: that table's
- * data is updated in a separate process.
  */
 class Enable extends BaseEnable
 {
@@ -44,6 +42,7 @@ class Enable extends BaseEnable
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param Event\Overrides\Mapper $classInvolvementOverridesMapper
      * @param ClassPeriodMapper      $classPeriodMapper
+     * @param TimetableCycleMapper   $cycleMapper
      * @param TimetablePeriodMapper  $periodMapper
      * @param Event\Mapper           $eventMapper
      */
@@ -54,6 +53,7 @@ class Enable extends BaseEnable
         ClassInvolvementMapper $classInvolvementMapper,
         Event\Overrides\Mapper $classInvolvementOverridesMapper,
         ClassPeriodMapper $classPeriodMapper,
+        TimetableCycleMapper $cycleMapper,
         TimetablePeriodMapper $periodMapper,
         Event\Mapper $eventMapper,
     ) {
@@ -64,6 +64,7 @@ class Enable extends BaseEnable
             $classInvolvementMapper,
             $classInvolvementOverridesMapper,
             $classPeriodMapper,
+            $cycleMapper,
             $periodMapper,
             $eventMapper,
         );
