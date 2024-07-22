@@ -43,6 +43,10 @@ export type Unit = {
         items: Activity[];
     };
     curriculum: {
+        _routes: {
+            createComponent: string | null;
+            modifyCurriculum: string | null;
+        }
         selectedNodes: Node[]; // the individual nodes assigned to the folder
         nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
         components: CurriculumOverviewComponent[];

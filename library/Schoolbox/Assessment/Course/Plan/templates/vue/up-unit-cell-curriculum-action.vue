@@ -72,7 +72,7 @@ async function onCreateSelected() {
 </script>
 
 <template>
-    <template v-if="props.unit._routes.modifyCurriculum">
+    <template v-if="props.unit.curriculum._routes.modifyCurriculum">
         <div v-if="component === null" class="component-action">
             <section>
                 <button @click.prevent="onCreateSelected">{{ createText }}</button>

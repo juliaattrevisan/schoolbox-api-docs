@@ -861,9 +861,9 @@ class Controller extends Base
             'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
             'createTextbox'   => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
         ];
-        $routes       = [
-            'createCurriculumComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
-            'modifyCurriculum'          => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
+        $curriculum['_routes'] = [
+            'createComponent'  => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'modifyCurriculum' => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
         ];
 
 
@@ -907,9 +907,6 @@ class Controller extends Base
              */
             'curriculum' => $curriculum,
             'sequence' => $unit->getFolder()->getSequence(),
-
-            // Routes
-            '_routes' => $routes,
         ];
     }
 
