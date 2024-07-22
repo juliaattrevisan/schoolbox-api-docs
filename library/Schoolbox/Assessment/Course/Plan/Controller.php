@@ -814,6 +814,8 @@ class Controller extends Base
             ];
         }
 
+        // Activity routes
+        // TODO move to other unit-level routes
         $activitiesListRoutes = [
             'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
                 'contextType' => 'unitspecs',
@@ -835,42 +837,24 @@ class Controller extends Base
             }
         }
 
-        // Unit routes for rubrics
-        $rubricRoutes = [
-            'manage' => $this->getRouteIfAuthorized(
-                'rubricManager.getForm',
-                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
-            ) ?: null,
-        ];
-
-        // Unit routes for textboxes
+        // Unit-level routes
+        $folderParams             = ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()];
         $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
-        $textboxRoutes = [
-            'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
-            'create'          => $this->getRouteIfAuthorized(
-                'textbox.createTextboxInFolder',
-                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
-            ) ?: null,
-        ];
-
-        // Unit routes for curricula
-        $curriculumRoutes = [
-            'createComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
-            'modify'          => $this->getRouteIfAuthorized(
-                'curriculumApiUsageFolder.postFolderUsage',
-                ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
-            ),
+        $routes       = [
+            'manageRubric'              => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+            'createTextboxComponent'    => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'createTextbox'             => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
+            'createCurriculumComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'modifyCurriculum'          => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
         ];
 
         // Routes for each textbox
-        $singleTextboxRoutes = [];
+        $textboxRoutes = [];
         foreach ($textboxData['textboxes'] as $textbox) {
             if ($textbox['id'] > 0) {
-                $singleTextboxRoutes[$textbox['id']]['modify'] = $this->getRouteIfAuthorized(
+                $textboxRoutes[$textbox['id']]['modify'] = $this->getRouteIfAuthorized(
                     'textbox.updateTextbox',
-                    [
-                        'folderId' => $unit->getFolder()->getId(),
-                        'folder'   => $unit->getFolder(),
+                    $folderParams + [
                         'id'       => $textbox['id'],
                         'textbox'  => (new Textbox\Model())->setId($textbox['id']),
                     ],
@@ -909,11 +893,14 @@ class Controller extends Base
              * the assessment specs in this unit
              */
             'rubricCapabilities' => $rubricCapabilities,
-            'rubricRoutes'       => $rubricRoutes,
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,
             'sequence' => $unit->getFolder()->getSequence(),
+
+            // Routes
+            '_routes'        => $routes,
+            '_textboxRoutes' => $textboxRoutes,
         ];
     }
 
