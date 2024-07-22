@@ -85,8 +85,11 @@ class Api
 
         $externalId = $this->paperlyUser->getExternalId();
 
-        if ('' === (string)$externalId) {
-            throw new RuntimeException('External id is not configured');
+        /**
+         * Should exit quickly if external id is falsey (ie NULL, empty string or 0)
+         */
+        if (!$externalId) {
+            throw new DomainException('External id is not configured');
         }
 
         $paperlyAPIEndpoint = sprintf(
