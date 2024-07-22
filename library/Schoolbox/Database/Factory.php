@@ -263,7 +263,8 @@ class Factory
                 $config->get('external_db_host'),
                 $config->get('external_db_db'),
                 $config->get('external_db_user'),
-                $config->get('external_db_passwd')
+                $config->get('external_db_passwd'),
+                ['Encrypt' => $config->get('external_db_encryption')]
             );
 
             $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalReadDatabase()));
