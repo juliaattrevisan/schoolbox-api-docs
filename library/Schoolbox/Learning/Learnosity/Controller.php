@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
@@ -846,17 +847,19 @@ class Controller extends Base
 
 
     /**
-     * Retrieve the comment for this attempt
+     * Retrieve the response for this attempt
      *
      * @param Model $attempt
+     * @param IFeedback $feedback
      * @return array
      */
-    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt): array
+    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, IFeedback $feedback): array
     {
         return  [
             'learnosityReference' => $attempt->getLearnosityReference(),
             'studentId' => $attempt->getUser()->getId(),
-            'comment' => $attempt->getComment()
+            'comment' => $attempt->getComment(),
+            'responseId' => $feedback ? $feedback->getId() : null,
         ];
     }
 
@@ -962,6 +965,15 @@ class Controller extends Base
                 'Review', null
             ]);
 
+        /* Find this attempt's MapperProxy equivalent from something we already obtained
+         */
+        $feedback = $assessment->getParticipant($student)
+            ->getAllFeedbacks()
+            ->filter(static function ($model) use ($attempt) {
+                return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+            })
+            ->first();
+
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'student' => $this->getStudentData($attempt),
             'assessment' => $assessment,
@@ -969,7 +981,7 @@ class Controller extends Base
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $this->getAttemptComment($attempt),
+            'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}",
             'hasMarkVisibility' => $hasMarkVisibility,
         ], "Result for {$assessment->getTitle()}");
@@ -1062,7 +1074,7 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $this->getAttemptComment($attempt),
+            'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'urls' => $urls,
             /* For Submission States
              */
@@ -1135,7 +1147,7 @@ class Controller extends Base
 
                 /* Find all the comments for this attempt (need it later)
                  */
-                $attemptComments[$attempt->getUser()->getId()] = [
+                $attemptResponses[$attempt->getUser()->getId()] = [
                     'learnosityReference' => $attempt->getLearnosityReference(),
                     'studentId' => $attempt->getUser()->getId(),
                     'comment' => $attempt->getComment()
@@ -1344,7 +1356,7 @@ class Controller extends Base
          */
         $students = array_values($users);
         $itemResponses = array_values(array_merge_recursive($scores, $responseComments));
-        $attemptComments = array_values($attemptComments);
+        $attemptResponses = array_values($attemptResponses);
         $urls = array_values($urls);
 
         /* Breadcrumbs
@@ -1363,7 +1375,7 @@ class Controller extends Base
             'itemReferences' => $itemReferences,
             'students' => $students,
             'itemResponses' => $itemResponses,
-            'attemptComments' => $attemptComments,
+            'attemptResponses' => $attemptResponses,
             'urls' => $urls,
             'grading' => $grading,
             /* A list of submission states

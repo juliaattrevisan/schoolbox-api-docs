@@ -7,7 +7,7 @@
  # @param array          $breadcrumbs        A context trail at the top of the screeen
  # @param Attempt\Model  $attempt            The student's attempt from our local db
  # @param string         $itemResponses      A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string         $attemptComment     The overall comment for the attempt
+ # @param string         $attemptResponse    The overall response for the attempt
  # @param object         $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #
  # These are needed for Submission States
@@ -31,7 +31,7 @@
             :student="{{ student|json_encode }}"
             :report-init-options="{{ reportInitOptions }}"
             :item-responses="{{ itemResponses|json_encode }}"
-            :attempt-response="{{ attemptComment|json_encode }}"
+            :attempt-response="{{ attemptResponse|json_encode }}"
             :is-read-only="false"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="true"
