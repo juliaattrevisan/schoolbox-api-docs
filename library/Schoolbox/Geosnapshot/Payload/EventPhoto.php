@@ -30,6 +30,8 @@ class EventPhoto
      */
     public function build(string $eventName, User $viewer): array
     {
+        /* TODO consolidate ext_user_id into a codec, for consistent representation
+         */
         return [
             'event_name' => trim($eventName),
             'ext_user_id' => INSTANCE_ID . '.' . $viewer->getId(),

@@ -11,6 +11,7 @@ namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
@@ -50,12 +51,6 @@ class Api
 
 
     /**
-     * @var string
-     */
-    private string $apiKey;
-
-
-    /**
      * Last payload we generated, so we can inspect it for diagnostic purposes
      *
      * @var array
@@ -68,9 +63,8 @@ class Api
      *
      * @param string $apiKey
      */
-    public function __construct(#[SensitiveParameter] string $apiKey)
+    public function __construct(#[SensitiveParameter] private string $apiKey)
     {
-        $this->apiKey = $apiKey;
     }
 
 
@@ -100,13 +94,16 @@ class Api
      *
      * Manufacture a payload with the necessary parts and send it out there
      *
-     * @param User            $viewee
-     * @param User            $viewer
+     * @param User $viewee
+     * @param User $viewer
      * @param FilesystemProxy $filesystemProxy
      * @return array
-     * @throws GuzzleException
-     * @throws \JsonException
      * @throws FilesystemException
+     * @throws GuzzleException
+     * @throws \DomainException
+     * @throws InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function retrieveStudentPhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
     {
@@ -120,10 +117,13 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param string $eventName
-     * @param User   $viewer
+     * @param User $viewer
      * @return array
      * @throws GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \DomainException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function retrieveEventPhotos(string $eventName, User $viewer): array
     {
