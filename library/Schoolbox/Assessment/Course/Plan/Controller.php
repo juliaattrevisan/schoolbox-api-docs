@@ -829,7 +829,6 @@ class Controller extends Base
         }
 
         // Activity routes
-        // TODO move to other unit-level routes
         $activitiesListRoutes = [
             'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
                 'contextType' => 'unitspecs',
