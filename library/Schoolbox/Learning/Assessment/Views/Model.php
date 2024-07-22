@@ -42,7 +42,9 @@ class Model
     private \Alaress_Date_Format $lastVisit;
 
     /**
-     * @var bool Feedback was visible to user at the time the assessment was viewed.
+     * @var bool Feedback was visible to the user at the time the assessment was viewed.
+     *           This will be true if the assessment's mark visibility included the viewer's role type at the time the
+     *           assessment was viewed.  @see /Learning/Assessment/Views/LatestView->addNewView().
      */
     private bool $feedbackWasVisible;
 
