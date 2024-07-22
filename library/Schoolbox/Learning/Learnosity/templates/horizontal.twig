@@ -37,7 +37,6 @@
         :attempt-responses="{{ attemptComments|json_encode }}"
         :urls="{{ urls|json_encode }}"
         :report-payloads="{{ reportPayloads }}"
-        post-feedback="{{ routeLookup('learnosity.postHoriziontalMarking', {assessment: assessment}) }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />
 </div>

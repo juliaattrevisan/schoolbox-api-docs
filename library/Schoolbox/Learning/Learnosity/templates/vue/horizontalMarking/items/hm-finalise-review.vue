@@ -50,21 +50,23 @@ function getFormData() {
 }
 
 /**
+ * Get the list of all students to post feedback for
+ */
+function getFetches() {}
+
+/**
  * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
     isFinalising.value = true;
-    try {
-        await fetch(`${store.postFeedback}`, {
-            method: "POST",
-            body: getFormData(),
-        });
-    } catch (error) {
-        console.error(error);
-    } finally {
-        isFinalising.value = false;
-        window.location.href = store.statusPage;
-    }
+    // try {
+    //     // getFetches();
+    // } catch (error) {
+    //     console.error(error);
+    // } finally {
+    //     isFinalising.value = false;
+    //     window.location.href = store.statusPage;
+    // }
 }
 
 /**

@@ -10,7 +10,6 @@ export const useStore = defineStore("quizFeedback", () => {
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
-    const postFeedback = window.Vue.ref<string>(""); // the feedback url to post to
     const maxMarks = window.Vue.ref<string>(""); // the maximum marks for the quiz
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
 
@@ -44,7 +43,6 @@ export const useStore = defineStore("quizFeedback", () => {
         init,
         isFinaliseReviewModalOpen,
         hasMarkVisibility,
-        postFeedback,
         maxMarks,
         statusPage,
     };
