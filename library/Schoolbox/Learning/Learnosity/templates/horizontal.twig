@@ -42,7 +42,9 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
 
-{# TODO @donny move this into whatever Vue component should use it #}
+{##
+The grades below are inserted into the horizontal-marking Vue DOM structure then displayed
+#}
 {% for userId, data in grading %}
     <div id="grade-container-{{ data.participant.user.id }}" class="hide">
         <form data-feedback-form="{{ data.participant.user.id }}" method="post" action="">
@@ -61,23 +63,3 @@
         </form>
     </div>
 {% endfor %}
-
-{##
-The grades below are inserted into the quiz-feedback Vue DOM structure then displayed
-#}
-{# <div id="grade-container-{{ participant.user.id }}" class="hide">
-    <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
-        <label>{{ locale.grades.proper }}
-            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
-                assessment:  assessment,
-                participant: participant,
-                feedback:    participant.findMostRecentInstructorGivenFeedback ?? null,
-                markScheme:  assessment.markScheme,
-                limit:       maxMarks,
-                tabIndex:    1,
-                errors:      errors,
-                readonly:    false,
-            } only %}
-        </label>
-    </form>
-</div> #}
