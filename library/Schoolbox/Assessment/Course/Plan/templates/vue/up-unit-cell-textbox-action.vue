@@ -46,8 +46,7 @@ const displayActionBar = window.Vue.computed(() => {
         return (props.unit._routes.createTextboxComponent && props.unit._routes.createTextbox);
     }
 
-    let textboxId = props.unit.textboxes[props.column.label].id;
-    return Boolean(props.unit._textboxRoutes[textboxId]?.modify ?? false);
+    return Boolean(props.unit.textboxes[props.column.label]._routes.modify ?? false);
 });
 
 /**

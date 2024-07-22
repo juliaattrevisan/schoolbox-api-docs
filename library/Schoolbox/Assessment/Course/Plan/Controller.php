@@ -30,6 +30,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Textbox;
 use Scrub;
 use Twig\Error\Error;
@@ -536,13 +537,13 @@ class Controller extends Base
      * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
      * is thrown into extraTextboxes)
      *
-     * @param null|int $unitTemplateId
-     * @param int $unitFolderId
+     * @param null|int    $unitTemplateId
+     * @param FolderModel $unitFolder
      * @return array
      * @throws Exception
      * @throws \DomainException
      */
-    private function findTextboxes(?int $unitTemplateId, int $unitFolderId): array
+    private function findTextboxes(?int $unitTemplateId, FolderModel $unitFolder): array
     {
         /* In case the course wasn't hydrated with all the parts
          */
@@ -595,7 +596,7 @@ class Controller extends Base
 
         $this->textboxStatement->execute(
             [
-                'folderId' => $unitFolderId,
+                'folderId' => $unitFolder->getId(),
                 'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
                 'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
@@ -610,9 +611,20 @@ class Controller extends Base
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
-                    'id' => $row['textboxID'],
-                    'body' => Scrub::html($row['textboxBody']),
+                    'id'         => $row['textboxID'],
+                    'body'       => Scrub::html($row['textboxBody']),
                     'inTemplate' => true,
+                    '_routes'    => [
+                        'modify' => $this->getRouteIfAuthorized(
+                            'textbox.updateTextbox',
+                            [
+                                'folderId' => $unitFolder->getId(),
+                                'folder'   => $unitFolder,
+                                'id'       => $row['textboxID'],
+                                'textbox'  => (new Textbox\Model())->setId($row['textboxID']),
+                            ],
+                        ) ?: null
+                    ],
                 ];
             } else {
                 // increase the extra textboxes by 1
@@ -752,8 +764,8 @@ class Controller extends Base
         ?int $curriculumDefId
     ): array {
         /* Gather up the textboxes and extraTextboxes meta
-             */
-        $textboxData = $this->findTextboxes($templateId, $unit->getFolder()->getId());
+         */
+        $textboxData = $this->findTextboxes($templateId, $unit->getFolder());
 
         // Learning Activities
         $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
@@ -850,20 +862,6 @@ class Controller extends Base
             'modifyCurriculum'          => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
         ];
 
-        // Routes for each textbox
-        $textboxRoutes = [];
-        foreach ($textboxData['textboxes'] as $textbox) {
-            if ($textbox['id'] > 0) {
-                $textboxRoutes[$textbox['id']]['modify'] = $this->getRouteIfAuthorized(
-                    'textbox.updateTextbox',
-                    $folderParams + [
-                        'id'       => $textbox['id'],
-                        'textbox'  => (new Textbox\Model())->setId($textbox['id']),
-                    ],
-                ) ?: null;
-            }
-        }
-
 
         /* Aggregated data for each unit appears as a row in the Unit Planner
          * on the front end - this is basically the contract between back- and
@@ -901,8 +899,7 @@ class Controller extends Base
             'sequence' => $unit->getFolder()->getSequence(),
 
             // Routes
-            '_routes'        => $routes,
-            '_textboxRoutes' => $textboxRoutes,
+            '_routes' => $routes,
         ];
     }
 
