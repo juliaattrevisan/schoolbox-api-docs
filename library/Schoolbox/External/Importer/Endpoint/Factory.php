@@ -374,7 +374,7 @@ class Factory implements IFactory
         // and disable them after all other strategies
         return $composites
             ->prepend(
-                new ShadowTable\Profile\Enable(
+                new ShadowTable\All\Enable(
                     $this->logger,
                     $this->perform,
                     UserProfile\Mapper::getInstance()->disableCache(),
@@ -382,23 +382,20 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),
                     UserProfile\Staff\Mapper::getInstance()->disableCache(),
                     UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                )
-            )
-            ->prepend(
-                new ShadowTable\Timetable\Enable(
-                    $this->logger,
-                    $this->perform,
                     ClassEntryMapper::getInstance()->disableCache(),
                     ClassInvolvementMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                     ClassPeriodMapper::getInstance()->disableCache(),
                     TimetableCycleMapper::getInstance()->disableCache(),
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
                 )
             )
             ->add(
-                new ShadowTable\Profile\Disable(
+                new ShadowTable\All\Disable(
                     $this->logger,
                     $this->perform,
                     UserProfile\Mapper::getInstance()->disableCache(),
@@ -406,19 +403,16 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),
                     UserProfile\Staff\Mapper::getInstance()->disableCache(),
                     UserProfile\Relationship\Mapper::getInstance()->disableCache(),
-                )
-            )
-            ->add(
-                new ShadowTable\Timetable\Disable(
-                    $this->logger,
-                    $this->perform,
                     ClassEntryMapper::getInstance()->disableCache(),
                     ClassInvolvementMapper::getInstance()->disableCache(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
                     ClassPeriodMapper::getInstance()->disableCache(),
                     TimetableCycleMapper::getInstance()->disableCache(),
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
                 )
             );
 
