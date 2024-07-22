@@ -20,7 +20,7 @@ const textboxStore = useUnitPlannerTextboxStore();
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].id || 0) >= 0;
 });
 
 const contentIsFocused = window.Vue.computed(() => {
@@ -43,10 +43,10 @@ const isContentSaving = window.Vue.ref(false);
  */
 const displayActionBar = window.Vue.computed(() => {
     if (!textboxIsCreated.value) {
-        return (props.unit._routes.createTextboxComponent && props.unit._routes.createTextbox);
+        return (props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox);
     }
 
-    return Boolean(props.unit.textboxes[props.column.label]._routes.modify ?? false);
+    return Boolean(props.unit.textboxes.items[props.column.label]._routes.modify ?? false);
 });
 
 /**

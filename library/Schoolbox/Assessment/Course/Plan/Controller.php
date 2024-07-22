@@ -857,9 +857,11 @@ class Controller extends Base
         $rubricRoutes = [
             'manage' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
         ];
+        $textboxRoutes = [
+            'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'createTextbox'   => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
+        ];
         $routes       = [
-            'createTextboxComponent'    => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
-            'createTextbox'             => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
             'createCurriculumComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
             'modifyCurriculum'          => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
         ];
@@ -876,7 +878,10 @@ class Controller extends Base
             'folderId' => $unit->getFolder()->getId(),
             /* Textboxes in the Unit that circumstantially match ones in the Template
              */
-            'textboxes' => $textboxData['textboxes'],
+            'textboxes' => [
+                '_routes' => $textboxRoutes,
+                'items'   => $textboxData['textboxes'],
+            ],
             /* All the other random textboxes that don't match
              */
             'extraTextboxes' => $textboxData['extraTextboxes'],
@@ -884,7 +889,7 @@ class Controller extends Base
              */
             'activities' => [
                 '_routes' => $activitiesListRoutes,
-                'items' => $assessments->map(new UnitAssessments(
+                'items'   => $assessments->map(new UnitAssessments(
                     $this->routeGenerator,
                     $this->getAuthorizer(),
                     $this->getUser(),

@@ -26,10 +26,10 @@ const storeUnit = window.Vue.computed(() => {
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (storeUnit.value?.textboxes[props.column.label].id || 0) >= 0;
+    return (storeUnit.value?.textboxes.items[props.column.label].id || 0) >= 0;
 });
 
-const editorContent = window.Vue.ref(props.unit.textboxes[props.column.label].body);
+const editorContent = window.Vue.ref(props.unit.textboxes.items[props.column.label].body);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
@@ -94,7 +94,7 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
             });
     });
 
-    const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label];
+    const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label];
     if (storeTextbox) {
         storeTextbox.body = editor.getData();
     }
@@ -142,7 +142,7 @@ window.Vue.onMounted(initEditor);
             ref="editorContentEl"
             tag="div"
             class="editor-content"
-            :content="props.unit.textboxes[props.column.label].body"
+            :content="props.unit.textboxes.items[props.column.label].body"
         ></media-article>
     </div>
 </template>

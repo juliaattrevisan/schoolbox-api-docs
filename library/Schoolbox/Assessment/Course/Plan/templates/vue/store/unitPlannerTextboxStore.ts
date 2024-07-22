@@ -20,7 +20,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
 
         // If the content is the same as the current content, then it's no longer unsaved
-        if (unitPlannerStore.units.find((u) => u.id === unitId)?.textboxes[column.label]?.body === content) {
+        if (unitPlannerStore.units.find((u) => u.id === unitId)?.textboxes.items[column.label]?.body === content) {
             delete unsavedTextboxes.value[unitId][column.id];
             return;
         }
@@ -45,7 +45,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             throw new Error("Unit not found");
         }
 
-        const selectedTextbox = storeUnit.textboxes[column.label];
+        const selectedTextbox = storeUnit.textboxes.items[column.label];
         if (selectedTextbox.id >= 0) {
             return;
         }
@@ -95,7 +95,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
             // If we just created a textbox, then we need to update the store with the new textbox id
             const responseJSON = (await response.json()) as { id: number };
-            storeUnit.textboxes[column.label].id = responseJSON.id;
+            storeUnit.textboxes.items[column.label].id = responseJSON.id;
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
@@ -113,7 +113,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         if (!storeUnit) {
             throw new Error("Unit not found");
         }
-        const selectedTextbox = storeUnit.textboxes[column.label];
+        const selectedTextbox = storeUnit.textboxes.items[column.label];
 
         const content = unsavedTextboxes.value[unitId]?.[column.id];
         if (content === undefined) {
@@ -141,7 +141,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             }
 
             // To finish off, update the store with the new content and remove the unsaved state
-            storeUnit.textboxes[column.label].body = content;
+            storeUnit.textboxes.items[column.label].body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
             timeout({ text: "Text box saved successfully" });

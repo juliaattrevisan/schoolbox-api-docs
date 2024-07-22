@@ -53,7 +53,14 @@ export type Unit = {
         };
         items: RubricCapability[];
     };
-    textboxes: Record<string, TextboxContent>;
+    textboxes: {
+        _routes: {
+            createComponent: string | null;
+            createTextbox: string | null;
+        };
+        items: Record<string, TextboxContent>;
+    }
+
     extraTextboxes: number;
     sequence: number;
 };
