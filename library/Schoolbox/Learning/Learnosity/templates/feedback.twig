@@ -36,6 +36,8 @@
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="true"
             :urls="{{ urls|json_encode }}"
+            max-marks="{{ maxMarks }}"
+            response-id="{{ feedback ? feedback.id : '' }}"
             post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
         />

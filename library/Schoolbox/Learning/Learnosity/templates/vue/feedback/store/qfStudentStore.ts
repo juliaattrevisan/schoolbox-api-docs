@@ -33,10 +33,12 @@ export const useStudentStore = defineStore("qfStudent", () => {
         },
         urls: {
             studentId: 0,
-            score: "",
-            comment: "",
-            attemptComment: "",
-            teacherFeedback: "",
+            postFeedbackScore: "",
+            postFeedbackComment: "",
+            postFeedbackAttemptComment: "",
+            postFeedbackAttemptScore: "",
+            getFeedback: "",
+            postFinaliseAttempt: "",
         },
     });
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
@@ -47,6 +49,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * @param {Student} $student - the student
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
      * @param {StudentAttemptResponse} $attemptResponse - the attempt responses
+     * @param {string} $responseId - the response id
      * @param {StudentUrls} $urls - the urls
      * @param {boolean} $isReviewed - whether the attempt has been reviewed
      */
@@ -54,6 +57,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         $student: Student,
         $itemResponses: StudentItemQuestionResponse[],
         $attemptResponse: StudentAttemptResponse,
+        $responseId?: string,
         $urls?: StudentUrls,
         $isReviewed?: boolean,
     ) {
@@ -61,7 +65,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
             ...$student,
             isReportLoaded: false,
             items: [],
-            attemptResponse: $attemptResponse,
+            attemptResponse: { ...$attemptResponse, responseId: $responseId },
             urls: $urls === undefined ? undefined : $urls,
             showMarked: true,
             isReviewed: $isReviewed === undefined ? undefined : $isReviewed,

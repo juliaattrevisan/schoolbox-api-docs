@@ -5,7 +5,6 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
-import { getItemScore } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 
@@ -50,6 +49,20 @@ window.Vue.watch(
 );
 
 /**
+ * To mark the attempt as reviewed
+ * @returns {FormData} - the data to send through
+ */
+function getFormData() {
+    const formData = new FormData();
+    formData.append("responseId", studentStore.student.attemptResponse?.responseId ?? "");
+    formData.append("maxMarks", useStore().maxMarks ?? "");
+    formData.append("mark", studentStore.student.attemptResponse?.mark ?? "");
+    formData.append("comment", studentStore.student.attemptResponse?.comment ?? "");
+    formData.append("publish", "1");
+    return formData;
+}
+
+/**
  * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
@@ -58,6 +71,10 @@ async function submitFeedback() {
     try {
         const response = await fetch(`${studentStore.student.urls?.postFinaliseAttempt}`, {
             method: "POST",
+            headers: {
+                Accept: "application/json",
+            },
+            body: getFormData(),
         });
         if (response.ok) {
             isFinalising.value = false;

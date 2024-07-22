@@ -24,6 +24,8 @@ interface Props {
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
     postFeedback?: string; // the URL to post the feedback to
     statusPage?: string; // the status page to link to once user has finished marking
+    maxMarks?: string; // the maximum marks available for the quiz
+    responseId?: string; // the response id linked to the response
 }
 
 const props = defineProps<Props>();
@@ -35,8 +37,15 @@ const studentStore = useStudentStore();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.isReadOnly, props.hasMarkVisibility, props.postFeedback, props.statusPage);
-    useStudentStore().init(props.student, props.itemResponses, props.attemptResponse, props.urls, props.isReviewed);
+    store.init(props.isReadOnly, props.hasMarkVisibility, props.postFeedback, props.maxMarks, props.statusPage);
+    useStudentStore().init(
+        props.student,
+        props.itemResponses,
+        props.attemptResponse,
+        props.responseId,
+        props.urls,
+        props.isReviewed,
+    );
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions, props.hasMarkVisibility);
 });
