@@ -8,6 +8,7 @@
 namespace Schoolbox\Paperly;
 
 use Alaress\Web\Controller\Base;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Config\ConfigMapper;
 use RuntimeException;
 use Twig\Error\Error;
@@ -18,12 +19,16 @@ use Alaress\Codec\Json\Base64;
 class Controller extends Base
 {
     private Base64 $base64Codec;
+    private const PAPERLY_API_CACHE_DEFAULT_TTL = 600;
+    private const PAPERLY_API_CACHE_KEY = 'paperly_dashboard_user_%s';
+
 
     /**
      * Controller constructor.
      */
-    public function __construct()
-    {
+    public function __construct(
+        private CacheInterface $paperlyCache
+    ) {
         $this->base64Codec = new Base64();
     }
 
@@ -90,17 +95,31 @@ class Controller extends Base
      */
     private function getPaperlyPayload(): array
     {
-
-        $api = new Api(
-            $this->getPaperlyHostname(),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_KEY),
-            $this->getUser()
+        $cacheKey = sprintf(
+            self::PAPERLY_API_CACHE_KEY,
+            $this->getUser()->getExternalId()
         );
 
-        /**
-         * Currently the Paperly endpoint is called everytime function runs, might potentially hit rate limit
-         */
-        $paperlyPayload = $api->retrievePaperlyIframeView();
+        $paperlyPayload = $this->paperlyCache->get($cacheKey);
+
+        if ($paperlyPayload === null) {
+            $api = new Api(
+                $this->getPaperlyHostname(),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_API_KEY),
+                $this->getUser()
+            );
+
+            $paperlyPayload = $api->retrievePaperlyIframeView();
+
+            //If we successfully acquired the payload, save it.
+            if ($paperlyPayload !== null) {
+                $this->paperlyCache->set(
+                    $cacheKey,
+                    $paperlyPayload,
+                    self::PAPERLY_API_CACHE_DEFAULT_TTL
+                );
+            }
+        }
 
         return $paperlyPayload;
     }
