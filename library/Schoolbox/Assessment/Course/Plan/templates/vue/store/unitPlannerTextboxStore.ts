@@ -58,7 +58,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             formData.append("cid", storeUnit.folderId.toString());
             formData.append("add", componentDefinition.toString());
 
-            const responseComponent = await fetch("/homepage/configForm.php", {
+            const responseComponent = await fetch(`${storeUnit.textboxes._routes.createComponent}`, {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -74,7 +74,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
             // Then create the textbox
             const response = await fetch(
-                `/textbox/folder/${storeUnit.folderId}/component/${responseComponentJSON.instanceID}`,
+                `${storeUnit.textboxes._routes.createTextbox}/component/${responseComponentJSON.instanceID}`,
                 {
                     method: "POST",
                     body: JSON.stringify({
@@ -93,9 +93,18 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 throw new Error(await extractErrorMessage(response));
             }
 
-            // If we just created a textbox, then we need to update the store with the new textbox id
+            // If we just created a textbox, then we need to update the store
+            // with the new textbox.
+            // Need to finagle a modify route, though
             const responseJSON = (await response.json()) as { id: number };
-            storeUnit.textboxes.items[column.label].id = responseJSON.id;
+            storeUnit.textboxes.items[column.label] = {
+                id: responseJSON.id,
+                inTemplate: true,
+                body: '',
+                _routes: {
+                    modify: `/textbox/${responseJSON.id}`
+                },
+            };
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
@@ -124,7 +133,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
         try {
             let response = null;
-            response = await fetch(`/textbox/${selectedTextbox.id}`, {
+            response = await fetch(`${selectedTextbox._routes.modify}`, {
                 method: "PUT",
                 body: JSON.stringify({
                     body: content,
