@@ -854,8 +854,10 @@ class Controller extends Base
         // Unit-level routes
         $folderParams             = ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()];
         $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
+        $rubricRoutes = [
+            'manage' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+        ];
         $routes       = [
-            'manageRubric'              => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
             'createTextboxComponent'    => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
             'createTextbox'             => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
             'createCurriculumComponent' => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
@@ -892,7 +894,10 @@ class Controller extends Base
             /* All the rubric capabilities and indicators that are in use among all
              * the assessment specs in this unit
              */
-            'rubricCapabilities' => $rubricCapabilities,
+            'rubricCapabilities' => [
+                '_routes' => $rubricRoutes,
+                'items'   => $rubricCapabilities,
+            ],
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,

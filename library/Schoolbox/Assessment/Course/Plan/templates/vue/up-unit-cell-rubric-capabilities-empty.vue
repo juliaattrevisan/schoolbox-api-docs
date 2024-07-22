@@ -15,9 +15,9 @@ const props = defineProps<Props>();
 
 <template>
     <i class="icon-criteria"></i>
-    <p v-if="props.unit._routes.manageRubric">
+    <p v-if="props.unit.rubricCapabilities._routes.manage">
         No rubric {{ locale.rubricGroup.plural() }} have been added to this unit yet,
-        <a :href="getReturnUrl(`${props.unit._routes.manageRubric}`)">
+        <a :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manage}`)">
             start by adding rubric {{ locale.rubricGroup.plural() }}
         </a>
     </p>

@@ -47,7 +47,12 @@ export type Unit = {
         nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
         components: CurriculumOverviewComponent[];
     };
-    rubricCapabilities: RubricCapability[];
+    rubricCapabilities: {
+        _routes: {
+            manage: string | null;
+        };
+        items: RubricCapability[];
+    };
     textboxes: Record<string, TextboxContent>;
     extraTextboxes: number;
     sequence: number;

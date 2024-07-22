@@ -296,7 +296,7 @@ const isFirstUnit = window.Vue.computed(() => {
             <up-unit-cell-rubric-capabilities-content
                 v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                 ref="rubricCapabilitiesContentComponent"
-                :rubric-capabilities="props.unit.rubricCapabilities"
+                :rubric-capabilities="props.unit.rubricCapabilities.items"
             />
 
             <up-unit-cell-curriculum-content
