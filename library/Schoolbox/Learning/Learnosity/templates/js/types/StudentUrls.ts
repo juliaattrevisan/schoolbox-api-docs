@@ -9,4 +9,5 @@ export type StudentUrls = {
     postFeedbackAttemptComment: string; // the url to update the overall attempt comment
     postFeedbackAttemptScore: string; // the url to update the overall attempt score (to override the calculated score, with a new mark, or 'Absent' for example)
     getFeedback: string; // the url to view an individual student attempt, used within horizontal marking
+    postFinaliseAttempt: string; // to confirm the attempt is finalised
 };

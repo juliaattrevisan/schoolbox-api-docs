@@ -4,6 +4,7 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getItemScore } from "@schoolboxLearnosity/js/util/markingUtils";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
@@ -49,36 +50,30 @@ window.Vue.watch(
 );
 
 /**
- * To mark the attempt as reviewed
- * @returns {FormData} - the data to send through
- */
-function getFormData() {
-    const formData = new FormData();
-    // run through all the items and add the total score and comment for each item
-    studentStore.student.items.forEach((item) => {
-        formData.append(`scores[${item.reference}]`, getItemScore(item).toString());
-        formData.append(`comment[${item.reference}]`, item.questions[0].response?.comment ?? "");
-    });
-    formData.append(`attempt-comment`, studentStore.student.attemptResponse.comment ?? "");
-    // formData.append(`attempt-mark`, studentStore.student.attemptResponse.mark ?? "");
-    return formData;
-}
-
-/**
  * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
     isFinalising.value = true;
+    activate("Finalising review...");
     try {
-        await fetch(`${store.postFeedback}`, {
+        const response = await fetch(`${studentStore.student.urls?.postFinaliseAttempt}`, {
             method: "POST",
-            body: getFormData(),
         });
+        if (response.ok) {
+            isFinalising.value = false;
+            window.location.href = store.statusPage;
+            timeout({ text: "Review successfully finalised" });
+        } else {
+            timeout({
+                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                isSuccess: false,
+            });
+        }
     } catch (error) {
-        console.error(error);
-    } finally {
-        isFinalising.value = false;
-        window.location.href = store.statusPage;
+        timeout({
+            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            isSuccess: false,
+        });
     }
 }
 
