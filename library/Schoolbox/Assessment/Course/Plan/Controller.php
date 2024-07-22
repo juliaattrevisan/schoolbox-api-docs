@@ -239,13 +239,15 @@ class Controller extends Base
          */
         foreach ($course->getUnits() as $unit) {
             // add this units data to the whole course units collection.
-            $units[] = $this->getUnitData(
-                $unit,
-                $course->getTemplate()?->getUnitTemplate()->getId(),
-                $curriculumKey,
-                $textboxDefId,
-                $curriculumDefId,
-            );
+            if ($this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+                $units[] = $this->getUnitData(
+                    $unit,
+                    $course->getTemplate()?->getUnitTemplate()->getId(),
+                    $curriculumKey,
+                    $textboxDefId,
+                    $curriculumDefId,
+                );
+            }
         }
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
