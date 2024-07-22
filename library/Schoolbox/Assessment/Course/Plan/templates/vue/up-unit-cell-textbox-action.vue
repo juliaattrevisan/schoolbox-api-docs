@@ -35,6 +35,22 @@ const isCreatingTextbox = window.Vue.ref(false);
 const isContentSaving = window.Vue.ref(false);
 
 /**
+ * Condition for displaying the action bar:
+ * * If the textbox exists in the backend:
+ *   allow if the create component and textbox routes are set
+ * * Otherwise:
+ *   allow if the textbox's modify route is set
+ */
+const displayActionBar = window.Vue.computed(() => {
+    if (!textboxIsCreated.value) {
+        return (props.unit._routes.createTextboxComponent && props.unit._routes.createTextbox);
+    }
+
+    let textboxId = props.unit.textboxes[props.column.label].id;
+    return Boolean(props.unit._textboxRoutes[textboxId]?.modify ?? false);
+});
+
+/**
  * When the modify button is clicked.
  */
 function onModifyClicked() {
@@ -76,7 +92,7 @@ function onSaveClicked() {
 </script>
 
 <template>
-    <div class="component-action">
+    <div class="component-action" v-if="displayActionBar">
         <section>
             <button v-if="!contentIsSaved && !isContentSaving" data-role="dirty-indicator" disabled>
                 Changes not saved

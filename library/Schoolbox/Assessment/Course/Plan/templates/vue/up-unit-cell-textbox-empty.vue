@@ -48,7 +48,7 @@ function onModifyClicked() {
 <template>
     <i class="icon-textbox"></i>
     <p v-if="emptyStateTemplateMessage">{{ emptyStateTemplateMessage }}</p>
-    <p>
+    <p v-if="props.unit._routes.createTextboxComponent && props.unit._routes.createTextbox">
         <a @click.prevent="onModifyClicked">Add content to this text box</a>
     </p>
 </template>
