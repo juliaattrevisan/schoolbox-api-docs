@@ -15,9 +15,9 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="component-action">
+    <div class="component-action" v-if="props.unit._routes.manageRubric">
         <section>
-            <a class="button" :href="getReturnUrl(`/rubric/manager/${props.unit.folderId}`)">
+            <a class="button" :href="getReturnUrl(`${props.unit._routes.manageRubric}`)">
                 Manage rubric {{ locale.rubricGroup.plural() }}
             </a>
         </section>
