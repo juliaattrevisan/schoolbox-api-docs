@@ -8,6 +8,7 @@
 namespace Custom\Dsfg\AchievementReport\MYP;
 
 use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
+use External_User;
 
 /**
  * Class Base
@@ -16,6 +17,8 @@ use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
  */
 class Base extends AchievementReportBase
 {
+    const END_OF_YEAR_SEMESTER_NUMBER = 4;
+
     /**
      * @inheritDoc
      */
@@ -34,9 +37,17 @@ class Base extends AchievementReportBase
 if ($_SESSION['loggedInUserIdForDebuggingPurposes'] ?? null === 1) {
     // Dump debugging info.
 }
+
+        $externalUserHandler = new External_User();
+        $currentYear = date('Y');
+        $currentSemester = $externalUserHandler->getCurrentSemester($this->getExternalUserId());
+
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year'       => $this->year,
+            'selectedFileSemester' => (
+                ($this->year == $currentYear) ? self::END_OF_YEAR_SEMESTER_NUMBER: $currentSemester
+            )
         ];
 return [
     'data' => [
@@ -114,6 +125,10 @@ return [
 ];
 
 // TODO: Get FileSemester in the query below, and use its value somehow to determine which Overview to display.
+        // The DISTINCT keyword has been used because the view seems to be duplicating
+        // rows because of an incorrect join involving the SubjectGrouping2 column.
+        // Some rows have a SubjectGrouping2 value of NULL, and others have a value of
+        // 'NULL' (a string).
         $query = "
             SELECT
                 ID,
