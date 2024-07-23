@@ -44,6 +44,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\DefinitionException;
 use Twig\Error\Error;
 use UnexpectedValueException;
@@ -76,6 +77,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param DataSource                 $participantDataSource
      * @param CourseSpecificationMapper  $courseSpecificationMapper
      * @param UnitSpecificationMapper    $unitSpecificationMapper
+     * @param RosettaStone               $rosettaStone
      * @param Replicator                 $replicator
      * @param LatestViewMapper           $latestViewMapper
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
@@ -94,13 +96,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Participant\DataSource $participantDataSource,
         private CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
+        RosettaStone $rosettaStone,
         private Replicator $replicator,
         protected LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $this->projectResultCacheMapper);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $rosettaStone, $this->projectResultCacheMapper);
     }
 
 

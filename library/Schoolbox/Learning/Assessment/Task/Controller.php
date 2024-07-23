@@ -37,6 +37,7 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
@@ -69,6 +70,7 @@ class Controller extends Assessment\Controller
      * @param DataSource                            $participantDataSource
      * @param CourseSpecificationMapper             $courseSpecificationMapper
      * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param RosettaStone                          $rosettaStone
      * @param Replicator                            $replicator
      * @param LatestViewMapper                      $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
@@ -88,6 +90,7 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
+        RosettaStone $rosettaStone,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
@@ -106,6 +109,7 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
+            $rosettaStone,
             $replicator,
             $latestViewMapper,
             $projectResultCacheMapper,
