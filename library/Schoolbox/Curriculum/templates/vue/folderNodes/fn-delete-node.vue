@@ -70,7 +70,7 @@ function onModalClosed() {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to remove this node?</p>
+        <p>Are you sure you wish to remove this outcome?</p>
         <ul class="flex-list">
             <li>
                 <button
