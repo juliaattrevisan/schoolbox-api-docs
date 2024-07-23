@@ -42,7 +42,7 @@
                     detail: { text: "Saving..." }
                 }));
                 try {
-                    const $response = $.post(action, formdata)
+                    $.post(action, formdata)
                         .done(() => {
                             document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
                                 detail: { text: "Saved." }
@@ -53,7 +53,7 @@
                                 detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
                             }));
                         })
-                } catch (e) {
+                } catch (error) {
                     document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
                         detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
                     }));
