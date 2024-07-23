@@ -488,7 +488,16 @@ class EventNotifier extends AbstractModuleNotifier
         if (null === $diff) {
             $newlyInvited = array_column($this->attendanceMapper->findAttendances($event), 'id');
         } elseif (isset($diff['guests'])) {
-            $newlyInvited = array_diff($diff['guests'][0] ?? [], $diff['guests'][1] ?? []);
+            // If somehow either diff is a collection: convert to an array
+            $currentGuests = $diff['guests'][0] ?? [];
+            if ($currentGuests instanceof Collection) {
+                $currentGuests = $currentGuests->getAll();
+            }
+            $previousGuests = $diff['guests'][1] ?? [];
+            if ($previousGuests instanceof Collection) {
+                $previousGuests = $previousGuests->getAll();
+            }
+            $newlyInvited = array_diff($currentGuests, $previousGuests);
         }
 
         if (empty($newlyInvited)) {
