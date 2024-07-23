@@ -1,7 +1,9 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
+{%  set profile = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, uesr: award.recipient}) %}
 {{ bread.crumbs(
-    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, uesr: award.recipient}) ],
-    [ award.status | capitalize ~ ' Evidence']
+    [ award.recipient.fullname, profile ],
+    [ award.status | capitalize ~ 's', profile ~ '#' ~ award.status ~'s' ],
+    [ award.badge.name ]
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id, award: award}) %}
@@ -32,25 +34,7 @@
         });
     });
 </script>
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ award.status | capitalize }} Evidence</h1>
-        <ul class="meta">
-            <li class="icon-{{ award.status }}">{{ award.status == 'goal' ? 'Goal set' : 'Awarded' }}
-                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
-                by
-                {% if awardedByRoute %}
-                    <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
-                {% else %}
-                    {{ award.awardedBy.fullname }}
-                {% endif %}
-            </li>
-            {% if award.status == 'goal' and award.award %}
-                <li class="icon-achievement">Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.award.awardedAt.relativeTime }}</time></li>
-            {% endif %}
-        </ul>
-    </div>
-</div>
+{%  include '@learningBadgeAward/awardMeta.twig' with {award: award, awardedByRoute: awardedByRoute, profile: profile} only %}
 {% include '@learningBadgeAward/awardBadgeList.twig'
     with {badges: badges, isGoal: award.isGoal} only %}
 <div class="row">

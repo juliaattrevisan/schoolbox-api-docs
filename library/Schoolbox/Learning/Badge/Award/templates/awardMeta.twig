@@ -1,0 +1,43 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js?v={{ config.site_version }}"></script>
+<script>
+    var client = new ClipboardJS('#copy-button');
+</script>
+
+<div id="export-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <p>This URL can be copied into 3rd party systems that support the OpenBadge 2.0 standard, allowing you to share your achievements in other systems.</p>
+    <textarea readonly id="copy-badge-link" rows="6">https://{{ config.site_hostname }}.{{ config.site_domain }}{{  routeLookupIfAuthorized('learningBadgeApi.getBadgeAssertion', { award: award, awardId: award.id }) }}</textarea>
+    <div class="component-action">
+        <section>
+            <button id="copy-button" data-clipboard-target="#copy-badge-link">Copy to Clipboard</button>
+        </section>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <ul class="meta">
+                <li class="icon-{{ award.status }}">This badge was {{ award.status == 'goal' ? 'set as a goal' : 'awarded' }}
+                    to <a href="{{ profile }}">{{ award.recipient.fullname }}</a>, <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                    by
+                    {% if awardedByRoute %}
+                        <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
+                    {% else %}
+                        {{ award.awardedBy.fullname }}
+                    {% endif %}
+                </li>
+                {% if award.status == 'goal' and award.award %}
+                    <li class="icon-achievement">Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.award.awardedAt.relativeTime }}</time></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <sbx-pop-out content-id="badge-menu"></sbx-pop-out>
+    </nav>
+    <ul id="badge-menu" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Share</li>
+        <li><a id="copy-award" data-reveal-id="export-modal" href="#">Copy Award URL</a></li>
+    </ul>
+</div>
