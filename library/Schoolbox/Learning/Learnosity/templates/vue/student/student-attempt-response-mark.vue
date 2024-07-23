@@ -110,6 +110,7 @@ async function saveMark() {
     if (props.student.urls === undefined) {
         return;
     }
+    emit("updatedMark", mark.value);
     try {
         isSaving.value = true;
         window.addEventListener("beforeunload", beforeUnloadHandler);
@@ -120,7 +121,6 @@ async function saveMark() {
             body: formData,
         });
         if (response.ok) {
-            emit("updatedMark", mark.value);
             hasSaved.value = true;
         } else {
             hasError.value = true;
@@ -143,15 +143,8 @@ watchDebounced(
     () => {
         void saveMark();
     },
-    { debounce: 1000 },
+    { debounce: 300 },
 );
-
-/**
- * Save any unsaved changes
- */
-window.Vue.onUnmounted(async () => {
-    await saveMark();
-});
 
 /**
  * To add the grade field in
@@ -159,6 +152,13 @@ window.Vue.onUnmounted(async () => {
 window.Vue.onMounted(async () => {
     await window.Vue.nextTick();
     getGradeContainer();
+});
+
+/**
+ * Save any unsaved changes
+ */
+window.Vue.onUnmounted(async () => {
+    await saveMark();
 });
 </script>
 
