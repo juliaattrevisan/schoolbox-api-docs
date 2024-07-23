@@ -141,7 +141,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if attempt.normalisedMark is not null %}
+                            {% if attempt.mark is not null %}
                                 {% if attempt.reviewed %}
                                     {{ markVisible.showIfVisible(assessment, attempt.mark, '—' ) }}
                                 {% else %}
