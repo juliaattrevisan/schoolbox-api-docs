@@ -152,7 +152,7 @@
 
                             {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
                                 <li>
-                                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">View Worksheets</a>
+                                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
                                 </li>
                             {% endif %}
                             {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
