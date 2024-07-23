@@ -39,7 +39,7 @@
 
             iiCache[sourceId] = setTimeout(function () {
                 document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                    detail: { text: "Saving setting..." }
+                    detail: { text: "Saving..." }
                 }));
                 try {
                     const $response = $.post(action, formdata)
@@ -50,12 +50,12 @@
                         })
                         .fail(() => {
                             document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Setting save failed. Please contact your support if the problem persists.", isSuccess: false }
+                                detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
                             }));
                         })
                 } catch (e) {
                     document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                        detail: { text: "Setting save failed. Please contact your support if the problem persists.", isSuccess: false }
+                        detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
                     }));
                 }
             }
