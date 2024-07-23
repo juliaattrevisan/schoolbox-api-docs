@@ -38,8 +38,8 @@ export const useItemsStore = defineStore("hmItems", () => {
         // we add in an 'dummy' item for the final 'item' which allows the opportunity to provide final feedback for each student
         const lastItemForReview = {
             id: "0",
-            reference: "attempt-comments",
-            title: "Overall Comments",
+            reference: "overall-feedback",
+            title: "Overall Feedback",
             isAttemptComment: true,
         };
         items.value.push(lastItemForReview);
@@ -73,7 +73,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         if (isLastAttempt) {
             // only show those items with questions and the final review
             items.value = items.value.filter(
-                (item) => (item.questions && item.questions.length > 0) || item.isAttemptComment
+                (item) => (item.questions && item.questions.length > 0) || item.isAttemptComment,
             );
             activeItem.value = { ...items.value[0] };
         }

@@ -24,7 +24,7 @@
     var Combobox = function (textInputElement, selectOptions) {
         this.textInputElement = jQuery(textInputElement);
         this.textInputElement.wrap(
-            '<span class="combobox" style="position:relative; ' + 'display:-moz-inline-box; display:inline-block;"/>'
+            '<span class="combobox" style="position:relative; ' + 'display:-moz-inline-box; display:inline-block;"/>',
         );
         this.selector = new ComboboxSelector(this);
         this.setSelectOptions(selectOptions);
@@ -108,15 +108,16 @@
         this.selectedIndex = -1;
         this.allSelectOptions = [];
         var selectorTop = combobox.textInputElement.outerHeight();
-        var selectorWidth = combobox.textInputElement.outerWidth();
+        var selectorWidth =
+            combobox.textInputElement.outerWidth() !== 0 ? `${combobox.textInputElement.outerWidth()}px` : "100%"; // default to 100% if the input element has no width
         this.selectorElement = jQuery(
             '<div class="combobox_selector" ' +
                 'style="display:none; width:' +
                 selectorWidth +
-                "px; position:absolute; left: 0; top: " +
+                "; position:absolute; left: 0; top: " +
                 selectorTop +
                 'px;"' +
-                "></div>"
+                "></div>",
         ).insertAfter(this.combobox.textInputElement);
         var thisSelector = this;
         this.keypressHandler = function (e) {

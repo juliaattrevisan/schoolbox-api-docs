@@ -6,7 +6,7 @@
 import type { Item } from "@schoolboxLearnosity/js/types/Item";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
@@ -23,10 +23,9 @@ interface Props {
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
-    attemptComments: StudentAttemptComment[]; // all the overall attempt comments for the quiz
+    attemptResponses: StudentAttemptResponse[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
-    postFeedback: string; // the URL to post the feedback to
     statusPage: string; // the status page to link to once user has finished marking
 }
 const props = defineProps<Props>();
@@ -46,9 +45,9 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.postFeedback, props.statusPage);
+    store.init(props.statusPage);
     itemsStore.init(props.items);
-    useStudentsStore().init(props.students, props.itemResponses, props.attemptComments, props.urls);
+    useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReports(props.reportPayloads);
 });

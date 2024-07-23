@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To provide the opportunity for a final comment
+ * To provide a final comment response for a student
  */
 
 import { watchDebounced } from "@vueuse/core";
@@ -12,8 +12,9 @@ interface Props {
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
 }
 const props = defineProps<Props>();
+
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = window.Vue.ref(props.student.attemptComment.comment ?? "");
+const comment = window.Vue.ref(props.student.attemptResponse.comment ?? "");
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
@@ -63,7 +64,7 @@ async function saveComment() {
     if (isSaving.value) {
         return;
     }
-    if (comment.value === props.student.attemptComment.comment) {
+    if (comment.value === props.student.attemptResponse.comment) {
         return;
     }
     if (props.student.urls === undefined) {
@@ -74,7 +75,7 @@ async function saveComment() {
         window.addEventListener("beforeunload", beforeUnloadHandler);
         const formData = new FormData();
         formData.append("comment", comment.value);
-        const response = await fetch(props.student.urls.attemptComment, {
+        const response = await fetch(props.student.urls.postFeedbackAttemptComment, {
             method: "POST",
             body: formData,
         });
@@ -114,31 +115,34 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-gap-m l-pad-m">
-        <div>
-            <p
-                v-if="
-                    (props.isReadOnly && props.student.attemptComment.comment === null) ||
-                    (props.isReadOnly && props.student.attemptComment.comment === '')
-                "
-            >
+    <div class="l-flex__item--1-grow">
+        <div
+            v-if="
+                (props.isReadOnly && props.student.attemptResponse.comment === null) ||
+                (props.isReadOnly && props.student.attemptResponse.comment === '')
+            "
+            class="l-flex-col l-gap-s"
+        >
+            <label>Comment</label>
+            <p>
                 <em>No comment added.</em>
             </p>
-            <p v-else-if="props.isReadOnly && props.student.attemptComment.comment !== ''">
-                {{ props.student.attemptComment.comment }}
-            </p>
-            <template v-else>
-                <label :for="editorId">Comment</label>
-                <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
-                <div class="save-container l-grid">
-                    <div class="save-container__inner-container">
-                        <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
-                            <em>{{ saveText }}</em>
-                        </div>
+        </div>
+        <div v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''" class="l-flex-col l-gap-s">
+            <label>Comment</label>
+            <p>{{ props.student.attemptResponse.comment }}</p>
+        </div>
+        <template v-else>
+            <label :for="editorId">Comment</label>
+            <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
+            <div class="save-container l-grid">
+                <div class="save-container__inner-container">
+                    <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
+                        <em>{{ saveText }}</em>
                     </div>
                 </div>
-            </template>
-        </div>
+            </div>
+        </template>
     </div>
 </template>
 

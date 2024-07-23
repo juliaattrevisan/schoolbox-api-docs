@@ -30,6 +30,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
@@ -37,6 +38,7 @@ use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -358,9 +360,9 @@ class Controller extends Base
                                  * Therefore: temporarily disabled until they fix this somehow.
                                  * I can't circumvent their implementation.
                                  */
-//                                 'none' => [
-//                                    $tagFactory->produceImplFlag()
-//                                ]
+                                //                                 'none' => [
+                                //                                    $tagFactory->produceImplFlag()
+                                //                                ]
                             ]
                         ]
                     ]
@@ -547,13 +549,12 @@ class Controller extends Base
                          *  as a source of truth instead of their server...lol. Re-enable this once learnosity
                          *  figures out how to accurately control attempt commencement
                          */
-//                        'type' => 'soft',
+                        //                        'type' => 'soft',
                         /* Note: Whilst looking into this, I also experimented with the "hard" type which requires a "value" prop.
                          * Learnosity wants this value given in UTC with an unusual format, which can be achieved with "Ymd-His"
                          * The Learnosity docs do not include seconds as a valid attribute, however, I found that this both works and is
                          * required to ensure that the start time is not off by a few seconds when starting the quiz
-                         */
-                    ]
+                         */]
                 ],
                 /* This is our Quiz title, I guess
                  */
@@ -666,12 +667,17 @@ class Controller extends Base
      * @param QuizDomainObject $assessment
      * @param User $student
      * @return void
+     * @throws ApiException
      * @throws Deleted
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
      * @throws NotFound
+     * @throws RouteNotFound
      * @throws ValidationException
+     * @throws \Interop\Queue\Exception
+     * @throws \InvalidArgumentException
      * @throws \JsonException
      * @throws \PDOException
-     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -841,17 +847,21 @@ class Controller extends Base
 
 
     /**
-     * Retrieve the comment for this attempt
+     * Retrieve the response for this attempt
      *
      * @param Model $attempt
+     * @param IFeedback|null $feedback
      * @return array
      */
-    private function getAttemptComment(\Schoolbox\Learning\Quiz\Attempt\Model $attempt): array
+    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, ?IFeedback $feedback): array
     {
         return  [
             'learnosityReference' => $attempt->getLearnosityReference(),
             'studentId' => $attempt->getUser()->getId(),
-            'comment' => $attempt->getComment()
+            'comment' => $attempt->getComment(),
+            'responseId' => $feedback?->getId(),
+            'mark' => $attempt->getMark(),
+            'maxMarks' => $attempt->getMaxMark(),
         ];
     }
 
@@ -940,15 +950,15 @@ class Controller extends Base
             $assessmentNode = [
                 $assessment->getTitle(),
                 $assessment->isImplementation()
-                ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
-                : null
+                    ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()])
+                    : null
             ];
         } else {
             $assessmentNode = [
                 $assessment->getTitle(),
                 $assessment->isImplementation()
-                ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $student->getId()])
-                : null
+                    ? $this->routeGenerator->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $student->getId()])
+                    : null
             ];
         }
 
@@ -957,6 +967,15 @@ class Controller extends Base
                 'Review', null
             ]);
 
+        /* Find this attempt's MapperProxy equivalent from something we already obtained
+         */
+        $feedback = $assessment->getParticipant($student)
+            ->getAllFeedbacks()
+            ->filter(static function ($model) use ($attempt) {
+                return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+            })
+            ->first();
+
         $this->response = $this->responseFromTemplate('@learnosity/review.twig', [
             'student' => $this->getStudentData($attempt),
             'assessment' => $assessment,
@@ -964,7 +983,7 @@ class Controller extends Base
             'reportInitOptions' => $this->api->initOptions('reports', $reportPayload),
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $this->getAttemptComment($attempt),
+            'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}",
             'hasMarkVisibility' => $hasMarkVisibility,
         ], "Result for {$assessment->getTitle()}");
@@ -1028,11 +1047,27 @@ class Controller extends Base
 
         $urls = [
             'studentId' => $attempt->getUser()->getId(),
-            'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
-            'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
-            'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-            'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+            'postFeedbackAttemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
+            'postFeedbackAttemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+            'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+            'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+            'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+            /* This is a special route name that doesn't actually exist: it's used to POST data to the
+             * Quiz Quickmark endpoint that will set the reviewed_at value, making feedback published.
+             * In the corresponding aura module/controller, it's called postModify: I've used postFinalisedAttempt
+             * to try and elucidate what we're trying to do here
+             */
+            'postFinaliseAttempt' => $this->router->getGenerator()->generate('learningQuizAttempt.postModify', $args),
         ];
+
+        /* Find this attempt's MapperProxy equivalent from something we already obtained
+         */
+        $feedback = $assessment->getParticipant($student)
+            ->getAllFeedbacks()
+            ->filter(static function ($model) use ($attempt) {
+                return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+            })
+            ->first();
 
         $this->response = $this->responseFromTemplate('@learnosity/feedback.twig', [
             'student' => $this->getStudentData($attempt),
@@ -1041,12 +1076,12 @@ class Controller extends Base
             'breadcrumbs' => $breadcrumbs,
             'attempt' => $attempt,
             'itemResponses' => $this->getItemResponses($attempt),
-            'attemptComment' => $this->getAttemptComment($attempt),
+            'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'urls' => $urls,
             /* For Submission States
              */
             'participant' => $assessment->getParticipant($student),
-            'feedback' => $attempt,
+            'feedback' => $feedback,
             'maxMarks' => $attempt->getMaxMark(),
             'errors' => $this->stateMapper->listDisplayValues(),
         ], sprintf(
@@ -1054,261 +1089,6 @@ class Controller extends Base
             $student->getFullName(),
             $assessment->getTitle()
         ));
-    }
-
-
-    /**
-     * Tell Learnosity about what our teachers marked each question
-     *
-     * @param QuizDomainObject $assessment
-     * @param User $student
-     * @param Model $attempt
-     * @return void
-     * @throws RouteNotFound
-     * @throws ValidationException
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function postFeedback(
-        QuizDomainObject $assessment,
-        \Schoolbox\User $student,
-        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
-    ): void {
-        // As with posting a feedback:
-        // need the existing response to determine a human-readable mark.
-        $existingResponse = $this->helper->extractExistingResponse($assessment, $student, $attempt);
-
-        // TODO as with posting a feedback:
-        //      what kind of error should we present to users? It's asynchronous
-        if (!$existingResponse) {
-            return;
-        }
-
-        /* Updated marks given by our teacher,
-         * including attempt-based commentary
-         */
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* For every learnosity question, see if we have a db record for its feedback
-         * If we do, recycle it and update its contents
-         * Otherwise spawn a new one
-         *
-         * TODO make this algorithm cheaper
-         */
-        foreach ($postData['comment'] as $learnosityReference => $comment) {
-            try {
-                $feedback = $this->feedbackMapper->findOneByColumnList([
-                    'attempt_id' => $attempt->getId(),
-                    'learnosity_reference' => $learnosityReference
-                ]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $feedback = $this->feedbackMapper->createModel()
-                    ->setAttempt($attempt)
-                    ->setLearnosityReference($learnosityReference);
-            }
-
-            /* Update comment
-             * Replace tokens in individual questions' feedback comment
-             *
-             * TODO optionally update score, if we want to store that locally
-             *  at the risk of desyncing with learnosity
-             */
-            $feedback->setComment($this->replaceTokens($comment, $student));
-
-            $this->feedbackMapper->save($feedback);
-        }
-
-        /* Start preparing data payload for updating Learnosity
-         * This is so the updated scores appear in their interfaces
-         *
-         * These are the scores they obtained for the one session we chose
-         * (It'll still come to us as an array of sessions though)
-         *
-         * Learnosity requires multiple fields to update values so you
-         * might as well refetch it all at this point so we can send it
-         * to them in the format it wants
-         */
-        $responses = $this->api->dataGetRequest('sessions/responses/scores', [
-            'session_id' => [
-                $attempt->getLearnosityReference()
-            ]
-        ])['data'][0]['responses'];
-
-        /* Re-collate updated response data
-         */
-        $responseData = [];
-        $updatedMaxMarks = 0;
-
-        foreach ($responses as $response) {
-            $updatedResponse = $response;
-
-            /* If $updatedResponse['max_score'] is null...I guess this is unscored/practice
-             * Learnosity fails with http 400 if you try to score an unscorable question
-             */
-            if (null === $updatedResponse['max_score']) {
-                continue;
-            }
-
-            /* Arbitrarily max out $mark if it somehow exceeds the maximum limit
-             * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-             */
-            $sanitisedScore = (new SanitiseScores())->sanitise($updatedResponse['score'], $updatedResponse['max_score']);
-
-            $mark = $sanitisedScore['score'];
-            $maxMark = $sanitisedScore['max_score'];
-
-            /* If the new score is also null, skip it
-             *
-             * This would happen if frontend validation failed and allowed users
-             * to pass a value that equated to null, such as the string "cat"
-             * Consult unit tests for other reasons
-             */
-            if (null === $maxMark) {
-                continue;
-            }
-
-            /* Get ready to send it back to Learnosity land
-             */
-            $updatedResponse['score'] = $mark;
-            $updatedResponse['max_score'] = $maxMark;
-
-            /* "When setting a non-zero score, the response must also be attempted."
-             *    -- https://reference.learnosity.com/data-api/endpoints/sessions_endpoints#updateResponseScores
-             *
-             * This includes responses that cannot be automagically calculated
-             */
-            $updatedResponse['attempted'] = true;
-
-            $responseData[] = $updatedResponse;
-
-            /* Also collate the new max_mark total here, in case someone changed
-             * this in learnosity and we didn't already know
-             */
-            $updatedMaxMarks += (float)$maxMark;
-        }
-
-        /* Instead of asking learnosity how it tallied everything, we can
-         * just...do it ourselves, I guess, and sort-of delete this problem
-         * We knew the max_mark from the attempt table, so it could potentially
-         * desync from what Learnosity knows.
-         *
-         * FIXME Add Polling Mechanism
-         *  This would otherwise have been processed by the polling thing
-         *
-         * Arbitrarily max out $mark if it somehow exceeds the maximum limit
-         * ($mark must never exceed $maxMark) and/or otherwise sanitise data
-         */
-        $sanitisedScore = (new SanitiseScores())->sanitise(array_sum(array_values($postData['scores'])), $updatedMaxMarks);
-
-        $mark = $sanitisedScore['score'];
-        $maxMark = $sanitisedScore['max_score'];
-
-        /* Log data that seems suspiciously broken
-         */
-        (new Feedback\SuspiciousLogger())->logSanitisedScore(
-            'postFeedback() score calc',
-            $attempt->getLearnosityReference(),
-            $sanitisedScore,
-            $postData
-        );
-
-        $this->helper->assignMarksToAttempt($attempt, $existingResponse, $assessment, $mark, $maxMark);
-
-        /* $postData is a structured array containing all the feedback info
-         * Some of it goes back into learnosity; some is saved locally
-         *
-         * $postData = [
-         *     'scores' => [
-                   '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 2
-         *     ],
-         *     'comments' => [
-         *         '62ff8e77-cfec-444c-ad82-2dc7657aee91_d864fd514aeab7448acdb271fc81164a' => 'my comment'
-         *     ],
-         *     'attempt-comment' => 'you did a good job, now back to sleep'
-         * ]
-         */
-
-        /* Replace tokens in Overall Attempt Comment
-         */
-        $comment = $this->replaceTokens($postData['attempt-comment'], $student);
-
-        /* Save the comment and new normalised mark
-         */
-        $attempt->setComment($comment)
-            ->setReviewer($this->getUser())
-            ->setReviewed(\Alaress_Date_Format::now());
-
-        $this->attemptMapper->save($attempt);
-
-        /* Update project result cache
-         */
-        (new ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $attempt->getUser());
-
-        /* Post back to learnosity
-         * When the learnosity ui reloads again, it'll still be remembering
-         * all the old scores. You have to wait for it to reload, then hit
-         * F5 to get the new updated values to appear. That's what happens
-         * if you just rely on window.location.reload() in frontend.
-         *
-         * Instead, redirect people to a whole other screen afterwards to
-         * artificially force this behaviour
-         */
-        $payload = [
-            'sessions' => [
-                [
-                    'session_id' => $attempt->getLearnosityReference(),
-                    'user_id' => (new UserIdentifier())->generate($this->getConfigLoader()->get('site_school_code'), $attempt->getUser()->getId()),
-                    'responses' => $responseData
-                ]
-            ]
-        ];
-
-        /* Log payload data, because we're dropping attempts randomly and nobody knows why.
-         * Hopefully this init payload will helps hed light on things in SA-17302
-         */
-        if (\count($responseData)) {
-            $result = $this->api->dataUpdateRequest('/sessions/responses/scores', $payload);
-
-            (new Feedback\SuspiciousLogger())->logPayload(
-                'postFeedback() $result payload after processing learnosity /sessions/responses/scores',
-                $payload,
-                $result,
-                $attempt
-            );
-        } else {
-            (new Feedback\SuspiciousLogger())->logPayload(
-                'postFeedback() empty $responseData via learnosity /sessions/responses/scores',
-                $payload,
-                [],
-                $attempt
-            );
-        }
-
-        /* Get the new result back from learnosity
-         *
-         * FIXME Add Polling Mechanism
-         *  This occurs too quickly. We refetch the session score before
-         *  Learnosity had a chance to finish updating it, so we always get
-         *  the old value back.
-         *
-            $result = $this->api->dataGetRequest('/sessions/scores', [
-                'session_id' => [
-                    $attempt->getLearnosityReference()
-                ]
-            ]);
-         */
-
-        /* Redirect back to summary screen
-         */
-        $redirect = $this->router->getGenerator()->generate('learningAssessment.getSummary', [
-            'assessmentId' => $assessment->getId(),
-            'studentId' => $attempt->getUser()->getId(),
-        ]);
-
-        $this->response = $this->redirectFound($redirect);
     }
 
 
@@ -1356,22 +1136,29 @@ class Controller extends Base
         $sessions = [];
         $users = [];
         $reportPayloads = [];
-        $attemptComments = [];
+        $attemptResponses = [];
         $urls = [];
+        $grading = [];
 
+        /** @var Model $attempt */
         foreach ($attempts as $attempt) {
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
             if (!isset($users[$key]) && $attempt->isFinished()) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
-                /* Find all the comments for this attempt (need it later)
+                /* Find this attempt's MapperProxy equivalent from something we already obtained
+                */
+                $feedback = $assessment->getParticipant($attempt->getUser())
+                    ->getAllFeedbacks()
+                    ->filter(static function ($model) use ($attempt) {
+                        return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+                    })
+                    ->first();
+
+                /* Find all the responses for this attempt (need it later)
                  */
-                $attemptComments[$attempt->getUser()->getId()] = [
-                    'learnosityReference' => $attempt->getLearnosityReference(),
-                    'studentId' => $attempt->getUser()->getId(),
-                    'comment' => $attempt->getComment()
-                ];
+                $attemptResponses[$attempt->getUser()->getId()] = $this->getAttemptResponse($attempt, $feedback);
 
                 /* ...because Learnosity wants it in this format
                  */
@@ -1419,10 +1206,34 @@ class Controller extends Base
 
                 $urls[$attempt->getUser()->getId()] = [
                     'studentId' => $attempt->getUser()->getId(),
-                    'attemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
-                    'comment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
-                    'score' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
-                    'teacherFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+                    'postFeedbackAttemptScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptScore', $args),
+                    'postFeedbackAttemptComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackAttemptComment', $args),
+                    'postFeedbackComment' => $this->router->getGenerator()->generate('learnosity.postFeedbackComment', $args),
+                    'postFeedbackScore' => $this->router->getGenerator()->generate('learnosity.postFeedbackScore', $args),
+                    'getFeedback' => $this->router->getGenerator()->generate('learnosity.getFeedback', $args),
+                    /* This is a special route name that doesn't actually exist: it's used to POST data to the
+                     * Quiz Quickmark endpoint that will set the reviewed_at value, making feedback published.
+                     * In the corresponding aura module/controller, it's called postModify: I've used postFinalisedAttempt
+                     * to try and elucidate what we're trying to do here
+                     */
+                    'postFinaliseAttempt' => $this->router->getGenerator()->generate('learningQuizAttempt.postModify', $args),
+                ];
+
+                /* Set up the grading ingredients for the submission states and comboboxes
+                 */
+                $participant = $assessment->getParticipant($attempt->getUser());
+
+                $feedback = $participant
+                    ->getAllFeedbacks()
+                    ->filter(static function ($model) use ($attempt) {
+                        return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+                    })
+                    ->first();
+
+                $grading[$attempt->getUser()->getId()] = [
+                    'participant' => $participant,
+                    'feedback' => $feedback,
+                    'maxMarks' => $attempt->getMaxMark(),
                 ];
             }
         }
@@ -1552,7 +1363,7 @@ class Controller extends Base
          */
         $students = array_values($users);
         $itemResponses = array_values(array_merge_recursive($scores, $responseComments));
-        $attemptComments = array_values($attemptComments);
+        $attemptResponses = array_values($attemptResponses);
         $urls = array_values($urls);
 
         /* Breadcrumbs
@@ -1571,11 +1382,15 @@ class Controller extends Base
             'itemReferences' => $itemReferences,
             'students' => $students,
             'itemResponses' => $itemResponses,
-            'attemptComments' => $attemptComments,
+            'attemptResponses' => $attemptResponses,
             'urls' => $urls,
+            'grading' => $grading,
+            /* A list of submission states
+             */
+            'errors' => $this->stateMapper->listDisplayValues(),
             /* This list of learnosity references is used for the finalisation step
              */
-            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR)
+            'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
@@ -1810,6 +1625,76 @@ class Controller extends Base
 
 
     /**
+     * Post the human-readable overall mark for an Attempt into assess_attempt.mark
+     *
+     * @param QuizDomainObject $assessment
+     * @param User $student
+     * @param Model $attempt
+     * @return void
+     * @throws DebugBarException
+     * @throws Deleted
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postFeedbackAttemptScore(
+        QuizDomainObject $assessment,
+        \Schoolbox\User $student,
+        \Schoolbox\Learning\Quiz\Attempt\Model $attempt
+    ): void {
+        $postData = $this->requestPost->getArrayCopy();
+
+        /* If this is an actual grade, try to interpret the pieces:
+         *     - Human-readable mark, from the combobox
+         *     - Normalised mark derived from the human-readable mark
+         */
+        $mark = trim((string)$postData['mark']);
+
+        if ($assessment->getMarkScheme() instanceof TotalMarkFractional) {
+            try {
+                $assessment->getMarkScheme()->setTotalMark((float)($attempt->getMaxMark()));
+            } catch (\RangeException $e) {
+                // This is thrown if you haven't assigned question scores in learnosity
+            }
+        }
+
+        /* Default values
+         * Note that $mark might be empty string at this point:
+         * this occurs when you add a comment before the grade, in the Quiz Quickmark screen
+         */
+        $normalisedMark = null;
+        $humanReadableMark = null;
+
+        /* Apparently this is how you detect a Submission State: an exception is thrown
+         * trying to interpret it as one of the Mark Schemes. No wonder it was classified
+         * as the $errors var. Wild!
+         *
+         * Shanked from Learning/Assessment/DueWork/Feedback/Factory.php::210
+         */
+        try {
+            $normalisedMark = $assessment->getMarkScheme()->getNormalisedMark($mark);
+            $humanReadableMark = $assessment->getMarkScheme()->getHumanReadableMark($normalisedMark);
+        } catch (\InvalidArgumentException $e) {
+            if ('' !== $mark) {
+                /* If it's a Submission State, save the text as the human readable mark
+                 * and derive its normalised mark from the uh Lists in admin
+                 */
+                $code = $this->stateMapper->findOneByColumn('display_as', $mark);
+
+                $normalisedMark = $code->getNormaliseAs();
+                $humanReadableMark = $mark;
+            }
+        }
+
+        /* Update the deets and save it
+         */
+        $attempt->setMark($humanReadableMark)->setNormalisedMark($normalisedMark);
+
+        $this->attemptMapper->save($attempt);
+    }
+
+
+    /**
      * Archive (soft-delete) a particular Learnosity Activity
      * Activities must have at least one published item before an activity can be archived
      *
@@ -1819,6 +1704,7 @@ class Controller extends Base
      * @param string $learnosityReference
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public function getArchiveReference(string $learnosityReference): void
@@ -1889,14 +1775,18 @@ class Controller extends Base
      * @param QuizDomainObject $source
      * @param QuizDomainObject $destination
      * @return void
-     * @throws RouteNotFound
+     * @throws Deleted
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws SourceAssociationException
      * @throws ValidationException
      * @throws \DomainException
      * @throws \Interop\Queue\Exception
-     * @throws InvalidDestinationException
-     * @throws InvalidMessageException
-     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
@@ -1926,6 +1816,9 @@ class Controller extends Base
      *
      * @param QuizDomainObject $assessment
      * @return void
+     * @throws Exception
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function postPollQuizStatus(QuizDomainObject $assessment): void
     {
@@ -1966,9 +1859,16 @@ class Controller extends Base
      * @since 23.1
      *
      * @param QuizDomainObject $assessment
-     * @param User             $student
-     * @param Model            $attempt
+     * @param User $student
+     * @param Model $attempt
      * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postPollQuizAttemptStatus(
         QuizDomainObject $assessment,
@@ -1985,7 +1885,7 @@ class Controller extends Base
         $responseCode = match ($status) {
             Helper::LEARNOSITY_PROCESS_STATUS_COMPLETED => 200,
             Helper::LEARNOSITY_PROCESS_STATUS_PENDING, Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING => 202,
-            // including failure
+                // including failure
             default => 400,
         };
         $this->response = $this

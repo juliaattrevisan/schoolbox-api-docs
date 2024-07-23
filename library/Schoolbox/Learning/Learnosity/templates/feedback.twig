@@ -1,19 +1,18 @@
 {##
  # Give feedback for an attempt
  #
- # @param object student                     The student's data
+ # @param User           $student            The student's data
  # @param string|array   $reportInitOptions  Learnosity API initialisation object
- # @param IAssessable    $assessment         Our schoolbgox quiz instance
- # @param array          $breadcrumbs        A context trail at the top of the screeen
  # @param IAssessable    $assessment         Our schoolbox quiz instance
+ # @param array          $breadcrumbs        A context trail at the top of the screeen
  # @param Attempt\Model  $attempt            The student's attempt from our local db
  # @param string         $itemResponses      A base64_encoded set of (student id, comment, scores) tuples that contain per-question comments and scores
- # @param string         $attemptComment     The overall comment for the attempt
- # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
+ # @param string         $attemptResponse    The overall response for the attempt
  # @param object         $urls               A list of (student id, attempt comment, comment, score) endpoint tuples which tell us each user's persistence urls, indexed by user id
  #
  # These are needed for Submission States
  # @param Participant/Model $participant     The student who did the attempt
+ # @param Attempt\Model     $feedback        The student's attempt from our local db
  # @param float             $maxMarks        Maximum available marks in this attempt
  # @param array             $errors          A list of submission states that can be chosen
  #}
@@ -23,6 +22,7 @@
 <script src="https://reports-au.learnosity.com/?v{{ config.learnosity_version }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/learnosity.css?v={{ config.site_version }}" />
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
 
 <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
     <h1>Feedback for {{ assessment.title }}</h1>
@@ -31,14 +31,33 @@
             :student="{{ student|json_encode }}"
             :report-init-options="{{ reportInitOptions }}"
             :item-responses="{{ itemResponses|json_encode }}"
-            :attempt-comment="{{ attemptComment|json_encode }}"
+            :attempt-response="{{ attemptResponse|json_encode }}"
             :is-read-only="false"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="true"
             :urls="{{ urls|json_encode }}"
-            post-feedback="{{ routeLookupIfAuthorized('learnosity.postFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: attempt.user.id, learnositySessionReference: attempt.learnosityReference}) }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
         />
     </div>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/quizFeedback.js?v={{ config.site_version }}"></script>
+
+{##
+The grade below is inserted into the quiz-feedback Vue DOM structure then displayed
+#}
+<div id="grade-container-{{ participant.user.id }}" class="hide">
+    <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+        <label>{{ locale.grades.proper }}
+            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                assessment:  assessment,
+                participant: participant,
+                feedback:    feedback,
+                markScheme:  assessment.markScheme,
+                limit:       maxMarks,
+                tabIndex:    1,
+                errors:      errors,
+                readonly:    false,
+            } only %}
+        </label>
+    </form>
+</div>

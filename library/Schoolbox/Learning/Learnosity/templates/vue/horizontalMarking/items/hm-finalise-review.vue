@@ -4,6 +4,8 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
@@ -33,20 +35,42 @@ window.Vue.watch(
         } else {
             modalEl.value?.close();
         }
-    }
+    },
 );
 
 /**
  * To mark all attempts as reviewed
+ * @param {Student} student - the student to mark
  * @returns {FormData} - the data to send through
  */
-function getFormData() {
+function getFormData(student: Student) {
     const formData = new FormData();
-    // add the reference for each attempt
-    studentsStore.students.forEach((student) => {
-        formData.append("learnosityReferences[]", student.attemptComment.learnosityReference);
-    });
+    formData.append("responseId", student.attemptResponse?.responseId ?? "");
+    formData.append("maxMarks", student.attemptResponse?.maxMarks?.toString() ?? "");
+    formData.append("mark", student.attemptResponse?.mark ?? "");
+    formData.append("comment", student.attemptResponse?.comment ?? "");
+    formData.append("publish", "1");
     return formData;
+}
+
+/**
+ * Get the list of all students to post feedback for
+ * @returns {Promise<string>[]} - the list of fetches to make
+ */
+function getFetches() {
+    const fetchList: Promise<Response>[] = [];
+    studentsStore.students.forEach((student) => {
+        fetchList.push(
+            fetch(`${student.urls?.postFinaliseAttempt}`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                },
+                body: getFormData(student),
+            }),
+        );
+    });
+    return fetchList;
 }
 
 /**
@@ -54,16 +78,27 @@ function getFormData() {
  */
 async function submitFeedback() {
     isFinalising.value = true;
+    activate("Finalising review...");
     try {
-        await fetch(`${store.postFeedback}`, {
-            method: "POST",
-            body: getFormData(),
-        });
+        const feedbacks = await Promise.all(getFetches());
+        const responses = feedbacks.map((response) => response.ok);
+        const isAllResponsesOk = responses.every((response) => response === true);
+        if (isAllResponsesOk) {
+            window.location.href = store.statusPage;
+            timeout({ text: "Review successfully finalised" });
+        } else {
+            timeout({
+                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                isSuccess: false,
+            });
+        }
     } catch (error) {
-        console.error(error);
+        timeout({
+            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            isSuccess: false,
+        });
     } finally {
         isFinalising.value = false;
-        window.location.href = store.statusPage;
     }
 }
 

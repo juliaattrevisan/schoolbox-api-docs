@@ -152,10 +152,6 @@ class Module extends BaseModule
          */
         $this->register('GET', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'getFeedback', $instructorPerms, $preloadAttemptForReview);
 
-        /* Persist feedback to a student's attempt
-         */
-        $this->register('POST', '/{assessmentId}/feedback/{studentId}/{learnositySessionReference}', 'postFeedback', $instructorPerms, $preloadAttemptForReview);
-
         /* Start horizontal marking using a Learnosity Report
          */
         $this->register('GET', '/{assessmentId}/horizontal', 'getHorizontalMarking', $instructorPerms, $preloadAssessment);
@@ -164,24 +160,46 @@ class Module extends BaseModule
          */
         $this->register('POST', '/{assessmentId}/horizontal', 'postHorizontalMarking', $instructorPerms, $preloadAssessment);
 
-        /* Provide updated score for a particular student response
+        /* Each part of the process where teacher provides feedback now has granular endpoints
+         * There's a unique endpoint for:
+         *     - updating the score for a particular Question
+         *     - updating the comment for a particular Item
+         *     - updating the overall comment for a particular Attempt
+         *     - updating the overall score for a particular Attempt
+         *
+         * The conversion to vue for horizontal marking meant all these vue components became
+         * really granular and ended up having their own behaviours. A full synchronous endpoint
+         * is no longer required, which is what postFeedback() used to be.
+         */
+
+        /* Provide updated score for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/question/{learnositySessionReference}/score', 'postFeedbackScore', $instructorPerms, $preloadAttemptForReview);
 
-        /* Provide updated comment for a particular student response
+        /* Provide updated comment for a particular student response to a particular question
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/item/{learnositySessionReference}/comment', 'postFeedbackComment', $instructorPerms, $preloadAttemptForReview);
 
-        /* Provide updated comment for a particular student attempt
+        /* Provide updated overall attempt score for a particular student attempt
          * (used predominantly in horizontal marking)
          */
-        $this->register('POST', '/{assessmentId}/horizontal/{studentId}/feedback/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/attempt/{learnositySessionReference}/attempt-score', 'postFeedbackAttemptScore', $instructorPerms, $preloadAttemptForReview);
 
-        /* Archive a set of reference identifiers in Learnosity
+        /* Provide updated overall attempt comment for a particular student attempt
+         * (used predominantly in horizontal marking)
          */
-        $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
+        $this->register('POST', '/{assessmentId}/feedback/{studentId}/attempt/{learnositySessionReference}/attempt-comment', 'postFeedbackAttemptComment', $instructorPerms, $preloadAttemptForReview);
+
+        /* polld endpoints: these exist to combat learnosity's universally asynchronous nature.
+         *
+         * Sometimes learnosity misinforms you because it hasn't finished some asynchronous task.
+         * You have to keep asking it if it's finished processing whatever it's doing before
+         * telling users the outcome.
+         *
+         * They won't tell you unless you've asked. And you have to ask a lot.
+         */
 
         // Async callback for copying contents from one quiz to another
         $this->register(
@@ -221,12 +239,19 @@ class Module extends BaseModule
         /* CSV Export of students' most recent response
          */
         $this->register('GET', '/{assessmentId}/attempts/csv', 'getExportAttempts', $instructorPerms, $preloadAssessment);
+        /* TODO: Miscellaneous endpoints that we can probably look at culling soon
+         *  These were originally early explorations in how their api worked.
+         */
 
         /* Older exploratory urls that aren't part of our conventional workflow
          */
         $this->register('GET', '/activityList', 'getActivityList', $instructorPerms, null);
         $this->register('GET', '/items', 'getItems', $instructorPerms, null);
         $this->register('GET', '/sessionList', 'getSessionListReport', $instructorPerms, null);
+
+        /* Archive a set of reference identifiers in Learnosity
+         */
+        $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
     }
 
 

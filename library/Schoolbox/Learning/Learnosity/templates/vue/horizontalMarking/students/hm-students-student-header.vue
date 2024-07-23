@@ -49,9 +49,7 @@ function onToggleSelected() {
                 </div>
             </div>
             <h2>
-                <a :href="props.student.urls?.teacherFeedback" title="View students response">{{
-                    props.student.name
-                }}</a>
+                <a :href="props.student.urls?.getFeedback" title="View students response">{{ props.student.name }}</a>
             </h2>
         </div>
         <div v-if="props.student.isReportLoaded">
@@ -59,7 +57,7 @@ function onToggleSelected() {
                 v-for="item in props.student.items"
                 :key="item.reference"
                 :item="item"
-                :container="(container as HTMLElement)"
+                :container="container as HTMLElement"
                 :is-shown="item.reference === itemsStore.activeItem.reference"
                 :show-title="false"
             />

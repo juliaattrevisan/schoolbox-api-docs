@@ -227,6 +227,13 @@
                 participantId = $participant.data("participant"),
                 commentBoxId = "comment-" + participantId;
 
+            /**
+             * Hide the publish button once the feedback has been published
+             */
+            if (config.isQuiz) {
+                $btnPublish.hide();
+            }
+
             /* Force blur in case you directly go from fiddling with the mark
              * straight to the publish
              */
@@ -246,6 +253,15 @@
                 resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop("checked");
             formData.push({ name: "publish", value: 1 });
 
+            /**
+             * Save the form data in the participant element, so we can compare it later to see
+             * if it has changed before showing the publish button again
+             */
+            if (config.isQuiz) {
+                const formDataString = $form.serialize();
+                $participant.attr("data-form-data", formDataString);
+            }
+
             config.onPrePublishCallback(participantId, formData);
 
             $.ajax($form.attr("action"), {
@@ -258,11 +274,15 @@
                     if ($actionBar.find("[data-feedback-attach-info]").length) {
                         $btnPublish.text(config.publishText).addClass("hide");
                         $btnDrafted.text("");
-                    } else {
+                        // Don't close the action bar if it contains the 'Review Attempt' button
+                    } else if ($actionBar.find("[data-interaction-review]").length === 0) {
                         $actionBar.slideUp(function () {
                             $btnPublish.text(config.publishText);
                             $btnDrafted.text("");
                         });
+                    } else {
+                        $btnPublish.text(config.publishText);
+                        $btnDrafted.text("");
                     }
 
                     // Update this participant's status:
@@ -319,9 +339,14 @@
             if (config.isQuiz) {
                 const $participant = findParticipantElement($input);
                 const $actionBar = $participant.find("[data-action-bar]");
-                $actionBar.slideDown();
-                const $btnPublish = $actionBar.find("[data-draft=publish]");
-                $btnPublish.removeAttr("disabled");
+                const $form = $participant.find("[data-feedback-form]");
+                // Ony show the action bar if the form data has changed,
+                if ($form.serialize() !== $participant.attr("data-form-data")) {
+                    $actionBar.slideDown();
+                    const $btnPublish = $actionBar.find("[data-draft=publish]");
+                    $btnPublish.removeAttr("disabled");
+                    $btnPublish.fadeIn(300);
+                }
                 return;
             }
 

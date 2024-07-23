@@ -1,0 +1,208 @@
+<script setup lang="ts">
+/**
+ * To provide a final mark response for a student
+ */
+
+import { watchDebounced } from "@vueuse/core";
+import { timeout } from "@js/util/jsUtils";
+import type { Student } from "@schoolboxLearnosity/js/types/Student";
+
+interface Props {
+    student: Student; // the student to display
+    isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
+}
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    updatedMark: [mark: string];
+}>();
+
+const gradeEl = window.Vue.ref<HTMLDivElement | null>(null);
+const mark = window.Vue.ref(props.student.attemptResponse.mark ?? "");
+const isSaving = window.Vue.ref(false);
+const hasSaved = window.Vue.ref(false);
+const hasError = window.Vue.ref(false);
+
+/**
+ * Here we retrieve the current mark by observing the input field
+ * As the input and validation are handled outside of Vue,
+ * we need to observe the input field to update the mark
+ * @param {HTMLElement} gradeContainer - the container to get the mark from
+ */
+function getMark(gradeContainer: HTMLElement) {
+    const input = gradeContainer.querySelector("input");
+    if (input !== null) {
+        mark.value = input.value;
+        emit("updatedMark", mark.value); // emit the initial value, as it's not currently returned in the initial payload
+        // we need to observe the input value to update the mark when it changes
+        const observer = new MutationObserver(() => {
+            if (input.getAttribute("aria-invalid") === "true") {
+                // ignore if the input is invalid
+                return;
+            }
+            mark.value = input.value; // if it's valid, update the mark
+        });
+        observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
+    }
+}
+
+/**
+ * The grade field utilises a considerable pre-existing twig/JS structure that we can't easily replicate in Vue,
+ * see for example: library/Schoolbox/Learning/MarkScheme/templates/TotalMarkFractional.twig.
+ * Rather than trying to rewrite the whole thing for a Vue context, we just store the grade field outside of Vue,
+ * and then append it into the Vue component when it's mounted.
+ */
+function getGradeContainer() {
+    const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
+    if (gradeContainer !== null) {
+        gradeEl.value?.append(gradeContainer);
+        gradeContainer.classList.remove("hide"); // now remove the hide class to show the grade
+        const form = gradeContainer.querySelector("form") as HTMLFormElement;
+        form.style.marginBottom = "0"; // override the default margin so the save container is flush with the grade field
+        getMark(gradeContainer);
+    }
+}
+
+/**
+ * To notify of the current save status
+ * @returns {string} - the text to display
+ */
+const saveText = window.Vue.computed(() => {
+    if (isSaving.value) {
+        return "Saving...";
+    }
+    if (hasError.value) {
+        return "Grade could not be saved";
+    }
+    return "Grade saved";
+});
+
+/**
+ * To open and close the save status
+ * @returns {string} - the grid-template-rows
+ */
+const saveContainerHeight = window.Vue.computed(() => {
+    if (isSaving.value || hasSaved.value || hasError.value) {
+        return "1fr";
+    }
+    return "0fr";
+});
+
+/**
+ * To notify the user that they're leaving the page while data is being saved
+ * @param {BeforeUnloadEvent} event - the event to prevent
+ */
+function beforeUnloadHandler(event: BeforeUnloadEvent) {
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+/**
+ * Save the mark if it's changed
+ */
+async function saveMark() {
+    if (isSaving.value) {
+        return;
+    }
+    if (mark.value === props.student.attemptResponse.mark) {
+        return;
+    }
+    if (props.student.urls === undefined) {
+        return;
+    }
+    emit("updatedMark", mark.value);
+    try {
+        isSaving.value = true;
+        window.addEventListener("beforeunload", beforeUnloadHandler);
+        const formData = new FormData();
+        formData.append("mark", mark.value);
+        const response = await fetch(props.student.urls.postFeedbackAttemptScore, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            hasSaved.value = true;
+        } else {
+            hasError.value = true;
+        }
+        window.removeEventListener("beforeunload", beforeUnloadHandler);
+        isSaving.value = false;
+    } catch (error) {
+        hasError.value = true;
+    }
+    await timeout(2000);
+    hasSaved.value = false;
+    hasError.value = false;
+}
+
+/**
+ * save the mark when it's changed
+ */
+watchDebounced(
+    mark,
+    () => {
+        void saveMark();
+    },
+    { debounce: 300 },
+);
+
+/**
+ * To add the grade field in
+ */
+window.Vue.onMounted(async () => {
+    if (props.isReadOnly) {
+        return;
+    }
+    await window.Vue.nextTick();
+    getGradeContainer();
+});
+
+/**
+ * Save any unsaved changes
+ */
+window.Vue.onUnmounted(async () => {
+    if (props.isReadOnly) {
+        return;
+    }
+    await saveMark();
+});
+</script>
+
+<template>
+    <div
+        v-if="
+            (props.isReadOnly && props.student.attemptResponse.mark === null) ||
+            (props.isReadOnly && props.student.attemptResponse.mark === '')
+        "
+        class="l-flex-col l-gap-s"
+    >
+        <label>Grade</label>
+        <p>
+            <em>No grade added.</em>
+        </p>
+    </div>
+    <div v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''" class="l-flex-col l-gap-s">
+        <label>Grade</label>
+        <p>{{ props.student.attemptResponse.mark }}</p>
+    </div>
+    <div v-else class="grade-container">
+        <div ref="gradeEl"></div>
+        <div class="save-container l-grid">
+            <div class="save-container__inner-container">
+                <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
+                    <em>{{ saveText }}</em>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+.save-container {
+    grid-template-rows: v-bind(saveContainerHeight);
+    transition: grid-template-rows 300ms;
+    &__inner-container {
+        overflow: hidden;
+    }
+}
+</style>

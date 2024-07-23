@@ -5,7 +5,7 @@
 
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 import HmStudentsStudentHeader from "./hm-students-student-header.vue";
@@ -42,7 +42,7 @@ window.Vue.watch(
         } else if (!showReviewedAttempts && props.student.isReviewed) {
             await slideUp(studentEl.value as HTMLElement);
         }
-    }
+    },
 );
 
 /**
@@ -53,7 +53,7 @@ window.Vue.watch(
     async () => {
         onToggleSelected();
         await window.Vue.nextTick();
-    }
+    },
 );
 
 /**
@@ -67,7 +67,7 @@ window.Vue.watch(
         } else {
             await slideUp(responseEl.value as HTMLElement);
         }
-    }
+    },
 );
 
 /**
@@ -77,13 +77,21 @@ window.Vue.watch(
 function onAttemptCommentUpdated(comment: string) {
     studentsStore.updateAttemptComment(props.student, comment);
 }
+
+/**
+ * To notify of a change in the mark
+ * @param {string} mark - the mark to save
+ */
+function onAttemptMarkUpdated(mark: string) {
+    studentsStore.updateAttemptMark(props.student, mark);
+}
 </script>
 
 <template>
     <div ref="studentEl" class="student c-island l-flex-col l-gap-m">
         <hm-students-student-header
             :student="props.student"
-            :container="(responseContentEl as HTMLElement)"
+            :container="responseContentEl as HTMLElement"
             @toggle="onToggleSelected"
         />
         <div ref="responseEl" class="">
@@ -97,13 +105,14 @@ function onAttemptCommentUpdated(comment: string) {
                     :key="item.reference"
                     :student="props.student"
                     :item="item"
-                    :container="(responseContentEl as HTMLElement)"
+                    :container="responseContentEl as HTMLElement"
                 />
-                <student-attempt-comment
+                <student-attempt-response
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
                     :is-read-only="false"
                     @updated-comment="onAttemptCommentUpdated"
+                    @updated-mark="onAttemptMarkUpdated"
                 />
                 <hm-students-student-unavailable-item :student="props.student" />
             </template>

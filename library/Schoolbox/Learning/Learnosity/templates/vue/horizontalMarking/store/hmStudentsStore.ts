@@ -7,7 +7,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import type { StudentItemQuestion } from "@schoolboxLearnosity/js/types/StudentItemQuestion";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
-import type { StudentAttemptComment } from "@schoolboxLearnosity/js/types/StudentAttemptComment";
+import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import {
     getItemQuestions,
@@ -24,7 +24,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     const students = window.Vue.ref<Student[]>([]);
     const isExpanded = window.Vue.ref<boolean>(true); // if all students are expanded
     const itemResponses = window.Vue.ref<StudentItemQuestionResponse[]>([]); // all item responses from the backend
-    const attemptComments = window.Vue.ref<StudentAttemptComment[]>([]); // all attempt comments from the backend
+    const attemptResponses = window.Vue.ref<StudentAttemptResponse[]>([]); // all attempt comments from the backend
     const urls = window.Vue.ref<StudentUrls[]>([]); // the urls for each student to save score, comment and attempt comment
     const showReviewedAttempts = window.Vue.ref<boolean>(true); // if true, show attempts that have been reviewed
     const allStudentsMarked = window.Vue.computed(() => students.value.every((student) => student.isMarked)); // if true, all students have been marked
@@ -35,14 +35,14 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * store any passed through properties
      * @param {object} $students - the students
      * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptComment[]} $attemptComments - the attempt responses
+     * @param {StudentAttemptResponse[]} $attemptResponses - the attempt responses
      * @param {StudentUrls[]} $urls - the urls
      */
     function init(
         $students: Student[],
         $itemResponses: StudentItemQuestionResponse[],
-        $attemptComments: StudentAttemptComment[],
-        $urls: StudentUrls[]
+        $attemptResponses: StudentAttemptResponse[],
+        $urls: StudentUrls[],
     ) {
         $students.forEach((student) => {
             students.value.push({
@@ -53,7 +53,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
             });
         });
         itemResponses.value = $itemResponses;
-        attemptComments.value = $attemptComments;
+        attemptResponses.value = $attemptResponses;
         urls.value = $urls;
     }
 
@@ -83,7 +83,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 item.isMarked = getItemIsMarked(item);
             });
             student.isMarked = getStudentIsMarked(student);
-            student.attemptComment = getAttemptResponse(attemptComments.value, student.id);
+            student.attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
             student.urls = getUrls(urls.value, student.id);
         }
     }
@@ -164,7 +164,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         student: Student,
         item: StudentItem,
         question: StudentItemQuestion,
-        score: number
+        score: number,
     ) {
         (question.response as StudentItemQuestionResponse).score = score;
         (question.response as StudentItemQuestionResponse).isMarked = true;
@@ -182,7 +182,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(
-            ($question) => ($question.response as StudentItemQuestionResponse)?.maxScore === null
+            ($question) => ($question.response as StudentItemQuestionResponse)?.maxScore === null,
         );
         questionsWithoutMaxScore.forEach(($question) => {
             ($question.response as StudentItemQuestionResponse).isMarked = true;
@@ -196,7 +196,16 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * @param {string} comment - the comment to update
      */
     function updateAttemptComment(student: Student, comment: string) {
-        student.attemptComment.comment = comment;
+        student.attemptResponse.comment = comment;
+    }
+
+    /**
+     * To update the overall mark response to an attempt
+     * @param {Student} $student - the student to update
+     * @param {string} mark - the mark to update
+     */
+    function updateAttemptMark($student: Student, mark: string) {
+        $student.attemptResponse.mark = mark;
     }
 
     return {
@@ -213,5 +222,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         updateItemResponseScore,
         updateItemComment,
         updateAttemptComment,
+        updateAttemptMark,
     };
 });

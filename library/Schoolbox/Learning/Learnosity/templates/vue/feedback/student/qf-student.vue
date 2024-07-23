@@ -3,7 +3,7 @@
  * Display a single student's responses
  */
 
-import StudentAttemptComment from "@schoolboxLearnosity/vue/student/student-attempt-comment.vue";
+import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
@@ -26,6 +26,14 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
  */
 function onAttemptCommentUpdated(comment: string) {
     useStudentStore().updateAttemptComment(props.student, comment);
+}
+
+/**
+ * To notify of a change in the mark
+ * @param {string} mark - the mark to save
+ */
+function onAttemptMarkUpdated(mark: string) {
+    useStudentStore().updateAttemptMark(props.student, mark);
 }
 </script>
 
@@ -50,7 +58,7 @@ function onAttemptCommentUpdated(comment: string) {
                         :key="item.reference"
                         :student="props.student"
                         :item="item"
-                        :container="(responseContentEl as HTMLDivElement)"
+                        :container="responseContentEl as HTMLDivElement"
                     />
                     <qf-student-all-marked />
                 </div>
@@ -59,11 +67,12 @@ function onAttemptCommentUpdated(comment: string) {
                 v-if="store.hasMarkVisibility && (props.student.isReviewed || !store.isReadOnly)"
                 class="l-flex-col l-gap-s"
             >
-                <h2 class="subheader f-no-margins">Overall Comment</h2>
-                <student-attempt-comment
+                <h2 class="subheader f-no-margins">Overall Feedback</h2>
+                <student-attempt-response
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
                     @updated-comment="onAttemptCommentUpdated"
+                    @updated-mark="onAttemptMarkUpdated"
                 />
             </div>
         </template>

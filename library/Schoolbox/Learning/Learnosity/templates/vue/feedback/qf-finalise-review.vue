@@ -4,7 +4,7 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import { getItemScore } from "@schoolboxLearnosity/js/util/markingUtils";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 
@@ -45,7 +45,7 @@ window.Vue.watch(
         } else {
             modalEl.value?.close();
         }
-    }
+    },
 );
 
 /**
@@ -54,12 +54,11 @@ window.Vue.watch(
  */
 function getFormData() {
     const formData = new FormData();
-    // run through all the items and add the total score and comment for each item
-    studentStore.student.items.forEach((item) => {
-        formData.append(`scores[${item.reference}]`, getItemScore(item).toString());
-        formData.append(`comment[${item.reference}]`, item.questions[0].response?.comment ?? "");
-    });
-    formData.append(`attempt-comment`, studentStore.student.attemptComment.comment ?? ""); //
+    formData.append("responseId", studentStore.student.attemptResponse?.responseId ?? "");
+    formData.append("maxMarks", studentStore.student.attemptResponse?.maxMarks?.toString() ?? "");
+    formData.append("mark", studentStore.student.attemptResponse?.mark ?? "");
+    formData.append("comment", studentStore.student.attemptResponse?.comment ?? "");
+    formData.append("publish", "1");
     return formData;
 }
 
@@ -68,16 +67,31 @@ function getFormData() {
  */
 async function submitFeedback() {
     isFinalising.value = true;
+    activate("Finalising review...");
     try {
-        await fetch(`${store.postFeedback}`, {
+        const response = await fetch(`${studentStore.student.urls?.postFinaliseAttempt}`, {
             method: "POST",
+            headers: {
+                Accept: "application/json",
+            },
             body: getFormData(),
         });
+        if (response.ok) {
+            window.location.href = store.statusPage;
+            timeout({ text: "Review successfully finalised" });
+        } else {
+            timeout({
+                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                isSuccess: false,
+            });
+        }
     } catch (error) {
-        console.error(error);
+        timeout({
+            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            isSuccess: false,
+        });
     } finally {
         isFinalising.value = false;
-        window.location.href = store.statusPage;
     }
 }
 

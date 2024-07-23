@@ -4,8 +4,10 @@
  */
 export type StudentUrls = {
     studentId: number;
-    score: string;
-    comment: string;
-    attemptComment: string;
-    teacherFeedback: string;
+    postFeedbackScore: string; // the url to update the individual score of an question
+    postFeedbackComment: string; // the url to update the individual comment of an question
+    postFeedbackAttemptComment: string; // the url to update the overall attempt comment
+    postFeedbackAttemptScore: string; // the url to update the overall attempt score (to override the calculated score, with a new mark, or 'Absent' for example)
+    getFeedback: string; // the url to view an individual student attempt, used within horizontal marking
+    postFinaliseAttempt: string; // to confirm the attempt is finalised
 };
