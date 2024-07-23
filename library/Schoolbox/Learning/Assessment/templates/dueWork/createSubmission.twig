@@ -381,30 +381,6 @@ Data:
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 
-                {% if config.kami_worksheets_enabled and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
-                    <div class="row">
-                        <div class="small-12 island">
-                            <div class="content">
-                                {% if kamiSession %}
-                                    {% include 'sub/iframeResponsive.twig' with {
-                                        id: 'kami-viewport',
-                                        src: kamiSession.viewerUrl,
-                                        allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
-                                        dataAttributes: {}
-                                    } only %}
-                                {% else %}
-                                    {# if kami is enabled, and we have a worksheet, but no kami iframe, we should show some help text... #}
-                                    <div class="empty-state">
-                                        <i class="icon-submissions"></i>
-                                        <p>Worksheet is still uploading...</p>
-                                        <p>Please try again soon</p>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-
                 {% if not isSubmitOnBehalfOf %}
                     <div class="row">
                         <div class="small-12 columns">
@@ -420,6 +396,24 @@ Data:
                     <div class="small-12 island">
                         <section>
                             <div class="content">
+                                {# kami worksheet if exists, and enabled #}
+                                {% if config.kami_worksheets_enabled and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
+                                    {% if kamiSession %}
+                                        {% include 'sub/iframeResponsive.twig' with {
+                                            id: 'kami-viewport',
+                                            src: kamiSession.viewerUrl,
+                                            allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
+                                            dataAttributes: {}
+                                        } only %}
+                                    {% else %}
+                                        {# if kami is enabled, and we have a worksheet, but no kami iframe, we should show some help text... #}
+                                        <div class="empty-state">
+                                            <i class="icon-submissions"></i>
+                                            <p>Worksheet is still uploading...</p>
+                                            <p>Please try again soon</p>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
                                 {# Submitted my own work checkbox #}
                                 {% if assessment.getEnableOffline %}
                                 <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
