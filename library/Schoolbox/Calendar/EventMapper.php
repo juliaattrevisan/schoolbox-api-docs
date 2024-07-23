@@ -726,9 +726,10 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      */
     public function diff($objectA, $objectB = null, $keys = [0, 1])
     {
-        // need to explicitly load guests for previous copy of event
+        // need to explicitly load guests for previous copy of event,
+        // if not already loaded
         /** @var Event|null $objectB */
-        if ($objectB) {
+        if ($objectB && !$objectB->getGuests()) {
             $objectB = $this->populateGuests($objectB);
         }
         return parent::diff($objectA, $objectB, $keys);
