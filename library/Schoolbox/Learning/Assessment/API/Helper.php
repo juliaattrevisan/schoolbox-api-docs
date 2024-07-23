@@ -137,8 +137,6 @@ class Helper
                         ($row['assessmentType'] === 'dueWork') ? (bool)$row['commonAssessment'] : null
                     ),
                     'workType'         => (
-                        (null === $row['workTypeId']) ?
-                        null :
                         [
                             'name' => $row['workTypeName'],
                             'id'   => (int)$row['workTypeId']
@@ -325,12 +323,8 @@ class Helper
         }
         if (array_key_exists('workType', $filter)) {
             if (array_key_exists('id', $filter['workType'])) {
-                if (in_array($filter['workType']['id'], [null, 'null', ''])) {
-                    $where .= " AND assessment.work_type_id is null ";
-                } else {
-                    $where .= " AND assessment.work_type_id = :workTypeID ";
-                    $params['workTypeID'] = $filter['workType']['id'];
-                }
+                $where .= " AND assessment.work_type_id = :workTypeID ";
+                $params['workTypeID'] = $filter['workType']['id'];
             } elseif (array_key_exists('name', $filter['workType'])) {
                 $where .= " AND lu_work_type.name = :workTypeName ";
                 $params['workTypeName'] = $filter['workType']['name'];
