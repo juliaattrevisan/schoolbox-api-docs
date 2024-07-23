@@ -227,6 +227,13 @@
                 participantId = $participant.data("participant"),
                 commentBoxId = "comment-" + participantId;
 
+            /**
+             * Hide the publish button once the feedback has been published
+             */
+            if (config.isQuiz) {
+                $btnPublish.hide();
+            }
+
             /* Force blur in case you directly go from fiddling with the mark
              * straight to the publish
              */
@@ -245,6 +252,15 @@
             var formData = $form.serializeArray(),
                 resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop("checked");
             formData.push({ name: "publish", value: 1 });
+
+            /**
+             * Save the form data in the participant element, so we can compare it later to see
+             * if it has changed before showing the publish button again
+             */
+            if (config.isQuiz) {
+                const formDataString = $form.serialize();
+                $participant.attr("data-form-data", formDataString);
+            }
 
             config.onPrePublishCallback(participantId, formData);
 
@@ -322,7 +338,11 @@
                 $actionBar.slideDown();
                 const $btnPublish = $actionBar.find("[data-draft=publish]");
                 $btnPublish.removeAttr("disabled");
-                $btnPublish.fadeIn(300);
+                // Ony if the form data has changed, show the publish button
+                const $form = $participant.find("[data-feedback-form]");
+                if ($form.serialize() !== $participant.attr("data-form-data")) {
+                    $btnPublish.fadeIn(300);
+                }
                 return;
             }
 
