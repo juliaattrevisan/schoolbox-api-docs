@@ -261,6 +261,16 @@
         {# Only show if there's an existing learnosity attempt, otherwise we'll show when there's a change to grade/comment #}
         {% set actionStyle = latestResponse.learnosityReference ?? null ? 'display: block' : 'display: none' %}
 
+        {# The most recent feedback, supposedly #}
+        {% set latestFeedback = participant.findMostRecentInstructorGivenFeedback %}
+
+        {# Decide if the Save And Publish buton is visible #}
+        {% set publishStyle = 'display: none' %}
+
+        {% if (latestFeedback ?? null) and not latestFeedback.published %}
+            {% set publishStyle = 'display: block' %}
+        {% endif %}
+
         {# Mass/Bulk actions #}
         {% set massActions = '' %}
         {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
@@ -293,7 +303,7 @@
                 {% endif %}
 
                 {# You can always publish a new feedback...even if the student never attempted it #}
-                <a class="button" data-draft="publish" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
+                <a class="button" style="{{ publishStyle }}" data-draft="publish" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
             {% endset %}
         {% endapply %}
 
@@ -308,9 +318,6 @@
                  # defaulted hardcoded value of 100.
                  #}
                 {% set maxMarks = maxMarks[participant.user.id] ?? latestResponse.marksAvailable ?? null %}
-
-                {# The most recent feedback, supposedly #}
-                {% set latestFeedback = participant.findMostRecentInstructorGivenFeedback %}
 
                 <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
                 <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />

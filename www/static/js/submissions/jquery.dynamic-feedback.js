@@ -322,6 +322,7 @@
                 $actionBar.slideDown();
                 const $btnPublish = $actionBar.find("[data-draft=publish]");
                 $btnPublish.removeAttr("disabled");
+                $btnPublish.fadeIn(300);
                 return;
             }
 
