@@ -653,23 +653,29 @@
                         }
                     }
 
-                    {# When the same device is re-registered, Firebase will invalidate all old devices automatically.
-                     # Check if any users that aren't the current logged in user have (according to pwaConfig) previously been registered
-                     # and if so, invalidate their registration locally so we can re-register them when they next log in.
-                     #
-                     # NOTE: We should NOT send PWA_NOTIFICATION_DENY in this case, as it will de-register the current user too!
-                     #
-                     # We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
-                     # the schoolbox mobile app registration database. See firebase-init for more details about this scenario.
-                     #}
-                    for (const [userId, pwaUserConfig] of Object.entries(window.sbProps.pwaConfig.config.users)) {
-                        if (userId.toString() !== window.schoolboxUser.id.toString()) {
-                            pwaUserConfig.notificationState = null;
-                        }
-                    };
+                    if (window.schoolboxUser.impersonated) {
+                        {# If the user is impersonating another user, notification functionality is disabled #}
+                        {# Only show the message on the settings page #}
 
-                    {# if notifications have been disabled show prompt, and disable allow notif switch #}
-                    if ("Notification" in window) {
+                        document.querySelectorAll('[data-pwa-page="settings"] [data-pwa-notif="notifDisabledImpersonate"]').forEach((element) => {
+                            element.classList.remove('hide');
+                        });
+                    } else if ("Notification" in window) {
+                        {# When the same device is re-registered, Firebase will invalidate all old devices automatically.
+                         # Check if any users that aren't the current logged in user have (according to pwaConfig) previously been registered
+                         # and if so, invalidate their registration locally so we can re-register them when they next log in.
+                         #
+                         # NOTE: We should NOT send PWA_NOTIFICATION_DENY in this case, as it will de-register the current user too!
+                         #
+                         # We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
+                         # the schoolbox mobile app registration database. See firebase-init for more details about this scenario.
+                         #}
+                        for (const [userId, pwaUserConfig] of Object.entries(window.sbProps.pwaConfig.config.users)) {
+                            if (userId.toString() !== window.schoolboxUser.id.toString()) {
+                                pwaUserConfig.notificationState = null;
+                            }
+                        };
+
                         {# As Notification.permission cannot be trusted on iOS, we can use the PWA config to determine
                          # if we should avoid showing "Enable Notifications" again when the user has already enabled them
                          # If the browser is saying notifications are blocked, respect that, even though it may be wrong
