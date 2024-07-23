@@ -2010,7 +2010,7 @@ class Controller extends Assessment\Controller
                         'assessmentId' => $assessment->getId()
                     ])
                 ])->add([
-                    'Worksheet',
+                    'Class View',
                     ''
                 ]),
                 'assessment' => $assessment,
