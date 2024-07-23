@@ -395,7 +395,7 @@ Data:
                 <div class="row">
                     {# kami worksheet if exists, and enabled #}
                     {% if config.kami_worksheets_enabled and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
-                    <div class="small-12">
+                    <div class="small-12 island">
                         {% if kamiSession %}
                             {% include 'sub/iframeResponsive.twig' with {
                                 id: 'kami-viewport',
