@@ -116,21 +116,22 @@ window.Vue.onUnmounted(async () => {
 
 <template>
     <div class="l-flex__item--1-grow">
-        <template
+        <div
             v-if="
                 (props.isReadOnly && props.student.attemptResponse.comment === null) ||
                 (props.isReadOnly && props.student.attemptResponse.comment === '')
             "
+            class="l-flex-col l-gap-s"
         >
             <label>Comment</label>
             <p>
                 <em>No comment added.</em>
             </p>
-        </template>
-        <template v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''">
+        </div>
+        <div v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''" class="l-flex-col l-gap-s">
             <label>Comment</label>
             <p>{{ props.student.attemptResponse.comment }}</p>
-        </template>
+        </div>
         <template v-else>
             <label :for="editorId">Comment</label>
             <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>

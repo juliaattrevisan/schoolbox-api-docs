@@ -169,21 +169,22 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <template
+    <div
         v-if="
             (props.isReadOnly && props.student.attemptResponse.mark === null) ||
             (props.isReadOnly && props.student.attemptResponse.mark === '')
         "
+        class="l-flex-col l-gap-s"
     >
         <label>Grade</label>
         <p>
             <em>No grade added.</em>
         </p>
-    </template>
-    <template v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''">
+    </div>
+    <div v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''" class="l-flex-col l-gap-s">
         <label>Grade</label>
         <p>{{ props.student.attemptResponse.mark }}</p>
-    </template>
+    </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
         <div class="save-container l-grid">
