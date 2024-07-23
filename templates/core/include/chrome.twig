@@ -816,7 +816,10 @@
                                             }
                                         })
                                     }
-                                } else if (permission === 'denied') {
+                                } else {
+                                    // may be "denied" or "default", in the case of "default" - we should treat as "denied" as per
+                                    // https://developer.mozilla.org/en-US/docs/Web/API/Notification/requestPermission_static#return_value
+
                                     {% if config.debug_mode %}
                                     console.warn('Notification permission denied');
                                     {% endif %}
