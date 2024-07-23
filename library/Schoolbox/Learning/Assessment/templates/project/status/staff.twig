@@ -140,6 +140,7 @@ Data:
                         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
                         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set worksheetClassView = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessable.id, assessment: assessable}) %}
 
                         <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                             <div{% if hasActions %} class="actions-small-1"{% endif %}>
@@ -169,6 +170,11 @@ Data:
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                         {% if statusRoute and assessable.isImplementation %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
+                                            <li>
+                                                <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
+                                            </li>
+                                        {% endif %}
                                         {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
                                         {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
 
