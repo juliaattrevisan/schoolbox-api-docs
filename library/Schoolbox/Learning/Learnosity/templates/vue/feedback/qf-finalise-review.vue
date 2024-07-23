@@ -77,7 +77,6 @@ async function submitFeedback() {
             body: getFormData(),
         });
         if (response.ok) {
-            isFinalising.value = false;
             window.location.href = store.statusPage;
             timeout({ text: "Review successfully finalised" });
         } else {
@@ -91,6 +90,8 @@ async function submitFeedback() {
             text: "Review could not be finalised. Please contact your support if the problem persists.",
             isSuccess: false,
         });
+    } finally {
+        isFinalising.value = false;
     }
 }
 
