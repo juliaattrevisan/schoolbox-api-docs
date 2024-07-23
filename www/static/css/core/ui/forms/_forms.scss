@@ -798,6 +798,7 @@ input[type="radio"] {
         width: $toggle-width;
         text-align: center;
         transition: background-color 0.15s linear;
+        cursor: pointer;
 
         // Make sure elements inside the label don't hijack the label click
         * {
