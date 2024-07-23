@@ -18,6 +18,8 @@ use Alaress\Jitter\IJitter;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use DateTime;
+use DateTimeInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\MobileApp\ServiceManager;
@@ -157,7 +159,24 @@ class Scheduler extends AbstractScheduler implements IConsumer
             }
 
             // Otherwise add it to the timer
-            $wait = $this->jitter->calculateJitter($attemptNum);
+            $wait = -1;
+            if ($e->getRetryAfter()) {
+                // retry after should be after current time
+                $this->log->notice(
+                    sprintf(
+                        'Retry time of %s provided in rate limit exception: retrying then',
+                        $e->getRetryAfter()->format(DateTimeInterface::RFC3339),
+                    )
+                );
+                $wait = $e->getRetryAfter()->diff(new DateTime())->s * 1000;
+                if ($wait < 0) {
+                    $this->log->notice('Retry time before current time: using standard exponential backoff instead');
+                }
+            }
+
+            if ($wait < 0) {
+                $wait = $this->jitter->calculateJitter($attemptNum);
+            }
             $this->log->notice(
                 sprintf(
                     'Message delivery to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
