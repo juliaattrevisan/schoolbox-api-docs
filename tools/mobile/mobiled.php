@@ -61,7 +61,7 @@ SYNOPSIS:
 
 DESCRIPTION:
     Daemon for listening to requests to forward notifications to a mobile app or personal web app. This may use one of
-    the follwoing delivery mechanisms:
+    the following delivery mechanisms:
     * Apple Push Notification Service
     * Digistorm API
     * Firebase
