@@ -83,6 +83,7 @@ class Controller extends Base
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
             'assessmentTypes'    => Assessment\AssessmentType::getOptions(
+                $this->getDi()->get('l10n'),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
             ),
         ]);

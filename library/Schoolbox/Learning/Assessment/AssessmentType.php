@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
@@ -120,19 +121,23 @@ class AssessmentType implements IType
 
     /**
      * Returns the list of enabled assessment (activity) types
+     * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
+     * @param RosettaStone $rosettaStone
      * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
      * @return array<string, string>
      */
-    public static function getOptions(bool $ltiEnabled): array
-    {
+    public static function getOptions(
+        RosettaStone $rosettaStone,
+        bool $ltiEnabled
+    ): array {
         $list = [
-            self::TYPE_DUE_WORK        => DueWork::getDefaultTypeName(),
+            self::TYPE_DUE_WORK        => $rosettaStone->translate("dueWork", false, true),
             self::TYPE_QUIZ            => Quiz::getDefaultTypeName(),
             self::TYPE_TASK            => Task::getDefaultTypeName(),
-            self::TYPE_PROJECT         => Project::getDefaultTypeName(),
+            self::TYPE_PROJECT         => $rosettaStone->translate("project", false, true),
             self::TYPE_LTI_ASSESSMENT  => LtiAssessment::getDefaultTypeName(),
-            self::TYPE_LESSON_PLAN     => LessonPlan::getDefaultTypeName(),
+            self::TYPE_LESSON_PLAN     => $rosettaStone->translate("lessonPlan", false, true),
         ];
 
         // if LTI is not enabled then remove that entry

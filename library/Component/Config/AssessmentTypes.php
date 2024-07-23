@@ -20,15 +20,15 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     {
         $di = $page->getDi();
         $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
+        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($di->get('l10n'), $ltiEnabled);
 
-        // if config doesn't exist, then default to the get options...
-        if ('' === $configValue) {
-            $setConfig = Assessment\AssessmentType::getOptions($ltiEnabled);
-        } else {
-            $setConfig = json_decode(html_entity_decode($configValue), true);
-            // in the event of an error return the blank entries ...
-            if (null === $setConfig) {
-                $setConfig = Assessment\AssessmentType::getOptions($ltiEnabled);
+        // if config doesn't exist, then default to all options...
+        $setConfig = $assessmentTypeOptions;
+        if ($configValue !== '') {
+            $decodedConfig = json_decode(html_entity_decode($configValue), true);
+            // If the config is valid, use it instead of the default
+            if ($decodedConfig !== null) {
+                $setConfig = $decodedConfig;
             }
         }
 
@@ -37,7 +37,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $page->setVar('assessmenttypes_block', '');
 
         /* filter config */
-        foreach (Assessment\AssessmentType::getOptions($ltiEnabled) as $key => $filter) {
+        foreach ($assessmentTypeOptions as $key => $filter) {
             $page->setVar([
                               'COMPONENT_CONFIG_FILTER_VALUE'     => $key,
                               'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($filter),
