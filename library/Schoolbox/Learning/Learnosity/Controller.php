@@ -853,13 +853,13 @@ class Controller extends Base
      * @param IFeedback|null $feedback
      * @return array
      */
-    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, IFeedback|null $feedback): array
+    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, ?IFeedback $feedback): array
     {
         return  [
             'learnosityReference' => $attempt->getLearnosityReference(),
             'studentId' => $attempt->getUser()->getId(),
             'comment' => $attempt->getComment(),
-            'responseId' => $feedback ? $feedback->getId() : null,
+            'responseId' => $feedback?->getId(),
             'mark' => $attempt->getMark(),
             'maxMarks' => $attempt->getMaxMark(),
         ];
@@ -1136,7 +1136,7 @@ class Controller extends Base
         $sessions = [];
         $users = [];
         $reportPayloads = [];
-        $attemptComments = [];
+        $attemptResponses = [];
         $urls = [];
         $grading = [];
 
