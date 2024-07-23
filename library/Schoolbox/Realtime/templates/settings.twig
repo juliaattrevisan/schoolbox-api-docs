@@ -45,7 +45,7 @@
                     const $response = $.post(action, formdata)
                         .done(() => {
                             document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Setting successfully saved." }
+                                detail: { text: "Saved." }
                             }));
                         })
                         .fail(() => {
