@@ -1,2 +1,2 @@
--- Kami worksheets, are currently disabled by default, we will open this back up later
-UPDATE config SET value = '0' WHERE name = 'kami_worksheets_enabled';
+-- Kami worksheets, lets enable for all schools, so they can start testing
+UPDATE config SET value = '1' WHERE name = 'kami_worksheets_enabled';
