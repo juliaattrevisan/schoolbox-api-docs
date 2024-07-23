@@ -1995,11 +1995,17 @@ class Controller extends Assessment\Controller
             throw new MapperException\NotFound();
         }
         $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
-        $session = $this->kamiConnector->viewSessionForGroup(
-            $kamiGroup,
-            $this->getUser(),
-            true,
-        );
+        $session = null;
+        try {
+            $session = $this->kamiConnector->viewSessionForGroup(
+                $kamiGroup,
+                $this->getUser(),
+                true,
+            );
+        } catch (Kami\Exception\NotFound $e) {
+            // No kami group file yet, You will have to wait...
+            // noop
+        }
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/worksheet.twig',
             [
