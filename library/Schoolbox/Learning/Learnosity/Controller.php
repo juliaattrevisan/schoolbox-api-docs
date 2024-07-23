@@ -1146,13 +1146,18 @@ class Controller extends Base
             if (!isset($users[$key]) && $attempt->isFinished()) {
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
-                /* Find all the comments for this attempt (need it later)
+                /* Find this attempt's MapperProxy equivalent from something we already obtained
+                */
+                $feedback = $assessment->getParticipant($attempt->getUser())
+                    ->getAllFeedbacks()
+                    ->filter(static function ($model) use ($attempt) {
+                        return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
+                    })
+                    ->first();
+
+                /* Find all the responses for this attempt (need it later)
                  */
-                $attemptResponses[$attempt->getUser()->getId()] = [
-                    'learnosityReference' => $attempt->getLearnosityReference(),
-                    'studentId' => $attempt->getUser()->getId(),
-                    'comment' => $attempt->getComment()
-                ];
+                $attemptResponses[$attempt->getUser()->getId()] = $this->getAttemptResponse($attempt, $feedback);
 
                 /* ...because Learnosity wants it in this format
                  */
