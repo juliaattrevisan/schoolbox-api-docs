@@ -850,10 +850,10 @@ class Controller extends Base
      * Retrieve the response for this attempt
      *
      * @param Model $attempt
-     * @param IFeedback $feedback
+     * @param IFeedback|null $feedback
      * @return array
      */
-    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, IFeedback $feedback): array
+    private function getAttemptResponse(\Schoolbox\Learning\Quiz\Attempt\Model $attempt, IFeedback|null $feedback): array
     {
         return  [
             'learnosityReference' => $attempt->getLearnosityReference(),
