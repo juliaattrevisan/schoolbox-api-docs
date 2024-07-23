@@ -168,7 +168,8 @@ class Scheduler extends AbstractScheduler implements IConsumer
                         $e->getRetryAfter()->format(DateTimeInterface::RFC3339),
                     )
                 );
-                $wait = $e->getRetryAfter()->diff(new DateTime())->s * 1000;
+                $diff = $e->getRetryAfter()->diff(new DateTime());
+                $wait = ($diff->s + $diff->f) * 1000;
                 if ($wait < 0) {
                     $this->log->notice('Retry time before current time: using standard exponential backoff instead');
                 }
