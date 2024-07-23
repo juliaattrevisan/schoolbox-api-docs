@@ -2003,6 +2003,16 @@ class Controller extends Assessment\Controller
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dueWork/worksheet.twig',
             [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Worksheet',
+                    ''
+                ]),
                 'assessment' => $assessment,
                 'session'    => $session,
             ]
