@@ -274,11 +274,15 @@
                     if ($actionBar.find("[data-feedback-attach-info]").length) {
                         $btnPublish.text(config.publishText).addClass("hide");
                         $btnDrafted.text("");
-                    } else {
+                        // Don't close the action bar if it contains the 'Review Attempt' button
+                    } else if ($actionBar.find("[data-interaction-review]").length === 0) {
                         $actionBar.slideUp(function () {
                             $btnPublish.text(config.publishText);
                             $btnDrafted.text("");
                         });
+                    } else {
+                        $btnPublish.text(config.publishText);
+                        $btnDrafted.text("");
                     }
 
                     // Update this participant's status:
