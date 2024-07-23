@@ -44,7 +44,6 @@ window.Vue.watch(
  * @returns {FormData} - the data to send through
  */
 function getFormData(student: Student) {
-    debugger;
     const formData = new FormData();
     formData.append("responseId", student.attemptResponse?.responseId ?? "");
     formData.append("maxMarks", student.attemptResponse?.maxMarks?.toString() ?? "");

@@ -77,6 +77,14 @@ window.Vue.watch(
 function onAttemptCommentUpdated(comment: string) {
     studentsStore.updateAttemptComment(props.student, comment);
 }
+
+/**
+ * To notify of a change in the mark
+ * @param {string} mark - the mark to save
+ */
+function onAttemptMarkUpdated(mark: string) {
+    studentsStore.updateAttemptMark(props.student, mark);
+}
 </script>
 
 <template>
@@ -104,6 +112,7 @@ function onAttemptCommentUpdated(comment: string) {
                     :student="props.student"
                     :is-read-only="false"
                     @updated-comment="onAttemptCommentUpdated"
+                    @updated-mark="onAttemptMarkUpdated"
                 />
                 <hm-students-student-unavailable-item :student="props.student" />
             </template>

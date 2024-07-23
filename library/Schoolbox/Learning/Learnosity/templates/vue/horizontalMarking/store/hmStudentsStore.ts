@@ -199,6 +199,15 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         student.attemptResponse.comment = comment;
     }
 
+    /**
+     * To update the overall mark response to an attempt
+     * @param {Student} $student - the student to update
+     * @param {string} mark - the mark to update
+     */
+    function updateAttemptMark($student: Student, mark: string) {
+        $student.attemptResponse.mark = mark;
+    }
+
     return {
         init,
         addItems,
@@ -213,5 +222,6 @@ export const useStudentsStore = defineStore("hmStudents", () => {
         updateItemResponseScore,
         updateItemComment,
         updateAttemptComment,
+        updateAttemptMark,
     };
 });
