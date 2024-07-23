@@ -53,12 +53,14 @@
 
 <div class="row">
     <div class="small-12 island">
-        <section>
-            {% if session %}
-                {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl, allow: '', dataAttributes: {}} only %}
-            {% else %}
-                No student have started the Interactive Worksheet, Please try again soon...
-            {% endif %}
-        </section>
+        {% if session %}
+            {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl, allow: '', dataAttributes: {}} only %}
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-surveys"></i>
+                <p>No student have started the Interactive Worksheet</p>
+                <p>Please try again soon...</p>
+            </div>
+        {% endif %}
     </div>
 </div>
