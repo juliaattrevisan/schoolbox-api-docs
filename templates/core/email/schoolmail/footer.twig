@@ -5,18 +5,18 @@
             {# noop #}
         {% else %}
             <p>If you do not wish to receive these emails from {{ config.school_name }}, please
-                <a href="http://{{ config.fqdn }}/settings/messages">unsubscribe</a>.
+                <a href="https://{{ config.fqdn }}/settings/messages">unsubscribe</a>.
             </p>
         {% endif %}
 
         <p>
             &copy; {{ config.year }}
             <a href="{{ config.school_address }}">{{ config.school_name }}</a> |
-            <a href="http://{{ config.fqdn }}/policy">Guidelines of Use and Privacy Policy</a>
+            <a href="https://{{ config.fqdn }}/policy">Guidelines of Use and Privacy Policy</a>
 
             {% if config.feedback_url|trim is not empty and config.feedback_text|trim is not empty %}
                 {% if config.feedback_url_object.isRelativeUrl %}
-                    {% set feedback_url = 'http://' ~ config.fqdn ~ config.feedback_url|trim %}
+                    {% set feedback_url = 'https://' ~ config.fqdn ~ config.feedback_url|trim %}
                 {% else %}
                     {% set feedback_url = config.feedback_url|trim %}
                 {% endif %}
