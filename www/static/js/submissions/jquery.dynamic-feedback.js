@@ -339,12 +339,12 @@
             if (config.isQuiz) {
                 const $participant = findParticipantElement($input);
                 const $actionBar = $participant.find("[data-action-bar]");
-                $actionBar.slideDown();
-                const $btnPublish = $actionBar.find("[data-draft=publish]");
-                $btnPublish.removeAttr("disabled");
-                // Ony if the form data has changed, show the publish button
                 const $form = $participant.find("[data-feedback-form]");
+                // Ony show the action bar if the form data has changed,
                 if ($form.serialize() !== $participant.attr("data-form-data")) {
+                    $actionBar.slideDown();
+                    const $btnPublish = $actionBar.find("[data-draft=publish]");
+                    $btnPublish.removeAttr("disabled");
                     $btnPublish.fadeIn(300);
                 }
                 return;
