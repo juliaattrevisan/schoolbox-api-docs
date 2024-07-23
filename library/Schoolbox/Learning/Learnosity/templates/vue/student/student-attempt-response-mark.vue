@@ -150,6 +150,9 @@ watchDebounced(
  * To add the grade field in
  */
 window.Vue.onMounted(async () => {
+    if (props.isReadOnly) {
+        return;
+    }
     await window.Vue.nextTick();
     getGradeContainer();
 });
@@ -158,12 +161,30 @@ window.Vue.onMounted(async () => {
  * Save any unsaved changes
  */
 window.Vue.onUnmounted(async () => {
+    if (props.isReadOnly) {
+        return;
+    }
     await saveMark();
 });
 </script>
 
 <template>
-    <div class="grade-container">
+    <template
+        v-if="
+            (props.isReadOnly && props.student.attemptResponse.mark === null) ||
+            (props.isReadOnly && props.student.attemptResponse.mark === '')
+        "
+    >
+        <label>Grade</label>
+        <p>
+            <em>No grade added.</em>
+        </p>
+    </template>
+    <template v-else-if="props.isReadOnly && props.student.attemptResponse.mark !== ''">
+        <label>Grade</label>
+        <p>{{ props.student.attemptResponse.mark }}</p>
+    </template>
+    <div v-else class="grade-container">
         <div ref="gradeEl"></div>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
