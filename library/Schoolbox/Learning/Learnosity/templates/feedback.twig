@@ -36,8 +36,6 @@
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="true"
             :urls="{{ urls|json_encode }}"
-            max-marks="{{ maxMarks }}"
-            response-id="{{ feedback ? feedback.id : '' }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
         />
     </div>

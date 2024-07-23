@@ -10,27 +10,17 @@ export const useStore = defineStore("quizFeedback", () => {
     const isLoaded = window.Vue.ref<boolean>(false); // to show the loading spinner while the reports are loading
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
-    const maxMarks = window.Vue.ref<string>(""); // the maximum marks for the quiz
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
 
     /**
      * store any passed through properties
      * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
      * @param {boolean} $hasMarkVisibility - whether marks and feedback are visible to the user
-     * @param {string|undefined} $maxMarks - the maximum marks for the quiz
      * @param {string|undefined} $statusPage - the link to the status page
      */
-    function init(
-        $isReadOnly: boolean,
-        $hasMarkVisibility: boolean,
-        $maxMarks: string | undefined,
-        $statusPage: string | undefined,
-    ) {
+    function init($isReadOnly: boolean, $hasMarkVisibility: boolean, $statusPage: string | undefined) {
         isReadOnly.value = $isReadOnly;
         hasMarkVisibility.value = $hasMarkVisibility;
-        if ($maxMarks !== undefined) {
-            maxMarks.value = $maxMarks;
-        }
         if ($statusPage !== undefined) {
             statusPage.value = $statusPage;
         }
@@ -43,7 +33,6 @@ export const useStore = defineStore("quizFeedback", () => {
         init,
         isFinaliseReviewModalOpen,
         hasMarkVisibility,
-        maxMarks,
         statusPage,
     };
 });

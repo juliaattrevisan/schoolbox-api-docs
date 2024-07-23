@@ -55,7 +55,7 @@ window.Vue.watch(
 function getFormData() {
     const formData = new FormData();
     formData.append("responseId", studentStore.student.attemptResponse?.responseId ?? "");
-    formData.append("maxMarks", useStore().maxMarks ?? "");
+    formData.append("maxMarks", studentStore.student.attemptResponse?.maxMarks?.toString() ?? "");
     formData.append("mark", studentStore.student.attemptResponse?.mark ?? "");
     formData.append("comment", studentStore.student.attemptResponse?.comment ?? "");
     formData.append("publish", "1");

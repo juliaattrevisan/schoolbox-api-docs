@@ -860,6 +860,7 @@ class Controller extends Base
             'studentId' => $attempt->getUser()->getId(),
             'comment' => $attempt->getComment(),
             'responseId' => $feedback ? $feedback->getId() : null,
+            'maxMarks' => $attempt->getMaxMark(),
         ];
     }
 
