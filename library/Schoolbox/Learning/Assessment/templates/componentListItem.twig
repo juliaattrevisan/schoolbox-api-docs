@@ -11,6 +11,7 @@
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% set worksheetClassView = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessable.id, assessment: assessable}) %}
     {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
 {% endif %}
 
@@ -40,6 +41,11 @@
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}">View Status</a></li>{% endif %}
+                {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
+                    <li>
+                        <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
+                    </li>
+                {% endif %}
                 {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
 
                 {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}

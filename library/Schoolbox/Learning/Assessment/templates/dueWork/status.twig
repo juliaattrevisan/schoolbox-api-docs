@@ -28,7 +28,7 @@
     {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
     {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
         <li>
-            <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">View Worksheets</a>
+            <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
         </li>
     {% endif %}
     <li>

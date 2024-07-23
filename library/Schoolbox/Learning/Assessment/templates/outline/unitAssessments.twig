@@ -131,6 +131,11 @@
                         {% if hasAssessmentRoutes %}
                             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                            {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
+                                <li>
+                                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
+                                </li>
+                            {% endif %}
                             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
                             {%  if assessment is dueWork and assessment.useRubric %}
                                 <li>
@@ -150,11 +155,6 @@
                                 {% endif %}
                             {% endif %}
 
-                            {% if assessment is dueWork and assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
-                                <li>
-                                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">View Worksheets</a>
-                                </li>
-                            {% endif %}
                             {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
                         {% endif %}
                         {% if hasCourseRoutes %}
