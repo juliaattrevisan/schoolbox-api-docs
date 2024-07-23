@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Views;
 
+use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -24,23 +25,29 @@ class Model
     private int $assessmentId;
 
     /**
-     * Participant
+     * @var User The user whose work was viewed.
      */
+    private User $participant;
     private int $participantId;
 
-    private User $participant;
-
     /**
-     * User
+     * @var User The user who viewed the assessment.
      */
-    private User $userId;
     private User $user;
-//    private int $userId;
+    private User $userId;
 
     /**
-     * last Visit
+     * @var Alaress_Date_Format The time the view occurred.  Only the most recent view is stored.
      */
-    private \Alaress_Date_Format $last_visit;
+    private Alaress_Date_Format $lastVisit;
+
+    /**
+     * @var bool Feedback existed and was visible to the user at the time the assessment was viewed.
+     *           A mark counts as feedback, so this will be true if a mark existed, and the assessment's mark
+     *           visibility included the viewer's role type at the time the assessment was viewed.
+     *           @see /Learning/Assessment/Views/LatestView->addNewView().
+     */
+    private bool $feedbackWasVisible;
 
     /**
      * @return int
@@ -49,7 +56,6 @@ class Model
     {
         return $this->assessmentId;
     }
-
 
     /**
      * @param IAssessable $assessment
@@ -80,7 +86,6 @@ class Model
         return $this->participantId;
     }
 
-
     /**
      * @return User
      */
@@ -88,7 +93,6 @@ class Model
     {
         return $this->participant;
     }
-
 
     /**
      * @param User $participant
@@ -99,7 +103,6 @@ class Model
         $this->participant = $participant;
         return $this;
     }
-
 
     /**
      * @param int $participantId
@@ -148,22 +151,40 @@ class Model
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getLastVisit(): \Alaress_Date_Format
+    public function getLastVisit(): Alaress_Date_Format
     {
-        return $this->last_visit;
+        return $this->lastVisit;
     }
 
-
     /**
-     * @param \Alaress_Date_Format $last_visit
+     * @param Alaress_Date_Format $lastVisit
      * @return $this
      *
      */
-    public function setLastVisit(\Alaress_Date_Format $last_visit): self
+    public function setLastVisit(Alaress_Date_Format $lastVisit): self
     {
-        $this->last_visit = $last_visit;
+        $this->lastVisit = $lastVisit;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getFeedbackWasVisible(): bool
+    {
+        return $this->feedbackWasVisible;
+    }
+
+    /**
+     * @param bool $feedbackWasVisible
+     * @return $this
+     *
+     */
+    public function setFeedbackWasVisible(bool $feedbackWasVisible): self
+    {
+        $this->feedbackWasVisible = $feedbackWasVisible;
         return $this;
     }
 }

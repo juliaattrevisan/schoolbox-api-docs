@@ -236,6 +236,7 @@ class Controller extends Assessment\Controller
          * record view
          */
         $lastView = new Assessment\Views\LatestView(
+            $this->getAccess(),
             $this->latestViewMapper,
             new \Schoolbox\External\User(
                 $this->getConfigLoader()->get('external_type'),

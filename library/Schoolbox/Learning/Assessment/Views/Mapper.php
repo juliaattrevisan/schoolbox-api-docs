@@ -40,6 +40,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
 
         $this->uses('last_visit', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('feedback_was_visible', self::TYPE_BOOLEAN);
     }
 
 

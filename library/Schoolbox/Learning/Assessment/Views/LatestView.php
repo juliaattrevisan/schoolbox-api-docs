@@ -15,16 +15,18 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
 class LatestView
 {
     /**
      * Constructor
+     * @param Access $access
      * @param Mapper $mapper
      * @param \Schoolbox\External\User $externalUser
      */
-    public function __construct(private Mapper $mapper, private \Schoolbox\External\User $externalUser)
+    public function __construct(private Access $access, private Mapper $mapper, private \Schoolbox\External\User $externalUser)
     {
     }
 
@@ -59,10 +61,20 @@ class LatestView
                 ->setUser($user);
         }
 
+        $feedbackIsVisibleToUser = match ($assessment->getMarkVisibility()) {
+            IAssessable::MARK_VISIBILITY_PARENT_STUDENT => $user->isParentOf($participant),
+            IAssessable::MARK_VISIBILITY_STUDENT => $user->getRole()->isStudent(),
+            IAssessable::MARK_VISIBILITY_PRIVATE => (
+                // Note class instructors can see feedback on that class' assessments.
+                $user->getRole()->isStaff() || $this->access->isInstructor($user, $assessment->getContext()->getFolder())
+            ),
+            default => false
+        };
+
         /**
-         * update time to now
+         * Update last visit time to now, and set whether feedback was visible on this visit.
          */
-        $lastView->setLastVisit(\Alaress_Date_Format::now());
+        $lastView->setLastVisit(\Alaress_Date_Format::now())->setFeedbackWasVisible($feedbackIsVisibleToUser);
 
         /**
          * check if use is either that student or the parents, then save
@@ -134,19 +146,10 @@ class LatestView
          */
         $feedback = null;
         if (null !== $studentView) {
-            /**
-             * student has viewed the assessment
-             */
             $views['student']['status'] = 'has viewed';
+            $views['student']['date'] = $studentView->getLastVisit()->getLong();
 
-            $studentDate = $studentView->getLastVisit();
-            $views['student']['date'] = $studentDate->getLong();
-
-            $feedback = $participant->getAuthoritativeFeedback(true);
-            if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
-                /**
-                 * was the last student view after feedback?
-                 */
+            if ($studentView->getFeedbackWasVisible()) {
                 $views['student']['object'] = 'feedback';
             }
         }
@@ -173,14 +176,10 @@ class LatestView
             /** @var Model|null $parentView */
             $parentView = $lastViews->getOffset($parent->getId());
             if (null !== $parentView) {
-                $parentDate = $parentView->getLastVisit();
-                $view['date'] = $parentDate->getLong();
+                $view['date'] = $parentView->getLastVisit()->getLong();
                 $view['status'] = 'has viewed';
-                /**
-                 * check if view after feedback?
-                 */
-                if (null !== $feedback && $feedback->getPublishedAt() < $parentDate) {
-                    //parent viewed after feedback was published
+
+                if ($parentView->getFeedbackWasVisible()) {
                     $view['object'] = 'feedback';
                 }
             }
