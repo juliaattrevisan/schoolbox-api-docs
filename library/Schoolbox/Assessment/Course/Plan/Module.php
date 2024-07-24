@@ -46,6 +46,11 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        // Currently:
+        // non-staff members are allowed to view and edit the unit planner, if
+        // they have permission to view the course's homepage.
+        // It was discussed whether to allow non-staff or not, and it was
+        // decided to not arbitrarily block non-staff.
         $getCourse = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
