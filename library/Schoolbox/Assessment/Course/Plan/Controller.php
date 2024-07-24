@@ -624,22 +624,6 @@ class Controller extends Base
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $translatedTextbox           = $textboxTranslator->__invoke($this->textboxMapper->findById($row['textboxID']));
                 $textboxes[$normalisedTitle] = $translatedTextbox + ['inTemplate' => true];
-//                $textboxes[$normalisedTitle] = [
-//                    'id'         => $row['textboxID'],
-//                    'body'       => Scrub::html($row['textboxBody']),
-//                    'inTemplate' => true,
-//                    '_routes'    => [
-//                        'modify' => $this->getRouteIfAuthorized(
-//                            'textbox.updateTextbox',
-//                            [
-//                                'folderId' => $unitFolder->getId(),
-//                                'folder'   => $unitFolder,
-//                                'id'       => $row['textboxID'],
-//                                'textbox'  => (new Textbox\Model())->setId($row['textboxID']),
-//                            ],
-//                        ) ?: null
-//                    ],
-//                ];
             } else {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
