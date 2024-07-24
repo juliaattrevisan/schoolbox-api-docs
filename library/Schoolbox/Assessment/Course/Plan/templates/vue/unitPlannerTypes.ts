@@ -18,6 +18,9 @@ export type TextboxContent = {
     id: number;
     body: string;
     inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
+    _links: {
+        update: string | null;
+    };
 };
 
 /**
@@ -40,12 +43,28 @@ export type Unit = {
         items: Activity[];
     };
     curriculum: {
+        _routes: {
+            createComponent: string | null;
+            modifyCurriculum: string | null;
+        }
         selectedNodes: Node[]; // the individual nodes assigned to the folder
         nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
         components: CurriculumOverviewComponent[];
     };
-    rubricCapabilities: RubricCapability[];
-    textboxes: Record<string, TextboxContent>;
+    rubricCapabilities: {
+        _routes: {
+            manage: string | null;
+        };
+        items: RubricCapability[];
+    };
+    textboxes: {
+        _routes: {
+            createComponent: string | null;
+            createTextbox: string | null;
+        };
+        items: Record<string, TextboxContent>;
+    }
+
     extraTextboxes: number;
     sequence: number;
 };

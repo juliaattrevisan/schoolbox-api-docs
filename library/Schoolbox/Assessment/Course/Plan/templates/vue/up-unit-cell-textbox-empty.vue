@@ -20,7 +20,7 @@ const emit = defineEmits(["modifyClicked", "createClicked"]);
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].id || 0) >= 0;
 });
 
 const emptyStateTemplateMessage = window.Vue.computed(() => {
@@ -48,7 +48,7 @@ function onModifyClicked() {
 <template>
     <i class="icon-textbox"></i>
     <p v-if="emptyStateTemplateMessage">{{ emptyStateTemplateMessage }}</p>
-    <p>
+    <p v-if="props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox">
         <a @click.prevent="onModifyClicked">Add content to this text box</a>
     </p>
 </template>

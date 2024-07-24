@@ -74,9 +74,12 @@ async function onMapSelected() {
 
 <template>
     <i class="icon-curriculum"></i>
-    <p>
+    <p v-if="props.unit.curriculum._routes.createComponent && props.unit.curriculum._routes.modifyCurriculum">
         <a @click.prevent="onMapSelected">Select the curriculum codes</a>
         that you intend to cover in this area of the curriculum
+    </p>
+    <p v-else>
+        No curriculum codes have been added to this unit.
     </p>
 </template>
 

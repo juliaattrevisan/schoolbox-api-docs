@@ -237,7 +237,7 @@ const isFirstUnit = window.Vue.computed(() => {
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'content-focused': contentIsFocused,
-            'overview-has-created-textbox': (storeUnit?.textboxes[props.column.label]?.id || 0) >= 0,
+            'overview-has-created-textbox': (storeUnit?.textboxes.items[props.column.label]?.id || 0) >= 0,
             'first-unit': isFirstUnit,
         }"
         :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"
@@ -296,7 +296,7 @@ const isFirstUnit = window.Vue.computed(() => {
             <up-unit-cell-rubric-capabilities-content
                 v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                 ref="rubricCapabilitiesContentComponent"
-                :rubric-capabilities="props.unit.rubricCapabilities"
+                :rubric-capabilities="props.unit.rubricCapabilities.items"
             />
 
             <up-unit-cell-curriculum-content

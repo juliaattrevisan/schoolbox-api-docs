@@ -72,17 +72,19 @@ async function onCreateSelected() {
 </script>
 
 <template>
-    <div v-if="component === null" class="component-action">
-        <section>
-            <button @click.prevent="onCreateSelected">{{ createText }}</button>
-        </section>
-    </div>
-    <fn-actions
-        v-else
-        :folder-id="props.unit.folderId"
-        :component-id="component.componentId"
-        @modify-selected="onModifySelected"
-    />
+    <template v-if="props.unit.curriculum._routes.modifyCurriculum">
+        <div v-if="component === null" class="component-action">
+            <section>
+                <button @click.prevent="onCreateSelected">{{ createText }}</button>
+            </section>
+        </div>
+        <fn-actions
+            v-else
+            :folder-id="props.unit.folderId"
+            :component-id="component.componentId"
+            @modify-selected="onModifySelected"
+        />
+    </template>
 </template>
 
 <style scoped>

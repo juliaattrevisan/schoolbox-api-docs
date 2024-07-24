@@ -114,7 +114,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             createFormData.append("cid", unit.folderId.toString());
             createFormData.append("add", componentDefinition.toString());
 
-            const createResponse = await fetch("/homepage/configForm.php", {
+            const createResponse = await fetch(`${unit.curriculum._routes.createComponent}`, {
                 method: "POST",
                 body: createFormData,
                 headers: {
@@ -142,7 +142,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             configSearchParams.append("curriculumTreeFilter", treeFilter ? treeFilter.id.toString() : "");
 
             // Then create the component
-            const configResponse = await fetch(`/homepage/configForm.php?${configSearchParams.toString()}`, {
+            const configResponse = await fetch(`${unit.curriculum._routes.createComponent}?${configSearchParams.toString()}`, {
                 method: "POST",
                 headers: {
                     Accept: "application/json",

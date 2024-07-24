@@ -28,6 +28,7 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 class Module extends BaseModule
 {
@@ -45,12 +46,17 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        // Currently:
+        // non-staff members are allowed to view and edit the unit planner, if
+        // they have permission to view the course's homepage.
+        // It was discussed whether to allow non-staff or not, and it was
+        // decided to not arbitrarily block non-staff.
         $getCourse = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
+                    UserAccess::ACCESS_READ,
                     static function (array $params): int {
                         if (isset($params['course']) && $params['course'] instanceof CourseSpecificationModel) {
                             return $params['course']->getFolder()->getId();
@@ -105,8 +111,10 @@ class Module extends BaseModule
             $this->getRubricIndicatorMapper(),
             $this->getNodeMapper(),
             $this->getComponentInstanceMapper(),
+            $this->getMapperFactory()->get(TextboxMapper::class),
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 

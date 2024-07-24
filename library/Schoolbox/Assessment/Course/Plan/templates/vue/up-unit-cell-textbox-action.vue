@@ -20,7 +20,7 @@ const textboxStore = useUnitPlannerTextboxStore();
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes[props.column.label].id || 0) >= 0;
+    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].id || 0) >= 0;
 });
 
 const contentIsFocused = window.Vue.computed(() => {
@@ -33,6 +33,21 @@ const contentIsSaved = window.Vue.computed(() => {
 
 const isCreatingTextbox = window.Vue.ref(false);
 const isContentSaving = window.Vue.ref(false);
+
+/**
+ * Condition for displaying the action bar:
+ * * If the textbox exists in the backend:
+ *   allow if the create component and textbox routes are set
+ * * Otherwise:
+ *   allow if the textbox's modify route is set
+ */
+const displayActionBar = window.Vue.computed(() => {
+    if (!textboxIsCreated.value) {
+        return (props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox);
+    }
+
+    return Boolean(props.unit.textboxes.items[props.column.label]._links.update ?? false);
+});
 
 /**
  * When the modify button is clicked.
@@ -76,7 +91,7 @@ function onSaveClicked() {
 </script>
 
 <template>
-    <div class="component-action">
+    <div class="component-action" v-if="displayActionBar">
         <section>
             <button v-if="!contentIsSaved && !isContentSaving" data-role="dirty-indicator" disabled>
                 Changes not saved

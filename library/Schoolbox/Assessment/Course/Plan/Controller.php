@@ -14,6 +14,7 @@ use Alaress\Database\Exception;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
 use Crell\ApiProblem\ApiProblem;
@@ -28,8 +29,11 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMap
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
-use Schoolbox\Resource\Textbox\Component\Homepage\Controller as TextboxComponentController;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
+use Schoolbox\Resource\Textbox;
 use Scrub;
 use Twig\Error\Error;
 
@@ -46,18 +50,24 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param AssessmentMapperProxy $assessmentMapper
-     * @param RubricIndicatorMapper $rubricIndicatorMapper
-     * @param Mapper $nodeMapper
+     * @param AssessmentMapperProxy     $assessmentMapper
+     * @param RubricIndicatorMapper     $rubricIndicatorMapper
+     * @param Mapper                    $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param Textbox\Mapper            $textboxMapper
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param UnitSpecificationMapper   $unitSpecificationMapper
+     * @param Access                    $access
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapper,
         private RubricIndicatorMapper $rubricIndicatorMapper,
         private Node\Mapper $nodeMapper,
         private \Component_InstanceMapper $componentInstanceMapper,
+        private Textbox\Mapper $textboxMapper,
         private CourseConfigMapper $courseConfigMapper,
-        private UnitSpecificationMapper $unitSpecificationMapper
+        private UnitSpecificationMapper $unitSpecificationMapper,
+        private Access $access,
     ) {
         /* Only prepare the textbox statement once
          */
@@ -151,8 +161,8 @@ class Controller extends Base
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
         $class = CurriculumOverviewController::class;
-        $curriculumnTemplate = [];
-        $curriculumnKey = [];
+        $curriculumTemplate = [];
+        $curriculumKey = [];
         $curriculumDefId = null;
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $course->getTemplate()?->getUnitTemplate()->getId(), $class);
 
@@ -183,18 +193,18 @@ class Controller extends Base
             } else {
                 $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
             }
-            $curriculumnTemplate[] = [
+            $curriculumTemplate[] = [
                 'heading' => $heading,
                 'filter' => $curricFilter,
             ];
-            $curriculumnKey[] = strtolower($heading);
+            $curriculumKey[] = strtolower($heading);
         }
 
         /**
          * Grab the list of textbox components from the Unit Template
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = TextboxComponentController::class;
+        $class = Textbox\Component\Homepage\Controller::class;
         $textboxTemplate = [];
         $textboxKey = [];
         $textboxDefId = null;
@@ -212,7 +222,7 @@ class Controller extends Base
                 $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
             } else {
                 // Fallback of the php default title for textbox components
-                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+                $heading = trim(Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING);
             }
 
             // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
@@ -234,7 +244,15 @@ class Controller extends Base
          */
         foreach ($course->getUnits() as $unit) {
             // add this units data to the whole course units collection.
-            $units[] = $this->getUnitData($unit, $course->getTemplate()?->getUnitTemplate()->getId(), $curriculumnKey);
+            if ($this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+                $units[] = $this->getUnitData(
+                    $unit,
+                    $course->getTemplate()?->getUnitTemplate()->getId(),
+                    $curriculumKey,
+                    $textboxDefId,
+                    $curriculumDefId,
+                );
+            }
         }
 
         $this->response = $this->responseFromTemplate('@coursePlan/index.twig', [
@@ -244,7 +262,7 @@ class Controller extends Base
                 'textboxDefId' => $textboxDefId,
                 'curriculumDefId' => $curriculumDefId,
                 'textboxes' => $textboxTemplate,
-                'curriculum' => $curriculumnTemplate,
+                'curriculum' => $curriculumTemplate,
             ]
         ], "Unit Planner - {$course->getTitle()}");
     }
@@ -355,7 +373,7 @@ class Controller extends Base
          */
         $compTextQuery->execute(array_merge(
             [
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
             ],
             Builder::getArrayParameters(array_keys($units), 'units')
@@ -364,7 +382,7 @@ class Controller extends Base
             $componentName = $row['componentName'] ?? 'NULL';
             // if component is empty string, use the system default
             if (trim($componentName) === '') {
-                $componentName = TextboxComponentController::DEFAULT_COMPONENT_HEADING;
+                $componentName = Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING;
             }
             //build the row and send
             fputcsv($fp, [
@@ -419,7 +437,7 @@ class Controller extends Base
          */
         $textQuery->execute(array_merge(
             [
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
             ],
             Builder::getArrayParameters(array_keys($units), 'units')
         ));
@@ -494,8 +512,18 @@ class Controller extends Base
             $this->unitSpecificationMapper->save($unitSpec);
 
             // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-            [$curriculumnTemplate, $curriculumnKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
-            $this->response = $this->responseAsJson($this->getUnitData($unitSpec, $course->getTemplate()->getUnitTemplate()->getId(), $curriculumnKey))
+            [$curriculumTemplate, $curriculumKey] = $this->getTemplateCurric($course->getTemplate()->getUnitTemplate()->getId());
+            // Textbox and curriculum def ID can be null for now:
+            // AFAICT this is unused
+            $this->response = $this->responseAsJson(
+                $this->getUnitData(
+                    $unitSpec,
+                    $course->getTemplate()->getUnitTemplate()->getId(),
+                    $curriculumKey,
+                    null,
+                    null,
+                )
+            )
                 ->withStatus(201);
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
@@ -513,13 +541,13 @@ class Controller extends Base
      * (A count of extraneous textboxes outside of the ones specified by $unitTemplateId
      * is thrown into extraTextboxes)
      *
-     * @param null|int $unitTemplateId
-     * @param int $unitFolderId
+     * @param null|int    $unitTemplateId
+     * @param FolderModel $unitFolder
      * @return array
      * @throws Exception
      * @throws \DomainException
      */
-    private function findTextboxes(?int $unitTemplateId, int $unitFolderId): array
+    private function findTextboxes(?int $unitTemplateId, FolderModel $unitFolder): array
     {
         /* In case the course wasn't hydrated with all the parts
          */
@@ -534,7 +562,7 @@ class Controller extends Base
          * Grab the list of textboxes from the Unit Template
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-        $class = TextboxComponentController::class;
+        $class = Textbox\Component\Homepage\Controller::class;
         $textboxes = [];
         $textboxesKeys = [];
         $unitTextboxes = $this->componentInstanceMapper->findByContextAndClass($module, $unitTemplateId, $class);
@@ -548,7 +576,7 @@ class Controller extends Base
                 $heading = trim($textboxComponent->getConfigByKey('componentname')->getDefaultValue());
             } else {
                 // Fallback of the php default title for textbox components
-                $heading = trim(TextboxComponentController::DEFAULT_COMPONENT_HEADING);
+                $heading = trim(Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING);
             }
 
             // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
@@ -572,10 +600,10 @@ class Controller extends Base
 
         $this->textboxStatement->execute(
             [
-                'folderId' => $unitFolderId,
-                'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                'folderId' => $unitFolder->getId(),
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                 'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
-                'homepageDefaultComponentHeading' => TextboxComponentController::DEFAULT_COMPONENT_HEADING,
+                'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
             ]
         );
 
@@ -588,13 +616,33 @@ class Controller extends Base
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
                     'id' => $row['textboxID'],
-                    'body' => Scrub::html($row['textboxBody']),
-                    'inTemplate' => true,
                 ];
             } else {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
                 $extraTextboxes++;
+            }
+        }
+
+        // Find actual textbox models, and hydrate and translate them before
+        // setting them in `$textboxes`.
+        $textboxTranslator = new Textbox\Translator\ModelToArray(
+            new LinkOnly(0),
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter()
+        );
+        $translatedTextboxes = $this->textboxMapper
+            ->findByColumn(
+                'textBoxID',
+                array_filter(array_column($textboxes, 'id'), fn ($id) => $id > 0),
+            )
+            ->indexBy('id')
+            ->map($textboxTranslator);
+        foreach ($textboxes as $normalisedTitle => $textbox) {
+            if (isset($translatedTextboxes[$textbox['id']])) {
+                $textboxes[$normalisedTitle] = $translatedTextboxes[$textbox['id']];
             }
         }
 
@@ -711,19 +759,26 @@ class Controller extends Base
 
     /**
      * helper common function to fetch the content of the unit and its components in a standard format
-     * @param Model $unit
-     * @param int $templateId // id of the homepage template used to standardize the unit
-     * @param array $curriculumnKey // what curriculum components titles exist in the component, if any
+     * @param Model    $unit
+     * @param int      $templateId      id of the homepage template used to standardize the unit
+     * @param array    $curriculumKey   what curriculum components titles exist in the component, if any
+     * @param int|null $textboxDefId    The definition ID of the textbox component, if any
+     * @param int|null $curriculumDefId The definition ID of the curriculum component, if any
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    private function getUnitData(Model $unit, int $templateId, array $curriculumnKey)
-    {
+    private function getUnitData(
+        Model $unit,
+        int $templateId,
+        array $curriculumKey,
+        ?int $textboxDefId,
+        ?int $curriculumDefId
+    ): array {
         /* Gather up the textboxes and extraTextboxes meta
-             */
-        $textboxData = $this->findTextboxes($templateId, $unit->getFolder()->getId());
+         */
+        $textboxData = $this->findTextboxes($templateId, $unit->getFolder());
 
         // Learning Activities
         $assessments = $this->assessmentMapper->findAllByUnitSpecificationId($unit->getId(), [
@@ -782,10 +837,11 @@ class Controller extends Base
                 'componentId' => $component->getId(),
                 'heading' => trim($instanceConfig['componentname']['value']),
                 'filter' => $instanceConfig['curriculumTreeFilter']['value'],
-                'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
+                'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumKey),
             ];
         }
 
+        // Activity routes
         $activitiesListRoutes = [
             'create' => ["route" => "learningAssessment.getCreateAssessmentForm", "params" => [
                 'contextType' => 'unitspecs',
@@ -807,6 +863,22 @@ class Controller extends Base
             }
         }
 
+        // Unit-level routes
+        $folderParams             = ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()];
+        $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
+        $rubricRoutes = [
+            'manage' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+        ];
+        $textboxRoutes = [
+            'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'createTextbox'   => $this->getRouteIfAuthorized('textbox.createTextboxInFolder', $folderParams) ?: null,
+        ];
+        $curriculum['_routes'] = [
+            'createComponent'  => ($curriculumDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
+            'modifyCurriculum' => $this->getRouteIfAuthorized('curriculumApiUsageFolder.postFolderUsage', $folderParams) ?: null,
+        ];
+
+
         /* Aggregated data for each unit appears as a row in the Unit Planner
          * on the front end - this is basically the contract between back- and
          * front-end implementations and the basis of an api-first philosophy
@@ -818,7 +890,10 @@ class Controller extends Base
             'folderId' => $unit->getFolder()->getId(),
             /* Textboxes in the Unit that circumstantially match ones in the Template
              */
-            'textboxes' => $textboxData['textboxes'],
+            'textboxes' => [
+                '_routes' => $textboxRoutes,
+                'items'   => $textboxData['textboxes'],
+            ],
             /* All the other random textboxes that don't match
              */
             'extraTextboxes' => $textboxData['extraTextboxes'],
@@ -826,7 +901,7 @@ class Controller extends Base
              */
             'activities' => [
                 '_routes' => $activitiesListRoutes,
-                'items' => $assessments->map(new UnitAssessments(
+                'items'   => $assessments->map(new UnitAssessments(
                     $this->routeGenerator,
                     $this->getAuthorizer(),
                     $this->getUser(),
@@ -836,7 +911,10 @@ class Controller extends Base
             /* All the rubric capabilities and indicators that are in use among all
              * the assessment specs in this unit
              */
-            'rubricCapabilities' => $rubricCapabilities,
+            'rubricCapabilities' => [
+                '_routes' => $rubricRoutes,
+                'items'   => $rubricCapabilities,
+            ],
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,
@@ -851,8 +929,8 @@ class Controller extends Base
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
         $class = CurriculumOverviewController::class;
-        $curriculumnTemplate = [];
-        $curriculumnKey = [];
+        $curriculumTemplate = [];
+        $curriculumKey = [];
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $courseTemplateId, $class);
 
         foreach ($unitCurricComp as $curricComponent) {
@@ -879,12 +957,12 @@ class Controller extends Base
             } else {
                 $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
             }
-            $curriculumnTemplate[] = [
+            $curriculumTemplate[] = [
                 'heading' => $heading,
                 'filter' => $curricFilter,
             ];
-            $curriculumnKey[] = strtolower($heading);
+            $curriculumKey[] = strtolower($heading);
         }
-        return [$curriculumnTemplate, $curriculumnKey];
+        return [$curriculumTemplate, $curriculumKey];
     }
 }
