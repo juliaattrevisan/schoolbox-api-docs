@@ -607,14 +607,6 @@ class Controller extends Base
             ]
         );
 
-        $textboxTranslator = new Textbox\Translator\ModelToArray(
-            new LinkOnly(0),
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            new ScrubAdapter()
-        );
-
         while ($row = $this->textboxStatement->fetch()) {
             // match only on the Component Heading
             $normalisedTitle = strtolower(trim((string)$row['componentHeading']));
@@ -622,12 +614,36 @@ class Controller extends Base
             if (array_key_exists($normalisedTitle, $textboxes)) {
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
-                $translatedTextbox           = $textboxTranslator->__invoke($this->textboxMapper->findById($row['textboxID']));
-                $textboxes[$normalisedTitle] = $translatedTextbox + ['inTemplate' => true];
+                $textboxes[$normalisedTitle] = [
+                    'id'  => $row['textboxID'],
+                    'row' => $row,
+                ];
             } else {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
                 $extraTextboxes++;
+            }
+        }
+
+        // Find actual textbox models, and hydrate and translate them before
+        // setting them in `$textboxes`.
+        $textboxTranslator = new Textbox\Translator\ModelToArray(
+            new LinkOnly(0),
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter()
+        );
+        $translatedTextboxes = $this->textboxMapper
+            ->findByColumn(
+                'textBoxID',
+                array_filter(array_column($textboxes, 'id'), fn ($id) => $id > 0),
+            )
+            ->indexBy('id')
+            ->map($textboxTranslator);
+        foreach ($textboxes as $normalisedTitle => $textbox) {
+            if (isset($translatedTextboxes[$textbox['id']])) {
+                $textboxes[$normalisedTitle] = $translatedTextboxes[$textbox['id']];
             }
         }
 
