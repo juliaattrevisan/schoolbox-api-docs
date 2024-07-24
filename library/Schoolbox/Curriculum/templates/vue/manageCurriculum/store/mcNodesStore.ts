@@ -95,7 +95,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             { id: viewNodesStore.current.id, name: viewNodesStore.current.name },
         ];
         const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb: Breadcrumb) =>
-            isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb)
+            isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb),
         );
         for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
             // recursively load in each node and traverse down
@@ -126,7 +126,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                 }
                 if (response.status === 404) {
                     // and we assume the id can't be found, displaying an error
-                    throw new Error(`No node id matching ${id} has been found`);
+                    throw new Error(`No outcome id matching ${id} has been found`);
                 }
             }
         } catch (error) {
@@ -166,7 +166,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                }
+                },
             );
             if (response.ok) {
                 const topLevelNodes = (await response.json()) as Node[];
@@ -195,7 +195,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                }
+                },
             );
             const responseJson = await response.json();
             if (response.ok) {
