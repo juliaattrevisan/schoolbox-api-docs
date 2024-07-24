@@ -615,8 +615,7 @@ class Controller extends Base
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
-                    'id'  => $row['textboxID'],
-                    'row' => $row,
+                    'id' => $row['textboxID'],
                 ];
             } else {
                 // increase the extra textboxes by 1
