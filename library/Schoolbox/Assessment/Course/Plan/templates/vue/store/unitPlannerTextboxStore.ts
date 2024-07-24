@@ -133,7 +133,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
         try {
             let response = null;
-            response = await fetch(`${selectedTextbox._routes.modify}`, {
+            response = await fetch(`${selectedTextbox._links.update}`, {
                 method: "PUT",
                 body: JSON.stringify({
                     body: content,
