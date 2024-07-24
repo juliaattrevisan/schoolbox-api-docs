@@ -1,10 +1,8 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 namespace Schoolbox\Realtime\MessageList;
@@ -14,25 +12,19 @@ use Alaress\Async\Queue\QueueInterface;
 use Alaress\Redis;
 use Predis\ClientInterface;
 
+/**
+ * Factory for building message queues.
+ */
 class ListFactory implements IListFactory
 {
-    /** @var string */
-    private $instanceId;
-
     /**
-     * The Redis instance where notification content is stored.
+     * Constructor
+     *
+     * @param string          $instanceId The instance for which this factory is created.
+     * @param ClientInterface $redis      Redis client: data store for messages.
      */
-    private ClientInterface $redis;
-
-
-    /**
-     * @param string          $instanceId
-     * @param ClientInterface $redis
-     */
-    public function __construct($instanceId, ClientInterface $redis)
+    public function __construct(private string $instanceId, private ClientInterface $redis)
     {
-        $this->instanceId = $instanceId;
-        $this->redis      = $redis;
     }
 
 

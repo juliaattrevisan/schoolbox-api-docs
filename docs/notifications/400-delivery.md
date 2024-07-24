@@ -47,13 +47,14 @@ sends emails to recipients accordingly.
 
 ### Schoolbox App
 
-As an addition to instant notification, users who have installed the Schoolbox
-app for their school may opt to additionally receive notifications directly
-through the app.
+As an addition to instant notification, users who have installed a Schoolbox
+mobile app or personal web app may opt to additionally receive notifications
+directly through the app.
 
-The app subsystem is simply a queue; a process monitors the queue, and pushes
-notifications to those who have subscribed to the app. The app then issues an
-OS-native notification.
+The app subsystem is another Message Broker; a daemon monitors the queue, and
+pushes notifications to those who have subscribed to the app.
+
+The app then issues an OS-native notification.
 
 > TODO document app messaging
 

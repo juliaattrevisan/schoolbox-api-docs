@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Notification;
 use Kreait\Firebase;
 use Monolog\Logger;
@@ -86,6 +87,9 @@ class Service extends AbstractService
         } catch (Firebase\Exception\InvalidArgumentException $e) {
             // Invalid message or empty token list
             $this->getLog()->warning('Invalid message: ' . $e->getMessage());
+        } catch (Firebase\Exception\Messaging\QuotaExceeded $e) {
+            // This may be a rate limit: handle that especially
+            throw new RateLimitException('Firebase service is rate-limited', 0, $e, $e->retryAfter());
         } catch (Firebase\Exception\MessagingException $e) {
             // API request failed
             $this->getLog()->warning('Firebase API request failed: ' . $e->getMessage());

@@ -184,6 +184,7 @@ class ConfigMapper extends Mapper
     public const NAME_RUBRIC_MARKBOOK_ENABLED = 'rubric_markbook_enable';
     public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
+    public const NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
     public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
@@ -342,6 +343,7 @@ class ConfigMapper extends Mapper
         'restrict_parent_duework_access',
         'restrict_student_submissions',
         'restrict_parent_grades',
+        self::NAME_MOBILE_DAEMON_ENABLED,
     ];
 
     /**

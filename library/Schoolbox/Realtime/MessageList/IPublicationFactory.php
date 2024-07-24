@@ -1,20 +1,31 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
 
+/**
+ * Interface for factory for building message "queues" for direct publication
+ * (these are not queues at all, but instead they send a message directly).
+ *
+ * Currently, this builds only the email queue: all other queues are handled
+ * by other processes.
+ */
 interface IPublicationFactory extends IListFactory
 {
-
     /**
+     * Build the queue for messages delivered to a mobile app or personal web
+     * app.
+     *
+     * TODO move back to IListFactory once MobileSend is removed:
+     *
      * @param int $userId
      * @return QueueInterface
      */
@@ -22,6 +33,8 @@ interface IPublicationFactory extends IListFactory
 
 
     /**
+     * Build the message queue for sending via email.
+     *
      * @param int $userId
      * @return QueueInterface
      */

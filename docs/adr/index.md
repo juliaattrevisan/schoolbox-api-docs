@@ -8,6 +8,8 @@ This log lists the architectural decisions for Schoolbox, as of 2021-03-18.
 * [ADR-0001](0001-separateStaticAssetsAndExecutableScriptsWithinWebRoot.md) - Separate static assets and executable scripts within web root
 * [ADR-0002](0002-makingCdnPrefixGloballyAvailable.md) - Making CDN Prefix globally available
 * [ADR-0003](0003-singleSignOnIntoHelp.md) - Single Sign-On into Help
+* [ADR-0004](0004-searchArchitecture.md) - Search Architecture
+* [ADR-0005](0005-mobileDaemon.md) - Mobile Daemon
 
 <!-- adrlogstop -->
 

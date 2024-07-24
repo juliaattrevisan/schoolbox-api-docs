@@ -1,6 +1,6 @@
 # Search Architecture
 
-* Status: Proposed
+* Status: Accepted
 * Deciders: Amri Sannang
 * Date: 2023-08-01
 

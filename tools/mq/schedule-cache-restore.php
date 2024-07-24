@@ -10,7 +10,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Psr\Container\ContainerInterface;
@@ -41,7 +40,7 @@ try {
         // the passive part is important:
         // it means the queue won't be created if it doesn't already exist
         $mq = (new ConnectorFactory($di->get('config')))->build(['passive' => true]);
-        $q  = Broker::QUEUE;
+        $q  = Schedule\Broker::QUEUE;
 
         try {
             $mq->declareQueue($q);

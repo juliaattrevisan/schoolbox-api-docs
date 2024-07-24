@@ -164,8 +164,10 @@ In addition, due to performance issues with persisting and reloading RabbitMQ
 instances with large numbers of queues, the decision was made to no longer
 treat RabbitMQ as the single source of truth for queue data.
 
-The current implementation of notifications maintains just one queue for
-the [scheduling](../200-scheduling.md) sub-system.
+The current implementation of notifications maintains just two queues:
+- one for the [scheduling](../200-scheduling.md) sub-system
+- one for the [delivery](../400-delivery.md) sub-system, for the delivery of
+  messages to the Schoolbox mobile app or personal web app
 
 
 #### Why not just Redis?

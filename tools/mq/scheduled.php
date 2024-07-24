@@ -9,7 +9,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\Broker\StompRedis\Broker;
 use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Redis\Async;
@@ -24,6 +23,7 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
+use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Schoolbox\Application\Daemon;

@@ -1,51 +1,41 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
 use Predis\ClientInterface;
-use Schoolbox\MobileApp;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\UserMapper;
 
+/**
+ * Factory for message "queues" for direct publication.
+ */
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
-    /** @var MobileApp\IServiceManager */
-    private $cloudManager;
-
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var Mailer */
-    private $mailer;
-
     /**
-     * @param string                    $instanceId
-     * @param ClientInterface           $redis
-     * @param MobileApp\IServiceManager $cloudManager
-     * @param UserMapper                $userMapper
-     * @param Mailer                    $mailer
+     * Constructor
+     *
+     * @param string                    $instanceId         The instance for which this factory is created.
+     * @param ClientInterface           $redis              Redis client: data store for messages.
+     * @param UserMapper                $userMapper         User mapper: required for finding user's email address.
+     * @param Mailer                    $mailer             Mailer class: required for sending emails.
+     * @param Mobile\IQueueFactory      $mobileQueueFactory The factory which may build a different type of mobile
+     *                                                      queue, dependent on configuration.
      */
     public function __construct(
-        $instanceId,
+        string $instanceId,
         ClientInterface $redis,
-        MobileApp\IServiceManager $cloudManager,
-        UserMapper $userMapper,
-        Mailer $mailer
+        private UserMapper $userMapper,
+        private Mailer $mailer,
+        private Mobile\IQueueFactory $mobileQueueFactory,
     ) {
         parent::__construct($instanceId, $redis);
-        $this->cloudManager = $cloudManager;
-        $this->userMapper   = $userMapper;
-        $this->mailer       = $mailer;
     }
-
 
 
     /**
@@ -54,7 +44,7 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
      */
     public function mobile($userId)
     {
-        return new Mobile($this->cloudManager, $userId);
+        return $this->mobileQueueFactory->build($userId);
     }
 
 

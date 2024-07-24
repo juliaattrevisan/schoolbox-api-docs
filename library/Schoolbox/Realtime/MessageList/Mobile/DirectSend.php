@@ -1,20 +1,28 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2024, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
-namespace Schoolbox\Realtime\MessageList;
+declare(strict_types=1);
+
+namespace Schoolbox\Realtime\MessageList\Mobile;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
 use Schoolbox\MobileApp;
 
-class Mobile implements QueueInterface
+/**
+ * "List" which sends messages it receives directly to a mobile device.
+ *
+ * Renamed from `\Schoolbox\Realtime\MessageList\Mobile` in SA-17997.
+ *
+ * @deprecated this will be superseded by `ForwardToBrokeredQueue`, which is a
+ *             forwards messages to a brokered queue.
+ */
+class DirectSend implements QueueInterface
 {
     /** @var MobileApp\IServiceManager */
     private $cloudManager;
