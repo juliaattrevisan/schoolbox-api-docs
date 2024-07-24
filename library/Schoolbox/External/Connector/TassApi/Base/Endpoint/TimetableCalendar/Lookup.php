@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -46,10 +47,12 @@ class Lookup
      */
     private function initStudentLookup(): array
     {
+        $userProfileTable     = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $studentProfileTable  = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
         $userStatement = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT external_id, firstname, lastname
-            FROM sis_user_profile sup
-            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
+            FROM {$userProfileTable} sup
+            INNER JOIN {$studentProfileTable} sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL
         ");
 
@@ -70,13 +73,15 @@ class Lookup
      */
     private function initStaffLookup(): array
     {
+        $userProfileTable  = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
+        $staffProfileTable = \Schoolbox\External\Profile\Staff\Mapper::getInstance()->getTable();
         $userStatement = $this->timetablePeriodMapper->getDatabase()->query(
-            '
+            "
             SELECT external_id, firstname, lastname
-            FROM sis_user_profile sup
-            INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
+            FROM {$userProfileTable} sup
+            INNER JOIN {$staffProfileTable} sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL AND category = :category
-        ',
+        ",
             [':category' => Profile::TEACHER]
         );
 
@@ -98,13 +103,14 @@ class Lookup
      */
     private function initPeriodLookup(): array
     {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $timetableCycleTable = TimetableCycleMapper::getInstance()->getTable();
+        $periodStatement     = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT
                 cycle.cycle_identifier,
                 period.day, period.id, period.title
-            FROM sis_timetable_cycle cycle
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-        ');
+            FROM {$timetableCycleTable} cycle
+            LEFT JOIN {$this->timetablePeriodMapper->getTable()} period ON cycle.id = period.cycle_id
+        ");
 
         $periods = [];
 
@@ -132,13 +138,15 @@ class Lookup
      */
     private function initClassInvolvementLookup(): array
     {
-        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $classEntryTable           = \Schoolbox\External\ClassEntryMapper::getInstance()->getTable();
+        $classInvolvementTable     = \Schoolbox\External\ClassInvolvementMapper::getInstance()->getTable();
+        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT
                 scu.external_id,
                 sc.name, sc.code
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc on scu.class_id = sc.id
-        ');
+            FROM {$classInvolvementTable} scu
+            INNER JOIN {$classEntryTable} sc on scu.class_id = sc.id
+        ");
 
         $involvements = [];
 

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -77,24 +78,26 @@ class Lookup
      */
     private function initUserLookup(): array
     {
+        $staffProfileTable   = \Schoolbox\External\Profile\Staff\Mapper::getInstance()->getTable();
+        $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
         $userStatement = $this->baseProfileMapper->getDatabase()->query("
-            (SELECT 
+            (SELECT
                 external_id AS externalId,
-                title, 
-                firstname, 
+                title,
+                firstname,
                 lastname
-            FROM sis_user_profile_staff sups 
+            FROM {$staffProfileTable} sups
             INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
             WHERE external_id IS NOT NULL)
-            
-            UNION 
-            
-            (SELECT 
+
+            UNION
+
+            (SELECT
                 external_id AS externalId,
-                title, 
-                firstname, 
+                title,
+                firstname,
                 lastname
-            FROM sis_user_profile_student sups 
+            FROM {$studentProfileTable} sups
             INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
             WHERE external_id IS NOT NULL)
         ");
@@ -117,13 +120,14 @@ class Lookup
      */
     private function initPeriodLookup(): array
     {
-        $periodStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $timetableCycleTable = TimetableCycleMapper::getInstance()->getTable();
+        $periodStatement     = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT
                 cycle.id AS cycle_id,
                 period.day, period.id, period.sequence
-            FROM sis_timetable_cycle cycle
-            LEFT JOIN sis_timetable_period period ON cycle.id = period.cycle_id
-        ');
+            FROM {$timetableCycleTable} cycle
+            LEFT JOIN {$this->timetablePeriodMapper->getTable()} period ON cycle.id = period.cycle_id
+        ");
 
         $periods = [];
 

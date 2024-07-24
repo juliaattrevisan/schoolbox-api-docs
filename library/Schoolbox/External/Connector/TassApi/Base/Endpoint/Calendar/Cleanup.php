@@ -81,13 +81,17 @@ class Cleanup implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
+            $eventTable         = $this->eventMapper->getTable();
+            $eventCampusTable   = \Schoolbox\External\Event\Campus\Mapper::getInstance()->getTable();
+            $eventRoleTypeTable = \Schoolbox\External\Event\Roletype\Mapper::getInstance()->getTable();
+            $eventUserTable     = \Schoolbox\External\Event\User\Mapper::getInstance()->getTable();
             $queries = [
                 [
                     'query' => "
-                        DELETE sis_event_campus
-                        FROM sis_event_campus
-                        INNER JOIN sis_event ON sis_event.id = sis_event_campus.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
-                        WHERE sis_event.source = :source
+                        DELETE {$eventCampusTable}
+                        FROM {$eventCampusTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventCampusTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
                     ",
                     'params' => [
                         'source' => $this->source
@@ -95,10 +99,10 @@ class Cleanup implements IStrategy
                 ],
                 [
                     'query' => "
-                        DELETE sis_event_roletype
-                        FROM sis_event_roletype
-                        INNER JOIN sis_event ON sis_event.id = sis_event_roletype.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
-                        WHERE sis_event.source = :source
+                        DELETE {$eventRoleTypeTable}
+                        FROM {$eventRoleTypeTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventRoleTypeTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
                     ",
                     'params' => [
                         'source' => $this->source
@@ -106,10 +110,10 @@ class Cleanup implements IStrategy
                 ],
                 [
                     'query' => "
-                        DELETE sis_event_user
-                        FROM sis_event_user
-                        INNER JOIN sis_event ON sis_event.id = sis_event_user.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
-                        WHERE sis_event.source = :source
+                        DELETE {$eventUserTable}
+                        FROM {$eventUserTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventUserTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
                     ",
                     'params' => [
                         'source' => $this->source
@@ -117,9 +121,9 @@ class Cleanup implements IStrategy
                 ],
                 [
                     'query' => "
-                        DELETE FROM sis_event
+                        DELETE FROM {$eventTable}
                         WHERE updated_at = '0000-00-00 00:00:00'
-                        AND sis_event.source = :source
+                        AND {$eventTable}.source = :source
                     ",
                     'params' => [
                         'source' => $this->source

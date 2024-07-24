@@ -220,7 +220,6 @@ NULLTYPE;
         $runId = (new Guid())->generate();
 
         (new Endpoint\Scheduler(
-            $randomMapper->getDatabase(),
             $frequency,
             $customHours,
             $factory,

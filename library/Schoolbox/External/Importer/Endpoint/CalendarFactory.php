@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Base\ShadowTable;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
 use Schoolbox\GenericCollection;
@@ -96,7 +97,7 @@ class CalendarFactory implements IFactory
     {
         switch ($type) {
             case self::TASS_API:
-                return (new TassApiEndpoint\Calendar\Factory(
+                $composites = (new TassApiEndpoint\Calendar\Factory(
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -111,9 +112,10 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
                     RoleMapper::getInstance()->disableCache()
                 ))->produce();
+                break;
 
             case self::COMPASS:
-                return (new CompassEndpoint\Calendar\Factory(
+                $composites = (new CompassEndpoint\Calendar\Factory(
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -121,10 +123,33 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache()
                 ))->produce();
+                break;
 
             default:
                 // Use manual csv imports
                 return null;
         }
+
+        return $composites
+            ->prepend(
+                new ShadowTable\Calendar\Enable(
+                    $this->logger,
+                    $this->perform,
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
+                )
+            )
+            ->add(
+                new ShadowTable\Calendar\Disable(
+                    $this->logger,
+                    $this->perform,
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
+                )
+            );
     }
 }

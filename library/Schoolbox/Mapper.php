@@ -139,6 +139,11 @@ abstract class Mapper implements IMapper
     public const SORT_ORDER_DESC = 'desc';
 
     /**
+     * Prefix for a mapper's shadow table.
+     */
+    private const SHADOW_PREFIX = 'shadow__';
+
+    /**
      * @var IConnector
      */
     protected IConnector $database;
@@ -151,9 +156,17 @@ abstract class Mapper implements IMapper
     protected IConnector $databaseRead;
 
     /**
-     * @var string
+     * The mapper's table: may be null if it maps something which isn't a table.
      */
-    protected $table;
+    protected ?string $table = null;
+
+    /**
+     * Are shadow tables in use for this mapper?
+     *
+     * If so, `$this->getTable()` returns `$this->table` prefixed with
+     * `self::SHADOW_PREFIX`.
+     */
+    protected bool $useShadowTable = false;
 
     /**
      * Class name of the model to associate with this mapper.
@@ -1981,11 +1994,56 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * @return string
+     * Return the table name, respecting shadow table if enabled.
+     *
+     * @return string|null
      */
-    public function getTable()
+    public function getTable(): ?string
+    {
+        return $this->useShadowTable ? $this->getShadowTableName() : $this->getBaseTableName();
+    }
+
+    /**
+     * Return the table name, ignoring shadow table.
+     *
+     * @return string|null
+     */
+    public function getBaseTableName(): ?string
     {
         return $this->table;
+    }
+
+    /**
+     * Return the shadow table name, regardless of whether it's in use.
+     *
+     * @return string|null
+     */
+    public function getShadowTableName(): ?string
+    {
+        return isset($this->table) ? (self::SHADOW_PREFIX . $this->table) : null;
+    }
+
+    /**
+     * Enable shadow tables: this will cause this mapper to use the shadow table
+     * for all reads and writes.
+     *
+     * @return self
+     */
+    public function enableShadowTable(): self
+    {
+        $this->useShadowTable = true;
+        return $this;
+    }
+
+    /**
+     * Disable shadow tables.
+     *
+     * @return $this
+     */
+    public function disableShadowTable(): self
+    {
+        $this->useShadowTable = false;
+        return $this;
     }
 
     /**
@@ -2333,7 +2391,7 @@ abstract class Mapper implements IMapper
             // None of these things matter when counting
             unset($options['order'], $options['limit'], $options['offset']);
             $stmt = $this->selectScalarByPredicates(
-                "COUNT(DISTINCT {$this->table}.{$this->getIdentifierColumn()})",
+                "COUNT(DISTINCT {$this->getTable()}.{$this->getIdentifierColumn()})",
                 $pb,
                 $options
             );
@@ -2436,7 +2494,7 @@ abstract class Mapper implements IMapper
         );
         $options      = array_merge($defaults, $options);
 
-        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
@@ -2559,7 +2617,7 @@ abstract class Mapper implements IMapper
      */
     protected function getDeleteString()
     {
-        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         // only soft-delete if this is a soft-deletable model
         if ($softDelete = $this->getSoftDeleteUpdateSql()) {
@@ -2577,7 +2635,7 @@ abstract class Mapper implements IMapper
     protected function getSelectString()
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->getTable());
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
     }
 
@@ -3084,7 +3142,7 @@ abstract class Mapper implements IMapper
     public function save($object)
     {
         $collection  = $this->getModelAsCollection($object);
-        $tbl         = $this->table;
+        $tbl         = $this->getTable();
         $colString   = $this->getColumnString();
         $collection  = $this->populateUuids($this->populateSaveTimestamps($collection));
         $plcString   = $this->getPlaceholderString();
@@ -3886,7 +3944,7 @@ abstract class Mapper implements IMapper
             if (!empty($alias)) {
                 $columnString = "`$alias`.`{$map['column']}` AS `$alias.{$map['column']}`";
             } else {
-                $columnString = "`$this->table`.`{$map['column']}`";
+                $columnString = "`{$this->getTable()}`.`{$map['column']}`";
             }
             $columnList[] = $columnString;
         }
@@ -3978,7 +4036,7 @@ abstract class Mapper implements IMapper
             if (empty($map['column'])) {
                 continue;
             }
-            $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
+            $assignmentList[] = "`{$this->getTable()}`.`{$map['column']}` = :{$map['column']}";
         }
         return implode(', ', $assignmentList);
     }
@@ -4236,7 +4294,7 @@ abstract class Mapper implements IMapper
      */
     public function truncate()
     {
-        $query     = "DELETE FROM `{$this->table}`";
+        $query     = "DELETE FROM `{$this->getTable()}`";
         $statement = $this->database->prepare($query);
         $statement->execute();
     }
@@ -4270,7 +4328,7 @@ abstract class Mapper implements IMapper
         }
 
         $mappedFields = array_keys($mappedFields);
-        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->table}");
+        $stmt         = $this->getDatabase()->query("SHOW COLUMNS FROM {$this->getTable()}");
         $knownFields  = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));

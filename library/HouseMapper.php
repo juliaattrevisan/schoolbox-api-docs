@@ -7,8 +7,6 @@ use Schoolbox\Mapper\Exception\CallbackException;
  */
 class HouseMapper extends Schoolbox\Mapper
 {
-    protected $table = 'house';
-
     protected function mapping()
     {
         $this->hasTable('house');

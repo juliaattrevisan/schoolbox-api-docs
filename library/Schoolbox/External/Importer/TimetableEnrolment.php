@@ -172,7 +172,7 @@ class TimetableEnrolment extends AbstractImporter
         }
 
         if ($this->performUpdate && count($enrolmentItems) > 0) {
-            $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode(',', $enrolmentItems) . ';';
+            $fullQuery = "INSERT INTO {$this->enrolmentMapper->getTable()} (id, class_id, external_id) VALUES " . implode(',', $enrolmentItems) . ';';
 
             try {
                 // Manual bulk insert into the DB of "$fullquery"

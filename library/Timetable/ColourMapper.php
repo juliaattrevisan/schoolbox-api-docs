@@ -17,12 +17,6 @@ use Schoolbox\GenericCollection;
  */
 class Timetable_ColourMapper extends Schoolbox\Mapper
 {
-
-    /**
-     * @var string
-     */
-    protected $table = 'lu_timetable_colour';
-
     /**
      * @inheritDoc
      */

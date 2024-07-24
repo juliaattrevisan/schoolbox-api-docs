@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
-use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
@@ -78,7 +77,6 @@ class Scheduler
     /**
      * Scheduler constructor.
      *
-     * @param IConnector $db
      * @param string $frequency One of [hourly, twiceDaily, daily]
      * @param array $customHours Custom hours to run tool at, eg ['00','03','15','23']
      * @param IFactory $factory
@@ -88,7 +86,6 @@ class Scheduler
      * @param ImportLogMapper $importLogMapper
      */
     public function __construct(
-        private IConnector $db,
         private string $frequency,
         private array $customHours,
         private IFactory $factory,
@@ -145,12 +142,6 @@ class Scheduler
             $importLog = $this->importLogMapper->start($runId, $scriptName);
 
             try {
-                $this->logger->debug(sprintf(
-                    'Beginning transaction'
-                ));
-
-                $this->db->beginTransaction();
-
                 foreach ($composites as $composite) {
                     $composite->import();
                 }
@@ -166,32 +157,14 @@ class Scheduler
                 /* Trim away ancient logs
                  */
                 $this->importLogMapper->prune();
-
-                $this->logger->debug(sprintf(
-                    'Committing transaction'
-                ));
-
-                $this->db->commit();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
-
-                $this->logger->debug(sprintf(
-                    'Rollback transaction'
-                ));
-
-                $this->db->rollBack();
 
                 /* Something happened with the api; log it
                  */
                 $this->importLogMapper->error($importLog, $e->getMessage());
             } catch (\Throwable | \Exception $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
-
-                $this->logger->debug(sprintf(
-                    'Rollback transaction'
-                ));
-
-                $this->db->rollBack();
 
                 /* Some kind of unexpected fatal; log it
                  */
