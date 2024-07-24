@@ -50,7 +50,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
+                    UserAccess::ACCESS_READ,
                     static function (array $params): int {
                         if (isset($params['course']) && $params['course'] instanceof CourseSpecificationModel) {
                             return $params['course']->getFolder()->getId();
