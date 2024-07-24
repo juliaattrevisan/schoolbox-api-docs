@@ -42,7 +42,7 @@ deleteNodesStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.value.timeout("Unable to delete node", false, 5000);
+            store.toastEl.value.timeout("Unable to delete outcome", false, 5000);
         });
     }
 });
