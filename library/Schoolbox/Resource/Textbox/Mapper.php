@@ -21,6 +21,7 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
  * Class Mapper
  *
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
 class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable

@@ -14,6 +14,7 @@ use Alaress\Database\Exception;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Statement\Query\IQuery;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Component_Config_Componentname;
 use Crell\ApiProblem\ApiProblem;
@@ -31,6 +32,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 use Schoolbox\Resource\Textbox;
 use Scrub;
 use Twig\Error\Error;
@@ -52,6 +54,7 @@ class Controller extends Base
      * @param RubricIndicatorMapper     $rubricIndicatorMapper
      * @param Mapper                    $nodeMapper
      * @param \Component_InstanceMapper $componentInstanceMapper
+     * @param Textbox\Mapper            $textboxMapper
      * @param CourseConfigMapper        $courseConfigMapper
      * @param UnitSpecificationMapper   $unitSpecificationMapper
      * @param Access                    $access
@@ -61,6 +64,7 @@ class Controller extends Base
         private RubricIndicatorMapper $rubricIndicatorMapper,
         private Node\Mapper $nodeMapper,
         private \Component_InstanceMapper $componentInstanceMapper,
+        private Textbox\Mapper $textboxMapper,
         private CourseConfigMapper $courseConfigMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
         private Access $access,
@@ -603,6 +607,14 @@ class Controller extends Base
             ]
         );
 
+        $textboxTranslator = new Textbox\Translator\ModelToArray(
+            new LinkOnly(0),
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter()
+        );
+
         while ($row = $this->textboxStatement->fetch()) {
             // match only on the Component Heading
             $normalisedTitle = strtolower(trim((string)$row['componentHeading']));
@@ -610,22 +622,24 @@ class Controller extends Base
             if (array_key_exists($normalisedTitle, $textboxes)) {
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
-                $textboxes[$normalisedTitle] = [
-                    'id'         => $row['textboxID'],
-                    'body'       => Scrub::html($row['textboxBody']),
-                    'inTemplate' => true,
-                    '_routes'    => [
-                        'modify' => $this->getRouteIfAuthorized(
-                            'textbox.updateTextbox',
-                            [
-                                'folderId' => $unitFolder->getId(),
-                                'folder'   => $unitFolder,
-                                'id'       => $row['textboxID'],
-                                'textbox'  => (new Textbox\Model())->setId($row['textboxID']),
-                            ],
-                        ) ?: null
-                    ],
-                ];
+                $translatedTextbox           = $textboxTranslator->__invoke($this->textboxMapper->findById($row['textboxID']));
+                $textboxes[$normalisedTitle] = $translatedTextbox + ['inTemplate' => true];
+//                $textboxes[$normalisedTitle] = [
+//                    'id'         => $row['textboxID'],
+//                    'body'       => Scrub::html($row['textboxBody']),
+//                    'inTemplate' => true,
+//                    '_routes'    => [
+//                        'modify' => $this->getRouteIfAuthorized(
+//                            'textbox.updateTextbox',
+//                            [
+//                                'folderId' => $unitFolder->getId(),
+//                                'folder'   => $unitFolder,
+//                                'id'       => $row['textboxID'],
+//                                'textbox'  => (new Textbox\Model())->setId($row['textboxID']),
+//                            ],
+//                        ) ?: null
+//                    ],
+//                ];
             } else {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.

@@ -28,6 +28,7 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 class Module extends BaseModule
 {
@@ -105,6 +106,7 @@ class Module extends BaseModule
             $this->getRubricIndicatorMapper(),
             $this->getNodeMapper(),
             $this->getComponentInstanceMapper(),
+            $this->getMapperFactory()->get(TextboxMapper::class),
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
             $this->getMapperFactory()->get(Access::class),
