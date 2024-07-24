@@ -61,7 +61,7 @@ class Controller extends Base
         $model->setCreatedAt(\Alaress_Date_Format::now());
         $model->setCreatedBy($this->getUser()->getId());
         $this->mapper->save($model);
-        $this->response = $this->responseAsJson($model);
+        $this->response = $this->responseAsJson($this->buildTextboxTranslator()->__invoke($model));
     }
 
 
@@ -99,7 +99,7 @@ class Controller extends Base
 
 
         // Render the textbox
-        $this->response = $this->responseAsJson($model);
+        $this->response = $this->responseAsJson($this->buildTextboxTranslator()->__invoke($model));
     }
 
 
@@ -115,7 +115,7 @@ class Controller extends Base
     {
         $textbox = $this->persistTextbox($textbox);
         $this->mapper->save($textbox);
-        $this->response = $this->responseAsJson($textbox);
+        $this->response = $this->responseAsJson($this->buildTextboxTranslator()->__invoke($textbox));
     }
 
 
@@ -189,13 +189,7 @@ class Controller extends Base
     {
         // Convert `$usages` to an array structure
         $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly(0);
-        $translateTextbox = new Translator\ModelToArray(
-            $translateFolder,
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            new ScrubAdapter()
-        );
+        $translateTextbox = $this->buildTextboxTranslator();
 
         $usages = [];
         foreach ($this->mapper->findUsage($folder->getId()) as $usage) {
@@ -265,5 +259,21 @@ class Controller extends Base
         $this->response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
             'textbox'         => $textbox,
         ]);
+    }
+
+    /**
+     * Build a translator for textboxes to array representations.
+     *
+     * @return Translator\ModelToArray
+     */
+    private function buildTextboxTranslator(): Translator\ModelToArray
+    {
+        return new Translator\ModelToArray(
+            new Folder\Translator\ModelToArray\LinkOnly(0),
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter(),
+        );
     }
 }
