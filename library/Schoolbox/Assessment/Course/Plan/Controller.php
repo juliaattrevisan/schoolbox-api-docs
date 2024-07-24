@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as RubricIndicatorModel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model;
@@ -665,19 +666,13 @@ class Controller extends Base
      * @return array
      * @throws Exception
      */
-    private function findRubrics(int $unitFolderId): array
+    private function findRubrics(int $unitFolderId, $courseFolderId): array
     {
         /* TODO Add a list of all the rubric caps and inds that *should* have been fulfilled
          *  so users can compare it against the ones that *were* fulfilled (a diff between them)
          */
         $rubrics = [
-            'available' => [
-                'capabilities' => [],
-                /* Cross-referencing for fetching curriculum nodes separately
-                 */
-                'capabilityIds' => [],
-                'indicatorIds' => [],
-            ],
+            'available' => $this->getCourseUnitRubric([$courseFolderId, $unitFolderId]),
             'used' => [
                 'capabilities' => [],
                 /* Cross-referencing for fetching curriculum nodes separately
@@ -790,12 +785,13 @@ class Controller extends Base
         /* Get a set of rubrics that were used among all the assessment specs
          * This also comes with all the cap ids and indicator ids
          */
-        $rubricData = $this->findRubrics($unit->getFolder()->getId());
+        $rubricData = $this->findRubrics($unit->getFolder()->getId(), $unit->getCourse()->getFolder()->getId());
 
         /* TODO Later on we can provide a list of rubrics that exist in the whole course
          *  and diff them in some way so users can see what they haven't planned properly
          */
         $rubricCapabilities = array_values($rubricData['used']['capabilities']);
+        $availableRubricCapabilities = array_values($rubricData['available']['capabilities']);
 
         /* Curriculum nodes
          * A unique set of curriculum nodes collated from various places:
@@ -915,6 +911,7 @@ class Controller extends Base
                 '_routes' => $rubricRoutes,
                 'items'   => $rubricCapabilities,
             ],
+            'availableRubricCapabilities' => $availableRubricCapabilities,
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,
@@ -964,5 +961,54 @@ class Controller extends Base
             $curriculumKey[] = strtolower($heading);
         }
         return [$curriculumTemplate, $curriculumKey];
+    }
+
+
+    /**
+     * @param int|int[] $courseFolderId
+     * @return array|array[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function getCourseUnitRubric($courseFolderId)
+    {
+        // grab rubric info
+        $rubricsModels = $this->rubricIndicatorMapper->findForFolder($courseFolderId);
+        //-------------
+        $rubrics = [
+            'capabilities' => [],
+            /* Cross-referencing for fetching curriculum nodes separately
+             */
+            'capabilityIds' => [],
+            'indicatorIds' => [],
+        ];
+        /* Accumulate a unique set of capabilities and indicators
+         *
+         * Note that capabilities/indicators can be markdown stuff
+         */
+        foreach ($rubricsModels as $indicator) {
+            /** @var RubricIndicatorModel $indicator */
+            $capabilityId = $indicator->getCapability()->getId();
+            $indicatorId = $indicator->getId();
+
+            /* Cross-referencing for fetching curriculum nodes separately
+             */
+            $rubrics['capabilityIds'][$capabilityId] = $capabilityId;
+            $rubrics['indicatorIds'][$indicatorId] = $indicatorId;
+
+            /* Initialise it, if it hasn't already existed
+             */
+            if (!isset($rubrics['capabilities'][$capabilityId])) {
+                $rubrics['capabilities'][$capabilityId] = [
+                    'id' => $capabilityId,
+                    'name' => Scrub::markdown($indicator->getCapability()->getName()),
+                    'indicators' => [],
+                ];
+            }
+
+            $rubrics['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
+                'name' => Scrub::markdown($indicator->getName()),
+            ];
+        }
+        return $rubrics;
     }
 }

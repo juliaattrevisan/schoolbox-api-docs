@@ -57,6 +57,7 @@ export type Unit = {
         };
         items: RubricCapability[];
     };
+    availableRubricCapabilities: RubricCapability[];
     textboxes: {
         _routes: {
             createComponent: string | null;
