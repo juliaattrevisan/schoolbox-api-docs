@@ -136,8 +136,7 @@ export default {
 <style lang="scss" scoped>
 //apply padding as .fc-event-title will lose its padding from display: inline
 .event-container {
-    line-height: normal;
-    padding: 0px,2px,2px,2px; // make top padding zero to align the text to the top of the event in calendar
+    padding: 0px 2px 2px 2px; // make top padding zero to align the text to the top of the event in calendar
 }
 
 //needs to be inline to ensure the .strike class works
