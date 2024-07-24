@@ -45,17 +45,17 @@
                     $.post(action, formdata)
                         .done(() => {
                             document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Saved." }
+                                detail: { text: "Saved" }
                             }));
                         })
                         .fail(() => {
                             document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
+                                detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
                             }));
                         })
                 } catch (error) {
                     document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                        detail: { text: "Save failed. Please contact your support if the problem persists.", isSuccess: false }
+                        detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
                     }));
                 }
             }
