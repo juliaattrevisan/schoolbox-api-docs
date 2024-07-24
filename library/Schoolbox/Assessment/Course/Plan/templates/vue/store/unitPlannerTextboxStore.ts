@@ -3,6 +3,7 @@ import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent"
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
+import {TextboxContent} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
 
 export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore", () => {
     const unitPlannerStore = useUnitPlannerStore();
@@ -95,16 +96,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
             // If we just created a textbox, then we need to update the store
             // with the new textbox.
-            // Need to finagle a modify route, though
-            const responseJSON = (await response.json()) as { id: number };
-            storeUnit.textboxes.items[column.label] = {
-                id: responseJSON.id,
-                inTemplate: true,
-                body: '',
-                _routes: {
-                    modify: `/textbox/${responseJSON.id}`
-                },
-            };
+            let responseJSON = (await response.json()) as TextboxContent;
+            responseJSON.inTemplate = true;
+            storeUnit.textboxes.items[column.label] = responseJSON;
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
