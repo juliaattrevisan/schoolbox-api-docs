@@ -748,7 +748,7 @@ class Controller extends Base
      * helper common function to fetch the content of the unit and its components in a standard format
      * @param Model    $unit
      * @param int      $templateId      id of the homepage template used to standardize the unit
-     * @param array    $curriculumnKey  what curriculum components titles exist in the component, if any
+     * @param array    $curriculumKey   what curriculum components titles exist in the component, if any
      * @param int|null $textboxDefId    The definition ID of the textbox component, if any
      * @param int|null $curriculumDefId The definition ID of the curriculum component, if any
      * @return array
@@ -759,7 +759,7 @@ class Controller extends Base
     private function getUnitData(
         Model $unit,
         int $templateId,
-        array $curriculumnKey,
+        array $curriculumKey,
         ?int $textboxDefId,
         ?int $curriculumDefId
     ): array {
@@ -824,7 +824,7 @@ class Controller extends Base
                 'componentId' => $component->getId(),
                 'heading' => trim($instanceConfig['componentname']['value']),
                 'filter' => $instanceConfig['curriculumTreeFilter']['value'],
-                'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumnKey),
+                'inTemplate'    => in_array(strtolower(trim($instanceConfig['componentname']['value'])), $curriculumKey),
             ];
         }
 
@@ -916,8 +916,8 @@ class Controller extends Base
          */
         $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
         $class = CurriculumOverviewController::class;
-        $curriculumnTemplate = [];
-        $curriculumnKey = [];
+        $curriculumTemplate = [];
+        $curriculumKey = [];
         $unitCurricComp = $this->componentInstanceMapper->findByContextAndClass($module, $courseTemplateId, $class);
 
         foreach ($unitCurricComp as $curricComponent) {
@@ -944,12 +944,12 @@ class Controller extends Base
             } else {
                 $curricFilter = $this->nodeMapper->findOneByColumnList(['id' => $curricFilter, 'enabled' => true,]);
             }
-            $curriculumnTemplate[] = [
+            $curriculumTemplate[] = [
                 'heading' => $heading,
                 'filter' => $curricFilter,
             ];
-            $curriculumnKey[] = strtolower($heading);
+            $curriculumKey[] = strtolower($heading);
         }
-        return [$curriculumnTemplate, $curriculumnKey];
+        return [$curriculumTemplate, $curriculumKey];
     }
 }
