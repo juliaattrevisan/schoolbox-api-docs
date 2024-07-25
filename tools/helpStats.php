@@ -44,18 +44,13 @@ $app = new class extends CliTool\App {
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
 
-        // Only run for Schoolbox Help, current instance id is 3d844bfe
-//        if(!$config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE) == '3d844bfe'){
-//            exit;
-//        }
-
-        // Send the Data
-        $result = [];
+        // Only run for Schoolbox Help
+        if($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE) !== 'help'){
+            exit;
+        }
 
         // Fetch all the possible school codes
         $schoolCodes = $this->getSchoolCodes();
-
-        // Fetch all the current units in the OLC Course (course_spec 34)
 
         /* Get a list of (school code, counts) tuples
          */
@@ -70,8 +65,8 @@ $app = new class extends CliTool\App {
                 ->generate(2024)
         );
 
-        // for each of school code i need to substitute in that school code to a query that will give me a result
-        // for each of the below $result elements.
+        // start with an empty result set
+        $result = [];
 
         // for each of the school codes
         // I need a set of arrays each of which contains the fields: total users, starters, stars, superstars per unit
@@ -80,22 +75,20 @@ $app = new class extends CliTool\App {
             // I need to run a bunch of queries that only return results on pages that match 'school code + Unit Name'
             $result[$schoolcode]['school_code'] = $schoolcode;
 
-            /* TODO fill this in
-             */
-            $result[$schoolcode]['total_users'] = $this->getSchoolUser($schoolcode);
+            $result[$schoolcode]['total_users'] = $this->getSchoolUsers($schoolcode) ?? 0;
 
             $result[$schoolcode]['type'] = $config->get('site_type');
 
             // and then for each OLC Course unit
             // fetch the number of people in that unit, the amount of 'starters', the amount of 'Stars' and the amount of 'Superstars'
-            $unitProvisionedResults = $this->getUnitProvisioned($schoolcode,$this->db);
+            $unitProvisionedResults = $this->getUnitProvisioned($schoolcode);
 
             foreach (self::LOOKUP_UNIT_PREFIX as $unitSpecId => $prefix) {
                 /* Provisioned data comes from some other place other than $stack
                  * Treat it specially
                  */
                 $keyProvisioned = $prefix . '_provisioned';
-                $result[$schoolcode][$keyProvisioned] = $this->getDataFromArray($unitProvisionedResults, $keyProvisioned) ?? 0;
+                $result[$schoolcode][$keyProvisioned] = $this->getCount($unitProvisionedResults, $keyProvisioned) ?? 0;
 
                 /* A list of array keys named after their respective units
                  */
@@ -177,10 +170,15 @@ $app = new class extends CliTool\App {
         return $stack;
     }
 
-
+    /**
+     * Fetches a list of school codes based on users that exist
+     * if a user doesn't exist with an external id that includes a code
+     * then that school won't display in future results
+     *
+     * @return array
+     */
     private function getSchoolCodes() : array
     {
-        $schoolCodes = [];
         // Fetch a list of all existing unique School Codes by collecting a unique set of codes taken from the user.synergy_id, before the . delimiter
         $schoolCodeQuery = "
         SELECT
@@ -198,6 +196,14 @@ $app = new class extends CliTool\App {
         return $statement->fetchColumnArray('school_code');
     }
 
+    /**
+     * Gets a count of people that exist within each OLC Unit
+     * this will inevitably 'break' when a new unit is added
+     * as that unit will not show up in grafana
+     *
+     * @param $schoolcode
+     * @return array
+     */
     private function getUnitProvisioned($schoolcode) {
         $query = "
             SELECT
@@ -229,7 +235,13 @@ $app = new class extends CliTool\App {
         return $this->db->executeQuery($query)->fetchAll();
     }
 
-    private function getSchoolUser($schoolcode) {
+    /**
+     * Gets a count of all the users that exist for a given school code
+     *
+     * @param $schoolcode
+     * @return mixed
+     */
+    private function getSchoolUsers($schoolcode) {
         $query = "
         SELECT
             count(id) as num
@@ -243,47 +255,30 @@ $app = new class extends CliTool\App {
         return $this->db->executeQuery($query)->fetchColumn(0);
     }
 
-    private function getDataFromArray(array $arrayData, string $field) {
+
+    /**
+     * Gets the numerical count of people that are enrolled in a particular OLC unit
+     *
+     * @param array  $arrayData
+     * @param string $field
+     * @return int|null
+     */
+    private function getCount(array $arrayData, string $field): ?int
+    {
         // for each element of array data
-        foreach ($arrayData as $josh){
-            // josh {
+        foreach ($arrayData as $item) {
+            // datas {
             //      array_field = olc_extra_curricular_provisioned
             //      num = 6
 
             // im going to have an array containing num and array_field
             // if array_field matches what I'm looking for return the value of num
-            if($josh['array_field'] == $field){
-                return $josh['num'];
+            if ($item['array_field'] === $field) {
+                return (int)$item['num'];
             }
-
         }
 
-    }
-    private function getCourseUnitImps($schoolCodes) : array
-    {
-        // For each school code we need to fetch a list of unit pages
-
-        foreach ($schoolCodes as $code) {
-
-            $courseUnitsQuery = "
-                SELECT
-                    f.id as 'unitImpPageId'
-                FROM
-                    folder_code fc
-                JOIN
-                    folder f ON fc.folder_id = f.parent
-                WHERE
-                    fc.deleted_at IS NULL
-                AND
-                    fc.code = :school_code
-                AND
-                    f.name like '%OLC%'
-            ";
-
-            $statement = $db->executeQuery($courseUnitsQuery, ['school_code' => $code]);
-            $unitImpPageResult = $statement->fetchColumnArray('unitImpPageId');
-            return $unitImpPageResult;
-        }
+        return null;
     }
 };
 
