@@ -6,12 +6,18 @@
 
 import type { Ref } from "vue";
 import { useFloating, autoUpdate, flip, shift, offset } from "@floating-ui/vue";
+import {
+    ACTIVITY_TYPE_TASK,
+    ACTIVITY_TYPE_PROJECT,
+    ACTIVITY_TYPE_DUE_WORK,
+} from "@schoolboxAssessment/Types/assessmentTypes";
+import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import PopOut from "../popOut/pop-out.vue";
 import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 /**
  * an activity linked to the selected mark book item
@@ -49,7 +55,7 @@ type Routes = {
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
 const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
-const assessmentType = window.Vue.ref("");
+const assessmentType = window.Vue.ref<ActivityType>();
 
 const isLoading = window.Vue.ref(false);
 const isSelected = window.Vue.ref(false);
@@ -113,7 +119,7 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = window.Vue.computed(() => {
-    if ("Task" === assessmentType.value || "Project" === assessmentType.value) {
+    if (assessmentType.value === ACTIVITY_TYPE_TASK || assessmentType.value === ACTIVITY_TYPE_PROJECT) {
         return "";
     }
     if (!isParticipant.value) {
@@ -138,13 +144,13 @@ const viewAllText = window.Vue.computed(() => {
  * Used to determine the text shown for the view status link / menu
  */
 const viewStatusText = window.Vue.computed(() => {
-    if ("Due Work" === assessmentType.value) {
+    if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
         return "Submission History";
     }
-    if ("Task" === assessmentType.value) {
+    if (assessmentType.value === ACTIVITY_TYPE_TASK) {
         return "Student View";
     }
-    if ("Project" === assessmentType.value) {
+    if (assessmentType.value === ACTIVITY_TYPE_PROJECT) {
         return "View Progress";
     }
     return "View Attempts";
@@ -266,7 +272,8 @@ async function onPopOutSelected(event: CustomEvent) {
         isParticipant.value = event.detail.isParticipant;
         assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
-        if ("Task" === assessmentType.value || "Project" === assessmentType.value) {
+
+        if (assessmentType.value === ACTIVITY_TYPE_TASK || assessmentType.value === ACTIVITY_TYPE_PROJECT) {
             hasLoadError.value = false;
             isLoading.value = false;
             activityItems.value = [];
@@ -415,7 +422,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
             }
 
             // If including student reload the activity list
-            if ("Due Work" === assessmentType.value) {
+            if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
                 await getActivity();
             } else {
                 activityItems.value = [];
@@ -469,7 +476,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
                 </small-card>
             </div>
             <div class="c-pop-out-menu__options">
-                <template v-if="'Project' !== assessmentType">
+                <template v-if="assessmentType !== ACTIVITY_TYPE_PROJECT">
                     <pop-out-menu-item
                         :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                         @selected="onToggleSelected()"
@@ -477,7 +484,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
                         {{ viewAllText }}
                     </pop-out-menu-item>
                 </template>
-                <template v-if="('Due Work' === assessmentType) & !isExcluded">
+                <template v-if="assessmentType === ACTIVITY_TYPE_DUE_WORK && !isExcluded">
                     <pop-out-menu-divider />
                     <pop-out-menu-item
                         v-if="!isExcluded"
@@ -507,7 +514,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
                     Include Student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    v-if="!isExcluded && 'Project' !== assessmentType"
+                    v-if="!isExcluded && assessmentType !== ACTIVITY_TYPE_PROJECT"
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="excludeCheck()"
                 >
@@ -517,7 +524,9 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
                     v-if="!isExcluded"
                     :class="{
                         'is-disabled':
-                            !routes.historyRoute || isExcluded || (isActivityEmpty && 'Due Work' === assessmentType),
+                            !routes.historyRoute ||
+                            isExcluded ||
+                            (isActivityEmpty && assessmentType === ACTIVITY_TYPE_DUE_WORK),
                     }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
