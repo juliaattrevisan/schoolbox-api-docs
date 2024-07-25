@@ -85,7 +85,7 @@
                             elt.timer = null;
                             self.showTip($this);
                         }.bind(elt),
-                        self.settings.hover_delay
+                        self.settings.hover_delay,
                     );
                 }
             }
@@ -152,7 +152,7 @@
                                 _startShow(this, $this, true);
                             }
                         }
-                    }
+                    },
                 )
                 .on(
                     "mouseleave.fndtn.tooltip touchstart.fndtn.tooltip MSPointerDown.fndtn.tooltip",
@@ -172,11 +172,8 @@
                         } else {
                             _startHide(this, $(this));
                         }
-                    }
-                )
-                .on("DOMNodeRemoved DOMAttrModified", "[" + this.attr_name() + "]:not(a)", function (e) {
-                    _startHide(this, S(this));
-                });
+                    },
+                );
         },
 
         ie_touch: function (e) {
@@ -303,7 +300,7 @@
                         o_top + outerHeight / 2 - tip_outerHeight / 2,
                         "auto",
                         "auto",
-                        o_left - tip.outerWidth() - nubHeight
+                        o_left - tip.outerWidth() - nubHeight,
                     ).removeClass("tip-override");
                     nub.removeClass("rtl");
                 } else if (classes && classes.indexOf("tip-right") > -1) {
@@ -312,7 +309,7 @@
                         o_top + outerHeight / 2 - tip_outerHeight / 2,
                         "auto",
                         "auto",
-                        o_left + target.outerWidth() + nubHeight
+                        o_left + target.outerWidth() + nubHeight,
                     ).removeClass("tip-override");
                     nub.removeClass("rtl");
                 }
@@ -331,7 +328,7 @@
         inheritable_classes: function ($target) {
             var settings = $.extend({}, this.settings, this.data_options($target)),
                 inheritables = ["tip-top", "tip-left", "tip-bottom", "tip-right", "radius", "round"].concat(
-                    settings.additional_inheritable_classes
+                    settings.additional_inheritable_classes,
                 ),
                 classes = $target.attr("class"),
                 filtered = classes
@@ -356,7 +353,7 @@
                     "click.fndtn.tooltip.tapclose touchstart.fndtn.tooltip.tapclose MSPointerDown.fndtn.tooltip.tapclose",
                     function (e) {
                         self.hide($target);
-                    }
+                    },
                 );
             }
 
