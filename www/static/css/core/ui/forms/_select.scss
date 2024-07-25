@@ -35,7 +35,7 @@
         outline: none; // Remove focus outline, will add on alternate element
         padding: 0 var(--spacing-s) 0 0;
         width: 100%;
-        z-index: var(--depth-default); // Stack above custom arrow
+        z-index: var(--sbx-depth-default); // Stack above custom arrow
     }
     &::after {
         // Custom arrow

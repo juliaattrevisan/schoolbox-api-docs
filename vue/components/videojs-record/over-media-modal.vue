@@ -92,7 +92,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: var(--depth-modal);
+    z-index: var(--sbx-depth-modal);
     width: 100%;
     height: 100%;
     display: flex;

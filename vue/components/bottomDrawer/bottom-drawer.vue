@@ -84,7 +84,7 @@ export default {
     padding: 1rem;
     position: v-bind(position);
     width: v-bind(width);
-    z-index: var(--depth-ui-overlay);
+    z-index: var(--sbx-depth-ui-overlay);
 }
 
 .slide-enter-active,

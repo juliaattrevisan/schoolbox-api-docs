@@ -344,7 +344,7 @@ export default {
 <style lang="scss" scoped>
 .delete-button {
     position: absolute;
-    z-index: calc(var(--depth-default) + 2);
+    z-index: calc(var(--sbx-depth-default) + 2);
     right: 10px;
     top: 10px;
     width: 42px;

@@ -422,7 +422,7 @@ export default window.Vue.defineComponent({
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         position: absolute;
         top: 40px;
-        z-index: var(--depth-pop-over);
+        z-index: var(--sbx-depth-pop-over);
     }
 }
 

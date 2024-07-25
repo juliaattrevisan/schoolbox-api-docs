@@ -170,11 +170,11 @@ export default {
 }
 
 .media-container-record {
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
 }
 
 .media-container-playback {
-    z-index: calc(var(--depth-default) + 1);
+    z-index: calc(var(--sbx-depth-default) + 1);
 }
 
 .file-input-container {
@@ -187,7 +187,7 @@ export default {
 :deep(.dzone) {
     //piggy back on the existing dropzone styles, and update as needed
     position: absolute;
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
     width: 100%;
     height: 100%;
     font-size: 0px;
@@ -197,7 +197,7 @@ export default {
 .file-input-note {
     display: block;
     position: relative;
-    z-index: calc(var(--depth-default) + 1);
+    z-index: calc(var(--sbx-depth-default) + 1);
     padding: 20px;
     font-size: 0.8rem;
     pointer-events: none;

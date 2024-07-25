@@ -61,7 +61,7 @@ $tooltip-max-width: 300px !default;
             padding: $tooltip-padding;
             position: absolute;
             width: 100%;
-            z-index: var(--depth-modal-ui-overlay);
+            z-index: var(--sbx-depth-modal-ui-overlay);
             #{$default-float}: 50%;
 
             > .nub {

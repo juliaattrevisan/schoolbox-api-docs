@@ -20,7 +20,7 @@
     min-height: 2rem;
     padding: 0.5rem 0;
     position: absolute;
-    z-index: var(--depth-pop-over);
+    z-index: var(--sbx-depth-pop-over);
 
     &__divider {
         border: 1px solid rgba(255, 0, 0, 0.15);

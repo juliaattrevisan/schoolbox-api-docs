@@ -27,12 +27,12 @@ function adjustItemsListHeader() {
             questionItemsListHeader.style.position = "fixed";
             questionItemsListHeader.style.top = "0px";
             questionItemsListHeader.style.width = questionItemsListRect.width + "px";
-            questionItemsListHeader.style.zIndex = "var(--depth-ui-overlay)";
+            questionItemsListHeader.style.zIndex = "var(--sbx-depth-ui-overlay)";
         } else {
             questionItemsListHeader.style.position = "";
             questionItemsListHeader.style.top = "";
             questionItemsListHeader.style.width = "";
-            questionItemsListHeader.style.zIndex = "var(--depth-default)";
+            questionItemsListHeader.style.zIndex = "var(--sbx-depth-default)";
         }
     }
 }

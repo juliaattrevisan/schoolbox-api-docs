@@ -1,5 +1,5 @@
 .clr-picker {
-    z-index: var(--depth-pop-over);
+    z-index: var(--sbx-depth-pop-over);
 }
 .clr-field {
     min-width: 2.5rem;

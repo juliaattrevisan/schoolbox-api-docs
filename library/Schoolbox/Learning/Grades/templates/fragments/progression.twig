@@ -102,7 +102,7 @@
                 <script type="application/javascript">
                     $(function() {
                         const rootStyles = getComputedStyle(document.documentElement); // Get the computed styles of the :root element
-                        const depthDefault = parseInt(rootStyles.getPropertyValue('--depth-default')); // Get the default depth for the graph
+                        const depthDefault = parseInt(rootStyles.getPropertyValue('--sbx-depth-default')); // Get the default depth for the graph
                         var assessments = [
                             {% for activity_id, activity in rubricAssessmentList %}
                             "{{ activity.name }}",

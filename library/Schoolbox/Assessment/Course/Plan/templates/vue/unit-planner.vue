@@ -270,24 +270,24 @@ window.Vue.onUnmounted(() => {
 }
 
 .fixed-top.fixed-left {
-    z-index: calc(var(--depth-ui-overlay) + 3); // On top of both the left column, the header, and the dropdowns
+    z-index: calc(var(--sbx-depth-ui-overlay) + 3); // On top of both the left column, the header, and the dropdowns
 }
 
 .fixed-left {
     left: 0;
     position: sticky;
-    z-index: var(--depth-ui-overlay); // Behind the dropdowns and table header, but on top of the content
+    z-index: var(--sbx-depth-ui-overlay); // Behind the dropdowns and table header, but on top of the content
 }
 .fixed-top {
     position: sticky;
     top: 0;
-    z-index: calc(var(--depth-ui-overlay) + 2); // On top of both the left column and the dropdowns
+    z-index: calc(var(--sbx-depth-ui-overlay) + 2); // On top of both the left column and the dropdowns
 }
 
 #unitplanner-dropdown-container {
     height: 0;
     position: sticky;
-    z-index: calc(var(--depth-ui-overlay) + 1); // On top of left column, but behind the header
+    z-index: calc(var(--sbx-depth-ui-overlay) + 1); // On top of left column, but behind the header
 }
 
 #unit-planner-sortable-container {
@@ -296,7 +296,7 @@ window.Vue.onUnmounted(() => {
     position: absolute;
     top: var(--UnitPlannerTableHeaderHeight);
     width: 100%;
-    z-index: calc(var(--depth-default) - 1);
+    z-index: calc(var(--sbx-depth-default) - 1);
 }
 
 .unit-planner-sortable-placeholder {
@@ -304,7 +304,7 @@ window.Vue.onUnmounted(() => {
     grid-template-columns: 200px repeat(var(--UnitPlannerVisibleColumns), minmax(400px, 1fr));
     position: absolute;
     width: 100%;
-    z-index: var(--depth-pop-over);
+    z-index: var(--sbx-depth-pop-over);
 }
 /* Styles for printing */
 @media print {

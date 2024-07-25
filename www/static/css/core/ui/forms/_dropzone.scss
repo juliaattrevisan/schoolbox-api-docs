@@ -104,7 +104,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 .dragging {
     .dropzone.overlay {
         opacity: 1;
-        z-index: calc(var(--depth-default) + 1);
+        z-index: calc(var(--sbx-depth-default) + 1);
 
         transition: opacity $attachzone-overlay-duration $attachzone-overlay-timing;
     }
@@ -143,7 +143,7 @@ section > .dropzone-wrap {
         margin: 0;
         opacity: 0;
         display: block;
-        z-index: calc(var(--depth-default) - 2);
+        z-index: calc(var(--sbx-depth-default) - 2);
 
         transition:
             opacity $attachzone-overlay-duration $attachzone-overlay-timing,
