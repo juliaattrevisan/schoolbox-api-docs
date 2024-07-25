@@ -64,7 +64,9 @@ class CleanUpAbandoned extends CliTool\App
                 ? 'Running in live mode: registrations will be soft deleted.'
                 : 'Running in dry-run mode: registrations will not be soft deleted.'
         );
-
+        /**
+         * We will deal with the Firebase token separately
+         */
         $getAbandonedQuery = sprintf("
             SELECT
                 user_id,
