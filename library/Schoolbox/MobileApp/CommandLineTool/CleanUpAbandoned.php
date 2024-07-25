@@ -67,7 +67,8 @@ class CleanUpAbandoned extends CliTool\App
         /**
          * We will deal with the Firebase token separately
          */
-        $getAbandonedQuery = sprintf("
+        $getAbandonedQuery = sprintf(
+            "
             SELECT
                 user_id,
                 app_token,
@@ -91,7 +92,7 @@ class CleanUpAbandoned extends CliTool\App
             foreach ($result as $row) {
                 $this->getLogger()->info(
                     sprintf(
-                        '%s of user_id %d was last used at %s: Deleting.',
+                        '%s of user_id %d was last touched at %s: Deleting.',
                         $row['app_token'],
                         $row['user_id'],
                         $row['touched_at']
