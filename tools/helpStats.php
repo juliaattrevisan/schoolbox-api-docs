@@ -67,7 +67,7 @@ $app = new class extends CliTool\App {
         // ]
         $stack = $this->transpose(
             (new Payload($this->db, $this->getDi()->get('assessmentDataSource'), \Schoolbox\RoleMapper::getInstance()))
-               ->generate(2024)
+                ->generate(2024)
         );
 
         // for each of school code i need to substitute in that school code to a query that will give me a result
@@ -82,7 +82,7 @@ $app = new class extends CliTool\App {
 
             /* TODO fill this in
              */
-            $result[$schoolcode]['total_users'] = '';
+            $result[$schoolcode]['total_users'] = $this->getSchoolUser($schoolcode);
 
             $result[$schoolcode]['type'] = $config->get('site_type');
 
@@ -95,7 +95,7 @@ $app = new class extends CliTool\App {
                  * Treat it specially
                  */
                 $keyProvisioned = $prefix . '_provisioned';
-                $result[$schoolcode][$keyProvisioned] = $this->getDataFromArray($unitProvisionedResults, $keyProvisioned);
+                $result[$schoolcode][$keyProvisioned] = $this->getDataFromArray($unitProvisionedResults, $keyProvisioned) ?? 0;
 
                 /* A list of array keys named after their respective units
                  */
@@ -196,9 +196,9 @@ $app = new class extends CliTool\App {
 
         $statement = $this->db->executeQuery($schoolCodeQuery);
         return $statement->fetchColumnArray('school_code');
-        }
+    }
 
-    private function getUnitProvisioned($schoolcode, $db) {
+    private function getUnitProvisioned($schoolcode) {
         $query = "
             SELECT
                 CASE
@@ -226,7 +226,21 @@ $app = new class extends CliTool\App {
                 f.name
             ";
 
-        return $db->executeQuery($query)->fetchAll();
+        return $this->db->executeQuery($query)->fetchAll();
+    }
+
+    private function getSchoolUser($schoolcode) {
+        $query = "
+        SELECT
+            count(id) as num
+        FROM
+            user
+        WHERE
+            deleted_at is NULL
+        AND
+            synergy_id like '$schoolcode.%'
+        ";
+        return $this->db->executeQuery($query)->fetchColumn(0);
     }
 
     private function getDataFromArray(array $arrayData, string $field) {
@@ -245,22 +259,6 @@ $app = new class extends CliTool\App {
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private function getCourseUnitImps($schoolCodes) : array
     {
         // For each school code we need to fetch a list of unit pages
