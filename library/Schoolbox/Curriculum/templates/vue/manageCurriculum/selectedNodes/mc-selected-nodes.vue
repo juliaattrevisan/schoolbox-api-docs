@@ -63,7 +63,7 @@ function onDeleteNodesSelected() {
                 <mc-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
             </div>
             <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">
-                If you wish to re-enable disabled nodes, please enable the disabled parent.
+                If you wish to re-enable disabled outcomes, please enable the disabled parent.
             </p>
             <ul class="flex-list">
                 <li v-if="selectedNodesStore.allNodesEnabled">
