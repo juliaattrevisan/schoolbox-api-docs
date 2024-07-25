@@ -92,40 +92,25 @@ $app = new class extends CliTool\App {
              * In this case, $stack[$schoolcode] won't exist (no data exists)
              * Assume a count of zero
              */
-            $result[$schoolcode]['olc_extra_curricular_provisioned']     = $this->getDataFromArray($unitProvisionedResults, 'olc_extra_curricular_provisioned');
-            $result[$schoolcode]['olc_extra_curricular_starter']         = '';
-            $result[$schoolcode]['olc_extra_curricular_star']            = $stack[$schoolcode]['olc_extra_curricular_star'] ?? 0;
-            $result[$schoolcode]['olc_extra_curricular_superstar']       = $stack[$schoolcode]['olc_extra_curricular_superstar'] ?? 0;
+            foreach (self::LOOKUP_UNIT_PREFIX as $unitSpecId => $prefix) {
+                /* Provisioned data comes from some other place other than $stack
+                 * Treat it specially
+                 */
+                $keyProvisioned = $prefix . '_provisioned';
+                $result[$schoolcode][$keyProvisioned] = $this->getDataFromArray($unitProvisionedResults, $keyProvisioned);
 
-            // Find the results for fundamentals unit
-            $result[$schoolcode]['olc_fundamentals_provisioned']         = $this->getDataFromArray($unitProvisionedResults, 'olc_fundamentals_provisioned');
-            $result[$schoolcode]['olc_fundamentals_starters']            = '';
-            $result[$schoolcode]['olc_fundamentals_star']                = $stack[$schoolcode]['olc_fundamentals_star'] ?? 0;
-            $result[$schoolcode]['olc_fundamentals_superstar']           = $stack[$schoolcode]['olc_fundamentals_superstar'] ?? 0;
+                /* A list of array keys named after their respective units
+                 */
+                $keys = [
+                    $prefix . '_starter',
+                    $prefix . '_star',
+                    $prefix . '_superstar',
+                ];
 
-            // Find the results for marcomms unit
-            $result[$schoolcode]['olc_marcomms_provisioned']             = $this->getDataFromArray($unitProvisionedResults, 'olc_marcomms_provisioned');
-            $result[$schoolcode]['olc_marcomms_starter']                 = '';
-            $result[$schoolcode]['olc_marcomms_star']                    = $stack[$schoolcode]['olc_marcomms_star'] ?? 0;
-            $result[$schoolcode]['olc_marcomms_superstar']               = $stack[$schoolcode]['olc_marcomms_superstar'] ?? 0;
-
-            // Find the results for pastoral care unit
-            $result[$schoolcode]['olc_pastoral_care_provisioned']        = $this->getDataFromArray($unitProvisionedResults, 'olc_pastoral_care_provisioned');
-            $result[$schoolcode]['olc_pastoral_care_starter']            = '';
-            $result[$schoolcode]['olc_pastoral_care_star']               = $stack[$schoolcode]['olc_pastoral_care_star'] ?? 0;
-            $result[$schoolcode]['olc_pastoral_care_superstar']          = $stack[$schoolcode]['olc_pastoral_care_superstar'] ?? 0;
-
-            // Find the results for superuser unit
-            $result[$schoolcode]['olc_superuser_provisioned']            = $this->getDataFromArray($unitProvisionedResults, 'olc_superuser_provisioned');
-            $result[$schoolcode]['olc_superuser_starter']                = '';
-            $result[$schoolcode]['olc_superuser_star']                   = $stack[$schoolcode]['olc_superuser_star'] ?? 0;
-            $result[$schoolcode]['olc_superuser_superstar']              = $stack[$schoolcode]['olc_superuser_superstar'] ?? 0;
-
-            // Find the results for teaching and learning unit
-            $result[$schoolcode]['olc_teaching_and_learning_provisioned'] = $this->getDataFromArray($unitProvisionedResults, 'olc_teaching_and_learning_provisioned');
-            $result[$schoolcode]['olc_teaching_and_learning_starter']     = '';
-            $result[$schoolcode]['olc_teaching_and_learning_star']        = $stack[$schoolcode]['olc_teaching_and_learning_star'] ?? 0;
-            $result[$schoolcode]['olc_teaching_and_learning_superstar']   = $stack[$schoolcode]['olc_teaching_and_learning_superstar'] ?? 0;
+                foreach ($keys as $key) {
+                    $result[$schoolcode][$key] = $stack[$schoolcode][$key] ?? 0;
+                }
+            }
         }
 
         //TODO: Prepare the Data to send through to influx db
