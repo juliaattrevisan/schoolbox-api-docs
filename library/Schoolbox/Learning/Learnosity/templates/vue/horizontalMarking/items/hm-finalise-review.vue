@@ -5,10 +5,10 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
-import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
+import { getLatestMark, getFinaliseReviewFormData } from "../../student/util/studentUtils";
 
 const store = useStore();
 const itemsStore = useItemsStore();
@@ -39,21 +39,6 @@ window.Vue.watch(
 );
 
 /**
- * To mark all attempts as reviewed
- * @param {Student} student - the student to mark
- * @returns {FormData} - the data to send through
- */
-function getFormData(student: Student) {
-    const formData = new FormData();
-    formData.append("responseId", student.attemptResponse?.responseId ?? "");
-    formData.append("maxMarks", student.attemptResponse?.maxMarks?.toString() ?? "");
-    formData.append("mark", student.attemptResponse?.mark ?? "");
-    formData.append("comment", student.attemptResponse?.comment ?? "");
-    formData.append("publish", "1");
-    return formData;
-}
-
-/**
  * Get the list of all students to post feedback for
  * @returns {Promise<string>[]} - the list of fetches to make
  */
@@ -66,7 +51,7 @@ function getFetches() {
                 headers: {
                     Accept: "application/json",
                 },
-                body: getFormData(student),
+                body: getFinaliseReviewFormData(student),
             }),
         );
     });

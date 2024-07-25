@@ -5,9 +5,9 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
-import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
+import { getLatestMark, getFinaliseReviewFormData } from "../student/util/studentUtils";
 
 const store = useStore();
 const studentStore = useStudentStore();
@@ -50,40 +50,6 @@ window.Vue.watch(
 );
 
 /**
- * This ensures the mark is the latest valid submission.
- * If the user is quick enough, they can update the mark and press submit before
- * the mark is submitted to the back end.
- * @param {Student} student - the student to get the mark from
- * @returns {string} - the mark to submit
- */
-function getMark(student: Student) {
-    const gradeContainer = document.getElementById(`grade-container-${student.id}`) as HTMLDivElement;
-    const formElement = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
-    if (gradeContainer === null || formElement === null) {
-        return student.attemptResponse?.mark ?? "";
-    }
-    if (formElement.getAttribute("aria-invalid") === "false" && student.attemptResponse?.mark !== formElement.value) {
-        useStudentStore().updateAttemptMark(student, formElement.value as string);
-        return formElement.value as string;
-    }
-    return student.attemptResponse?.mark ?? "";
-}
-
-/**
- * To mark the attempt as reviewed
- * @returns {FormData} - the data to send through
- */
-function getFormData() {
-    const formData = new FormData();
-    formData.append("responseId", studentStore.student.attemptResponse?.responseId ?? "");
-    formData.append("maxMarks", studentStore.student.attemptResponse?.maxMarks?.toString() ?? "");
-    formData.append("mark", getMark(studentStore.student));
-    formData.append("comment", studentStore.student.attemptResponse?.comment ?? "");
-    formData.append("publish", "1");
-    return formData;
-}
-
-/**
  * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
@@ -95,7 +61,7 @@ async function submitFeedback() {
             headers: {
                 Accept: "application/json",
             },
-            body: getFormData(),
+            body: getFinaliseReviewFormData(studentStore.student),
         });
         if (response.ok) {
             window.location.href = store.statusPage;
