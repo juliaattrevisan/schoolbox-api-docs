@@ -53,12 +53,28 @@ defineExpose({ isEmpty });
         />
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
-                    <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
-                    <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}" v-html="capability.name"></th>
+<!--                    <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}">-->
+                    <th class="markdown border-none">
+                      <span
+                          v-if="props.usedCapabilities.includes(capability.id)"
+                          class="icon-submissions"
+                          title="Used in a Learning activity"
+                      ></span>
+                      <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
+                      <div v-html="capability.name"></div>
+                    </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                    <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
-                    <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name"></td>
+<!--                    <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name">-->
+                    <td class="markdown border-none">
+                      <span
+                          v-if="props.usedIndicators.includes(indicator.id)"
+                          class="icon-submissions"
+                          title="Used in a Learning activity"
+                      ></span>
+                      <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
+                      <div v-html="indicator.name"></div>
+                    </td>
                 </tr>
             </template>
         <up-unit-cell-rubric-capabilities-action
@@ -68,12 +84,28 @@ defineExpose({ isEmpty });
         />
             <template v-for="capability in unitRubric" :key="capability.id">
               <tr>
-                <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
-                <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}" v-html="capability.name"></th>
+                <!--                    <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}">-->
+                <th class="markdown border-none">
+                      <span
+                          v-if="props.usedCapabilities.includes(capability.id)"
+                          class="icon-submissions"
+                          title="Used in a Learning activity"
+                      ></span>
+                  <!-- eslint-disable-next-line vue/no-v-html | capability.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
+                  <div v-html="capability.name"></div>
+                </th>
               </tr>
               <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
-                <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name"></td>
+                <!--                    <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name">-->
+                <td class="markdown border-none">
+                      <span
+                          v-if="props.usedIndicators.includes(indicator.id)"
+                          class="icon-submissions"
+                          title="Used in a Learning activity"
+                      ></span>
+                  <!-- eslint-disable-next-line vue/no-v-html | indicator.name is scrubbed on input, and is sent here via Scrub::markdown() (which can add <p></p> tags for example) -->
+                  <div v-html="indicator.name"></div>
+                </td>
               </tr>
             </template>
         </tbody>
