@@ -108,7 +108,7 @@ class ManageCurriculumCest
         $disableNodes->clickConfirmButton();
         $i->amGoingTo('ensure the toast message is shown');
         $mc->waitForToast();
-        $i->canSee('Nodes successfully disabled');
+        $i->canSee('Outcomes successfully disabled');
     }
 
     /**
@@ -128,7 +128,7 @@ class ManageCurriculumCest
         $deleteNodes->clickConfirmButton();
         $i->amGoingTo('ensure the toast message is shown');
         $mc->waitForToast();
-        $i->canSee('Node successfully deleted');
+        $i->canSee('Outcome successfully deleted');
         $i->dontSee('Year 12 French');
     }
 
@@ -165,7 +165,7 @@ class ManageCurriculumCest
         $updateNode->fillDescription('1', 'Here we will focus mainly on the Romans, Egyptians and Babylonians');
         $updateNode->clickUpdateButton();
         $i->amGoingTo('ensure the toast message is shown');
-        $i->canSee('Node successfully updated');
+        $i->canSee('Outcome successfully updated');
         $i->amGoingTo('ensure the updated node displays correctly');
         $i->canSee('[9AH] Year 9 Ancient History');
     }

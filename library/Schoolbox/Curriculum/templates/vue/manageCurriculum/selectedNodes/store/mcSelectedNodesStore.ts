@@ -44,7 +44,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      *
      * @returns { string }
      */
-    const singleOrPlural = window.Vue.computed(() => (count.value > 1 ? "nodes" : "node"));
+    const singleOrPlural = window.Vue.computed(() => (count.value > 1 ? "outcomes" : "outcome"));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
@@ -155,7 +155,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
         } else {
             // use the .selectedParentId property to determine which child nodes to remove from the list
             childNodes.value = childNodes.value.filter(
-                (selectedCode) => selectedCode.selectedParentId !== selectedParentId
+                (selectedCode) => selectedCode.selectedParentId !== selectedParentId,
             );
         }
         node.children?.forEach((innerNode) => {
@@ -196,7 +196,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     function checkIfSelected(node: Node) {
         const parentNode: Node | undefined = findById(
             useNodesStore().nodes.children as Node[],
-            node.parent?.id as number
+            node.parent?.id as number,
         );
         // no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
         if (parentNode === undefined || nodesIds.value.includes(node.id) || childNodesIds.value.includes(node.id)) {
@@ -208,7 +208,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
         } else if (childNodesIds.value.includes(parentNode.id)) {
             // if the parent is in the children of selected list, this node can also go in the list
             const selectedParentNode: Node = childNodes.value.find(
-                (childNode) => childNode.id === parentNode.id
+                (childNode) => childNode.id === parentNode.id,
             ) as Node; // find the selected parent in the list
             node.selectedParentId = selectedParentNode.selectedParentId; // add the base level selectedParentId
             childNodes.value = [...childNodes.value, node]; // and then add the node

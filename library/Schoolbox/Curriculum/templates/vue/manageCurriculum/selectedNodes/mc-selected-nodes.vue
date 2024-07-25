@@ -27,7 +27,7 @@ const nodeUsageStore = useNodeUsageStore(); // so the bottom-drawer is not visib
  */
 const selectedNodesSummary = window.Vue.computed(() => {
     if (selectedNodesStore.hasNoNodes) {
-        return `No nodes`;
+        return `No outcomes`;
     }
     return selectedNodesStore.singleOrPlural;
 });

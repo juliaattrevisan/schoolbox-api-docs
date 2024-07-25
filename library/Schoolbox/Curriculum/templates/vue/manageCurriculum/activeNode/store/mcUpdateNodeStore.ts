@@ -77,7 +77,7 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
                 activeNodeStore.update(activeNodeCopy.value);
                 isProcessing.value = false;
                 cancel();
-                return { id: activeNodeStore.node.id, message: "Node successfully updated" };
+                return { id: activeNodeStore.node.id, message: "Outcome successfully updated" };
             }
             throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {

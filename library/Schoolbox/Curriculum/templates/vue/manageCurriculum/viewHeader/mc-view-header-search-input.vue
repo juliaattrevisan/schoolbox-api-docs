@@ -50,7 +50,7 @@ window.Vue.watch(
             searchStore.enableSearch();
             debounceSearch();
         }
-    }
+    },
 );
 
 /**
@@ -94,7 +94,7 @@ function onClearSearchSelected() {
         </div>
     </div>
     <div class="medium-4 small-12 columns">
-        <label class="inline-block">Show disabled nodes</label>
+        <label class="inline-block">Show disabled outcomes</label>
         <div class="long switch">
             <input
                 id="show-only-enabled"

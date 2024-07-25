@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 
 export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
@@ -59,7 +60,7 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
      */
     function getSuccessMessage() {
         const selectedNodesStore = useSelectedNodesStore();
-        const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1 ? "s" : ""}`;
+        const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
         const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? "disabled" : "enabled"}`;
         return `${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
     }

@@ -97,13 +97,13 @@ function onModalClosed() {
         <h2>Please Confirm</h2>
         <p v-if="enableNodesStore.enabled">
             Are you sure you wish to enable the selected {{ selectedNodesStore.singleOrPlural }} and all of
-            {{ selectedNodesStore.count > 1 ? "their" : "its" }} children? If you continue, these nodes will be visible
-            from the curriculum code selector during curriculum mapping.
+            {{ selectedNodesStore.count > 1 ? "their" : "its" }} children? If you continue, these outcomes will be
+            visible from the curriculum code selector during curriculum mapping.
         </p>
         <p v-else>
             Are you sure you wish to disable the selected {{ selectedNodesStore.singleOrPlural }} and all of
-            {{ selectedNodesStore.count > 1 ? "their" : "its" }} children? If you continue, these nodes will be hidden
-            from the curriculum code selector during curriculum mapping.
+            {{ selectedNodesStore.count > 1 ? "their" : "its" }} children? If you continue, these outcomes will be
+            hidden from the curriculum code selector during curriculum mapping.
         </p>
         <ul class="flex-list">
             <li>
