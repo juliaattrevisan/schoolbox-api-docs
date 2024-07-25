@@ -9,6 +9,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Custom\Help\Superstar\Candidacy;
 use Custom\Help\Superstar\Payload;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -78,8 +79,12 @@ $app = new class extends CliTool\App {
             // For each of these school codes
             // I need to run a bunch of queries that only return results on pages that match 'school code + Unit Name'
             $result[$schoolcode]['school_code'] = $schoolcode;
+
+            /* TODO fill this in
+             */
             $result[$schoolcode]['total_users'] = '';
-            $result[$schoolcode]['type']        = $config->get('site_type');
+
+            $result[$schoolcode]['type'] = $config->get('site_type');
 
             // and then for each OLC Course unit
             // fetch the number of people in that unit, the amount of 'starters', the amount of 'Stars' and the amount of 'Superstars'
@@ -95,9 +100,9 @@ $app = new class extends CliTool\App {
                 /* A list of array keys named after their respective units
                  */
                 $keys = [
-                    $prefix . '_starter',
-                    $prefix . '_star',
-                    $prefix . '_superstar',
+                    sprintf('%s_%s', $prefix, Candidacy::STARTER),
+                    sprintf('%s_%s', $prefix, Candidacy::STAR),
+                    sprintf('%s_%s', $prefix, Candidacy::SUPERSTAR),
                 ];
 
                 /* A school might not have any superstars/stars/etc
