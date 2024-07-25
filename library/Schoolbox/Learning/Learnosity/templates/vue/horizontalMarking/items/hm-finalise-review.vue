@@ -17,7 +17,7 @@ const modalEl = window.Vue.ref<typeof RevealModal | null>();
 const isFinalising = window.Vue.ref(false); // to show the finalising text on the button
 const buttonText = window.Vue.computed(() => {
     // to change the button text when finalising
-    return isFinalising.value ? "Finalising..." : "Finalise Review";
+    return isFinalising.value ? "Finalising..." : "Finalise review";
 });
 const confirmButtonText = window.Vue.computed(() => {
     // to change the button text when finalising
@@ -88,13 +88,13 @@ async function submitFeedback() {
             timeout({ text: "Review successfully finalised" });
         } else {
             timeout({
-                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                text: "Review could not be finalised, please contact your support if the problem persists",
                 isSuccess: false,
             });
         }
     } catch (error) {
         timeout({
-            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
         });
     } finally {
