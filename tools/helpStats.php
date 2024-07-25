@@ -9,6 +9,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Custom\Help\Superstar\Payload;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
@@ -45,6 +46,18 @@ $app = new class extends CliTool\App {
 
         // Fetch all the current units in the OLC Course (course_spec 34)
 
+        /* Get a list of (school code, counts) tuples
+         */
+        // $stack = [
+        //     'aas' => [
+        //         'olc_fundamentals_superstar' => 34,
+        //         'olc_fundamentals_star' => 11,
+        //     ]
+        // ]
+        $stack = $this->transposeData(
+            (new Payload($this->db, $this->getDi()->get('assessmentDataSource'), \Schoolbox\RoleMapper::getInstance()))
+               ->generate(2024)
+        );
 
         // for each of school code i need to substitute in that school code to a query that will give me a result
         // for each of the below $result elements.
@@ -62,45 +75,47 @@ $app = new class extends CliTool\App {
             // and then for each OLC Course unit
             // fetch the number of people in that unit, the amount of 'starters', the amount of 'Stars' and the amount of 'Superstars'
             $unitProvisionedResults = $this->getUnitProvisioned($schoolcode,$this->db);
-            $unitStartersResults = '';
-            $unitStarsResults = '';
-            $unitSuperstarsResults = '';
 
             // Find the results for extra-curricular unit
-            $result[$schoolcode]['olc_extra_curricular_provisioned']      = $this->getDataFromArray($unitProvisionedResults, 'olc_extra_curricular_provisioned');
-            $result[$schoolcode]['olc_extra_curricular_starters']         = '';
-            $result[$schoolcode]['olc_extra_curricular_stars']            = '';
-            $result[$schoolcode]['olc_extra_curricular_superstars']       = '';
+
+            /* A school might not have any superstars/stars/etc
+             * In this case, $stack[$schoolcode] won't exist (no data exists)
+             * Assume a count of zero
+             */
+            $result[$schoolcode]['olc_extra_curricular_provisioned']     = $this->getDataFromArray($unitProvisionedResults, 'olc_extra_curricular_provisioned');
+            $result[$schoolcode]['olc_extra_curricular_starter']         = '';
+            $result[$schoolcode]['olc_extra_curricular_star']            = $stack[$schoolcode]['olc_extra_curricular_star'] ?? 0;
+            $result[$schoolcode]['olc_extra_curricular_superstar']       = $stack[$schoolcode]['olc_extra_curricular_superstar'] ?? 0;
 
             // Find the results for fundamentals unit
-            $result[$schoolcode]['olc_fundamentals_provisioned']          = $this->getDataFromArray($unitProvisionedResults, 'olc_fundamentals_provisioned');
-            $result[$schoolcode]['olc_fundamentals_starters']             = '';
-            $result[$schoolcode]['olc_fundamentals_stars']                = '';
-            $result[$schoolcode]['olc_fundamentals_superstars']           = '';
+            $result[$schoolcode]['olc_fundamentals_provisioned']         = $this->getDataFromArray($unitProvisionedResults, 'olc_fundamentals_provisioned');
+            $result[$schoolcode]['olc_fundamentals_starters']            = '';
+            $result[$schoolcode]['olc_fundamentals_star']                = $stack[$schoolcode]['olc_fundamentals_star'] ?? 0;
+            $result[$schoolcode]['olc_fundamentals_superstar']           = $stack[$schoolcode]['olc_fundamentals_superstar'] ?? 0;
 
             // Find the results for marcomms unit
-            $result[$schoolcode]['olc_marcomms_provisioned']              = $this->getDataFromArray($unitProvisionedResults, 'olc_marcomms_provisioned');
-            $result[$schoolcode]['olc_marcomms_starters']                 = '';
-            $result[$schoolcode]['olc_marcomms_stars']                    = '';
-            $result[$schoolcode]['olc_marcomms_superstars']               = '';
+            $result[$schoolcode]['olc_marcomms_provisioned']             = $this->getDataFromArray($unitProvisionedResults, 'olc_marcomms_provisioned');
+            $result[$schoolcode]['olc_marcomms_starter']                 = '';
+            $result[$schoolcode]['olc_marcomms_star']                    = $stack[$schoolcode]['olc_marcomms_star'] ?? 0;
+            $result[$schoolcode]['olc_marcomms_superstar']               = $stack[$schoolcode]['olc_marcomms_superstar'] ?? 0;
 
             // Find the results for pastoral care unit
-            $result[$schoolcode]['olc_pastoral_care_provisioned']         = $this->getDataFromArray($unitProvisionedResults, 'olc_pastoral_care_provisioned');
-            $result[$schoolcode]['olc_pastoral_care_starters']            = '';
-            $result[$schoolcode]['olc_pastoral_care_stars']               = '';
-            $result[$schoolcode]['olc_pastoral_care_superstars']          = '';
+            $result[$schoolcode]['olc_pastoral_care_provisioned']        = $this->getDataFromArray($unitProvisionedResults, 'olc_pastoral_care_provisioned');
+            $result[$schoolcode]['olc_pastoral_care_starter']            = '';
+            $result[$schoolcode]['olc_pastoral_care_star']               = $stack[$schoolcode]['olc_pastoral_care_star'] ?? 0;
+            $result[$schoolcode]['olc_pastoral_care_superstar']          = $stack[$schoolcode]['olc_pastoral_care_superstar'] ?? 0;
 
             // Find the results for superuser unit
-            $result[$schoolcode]['olc_superuser_provisioned']             = $this->getDataFromArray($unitProvisionedResults, 'olc_superuser_provisioned');
-            $result[$schoolcode]['olc_superuser_starters']                = '';
-            $result[$schoolcode]['olc_superuser_stars']                   = '';
-            $result[$schoolcode]['olc_superuser_superstars']              = '';
+            $result[$schoolcode]['olc_superuser_provisioned']            = $this->getDataFromArray($unitProvisionedResults, 'olc_superuser_provisioned');
+            $result[$schoolcode]['olc_superuser_starter']                = '';
+            $result[$schoolcode]['olc_superuser_star']                   = $stack[$schoolcode]['olc_superuser_star'] ?? 0;
+            $result[$schoolcode]['olc_superuser_superstar']              = $stack[$schoolcode]['olc_superuser_superstar'] ?? 0;
 
             // Find the results for teaching and learning unit
             $result[$schoolcode]['olc_teaching_and_learning_provisioned'] = $this->getDataFromArray($unitProvisionedResults, 'olc_teaching_and_learning_provisioned');
-            $result[$schoolcode]['olc_teaching_and_learning_starters']    = '';
-            $result[$schoolcode]['olc_teaching_and_learning_stars']       = '';
-            $result[$schoolcode]['olc_teaching_and_learning_superstars']  = '';
+            $result[$schoolcode]['olc_teaching_and_learning_starter']     = '';
+            $result[$schoolcode]['olc_teaching_and_learning_star']        = $stack[$schoolcode]['olc_teaching_and_learning_star'] ?? 0;
+            $result[$schoolcode]['olc_teaching_and_learning_superstar']   = $stack[$schoolcode]['olc_teaching_and_learning_superstar'] ?? 0;
         }
 
         //TODO: Prepare the Data to send through to influx db
@@ -111,13 +126,83 @@ $app = new class extends CliTool\App {
         echo json_encode(array_values($result));
     }
 
+
+    /**
+     * Takes a Payload's array, grouped by "guys in a unit" and reorganises its
+     * contents into an array that contains counts "grouped by school"
+     *
+     * @param array $input
+     * @return array
+     */
+    private function transposeData(array $input): array
+    {
+        /* Convert unit id to an output field's name for the json payload
+         */
+        $unitPrefixLookup = [
+            137 => 'olc_superuser',
+            138 => 'olc_teaching_and_learning',
+            139 => 'olc_fundamentals',
+            140 => 'olc_extra_curricular',
+            141 => 'olc_pastoral_care',
+            142 => 'olc_marcomms',
+        ];
+
+        $stack = [];
+
+        /* input structure is described in Superstar/Payload.php's generate()
+         * docblock. This contains a list of superstars and stars across all
+         * the schools, grouped by unit spec (but we don't need this struct)
+         */
+
+        /* For each unit spec in $olcDataOutput
+         */
+        foreach ($input as $unitSpecId => $unitData) {
+            /* For each of the superstars,
+             *     find out what school code they're in
+             *     and increment a count for that school code in $stack[$unitSpecId]++
+             *
+             *  For each of the stars,
+             *     find out what school code they're in
+             *      and increment a count for that school code in $stack[$unitSpecId]++
+             */
+            foreach ($unitData['actionables'] as $stardom => $actionableData) {
+                foreach ($actionableData as $person) {
+                    /* Make everything uppercase lol
+                     */
+                    $schoolcode = strtoupper($person['school']['code']);
+
+                    /* Define an index to hold our counts separately
+                     */
+                    $index = sprintf(
+                        '%s_%s',
+                        $unitPrefixLookup[$unitSpecId],
+                        $stardom
+                    );
+
+                    /* init stack counter if we never saw this unit before
+                     */
+                    if (!isset($stack[$schoolcode][$index])) {
+                        $stack[$schoolcode][$index] = 0;
+                    }
+
+                    /* Add this guy to the count
+                     */
+                    $stack[$schoolcode][$index]++;
+                }
+            }
+        }
+
+        return $stack;
+    }
+
+
     private function getSchoolCodes() : array
     {
         $schoolCodes = [];
         // Fetch a list of all existing unique School Codes by collecting a unique set of codes taken from the user.synergy_id, before the . delimiter
         $schoolCodeQuery = "
         SELECT
-            DISTINCT SUBSTRING_INDEX(synergy_id, '.', 1) as 'school_code'
+            DISTINCT UPPER(SUBSTRING_INDEX(synergy_id, '.', 1)) as 'school_code'
         FROM
             user u
         WHERE
