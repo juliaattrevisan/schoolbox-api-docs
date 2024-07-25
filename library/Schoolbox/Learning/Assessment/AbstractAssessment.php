@@ -216,6 +216,23 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritdoc
+     */
+    public static function getDefaultTypeNameTranslated(): string
+    {
+        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+
+        // If the assessment is a terminology term, use that
+        if ($rosettaStone->__isset(static::getFamilyName())) {
+            return $rosettaStone->translate(static::getFamilyName(), false, true);
+        }
+
+        // Otherwise, use the default type name
+        return static::getDefaultTypeName();
+    }
+
+
+    /**
      * Clones this object in preparation for persisting as a copy of this object.
      *
      * @return static
@@ -805,26 +822,18 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
-
     /**
      * @inheritdoc
      */
     public function getTypeName()
     {
-        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-
         // If a work type is set, use that
         if ($this->getWorkType()) {
             return $this->getWorkType()->getName();
         }
 
         // Otherwise, use the default type name (translated if in terminology)
-        $assessmentFamilyName = $this->getFamilyName();
-        if ($rosettaStone->__isset($assessmentFamilyName)) {
-            return $rosettaStone->translate($assessmentFamilyName, false, true);
-        }
-
-        return static::getDefaultTypeName();
+        return static::getDefaultTypeNameTranslated();
     }
 
 

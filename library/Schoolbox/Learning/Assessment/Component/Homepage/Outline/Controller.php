@@ -142,7 +142,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
         $ltiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = AssessmentType::getOptions($this->getSitePage()->getDi()->get('l10n'), $ltiEnabled);
+        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled);
 
         /**
          * if filters fail, we should use the system default, of show everything

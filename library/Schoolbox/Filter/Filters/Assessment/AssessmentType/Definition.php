@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
-use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
@@ -80,21 +79,7 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        switch ($key) {
-            case self::KEY_PROJECT:
-                return 'Project';
-            case self::KEY_QUIZ:
-                return 'Quiz';
-            case self::KEY_DUE_WORK:
-                return 'Due Work';
-            case self::KEY_TASK:
-                return 'Task';
-            case self::KEY_LTI_ASSESSMENT:
-                return '3rd Party Assessment';
-            case self::KEY_LESSON_PLAN:
-                return 'Lesson Plan';
-        }
-        throw new InvalidArgumentException("Unknown AssessmentType key: $key");
+        return AssessmentType::stringToReadableName($key);
     }
 
     /**

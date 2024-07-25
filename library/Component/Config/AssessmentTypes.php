@@ -20,7 +20,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     {
         $di = $page->getDi();
         $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($di->get('l10n'), $ltiEnabled);
+        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($ltiEnabled);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;

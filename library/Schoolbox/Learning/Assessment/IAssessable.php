@@ -34,9 +34,18 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * The default readable name for this type of assessment, NOT translated
+     *
      * @return string
      */
     public static function getDefaultTypeName(): string;
+
+    /**
+     * The default readable name for this type of assessment, translated to match the current terminology
+     *
+     * @return string
+     */
+    public static function getDefaultTypeNameTranslated(): string;
 
 
     /**
