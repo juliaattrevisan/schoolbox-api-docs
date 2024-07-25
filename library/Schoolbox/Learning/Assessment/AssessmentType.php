@@ -152,7 +152,8 @@ class AssessmentType implements IType
      * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
      * @return array<string, string>
      */
-    public static function getOptions(bool $ltiEnabled): array {
+    public static function getOptions(bool $ltiEnabled): array
+    {
         // Bind the assessment types to their readable names
         $list = array_combine(
             self::ALL_TYPES,
