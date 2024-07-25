@@ -123,7 +123,7 @@ class AssessmentType implements IType
             case self::TYPE_TASK:
                 return Task::getDefaultTypeNameTranslated();
             case self::TYPE_QUIZ:
-                return Task::getDefaultTypeNameTranslated();
+                return Quiz::getDefaultTypeNameTranslated();
             case self::TYPE_LTI_ASSESSMENT:
                 return LtiAssessment::getDefaultTypeNameTranslated();
             case self::TYPE_LESSON_PLAN:
