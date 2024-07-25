@@ -49,7 +49,7 @@ defineExpose({ isEmpty });
             <th><span>Course Rubrics:</span></th>
           </tr>
           <template v-for="capability in courseRubric" :key="capability.id">
-              <tr>
+              <tr class="card small-12 compact">
                   <th class="markdown border-none">
                     <span
                         v-if="props.usedCapabilities.includes(capability.id)"
@@ -60,7 +60,7 @@ defineExpose({ isEmpty });
                     <div v-html="capability.name"></div>
                   </th>
               </tr>
-              <tr v-for="indicator in capability.indicators" :key="indicator.id">
+              <tr v-for="indicator in capability.indicators" :key="indicator.id" class="card small-12 compact">
                   <td class="markdown border-none">
                     <span
                         v-if="props.usedIndicators.includes(indicator.id)"
@@ -90,7 +90,7 @@ defineExpose({ isEmpty });
             <th><span>Unit Rubrics:</span></th>
           </tr>
           <template v-for="capability in unitRubric" :key="capability.id">
-            <tr>
+            <tr class="card small-12 compact">
               <th class="markdown border-none">
                     <span
                         v-if="props.usedCapabilities.includes(capability.id)"
@@ -101,7 +101,7 @@ defineExpose({ isEmpty });
                 <div v-html="capability.name"></div>
               </th>
             </tr>
-            <tr v-for="indicator in capability.indicators" :key="indicator.id">
+            <tr v-for="indicator in capability.indicators" :key="indicator.id" class="card small-12 compact">
                 <td class="markdown border-none">
                     <span
                         v-if="props.usedIndicators.includes(indicator.id)"
