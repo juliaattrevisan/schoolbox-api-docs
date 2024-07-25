@@ -30,19 +30,19 @@ const hasError = window.Vue.ref(false);
  * @param {HTMLElement} gradeContainer - the container to get the mark from
  */
 function getMark(gradeContainer: HTMLElement) {
-    const input = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
-    if (input !== null) {
-        mark.value = input.value as string;
+    const formElement = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
+    if (formElement !== null) {
+        mark.value = formElement.value as string;
         emit("updatedMark", mark.value); // emit the initial value, as it's not currently returned in the initial payload
         // we need to observe the input value to update the mark when it changes
         const observer = new MutationObserver(() => {
-            if (input.getAttribute("aria-invalid") === "true") {
+            if (formElement.getAttribute("aria-invalid") === "true") {
                 // ignore if the input is invalid
                 return;
             }
-            mark.value = input.value as string; // if it's valid, update the mark
+            mark.value = formElement.value as string; // if it's valid, update the mark
         });
-        observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
+        observer.observe(formElement, { attributeFilter: ["value", "aria-invalid"] });
     }
 }
 
