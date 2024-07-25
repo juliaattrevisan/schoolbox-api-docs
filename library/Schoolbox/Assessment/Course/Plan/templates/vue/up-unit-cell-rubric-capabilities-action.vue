@@ -24,7 +24,7 @@ const props = defineProps<Props>();
             Manage Course {{ locale.rubricGroup.plural() }}
           </a>
           <a v-if="routes.manageUnit" class="button" :href="getReturnUrl(`${routes.manageUnit}`)">
-            Manage {{ locale.rubricGroup.plural() }} {{ locale.rubricGroup.plural() }}
+            Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
           </a>
         </section>
     </div>
