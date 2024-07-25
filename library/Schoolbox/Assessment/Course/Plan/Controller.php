@@ -672,7 +672,7 @@ class Controller extends Base
          *  so users can compare it against the ones that *were* fulfilled (a diff between them)
          */
         $rubrics = [
-            'available' => $this->getCourseUnitRubric([$courseFolderId, $unitFolderId]),
+            'available' => $this->getCourseUnitRubric($courseFolderId, $unitFolderId),
             'used' => [
                 'capabilities' => [],
                 /* Cross-referencing for fetching curriculum nodes separately
@@ -705,12 +705,14 @@ class Controller extends Base
                 $rubrics['used']['capabilities'][$capabilityId] = [
                     'id' => $capabilityId,
                     'name' => Scrub::markdown($row['capability_name']),
+                    'course' => false,
                     'indicators' => [],
                 ];
             }
 
             $rubrics['used']['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
-                'name' => Scrub::markdown($row['indicator_name']),
+                'id'    => $indicatorId,
+                'name'  => Scrub::markdown($row['indicator_name']),
             ];
         }
 
@@ -790,7 +792,8 @@ class Controller extends Base
         /* TODO Later on we can provide a list of rubrics that exist in the whole course
          *  and diff them in some way so users can see what they haven't planned properly
          */
-        $rubricCapabilities = array_values($rubricData['used']['capabilities']);
+        $usedRubricCapabilities = array_values($rubricData['used']['capabilityIds']);
+        $usedRubricIndicators = array_values($rubricData['used']['indicatorIds']);
         $availableRubricCapabilities = array_values($rubricData['available']['capabilities']);
 
         /* Curriculum nodes
@@ -863,7 +866,8 @@ class Controller extends Base
         $folderParams             = ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()];
         $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
         $rubricRoutes = [
-            'manage' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+            'manageClass' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+            'manageCourse' => $this->getRouteIfAuthorized('rubricManager.getForm', ['folderId' => $unit->getCourse()->getFolder()->getId(), 'folder' => $unit->getCourse()->getFolder()]) ?: null,
         ];
         $textboxRoutes = [
             'createComponent' => ($textboxDefId && $hasUnitFolderWriteAccess) ? '/homepage/configForm.php' : null,
@@ -909,9 +913,10 @@ class Controller extends Base
              */
             'rubricCapabilities' => [
                 '_routes' => $rubricRoutes,
-                'items'   => $rubricCapabilities,
+                'usedIndicators'   => $usedRubricIndicators,
+                'usedCapabilities'   => $usedRubricCapabilities,
+                'availableRubricCapabilities' => $availableRubricCapabilities,
             ],
-            'availableRubricCapabilities' => $availableRubricCapabilities,
             /* Curriculum data object, containing selected, and filtered curriculum nodes
              */
             'curriculum' => $curriculum,
@@ -965,14 +970,15 @@ class Controller extends Base
 
 
     /**
-     * @param int|int[] $courseFolderId
+     * @param int $courseFolderId
+     * @param int $unitFolderId
      * @return array|array[]
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function getCourseUnitRubric($courseFolderId)
+    private function getCourseUnitRubric($courseFolderId, $unitFolderId)
     {
         // grab rubric info
-        $rubricsModels = $this->rubricIndicatorMapper->findForFolder($courseFolderId);
+        $rubricsModels = $this->rubricIndicatorMapper->findForFolder([$courseFolderId, $unitFolderId]);
         //-------------
         $rubrics = [
             'capabilities' => [],
@@ -1001,12 +1007,14 @@ class Controller extends Base
                 $rubrics['capabilities'][$capabilityId] = [
                     'id' => $capabilityId,
                     'name' => Scrub::markdown($indicator->getCapability()->getName()),
+                    'course' => ($indicator->getCapability()->getParentId() === $courseFolderId),
                     'indicators' => [],
                 ];
             }
 
             $rubrics['capabilities'][$capabilityId]['indicators'][$indicatorId] = [
-                'name' => Scrub::markdown($indicator->getName()),
+                'id'    => $indicator->getId(),
+                'name'  => Scrub::markdown($indicator->getName()),
             ];
         }
         return $rubrics;

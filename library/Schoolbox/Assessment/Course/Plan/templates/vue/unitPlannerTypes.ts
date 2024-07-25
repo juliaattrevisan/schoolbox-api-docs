@@ -8,6 +8,7 @@ export type Assessment = {
 export type RubricCapability = {
     id: number;
     name: string;
+    course: boolean;
     indicators: {
         id: number;
         name: string;
@@ -53,11 +54,13 @@ export type Unit = {
     };
     rubricCapabilities: {
         _routes: {
-            manage: string | null;
+            manageClass: string | null;
+            manageCourse: string | null;
         };
-        items: RubricCapability[];
+        usedIndicators: int[];
+        usedCapabilities: int[];
+        availableRubricCapabilities: RubricCapability[];
     };
-    availableRubricCapabilities: RubricCapability[];
     textboxes: {
         _routes: {
             createComponent: string | null;
