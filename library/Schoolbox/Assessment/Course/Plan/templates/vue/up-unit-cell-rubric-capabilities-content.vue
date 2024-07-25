@@ -45,7 +45,7 @@ defineExpose({ isEmpty });
 <template>
     <table ref="rubricCapabilitiesEl" class="rb rb-capabilities-indicators">
         <tbody>
-          <tr>
+          <tr :class="{'component-action': courseRubric.length === 0}">
             <th><span>Course Rubrics:</span></th>
           </tr>
           <template v-for="capability in courseRubric" :key="capability.id">
@@ -73,7 +73,7 @@ defineExpose({ isEmpty });
               </tr>
           </template>
           <template v-if="courseRubric.length === 0">
-            <div class="content-overlay empty-state no-print">
+            <div class="component-action">
             <p v-if="props.manageCourseRoute">
               No rubric {{ locale.rubricGroup.plural() }} have been added to this course yet,
               start by adding rubric {{ locale.rubricGroup.plural() }} to the
@@ -86,7 +86,7 @@ defineExpose({ isEmpty });
             </p>
             </div>
           </template>
-          <tr>
+          <tr :class="{'component-action': unitRubric.length === 0}">
             <th><span>Unit Rubrics:</span></th>
           </tr>
           <template v-for="capability in unitRubric" :key="capability.id">
@@ -114,7 +114,7 @@ defineExpose({ isEmpty });
             </tr>
           </template>
           <template v-if="unitRubric.length === 0">
-            <div class="content-overlay empty-state no-print">
+            <div class="component-action">
               <p v-if="props.manageUnitRoute">
                 No rubric {{ locale.rubricGroup.plural() }} have been added to this {{ locale.unit.singular() }} yet,
                 start by adding rubric {{ locale.rubricGroup.plural() }} to the
@@ -140,9 +140,6 @@ table {
     table td,
     th {
         border: none !important;
-    }
-    .no-print {
-      display: none !important; // Hide elements with 'no-print' class
     }
 }
 </style>
