@@ -77,21 +77,14 @@ $app = new class extends CliTool\App {
         foreach ($schoolCodes as $schoolcode) {
             // For each of these school codes
             // I need to run a bunch of queries that only return results on pages that match 'school code + Unit Name'
-
-            $result[$schoolcode]['school_code']                           = $schoolcode;
-            $result[$schoolcode]['total_users']                           = '';
-            $result[$schoolcode]['type']                                  = $config->get('site_type');
+            $result[$schoolcode]['school_code'] = $schoolcode;
+            $result[$schoolcode]['total_users'] = '';
+            $result[$schoolcode]['type']        = $config->get('site_type');
 
             // and then for each OLC Course unit
             // fetch the number of people in that unit, the amount of 'starters', the amount of 'Stars' and the amount of 'Superstars'
             $unitProvisionedResults = $this->getUnitProvisioned($schoolcode,$this->db);
 
-            // Find the results for extra-curricular unit
-
-            /* A school might not have any superstars/stars/etc
-             * In this case, $stack[$schoolcode] won't exist (no data exists)
-             * Assume a count of zero
-             */
             foreach (self::LOOKUP_UNIT_PREFIX as $unitSpecId => $prefix) {
                 /* Provisioned data comes from some other place other than $stack
                  * Treat it specially
@@ -107,17 +100,17 @@ $app = new class extends CliTool\App {
                     $prefix . '_superstar',
                 ];
 
+                /* A school might not have any superstars/stars/etc
+                 * In this case, $stack[$schoolcode] won't exist (no data exists)
+                 * Assume a count of zero
+                 */
                 foreach ($keys as $key) {
                     $result[$schoolcode][$key] = $stack[$schoolcode][$key] ?? 0;
                 }
             }
         }
 
-        //TODO: Prepare the Data to send through to influx db
-
-        //remove the array key
-
-        // output results
+        // output results, ditch the array key which was the school code
         echo json_encode(array_values($result));
     }
 
