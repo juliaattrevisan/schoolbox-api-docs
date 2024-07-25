@@ -251,6 +251,7 @@ interface IAssessable extends ISoftDeletable
      *
      * For Project, it'll just be "Project"
      * For other assessment types, it will be "Essay, Homework, etc"
+     * Terminology applies to assessment types with associated terminology, e.g. "Project", "Due Work", or "Lesson Plan"
      *
      * @return string
      */

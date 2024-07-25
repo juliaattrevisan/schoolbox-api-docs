@@ -130,19 +130,16 @@
  </script>
 
 
- <div class="actions-small-1 row">
-     <div class="list-item">
-         <div class="small-12 column">
-             <h1>Create
-                 {% if assessment.typeName is defined %}
-                     {% if attribute(locale, assessment.typeName|lower) is defined %}
-                         {{ attribute(locale, assessment.typeName|lower).proper }}
-                     {% else %}
-                        {{ assessment.typeName }}
-                     {% endif %}
-                 {% else %}
-                     Activity
-                 {% endif %}</h1>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Create
+                {% if assessment.typeName is defined %}
+                    {{ assessment.typeName }}
+                {% else %}
+                    Activity
+                {% endif %}
+            </h1>
          </div>
      </div>
      {% if assessment is defined and assessment is quiz %}

@@ -27,7 +27,10 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use TypeError;
+use UnexpectedValueException;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -808,8 +811,20 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getTypeName()
     {
-        $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
-        return $subTypeName ?: $this::getDefaultTypeName();
+        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+
+        // If a work type is set, use that
+        if ($this->getWorkType()) {
+            return $this->getWorkType()->getName();
+        }
+
+        // Otherwise, use the default type name (translated if in terminology)
+        $assessmentFamilyName = $this->getFamilyName();
+        if ($rosettaStone->__isset($assessmentFamilyName)) {
+            return $rosettaStone->translate($assessmentFamilyName, false, true);
+        }
+
+        return static::getDefaultTypeName();
     }
 
 
