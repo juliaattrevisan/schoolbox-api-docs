@@ -5,6 +5,7 @@ namespace Schoolbox\MobileApp\CommandLineTool;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Alaress_Date_Format;
+use Schoolbox\MobileApp\Registry;
 
 /**
  * Command-line tool for cleaning up old and abandoned app registrations,
@@ -64,14 +65,18 @@ class CleanUpAbandoned extends CliTool\App
                 : 'Running in dry-run mode: registrations will not be soft deleted.'
         );
 
-        $getAbandonedQuery = "
+        $getAbandonedQuery = sprintf("
             SELECT
                 user_id,
                 app_token,
                 touched_at
             FROM mobile_app_registry
-            WHERE touched_at < DATE_SUB(CURDATE(), INTERVAL 1 YEAR);
-        ";
+            LEFT JOIN mobile_app ON mobile_app_registry.app_id = mobile_app.id
+            WHERE touched_at < DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+            AND mobile_app.provider <> '%s'
+            AND mobile_app_registry.deleted_at IS NULL;",
+            Registry::PROVIDER_FIREBASE
+        );
 
         try {
             $result = $db->executeQuery($getAbandonedQuery)->fetchAll();
