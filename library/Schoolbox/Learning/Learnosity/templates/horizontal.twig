@@ -45,8 +45,9 @@
 {##
 The grades below are inserted into the horizontal-marking Vue DOM structure then displayed
 #}
+<div id="grades-container" hidden>
 {% for userId, data in grading %}
-    <div id="grade-container-{{ data.participant.user.id }}" class="hide">
+    <div id="grade-container-{{ data.participant.user.id }}">
         <form data-feedback-form="{{ data.participant.user.id }}" method="post" action="">
             <label>{{ locale.grades.proper }}
                 {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
@@ -63,3 +64,4 @@ The grades below are inserted into the horizontal-marking Vue DOM structure then
         </form>
     </div>
 {% endfor %}
+</div>

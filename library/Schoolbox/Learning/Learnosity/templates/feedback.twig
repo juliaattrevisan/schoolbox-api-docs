@@ -45,19 +45,21 @@
 {##
 The grade below is inserted into the quiz-feedback Vue DOM structure then displayed
 #}
-<div id="grade-container-{{ participant.user.id }}" class="hide">
-    <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
-        <label>{{ locale.grades.proper }}
-            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
-                assessment:  assessment,
-                participant: participant,
-                feedback:    feedback,
-                markScheme:  assessment.markScheme,
-                limit:       maxMarks,
-                tabIndex:    1,
-                errors:      errors,
-                readonly:    false,
-            } only %}
-        </label>
-    </form>
+<div id="grades-container" hidden>
+    <div id="grade-container-{{ participant.user.id }}">
+        <form data-feedback-form="{{ participant.user.id }}" method="post" action="">
+            <label>{{ locale.grades.proper }}
+                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                    assessment:  assessment,
+                    participant: participant,
+                    feedback:    feedback,
+                    markScheme:  assessment.markScheme,
+                    limit:       maxMarks,
+                    tabIndex:    1,
+                    errors:      errors,
+                    readonly:    false,
+                } only %}
+            </label>
+        </form>
+    </div>
 </div>
