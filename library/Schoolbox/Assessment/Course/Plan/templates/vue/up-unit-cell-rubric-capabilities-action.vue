@@ -8,21 +8,23 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
-    link: string|null;
-    title: string;
+    routes: {
+      manageUnit: string | null;
+      manageCourse: string | null;
+    };
 }
 
 const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="component-action" v-if="link">
+    <div class="component-action" v-if="routes.manageCourse || routes.manageUnit">
         <section>
-          <button disabled>
-            {{ title }}
-          </button>
-          <a class="button" :href="getReturnUrl(`${link}`)">
-              Manage rubric {{ locale.rubricGroup.plural() }}
+          <a v-if="routes.manageCourse" class="button" :href="getReturnUrl(`${routes.manageCourse}`)">
+            Manage Course {{ locale.rubricGroup.plural() }}
+          </a>
+          <a v-if="routes.manageUnit" class="button" :href="getReturnUrl(`${routes.manageUnit}`)">
+            Manage {{ locale.rubricGroup.plural() }} {{ locale.rubricGroup.plural() }}
           </a>
         </section>
     </div>
