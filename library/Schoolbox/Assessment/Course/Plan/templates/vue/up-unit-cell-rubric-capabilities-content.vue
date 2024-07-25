@@ -45,11 +45,9 @@ defineExpose({ isEmpty });
 <template>
     <table ref="rubricCapabilitiesEl" class="rb rb-capabilities-indicators">
         <tbody>
-<!--        <up-unit-cell-rubric-capabilities-action-->
-<!--            v-if="courseRubric.length != 0"-->
-<!--            :link="props.manageCourseRoute"-->
-<!--            title="Course Rubrics"-->
-<!--        />-->
+          <tr v-if="courseRubric.length != 0">
+            <th><span>Course Rubrics:</span></th>
+          </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
                     <th class="markdown border-none">
@@ -74,11 +72,9 @@ defineExpose({ isEmpty });
                     </td>
                 </tr>
             </template>
-<!--        <up-unit-cell-rubric-capabilities-action-->
-<!--            v-if="unitRubric.length != 0"-->
-<!--            :link="props.manageUnitRoute"-->
-<!--            title="Unit Rubrics"-->
-<!--        />-->
+            <tr v-if="unitRubric.length != 0">
+              <th><span>Unit Rubrics:</span></th>
+            </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
               <tr>
                 <th class="markdown border-none">
