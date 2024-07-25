@@ -3,7 +3,6 @@
  * A component that displays a list of rubric capabilities and their indicators
  */
 import { RubricCapability } from "./unitPlannerTypes";
-import {ColumnType} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerConfig";
 import UpUnitCellRubricCapabilitiesAction
   from "@schoolboxAssessment/Course/Plan/templates/vue/up-unit-cell-rubric-capabilities-action.vue";
 
@@ -53,7 +52,6 @@ defineExpose({ isEmpty });
         />
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
-<!--                    <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}">-->
                     <th class="markdown border-none">
                       <span
                           v-if="props.usedCapabilities.includes(capability.id)"
@@ -65,7 +63,6 @@ defineExpose({ isEmpty });
                     </th>
                 </tr>
                 <tr v-for="indicator in capability.indicators" :key="indicator.id">
-<!--                    <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name">-->
                     <td class="markdown border-none">
                       <span
                           v-if="props.usedIndicators.includes(indicator.id)"
@@ -84,7 +81,6 @@ defineExpose({ isEmpty });
         />
             <template v-for="capability in unitRubric" :key="capability.id">
               <tr>
-                <!--                    <th class="markdown border-none" :class="{usedCapability: props.usedCapabilities.includes(capability.id)}">-->
                 <th class="markdown border-none">
                       <span
                           v-if="props.usedCapabilities.includes(capability.id)"
@@ -96,8 +92,7 @@ defineExpose({ isEmpty });
                 </th>
               </tr>
               <tr v-for="indicator in capability.indicators" :key="indicator.id">
-                <!--                    <td class="markdown border-none" :class="{usedIndicator: props.usedIndicators.includes(indicator.id)}" v-html="indicator.name">-->
-                <td class="markdown border-none">
+                  <td class="markdown border-none">
                       <span
                           v-if="props.usedIndicators.includes(indicator.id)"
                           class="icon-submissions"
@@ -115,9 +110,6 @@ defineExpose({ isEmpty });
 <style scoped>
 table {
     margin-bottom: 5px;
-}
-.usedIndicator, .usedCapability{
-  background-color: cyan;
 }
 /* Styles for printing */
 @media print {
