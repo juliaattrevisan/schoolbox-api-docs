@@ -24,6 +24,6 @@ function onSelected() {
         :disabled="!itemsStore.hasPreviousItem || store.isProcessing"
         @click.prevent="onSelected"
     >
-        Previous Item
+        Previous item
     </button>
 </template>
