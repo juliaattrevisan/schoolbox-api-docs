@@ -117,7 +117,7 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
-    public function getFamilyName()
+    public static function getFamilyName()
     {
         return AssessmentType::TYPE_LTI_ASSESSMENT;
     }

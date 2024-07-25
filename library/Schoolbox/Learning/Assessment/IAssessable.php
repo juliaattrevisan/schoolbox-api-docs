@@ -244,7 +244,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @return string
      */
-    public function getFamilyName();
+    public static function getFamilyName();
 
     /**
      * Return the name of the "type" of Assessable this is

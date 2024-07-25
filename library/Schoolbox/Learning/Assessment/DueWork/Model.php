@@ -534,7 +534,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @inheritdoc
      */
-    public function getFamilyName()
+    public static function getFamilyName()
     {
         return AssessmentType::TYPE_DUE_WORK;
     }

@@ -66,7 +66,7 @@ class ModelToArray
         $translation = [
             'id'    => $assessment->getId(),
             'title' => $assessment->getTitle(),
-            'type'  => $assessment->getFamilyName(),
+            'type'  => $assessment::getFamilyName(),
         ];
 
         if ($includeUnit) {

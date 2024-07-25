@@ -117,7 +117,7 @@ class Javascript extends Base
             'workType'       => $workType ? $workType->getName() : null,
             'workTypeId'     => $workType ? $workType->getId() : null,
             'weighted'       => $assessable->getWeight() ? 1 : 0,
-            'assessmentType' => $assessable->getFamilyName(),
+            'assessmentType' => $assessable::getFamilyName(),
             'colour'         => $folderColour ? $folderColour->getAsRgba() : null,
             // Schoolbox's editable setting: controls whether the dialog show an
             // edit button
