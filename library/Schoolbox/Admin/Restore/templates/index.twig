@@ -41,9 +41,9 @@
         $('[data-restore-assessment]').click(function(event) {
             event.preventDefault();
             $(this).confirmDialog({
-                text: 'Are you sure you want to recover this assessment?',
+                text: 'Are you sure you want to recover this activity?',
                 confirmEvent: function() {
-                    var config = {text: 'Restoring assessment...'};
+                    var config = {text: 'Restoring activity...'};
                     $toast.toastActivate(config);
 
                     $.ajax({
@@ -56,7 +56,7 @@
                     })
                     .done(function() {
                         $toast.toastTimeout({
-                            text: 'Assessment recovered!',
+                            text: 'Activity recovered!',
                             css: 'success'
                         });
                         $(event.target).closest('tr').remove();
@@ -95,7 +95,7 @@
         <div class="small-12 island">
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#panel1-1">Folder</a></dd>
-                <dd><a href="#panel1-2">Assessment</a></dd>
+                <dd><a href="#panel1-2">Learning Activity</a></dd>
             </dl>
             <section class="content tabs-content">
                 <div class="content active" id="panel1-1">
@@ -122,7 +122,7 @@
                     <table>
                         <thead>
                         <tr>
-                            <td>Assessment Name</td>
+                            <td>Activity Name</td>
                             <td>Type</td>
                             <td>Location</td>
                             <td>Deleted On</td>
