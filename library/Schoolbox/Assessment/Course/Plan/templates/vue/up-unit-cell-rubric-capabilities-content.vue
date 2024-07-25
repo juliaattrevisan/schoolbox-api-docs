@@ -2,11 +2,9 @@
 /**
  * A component that displays a list of rubric capabilities and their indicators
  */
-import { RubricCapability } from "./unitPlannerTypes";
-import UpUnitCellRubricCapabilitiesAction
-  from "@schoolboxAssessment/Course/Plan/templates/vue/up-unit-cell-rubric-capabilities-action.vue";
 import {getReturnUrl} from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
+import { RubricCapability } from "./unitPlannerTypes";
 
 interface Props {
     rubricCapabilities: RubricCapability[];

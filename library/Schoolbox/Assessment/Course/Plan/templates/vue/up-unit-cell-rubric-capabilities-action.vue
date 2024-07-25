@@ -5,7 +5,6 @@
  */
 import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
     routes: {
@@ -18,7 +17,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="component-action" v-if="routes.manageCourse || routes.manageUnit">
+    <div v-if="routes.manageCourse || routes.manageUnit" class="component-action">
         <section>
           <a v-if="routes.manageCourse" class="button" :href="getReturnUrl(`${routes.manageCourse}`)">
             Manage Course {{ locale.rubricGroup.plural() }}
