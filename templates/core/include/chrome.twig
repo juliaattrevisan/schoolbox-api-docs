@@ -902,12 +902,5 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
-<!-- temporary conditionals to show the birthday surprise for Jana Reed -->
-{% if ws.enabled and user.current.id and user.current.id == 13 %}
-<div id="birthday-surprise-container">
-    <birthday-surprise />
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/birthdaySurprise.js?v={{ config.site_version }}"></script>
-{% endif %}
 </body>
 </html>
