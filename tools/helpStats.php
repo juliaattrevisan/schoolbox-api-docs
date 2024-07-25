@@ -14,7 +14,6 @@ use Custom\Help\Superstar\Payload;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -41,13 +40,19 @@ $app = new class extends CliTool\App {
     {
         /* @var IConnector $db */
         $this->db = $this->getDi()->get('databaseInternalRead');
+
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
 
         // Only run for Schoolbox Help
-        if($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE) !== 'help'){
+        if ($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE) !== 'help') {
             exit;
         }
+
+        /* Get data for the following year (YYYY)
+         * TODO: maybe parameterise on the cli with an arg
+         */
+        $year = date('Y');
 
         // Fetch all the possible school codes
         $schoolCodes = $this->getSchoolCodes();
@@ -62,7 +67,7 @@ $app = new class extends CliTool\App {
         // ]
         $stack = $this->transpose(
             (new Payload($this->db, $this->getDi()->get('assessmentDataSource'), \Schoolbox\RoleMapper::getInstance()))
-                ->generate(2024)
+                ->generate($year)
         );
 
         // start with an empty result set
@@ -201,10 +206,10 @@ $app = new class extends CliTool\App {
      * this will inevitably 'break' when a new unit is added
      * as that unit will not show up in grafana
      *
-     * @param $schoolcode
+     * @param string $schoolcode
      * @return array
      */
-    private function getUnitProvisioned($schoolcode) {
+    private function getUnitProvisioned(string $schoolcode): array {
         $query = "
             SELECT
                 CASE
@@ -235,24 +240,26 @@ $app = new class extends CliTool\App {
         return $this->db->executeQuery($query)->fetchAll();
     }
 
+
     /**
      * Gets a count of all the users that exist for a given school code
      *
-     * @param $schoolcode
-     * @return mixed
+     * @param string $schoolcode
+     * @return int
      */
-    private function getSchoolUsers($schoolcode) {
+    private function getSchoolUsers(string $schoolcode): int {
         $query = "
-        SELECT
-            count(id) as num
-        FROM
-            user
-        WHERE
-            deleted_at is NULL
-        AND
-            synergy_id like '$schoolcode.%'
+            SELECT
+                count(id) as num
+            FROM
+                user
+            WHERE
+                deleted_at is NULL
+            AND
+                synergy_id like '{$schoolcode}.%'
         ";
-        return $this->db->executeQuery($query)->fetchColumn(0);
+
+        return (int)$this->db->executeQuery($query)->fetchColumn(0);
     }
 
 
@@ -267,7 +274,7 @@ $app = new class extends CliTool\App {
     {
         // for each element of array data
         foreach ($arrayData as $item) {
-            // datas {
+            // item {
             //      array_field = olc_extra_curricular_provisioned
             //      num = 6
 
