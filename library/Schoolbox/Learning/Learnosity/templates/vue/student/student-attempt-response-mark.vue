@@ -24,15 +24,15 @@ const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
 
 /**
- * Here we retrieve the current mark by observing the input field
+ * Here we retrieve the current mark by observing the relevant form field
  * As the input and validation are handled outside of Vue,
- * we need to observe the input field to update the mark
+ * we need to observe the form field to update the mark
  * @param {HTMLElement} gradeContainer - the container to get the mark from
  */
 function getMark(gradeContainer: HTMLElement) {
-    const input = gradeContainer.querySelector("input");
+    const input = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
     if (input !== null) {
-        mark.value = input.value;
+        mark.value = input.value as string;
         emit("updatedMark", mark.value); // emit the initial value, as it's not currently returned in the initial payload
         // we need to observe the input value to update the mark when it changes
         const observer = new MutationObserver(() => {
@@ -40,7 +40,7 @@ function getMark(gradeContainer: HTMLElement) {
                 // ignore if the input is invalid
                 return;
             }
-            mark.value = input.value; // if it's valid, update the mark
+            mark.value = input.value as string; // if it's valid, update the mark
         });
         observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
     }
