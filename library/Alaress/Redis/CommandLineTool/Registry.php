@@ -58,6 +58,10 @@ class Registry
             // ClickView (Homepage Component) cache
             'component.homepage.clickview:' . INSTANCE_ID . ':',
 
+            // Paperly cache
+            'paperly' . ':' . INSTANCE_ID . ':paperly_dashboard_user',
+            'paperly' . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+
             // Storage cache
             '^fc:' . INSTANCE_ID . ':system_usage_',
         ],

@@ -506,6 +506,21 @@ class Kernel extends WebKernelAbstract
             )
         );
 
+        $di->set(
+            'paperly.cache',
+            $di->lazy(
+                function () use ($di) {
+                    return new SimpleCacheBridge(
+                        new ItemPool(
+                            $di->get('redis.cache'),
+                            new Base64(),
+                            new KeyGenerator('paperly', INSTANCE_ID),
+                        )
+                    );
+                }
+            )
+        );
+
         // Filesystems
         $di->set(
             'filesystem.storage',

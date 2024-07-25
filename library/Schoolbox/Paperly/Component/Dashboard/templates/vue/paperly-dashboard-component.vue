@@ -37,7 +37,6 @@ async function loadPayload() {
     } catch (error) {
         hasLoadError.value = true;
     } finally {
-        await timeout(2000);
         isProcessing.value = false;
     }
 }
