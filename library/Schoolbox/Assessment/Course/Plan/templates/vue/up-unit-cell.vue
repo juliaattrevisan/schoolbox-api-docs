@@ -299,7 +299,8 @@ const isFirstUnit = window.Vue.computed(() => {
                 :rubric-capabilities="props.unit.rubricCapabilities.availableRubricCapabilities"
                 :used-indicators="props.unit.rubricCapabilities.usedIndicators"
                 :used-capabilities="props.unit.rubricCapabilities.usedCapabilities"
-                :unit-folder-id="props.unit.folderId"
+                :manage-unit-route="props.unit.rubricCapabilities._routes.manageUnit"
+                :manage-course-route="props.unit.rubricCapabilities._routes.manageCourse"
             />
 
             <up-unit-cell-curriculum-content
@@ -353,10 +354,6 @@ const isFirstUnit = window.Vue.computed(() => {
                 <activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
-                />
-                <up-unit-cell-rubric-capabilities-action
-                    v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
-                    :unit="props.unit"
                 />
                 <up-unit-cell-curriculum-action
                     v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"

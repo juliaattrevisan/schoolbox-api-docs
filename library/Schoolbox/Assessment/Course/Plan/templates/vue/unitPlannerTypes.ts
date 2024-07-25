@@ -54,7 +54,7 @@ export type Unit = {
     };
     rubricCapabilities: {
         _routes: {
-            manageClass: string | null;
+            manageUnit: string | null;
             manageCourse: string | null;
         };
         usedIndicators: int[];

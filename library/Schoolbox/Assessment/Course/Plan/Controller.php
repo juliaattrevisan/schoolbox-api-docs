@@ -866,7 +866,7 @@ class Controller extends Base
         $folderParams             = ['folderId' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()];
         $hasUnitFolderWriteAccess = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_WRITE;
         $rubricRoutes = [
-            'manageClass' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
+            'manageUnit' => $this->getRouteIfAuthorized('rubricManager.getForm', $folderParams) ?: null,
             'manageCourse' => $this->getRouteIfAuthorized('rubricManager.getForm', ['folderId' => $unit->getCourse()->getFolder()->getId(), 'folder' => $unit->getCourse()->getFolder()]) ?: null,
         ];
         $textboxRoutes = [
