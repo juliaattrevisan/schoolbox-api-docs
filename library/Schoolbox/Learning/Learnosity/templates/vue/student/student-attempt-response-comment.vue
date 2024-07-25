@@ -80,7 +80,6 @@ async function saveComment() {
             body: formData,
         });
         if (response.ok) {
-            emit("updatedComment", comment.value);
             hasSaved.value = true;
         } else {
             hasError.value = true;
@@ -94,6 +93,13 @@ async function saveComment() {
     hasSaved.value = false;
     hasError.value = false;
 }
+
+/**
+ * Watch for changes on the comment field, ensuring the store is always in sync
+ */
+window.Vue.watch(comment, (newValue) => {
+    emit("updatedComment", newValue);
+});
 
 /**
  * save the comment when it's changed
