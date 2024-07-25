@@ -23,6 +23,16 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Logging is piped to STDERR
  */
 $app = new class extends CliTool\App {
+    /* Convert unit id to an output field's name for the json payload
+     */
+    private const LOOKUP_UNIT_PREFIX = [
+        137 => 'olc_superuser',
+        138 => 'olc_teaching_and_learning',
+        139 => 'olc_fundamentals',
+        140 => 'olc_extra_curricular',
+        141 => 'olc_pastoral_care',
+        142 => 'olc_marcomms',
+    ];
 
     private iConnector $db;
 
@@ -54,7 +64,7 @@ $app = new class extends CliTool\App {
         //         'olc_fundamentals_star' => 11,
         //     ]
         // ]
-        $stack = $this->transposeData(
+        $stack = $this->transpose(
             (new Payload($this->db, $this->getDi()->get('assessmentDataSource'), \Schoolbox\RoleMapper::getInstance()))
                ->generate(2024)
         );
@@ -134,19 +144,8 @@ $app = new class extends CliTool\App {
      * @param array $input
      * @return array
      */
-    private function transposeData(array $input): array
+    private function transpose(array $input): array
     {
-        /* Convert unit id to an output field's name for the json payload
-         */
-        $unitPrefixLookup = [
-            137 => 'olc_superuser',
-            138 => 'olc_teaching_and_learning',
-            139 => 'olc_fundamentals',
-            140 => 'olc_extra_curricular',
-            141 => 'olc_pastoral_care',
-            142 => 'olc_marcomms',
-        ];
-
         $stack = [];
 
         /* input structure is described in Superstar/Payload.php's generate()
@@ -175,7 +174,7 @@ $app = new class extends CliTool\App {
                      */
                     $index = sprintf(
                         '%s_%s',
-                        $unitPrefixLookup[$unitSpecId],
+                        self::LOOKUP_UNIT_PREFIX[$unitSpecId],
                         $stardom
                     );
 
