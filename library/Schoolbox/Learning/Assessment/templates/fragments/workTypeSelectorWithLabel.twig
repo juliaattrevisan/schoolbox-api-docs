@@ -16,8 +16,8 @@
     {% endfor %}
 </select>
 {% if selectIsDisabled %}
-{#
- # The workType selector is a required field, so if the select is disabled it must be replaced by a hidden input.
+
+{# The workType selector is a required field, so if the select is disabled it must be replaced by a hidden input.
  # (Disabled fields are not included in form submissions.)
  #}
 <input type="hidden" name="workType" value="{{ assessment.workType.id ?? '' }}"/>
