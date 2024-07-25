@@ -2,10 +2,15 @@
  * HTML canvas util methods to get the object, size and clear once used.
  */
 
+export type CanvasDimensions = {
+    width: number;
+    height: number;
+};
+
 /**
  * Get the dimensions of the canvas, which can change depending on screen dimensions
- * @param canvas { HTMLCanvasElement }
- * @return { Number, Number }
+ * @param {HTMLCanvasElement} canvas = the canvas element to get the dimensions of
+ * @returns {CanvasDimensions} - the width and height of the canvas
  */
 export function getCanvasDimensions(canvas: HTMLCanvasElement) {
     return {
@@ -17,9 +22,8 @@ export function getCanvasDimensions(canvas: HTMLCanvasElement) {
 /**
  * Get the context
  * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
- *
- * @param canvas { HTMLCanvasElement }
- * @return { CanvasRenderingContext2D|null }
+ * @param {HTMLCanvasElement} canvas - the canvas element to get the context of
+ * @returns {CanvasRenderingContext2D|null} - the context of the canvas
  */
 export function getContext(canvas: HTMLCanvasElement) {
     return canvas.getContext("2d");
@@ -27,7 +31,7 @@ export function getContext(canvas: HTMLCanvasElement) {
 
 /**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
- * @param canvas { HTMLCanvasElement }
+ * @param {HTMLCanvasElement} canvas - the canvas element to clear
  */
 export function clearCanvas(canvas: HTMLCanvasElement) {
     const canvasDimensions = getCanvasDimensions(canvas);
