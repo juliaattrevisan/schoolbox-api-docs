@@ -1,5 +1,5 @@
 /**
- * Any student related methods that are used by both vertical (quiz-feedback.bue) and horizontal marking
+ * Any finalise review related methods that are used by both vertical (quiz-feedback.bue) and horizontal marking
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
@@ -24,7 +24,7 @@ export function getLatestMark(student: Student): string {
 }
 
 /**
- * To mark attempts as reviewed
+ * To mark an attempt as reviewed
  * @param {Student} student - the student to mark
  * @returns {FormData} - the data to send through
  */
