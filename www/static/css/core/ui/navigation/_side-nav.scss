@@ -165,7 +165,7 @@ $border-bottom-width: 2px;
                 display: none;
                 background-color: $white;
                 width: 100%;
-                z-index: var(--depth-pop-over);
+                z-index: var(--sbx-depth-pop-over);
 
                 @media #{$mediumwide-up} {
                     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3);

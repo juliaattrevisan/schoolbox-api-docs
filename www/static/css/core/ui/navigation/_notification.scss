@@ -46,7 +46,7 @@ $allow-notification-stash: $xlarge-up;
 .right-off-canvas-menu {
     background-color: $off-canvas-background;
     flex: 0 0 $off-canvas-width;
-    z-index: var(--depth-menu);
+    z-index: var(--sbx-depth-menu);
 
     ul.off-canvas-list #notification-toggle-full {
         background: $notification-unread-background;
@@ -61,7 +61,7 @@ $allow-notification-stash: $xlarge-up;
         margin: $off-canvas-label-margin;
         padding: 0 0 0 1rem;
         text-transform: uppercase;
-        z-index: calc(var(--depth-menu) + 1);
+        z-index: calc(var(--sbx-depth-menu) + 1);
 
         @media #{$allow-notification-stash} {
             padding: 0 0 0 3rem;
@@ -102,7 +102,7 @@ $allow-notification-stash: $xlarge-up;
             left: 0;
             transform: translateY(40%);
             width: 2.5rem;
-            z-index: calc(var(--depth-default) + 1); // Safari will not see the icon without this
+            z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
 
             &::after {
                 content: "\e915"; //.icon-pin-hollow
@@ -128,7 +128,7 @@ $allow-notification-stash: $xlarge-up;
         top: 0;
         transform: translateY(40%);
         width: 2rem;
-        z-index: calc(var(--depth-default) + 1); // Safari will not see the icon without this
+        z-index: calc(var(--sbx-depth-default) + 1); // Safari will not see the icon without this
     }
 
     /* The button that allows you to view your notifications

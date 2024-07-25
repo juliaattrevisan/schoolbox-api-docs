@@ -679,17 +679,17 @@
             opened: function () {
                 if ($participantCustomiseModal.hasClass("toback")) {
                     // so the participant customise modal and link balloon is behind the modal bkg
-                    $participantCustomiseModal.css("z-index", "calc(var(--depth-modal) - 3)");
-                    updateLinkBalloonDepth("calc(var(--depth-modal) - 2)");
+                    $participantCustomiseModal.css("z-index", "calc(var(--sbx-depth-modal) - 3)");
+                    updateLinkBalloonDepth("calc(var(--sbx-depth-modal) - 2)");
                 } else {
-                    $participantCustomiseModal.css("z-index", "var(--depth-modal)");
+                    $participantCustomiseModal.css("z-index", "var(--sbx-depth-modal)");
                 }
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
                 // so the participant customise modal and link balloon is back in front of the modal bkg
-                $participantCustomiseModal.css("z-index", "var(--depth-modal)");
-                updateLinkBalloonDepth("calc(var(--depth-modal) + 1)");
+                $participantCustomiseModal.css("z-index", "var(--sbx-depth-modal)");
+                updateLinkBalloonDepth("calc(var(--sbx-depth-modal) + 1)");
             },
         });
     }

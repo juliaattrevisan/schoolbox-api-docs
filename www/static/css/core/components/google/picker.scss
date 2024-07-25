@@ -1,4 +1,4 @@
 // Ensure the google picker sits above the foundation modal effect
 div.picker-dialog {
-    z-index: var(--depth-modal-ui-overlay);
+    z-index: var(--sbx-depth-modal-ui-overlay);
 }

@@ -149,7 +149,7 @@ window.Vue.onMounted(initEditor);
 
 <style>
 .editor-wrapper {
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
 }
 .editor-content {
     border: 0 !important;

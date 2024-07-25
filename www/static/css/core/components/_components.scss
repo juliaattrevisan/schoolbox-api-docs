@@ -239,13 +239,13 @@
     &:hover {
         transform: translate(0.2rem, -0.2rem);
         box-shadow: -10px 10px 0 rgba(0, 0, 0, 0.1);
-        z-index: var(--depth-ui-overlay);
+        z-index: var(--sbx-depth-ui-overlay);
     }
 }
 
 .ui-draggable-dragging {
     box-shadow: -10px 10px 0 rgba(0, 0, 0, 0.1);
-    z-index: calc(var(--depth-pop-over) + 1);
+    z-index: calc(var(--sbx-depth-pop-over) + 1);
     max-width: calc(100% - 2rem);
 }
 

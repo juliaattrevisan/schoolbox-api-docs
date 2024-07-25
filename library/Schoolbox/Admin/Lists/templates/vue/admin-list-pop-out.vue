@@ -287,7 +287,7 @@ export default {
 
 .outer-container {
     position: absolute;
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
     right: 0px;
     top: 0px;
     width: 320px;

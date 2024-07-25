@@ -34,7 +34,7 @@ $f-dropdown-line-height: rem-calc(18) !default;
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: var(--depth-pop-over); // Show on top
+    z-index: var(--sbx-depth-pop-over); // Show on top
 
     > *:first-child {
         margin-top: 0;

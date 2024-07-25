@@ -78,7 +78,7 @@ export default {
 <style lang="scss" scoped>
 .device-options {
     position: absolute;
-    z-index: calc(var(--depth-default) + 1);
+    z-index: calc(var(--sbx-depth-default) + 1);
     top: 10px;
     left: 10px;
     max-width: 50%;

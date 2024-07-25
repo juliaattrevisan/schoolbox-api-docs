@@ -239,7 +239,7 @@ export default {
     .vjs-big-play-button {
         display: block;
         position: absolute;
-        z-index: calc(var(--depth-default) + 1);
+        z-index: calc(var(--sbx-depth-default) + 1);
         background-color: black;
         border: 2px solid white;
         border-radius: 0;

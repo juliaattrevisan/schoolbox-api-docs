@@ -169,7 +169,7 @@ function onNewComponentClicked(draggableInstance) {
         insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
         __newComponent.style.float = "none"; //needs to be factored into the document flow, so take float off
         __newComponent.style.marginBottom = "1rem"; //add the appropriate margin in
-        __newComponent.style.zIndex = "var(--depth-pop-over)"; //ensure it stays on top
+        __newComponent.style.zIndex = "var(--sbx-depth-pop-over)"; //ensure it stays on top
         __newComponent.style.position = "static";
         __newComponent.style.width = "100%";
 
@@ -178,7 +178,7 @@ function onNewComponentClicked(draggableInstance) {
             duration: ANIMATE_SPEED * 2,
             ease: "power1.inOut",
             nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
-            zIndex: "var(--depth-pop-over)", //ensure it stays on top
+            zIndex: "var(--sbx-depth-pop-over)", //ensure it stays on top
             onComplete: () => {
                 __isFlipping = false;
                 reinsertNewComponentButton();
@@ -589,7 +589,7 @@ async function addNewComponent() {
  */
 function reinsertNewComponentButton() {
     __newComponentTabsContainer.appendChild(__newComponentClone);
-    __newComponentClone.style.zIndex = "var(--depth-default)"; //ensure there's no z-index issues, as it was boosted when dragging took place
+    __newComponentClone.style.zIndex = "var(--sbx-depth-default)"; //ensure there's no z-index issues, as it was boosted when dragging took place
 }
 
 /**

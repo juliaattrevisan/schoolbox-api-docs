@@ -3,7 +3,7 @@
     border-top: 1px solid var(--content-ui-background);
     margin: -1px 0 0 0; //-1px so it butts up against the node border above
     position: relative;
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
 }
 
 .title {

@@ -513,7 +513,7 @@ export default {
     background: black;
     overflow: hidden;
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
     h2,
     h3 {
         max-width: none;
@@ -528,7 +528,7 @@ export default {
 }
 
 .component-action {
-    z-index: calc(var(--depth-default) + 1);
+    z-index: calc(var(--sbx-depth-default) + 1);
 }
 
 .fade-enter-active,

@@ -104,10 +104,10 @@ window.Vue.onMounted(() => {
         grid-area: 1/-1; // place the background/foreground on top of each other
     }
     &__background {
-        z-index: var(--depth-default);
+        z-index: var(--sbx-depth-default);
     }
     &__foreground {
-        z-index: calc(var(--depth-default) + 1);
+        z-index: calc(var(--sbx-depth-default) + 1);
     }
 }
 </style>

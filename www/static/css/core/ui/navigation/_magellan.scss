@@ -17,7 +17,7 @@ $magellan-padding: 10px !default;
             background: $magellan-bg;
             min-width: 100%;
             padding: $magellan-padding;
-            z-index: var(--depth-pop-over);
+            z-index: var(--sbx-depth-pop-over);
 
             .sub-nav {
                 margin-bottom: 0;

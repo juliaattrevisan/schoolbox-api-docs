@@ -39,7 +39,7 @@
     .combobox_selector {
         background: $selectize-color-dropdown;
         font-size: $input-font-size;
-        z-index: var(--depth-pop-over);
+        z-index: var(--sbx-depth-pop-over);
         overflow-y: auto;
         overflow-x: hidden;
         max-height: $selectize-max-height-dropdown;

@@ -192,7 +192,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 .selectize-dropdown {
     // ¯\_(ツ)_/¯
     // (just has to be > .reveal-modal-bg z-index value)
-    z-index: calc(var(--depth-modal) + 2);
+    z-index: calc(var(--sbx-depth-modal) + 2);
 
     .row[data-selectable] {
         padding: 0;

@@ -60,7 +60,7 @@
             transition: inherit;
             width: var(--diameter);
             will-change: transform;
-            z-index: var(--depth-default);
+            z-index: var(--sbx-depth-default);
         }
     }
     &--inline {

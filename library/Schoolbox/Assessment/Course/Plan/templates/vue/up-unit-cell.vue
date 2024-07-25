@@ -387,7 +387,7 @@ const isFirstUnit = window.Vue.computed(() => {
     height: 25px;
     position: absolute;
     width: 25px;
-    z-index: var(--depth-default);
+    z-index: var(--sbx-depth-default);
 
     &:not(.isDragging) {
         transform: none !important;
@@ -404,7 +404,7 @@ const isFirstUnit = window.Vue.computed(() => {
     pointer-events: none;
     position: absolute;
     width: 100%;
-    z-index: calc(var(--depth-default) + 1); // Always appear above the content
+    z-index: calc(var(--sbx-depth-default) + 1); // Always appear above the content
 
     .content-overlay {
         display: flex;
