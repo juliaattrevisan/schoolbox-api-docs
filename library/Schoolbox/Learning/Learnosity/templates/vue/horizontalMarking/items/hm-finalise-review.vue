@@ -8,7 +8,7 @@ import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent"
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
-import { getLatestMark, getFinaliseReviewFormData } from "../../student/util/finaliseReviewUtils";
+import { getFinaliseReviewFormData } from "../../student/util/finaliseReviewUtils";
 
 const store = useStore();
 const itemsStore = useItemsStore();

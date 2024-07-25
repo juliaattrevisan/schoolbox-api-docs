@@ -7,7 +7,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
-import { getLatestMark, getFinaliseReviewFormData } from "../student/util/finaliseReviewUtils";
+import { getFinaliseReviewFormData } from "../student/util/finaliseReviewUtils";
 
 const store = useStore();
 const studentStore = useStudentStore();
