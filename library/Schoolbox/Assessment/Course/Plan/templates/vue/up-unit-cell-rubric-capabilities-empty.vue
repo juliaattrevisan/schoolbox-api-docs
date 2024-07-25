@@ -22,7 +22,7 @@ const props = defineProps<Props>();
         </a>
     </p>
     <p v-else>
-        No rubric {{ locale.rubricGroup.plural() }} have been added to this unit.
+        No rubric {{ locale.rubricGroup.plural() }} have been added to this course or unit.
     </p>
 </template>
 
