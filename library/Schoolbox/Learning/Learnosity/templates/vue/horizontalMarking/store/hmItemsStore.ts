@@ -39,7 +39,7 @@ export const useItemsStore = defineStore("hmItems", () => {
         const lastItemForReview = {
             id: "0",
             reference: "overall-feedback",
-            title: "Overall Feedback",
+            title: "Overall feedback",
             isAttemptComment: true,
         };
         items.value.push(lastItemForReview);
