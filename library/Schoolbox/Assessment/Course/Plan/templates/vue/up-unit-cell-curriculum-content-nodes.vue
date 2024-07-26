@@ -11,11 +11,12 @@ import FnDeleteNode from "@schoolboxCurriculum/vue/folderNodes/fn-delete-node.vu
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerCurriculumStore } from "./store/unitPlannerCurriculumStore";
-import type { CurriculumOverviewComponent } from "./unitPlannerTypes";
+import type { CurriculumOverviewComponent, Unit } from "./unitPlannerTypes";
 
 interface Props {
-    nodes: Node[]; // The nodes to display
     selectedNodes: Node[]; // The selected nodes
+    unit: Unit; // the unit linked to the curriculum cell
+    nodes: Node[]; // The nodes to display
     folderId: number; // The folder id to display the nodes for
     component: CurriculumOverviewComponent; // The component instance id to display the nodes on
 }
@@ -100,7 +101,12 @@ window.Vue.watch(
  */
 window.Vue.onMounted(() => {
     if (!folderNodesStore().hasLoaded) {
-        folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
+        folderNodesStore().init(
+            props.selectedNodes,
+            props.nodes,
+            props.component?.filter ?? null,
+            props.unit.curriculum._routes.modifyCurriculum === null,
+        );
     }
 
     // Let the parent know if we have any filtered nodes or not

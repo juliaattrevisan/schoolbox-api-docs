@@ -65,6 +65,7 @@ window.Vue.watch(
     <up-unit-cell-curriculum-content-nodes
         v-if="component !== null && storeUnit"
         :selected-nodes="storeUnit.curriculum.selectedNodes"
+        :unit="props.unit"
         :nodes="props.unit.curriculum.nodes ?? []"
         :folder-id="props.unit.folderId"
         :component="component"

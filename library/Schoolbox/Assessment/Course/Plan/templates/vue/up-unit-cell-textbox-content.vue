@@ -132,7 +132,17 @@ function initEditor() {
     );
 }
 
-window.Vue.onMounted(initEditor);
+/**
+ * Only initialize the CKEditor if we have read access,
+ * otherwise just display the content
+ */
+window.Vue.onMounted(() => {
+    if (props.unit.textboxes._routes.createTextbox === null) {
+        editorCreated.value = true;
+        return;
+    }
+    initEditor();
+});
 </script>
 
 <template>
