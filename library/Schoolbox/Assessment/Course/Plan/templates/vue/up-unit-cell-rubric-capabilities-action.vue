@@ -23,14 +23,14 @@ const props = defineProps<Props>();
             <a
                 v-if="props.unit.rubricCapabilities._routes.manageCourse"
                 class="button"
-                :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageCourse}`)"
+                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)"
             >
                 Manage Course {{ locale.rubricGroup.plural() }}
             </a>
             <a
                 v-if="props.unit.rubricCapabilities._routes.manageUnit"
                 class="button"
-                :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageUnit}`)"
+                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)"
             >
                 Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
             </a>
