@@ -289,7 +289,7 @@ class ListController extends Web\Controller\Base
     {
         try {
             // we need to perform some surgery on our "post" data before we send it through
-            $post = $this->requestPost->getArrayCopy();
+            $post            = $this->requestPost->getArrayCopy();
             $post['context'] = $context;
 
             $assessmentInfo = $this->persistAssessment($this->getUser(), $post);
@@ -305,15 +305,22 @@ class ListController extends Web\Controller\Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
-            $this->redirect($controller->determineRedirect(
-                $assessmentInfo['assessment'],
-                $explicitReturnUrl,
-                $assessmentInfo[Redirect::RETURN_URL],
-                $assessmentInfo['relocated'],
-                true
-            ));
+            $this->redirect(
+                $controller->determineRedirect(
+                    $assessmentInfo['assessment'],
+                    $explicitReturnUrl,
+                    $assessmentInfo[Redirect::RETURN_URL],
+                    $assessmentInfo['relocated'],
+                    true
+                )
+            );
         } catch (InvalidArgumentException $e) {
-            $this->sendError('Course and/or units were invalid; they might have been deleted.', [], 400, $e->getCode());
+            //Check to see if the said Course and/or Units were deleted before throwing the message
+            if ($context instanceof \Schoolbox\ISoftDeletable && $context->isDeleted()) {
+                $this->sendError('Course and/or units were invalid; they might have been deleted.', [], 400, $e->getCode());
+            } else {
+                $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
+            }
             return;
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
@@ -671,6 +678,7 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\InvalidArgumentException $e) {
+            $db->rollBack();
             /* InvalidArgumentException is thrown when a valid context is missing
              * such as it's been deleted, never existed, or bad data
              */
