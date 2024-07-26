@@ -80,7 +80,6 @@ async function saveComment() {
             body: formData,
         });
         if (response.ok) {
-            emit("updatedComment", comment.value);
             hasSaved.value = true;
         } else {
             hasError.value = true;
@@ -96,7 +95,15 @@ async function saveComment() {
 }
 
 /**
- * save the comment when it's changed
+ * watch for changes on the comment field, ensuring the store is always in sync
+ */
+window.Vue.watch(comment, (newValue) => {
+    emit("updatedComment", newValue);
+});
+
+/**
+ * save the comment when it's changed, debouncing to prevent multiple saves,
+ * only saving when the user has stopped typing for 1 second
  */
 watchDebounced(
     comment,

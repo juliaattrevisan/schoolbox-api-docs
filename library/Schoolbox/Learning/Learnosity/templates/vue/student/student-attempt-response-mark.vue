@@ -24,25 +24,25 @@ const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
 
 /**
- * Here we retrieve the current mark by observing the input field
+ * Here we retrieve the current mark by observing the relevant form field
  * As the input and validation are handled outside of Vue,
- * we need to observe the input field to update the mark
+ * we need to observe the form field to update the mark
  * @param {HTMLElement} gradeContainer - the container to get the mark from
  */
 function getMark(gradeContainer: HTMLElement) {
-    const input = gradeContainer.querySelector("input");
-    if (input !== null) {
-        mark.value = input.value;
+    const formElement = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
+    if (formElement !== null) {
+        mark.value = formElement.value as string;
         emit("updatedMark", mark.value); // emit the initial value, as it's not currently returned in the initial payload
         // we need to observe the input value to update the mark when it changes
         const observer = new MutationObserver(() => {
-            if (input.getAttribute("aria-invalid") === "true") {
+            if (formElement.getAttribute("aria-invalid") === "true") {
                 // ignore if the input is invalid
                 return;
             }
-            mark.value = input.value; // if it's valid, update the mark
+            mark.value = formElement.value as string; // if it's valid, update the mark
         });
-        observer.observe(input, { attributeFilter: ["value", "aria-invalid"] });
+        observer.observe(formElement, { attributeFilter: ["value", "aria-invalid"] });
     }
 }
 
@@ -51,15 +51,28 @@ function getMark(gradeContainer: HTMLElement) {
  * see for example: library/Schoolbox/Learning/MarkScheme/templates/TotalMarkFractional.twig.
  * Rather than trying to rewrite the whole thing for a Vue context, we just store the grade field outside of Vue,
  * and then append it into the Vue component when it's mounted.
+ * See library/Schoolbox/Learning/Learnosity/templates/horizontal.twig and
+ * library/Schoolbox/Learning/Learnosity/templates/feedback.twig for where the grade field is initially rendered.
  */
-function getGradeContainer() {
+function addGradeElement() {
     const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
     if (gradeContainer !== null) {
         gradeEl.value?.append(gradeContainer);
-        gradeContainer.classList.remove("hide"); // now remove the hide class to show the grade
         const form = gradeContainer.querySelector("form") as HTMLFormElement;
         form.style.marginBottom = "0"; // override the default margin so the save container is flush with the grade field
         getMark(gradeContainer);
+    }
+}
+
+/**
+ * To remove the grade field from the Vue component, to prevent it being destroyed when the component is unmounted
+ * and to allow it to be re-appended when the component is potentially mounted again
+ */
+function removeGradeElement() {
+    const gradesContainer = document.getElementById("grades-container");
+    const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
+    if (gradesContainer !== null && gradeContainer !== null) {
+        gradesContainer.append(gradeContainer);
     }
 }
 
@@ -150,20 +163,23 @@ watchDebounced(
  * To add the grade field in
  */
 window.Vue.onMounted(async () => {
+    // don't need to proceed if it's readonly as the grade field won't be in the Vue component
     if (props.isReadOnly) {
         return;
     }
     await window.Vue.nextTick();
-    getGradeContainer();
+    addGradeElement();
 });
 
 /**
- * Save any unsaved changes
+ * Return the grade field and save any unsaved changes
  */
-window.Vue.onUnmounted(async () => {
+window.Vue.onBeforeUnmount(async () => {
+    // don't need to proceed if it's readonly as the grade field won't be in the Vue component
     if (props.isReadOnly) {
         return;
     }
+    removeGradeElement();
     await saveMark();
 });
 </script>

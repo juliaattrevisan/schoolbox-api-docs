@@ -7,6 +7,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
+import { getFinaliseReviewFormData } from "../student/util/finaliseReviewUtils";
 
 const store = useStore();
 const studentStore = useStudentStore();
@@ -19,10 +20,10 @@ const isFinalising = window.Vue.ref(false); // to show the finalising text on th
  */
 const buttonText = window.Vue.computed(() => {
     if (studentStore.student.isReviewed) {
-        return isFinalising.value ? "Updating..." : "Update Review";
+        return isFinalising.value ? "Updating..." : "Update review";
     }
     // to change the button text when finalising
-    return isFinalising.value ? "Finalising..." : "Finalise Review";
+    return isFinalising.value ? "Finalising..." : "Finalise review";
 });
 
 /**
@@ -49,20 +50,6 @@ window.Vue.watch(
 );
 
 /**
- * To mark the attempt as reviewed
- * @returns {FormData} - the data to send through
- */
-function getFormData() {
-    const formData = new FormData();
-    formData.append("responseId", studentStore.student.attemptResponse?.responseId ?? "");
-    formData.append("maxMarks", studentStore.student.attemptResponse?.maxMarks?.toString() ?? "");
-    formData.append("mark", studentStore.student.attemptResponse?.mark ?? "");
-    formData.append("comment", studentStore.student.attemptResponse?.comment ?? "");
-    formData.append("publish", "1");
-    return formData;
-}
-
-/**
  * Submit the feedback then redirect to the status page
  */
 async function submitFeedback() {
@@ -74,20 +61,20 @@ async function submitFeedback() {
             headers: {
                 Accept: "application/json",
             },
-            body: getFormData(),
+            body: getFinaliseReviewFormData(studentStore.student),
         });
         if (response.ok) {
             window.location.href = store.statusPage;
             timeout({ text: "Review successfully finalised" });
         } else {
             timeout({
-                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                text: "Review could not be finalised, please contact your support if the problem persists",
                 isSuccess: false,
             });
         }
     } catch (error) {
         timeout({
-            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
         });
     } finally {
@@ -147,3 +134,4 @@ function onCancelSelected() {
         </ul>
     </reveal-modal>
 </template>
+../student/util/finaliseReviewUtils

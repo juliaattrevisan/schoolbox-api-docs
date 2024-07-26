@@ -13,7 +13,7 @@ const itemsStore = useItemsStore();
  * The title of the button, will change when next is attempt comments
  */
 const buttonTitle = window.Vue.computed(() => {
-    return itemsStore.isNextFinalReview ? "Overall Comments" : "Next Item";
+    return itemsStore.isNextFinalReview ? "Overall feedback" : "Next item";
 });
 
 /**

@@ -5,10 +5,10 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
-import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
+import { getFinaliseReviewFormData } from "../../student/util/finaliseReviewUtils";
 
 const store = useStore();
 const itemsStore = useItemsStore();
@@ -17,7 +17,7 @@ const modalEl = window.Vue.ref<typeof RevealModal | null>();
 const isFinalising = window.Vue.ref(false); // to show the finalising text on the button
 const buttonText = window.Vue.computed(() => {
     // to change the button text when finalising
-    return isFinalising.value ? "Finalising..." : "Finalise Review";
+    return isFinalising.value ? "Finalising..." : "Finalise review";
 });
 const confirmButtonText = window.Vue.computed(() => {
     // to change the button text when finalising
@@ -39,21 +39,6 @@ window.Vue.watch(
 );
 
 /**
- * To mark all attempts as reviewed
- * @param {Student} student - the student to mark
- * @returns {FormData} - the data to send through
- */
-function getFormData(student: Student) {
-    const formData = new FormData();
-    formData.append("responseId", student.attemptResponse?.responseId ?? "");
-    formData.append("maxMarks", student.attemptResponse?.maxMarks?.toString() ?? "");
-    formData.append("mark", student.attemptResponse?.mark ?? "");
-    formData.append("comment", student.attemptResponse?.comment ?? "");
-    formData.append("publish", "1");
-    return formData;
-}
-
-/**
  * Get the list of all students to post feedback for
  * @returns {Promise<string>[]} - the list of fetches to make
  */
@@ -66,7 +51,7 @@ function getFetches() {
                 headers: {
                     Accept: "application/json",
                 },
-                body: getFormData(student),
+                body: getFinaliseReviewFormData(student),
             }),
         );
     });
@@ -88,13 +73,13 @@ async function submitFeedback() {
             timeout({ text: "Review successfully finalised" });
         } else {
             timeout({
-                text: "Review could not be finalised. Please contact your support if the problem persists.",
+                text: "Review could not be finalised, please contact your support if the problem persists",
                 isSuccess: false,
             });
         }
     } catch (error) {
         timeout({
-            text: "Review could not be finalised. Please contact your support if the problem persists.",
+            text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
         });
     } finally {
@@ -155,3 +140,4 @@ function onCancelSelected() {
         </ul>
     </reveal-modal>
 </template>
+../../student/util/finaliseReviewUtils
