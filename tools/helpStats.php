@@ -80,7 +80,7 @@ $app = new class extends CliTool\App {
             // I need to run a bunch of queries that only return results on pages that match 'school code + Unit Name'
             $result[$schoolcode]['school_code'] = $schoolcode;
 
-            $result[$schoolcode]['total_users'] = $this->getSchoolUsers($schoolcode) ?? 0;
+            $result[$schoolcode]['olc_total_users'] = $this->getSchoolUsers($schoolcode) ?? 0;
 
             $result[$schoolcode]['type'] = $config->get('site_type');
 
