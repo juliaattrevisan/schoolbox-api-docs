@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
@@ -56,6 +57,7 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
+        RosettaStone $rosettaStone,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
@@ -74,6 +76,7 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
+            $rosettaStone,
             $replicator,
             $latestViewMapper,
             $this->projectResultCacheMapper,

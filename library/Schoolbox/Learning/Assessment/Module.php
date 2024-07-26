@@ -560,6 +560,7 @@ class Module extends BaseModule
                     $transactor,
                     $participantDataSource,
                     $this->getUnitSpecificationMapper(),
+                    $this->injector->get('l10n'),
                     $projectResultCacheMapper
                 );
 
@@ -620,6 +621,7 @@ class Module extends BaseModule
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
+                    $this->injector->get('l10n'),
                     $replicator,
                     $viewLatestMapper,
                     $projectResultCacheMapper,
@@ -643,6 +645,7 @@ class Module extends BaseModule
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
+                    $this->injector->get('l10n'),
                     $replicator,
                     $folderMapper,
                     $viewLatestMapper,
@@ -671,6 +674,7 @@ class Module extends BaseModule
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
+                    $this->injector->get('l10n'),
                     $replicator,
                     $viewLatestMapper,
                     $projectResultCacheMapper,
@@ -691,6 +695,7 @@ class Module extends BaseModule
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
+                    $this->injector->get('l10n'),
                     $replicator,
                     $this->getMapperFactory()->get(LtiToolMapper::class),
                     $this->getMapperFactory()->get(LtiAssessmentMapper::class),
@@ -717,6 +722,7 @@ class Module extends BaseModule
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
+                    $this->injector->get('l10n'),
                     $replicator,
                     $viewLatestMapper,
                     $projectResultCacheMapper,

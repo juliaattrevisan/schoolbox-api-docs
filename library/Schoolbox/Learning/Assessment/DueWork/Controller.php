@@ -200,6 +200,7 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
+            $rosettaStone,
             $replicator,
             $latestViewMapper,
             $this->projectResultCacheMapper,

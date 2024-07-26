@@ -80,7 +80,7 @@ class DehydratorTest extends TestCase
         // as defined in $this->commonFields.
         $expected = [
             'id'             => $dueWork->getId(),
-            'type'           => $dueWork->getFamilyName(),
+            'type'           => $dueWork::getFamilyName(),
             'title'          => $dueWork->getTitle(),
             'weight'         => $dueWork->getWeight(),
             'markVisibility' => $dueWork->getMarkVisibility(),
@@ -468,7 +468,7 @@ class DehydratorTest extends TestCase
             ],
             'assessment' => [
                 'id'                     => $dueWork->getId(),
-                'type'                   => $dueWork->getFamilyName(),
+                'type'                   => $dueWork::getFamilyName(),
                 'title'                  => $dueWork->getTitle(),
                 'weight'                 => $dueWork->getWeight(),
                 'markVisibility'         => $dueWork->getMarkVisibility(),

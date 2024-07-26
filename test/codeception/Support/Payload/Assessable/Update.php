@@ -12,6 +12,7 @@ namespace Tests\Support\Payload\Assessable;
 use Tests\Support\Payload\PostTrait;
 use Tests\Support\Payload\Request;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use UnexpectedValueException;
 
 class Update extends Request
@@ -33,7 +34,7 @@ class Update extends Request
 
         $this->setReferer("/learning/assessments/{$assessable->getId()}/modify?returnUrl=");
 
-        $this->initiateForm($assessable::getDefaultTypeName());
+        $this->initiateForm(AssessmentType::objectToString($assessable));
         $this->populateForm($assessable, $returnUrl);
 
         $this->setFormParam("part-2", 1);

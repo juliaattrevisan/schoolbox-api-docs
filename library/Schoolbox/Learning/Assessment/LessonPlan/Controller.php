@@ -17,6 +17,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -57,6 +58,7 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecification\Mapper $courseSpecificationMapper,
         UnitSpecification\Mapper $unitSpecificationMapper,
+        RosettaStone $rosettaStone,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
         Project\ResultCache\Mapper $projectResultCacheMapper,
@@ -78,6 +80,7 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
+            $rosettaStone,
             $replicator,
             $latestViewMapper,
             $projectResultCacheMapper,

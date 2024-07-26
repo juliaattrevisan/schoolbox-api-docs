@@ -27,7 +27,10 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use TypeError;
+use UnexpectedValueException;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -209,6 +212,23 @@ abstract class AbstractAssessment implements IAssessable
     public static function getDefaultTypeName(): string
     {
         return 'Assessment';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDefaultTypeNameTranslated(): string
+    {
+        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+
+        // If the assessment is a terminology term, use that
+        if ($rosettaStone->__isset(static::getFamilyName())) {
+            return $rosettaStone->translate(static::getFamilyName(), false, true);
+        }
+
+        // Otherwise, use the default type name
+        return static::getDefaultTypeName();
     }
 
 
@@ -802,14 +822,18 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
-
     /**
      * @inheritdoc
      */
     public function getTypeName()
     {
-        $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
-        return $subTypeName ?: $this::getDefaultTypeName();
+        // If a work type is set, use that
+        if ($this->getWorkType()) {
+            return $this->getWorkType()->getName();
+        }
+
+        // Otherwise, use the default type name (translated if in terminology)
+        return static::getDefaultTypeNameTranslated();
     }
 
 

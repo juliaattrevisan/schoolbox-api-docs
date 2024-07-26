@@ -34,9 +34,18 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * The default readable name for this type of assessment, NOT translated
+     *
      * @return string
      */
     public static function getDefaultTypeName(): string;
+
+    /**
+     * The default readable name for this type of assessment, translated to match the current terminology
+     *
+     * @return string
+     */
+    public static function getDefaultTypeNameTranslated(): string;
 
 
     /**
@@ -244,13 +253,14 @@ interface IAssessable extends ISoftDeletable
      *
      * @return string
      */
-    public function getFamilyName();
+    public static function getFamilyName();
 
     /**
      * Return the name of the "type" of Assessable this is
      *
      * For Project, it'll just be "Project"
      * For other assessment types, it will be "Essay, Homework, etc"
+     * Terminology applies to assessment types with associated terminology, e.g. "Project", "Due Work", or "Lesson Plan"
      *
      * @return string
      */

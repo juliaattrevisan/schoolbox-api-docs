@@ -42,6 +42,15 @@ class AssessmentType implements IType
     public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
 
+    private const ALL_TYPES = [
+        self::TYPE_PROJECT,
+        self::TYPE_DUE_WORK,
+        self::TYPE_TASK,
+        self::TYPE_QUIZ,
+        self::TYPE_LTI_ASSESSMENT,
+        self::TYPE_LESSON_PLAN
+    ];
+
     /**
      * Get twig template directory for a given IAssessable
      *
@@ -99,6 +108,31 @@ class AssessmentType implements IType
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
     }
 
+    /**
+     * Get the readable type name (translated) from a string representation
+     * @param string $stringVal e.g. 'dueWork'
+     * @return string e.g. 'Due Work'
+     */
+    public static function stringToReadableName(string $stringVal): string
+    {
+        switch ($stringVal) {
+            case self::TYPE_PROJECT:
+                return Project::getDefaultTypeNameTranslated();
+            case self::TYPE_DUE_WORK:
+                return DueWork::getDefaultTypeNameTranslated();
+            case self::TYPE_TASK:
+                return Task::getDefaultTypeNameTranslated();
+            case self::TYPE_QUIZ:
+                return Quiz::getDefaultTypeNameTranslated();
+            case self::TYPE_LTI_ASSESSMENT:
+                return LtiAssessment::getDefaultTypeNameTranslated();
+            case self::TYPE_LESSON_PLAN:
+                return LessonPlan::getDefaultTypeNameTranslated();
+            default:
+                throw new InvalidArgumentException("Unknown assessment type: $stringVal");
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -108,32 +142,26 @@ class AssessmentType implements IType
      */
     protected function toArray()
     {
-        return [
-            self::TYPE_PROJECT,
-            self::TYPE_DUE_WORK,
-            self::TYPE_TASK,
-            self::TYPE_QUIZ,
-            self::TYPE_LTI_ASSESSMENT,
-            self::TYPE_LESSON_PLAN
-        ];
+        return self::ALL_TYPES;
     }
 
     /**
      * Returns the list of enabled assessment (activity) types
+     * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
      * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
      * @return array<string, string>
      */
     public static function getOptions(bool $ltiEnabled): array
     {
-        $list = [
-            self::TYPE_DUE_WORK        => DueWork::getDefaultTypeName(),
-            self::TYPE_QUIZ            => Quiz::getDefaultTypeName(),
-            self::TYPE_TASK            => Task::getDefaultTypeName(),
-            self::TYPE_PROJECT         => Project::getDefaultTypeName(),
-            self::TYPE_LTI_ASSESSMENT  => LtiAssessment::getDefaultTypeName(),
-            self::TYPE_LESSON_PLAN     => LessonPlan::getDefaultTypeName(),
-        ];
+        // Bind the assessment types to their readable names
+        $list = array_combine(
+            self::ALL_TYPES,
+            array_map(
+                fn($type) => self::stringToReadableName($type),
+                self::ALL_TYPES,
+            )
+        );
 
         // if LTI is not enabled then remove that entry
         if (!$ltiEnabled) {

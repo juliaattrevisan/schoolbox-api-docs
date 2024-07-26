@@ -148,7 +148,7 @@ class Dehydrator
         // Generic fields
         $dehydrated = [
             'id'             => $assessment->getId(),
-            'type'           => $assessment->getFamilyName(),
+            'type'           => $assessment::getFamilyName(),
             'title'          => $assessment->getTitle(),
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),

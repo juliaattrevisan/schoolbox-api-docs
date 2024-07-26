@@ -1,9 +1,24 @@
+// All assessment types, as per library/Schoolbox/Learning/Assessment/AssessmentType.php
+export const ACTIVITY_TYPE_PROJECT = "project";
+export const ACTIVITY_TYPE_DUE_WORK = "dueWork";
+export const ACTIVITY_TYPE_TASK = "task";
+export const ACTIVITY_TYPE_QUIZ = "quiz";
+export const ACTIVITY_TYPE_LTI_ASSESSMENT = "lti";
+export const ACTIVITY_TYPE_LESSON_PLAN = "lessonPlan";
+export type ActivityType =
+    | typeof ACTIVITY_TYPE_PROJECT
+    | typeof ACTIVITY_TYPE_DUE_WORK
+    | typeof ACTIVITY_TYPE_TASK
+    | typeof ACTIVITY_TYPE_QUIZ
+    | typeof ACTIVITY_TYPE_LTI_ASSESSMENT
+    | typeof ACTIVITY_TYPE_LESSON_PLAN;
+
 export type Activity = {
     id: number;
     title: string;
     unit: string;
     projectName: string;
-    assessmentType: string;
+    assessmentType: ActivityType;
     assessments: Activity[] | null;
     dueAt: {
         atom: string;

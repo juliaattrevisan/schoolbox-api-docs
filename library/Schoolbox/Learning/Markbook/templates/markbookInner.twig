@@ -221,7 +221,7 @@
                             {% if assessment is dueWork or assessment is quiz or assessment is lti or (assessment is project and (participant and not participant.isExcluded)) %}
                             data-pop-out-menu
                             {% endif %}
-                            data-assessment-type="{{ assessment.getDefaultTypeName }}"
+                            data-assessment-type="{{ assessment.getFamilyName }}"
                             data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                             data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"

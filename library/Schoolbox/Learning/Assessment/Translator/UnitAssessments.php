@@ -145,7 +145,7 @@ class UnitAssessments
         return [
             'id'                   => $assessment->getId(),
             'title'                => $assessment->getTitle(),
-            'assessmentType'       => $assessment->getFamilyName(),
+            'assessmentType'       => $assessment::getFamilyName(),
             'course'               => $this->getCourseName($assessment),
             'unit'                 => $assessment->getBaseContext()->getTitle(),
             'projectName'          => $projectName,

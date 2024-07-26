@@ -30,11 +30,16 @@ use Schoolbox\Learning\Assessment\Participant\ParticipationHelper;
 use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -104,6 +109,7 @@ class ListController extends Web\Controller\Base
      * @param Transactor                 $transactor
      * @param DataSource                 $participantDataSource
      * @param UnitSpecificationMapper    $unitSpecificationMapper
+     * @param RosettaStone               $rosettaStone
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
@@ -114,6 +120,7 @@ class ListController extends Web\Controller\Base
         Transactor $transactor,
         Participant\DataSource $participantDataSource,
         UnitSpecificationMapper $unitSpecificationMapper,
+        private RosettaStone $rosettaStone,
         protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->setUserMapper($userMapper);
@@ -525,21 +532,21 @@ class ListController extends Web\Controller\Base
             [
                 'id'    => 'due-work',
                 'value' => AssessmentType::TYPE_DUE_WORK,
-                'label' => 'Due Work',
+                'label' => $this->rosettaStone->translate('dueWork', false, true),
                 'icon'  => 'due-work',
                 'title' => 'Create an assessable item for students that can accept submissions',
             ],
             [
                 'id'    => 'task',
                 'value' => AssessmentType::TYPE_TASK,
-                'label' => 'Task',
+                'label' => Task::getDefaultTypeName(),
                 'icon'  => 'task',
                 'title' => 'A simple activity that will track student completion',
             ],
             [
                 'id'    => 'quiz',
                 'value' => AssessmentType::TYPE_QUIZ,
-                'label' => 'Quiz',
+                'label' => Quiz::getDefaultTypeName(),
                 'icon'  => 'quiz',
                 'title' => 'Ask a series of questions with automatic marking',
             ],
@@ -548,7 +555,7 @@ class ListController extends Web\Controller\Base
             $data['types'][] = [
                 'id'    => 'lti',
                 'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
-                'label' => '3rd Party Assessment',
+                'label' => LtiAssessment::getDefaultTypeName(),
                 'icon'  => 'lti',
                 'title' => 'Connect an assessment provided by an LTI tool',
             ];
@@ -559,7 +566,7 @@ class ListController extends Web\Controller\Base
         $data['types'][] = [
             'id'    => 'lesson-plan',
             'value' => AssessmentType::TYPE_LESSON_PLAN,
-            'label' => 'Lesson Plan',
+            'label' => $this->rosettaStone->translate('lessonPlan', false, true),
             'icon'  => 'lesson-plan',
             'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
         ];
@@ -572,9 +579,9 @@ class ListController extends Web\Controller\Base
             $item = [
                 'id'    => 'project',
                 'value' => AssessmentType::TYPE_PROJECT,
-                'label' => 'Project',
+                'label' => $this->rosettaStone->translate('project', false, true),
                 'icon'  => 'project',
-                'title' => 'Setup a container for multiple assessments that are related',
+                'title' => 'Setup a container for multiple activities that are related',
             ];
             array_unshift($data['types'], $item);
         }
@@ -754,7 +761,7 @@ class ListController extends Web\Controller\Base
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
 
             //Handle assessments that do no accept submissions:
-            if (($assessment instanceof DueWork\Model && $assessment->getAcceptOnline() == 0) || $assessment instanceof Task\Model) {
+            if (($assessment instanceof DueWork && $assessment->getAcceptOnline() == 0) || $assessment instanceof Task) {
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }

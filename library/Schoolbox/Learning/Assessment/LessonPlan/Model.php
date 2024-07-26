@@ -413,7 +413,7 @@ class Model extends AbstractAssessment
      *
      * @return string
      */
-    public function getFamilyName(): string
+    public static function getFamilyName(): string
     {
         return AssessmentType::TYPE_LESSON_PLAN;
     }

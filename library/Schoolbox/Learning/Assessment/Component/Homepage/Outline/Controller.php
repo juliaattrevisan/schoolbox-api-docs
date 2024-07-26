@@ -141,11 +141,14 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
+        $ltiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
+        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled);
+
         /**
          * if filters fail, we should use the system default, of show everything
          */
         if (!is_array($filters)) {
-            $filters = AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE));
+            $filters = $assessmentTypeOptions;
         }
 
         /**
@@ -154,16 +157,17 @@ class Controller extends Component_Homepage_ControllerAbstract
          */
         $assessmentTypes = array_keys(array_filter(
             $filters,
-            function ($v, $k) {
-                return $v === "1" && key_exists($k, AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)));
+            function ($v, $k) use ($assessmentTypeOptions) {
+                return $v === "1" && key_exists($k, $assessmentTypeOptions);
             },
             ARRAY_FILTER_USE_BOTH
         ));
+
         /**
          * If we are filtering, set the filterList to the visible assessment types.
          * if we are not filtering, then set filterList to false
          */
-        $this->filterList = (count($assessmentTypes) < count(AssessmentType::getOptions($this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)))) ? $assessmentTypes : false;
+        $this->filterList = (count($assessmentTypes) < count($assessmentTypeOptions)) ? $assessmentTypes : false;
 
         /**
          * if everything has been filtered out, we should ignore the filter (and show everything)
