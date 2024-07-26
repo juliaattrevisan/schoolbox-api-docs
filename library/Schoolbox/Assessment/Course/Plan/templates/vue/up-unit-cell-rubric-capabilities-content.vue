@@ -47,8 +47,8 @@ defineExpose({ isEmpty });
 <template>
     <table ref="rubricCapabilitiesEl" class="rb rb-capabilities-indicators">
         <tbody>
-            <tr :class="{ 'component-action': courseRubric.length === 0 }">
-                <th><span>Course Rubrics:</span></th>
+            <tr>
+                <th>Course Rubrics</th>
             </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr class="card small-12 compact">
@@ -75,17 +75,15 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="courseRubric.length === 0">
-                <div class="component-action">
-                    <p v-if="props.manageCourseRoute">
-                        No rubric {{ locale.rubricGroup.plural() }} have been added to this course yet, start by adding
-                        rubric {{ locale.rubricGroup.plural() }} to the
-                        <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course </a>
-                    </p>
-                    <p v-else>No rubric {{ locale.rubricGroup.plural() }} have been added to this course.</p>
-                </div>
+                <p v-if="props.manageCourseRoute">
+                    No rubric {{ locale.rubricGroup.plural() }} have been added to this course yet, start by adding
+                    rubric {{ locale.rubricGroup.plural() }} to the
+                    <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course </a>
+                </p>
+                <p v-else>No rubric {{ locale.rubricGroup.plural() }} have been added to this course.</p>
             </template>
-            <tr :class="{ 'component-action': unitRubric.length === 0 }">
-                <th><span>Unit Rubrics:</span></th>
+            <tr>
+                <th>Unit Rubrics</th>
             </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
                 <tr class="card small-12 compact">
@@ -112,20 +110,16 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="unitRubric.length === 0">
-                <div class="component-action">
-                    <p v-if="props.manageUnitRoute">
-                        No rubric {{ locale.rubricGroup.plural() }} have been added to this
-                        {{ locale.unit.singular() }} yet, start by adding rubric {{ locale.rubricGroup.plural() }} to
-                        the
-                        <a :href="getReturnUrl(`${props.manageUnitRoute}`)">
-                            {{ locale.unit.singular() }}
-                        </a>
-                    </p>
-                    <p v-else>
-                        No rubric {{ locale.rubricGroup.plural() }} have been added to this
-                        {{ locale.unit.singular() }}.
-                    </p>
-                </div>
+                <p v-if="props.manageUnitRoute">
+                    No rubric {{ locale.rubricGroup.plural() }} have been added to this
+                    {{ locale.unit.singular() }} yet, start by adding rubric {{ locale.rubricGroup.plural() }} to the
+                    <a :href="getReturnUrl(`${props.manageUnitRoute}`)">
+                        {{ locale.unit.singular() }}
+                    </a>
+                </p>
+                <p v-else>
+                    No rubric {{ locale.rubricGroup.plural() }} have been added to this {{ locale.unit.singular() }}.
+                </p>
             </template>
         </tbody>
     </table>
@@ -138,6 +132,10 @@ table {
 
 table.rb a {
     line-height: inherit; /* to remove the large line-height on the link */
+}
+
+table.rb p {
+    padding: 0.625rem;
 }
 
 /* Styles for printing */
