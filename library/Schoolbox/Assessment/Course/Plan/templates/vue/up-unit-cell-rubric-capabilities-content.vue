@@ -47,7 +47,7 @@ defineExpose({ isEmpty });
 <template>
     <table ref="rubricCapabilitiesEl" class="rb rb-capabilities-indicators">
         <tbody>
-            <tr>
+            <tr :class="{ 'hide-for-print': courseRubric.length === 0 }">
                 <th>Course Rubrics</th>
             </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
@@ -75,7 +75,7 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="courseRubric.length === 0">
-                <tr v-if="props.manageCourseRoute">
+                <tr v-if="props.manageCourseRoute" class="hide-for-print">
                     <p>
                         No rubric
                         {{ locale.rubricGroup.plural() }}
@@ -85,7 +85,7 @@ defineExpose({ isEmpty });
                         <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course.</a>
                     </p>
                 </tr>
-                <tr v-else>
+                <tr v-else class="hide-for-print">
                     <p>
                         No rubric
                         {{ locale.rubricGroup.plural() }}
@@ -93,7 +93,7 @@ defineExpose({ isEmpty });
                     </p>
                 </tr>
             </template>
-            <tr>
+            <tr :class="{ 'hide-for-print': unitRubric.length === 0 }">
                 <th>Unit Rubrics</th>
             </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
@@ -121,7 +121,7 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="unitRubric.length === 0">
-                <tr v-if="props.manageUnitRoute">
+                <tr v-if="props.manageUnitRoute" class="hide-for-print">
                     <p>
                         No rubric
                         {{ locale.rubricGroup.plural() }}
@@ -133,7 +133,7 @@ defineExpose({ isEmpty });
                         <a :href="getReturnUrl(`${props.manageUnitRoute}`)"> {{ locale.unit.singular() }}. </a>
                     </p>
                 </tr>
-                <tr v-else>
+                <tr v-else class="hide-for-print">
                     <p>
                         No rubric
                         {{ locale.rubricGroup.plural() }}
