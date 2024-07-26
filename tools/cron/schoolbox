@@ -159,6 +159,6 @@ MAILTO="support@schoolbox.com.au"
 36 1 * * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/firebase/deploy-credentials.php -vv >> /var/log/schoolbox/firebase-deploy-credentials.log 2>&1
 
 # clean up the now abandoned mobile app registrations at 1:03 on the 9th of each month
-3 1 9 * *    www-date    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/digistorm/cleanUpAbandonedMobileAppRegistrations.php -p >> /var/log/schoolbox/schema-loginlog.log 2>&1
+3 1 9 * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/digistorm/cleanUpAbandonedMobileAppRegistrations.php -p >> /var/log/schoolbox/schema-loginlog.log 2>&1
 
 # End of file - do not delete
