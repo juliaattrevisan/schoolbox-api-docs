@@ -38,8 +38,28 @@
             }
 
             iiCache[sourceId] = setTimeout(function () {
-                $.post(action, formdata);
-            }, 500);
+                document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
+                    detail: { text: "Saving..." }
+                }));
+                try {
+                    $.post(action, formdata)
+                        .done(() => {
+                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                                detail: { text: "Saved" }
+                            }));
+                        })
+                        .fail(() => {
+                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                                detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
+                            }));
+                        })
+                } catch (error) {
+                    document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
+                        detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
+                    }));
+                }
+            }
+            , 500);
         }
 
     });
@@ -82,7 +102,7 @@
     </div>
     <div class="small-12 columns">
         <div class="alert-box no-margin">
-            <p>
+            <p class="f-no-margins">
                 Customise when and how you receive notifications.
                 <em>Options that are unavailable have been disabled by your system administrator.</em>
             </p>
@@ -108,8 +128,6 @@
                 </section>
             {% endif %}
         {% endfor %}
-
-        <input type="submit" value="Submit" />
     </div>
 </form>
 
