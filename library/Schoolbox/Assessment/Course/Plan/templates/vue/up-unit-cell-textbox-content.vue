@@ -78,6 +78,12 @@ defineExpose({ focusEditor, isEmpty });
 function onEditorCreated(event: EditorCreatedEventInfo) {
     editor = event.editor as InlineEditor;
 
+    // enable read-only mode if the user doesn't have permission to create a textbox
+    if (props.unit.textboxes._routes.createTextbox === null) {
+        editor.enableReadOnlyMode("is-read-only");
+        return;
+    }
+
     editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
         store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
     });
