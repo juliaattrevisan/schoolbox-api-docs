@@ -135,6 +135,11 @@ defineExpose({ isEmpty });
 table {
     margin-bottom: 5px;
 }
+
+table.rb a {
+    line-height: inherit; /* to remove the large line-height on the link */
+}
+
 /* Styles for printing */
 @media print {
     table td,
