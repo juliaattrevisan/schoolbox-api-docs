@@ -357,7 +357,7 @@ const isFirstUnit = window.Vue.computed(() => {
                 />
                 <up-unit-cell-rubric-capabilities-action
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
-                    :routes="props.unit.rubricCapabilities._routes"
+                    :unit="props.unit"
                 />
                 <up-unit-cell-curriculum-action
                     v-else-if="props.column.type === ColumnType.CURRICULUM_OVERVIEW"

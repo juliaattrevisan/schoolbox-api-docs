@@ -5,26 +5,35 @@
  */
 import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
-    routes: {
-      manageUnit: string | null;
-      manageCourse: string | null;
-    };
+    unit: Unit;
 }
 
 const props = defineProps<Props>();
 </script>
 
 <template>
-    <div v-if="routes.manageCourse || routes.manageUnit" class="component-action">
+    <div
+        v-if="props.unit.rubricCapabilities._routes.manageCourse || props.unit.rubricCapabilities._routes.manageUnit"
+        class="component-action"
+    >
         <section>
-          <a v-if="routes.manageCourse" class="button" :href="getReturnUrl(`${routes.manageCourse}`)">
-            Manage Course {{ locale.rubricGroup.plural() }}
-          </a>
-          <a v-if="routes.manageUnit" class="button" :href="getReturnUrl(`${routes.manageUnit}`)">
-            Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
-          </a>
+            <a
+                v-if="props.unit.rubricCapabilities._routes.manageCourse"
+                class="button"
+                :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageCourse}`)"
+            >
+                Manage Course {{ locale.rubricGroup.plural() }}
+            </a>
+            <a
+                v-if="props.unit.rubricCapabilities._routes.manageUnit"
+                class="button"
+                :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageUnit}`)"
+            >
+                Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
+            </a>
         </section>
     </div>
 </template>
