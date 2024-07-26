@@ -51,8 +51,8 @@ defineExpose({ isEmpty });
                 <th>Course Rubrics</th>
             </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
-                <tr class="card small-12 compact">
-                    <th class="markdown border-none">
+                <tr>
+                    <th class="l-flex border-none">
                         <span
                             v-if="props.usedCapabilities.includes(capability.id)"
                             class="icon-submissions"
@@ -62,8 +62,8 @@ defineExpose({ isEmpty });
                         <div v-html="capability.name"></div>
                     </th>
                 </tr>
-                <tr v-for="indicator in capability.indicators" :key="indicator.id" class="card small-12 compact">
-                    <td class="markdown border-none">
+                <tr v-for="indicator in capability.indicators" :key="indicator.id">
+                    <td class="l-flex border-none">
                         <span
                             v-if="props.usedIndicators.includes(indicator.id)"
                             class="icon-submissions"
@@ -97,8 +97,8 @@ defineExpose({ isEmpty });
                 <th>Unit Rubrics</th>
             </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
-                <tr class="card small-12 compact">
-                    <th class="markdown border-none">
+                <tr>
+                    <th class="l-flex border-none">
                         <span
                             v-if="props.usedCapabilities.includes(capability.id)"
                             class="icon-submissions"
@@ -108,8 +108,8 @@ defineExpose({ isEmpty });
                         <div v-html="capability.name"></div>
                     </th>
                 </tr>
-                <tr v-for="indicator in capability.indicators" :key="indicator.id" class="card small-12 compact">
-                    <td class="markdown border-none">
+                <tr v-for="indicator in capability.indicators" :key="indicator.id">
+                    <td class="l-flex border-none">
                         <span
                             v-if="props.usedIndicators.includes(indicator.id)"
                             class="icon-submissions"
@@ -146,21 +146,22 @@ defineExpose({ isEmpty });
     </table>
 </template>
 
-<style scoped>
-table {
+<style lang="scss" scoped>
+table.rb {
     margin-bottom: 5px;
-}
-
-table.rb a {
-    line-height: inherit; /* to remove the large line-height on the link */
-}
-
-table.rb p {
-    padding: 0.625rem;
-}
-
-table.rb tbody th:first-of-type {
-    border-right: none; /* remove the 2px right border on the first th */
+    padding-bottom: 1rem;
+    a {
+        line-height: inherit; /* to remove the large line-height on the link */
+    }
+    p {
+        padding: 0.625rem;
+    }
+    th:first-of-type {
+        border-right: none; /* remove the 2px right border on the first th */
+    }
+    th p {
+        font-weight: bold;
+    }
 }
 
 /* Styles for printing */
