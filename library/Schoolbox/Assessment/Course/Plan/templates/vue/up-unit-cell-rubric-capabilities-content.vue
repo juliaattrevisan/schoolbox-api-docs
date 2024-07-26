@@ -82,7 +82,7 @@ defineExpose({ isEmpty });
                         have been added to this course yet, start by adding rubric
                         {{ locale.rubricGroup.plural() }}
                         to the
-                        <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course </a>
+                        <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course.</a>
                     </p>
                 </tr>
                 <tr v-else>
@@ -130,9 +130,7 @@ defineExpose({ isEmpty });
                         yet, start by adding rubric
                         {{ locale.rubricGroup.plural() }}
                         to the
-                        <a :href="getReturnUrl(`${props.manageUnitRoute}`)">
-                            {{ locale.unit.singular() }}
-                        </a>
+                        <a :href="getReturnUrl(`${props.manageUnitRoute}`)"> {{ locale.unit.singular() }}. </a>
                     </p>
                 </tr>
                 <tr v-else>
@@ -159,6 +157,10 @@ table.rb a {
 
 table.rb p {
     padding: 0.625rem;
+}
+
+table.rb tbody th:first-of-type {
+    border-right: none; /* remove the 2px right border on the first th */
 }
 
 /* Styles for printing */
