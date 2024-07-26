@@ -52,7 +52,7 @@ defineExpose({ isEmpty });
             </tr>
             <template v-for="capability in courseRubric" :key="capability.id">
                 <tr>
-                    <th class="l-flex border-none">
+                    <th class="l-flex markdown border-none">
                         <span
                             v-if="props.usedCapabilities.includes(capability.id)"
                             class="icon-submissions"
@@ -98,7 +98,7 @@ defineExpose({ isEmpty });
             </tr>
             <template v-for="capability in unitRubric" :key="capability.id">
                 <tr>
-                    <th class="l-flex border-none">
+                    <th class="l-flex markdown border-none">
                         <span
                             v-if="props.usedCapabilities.includes(capability.id)"
                             class="icon-submissions"
