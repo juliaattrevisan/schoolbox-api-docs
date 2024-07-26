@@ -75,12 +75,23 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="courseRubric.length === 0">
-                <p v-if="props.manageCourseRoute">
-                    No rubric {{ locale.rubricGroup.plural() }} have been added to this course yet, start by adding
-                    rubric {{ locale.rubricGroup.plural() }} to the
-                    <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course </a>
-                </p>
-                <p v-else>No rubric {{ locale.rubricGroup.plural() }} have been added to this course.</p>
+                <tr v-if="props.manageCourseRoute">
+                    <p>
+                        No rubric
+                        {{ locale.rubricGroup.plural() }}
+                        have been added to this course yet, start by adding rubric
+                        {{ locale.rubricGroup.plural() }}
+                        to the
+                        <a :href="getReturnUrl(`${props.manageCourseRoute}`)"> course </a>
+                    </p>
+                </tr>
+                <tr v-else>
+                    <p>
+                        No rubric
+                        {{ locale.rubricGroup.plural() }}
+                        have been added to this course.
+                    </p>
+                </tr>
             </template>
             <tr>
                 <th>Unit Rubrics</th>
@@ -110,16 +121,28 @@ defineExpose({ isEmpty });
                 </tr>
             </template>
             <template v-if="unitRubric.length === 0">
-                <p v-if="props.manageUnitRoute">
-                    No rubric {{ locale.rubricGroup.plural() }} have been added to this
-                    {{ locale.unit.singular() }} yet, start by adding rubric {{ locale.rubricGroup.plural() }} to the
-                    <a :href="getReturnUrl(`${props.manageUnitRoute}`)">
+                <tr v-if="props.manageUnitRoute">
+                    <p>
+                        No rubric
+                        {{ locale.rubricGroup.plural() }}
+                        have been added to this
                         {{ locale.unit.singular() }}
-                    </a>
-                </p>
-                <p v-else>
-                    No rubric {{ locale.rubricGroup.plural() }} have been added to this {{ locale.unit.singular() }}.
-                </p>
+                        yet, start by adding rubric
+                        {{ locale.rubricGroup.plural() }}
+                        to the
+                        <a :href="getReturnUrl(`${props.manageUnitRoute}`)">
+                            {{ locale.unit.singular() }}
+                        </a>
+                    </p>
+                </tr>
+                <tr v-else>
+                    <p>
+                        No rubric
+                        {{ locale.rubricGroup.plural() }}
+                        have been added to this
+                        {{ locale.unit.singular() }}.
+                    </p>
+                </tr>
             </template>
         </tbody>
     </table>
