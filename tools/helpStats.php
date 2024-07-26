@@ -45,7 +45,7 @@ $app = new class extends CliTool\App {
         $config = $this->getDi()->get('config');
 
         // Only run for Schoolbox Help
-        if ($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE) !== 'help') {
+        if (strtoupper($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE)) !== 'HELP'){
             exit;
         }
 
