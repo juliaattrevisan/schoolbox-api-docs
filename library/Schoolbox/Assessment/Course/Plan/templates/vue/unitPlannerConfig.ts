@@ -5,9 +5,9 @@ import type { UnitTemplate, UnitTemplateComponent } from "./unitPlannerTypes";
 export enum ColumnType {
     UNIT = "unit",
     OVERVIEW = "overview",
+    CURRICULUM_OVERVIEW = "curriculum-overview",
     ACTIVITIES = "activities",
     RUBRIC_CAPABILITIES = "rubric-capabilities",
-    CURRICULUM_OVERVIEW = "curriculum-overview",
 }
 
 // For linking a column type to specific configuration options for that column
@@ -45,6 +45,11 @@ const tabConfig: TabConfig[] = [
     { id: "all", label: "All", columnTypeIDs: Object.values(ColumnType) },
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
     {
+        id: "curriculum-overview",
+        label: "Curriculum Overview",
+        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
+    },
+    {
         id: "activities",
         label: `Learning ${locale.activity.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES],
@@ -53,11 +58,6 @@ const tabConfig: TabConfig[] = [
         id: "rubric-capabilities",
         label: `Rubric ${locale.rubricGroup.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.RUBRIC_CAPABILITIES],
-    },
-    {
-        id: "curriculum-overview",
-        label: "Curriculum Overview",
-        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
     },
 ];
 
@@ -95,6 +95,7 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
+    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
     [ColumnType.ACTIVITIES]: {
         label: `Learning ${locale.activity.properPlural()}`,
         fixedLeft: false,
@@ -103,7 +104,6 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
         label: `Rubric ${locale.rubricGroup.properPlural()}`,
         fixedLeft: false,
     },
-    [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
 };
 
 /**
