@@ -101,7 +101,12 @@ window.Vue.watch(
  */
 window.Vue.onMounted(() => {
     if (!folderNodesStore().hasLoaded) {
-        folderNodesStore().init(props.selectedNodes, props.nodes, props.component?.filter ?? null, false);
+        folderNodesStore().init(
+            props.selectedNodes,
+            props.nodes,
+            props.component?.filter ?? null,
+            props.unit.curriculum._routes.modifyCurriculum === null,
+        );
     }
 
     // Let the parent know if we have any filtered nodes or not
