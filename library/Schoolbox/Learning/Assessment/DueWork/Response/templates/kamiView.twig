@@ -44,7 +44,12 @@
     <div class="small-12 island">
         {% if kami.isStatusDone %}
         <section>
-            {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl, allow: '', dataAttributes: {}} only %}
+            {% include 'sub/iframeResponsive.twig' with {
+                id: 'kami-viewport',
+                src: session.viewerUrl,
+                allow: 'microphone *; camera *',
+                dataAttributes: {}
+            } only %}
         </section>
         {% else %}
             <div class="empty-state">

@@ -22,7 +22,12 @@
 <div class="row">
     <div class="small-12 island">
         {% if session %}
-            {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl, allow: '', dataAttributes: {}} only %}
+            {% include 'sub/iframeResponsive.twig' with {
+                id: 'kami-viewport',
+                src: session.viewerUrl,
+                allow: 'microphone *; camera *',
+                dataAttributes: {}
+            } only %}
         {% else %}
             <div class="empty-state">
                 <i class="icon-surveys"></i>
