@@ -45,6 +45,11 @@ const tabConfig: TabConfig[] = [
     { id: "all", label: "All", columnTypeIDs: Object.values(ColumnType) },
     { id: "overview", label: "Overview", columnTypeIDs: [ColumnType.UNIT, ColumnType.OVERVIEW] },
     {
+        id: "curriculum-overview",
+        label: "Curriculum Overview",
+        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
+    },
+    {
         id: "activities",
         label: `Learning ${locale.activity.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.ACTIVITIES],
@@ -53,11 +58,6 @@ const tabConfig: TabConfig[] = [
         id: "rubric-capabilities",
         label: `Rubric ${locale.rubricGroup.properPlural()}`,
         columnTypeIDs: [ColumnType.UNIT, ColumnType.RUBRIC_CAPABILITIES],
-    },
-    {
-        id: "curriculum-overview",
-        label: "Curriculum Overview",
-        columnTypeIDs: [ColumnType.UNIT, ColumnType.CURRICULUM_OVERVIEW],
     },
 ];
 
