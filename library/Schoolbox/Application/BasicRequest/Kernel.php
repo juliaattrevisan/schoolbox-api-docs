@@ -279,20 +279,16 @@ class Kernel extends WebKernelAbstract
             'sentry',
             $di->lazy(
                 static function () use ($di) {
-                    $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
-                    $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-                    if (\strlen($sentryToken) && \strlen($sentryProject)) {
-                        /** @var Instance $sb */
-                        $sb = $di->get('instance');
-                        return (new \Alaress\Sentry\Factory())->build(
-                            $sb,
-                            Instance::APPLICATION_NAME,
-                            $sentryToken,
-                            $sentryProject
-                        );
-                    } else {
-                        return new \Alaress\Sentry\NullHub();
-                    }
+                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
+                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
+                    /** @var Instance $sb */
+                    $sb = $di->get('instance');
+                    return (new \Alaress\Sentry\Factory())->build(
+                        $sb,
+                        Instance::APPLICATION_NAME,
+                        $sentryToken,
+                        $sentryProject,
+                    );
                 }
             )
         );
