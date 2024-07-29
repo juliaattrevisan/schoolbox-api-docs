@@ -65,6 +65,7 @@ class Factory
             'error_types' => self::ERROR_REPORTING,
             'send_default_pii' => true,
             'attach_stacktrace' => true,
+            'traces_sample_rate' => 1.0,
         ]);
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([
