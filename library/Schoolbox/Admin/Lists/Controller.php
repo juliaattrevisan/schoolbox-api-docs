@@ -702,13 +702,21 @@ class Controller extends Base
                     'code'          => [
                         'caption'   => 'Code',
                         'width'     => 2,
-                        'maxLength' => 4,
+                        /* This is intentionally shorter than what the db schema allows (8)
+                         * to...artificially inhibit users' creativity here. Because this is
+                         * php-land, we can expand it on-demand in a master branch.
+                         */
+                        'maxLength' => 6,
                         'default'   => '',
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
                         'width'     => 7,
-                        'maxLength' => 16,
+                        /* This is intentionally shorter than what the db schema allows (64)
+                         * to...artificially inhibit users' creativity here. Because this is
+                         * php-land, we can expand it on-demand in a master branch.
+                         */
+                        'maxLength' => 48,
                         'mandatory' => true,
                         'default'   => '',
                     ],
