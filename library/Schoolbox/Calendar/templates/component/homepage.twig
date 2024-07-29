@@ -6,9 +6,9 @@
             folderId: Number('{{ folder.id }}') || null,
             componentId: Number('{{ component.instance.id }}') || null,
             // Days: 0 = max, must be at least 1.
-            // Allegedly may be up to 1 year (or "all": wtf?),
-            // but surely don't show all events for all time?
-            days: Math.min(Math.max(1, Number('{{ component.config.days }}') || 365), 365),
+            // Maximum is defined as the number of remaining days from current date to the
+            // end of the following school year period.
+            days: Math.min(Math.max(1, Number('{{ component.config.days }}') || {{ maxCalendarDays }}), {{ maxCalendarDays }}),
             dateDisplayFormats: dateDisplayFormats,
             limit: Number('{{ component.config.size }}') || null,
             createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ returnUrl }}&level=2&homepageId={{ folder.id }}",
