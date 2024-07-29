@@ -54,28 +54,31 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         activate("Creating text box...");
 
         try {
-            // First create a new component
-            const formData = new FormData();
-            formData.append("cid", storeUnit.folderId.toString());
-            formData.append("add", componentDefinition.toString());
+            // First create a new component if it doesn't already exist
+            if (selectedTextbox.componentId >= 0) {
+                const formData = new FormData();
+                formData.append("cid", storeUnit.folderId.toString());
+                formData.append("add", componentDefinition.toString());
 
-            const responseComponent = await fetch(`${storeUnit.textboxes._routes.createComponent}`, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    Accept: "application/json",
-                },
-            });
+                const responseComponent = await fetch(`${storeUnit.textboxes._routes.createComponent}`, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Accept: "application/json",
+                    },
+                });
 
-            if (!responseComponent.ok) {
-                throw new Error(await extractErrorMessage(responseComponent));
+                if (!responseComponent.ok) {
+                    throw new Error(await extractErrorMessage(responseComponent));
+                }
+
+                const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
+                storeUnit.textboxes.items[column.label].componentId = responseComponentJSON.instanceID;
             }
-
-            const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
 
             // Then create the textbox
             const response = await fetch(
-                `${storeUnit.textboxes._routes.createTextbox}/component/${responseComponentJSON.instanceID}`,
+                `${storeUnit.textboxes._routes.createTextbox}/component/${storeUnit.textboxes.items[column.label].componentId}`,
                 {
                     method: "POST",
                     body: JSON.stringify({
