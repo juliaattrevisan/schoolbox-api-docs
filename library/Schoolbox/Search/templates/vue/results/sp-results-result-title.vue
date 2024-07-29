@@ -37,6 +37,7 @@ const queryStore = useQueryStore();
                 href="#open-badge-modal"
                 :text="props.result.title"
                 :query="queryStore.activeQuery"
+                :prevent-default="true"
                 @click="emit('badgeSelected', props.result)"
             />
         </h3>

@@ -10,11 +10,12 @@ interface Props {
     text: string; // the text to show in the element
     query: string; // the list of words within the query
     isSearching?: boolean; // whether the search is currently active, if not we don't need to use v-html
-    href?: string | undefined; // the href to navigate to
-    class?: string | undefined; // the classes to apply to the elements
-    title?: string | undefined; // the title to display
-    disabled?: boolean | undefined; // whether the element is disabled
-    for?: string | undefined; // the for attribute
+    href?: string; // the href to navigate to
+    class?: string; // the classes to apply to the elements
+    title?: string; // the title to display
+    disabled?: boolean; // whether the element is disabled
+    for?: string; // the for attribute
+    preventDefault?: boolean; // whether to prevent the default action
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     title: undefined,
     disabled: undefined,
     for: undefined,
+    preventDefault: false,
 });
 
 /**
@@ -40,6 +42,18 @@ const queryWordList = window.Vue.computed(() => {
 const emit = defineEmits<{
     click: [];
 }>();
+
+/**
+ * When the element is clicked, emit the click event
+ * @param {Event} event the event that triggered the click
+ */
+function onClicked(event: Event) {
+    // to prevent the default action, which is to navigate to the href if the element is an anchor
+    if (props.preventDefault) {
+        event.preventDefault();
+    }
+    emit("click");
+}
 </script>
 
 <template>
@@ -49,11 +63,11 @@ const emit = defineEmits<{
         :is="props.tag"
         v-if="props.isSearching"
         :href="props.href ? props.href : undefined"
-        :class="props.class ? props.class : undefined"
+        :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
         :disabled="props.disabled ? props.disabled : undefined"
         :for="props.for ? props.for : undefined"
-        @click.prevent="emit('click')"
+        @click="onClicked"
         v-html="addMarks(props.text, queryWordList)"
     ></component>
     <!-- eslint-enable vue/no-v-html -->
@@ -62,11 +76,11 @@ const emit = defineEmits<{
         :is="props.tag"
         v-else
         :href="props.href ? props.href : undefined"
-        :class="props.class ? props.class : undefined"
+        :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
         :disabled="props.disabled ? props.disabled : undefined"
         :for="props.for ? props.for : undefined"
-        @click.prevent="emit('click')"
+        @click="onClicked"
         >{{ props.text }}</component
     >
 </template>
