@@ -108,9 +108,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
     public function validateNormMark(ReturnedWork $object): bool
     {
         if ($object->getNormalizedMark() < IMarkScheme::NORMALISED_MARK_MIN || $object->getNormalizedMark() > IMarkScheme::NORMALISED_MARK_MAX) {
-            $msg = 'Normalised mark must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
-                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $object->getNormalizedMark();
-            throw new RangeException($msg);
+            throw new RangeException(
+                // For consistency, 'normalised grade' should be used instead of 'normalised mark' in the UI.
+                'Normalised grade must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
+                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $object->getNormalizedMark()
+            );
         }
         return true;
     }

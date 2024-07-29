@@ -55,6 +55,12 @@ class Controller extends Base
 
 
     /**
+     * Note to anyone thinking about using the RosettaStone here to fix terminology:
+     *  - Terminology should not be used in the admin system. It creates a recursive problem that cannot be solved. We
+     *    use terminology only in user facing areas, in admin areas we use the original terminology to avoid any
+     *    confusion when things are renamed.  Example: You change the language on your phone, and then you can't find
+     *    the menu to change the language back because its in the foreign language.
+     *
      * @param MapperFactory $mapperFactory
      */
     public function __construct(MapperFactory $mapperFactory)
@@ -707,7 +713,7 @@ class Controller extends Base
                         'default'   => '',
                     ],
                     'normaliseAs'   => [
-                        'caption'   => 'Normalised Mark',
+                        'caption'   => 'Normalised Grade', // For consistency, 'normalised grade' should be used instead of 'normalised mark' in the UI.
                         'tooltip'   => 'Add a value between 0 or 100 that will be awarded on the assessment of a learning activity. Leaving the field blank will result in a NULL value when the submission state is selected',
                         'nullable'  => true,
                         'width'     => 2,
