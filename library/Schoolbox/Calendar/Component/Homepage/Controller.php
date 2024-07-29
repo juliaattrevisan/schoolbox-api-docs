@@ -41,7 +41,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'user'              => $this->getUser(),
                 'folder'            => $this->getContext(),
                 //Maximum days should be set to the number of remaining days until the end of the following school year
-                'maxCalendarDays'   => $endOfNextSchoolYear->diffInDays(\Alaress_Date_Format::now()),
+                'maxCalendarDays'   => $endOfNextSchoolYear->diffInDays(\Alaress_Date_Format::now()) + 1,
                 'canCreateEvent'    => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
                 'returnUrl'         => Redirect::encode(sprintf('/homepage/%d', $this->getInstance()->getIdentifier()))
             ],
