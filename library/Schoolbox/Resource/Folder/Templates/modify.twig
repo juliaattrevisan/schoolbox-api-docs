@@ -201,14 +201,14 @@
             var shortEnough = true;
 
             explodeCodes.forEach(function(code){
-                if($.trim(code).length > 20) {
+                if($.trim(code).length > 64) {
                     shortEnough = false;
                 }
             });
 
             return shortEnough;
 
-        }, 'Class codes may not exceed 20 characters.');
+        }, 'Class codes may not exceed 64 characters.');
 
         {% if folder.id %}
             {# Warn user that changing inherit permissions will destroy this group #}
