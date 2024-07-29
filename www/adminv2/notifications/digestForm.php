@@ -9,6 +9,7 @@
 
 // If in SitePage context
 use Alaress\Redis;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (isset($this)) {
     SitePage::localRedir('/adminv2/notifications');
@@ -22,7 +23,7 @@ if (empty($_POST)) {
 }
 
 if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
+    ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW, null, '', 403);
 }
 
 foreach ($_POST['role'] as $roleId => $data) {
