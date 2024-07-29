@@ -2156,7 +2156,7 @@ abstract class Kernel
      * @param Di\Container $di
      * @return array
      */
-    abstract static protected function getKnownUserClassesFromSession(Di\Container $di): array;
+    abstract protected static function getKnownUserClassesFromSession(Di\Container $di): array;
 
 
     /**
