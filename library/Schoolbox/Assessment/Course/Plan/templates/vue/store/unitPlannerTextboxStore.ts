@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import { TextboxContent } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
-import {TextboxContent} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
 
 export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore", () => {
     const unitPlannerStore = useUnitPlannerStore();
@@ -47,7 +47,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
 
         const selectedTextbox = storeUnit.textboxes.items[column.label];
-        if (selectedTextbox.id >= 0) {
+        if (selectedTextbox.textboxId >= 0) {
             return;
         }
 
@@ -96,7 +96,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
             // If we just created a textbox, then we need to update the store
             // with the new textbox.
-            let responseJSON = (await response.json()) as TextboxContent;
+            const responseJSON = (await response.json()) as TextboxContent;
             responseJSON.inTemplate = true;
             storeUnit.textboxes.items[column.label] = responseJSON;
 

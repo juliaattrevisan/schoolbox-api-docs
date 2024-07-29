@@ -237,7 +237,7 @@ const isFirstUnit = window.Vue.computed(() => {
             'fixed-left': props.column.fixedLeft,
             'sortable-dropzone': !props.isSortablePlaceholder && store.dragCurrentUnit === props.unit,
             'content-focused': contentIsFocused,
-            'overview-has-created-textbox': (storeUnit?.textboxes.items[props.column.label]?.id || 0) >= 0,
+            'overview-has-created-textbox': (storeUnit?.textboxes.items[props.column.label]?.textboxId || 0) >= 0,
             'first-unit': isFirstUnit,
         }"
         :style="{ height: `${store.unitRowDisplayHeights[props.unit.id]}px` }"

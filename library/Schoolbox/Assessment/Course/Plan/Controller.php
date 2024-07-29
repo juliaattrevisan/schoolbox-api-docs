@@ -585,6 +585,7 @@ class Controller extends Base
             // This saves needing to manipulate the initial data on the frontend on the first mount
             $textboxes[strtolower($heading)] = [
                 'id' => -1,
+                'textboxId' => -1,
                 'body' => '',
             ];
 
@@ -617,6 +618,7 @@ class Controller extends Base
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
                     'id' => $row['textboxID'],
+                    'textboxId' => $row['textboxID'],
                 ];
             } else {
                 // increase the extra textboxes by 1

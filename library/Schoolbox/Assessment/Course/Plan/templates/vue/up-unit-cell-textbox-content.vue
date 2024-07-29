@@ -26,7 +26,7 @@ const storeUnit = window.Vue.computed(() => {
 
 // Whether the textbox exists in the backend, or if it still needs to be created
 const textboxIsCreated = window.Vue.computed(() => {
-    return (storeUnit.value?.textboxes.items[props.column.label].id || 0) >= 0;
+    return (storeUnit.value?.textboxes.items[props.column.label].textboxId || 0) >= 0;
 });
 
 const editorContent = window.Vue.ref(props.unit.textboxes.items[props.column.label].body);
