@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\DueWork;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper;
 
 /**
@@ -121,10 +122,10 @@ class StateMapper extends Mapper
         }
         if ($object->getNormaliseAs() < 0 || $object->getNormaliseAs() > 100) {
             throw new \Schoolbox\Mapper\Exception(
-                sprintf(
-                    'Invalid normalised mark: %s. Normalised mark must be empty or between 0-100.',
-                    $object->getNormaliseAs()
-                )
+                // For consistency, 'normalised grade' should be used instead of 'normalised mark' in the UI.
+                'Invalid normalised grade: ' . $object->getNormaliseAs() . '.' .
+                ' Normalised grade must be empty or between ' . IMarkScheme::NORMALISED_MARK_MIN .
+                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . '.'
             );
         }
         return true;

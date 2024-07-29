@@ -713,7 +713,7 @@ class Controller extends Base
                         'default'   => '',
                     ],
                     'normaliseAs'   => [
-                        'caption'   => 'Normalised Mark',
+                        'caption'   => 'Normalised Grade', // For consistency, 'normalised grade' should be used instead of 'normalised mark' in the UI.
                         'tooltip'   => 'Add a value between 0 or 100 that will be awarded on the assessment of a learning activity. Leaving the field blank will result in a NULL value when the submission state is selected',
                         'nullable'  => true,
                         'width'     => 2,

@@ -96,9 +96,11 @@ abstract class AbstractMarkScheme implements IMarkScheme
     protected function validateNormalisedMarkValue($normalisedMark)
     {
         if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN || $normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
-            $msg = 'Normalised mark must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
-                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $normalisedMark;
-            throw new RangeException($msg);
+            throw new RangeException(
+                // For consistency, 'normalised grade' should be used instead of 'normalised mark' in the UI.
+                'Normalised grade must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
+                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $normalisedMark
+            );
         }
     }
 
