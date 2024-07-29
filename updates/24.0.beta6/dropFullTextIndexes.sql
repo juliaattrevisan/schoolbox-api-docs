@@ -9,10 +9,3 @@ drop index `fulltext` on event;
 drop index `fulltext` on assessment;
 drop index `fulltext` on lesson_plan_field;
 drop index `fulltext` on wikiRevision;
-
-
-
-
-
-
-
