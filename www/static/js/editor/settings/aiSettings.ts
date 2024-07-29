@@ -1,12 +1,17 @@
+import {EditorConfig} from "@js/editor/types/editorTypes";
+
 /**
  * Returns the settings for the AI assistant
  * @returns { object } - the font settings
  */
-export function getAISettings() {
+export function getAISettings(model: string | undefined) {
     return {
         ai: {
             openAI: {
                 apiUrl: "/openai",
+                requestParameters: {
+                    'model': model,
+                }
             },
             aiAssistant: {
                 // Define the commands list from scratch.

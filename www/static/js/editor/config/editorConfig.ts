@@ -90,7 +90,7 @@ export function getConfig(config: EditorConfig): EditorConfig {
         ...getTokensSettings(config),
         ...getWordCountSettings(),
         ...getHTMLSupportSettings(),
-        ...getAISettings(),
+        ...getAISettings(window.sbProps.openAIModel),
         sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }

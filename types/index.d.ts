@@ -25,6 +25,7 @@ declare global {
             colourDefaults: { [key: string]: any };
             editors: { [key: string]: Editor };
             hasEditorAI: true | undefined; // to display the AI features within the editor
+            openAIModel: string | undefined; // chosen open AI model to use
             lightGallery: Function;
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
