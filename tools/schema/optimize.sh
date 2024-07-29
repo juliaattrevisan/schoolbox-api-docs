@@ -42,6 +42,8 @@ if ! db_user=$(schoolbox-read-instances --ini "$ini_file" --option SQL_user) ||
 fi
 
 for table in $(mysql -h"$db_host" -u"$db_user" -p"$db_pass" -sse "SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA = '$db_schema' AND TABLE_TYPE != 'VIEW' ORDER BY TABLE_NAME"); do
+  # skipping the search index table as it is being indexed by
+  # library/Schoolbox/Api/Database/Index/CmmandLineTool/IndexBuilder.php
   if [[ $table == "search_index" ]]; then
     log "Skipping table: '$table'..."
     continue

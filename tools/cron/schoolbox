@@ -93,8 +93,8 @@ MAILTO="support@schoolbox.com.au"
 # Cleanup redis notification data (once a week on a Sunday)
 20 1 * * 0 www-data php /usr/share/schoolbox/tools/mq/remove-old-triggers.php -p >> /var/log/schoolbox/remove-old-triggers.log 2>&1
 
-# mysql optimize. Each night between 3:45 - 4:45 AM
-45 03 * * * root /usr/local/bin/jitter 3600 /usr/share/schoolbox/tools/schema/optimize.sh >> /var/log/schoolbox/mysql-optimize.log 2>&1
+# mysql optimize. Each night between 2:00 - 3:00 AM
+00 02 * * * root /usr/local/bin/jitter 3600 /usr/share/schoolbox/tools/schema/optimize.sh >> /var/log/schoolbox/mysql-optimize.log 2>&1
 
 # Clean orphaned transforms at 2:18 AM everyday
 18 2 * * * root /usr/share/schoolbox/tools/storage/transform-cleanup.php -p >> /var/log/schoolbox/transform-cleanup.log 2>&1
