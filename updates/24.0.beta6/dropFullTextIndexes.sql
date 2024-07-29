@@ -1,0 +1,18 @@
+drop index idx_comms_news_article_fulltext on comms_news_article;
+drop index `fulltext` on blog;
+drop index `fulltext` on file;
+drop index `fulltext` on forumPost;
+drop index threadtitle on forumThread;
+drop index `fulltext` on link;
+drop index `fulltext` on eotc_event;
+drop index `fulltext` on event;
+drop index `fulltext` on assessment;
+drop index `fulltext` on lesson_plan_field;
+drop index `fulltext` on wikiRevision;
+
+
+
+
+
+
+
