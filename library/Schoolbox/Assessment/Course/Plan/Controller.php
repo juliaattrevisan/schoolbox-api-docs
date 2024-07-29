@@ -1011,6 +1011,24 @@ class Controller extends Base
                 'name'  => Scrub::markdown($indicator->getName()),
             ];
         }
+
+        // normalize and sort the capabilities and indicators
+        $rubrics['capabilities'] = array_values($rubrics['capabilities']);
+
+        // sort the rubrics, to the same structure / format as the other spaces in the UI
+        usort($rubrics['capabilities'], static function ($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        // sort and normalize indicators
+        foreach ($rubrics['capabilities'] as $key => $value) {
+            $tmp = array_values($value['indicators']);
+            usort($tmp, static function ($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
+            $rubrics['capabilities'][$key]['indicators'] = $tmp;
+        }
+
         return $rubrics;
     }
 }
