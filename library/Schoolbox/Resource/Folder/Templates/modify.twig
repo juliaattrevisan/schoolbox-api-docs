@@ -444,7 +444,7 @@
                         <label>
                             {{ database }} {{ locale.class.proper }} Codes
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ codeTitle }}">?</span>
-                            <input type="text" name="code" size="40" value="{{ folder.getCodeString }}"{% if not canChangeClassCodes %} disabled{% endif %}/>
+                            <input type="text" name="code" size="40" maxlength="64" value="{{ folder.getCodeString }}"{% if not canChangeClassCodes %} disabled{% endif %}/>
                         </label>
                     </div>
                 </fieldset>
