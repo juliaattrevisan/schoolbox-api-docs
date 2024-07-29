@@ -12,6 +12,8 @@ namespace Schoolbox\Calendar\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
+use RuntimeException;
+use Twig\Error;
 
 /**
  * Homepage calendar component.
@@ -22,8 +24,12 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @param String $templateHandle
      *
      * @return bool
+     * @throws Error\LoaderError
+     * @throws Error\RuntimeError
+     * @throws Error\SyntaxError
+     * @throws RuntimeException
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
         $endOfNextSchoolYear = (new \Alaress_Date_Format())->endOfSchoolYear()->addYears(1);
 
