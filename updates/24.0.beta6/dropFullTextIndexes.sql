@@ -9,3 +9,6 @@ drop index `fulltext` on event;
 drop index `fulltext` on assessment;
 drop index `fulltext` on lesson_plan_field;
 drop index `fulltext` on wikiRevision;
+drop index `fulltext` on `groups`;
+drop index `fulltext` on luCampus;
+drop index `fulltext` on user;
