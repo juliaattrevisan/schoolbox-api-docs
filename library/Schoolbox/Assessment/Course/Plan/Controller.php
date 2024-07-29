@@ -668,9 +668,6 @@ class Controller extends Base
      */
     private function findRubrics(int $unitFolderId, $courseFolderId): array
     {
-        /* TODO Add a list of all the rubric caps and inds that *should* have been fulfilled
-         *  so users can compare it against the ones that *were* fulfilled (a diff between them)
-         */
         $rubrics = [
             'available' => $this->getCourseUnitRubric($courseFolderId, $unitFolderId),
             'used' => [
@@ -789,9 +786,6 @@ class Controller extends Base
          */
         $rubricData = $this->findRubrics($unit->getFolder()->getId(), $unit->getCourse()->getFolder()->getId());
 
-        /* TODO Later on we can provide a list of rubrics that exist in the whole course
-         *  and diff them in some way so users can see what they haven't planned properly
-         */
         $usedRubricCapabilities = array_values($rubricData['used']['capabilityIds']);
         $usedRubricIndicators = array_values($rubricData['used']['indicatorIds']);
         $availableRubricCapabilities = array_values($rubricData['available']['capabilities']);
