@@ -14,6 +14,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -71,7 +72,12 @@ class CanSeeParticipation extends AbstractParticipationRule
         $assessable  = $this->findAssessable($params);
         $student     = $this->findStudent($params);
         $participant = $assessable->getParticipantIfExtant($student);
-        $accessLevel = $this->calculateAccessLevel($assessable, $user);
+
+        try {
+            $accessLevel = $this->calculateAccessLevel($assessable, $user);
+        } catch (MapperException $e) {
+            throw new InvalidPath($e->getMessage(), $e->getCode(), $e);
+        }
 
         //is user student deleted? if so they do not exist
         if ($student->isDeleted()) {
@@ -132,8 +138,9 @@ class CanSeeParticipation extends AbstractParticipationRule
      * @param User        $user
      * @return int
      * @throws InvalidArgumentException
+     * @throws MapperException
      */
-    private function calculateAccessLevel(IAssessable $assessable, User $user)
+    private function calculateAccessLevel(IAssessable $assessable, User $user): int
     {
         $folderId = $assessable->getBaseContext()->getFolder()->getId();
         if (!$folderId) {
