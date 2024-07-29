@@ -15,10 +15,24 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="component-action" v-if="props.unit.rubricCapabilities._routes.manage">
+    <div
+        v-if="props.unit.rubricCapabilities._routes.manageCourse || props.unit.rubricCapabilities._routes.manageUnit"
+        class="component-action"
+    >
         <section>
-            <a class="button" :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manage}`)">
-                Manage rubric {{ locale.rubricGroup.plural() }}
+            <a
+                v-if="props.unit.rubricCapabilities._routes.manageCourse"
+                class="button"
+                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)"
+            >
+                Manage Course {{ locale.rubricGroup.plural() }}
+            </a>
+            <a
+                v-if="props.unit.rubricCapabilities._routes.manageUnit"
+                class="button"
+                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)"
+            >
+                Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
             </a>
         </section>
     </div>

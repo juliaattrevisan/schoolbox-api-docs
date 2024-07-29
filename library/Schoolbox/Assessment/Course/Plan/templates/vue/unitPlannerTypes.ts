@@ -8,6 +8,7 @@ export type Assessment = {
 export type RubricCapability = {
     id: number;
     name: string;
+    course: boolean;
     indicators: {
         id: number;
         name: string;
@@ -46,16 +47,19 @@ export type Unit = {
         _routes: {
             createComponent: string | null;
             modifyCurriculum: string | null;
-        }
+        };
         selectedNodes: Node[]; // the individual nodes assigned to the folder
         nodes: Node[]; // the selectedNodes, displayed within their entire tree structure, containing all parent nodes
         components: CurriculumOverviewComponent[];
     };
     rubricCapabilities: {
         _routes: {
-            manage: string | null;
+            manageUnit: string | null;
+            manageCourse: string | null;
         };
-        items: RubricCapability[];
+        usedIndicators: number[];
+        usedCapabilities: number[];
+        availableRubricCapabilities: RubricCapability[];
     };
     textboxes: {
         _routes: {
@@ -63,7 +67,7 @@ export type Unit = {
             createTextbox: string | null;
         };
         items: Record<string, TextboxContent>;
-    }
+    };
 
     extraTextboxes: number;
     sequence: number;
@@ -87,8 +91,8 @@ export interface UnitTemplateTextboxComponent extends UnitTemplateComponent {
  * and which are just components added to a home page
  */
 export type UnitTemplate = {
-    textboxDefId: null|number; // the textbox component definition ID
-    curriculumDefId: null|number; // the curriculum component definition ID
+    textboxDefId: null | number; // the textbox component definition ID
+    curriculumDefId: null | number; // the curriculum component definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
 };
