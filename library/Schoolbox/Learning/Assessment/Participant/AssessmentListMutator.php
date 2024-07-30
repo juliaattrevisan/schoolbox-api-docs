@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -99,32 +100,36 @@ class AssessmentListMutator
             $this->showClosed,
             $this->now
         );
+
         if ($this->visibilityCache[$assessmentId]) {
             return $assessment;
         }
 
-        try {
-            // Forcibly hydrate the children of the current dude if they're a parent.
-            (new \Schoolbox\External\User())->loadChildren([$this->user]);
-        } catch (\Alaress\Database\Exception) {
-            if ($this->user->getChildren() === null) {
-                // No children have been loaded, and none can be loaded because the external database is unavailable.
-                // Just return the $assessment as is in this case.
-                return $assessment;
-            }
-        }
+        if ($this->user->getRole()->isParent()) {
 
-        // Unset children who don't have visibility, and set visibility
-        // based on that factor
-        foreach ($this->user->getChildren() as $child) {
-            if ($assessment->isParticipant($child)) {
-                if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
-                    $this->visibilityCache[$assessmentId] = true;
-                } else {
-                    $assessment->unsetUserParticipation($child);
+            // Check if the user's children have been loaded, and attempt to load them if not.
+            if ($this->user->getChildren() === null) {
+                try {
+                    (new \Schoolbox\External\User())->loadChildren([$this->user]);
+                } catch (\Alaress\Database\Exception) {
+                    // No children have been loaded, and none can be loaded because the external database is unavailable.
+                    // Just return the $assessment as is in this case.
+                    return $assessment;
+                }
+            }
+
+            // Unset children who don't have visibility, and set visibility based on that factor.
+            foreach ($this->user->getChildren() as $child) {
+                if ($assessment->isParticipant($child)) {
+                    if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
+                        $this->visibilityCache[$assessmentId] = true;
+                    } else {
+                        $assessment->unsetUserParticipation($child);
+                    }
                 }
             }
         }
+
         return $assessment;
     }
 
