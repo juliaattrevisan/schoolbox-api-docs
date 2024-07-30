@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as AwardMapper;
-
 use Closure;
 
 /**

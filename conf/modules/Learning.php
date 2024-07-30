@@ -91,7 +91,6 @@ class Learning extends ModuleLoader
             $this->loadModule($di, BadgeModule::class, "/{$namespace}/badge");
             $this->loadModule($di, BadgeAwardModule::class, "/{$namespace}/badge/award");
             $this->loadModule($di, OpenBadgeModule::class, "/{$namespace}/badge/api");
-
         }
 
         // Feed module: not behind a feature flag

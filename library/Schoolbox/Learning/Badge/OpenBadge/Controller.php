@@ -22,7 +22,6 @@ use Scrub;
  */
 class Controller extends Base
 {
-
     private const CONTEXT = 'https://w3id.org/openbadges/v2';
 
     public function __construct(
@@ -82,7 +81,7 @@ class Controller extends Base
 
         $badgeJson = [
             '@context'  => self::CONTEXT,
-            'id'        => $fqdn->withPath('/learning/badge/api/badge/'.$badge->getId().'.json'),
+            'id'        => $fqdn->withPath('/learning/badge/api/badge/' . $badge->getId() . '.json'),
             'type'      => 'BadgeClass',
             'name'      => $badge->getName(),
             'description' => Scrub::html($badge->getBody()),
@@ -117,13 +116,13 @@ class Controller extends Base
         $assertionJson = [
             '@context'      => self::CONTEXT,
             'type'          => 'Assertion',
-            'id'            => $fqdn->withPath('/learning/badge/api/assertion/'.$award->getId().'.json'),
+            'id'            => $fqdn->withPath('/learning/badge/api/assertion/' . $award->getId() . '.json'),
             'recipient' => [
                 'type'      => 'email',
                 'hashed'    => true,
-                'identity'  => 'sha256'.hash('sha256', $award->getRecipient()->getEmail()),
+                'identity'  => 'sha256' . hash('sha256', $award->getRecipient()->getEmail()),
             ],
-            'badge'         => $fqdn->withPath('/learning/badge/api/badge/'.$award->getBadge()->getId().'.json'),
+            'badge'         => $fqdn->withPath('/learning/badge/api/badge/' . $award->getBadge()->getId() . '.json'),
             'verification'  => [
                 'type'      => 'hosted',
             ] ,
