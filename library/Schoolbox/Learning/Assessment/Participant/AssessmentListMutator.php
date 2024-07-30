@@ -109,13 +109,13 @@ class AssessmentListMutator
 
             // Check if the user's children have been loaded, and attempt to load them if not.
             if ($this->user->getChildren() === null) {
-                try {
+//                try {
                     (new \Schoolbox\External\User())->loadChildren([$this->user]);
-                } catch (\Alaress\Database\Exception) {
-                    // No children have been loaded, and none can be loaded because the external database is unavailable.
-                    // Just return the $assessment as is in this case.
-                    return $assessment;
-                }
+//                } catch (\Alaress\Database\Exception) {
+//                    // No children have been loaded, and none can be loaded because the external database is unavailable.
+//                    // Just return the $assessment as is in this case.
+//                    return $assessment;
+//                }
             }
 
             // Unset children who don't have visibility, and set visibility based on that factor.
