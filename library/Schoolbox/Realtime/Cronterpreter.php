@@ -63,10 +63,7 @@ class Cronterpreter
      */
     public function interpret($crontab)
     {
-        $cron = new CronExpression($crontab);
-
-        // parse out a human-readable form of the cron
-        $test = [
+        $dayNameByIndex = [
             0 => 'Sundays',
             1 => 'Mondays',
             2 => 'Tuesdays',
@@ -75,32 +72,93 @@ class Cronterpreter
             5 => 'Fridays',
             6 => 'Saturdays'
         ];
+        $weekendIndexes = [0, 6];
+        $weekdayIndexes = [1, 2, 3, 4, 5];
 
-        $days = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
+        $cron = new CronExpression($crontab);
+        $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
+        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, null);
+        $nDaysSelected = count($selectedDayIndexes);
+        $desc = '';
 
-        if (!array_diff(array_keys($test), $days)) {
-            // no diff: every day
-            $fq = "every day";
-        } elseif (!array_diff($days, array_slice(array_keys($test), 1, 5))) {
-            // matches middle 5: weekdays
-            $fq = "on weekdays";
-        } elseif (!array_diff($days, [0, 6])) {
-            // matches first and last: weekend
-            $fq = "on weekends";
+        if ($nDaysSelected === 7) {
+            // The selected day list contains all days.
+            $desc = 'weekends and weekdays';
+        } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekdayIndexes)) {
+            // The selected day list contains all weekdays.
+            $desc = 'weekdays';
+
+            if (array_key_exists(0, $selectedDayIndexesAsKeys)) {
+                $desc .= ' and Sundays';
+            } elseif (array_key_exists(6, $selectedDayIndexesAsKeys)) {
+                $desc .= ' and Saturdays';
+            }
         } else {
-            // something else
-            $fq = 'on ' . implode(', ', array_intersect_key($test, array_flip($days)));
+            if ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekendIndexes)) {
+                // The selected day list contains both weekend days.
+                $desc = 'weekends';
+                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekendIndexes);
+            } else {
+                // The selected day list does not contain both weekend days.
+                $selectedOtherDayIndexes = $selectedDayIndexes;
+            }
 
-            if (($pos = strrpos($fq, ',')) !== false) {
-                $fq = substr_replace($fq, ' &', $pos, 1);
+            if (count($selectedOtherDayIndexes) > 0) {
+                // The selected day list contains other days as well as weekend days.
+                $terms = ($desc === '') ? [] : [$desc];
+
+                foreach ($selectedOtherDayIndexes as $weekdayIndex) {
+                    $terms[] = $dayNameByIndex[$weekdayIndex];
+                }
+
+                $desc = $this->createOxfordCommaListStringFromArray($terms);
             }
         }
 
-        $fq .= sprintf(' at %s', date($this->getTimeFormat(), strtotime(
+        $desc .= sprintf(' at %s', date($this->getTimeFormat(), strtotime(
             $cron->getExpression(CronExpression::HOUR) . ":" .
                 $cron->getExpression(CronExpression::MINUTE)
         )));
 
-        return $fq;
+        return $desc;
+    }
+
+    /**
+     * @param array $array
+     * @param array $keys
+     * @return bool
+     */
+    private function arrayKeysExist(array $array, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $array)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Create a string like "$term1, $term2, and $term3"
+     * from an array of terms (strings).
+     *
+     * @param array $terms
+     * @return string
+     */
+    private function createOxfordCommaListStringFromArray(array $terms): string
+    {
+        switch (count($terms)) {
+            case 0:
+                return '';
+            case 1:
+                return $terms[0];
+            case 2:
+                return "{$terms[0]} and {$terms[1]}";
+            default:
+                $lastIndex = count($terms) - 1;
+                $terms[$lastIndex] = "and {$terms[$lastIndex]}";
+                return implode(', ', $terms);
+        }
     }
 }
