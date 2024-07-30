@@ -15,6 +15,14 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
+ * Whether the student has a submission state, which is a manual override of the mark
+ * @returns {boolean} - whether the student has a submission state
+ */
+const hasSubmissionState = window.Vue.computed(() => {
+    return props.student.attemptResponse.mark && props.submissionStates.includes(props.student.attemptResponse.mark);
+});
+
+/**
  * Get the current total score for all items, so the total of all questions within each item
  * @returns {number} - the total score
  */
@@ -51,8 +59,11 @@ const statusStyles = window.Vue.computed(() => {
 </script>
 
 <template>
+    <div v-if="hasSubmissionState">
+        <p>{{ props.student.attemptResponse.mark }}</p>
+    </div>
     <!-- this is the matched DOM structure of a Learnosity score -->
-    <div v-if="hasScore" class="lrn learnosity-report session-detail-by-item mark">
+    <div v-else-if="hasScore" class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
             <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
