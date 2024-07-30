@@ -93,7 +93,7 @@ $app = new class extends CliTool\App {
                  * Treat it specially
                  */
                 $keyProvisioned = $prefix . '_provisioned';
-                $result[$schoolcode][$keyProvisioned] = $this->getCount($unitProvisionedResults, $keyProvisioned) ?? 0;
+                $result[$schoolcode][$keyProvisioned] = $this->getCount($unitProvisionedResults, $keyProvisioned);
 
                 /* A list of array keys named after their respective units
                  */
