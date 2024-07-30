@@ -86,6 +86,14 @@ const currentScore = window.Vue.computed(() => {
 });
 
 /**
+ * Get the current mark, which includes any updates made by the user since .mark was last updated
+ * @returns {string} - the current mark
+ */
+const currentMark = window.Vue.computed(() => {
+    return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
+});
+
+/**
  * Whether to show the assign button, shown when the mark doesn't match the currentScore,
  * so users can easily re-assign the mark from the item scores
  * @returns {boolean} - whether to show the assign button
@@ -94,8 +102,17 @@ const showAssignButton = window.Vue.computed(() => {
     if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
         return false;
     }
-    return currentScore.value.toString() !== props.student.attemptResponse.mark;
+    return currentMark.value !== props.student.attemptResponse.mark;
 });
+
+/**
+ * Update the mark when the assign button is clicked,
+ * which will fire the watchDebounced and save the mark
+ */
+function onAssignSelected() {
+    const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
+    formElement.value = currentScore.value.toString();
+}
 
 /**
  * To notify of the current save status
@@ -224,8 +241,8 @@ window.Vue.onBeforeUnmount(async () => {
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
-        <button v-if="showAssignButton" class="full-width btn-assign">
-            Assign <b>{{ currentScore }} / {{ props.student.attemptResponse.maxMarks }}</b> from item scores
+        <button v-if="showAssignButton" class="full-width btn-assign" @click.prevent="onAssignSelected">
+            Assign <b>{{ currentMark }}</b> from item scores
         </button>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
