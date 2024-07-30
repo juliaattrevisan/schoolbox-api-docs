@@ -400,7 +400,7 @@ Data:
                             {% include 'sub/iframeResponsive.twig' with {
                                 id: 'kami-viewport',
                                 src: kamiSession.viewerUrl,
-                                allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
+                                allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; clipboard-read *; display-capture *; fullscreen *',
                                 dataAttributes: {}
                             } only %}
                         {% else %}
