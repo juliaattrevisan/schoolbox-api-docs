@@ -986,6 +986,7 @@ class Controller extends Base
             'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}",
             'hasMarkVisibility' => $hasMarkVisibility,
+            'submissionStates' => $this->stateMapper->listDisplayValues(),
         ], "Result for {$assessment->getTitle()}");
     }
 

@@ -10,6 +10,7 @@
  # @param string         $attemptComment     The overall comment for the attempt
  # @param bool           $hasMarkVisibility  If true, marks and feedback should be visible to the user
  # @param string         $returnUrl          A redirect destination we remembered from some previous place
+ # @param array          $submissionStates   A list of submission states that can be chosen
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -41,6 +42,7 @@
             :is-read-only="true"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="{{ hasMarkVisibility ? 'true' : 'false' }}"
+            :submission-states="{{ submissionStates|json_encode }}"
         />
     </div>
 </div>
