@@ -408,12 +408,12 @@ export default {
                     <div class="component-action">
                         <section>
                             <a
-                                v-if="awardedGoalHasEvidence() || hasEvidence(award)"
-                                title="View evidence"
+                                v-if="!hasAwardUpdateLink()"
+                                title="View award"
                                 class="button"
                                 :href="getViewEvidenceLink()"
                             >
-                                View Evidence
+                                View Award
                             </a>
                             <a
                                 v-else-if="hasAwardUpdateLink()"
