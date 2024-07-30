@@ -103,8 +103,16 @@ class AssessmentListMutator
             return $assessment;
         }
 
-        // Forcibly hydrate the children of the current dude if they're a parent.
-        (new \Schoolbox\External\User())->loadChildren([$this->user]);
+        try {
+            // Forcibly hydrate the children of the current dude if they're a parent.
+            (new \Schoolbox\External\User())->loadChildren([$this->user]);
+        } catch (\Alaress\Database\Exception) {
+            if ($this->user->getChildren() === null) {
+                // No children have been loaded, and none can be loaded because the external database is unavailable.
+                // Just return the $assessment as is in this case.
+                return $assessment;
+            }
+        }
 
         // Unset children who don't have visibility, and set visibility
         // based on that factor
