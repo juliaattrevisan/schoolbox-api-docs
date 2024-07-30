@@ -106,7 +106,6 @@ class AssessmentListMutator
         }
 
         if ($this->user->getRole()->isParent()) {
-
             // Check if the user's children have been loaded, and attempt to load them if not.
             if ($this->user->getChildren() === null) {
 //                try {
