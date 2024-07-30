@@ -20,7 +20,7 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
 
     // Maximum length allowed for folder codes
-    public const CODE_LENGTH_MAX = 20;
+    public const CODE_LENGTH_MAX = 64;
 
     /**
      * @var Folder\Model

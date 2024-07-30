@@ -1,0 +1,2 @@
+ALTER TABLE `folder_code`
+    CHANGE COLUMN `code` `code` VARCHAR(64) NULL DEFAULT NULL ;
