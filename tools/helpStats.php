@@ -45,7 +45,7 @@ $app = new class extends CliTool\App {
         $config = $this->getDi()->get('config');
 
         // Only run for Schoolbox Help
-        if (strtoupper($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE)) !== 'HELP'){
+        if (strtoupper($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE)) !== 'HELP') {
             exit;
         }
 
@@ -182,7 +182,7 @@ $app = new class extends CliTool\App {
      *
      * @return array
      */
-    private function getSchoolCodes() : array
+    private function getSchoolCodes(): array
     {
         // Fetch a list of all existing unique School Codes by collecting a unique set of codes taken from the user.synergy_id, before the . delimiter
         $schoolCodeQuery = "
@@ -209,7 +209,8 @@ $app = new class extends CliTool\App {
      * @param string $schoolcode
      * @return array
      */
-    private function getUnitProvisioned(string $schoolcode): array {
+    private function getUnitProvisioned(string $schoolcode): array
+    {
         $query = "
             SELECT
                 CASE
@@ -247,7 +248,8 @@ $app = new class extends CliTool\App {
      * @param string $schoolcode
      * @return int
      */
-    private function getSchoolUsers(string $schoolcode): int {
+    private function getSchoolUsers(string $schoolcode): int
+    {
         $query = "
             SELECT
                 count(id) as num
