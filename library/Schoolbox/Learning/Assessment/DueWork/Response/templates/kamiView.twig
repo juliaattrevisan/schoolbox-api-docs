@@ -44,10 +44,12 @@
     <div class="small-12 island">
         {% if kami.isStatusDone %}
         <section>
+            {# Will need confirmations from Kami on how each of the permissions worked within the worksheet, #}
+            {# but 'midi' permission probably shouldn't be needed in a 'view/read' only page #}
             {% include 'sub/iframeResponsive.twig' with {
                 id: 'kami-viewport',
                 src: session.viewerUrl,
-                allow: 'microphone *; camera *',
+                allow: 'midi *; encrypted-media *; autoplay *; fullscreen *',
                 dataAttributes: {}
             } only %}
         </section>
