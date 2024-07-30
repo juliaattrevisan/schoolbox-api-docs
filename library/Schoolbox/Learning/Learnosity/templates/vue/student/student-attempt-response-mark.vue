@@ -203,6 +203,7 @@ window.Vue.onBeforeUnmount(async () => {
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
+        <button class="full-width btn-assign">Assign from item scores</button>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
                 <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
@@ -214,6 +215,10 @@ window.Vue.onBeforeUnmount(async () => {
 </template>
 
 <style lang="scss" scoped>
+.btn-assign {
+    font-size: 0.8125rem;
+}
+
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
     transition: grid-template-rows 300ms;
