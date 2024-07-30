@@ -10,6 +10,7 @@ import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/uti
 
 interface Props {
     student: Student; // the item to display
+    submissionStates: string[]; // the submission states that be used to override the automatically set mark
 }
 const props = defineProps<Props>();
 

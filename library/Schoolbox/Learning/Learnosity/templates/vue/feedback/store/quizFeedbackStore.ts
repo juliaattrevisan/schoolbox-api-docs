@@ -11,16 +11,24 @@ export const useStore = defineStore("quizFeedback", () => {
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
+    const submissionStates = window.Vue.ref<string[]>([]); // the submission states for each question
 
     /**
      * store any passed through properties
      * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
      * @param {boolean} $hasMarkVisibility - whether marks and feedback are visible to the user
+     * @param {string[]} $submissionStates - the submission states that be used to override the automatically set mark
      * @param {string|undefined} $statusPage - the link to the status page
      */
-    function init($isReadOnly: boolean, $hasMarkVisibility: boolean, $statusPage: string | undefined) {
+    function init(
+        $isReadOnly: boolean,
+        $hasMarkVisibility: boolean,
+        $submissionStates: string[],
+        $statusPage: string | undefined,
+    ) {
         isReadOnly.value = $isReadOnly;
         hasMarkVisibility.value = $hasMarkVisibility;
+        submissionStates.value = $submissionStates;
         if ($statusPage !== undefined) {
             statusPage.value = $statusPage;
         }
@@ -33,6 +41,7 @@ export const useStore = defineStore("quizFeedback", () => {
         init,
         isFinaliseReviewModalOpen,
         hasMarkVisibility,
+        submissionStates,
         statusPage,
     };
 });

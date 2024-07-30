@@ -31,7 +31,11 @@ const store = useStore();
             </h2>
         </div>
         <div v-if="store.hasMarkVisibility">
-            <student-header-attempt-mark v-if="props.student.isReportLoaded" :student="props.student" />
+            <student-header-attempt-mark
+                v-if="props.student.isReportLoaded"
+                :student="props.student"
+                :submission-states="store.submissionStates"
+            />
         </div>
     </div>
 </template>
