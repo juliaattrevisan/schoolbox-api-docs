@@ -111,7 +111,9 @@ const showAssignButton = window.Vue.computed(() => {
  */
 function onAssignSelected() {
     const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
-    formElement.value = currentScore.value.toString();
+    formElement.value = currentMark.value;
+    mark.value = currentMark.value;
+    void saveMark();
 }
 
 /**
@@ -241,9 +243,6 @@ window.Vue.onBeforeUnmount(async () => {
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
-        <button v-if="showAssignButton" class="full-width btn-assign" @click.prevent="onAssignSelected">
-            Assign <b>{{ currentMark }}</b> from item scores
-        </button>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
                 <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
@@ -251,6 +250,9 @@ window.Vue.onBeforeUnmount(async () => {
                 </div>
             </div>
         </div>
+        <button v-if="showAssignButton" class="full-width btn-assign" @click.prevent="onAssignSelected">
+            Assign <b>{{ currentMark }}</b> from item scores
+        </button>
     </div>
 </template>
 
