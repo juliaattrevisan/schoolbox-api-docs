@@ -20,20 +20,25 @@ const props = defineProps<Props>();
         class="component-action"
     >
         <section>
-            <a
-                v-if="props.unit.rubricCapabilities._routes.manageCourse"
-                class="button"
-                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)"
-            >
-                Manage Course {{ locale.rubricGroup.plural() }}
-            </a>
-            <a
-                v-if="props.unit.rubricCapabilities._routes.manageUnit"
-                class="button"
-                :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)"
-            >
-                Manage {{ locale.unit.plural() }} {{ locale.rubricGroup.plural() }}
-            </a>
+            <sbx-pop-out
+                :content-id="`dropdown-unit-${props.unit.id}-rubric-capabilities`"
+                button-text="Manage"
+                move-to="#unitplanner-dropdown-container"
+                is-component-action
+            ></sbx-pop-out>
+
+            <ul :id="`dropdown-unit-${props.unit.id}-rubric-capabilities`" class="f-dropdown" data-dropdown-content>
+                <li v-if="props.unit.rubricCapabilities._routes.manageCourse">
+                    <a class="icon-criteria" :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageCourse)">
+                        Manage Course {{ locale.rubricGroup.translate(true, true) }}
+                    </a>
+                </li>
+                <li v-if="props.unit.rubricCapabilities._routes.manageUnit">
+                    <a class="icon-criteria" :href="getReturnUrl(props.unit.rubricCapabilities._routes.manageUnit)">
+                        Manage {{ locale.unit.translate(false, true) }} {{ locale.rubricGroup.translate(true, true) }}
+                    </a>
+                </li>
+            </ul>
         </section>
     </div>
 </template>
