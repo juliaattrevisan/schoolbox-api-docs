@@ -38,6 +38,7 @@ function onToggleSelected() {
                     props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
                 }`"
                 :disabled="!props.student.isReportLoaded"
+                aria-label="Toggle student response"
                 @click.prevent="onToggleSelected"
             ></button>
             <span v-else class="loader"></span>
