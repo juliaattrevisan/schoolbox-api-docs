@@ -11,7 +11,7 @@ export const useStore = defineStore("quizFeedback", () => {
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
-    const submissionStates = window.Vue.ref<string[]>([]); // the submission states for each question
+    const submissionStates = window.Vue.ref<string[]>([]); // the submission states that be used to override the automatically set mark
 
     /**
      * store any passed through properties

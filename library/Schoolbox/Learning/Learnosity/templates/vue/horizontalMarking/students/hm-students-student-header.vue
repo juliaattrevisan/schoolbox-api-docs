@@ -6,6 +6,7 @@
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 
 interface Props {
@@ -61,7 +62,11 @@ function onToggleSelected() {
                 :is-shown="item.reference === itemsStore.activeItem.reference"
                 :show-title="false"
             />
-            <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
+            <student-header-attempt-mark
+                v-if="itemsStore.isAttemptComment"
+                :student="props.student"
+                :submission-states="useStore().submissionStates"
+            />
         </div>
     </div>
 </template>
