@@ -77,7 +77,7 @@ class Cronterpreter
 
         $cron = new CronExpression($crontab);
         $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
-        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, null);
+        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, -1);
         $nDaysSelected = count($selectedDayIndexes);
         $desc = '';
 
