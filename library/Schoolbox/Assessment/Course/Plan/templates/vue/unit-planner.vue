@@ -11,6 +11,7 @@ import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
+import UpUnitCellTextboxContentPlaceholder from "./up-unit-cell-textbox-content-placeholder.vue";
 import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
@@ -149,6 +150,9 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
+    <up-unit-cell-textbox-content-placeholder
+        v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)"
+    />
     <up-header :course-title="props.courseTitle" :course-id="store.courseId" :folder-id="props.folderId" />
     <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
