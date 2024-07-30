@@ -72,7 +72,9 @@ class Cronterpreter
             5 => 'Fridays',
             6 => 'Saturdays'
         ];
+
         $weekendIndexes = $this->getConfiguredWeekendDays();
+
         $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $weekendIndexes); // All days that aren't weekend days.
 
         $cron = new CronExpression($crontab);
@@ -118,12 +120,18 @@ class Cronterpreter
     }
 
     /**
+     * Return true if all keys in $keys exist in $array.  Return false otherwise.
+     * Note if $keys is empty, false is returned.
      * @param array $array
      * @param array $keys
      * @return bool
      */
     private function arrayKeysExist(array $array, array $keys): bool
     {
+        if (count($keys) === 0) {
+            return false;
+        }
+
         foreach ($keys as $key) {
             if (!array_key_exists($key, $array)) {
                 return false;
