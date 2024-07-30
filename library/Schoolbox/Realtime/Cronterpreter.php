@@ -88,9 +88,9 @@ class Cronterpreter
             // The selected day list contains all weekdays.
             $desc = 'weekdays';
 
-            if (array_key_exists(0, $selectedDayIndexesAsKeys)) {
+            if (in_array(0, $selectedDayIndexes)) {
                 $desc .= ' and Sundays';
-            } elseif (array_key_exists(6, $selectedDayIndexesAsKeys)) {
+            } elseif (in_array(6, $selectedDayIndexes)) {
                 $desc .= ' and Saturdays';
             }
         } else {
