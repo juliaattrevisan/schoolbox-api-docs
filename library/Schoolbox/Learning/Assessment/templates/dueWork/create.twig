@@ -138,12 +138,16 @@
                     <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
 
-                    {# Forcibly untick this checkbox to fool the validator #}
+                    {# Forcibly untick this checkbox to fool the validator
+                     # Only applies if you have kami worksheets disabled.
+                     #}
+                    {% if not config.kami_worksheets_enabled %}
                     <script>
                         $(function() {
                             $('#worksheet').prop('checked', false);
                         })
                     </script>
+                    {% endif %}
                 </li>
                 {% endif %}
                 <li>
