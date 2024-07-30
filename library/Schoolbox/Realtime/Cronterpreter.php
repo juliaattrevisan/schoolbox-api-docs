@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime;
 
 use Cron\CronExpression;
 use InvalidArgumentException;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Cron + Interpreter: makes crontab human-readable
@@ -171,6 +172,23 @@ class Cronterpreter
      */
     private function getConfiguredWeekendDays(): array
     {
-        return [0, 6];
+        $config = ConfigLoader::getInstance();
+        $weekendDayIndexesString = $config->get('locale_weekend');
+        $weekendDayIndexes = explode(',', $weekendDayIndexesString);
+
+        $defaultWeekendDayIndexes = [0, 6];
+
+        if (count($weekendDayIndexes) !== 2) {
+            return $defaultWeekendDayIndexes;
+        }
+
+        foreach ($weekendDayIndexes as $dayIndex) {
+            if (!ctype_digit($dayIndex) || $dayIndex < 0 || $dayIndex > 6) {
+                // If the configured locale_weekend is invalid, use the default of Sunday and Saturday.
+                return $defaultWeekendDayIndexes;
+            }
+        }
+
+        return $weekendDayIndexes;
     }
 }
