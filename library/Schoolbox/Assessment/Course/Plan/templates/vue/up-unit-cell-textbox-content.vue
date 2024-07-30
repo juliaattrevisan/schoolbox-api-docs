@@ -154,6 +154,7 @@ defineExpose({ focusEditor, isEmpty });
             class="editor-content"
             :content="props.unit.textboxes.items[props.column.label].body"
         ></media-article>
+        <div class="clearfix"></div>
     </div>
 </template>
 
