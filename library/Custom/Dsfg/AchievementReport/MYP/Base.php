@@ -49,7 +49,7 @@ class Base extends AchievementReportBase
                 StaffMailNamePrimary,
                 StaffEmail
             FROM
-                uvSchoolBoxMYPResults
+                uvSchoolBoxMYPResults_CurrentOverview
             WHERE
                 SubjectName IS NOT NULL
                 AND ID = :externalId
