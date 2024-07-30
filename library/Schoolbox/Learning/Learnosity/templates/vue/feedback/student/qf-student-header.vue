@@ -21,7 +21,7 @@ const store = useStore();
             <div class="c-img c-img--round c-img--s">
                 <div class="c-img__wrapper">
                     <img
-                        :src="`/portrait.php?id=${props.student.id}&size=square32`"
+                        :src="`/portrait.php?id=${props.student.id}&size=square64`"
                         :alt="`Photo of ${props.student.name}`"
                     />
                 </div>
