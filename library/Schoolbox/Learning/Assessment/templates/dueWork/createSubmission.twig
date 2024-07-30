@@ -393,8 +393,14 @@ Data:
                 {% endif %}
 
                 <div class="row">
+                    {# Kami Interactive Worksheet
+                     #   * Kami module must be enabled
+                     #   * Kami Interactive Worksheet feature flag must be enabled (this should always be the case now)
+                     #   * The Due Work must have Interactive Worksheet ticked
+                     #   * A worksheet file must have been provided
+                     #}
                     {# kami worksheet if exists, and enabled #}
-                    {% if config.kami_worksheets_enabled and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
+                    {% if config.kami_worksheets_enabled and assessment.getEnableWorksheet and assessment.getKamiWorksheetTemplate.getKamiDocumentId is defined %}
                     <div class="small-12 island">
                         {% if kamiSession %}
                             {% include 'sub/iframeResponsive.twig' with {
@@ -408,7 +414,7 @@ Data:
                             <div class="empty-state">
                                 <i class="icon-submissions"></i>
                                 <p>Worksheet is still uploading...</p>
-                                <p>Please try again soon</p>
+                                <p>Please try again soon.</p>
                             </div>
                         {% endif %}
                     </div>
