@@ -78,45 +78,6 @@ function removeGradeElement() {
 }
 
 /**
- * Get the current total score for all items, so the total of all questions within each item
- * @returns {number} - the total score
- */
-const currentScore = window.Vue.computed(() => {
-    return getAttemptScore(props.student);
-});
-
-/**
- * Get the current mark, which includes any updates made by the user since .mark was last updated
- * @returns {string} - the current mark
- */
-const currentMark = window.Vue.computed(() => {
-    return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
-});
-
-/**
- * Whether to show the assign button, shown when the mark doesn't match the currentScore,
- * so users can easily re-assign the mark from the item scores
- * @returns {boolean} - whether to show the assign button
- */
-const showAssignButton = window.Vue.computed(() => {
-    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
-        return false;
-    }
-    return currentMark.value !== props.student.attemptResponse.mark;
-});
-
-/**
- * Update the mark when the assign button is clicked,
- * which will fire the watchDebounced and save the mark
- */
-function onAssignSelected() {
-    const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
-    formElement.value = currentMark.value;
-    mark.value = currentMark.value;
-    void saveMark();
-}
-
-/**
  * To notify of the current save status
  * @returns {string} - the text to display
  */
@@ -198,6 +159,45 @@ watchDebounced(
     },
     { debounce: 300 },
 );
+
+/**
+ * Get the current total score for all items, so the total of all questions within each item
+ * @returns {number} - the total score
+ */
+const currentScore = window.Vue.computed(() => {
+    return getAttemptScore(props.student);
+});
+
+/**
+ * Get the current mark, which includes any updates made by the user since .mark was last updated
+ * @returns {string} - the current mark
+ */
+const currentMark = window.Vue.computed(() => {
+    return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
+});
+
+/**
+ * Whether to show the assign button, shown when the mark doesn't match the currentScore,
+ * so users can easily re-assign the mark from the item scores
+ * @returns {boolean} - whether to show the assign button
+ */
+const showAssignButton = window.Vue.computed(() => {
+    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
+        return false;
+    }
+    return currentMark.value !== props.student.attemptResponse.mark;
+});
+
+/**
+ * Update the mark when the assign button is clicked,
+ * which will fire the watchDebounced and save the mark
+ */
+function onAssignSelected() {
+    const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
+    formElement.value = currentMark.value;
+    mark.value = currentMark.value;
+    void saveMark();
+}
 
 /**
  * To add the grade field in
