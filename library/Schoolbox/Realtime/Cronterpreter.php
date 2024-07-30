@@ -64,20 +64,20 @@ class Cronterpreter
     public function interpret($crontab)
     {
         $dayNameByIndex = [
-            '0' => 'Sundays',
-            '1' => 'Mondays',
-            '2' => 'Tuesdays',
-            '3' => 'Wednesdays',
-            '4' => 'Thursdays',
-            '5' => 'Fridays',
-            '6' => 'Saturdays'
+            0 => 'Sundays',
+            1 => 'Mondays',
+            2 => 'Tuesdays',
+            3 => 'Wednesdays',
+            4 => 'Thursdays',
+            5 => 'Fridays',
+            6 => 'Saturdays'
         ];
-        $weekendIndexes = ['0', '6'];
-        $weekdayIndexes = ['1', '2', '3', '4', '5'];
+        $weekendIndexes = [0, 6];
+        $weekdayIndexes = [1, 2, 3, 4, 5];
 
         $cron = new CronExpression($crontab);
         $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
-        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, null);
+        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, -1);
         $nDaysSelected = count($selectedDayIndexes);
         $desc = '';
 
@@ -88,9 +88,9 @@ class Cronterpreter
             // The selected day list contains all weekdays.
             $desc = 'weekdays';
 
-            if (array_key_exists('0', $selectedDayIndexesAsKeys)) {
+            if (array_key_exists(0, $selectedDayIndexesAsKeys)) {
                 $desc .= ' and Sundays';
-            } elseif (array_key_exists('6', $selectedDayIndexesAsKeys)) {
+            } elseif (array_key_exists(6, $selectedDayIndexesAsKeys)) {
                 $desc .= ' and Saturdays';
             }
         } else {
