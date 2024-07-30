@@ -130,8 +130,6 @@ async function focusEditor() {
 
     await initEditor(); // Ensure the editor is initialised before focusing
 
-    await window.Vue.nextTick();
-
     editor.focus();
 
     // to assign the cursor to the end of the editor
