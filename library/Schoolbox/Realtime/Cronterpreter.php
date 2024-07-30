@@ -72,8 +72,8 @@ class Cronterpreter
             5 => 'Fridays',
             6 => 'Saturdays'
         ];
-        $weekendIndexes = [0, 6];
-        $weekdayIndexes = [1, 2, 3, 4, 5];
+        $weekendIndexes = $this->getConfiguredWeekendDays();
+        $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $weekendIndexes); // All days that aren't weekend days.
 
         $cron = new CronExpression($crontab);
         $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
@@ -84,22 +84,17 @@ class Cronterpreter
         if ($nDaysSelected === 7) {
             // The selected day list contains all days.
             $desc = 'weekends and weekdays';
-        } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekdayIndexes)) {
-            // The selected day list contains all weekdays.
-            $desc = 'weekdays';
-
-            if (in_array(0, $selectedDayIndexes)) {
-                $desc .= ' and Sundays';
-            } elseif (in_array(6, $selectedDayIndexes)) {
-                $desc .= ' and Saturdays';
-            }
         } else {
-            if ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekendIndexes)) {
+            if ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekdayIndexes)) {
+                // The selected day list contains all weekdays.
+                $desc = 'weekdays';
+                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekdayIndexes);
+            } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekendIndexes)) {
                 // The selected day list contains both weekend days.
                 $desc = 'weekends';
                 $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekendIndexes);
             } else {
-                // The selected day list does not contain both weekend days.
+                // The selected day list does not contain both weekend days and does not contain all weekday days.
                 $selectedOtherDayIndexes = $selectedDayIndexes;
             }
 
@@ -159,5 +154,15 @@ class Cronterpreter
                 $terms[$lastIndex] = "and {$terms[$lastIndex]}";
                 return implode(', ', $terms);
         }
+    }
+
+    /**
+     * Return a two-element array containing the day indexes that make up the weekend,
+     * obtained from the config locale_weekend value.  Possible indexes are 0 for Sunday, through 6 for Saturday.
+     * @return array
+     */
+    private function getConfiguredWeekendDays(): array
+    {
+        return [0, 6];
     }
 }
