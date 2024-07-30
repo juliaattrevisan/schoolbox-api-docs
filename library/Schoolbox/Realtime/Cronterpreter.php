@@ -108,7 +108,7 @@ class Cronterpreter
                     $terms[] = $dayNameByIndex[$weekdayIndex];
                 }
 
-                $desc = $this->createOxfordCommaListStringFromArray($terms);
+                $desc = implode(', ', $terms);
             }
         }
 
@@ -140,29 +140,6 @@ class Cronterpreter
         }
 
         return true;
-    }
-
-    /**
-     * Create a string like "$term1, $term2, and $term3"
-     * from an array of terms (strings).
-     *
-     * @param array $terms
-     * @return string
-     */
-    private function createOxfordCommaListStringFromArray(array $terms): string
-    {
-        switch (count($terms)) {
-            case 0:
-                return '';
-            case 1:
-                return $terms[0];
-            case 2:
-                return "{$terms[0]} and {$terms[1]}";
-            default:
-                $lastIndex = count($terms) - 1;
-                $terms[$lastIndex] = "and {$terms[$lastIndex]}";
-                return implode(', ', $terms);
-        }
     }
 
     /**
