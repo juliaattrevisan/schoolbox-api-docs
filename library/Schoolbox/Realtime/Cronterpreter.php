@@ -104,7 +104,6 @@ class Cronterpreter
             }
 
             if (count($selectedOtherDayIndexes) > 0) {
-                // The selected day list contains other days as well as weekend days.
                 $terms = ($desc === '') ? [] : [$desc];
 
                 foreach ($selectedOtherDayIndexes as $weekdayIndex) {
