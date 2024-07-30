@@ -6,6 +6,7 @@
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { getAttemptScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the student to display
@@ -75,6 +76,26 @@ function removeGradeElement() {
         gradesContainer.append(gradeContainer);
     }
 }
+
+/**
+ * Get the current total score for all items, so the total of all questions within each item
+ * @returns {number} - the total score
+ */
+const currentScore = window.Vue.computed(() => {
+    return getAttemptScore(props.student);
+});
+
+/**
+ * Whether to show the assign button, shown when the mark doesn't match the currentScore,
+ * so users can easily re-assign the mark from the item scores
+ * @returns {boolean} - whether to show the assign button
+ */
+const showAssignButton = window.Vue.computed(() => {
+    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
+        return false;
+    }
+    return currentScore.value.toString() !== props.student.attemptResponse.mark;
+});
 
 /**
  * To notify of the current save status
@@ -203,7 +224,9 @@ window.Vue.onBeforeUnmount(async () => {
     </div>
     <div v-else class="grade-container">
         <div ref="gradeEl"></div>
-        <button class="full-width btn-assign">Assign from item scores</button>
+        <button v-if="showAssignButton" class="full-width btn-assign">
+            Assign <b>{{ currentScore }} / {{ props.student.attemptResponse.maxMarks }}</b> from item scores
+        </button>
         <div class="save-container l-grid">
             <div class="save-container__inner-container">
                 <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
