@@ -103,9 +103,12 @@ class AssessmentListMutator
             return $assessment;
         }
 
+        // Forcibly hydrate the children of the current dude if they're a parent.
+        (new \Schoolbox\External\User())->loadChildren([$this->user]);
+
         // Unset children who don't have visibility, and set visibility
         // based on that factor
-        foreach ($this->user->getChildren() ?? [] as $child) {
+        foreach ($this->user->getChildren() as $child) {
             if ($assessment->isParticipant($child)) {
                 if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
                     $this->visibilityCache[$assessmentId] = true;
