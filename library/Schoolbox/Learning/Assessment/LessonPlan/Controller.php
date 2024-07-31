@@ -266,6 +266,11 @@ class Controller extends Assessment\Controller
             } else {
                 // only hydrate for the user who's lesson plan this is
                 $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($linkedAssessments, $student);
+
+                // only show the linked assessments that the student is a participant of
+                $linkedAssessments = $linkedAssessments->filter(function (IAssessable $assessable) use ($student) {
+                    return ($assessable->getParticipantIfExtant($student) instanceof Participant);
+                });
             }
         }
 
