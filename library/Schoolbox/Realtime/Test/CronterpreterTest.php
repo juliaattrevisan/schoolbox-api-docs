@@ -17,131 +17,142 @@ use Schoolbox\Realtime\Cronterpreter;
 
 class CronterpreterTest extends TestCase
 {
-    private array $inputOutputPairsByLocaleWeekend = [
-        '0,6' => [ // Tests for standard weekend [Sunday, Saturday].
-            [
-                'input'  => [0, 1, 2, 3, 4, 5, 6],
-                'output' => "weekends and weekdays",
-            ],
-            [
-                'input'  => [1, 2, 3, 4, 5],
-                'output' => "weekdays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 4, 5],
-                'output' => "weekdays and Sundays",
-            ],
-            [
-                'input'  => [1, 2, 3, 4, 5, 6],
-                'output' => "weekdays and Saturdays",
-            ],
-            [
-                'input'  => [0, 6],
-                'output' => "weekends",
-            ],
-            [
-                'input'  => [0, 1, 6],
-                'output' => "weekends and Mondays",
-            ],
-            [
-                'input'  => [0, 1, 2, 6],
-                'output' => "weekends, Mondays and Tuesdays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 6],
-                'output' => "weekends, Mondays, Tuesdays and Wednesdays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 4, 6],
-                'output' => "weekends, Mondays, Tuesdays, Wednesdays and Thursdays",
-            ],
-            [
-                'input'  => [1],
-                'output' => "Mondays",
-            ],
-            [
-                'input'  => [1, 4],
-                'output' => "Mondays and Thursdays",
-            ],
-            [
-                'input'  => [0, 1, 4],
-                'output' => "Sundays, Mondays and Thursdays",
-            ],
-            [
-                'input'  => [6, 1, 4],
-                'output' => "Saturdays, Mondays and Thursdays",
+    private array $testDataSets = [
+        [
+            // Tests for standard weekend [Sunday, Saturday] - implies weekdays are [Monday, Tuesday, Wednesday, Thursday, Friday].
+            'weekendDayIndexes' => [0, 6],
+            'data' => [
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,5,6',
+                    'output' => "weekends and weekdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,2,3,4,5',
+                    'output' => "weekdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,5',
+                    'output' => "weekdays and Sundays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,2,3,4,5,6',
+                    'output' => "weekdays and Saturdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,6',
+                    'output' => "weekends at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,6',
+                    'output' => "weekends and Mondays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,6',
+                    'output' => "weekends, Mondays and Tuesdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,6',
+                    'output' => "weekends, Mondays, Tuesdays and Wednesdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,6',
+                    'output' => "weekends, Mondays, Tuesdays, Wednesdays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1',
+                    'output' => "Mondays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,4',
+                    'output' => "Mondays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,4',
+                    'output' => "Sundays, Mondays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 6,1,4',
+                    'output' => "Saturdays, Mondays and Thursdays at 12:00am",
+                ],
             ],
         ],
-        '6,0,1' => [ // Tests for custom weekend [Saturday, Sunday, Monday] => weekdays are [Tuesday, Wednesday, Thursday, Friday].
-            [
-                'input'  => [0, 1, 2, 3, 4, 5, 6],
-                'output' => "weekends and weekdays",
-            ],
-            [
-                'input'  => [1, 2, 3, 4, 5],
-                'output' => "weekdays and Mondays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 4, 5],
-                'output' => "weekdays, Sundays and Mondays",
-            ],
-            [
-                'input'  => [1, 2, 3, 4, 5, 6],
-                'output' => "weekdays, Mondays and Saturdays",
-            ],
-            [
-                'input'  => [0, 6],
-                'output' => "Sundays and Saturdays",
-            ],
-            [
-                'input'  => [0, 1, 6],
-                'output' => "weekends",
-            ],
-            [
-                'input'  => [0, 1, 2, 6],
-                'output' => "weekends and Tuesdays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 6],
-                'output' => "weekends, Tuesdays and Wednesdays",
-            ],
-            [
-                'input'  => [0, 1, 2, 3, 4, 6],
-                'output' => "weekends, Tuesdays, Wednesdays and Thursdays",
-            ],
-            [
-                'input'  => [1],
-                'output' => "Mondays",
-            ],
-            [
-                'input'  => [1, 4],
-                'output' => "Mondays and Thursdays",
-            ],
-            [
-                'input'  => [0, 1, 4],
-                'output' => "Sundays, Mondays and Thursdays",
-            ],
-            [
-                'input'  => [6, 1, 4],
-                'output' => "Saturdays, Mondays and Thursdays",
-            ],
+        [
+             // Tests for custom weekend [Saturday, Sunday, Monday] - implies weekdays are [Tuesday, Wednesday, Thursday, Friday].
+            'weekendDayIndexes' => [6, 0, 1],
+            'data' => [
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,5,6',
+                    'output' => "weekends and weekdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,2,3,4,5',
+                    'output' => "weekdays and Mondays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,5',
+                    'output' => "weekdays, Sundays and Mondays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,2,3,4,5,6',
+                    'output' => "weekdays, Mondays and Saturdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,6',
+                    'output' => "Sundays and Saturdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,6',
+                    'output' => "weekends at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,6',
+                    'output' => "weekends and Tuesdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,6',
+                    'output' => "weekends, Tuesdays and Wednesdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,2,3,4,6',
+                    'output' => "weekends, Tuesdays, Wednesdays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1',
+                    'output' => "Mondays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 1,4',
+                    'output' => "Mondays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 0,1,4',
+                    'output' => "Sundays, Mondays and Thursdays at 12:00am",
+                ],
+                [
+                    'crontab' => '0 0 * * 6,1,4',
+                    'output' => "Saturdays, Mondays and Thursdays at 12:00am",
+                ],
+            ]
         ]
     ];
 
     /**
-     * Test that running Cronterpreter->convertDayIndexesToText() returns
-     * the expected output for each input in $this->inputOutputPairs.
+     * Test that running Cronterpreter->interpret() returns
+     * the expected output for each crontab in the test data set.
      */
     public function testInterpretations(): void
     {
-        $cronterpreter = new Cronterpreter(new Alaress_Date_Locale_Config());
+        $cronterpreter = new Cronterpreter('g:ia', [0,6]);
 
-        foreach ($this->inputOutputPairsByLocaleWeekend as $localeWeekend => $inputOutputPairs) {
-            $weekendDayIndexes = array_map('intval', explode(',', $localeWeekend));
-            $cronterpreter->setWeekendDayIndexes($weekendDayIndexes);
+        foreach ($this->testDataSets as $testDataSet) {
+            $cronterpreter->setWeekendDayIndexes($testDataSet['weekendDayIndexes']);
 
-            foreach ($inputOutputPairs as $pair) {
-                $this->assertSame($cronterpreter->convertDayIndexesToText($pair['input']), $pair['output']);
+            foreach ($testDataSet['data'] as $pair) {
+                $this->assertSame(
+                    $cronterpreter->interpret($pair['crontab']),
+                    $pair['output'],
+                    "Testing crontab '{$pair['crontab']}'."
+                );
             }
         }
     }
