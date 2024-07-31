@@ -1,7 +1,7 @@
 <?php
 
+
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -23,17 +23,24 @@ use Schoolbox\Config\Loader as ConfigLoader;
 class Cronterpreter
 {
     /** @var string */
-    protected $timeFormat;
-
+    protected string $timeFormat;
 
     /**
-     * @param string $timeFormat
+     * @var array
      */
-    public function __construct($timeFormat)
-    {
-        $this->setTimeFormat($timeFormat);
-    }
+    private array $weekendDayIndexes = [];
 
+    /**
+     * @param ConFigLoader $config
+     */
+    public function __construct(protected ConfigLoader $config)
+    {
+        $this->config = $config;
+
+        $this->setTimeFormat($this->config->get('date_time'));
+
+        $this->weekendDayIndexes = array_map('intval', explode(',', $this->config->get('locale_weekend')));
+    }
 
     /**
      * @return string
@@ -42,7 +49,6 @@ class Cronterpreter
     {
         return $this->timeFormat;
     }
-
 
     /**
      * This *should* be set to config.date_time
@@ -55,7 +61,6 @@ class Cronterpreter
         $this->timeFormat = $timeFormat;
         return $this;
     }
-
 
     /**
      * @param string $crontab
@@ -74,9 +79,7 @@ class Cronterpreter
             6 => 'Saturdays'
         ];
 
-        $weekendIndexes = $this->getConfiguredWeekendDays();
-
-        $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $weekendIndexes); // All days that aren't weekend days.
+        $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $this->weekendDayIndexes); // All days that aren't weekend days.
 
         $cron = new CronExpression($crontab);
         $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
@@ -92,10 +95,10 @@ class Cronterpreter
                 // The selected day list contains all weekdays.
                 $desc = 'weekdays';
                 $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekdayIndexes);
-            } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekendIndexes)) {
+            } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $this->weekendDayIndexes)) {
                 // The selected day list contains both weekend days.
                 $desc = 'weekends';
-                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekendIndexes);
+                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $this->weekendDayIndexes);
             } else {
                 // The selected day list does not contain both weekend days and does not contain all weekday days.
                 $selectedOtherDayIndexes = $selectedDayIndexes;
@@ -140,32 +143,5 @@ class Cronterpreter
         }
 
         return true;
-    }
-
-    /**
-     * Return a two-element array containing the day indexes that make up the weekend,
-     * obtained from the config locale_weekend value.  Possible indexes are 0 for Sunday, through 6 for Saturday.
-     * @return array
-     */
-    private function getConfiguredWeekendDays(): array
-    {
-        $config = ConfigLoader::getInstance();
-        $weekendDayIndexesString = $config->get('locale_weekend');
-        $weekendDayIndexes = explode(',', $weekendDayIndexesString);
-
-        $defaultWeekendDayIndexes = [0, 6];
-
-        if (count($weekendDayIndexes) !== 2) {
-            return $defaultWeekendDayIndexes;
-        }
-
-        foreach ($weekendDayIndexes as $dayIndex) {
-            if (!ctype_digit($dayIndex) || $dayIndex < 0 || $dayIndex > 6) {
-                // If the configured locale_weekend is invalid, use the default of Sunday and Saturday.
-                return $defaultWeekendDayIndexes;
-            }
-        }
-
-        return $weekendDayIndexes;
     }
 }

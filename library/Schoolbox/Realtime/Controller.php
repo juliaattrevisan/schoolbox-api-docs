@@ -211,7 +211,7 @@ class Controller extends BaseController
      */
     public function configure()
     {
-        $c = new Cronterpreter($this->getConfigLoader()->get('date_time'));
+        $c = new Cronterpreter($this->getConfigLoader());
 
         // TODO lookup on mobile registry table
         $mobile = true;
