@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use Alaress_Date_Format;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -108,13 +107,7 @@ class AssessmentListMutator
         if ($this->user->getRole()->isParent()) {
             // Check if the user's children have been loaded, and attempt to load them if not.
             if ($this->user->getChildren() === null) {
-//                try {
-                    (new \Schoolbox\External\User())->loadChildren([$this->user]);
-//                } catch (\Alaress\Database\Exception) {
-//                    // No children have been loaded, and none can be loaded because the external database is unavailable.
-//                    // Just return the $assessment as is in this case.
-//                    return $assessment;
-//                }
+                (new \Schoolbox\External\User())->loadChildren([$this->user]);
             }
 
             // Unset children who don't have visibility, and set visibility based on that factor.
