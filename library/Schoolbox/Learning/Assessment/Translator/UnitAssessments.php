@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Translator;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -140,7 +141,7 @@ class UnitAssessments
         }
 
         $progressTick = $this->getProgressTick($assessment);
-        $dueAt = $assessment->getDueAt();
+        $dueAt = $this->getDueAt($assessment);
 
         return [
             'id'                   => $assessment->getId(),
@@ -282,5 +283,25 @@ class UnitAssessments
             'postRouteUrl'  => $postRouteUrl,
             'progressClass' => $progress,
         ];
+    }
+
+    /**
+     * We should be showing the students personalised plan duedate (if it exists), or the assessment due date.
+     *
+     * @param IAssessable $assessable
+     * @return ?Alaress_Date_Format
+     */
+    private function getDueAt(IAssessable $assessable): ?Alaress_Date_Format
+    {
+        $participant = $assessable->getParticipantIfExtant($this->student);
+
+        if (null === $participant || $participant->isExcluded()) {
+            // The student ought to be a participant.  The only way this situation could arise is if the student was
+            // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
+            // at the start of this page-load (in Assessment/Module.php).
+            return $assessable->getDueAt();
+        }
+
+        return $participant->getDueDate();
     }
 }
