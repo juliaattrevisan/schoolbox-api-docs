@@ -55,7 +55,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
         try {
             // First create a new component if it doesn't already exist
-            if (selectedTextbox.componentId >= 0) {
+            if (selectedTextbox.componentId < 0) {
                 const formData = new FormData();
                 formData.append("cid", storeUnit.folderId.toString());
                 formData.append("add", componentDefinition.toString());
