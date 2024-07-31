@@ -35,8 +35,6 @@ class Cronterpreter
      */
     public function __construct(protected ConfigLoader $config)
     {
-        $this->config = $config;
-
         $this->setTimeFormat($this->config->get('date_time'));
 
         $this->weekendDayIndexes = array_map('intval', explode(',', $this->config->get('locale_weekend')));
