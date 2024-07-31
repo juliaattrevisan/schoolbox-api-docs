@@ -87,6 +87,7 @@ class Controller extends Base
                 IF(tb.heading = '', NULL, tb.heading),
                 :homepageDefaultComponentHeading
             ) AS componentHeading,
+            cci_textbox.component_instance_id AS componentID,
             tb.textBoxID AS textboxID,
             tb.body AS textboxBody ,
             tb.updated_at AS updated_at
@@ -101,7 +102,10 @@ class Controller extends Base
                 cci_textbox.component_config_definition_id = ccd_textbox.id AND
                 cci_textbox.component_instance_id = ci.id
             )
-            JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+            LEFT JOIN textBox tb ON (
+                CAST(tb.textBoxID AS NCHAR)=cci_textbox.value AND
+                tb.deleted_at IS NULL
+            )
             JOIN component_config_definition ccd_componentname ON (
                 ccd_componentname.component_definition_id = cd.id AND
                 ccd_componentname.key = :componentConfigComponentNameKey
@@ -112,7 +116,6 @@ class Controller extends Base
             )
             WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
             AND f.deleted_at IS NULL
-            AND tb.deleted_at IS NULL
             AND f.id = :folderId
             ORDER BY tb.updated_at ASC"
         );
@@ -587,6 +590,7 @@ class Controller extends Base
                 'id' => -1,
                 'textboxId' => -1,
                 'body' => '',
+                'componentId' => -1
             ];
 
             $textboxesKeys[strtolower($heading)] = $heading;
@@ -617,8 +621,9 @@ class Controller extends Base
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
                 $textboxes[$normalisedTitle] = [
-                    'id' => $row['textboxID'],
-                    'textboxId' => $row['textboxID'],
+                    'id' => $row['textboxID'] ?? -1,
+                    'textboxId' => $row['textboxID'] ?? -1,
+                    'componentId' => $row['componentID'],
                 ];
             } else {
                 // increase the extra textboxes by 1
