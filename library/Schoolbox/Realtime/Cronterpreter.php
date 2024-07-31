@@ -91,7 +91,7 @@ class Cronterpreter
      * @param array $dayIndexes - Array of integers representing days of the week (0 = Sunday, 6 = Saturday).
      * @return string
      */
-    public function convertDayIndexesToText(array $dayIndexes): string
+    private function convertDayIndexesToText(array $dayIndexes): string
     {
         $dayNameByIndex = [
             0 => 'Sundays',
