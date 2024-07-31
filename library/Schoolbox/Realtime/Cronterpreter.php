@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -36,13 +34,13 @@ class Cronterpreter
     public function __construct(protected Alaress_Date_Locale_Config $localeConfig)
     {
         $this->setTimeFormat($this->localeConfig->timeOnlyFormat());
-        $this->weekendDayIndexes = $this->localeConfig->weekendDays();
+        $this->setWeekendDayIndexes($this->localeConfig->weekendDays());
     }
 
     /**
      * @return string
      */
-    public function getTimeFormat()
+    public function getTimeFormat(): string
     {
         return $this->timeFormat;
     }
@@ -53,9 +51,19 @@ class Cronterpreter
      * @param string $timeFormat
      * @return static
      */
-    public function setTimeFormat($timeFormat)
+    public function setTimeFormat(string $timeFormat): static
     {
         $this->timeFormat = $timeFormat;
+        return $this;
+    }
+
+    /**
+     * @param array $weekendDayIndexes
+     * @return static
+     */
+    public function setWeekendDayIndexes(array $weekendDayIndexes): static
+    {
+        $this->weekendDayIndexes = $weekendDayIndexes;
         return $this;
     }
 
@@ -64,7 +72,7 @@ class Cronterpreter
      * @throws InvalidArgumentException
      * @return string
      */
-    public function interpret($crontab)
+    public function interpret(string $crontab): string
     {
         $cron = new CronExpression($crontab);
         $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
@@ -153,7 +161,7 @@ class Cronterpreter
     }
 
     /**
-     * Create a string like "$term1, $term2, and $term3"
+     * Create a string like "$term1, $term2 and $term3"
      * from an array of terms (strings).
      *
      * @param array $terms
@@ -167,11 +175,11 @@ class Cronterpreter
             case 1:
                 return $terms[0];
             case 2:
-                return "{$terms[0]} and {$terms[1]}";
+                return "$terms[0] and $terms[1]";
             default:
                 $lastTerm = array_pop($terms);
                 $lastIndex = count($terms) - 1;
-                $terms[$lastIndex] = "{$terms[$lastIndex]} and $lastTerm";
+                $terms[$lastIndex] = "$terms[$lastIndex] and $lastTerm";
                 return implode(', ', $terms);
         }
     }
