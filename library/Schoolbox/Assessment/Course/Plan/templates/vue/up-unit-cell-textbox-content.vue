@@ -38,23 +38,6 @@ const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
 /**
- * Focus the editor
- */
-function focusEditor() {
-    if (!editorContentEl.value) return;
-    if (!textboxIsCreated.value) return; // Don't focus if the textbox hasn't been created yet
-
-    editor?.focus();
-    // to assign the cursor to the end of the editor
-    editor?.model.change((writer) => {
-        const root = editor.model.document.getRoot();
-        if (root) {
-            writer.setSelection(writer.createPositionAt(root, "end"));
-        }
-    });
-}
-
-/**
  * Is this cell empty?
  * Used by the parent component to determine whether to show the empty state
  */
@@ -67,9 +50,6 @@ const isEmpty = window.Vue.computed(() => {
     // Otherwise, the cell is empty if there is no content in the body yet
     return editorContent.value === "";
 });
-
-// Allow the parent component to focus the editor and identify if the cell is empty
-defineExpose({ focusEditor, isEmpty });
 
 /**
  * When a new editor is created
@@ -114,35 +94,55 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 /**
  * Initialize the CKEditor instance
  */
-function initEditor() {
+async function initEditor() {
     if (!editorContentEl.value) return;
     if (editorInitialised.value) return;
 
+    // Avoid initialising the editor multiple times
     editorInitialised.value = true;
 
-    useEditor(
-        editorContent,
-        `#${editorId}`,
-        {
-            targetElements: [`#${editorId}`],
-            type: EditorType.INLINE,
-        },
-        true,
-        onEditorCreated,
-    );
+    await new Promise((resolve) => {
+        useEditor(
+            editorContent,
+            `#${editorId}`,
+            {
+                targetElements: [`#${editorId}`],
+                type: EditorType.INLINE,
+            },
+            true,
+            (e) => {
+                onEditorCreated(e);
+                resolve(true);
+            },
+        );
+    });
 }
 
 /**
- * Only initialize the CKEditor if we have read access,
- * otherwise just display the content
+ * Focus the editor
  */
-window.Vue.onMounted(() => {
-    if (props.unit.textboxes._routes.createTextbox === null) {
-        editorCreated.value = true;
-        return;
-    }
-    initEditor();
-});
+async function focusEditor() {
+    // Don't focus if the textbox hasn't been created yet
+    if (!textboxIsCreated.value) return;
+
+    // Don't focus if the user doesn't have permission to edit the textbox
+    if (props.unit.textboxes._routes.createTextbox === null) return;
+
+    await initEditor(); // Ensure the editor is initialised before focusing
+
+    editor.focus();
+
+    // to assign the cursor to the end of the editor
+    editor.model.change((writer) => {
+        const root = editor.model.document.getRoot();
+        if (root) {
+            writer.setSelection(writer.createPositionAt(root, "end"));
+        }
+    });
+}
+
+// Allow the parent component to focus the editor and identify if the cell is empty
+defineExpose({ focusEditor, isEmpty });
 </script>
 
 <template>
@@ -154,6 +154,7 @@ window.Vue.onMounted(() => {
             class="editor-content"
             :content="props.unit.textboxes.items[props.column.label].body"
         ></media-article>
+        <div class="clearfix"></div>
     </div>
 </template>
 
