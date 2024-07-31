@@ -9,9 +9,9 @@
 
 namespace Schoolbox\Realtime;
 
+use Alaress_Date_Locale_Config;
 use Cron\CronExpression;
 use InvalidArgumentException;
-use Schoolbox\IConfigLoader;
 
 /**
  * Cron + Interpreter: makes crontab human-readable
@@ -31,13 +31,12 @@ class Cronterpreter
     private array $weekendDayIndexes = [];
 
     /**
-     * @param IConFigLoader $config
+     * @param Alaress_Date_Locale_Config $localeConfig
      */
-    public function __construct(protected IConfigLoader $config)
+    public function __construct(protected Alaress_Date_Locale_Config $localeConfig)
     {
-        $this->setTimeFormat($this->config->get('date_time'));
-
-        $this->weekendDayIndexes = array_map('intval', explode(',', $this->config->get('locale_weekend')));
+        $this->setTimeFormat($this->localeConfig->timeOnlyFormat());
+        $this->weekendDayIndexes = $this->localeConfig->weekendDays();
     }
 
     /**

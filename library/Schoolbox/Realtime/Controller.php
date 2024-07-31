@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime;
 
+use Alaress_Date_Locale_Config;
 use Alaress\Web\Controller\Base as BaseController;
 use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -211,7 +212,7 @@ class Controller extends BaseController
      */
     public function configure()
     {
-        $c = new Cronterpreter($this->getConfigLoader());
+        $c = new Cronterpreter(new Alaress_Date_Locale_Config());
 
         // TODO lookup on mobile registry table
         $mobile = true;
