@@ -67,6 +67,24 @@ class Cronterpreter
      */
     public function interpret($crontab)
     {
+        $cron = new CronExpression($crontab);
+        $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
+
+        $desc  = $this->convertDayIndexesToText($selectedDayIndexes);
+        $desc .= sprintf(' at %s', date($this->getTimeFormat(), strtotime(
+            $cron->getExpression(CronExpression::HOUR) . ":" .
+            $cron->getExpression(CronExpression::MINUTE)
+        )));
+
+        return $desc;
+    }
+
+    /**
+     * @param array $dayIndexes - Array of integers representing days of the week (0 = Sunday, 6 = Saturday).
+     * @return string
+     */
+    public function convertDayIndexesToText(array $dayIndexes): string
+    {
         $dayNameByIndex = [
             0 => 'Sundays',
             1 => 'Mondays',
@@ -78,28 +96,25 @@ class Cronterpreter
         ];
 
         $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $this->weekendDayIndexes); // All days that aren't weekend days.
-
-        $cron = new CronExpression($crontab);
-        $selectedDayIndexes = explode(',', $cron->getExpression(CronExpression::WEEKDAY));
-        $selectedDayIndexesAsKeys = array_fill_keys($selectedDayIndexes, null);
-        $nDaysSelected = count($selectedDayIndexes);
+        $dayIndexesAsKeys = array_fill_keys($dayIndexes, null);
+        $nDaysSelected = count($dayIndexes);
         $desc = '';
 
         if ($nDaysSelected === 7) {
             // The selected day list contains all days.
             $desc = 'weekends and weekdays';
         } else {
-            if ($this->arrayKeysExist($selectedDayIndexesAsKeys, $weekdayIndexes)) {
+            if ($this->arrayKeysExist($dayIndexesAsKeys, $weekdayIndexes)) {
                 // The selected day list contains all weekdays.
                 $desc = 'weekdays';
-                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $weekdayIndexes);
-            } elseif ($this->arrayKeysExist($selectedDayIndexesAsKeys, $this->weekendDayIndexes)) {
+                $selectedOtherDayIndexes = array_diff($dayIndexes, $weekdayIndexes);
+            } elseif ($this->arrayKeysExist($dayIndexesAsKeys, $this->weekendDayIndexes)) {
                 // The selected day list contains both weekend days.
                 $desc = 'weekends';
-                $selectedOtherDayIndexes = array_diff($selectedDayIndexes, $this->weekendDayIndexes);
+                $selectedOtherDayIndexes = array_diff($dayIndexes, $this->weekendDayIndexes);
             } else {
                 // The selected day list does not contain both weekend days and does not contain all weekday days.
-                $selectedOtherDayIndexes = $selectedDayIndexes;
+                $selectedOtherDayIndexes = $dayIndexes;
             }
 
             if (count($selectedOtherDayIndexes) > 0) {
@@ -112,11 +127,6 @@ class Cronterpreter
                 $desc = implode(', ', $terms);
             }
         }
-
-        $desc .= sprintf(' at %s', date($this->getTimeFormat(), strtotime(
-            $cron->getExpression(CronExpression::HOUR) . ":" .
-                $cron->getExpression(CronExpression::MINUTE)
-        )));
 
         return $desc;
     }
