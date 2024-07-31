@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class AssessmentListMutatorTest extends TestCase
@@ -44,7 +45,13 @@ class AssessmentListMutatorTest extends TestCase
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 
         $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
-        $this->parent  = (new User())->setId(10)->setChildren(new GenericCollection(User::class));
+
+        // Create mock parent user with child.
+        $parentRole = new Role();
+        $parentRole->setType(Role::PARENT);
+        $this->parent = (new User())->setId(10)
+            ->setRole($parentRole)
+            ->setChildren(new GenericCollection(User::class));
         $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
 
         // Set up assessments
