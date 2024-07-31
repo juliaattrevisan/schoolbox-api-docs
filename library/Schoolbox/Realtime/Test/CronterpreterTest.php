@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Test;
 
-use Alaress_Date_Locale_Config;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Realtime\Cronterpreter;
 
@@ -23,6 +22,7 @@ class CronterpreterTest extends TestCase
             'weekendDayIndexes' => [0, 6],
             'data' => [
                 [
+                    // Crontab format is: 'minute hour dayOfMonth month dayOfWeek'.
                     'crontab' => '0 0 * * 0,1,2,3,4,5,6',
                     'output' => "weekends and weekdays at 12:00am",
                 ],
@@ -81,56 +81,57 @@ class CronterpreterTest extends TestCase
             'weekendDayIndexes' => [6, 0, 1],
             'data' => [
                 [
-                    'crontab' => '0 0 * * 0,1,2,3,4,5,6',
-                    'output' => "weekends and weekdays at 12:00am",
+                    // Crontab format is: 'minute hour dayOfMonth month dayOfWeek'.
+                    'crontab' => '54 22 * * 0,1,2,3,4,5,6',
+                    'output' => "weekends and weekdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 1,2,3,4,5',
-                    'output' => "weekdays and Mondays at 12:00am",
+                    'crontab' => '54 22 * * 1,2,3,4,5',
+                    'output' => "weekdays and Mondays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,2,3,4,5',
-                    'output' => "weekdays, Sundays and Mondays at 12:00am",
+                    'crontab' => '54 22 * * 0,1,2,3,4,5',
+                    'output' => "weekdays, Sundays and Mondays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 1,2,3,4,5,6',
-                    'output' => "weekdays, Mondays and Saturdays at 12:00am",
+                    'crontab' => '54 22 * * 1,2,3,4,5,6',
+                    'output' => "weekdays, Mondays and Saturdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,6',
-                    'output' => "Sundays and Saturdays at 12:00am",
+                    'crontab' => '54 22 * * 0,6',
+                    'output' => "Sundays and Saturdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,6',
-                    'output' => "weekends at 12:00am",
+                    'crontab' => '54 22 * * 0,1,6',
+                    'output' => "weekends at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,2,6',
-                    'output' => "weekends and Tuesdays at 12:00am",
+                    'crontab' => '54 22 * * 0,1,2,6',
+                    'output' => "weekends and Tuesdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,2,3,6',
-                    'output' => "weekends, Tuesdays and Wednesdays at 12:00am",
+                    'crontab' => '54 22 * * 0,1,2,3,6',
+                    'output' => "weekends, Tuesdays and Wednesdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,2,3,4,6',
-                    'output' => "weekends, Tuesdays, Wednesdays and Thursdays at 12:00am",
+                    'crontab' => '54 22 * * 0,1,2,3,4,6',
+                    'output' => "weekends, Tuesdays, Wednesdays and Thursdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 1',
-                    'output' => "Mondays at 12:00am",
+                    'crontab' => '54 22 * * 1',
+                    'output' => "Mondays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 1,4',
-                    'output' => "Mondays and Thursdays at 12:00am",
+                    'crontab' => '54 22 * * 1,4',
+                    'output' => "Mondays and Thursdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 0,1,4',
-                    'output' => "Sundays, Mondays and Thursdays at 12:00am",
+                    'crontab' => '54 22 * * 0,1,4',
+                    'output' => "Sundays, Mondays and Thursdays at 10:54pm",
                 ],
                 [
-                    'crontab' => '0 0 * * 6,1,4',
-                    'output' => "Saturdays, Mondays and Thursdays at 12:00am",
+                    'crontab' => '54 22 * * 6,1,4',
+                    'output' => "Saturdays, Mondays and Thursdays at 10:54pm",
                 ],
             ]
         ]
