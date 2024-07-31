@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime;
 
 use Cron\CronExpression;
 use InvalidArgumentException;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\IConfigLoader;
 
 /**
  * Cron + Interpreter: makes crontab human-readable
@@ -31,9 +31,9 @@ class Cronterpreter
     private array $weekendDayIndexes = [];
 
     /**
-     * @param ConFigLoader $config
+     * @param IConFigLoader $config
      */
-    public function __construct(protected ConfigLoader $config)
+    public function __construct(protected IConfigLoader $config)
     {
         $this->setTimeFormat($this->config->get('date_time'));
 
