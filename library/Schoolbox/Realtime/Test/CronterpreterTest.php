@@ -20,6 +20,7 @@ class CronterpreterTest extends TestCase
         [
             // Tests for standard weekend [Sunday, Saturday] - implies weekdays are [Monday, Tuesday, Wednesday, Thursday, Friday].
             'weekendDayIndexes' => [0, 6],
+            'timeFormat' => 'g:ia',
             'data' => [
                 [
                     // Crontab format is: 'minute hour dayOfMonth month dayOfWeek'.
@@ -79,59 +80,60 @@ class CronterpreterTest extends TestCase
         [
              // Tests for custom weekend [Saturday, Sunday, Monday] - implies weekdays are [Tuesday, Wednesday, Thursday, Friday].
             'weekendDayIndexes' => [6, 0, 1],
+             'timeFormat' => 'g:i a',
             'data' => [
                 [
                     // Crontab format is: 'minute hour dayOfMonth month dayOfWeek'.
                     'crontab' => '54 22 * * 0,1,2,3,4,5,6',
-                    'output' => "weekends and weekdays at 10:54pm",
+                    'output' => "weekends and weekdays at 10:54 pm",
                 ],
                 [
                     'crontab' => '54 22 * * 1,2,3,4,5',
-                    'output' => "weekdays and Mondays at 10:54pm",
+                    'output' => "weekdays and Mondays at 10:54 pm",
                 ],
                 [
                     'crontab' => '54 22 * * 0,1,2,3,4,5',
-                    'output' => "weekdays, Sundays and Mondays at 10:54pm",
+                    'output' => "weekdays, Sundays and Mondays at 10:54 pm",
                 ],
                 [
                     'crontab' => '54 22 * * 1,2,3,4,5,6',
-                    'output' => "weekdays, Mondays and Saturdays at 10:54pm",
+                    'output' => "weekdays, Mondays and Saturdays at 10:54 pm",
                 ],
                 [
                     'crontab' => '54 22 * * 0,6',
-                    'output' => "Sundays and Saturdays at 10:54pm",
+                    'output' => "Sundays and Saturdays at 10:54 pm",
                 ],
                 [
                     'crontab' => '54 22 * * 0,1,6',
-                    'output' => "weekends at 10:54pm",
+                    'output' => "weekends at 10:54 pm",
                 ],
                 [
-                    'crontab' => '54 22 * * 0,1,2,6',
-                    'output' => "weekends and Tuesdays at 10:54pm",
+                    'crontab' => '04 02 * * 0,1,2,6',
+                    'output' => "weekends and Tuesdays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 0,1,2,3,6',
-                    'output' => "weekends, Tuesdays and Wednesdays at 10:54pm",
+                    'crontab' => '04 02 * * 0,1,2,3,6',
+                    'output' => "weekends, Tuesdays and Wednesdays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 0,1,2,3,4,6',
-                    'output' => "weekends, Tuesdays, Wednesdays and Thursdays at 10:54pm",
+                    'crontab' => '04 02 * * 0,1,2,3,4,6',
+                    'output' => "weekends, Tuesdays, Wednesdays and Thursdays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 1',
-                    'output' => "Mondays at 10:54pm",
+                    'crontab' => '04 02 * * 1',
+                    'output' => "Mondays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 1,4',
-                    'output' => "Mondays and Thursdays at 10:54pm",
+                    'crontab' => '04 02 * * 1,4',
+                    'output' => "Mondays and Thursdays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 0,1,4',
-                    'output' => "Sundays, Mondays and Thursdays at 10:54pm",
+                    'crontab' => '04 02 * * 0,1,4',
+                    'output' => "Sundays, Mondays and Thursdays at 2:04 am",
                 ],
                 [
-                    'crontab' => '54 22 * * 6,1,4',
-                    'output' => "Saturdays, Mondays and Thursdays at 10:54pm",
+                    'crontab' => '04 02 * * 6,1,4',
+                    'output' => "Saturdays, Mondays and Thursdays at 2:04 am",
                 ],
             ]
         ]
@@ -147,6 +149,7 @@ class CronterpreterTest extends TestCase
 
         foreach ($this->testDataSets as $testDataSet) {
             $cronterpreter->setWeekendDayIndexes($testDataSet['weekendDayIndexes']);
+            $cronterpreter->setTimeFormat($testDataSet['timeFormat']);
 
             foreach ($testDataSet['data'] as $pair) {
                 $this->assertSame(
