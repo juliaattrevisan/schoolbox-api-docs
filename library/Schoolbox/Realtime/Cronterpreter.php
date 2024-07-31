@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Realtime;
 
-use Alaress_Date_Locale_Config;
 use Cron\CronExpression;
 use InvalidArgumentException;
 
@@ -21,21 +20,12 @@ use InvalidArgumentException;
  */
 class Cronterpreter
 {
-    /** @var string */
-    protected string $timeFormat;
-
     /**
-     * @var array
+     * @param string $timeFormat
+     * @param array  $weekendDayIndexes
      */
-    private array $weekendDayIndexes = [];
-
-    /**
-     * @param Alaress_Date_Locale_Config $localeConfig
-     */
-    public function __construct(protected Alaress_Date_Locale_Config $localeConfig)
+    public function __construct(protected string $timeFormat, protected array $weekendDayIndexes)
     {
-        $this->setTimeFormat($this->localeConfig->timeOnlyFormat());
-        $this->setWeekendDayIndexes($this->localeConfig->weekendDays());
     }
 
     /**
@@ -56,6 +46,14 @@ class Cronterpreter
     {
         $this->timeFormat = $timeFormat;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWeekendDayIndexes(): array
+    {
+        return $this->weekendDayIndexes;
     }
 
     /**
@@ -91,7 +89,7 @@ class Cronterpreter
      * @param array $dayIndexes - Array of integers representing days of the week (0 = Sunday, 6 = Saturday).
      * @return string
      */
-    private function convertDayIndexesToText(array $dayIndexes): string
+    protected function convertDayIndexesToText(array $dayIndexes): string
     {
         $dayNameByIndex = [
             0 => 'Sundays',
@@ -146,7 +144,7 @@ class Cronterpreter
      * @param array $keys
      * @return bool
      */
-    private function arrayKeysExist(array $array, array $keys): bool
+    protected function arrayKeysExist(array $array, array $keys): bool
     {
         if (count($keys) === 0) {
             return false;
@@ -168,7 +166,7 @@ class Cronterpreter
      * @param array $terms
      * @return string
      */
-    private function createGrammaticalList(array $terms): string
+    protected function createGrammaticalList(array $terms): string
     {
         switch (count($terms)) {
             case 0:

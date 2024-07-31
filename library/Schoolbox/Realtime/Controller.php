@@ -212,7 +212,8 @@ class Controller extends BaseController
      */
     public function configure()
     {
-        $c = new Cronterpreter(new Alaress_Date_Locale_Config());
+        $localeConfig = new Alaress_Date_Locale_Config();
+        $c = new Cronterpreter($localeConfig->timeOnlyFormat(), $localeConfig->weekendDays());
 
         // TODO lookup on mobile registry table
         $mobile = true;
