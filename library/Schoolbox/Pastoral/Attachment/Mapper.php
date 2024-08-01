@@ -169,6 +169,11 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Files are considered the same if
+     * they have the same real name
+     * they have the same hash
+     * they are both private / public (General / Confidential)
+     *
      * @param Collection $newAttachments
      * @param Collection $oldAttachments
      * @return array
@@ -177,6 +182,7 @@ class Mapper extends BaseMapper
     {
         $diffMethod = static function (Model $a, Model $b) {
             return $a->getRealname() === $b->getRealname()
+                && $a->getPrivate() === $b->getPrivate()
                 && $a->getStorage()->getHash() === $b->getStorage()->getHash();
         };
         return [
