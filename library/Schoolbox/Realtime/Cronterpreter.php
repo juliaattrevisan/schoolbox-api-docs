@@ -20,8 +20,6 @@ use InvalidArgumentException;
  */
 class Cronterpreter
 {
-    private array $weekendDayIndexes;
-
     /**
      * @param string $timeFormat
      *  - PHP time format string e.g. 'g:ia'.
@@ -30,10 +28,10 @@ class Cronterpreter
      *  - Comma-separated string of integers representing days (0 = Sunday, 6 = Saturday).
      *    This value should come straight out of the `config` db table for name 'locale_weekend'.
      */
-    public function __construct(private string $timeFormat, string $weekendDays)
+    public function __construct(private string $timeFormat, private string $weekendDays)
     {
         $this->setTimeFormat($timeFormat);
-        $this->setWeekendDayIndexes($weekendDays);
+        $this->setWeekendDays($weekendDays);
     }
 
     /**
@@ -57,11 +55,11 @@ class Cronterpreter
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getWeekendDayIndexes(): array
+    public function getWeekendDays(): string
     {
-        return $this->weekendDayIndexes;
+        return $this->weekendDays;
     }
 
     /**
@@ -69,9 +67,9 @@ class Cronterpreter
      *  - Comma-separated string of integers representing days (0 = Sunday, 6 = Saturday).
      * @return static
      */
-    public function setWeekendDayIndexes(string $weekendDays): static
+    public function setWeekendDays(string $weekendDays): static
     {
-        $this->weekendDayIndexes = array_map('intval', explode(',', $weekendDays));
+        $this->weekendDays = $weekendDays;
         return $this;
     }
 
@@ -110,7 +108,8 @@ class Cronterpreter
             6 => 'Saturdays'
         ];
 
-        $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $this->weekendDayIndexes); // All days that aren't weekend days.
+        $weekendDayIndexes = array_map('intval', explode(',', $this->weekendDays));
+        $weekdayIndexes = array_diff(array_keys($dayNameByIndex), $weekendDayIndexes); // All days that aren't weekend days.
         $dayIndexesAsKeys = array_fill_keys($dayIndexes, null);
         $nDaysSelected = count($dayIndexes);
         $desc = '';
@@ -123,10 +122,10 @@ class Cronterpreter
                 // The selected day list contains all weekdays.
                 $desc = 'weekdays';
                 $selectedOtherDayIndexes = array_diff($dayIndexes, $weekdayIndexes);
-            } elseif ($this->arrayKeysExist($dayIndexesAsKeys, $this->weekendDayIndexes)) {
+            } elseif ($this->arrayKeysExist($dayIndexesAsKeys, $weekendDayIndexes)) {
                 // The selected day list contains both weekend days.
                 $desc = 'weekends';
-                $selectedOtherDayIndexes = array_diff($dayIndexes, $this->weekendDayIndexes);
+                $selectedOtherDayIndexes = array_diff($dayIndexes, $weekendDayIndexes);
             } else {
                 // The selected day list does not contain both weekend days and does not contain all weekday days.
                 $selectedOtherDayIndexes = $dayIndexes;
