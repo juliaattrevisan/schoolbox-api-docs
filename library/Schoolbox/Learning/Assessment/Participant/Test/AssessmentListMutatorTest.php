@@ -38,6 +38,8 @@ class AssessmentListMutatorTest extends TestCase
      */
     private $assessments;
 
+    private $externalUser;
+
     /**
      * Set up student, parent, user methods
      */
@@ -59,6 +61,13 @@ class AssessmentListMutatorTest extends TestCase
             ->setRole($parentRole)
             ->setChildren(new GenericCollection(User::class));
         $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
+
+        $this->externalUser = $this->createConfiguredMock(
+            ExternalUser::class,
+            [
+                'loadChildren' => $this->parent->getChildren()
+            ]
+        );
 
         // Set up assessments
         $assessment1 = new DueWork\Model();
@@ -103,7 +112,7 @@ class AssessmentListMutatorTest extends TestCase
         $mutator = new AssessmentListMutator(
             $this->student,
             $mockVisibility,
-            new ExternalUser(),
+            $this->externalUser,
             \Alaress_Date_Format::now(),
             true
         );
@@ -142,7 +151,7 @@ class AssessmentListMutatorTest extends TestCase
         $mutator = new AssessmentListMutator(
             $this->parent,
             $mockVisibility,
-            new ExternalUser(),
+            $this->externalUser,
             \Alaress_Date_Format::now(),
             true
         );
