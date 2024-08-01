@@ -141,6 +141,10 @@ class InlineImageConverter
         foreach ($xpath->query('//body/*') as $bodyPart) {
             $bodyParts[] = trim($dom->saveHTML($bodyPart));
         }
+
+        // clean up the spawned classes
+        unset($dom, $xpath);
+
         return implode("\n", $bodyParts);
     }
 
