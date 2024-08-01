@@ -16,11 +16,14 @@ function overwriteStaticAssets() {
         .lg-outer .lg-item:not(.lg-start-end-progress) {
             background: url("${window.cdnPrefix}/images/loading.gif") no-repeat scroll center center transparent;
         }
-        `)
+        `),
     );
     document.head.appendChild(newStyle);
 }
 
+/**
+ * Initialise all lightboxes on the page
+ */
 function initLightGallery() {
     window.sbProps.lightGalleryInit();
     overwriteStaticAssets();
@@ -28,14 +31,13 @@ function initLightGallery() {
 
 /**
  * Check if lightGallery is already loaded, if not, load it.
- * @param { Function } initLightGallery - the function to call once lightGallery is loaded
  */
-function checkForLightGallery(initLightGallery: Function) {
+function checkForLightGallery() {
     // We need to ensure that the license key is available before loading the plugin
     // If it's not, wait for the DOM to load and try again
     if (!window.sbProps?.imageLightboxLicenseKey) {
         document.addEventListener("DOMContentLoaded", () => {
-            checkForLightGallery(initLightGallery);
+            checkForLightGallery();
         });
         return;
     }
@@ -46,12 +48,12 @@ function checkForLightGallery(initLightGallery: Function) {
         initLightGallery();
     } else if (!isScriptAdded(imageLightBoxSrc)) {
         // it hasn't been added to the page yet
-        injectScript(imageLightBoxSrc) as Promise<void>;
         document.addEventListener("IMAGE-LIGHTBOX__LOADED", initLightGallery);
+        void injectScript(imageLightBoxSrc);
     } else {
         // otherwise, wait for the script to load
         document.addEventListener("IMAGE-LIGHTBOX__LOADED", initLightGallery);
     }
 }
 
-checkForLightGallery(initLightGallery);
+checkForLightGallery();

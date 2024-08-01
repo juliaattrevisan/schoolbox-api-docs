@@ -5,6 +5,9 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
+import type { lightGallery } from "lightgallery";
+import type { LightGallery } from "lightgallery/lightgallery";
+import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
 import type { DefineComponent } from "vue";
 import type { Editor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
@@ -31,11 +34,11 @@ declare global {
             editors: { [key: string]: Editor };
             hasEditorAI: true | undefined; // to display the AI features within the editor
             openAIModel: string | undefined; // chosen open AI model to use
-            lightGallery: Function;
-            lightGalleryInit: Function;
-            lightGalleries: { [key: string]: any };
+            lightGallery: typeof lightGallery;
+            lightGalleryInit: InitLightGallery;
+            lightGalleries: Record<string, LightGallery | undefined>;
             imageLightboxLicenseKey: string;
-            imageSlideshows: { [key: string]: any };
+            imageSlideshowListenerExists?: true | undefined;
             injectScriptsIfNotLoaded: typeof injectScriptsIfNotLoaded;
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
