@@ -20,11 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class User
 {
-    private \External_User|null $externalUser;
-    private \External_Class|null $externalClass;
-    private UserMapper|null $userMapper;
-    private string|null $externalType;
-
     /**
      * Hydrator to load relationships for users from external databases
      * Can load multiple users at once, or will load just the relationship that has been requested
@@ -39,8 +34,12 @@ class User
      * @param \External_User|null  $externalUser
      * @param UserMapper|null      $userMapper
      */
-    public function __construct(string $externalType = null, \External_Class $externalClass = null, \External_User $externalUser = null, UserMapper $userMapper = null)
-    {
+    public function __construct(
+        private ?string $externalType = null,
+        private ?\External_Class $externalClass = null,
+        private ?\External_User $externalUser = null,
+        private ?UserMapper $userMapper = null
+    ) {
         $this->externalType = $externalType;
         $this->externalClass = $externalClass;
         $this->externalUser = $externalUser;
