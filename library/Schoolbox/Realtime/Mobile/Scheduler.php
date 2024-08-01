@@ -86,7 +86,14 @@ class Scheduler extends AbstractScheduler implements IConsumer
     {
         // Basic checks: payload type, context
         if (!$payload instanceof Instance) {
-            $this->log->warning(sprintf('Message received payload is not a %s instance: not retrying delivery', Instance::class));
+            $this->log->warning(
+                sprintf(
+                    'Message received payload is not a %s (received: %s): not retrying delivery',
+                    Instance::class,
+                    /** @phpstan-ignore-next-line - just in case this is not an object at all **/
+                    is_object($payload) ? get_class($payload) : gettype($payload),
+                ),
+            );
             // acknowledge instead of reject looks weird here,
             // but rejecting a message ends with it being put back in the queue
             // to be processed forever.
