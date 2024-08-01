@@ -145,9 +145,11 @@ class Scheduler extends AbstractScheduler implements IConsumer
      */
     private function attemptPush(string $instanceId, int $userId, Instance $payload, IResolver $resolver, int $attemptNum = 1): void
     {
-        $this->log->debug(
+        $this->log->info(
             sprintf(
-                'Attempting to deliver message to instance:user %s:%d, attempt %d',
+                'Attempting to deliver message %s:%s to instance:user %s:%d, attempt %d',
+                $payload->getBaseHash(),
+                $payload->getParamHash(),
                 $instanceId,
                 $userId,
                 $attemptNum,
@@ -163,7 +165,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
             if ($this->jitter->tooManyAttempts($attemptNum)) {
                 $this->log->warning(
                     sprintf(
-                        'Message received could not be delivered to instance:user %s:%d after %d attempts: not retrying delivery',
+                        'Message %s:%s could not be delivered to instance:user %s:%d after %d attempts: not retrying delivery',
+                        $payload->getBaseHash(),
+                        $payload->getParamHash(),
                         $instanceId,
                         $userId,
                         $attemptNum,
@@ -197,7 +201,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
             }
             $this->log->notice(
                 sprintf(
-                    'Message delivery to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
+                    'Delivery of message %s:%s to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
+                    $payload->getBaseHash(),
+                    $payload->getParamHash(),
                     $instanceId,
                     $userId,
                     $e->getMessage(),
