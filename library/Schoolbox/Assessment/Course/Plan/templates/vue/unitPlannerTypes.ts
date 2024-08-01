@@ -16,8 +16,8 @@ export type RubricCapability = {
 };
 
 export type TextboxContent = {
-    componentId: number; // the id of the component
-    textboxId: number; // the id of the textbox within the component
+    componentId: number; // the id of the component, -1 if it doesn't exist (a componentId must exist if a textboxId exists)
+    textboxId: number; // the id of the textbox within the component, -1 if it doesn't exist (note: a componentId may exist without a textboxId)
     body: string;
     inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
     _links: {

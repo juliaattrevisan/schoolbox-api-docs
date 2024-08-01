@@ -583,14 +583,22 @@ class Controller extends Base
                 $heading = trim(Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING);
             }
 
-            // Provide a default value for the textbox with a negative ID to indicate it doesn't exist
-            // The frontend will use this to determine whether the textbox needs to be created or not.
-            // This saves needing to manipulate the initial data on the frontend on the first mount
+            /*
+             * Provide a default value for the textbox with a negative ID to indicate it doesn't exist
+             * The frontend will use this to determine whether the textbox needs to be created or not.
+             * This saves needing to manipulate the initial data on the frontend on the first mount
+             *
+             * NOTE: This is the base structure for textbox data expected by the unit planner as per:
+             *   TextboxContent in library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlannerTypes.ts
+             */
             $textboxes[strtolower($heading)] = [
-                'id' => -1,
+                'componentId' => -1,
                 'textboxId' => -1,
-                'body' => '',
-                'componentId' => -1
+                'body' => '', // Empty string and not null as frontend expects a string (easier to handle in Vue)
+                'inTemplate' => false,
+                '_links' => [
+                    'update' => null,
+                ]
             ];
 
             $textboxesKeys[strtolower($heading)] = $heading;
@@ -620,11 +628,10 @@ class Controller extends Base
             if (array_key_exists($normalisedTitle, $textboxes)) {
                 // NOTE: This is all based on component titles (which don't need to be unique),
                 // so you could have 2 components on a page that share the same title, and this will just display the last entry.
-                $textboxes[$normalisedTitle] = [
-                    'id' => $row['textboxID'] ?? -1,
-                    'textboxId' => $row['textboxID'] ?? -1,
-                    'componentId' => $row['componentID'],
-                ];
+
+                $textboxes[$normalisedTitle]['componentId'] = $row['componentID'];
+                $textboxes[$normalisedTitle]['textboxId'] = $row['textboxID'] ?? -1; // The component may exist, but not have a textbox yet.
+                $textboxes[$normalisedTitle]['inTemplate'] = true; // It exists in the template if we've gotten here
             } else {
                 // increase the extra textboxes by 1
                 // usually a teacher has added an additional textbox component, may not be an issue, but good to inform the teachers there is something non standard in the unit.
@@ -644,14 +651,21 @@ class Controller extends Base
         $translatedTextboxes = $this->textboxMapper
             ->findByColumn(
                 'textBoxID',
-                array_filter(array_column($textboxes, 'id'), fn ($id) => $id > 0),
+                array_filter(array_column($textboxes, 'textboxId'), fn ($id) => $id > 0),
             )
             ->indexBy('id')
             ->map($textboxTranslator);
+
         foreach ($textboxes as $normalisedTitle => $textbox) {
-            if (isset($translatedTextboxes[$textbox['id']])) {
-                $textboxes[$normalisedTitle] = $translatedTextboxes[$textbox['id']];
+            if ($textbox['textboxId'] < 0) {
+                continue; // This textbox doesn't exist yet, so there won't be a translation for it.
             }
+
+            $translatedTextbox = $translatedTextboxes[$textbox['textboxId']];
+
+            // Assign (not overwrite) the relevant translated data to ensure the structure still conforms to what the FE expects
+            $textboxes[$normalisedTitle]['body'] = $translatedTextbox['body'];
+            $textboxes[$normalisedTitle]['_links']['update'] = $translatedTextbox['_links']['update'];
         }
 
         return [
