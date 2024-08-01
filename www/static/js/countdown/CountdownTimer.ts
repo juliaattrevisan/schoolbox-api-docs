@@ -1,33 +1,34 @@
+type TimeRemainingDetail = {
+    totalSeconds: number; // Total number of seconds remaining in the countdown
+    seconds: number; // Number of seconds remaining in the countdown
+    minutes: number; // Number of minutes remaining in the countdown
+    hours: number; // Number of hours remaining in the countdown
+    days: number; // Number of days remaining in the countdown
+    weeks: number; // Number of weeks remaining in the countdown
+};
+
+type OnCountdownChangeEvent = (timeRemaining: TimeRemainingDetail) => void;
+type OnCountdownFinishedEvent = () => void;
+
 /**
  * A class to implement a countdown timer
  */
 export default class CountdownTimer {
     private targetDate: Date;
-    private timerId: number;
+
+    private timerId: number | null = null; // The ID of the timer interval, so it can be stopped
+
     private interval: number;
 
     /**
      * Event to be emitted when the countdown changes
-     *
-     * @event
-     * @param {number} totalSeconds - Total number of seconds remaining in the countdown
-     * @param {number} seconds - Number of seconds remaining in the countdown
-     * @param {number} minutes - Number of minutes remaining in the countdown
-     * @param {number} hours - Number of hours remaining in the countdown
-     * @param {number} days - Number of days remaining in the countdown
-     * @param {number} weeks - Number of weeks remaining in the countdown
      */
-    public onCountdownChange: (timeRemaining: {
-        totalSeconds: number;
-        seconds: number;
-        minutes: number;
-        hours: number;
-        days: number;
-        weeks: number;
-    }) => void;
+    private onCountdownChangeHandler: OnCountdownChangeEvent | null = null;
 
-    // Event to be emitted when the countdown finishes
-    public onCountdownFinished: () => void;
+    /**
+     * Event to be emitted when the countdown finishes
+     */
+    private onCountdownFinishedHandler: OnCountdownFinishedEvent | null = null;
 
     constructor(targetDate: Date, interval = 1000) {
         this.targetDate = targetDate;
@@ -38,10 +39,14 @@ export default class CountdownTimer {
      * Updates the countdown and emits the onCountdownChange event
      */
     private updateCountdown() {
+        if (!this.timerId) return; // Timer has been stopped
+
         const timeRemaining = this.targetDate.getTime() - Date.now();
         if (timeRemaining <= 0) {
             window.clearInterval(this.timerId);
-            this.onCountdownFinished();
+            if (this.onCountdownFinishedHandler) {
+                this.onCountdownFinishedHandler();
+            }
         } else {
             const totalSeconds = timeRemaining / 1000;
             const seconds = Math.floor(totalSeconds % 60);
@@ -49,14 +54,16 @@ export default class CountdownTimer {
             const hours = Math.floor((totalSeconds / (60 * 60)) % 24);
             const days = Math.floor((totalSeconds / (60 * 60 * 24)) % 7);
             const weeks = Math.floor(totalSeconds / (60 * 60 * 24 * 7));
-            this.onCountdownChange({
-                totalSeconds,
-                seconds,
-                minutes,
-                hours,
-                days,
-                weeks,
-            });
+            if (this.onCountdownChangeHandler) {
+                this.onCountdownChangeHandler({
+                    totalSeconds,
+                    seconds,
+                    minutes,
+                    hours,
+                    days,
+                    weeks,
+                });
+            }
         }
     }
 
@@ -74,6 +81,23 @@ export default class CountdownTimer {
      * Stops the countdown
      */
     stop() {
+        if (!this.timerId) return; // Timer has already been stopped
         window.clearInterval(this.timerId);
+    }
+
+    /**
+     * Event to be emitted when the countdown finishes
+     * @param {OnCountdownFinishedEvent} handler - the event handler
+     */
+    public onCountdownChange(handler: (timeRemaining: TimeRemainingDetail) => void) {
+        this.onCountdownChangeHandler = handler;
+    }
+
+    /**
+     * Event to be emitted when the countdown finishes
+     * @param {OnCountdownFinishedEvent} handler - the event handler
+     */
+    public onCountdownFinished(handler: () => void) {
+        this.onCountdownFinishedHandler = handler;
     }
 }

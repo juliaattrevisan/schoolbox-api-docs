@@ -5,7 +5,8 @@ import CountdownTimer from "./CountdownTimer";
 
 const countdownElements = document.querySelectorAll('[data-countdown="elements"]');
 countdownElements.forEach((element) => {
-    const targetDate = new Date(element.getAttribute("data-target-date"));
+    const targetDateString = element.getAttribute("data-target-date");
+    const targetDate = targetDateString ? new Date(targetDateString) : new Date();
     const targetElement = element;
     const countdownTimer = new CountdownTimer(targetDate);
     // Avoid duplicate timers on the same element
@@ -14,7 +15,7 @@ countdownElements.forEach((element) => {
     }
     targetElement.setAttribute("started", "true");
 
-    countdownTimer.onCountdownChange = (timeRemaining) => {
+    countdownTimer.onCountdownChange((timeRemaining) => {
         let format =
             `<li><span class="count" data-hours>${timeRemaining.hours}</span> <span class="labels">Hrs</span></li>` +
             `<li><span class="count" data-minutes>${timeRemaining.minutes}</span> <span class="labels">Mins</span></li>` +
@@ -33,14 +34,21 @@ countdownElements.forEach((element) => {
         }
 
         targetElement.innerHTML = format;
-    };
+    });
 
-    countdownTimer.onCountdownFinished = () => {
-        if (targetElement.parentElement.classList.contains("disabled")) {
+    countdownTimer.onCountdownFinished(() => {
+        const targetElementParent = targetElement.parentElement;
+
+        if (targetElementParent === null) {
+            return; // Countdown is invalid or has been removed...
+        }
+
+        if (targetElementParent.classList.contains("disabled")) {
             return; // Prevent multiple confetti explosions
         }
+
         targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
-        targetElement.parentElement.classList.add("disabled");
+        targetElementParent.classList.add("disabled");
 
         if (targetElement.getAttribute("data-finish-animation") === "1") {
             let hasTriggered = false;
@@ -49,8 +57,8 @@ countdownElements.forEach((element) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting && !hasTriggered) {
                             hasTriggered = true;
-                            let boundRect = targetElement.getBoundingClientRect();
-                            confetti({
+                            const boundRect = targetElement.getBoundingClientRect();
+                            void confetti({
                                 particleCount: 300,
                                 spread: 360,
                                 ticks: 200,
@@ -62,12 +70,12 @@ countdownElements.forEach((element) => {
                         }
                     });
                 },
-                { rootMargin: "0px", threshold: 1.0 }
+                { rootMargin: "0px", threshold: 1.0 },
             );
 
             observer.observe(targetElement);
         }
-    };
+    });
 
     countdownTimer.start();
 });

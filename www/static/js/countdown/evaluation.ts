@@ -4,13 +4,18 @@ import CountdownTimer from "./CountdownTimer";
 
 const countdownText = document.querySelectorAll('[data-countdown="evaluation"]');
 countdownText.forEach((element) => {
-    const timeLeft = element.getAttribute('data-timeleft'); // in seconds
+    const timeLeft = parseInt(element.getAttribute("data-timeleft") ?? "-1", 10); // in seconds
+
+    if (!(element instanceof HTMLElement)) {
+        return;
+    }
+
     const targetElement = element;
     if (timeLeft < 0) {
         targetElement.innerText = "Unlimited";
         return;
     }
-    const targetDate = new Date(Date.now() + (timeLeft * 1000));
+    const targetDate = new Date(Date.now() + timeLeft * 1000);
     const countdownTimer = new CountdownTimer(targetDate);
 
     // Avoid duplicate timers on the same element
@@ -20,11 +25,11 @@ countdownText.forEach((element) => {
     targetElement.setAttribute("started", "true");
 
     countdownTimer.onCountdownChange = (timeRemaining) => {
-        targetElement.dispatchEvent(new CustomEvent('countdownChange', { detail: timeRemaining }));
+        targetElement.dispatchEvent(new CustomEvent("countdownChange", { detail: timeRemaining }));
     };
 
     countdownTimer.onCountdownFinished = () => {
-        targetElement.dispatchEvent(new CustomEvent('countdownFinished'));
+        targetElement.dispatchEvent(new CustomEvent("countdownFinished"));
     };
 
     countdownTimer.start();

@@ -115,6 +115,7 @@
     "@storybook/vue3": "^8.2.9",
     "@storybook/vue3-webpack5": "^8.2.9",
     "@testing-library/jest-dom": "~6.4.2",
+    "@types/canvas-confetti": "^1.6.4",
     "@types/jest": "~29.5.12",
     "@types/jquery": "~3.5.29",
     "@types/jqueryui": "~1.12.21",
