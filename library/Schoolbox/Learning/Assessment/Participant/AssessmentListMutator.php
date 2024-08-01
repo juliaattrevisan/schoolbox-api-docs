@@ -106,9 +106,7 @@ class AssessmentListMutator
 
         if ($this->user->getRole()->isParent()) {
             // Check if the user's children have been loaded, and attempt to load them if not.
-            if ($this->user->getChildren() === null) {
-                (new \Schoolbox\External\User())->loadChildren([$this->user]);
-            }
+            (new \Schoolbox\External\User())->loadChildren([$this->user]);
 
             // Unset children who don't have visibility, and set visibility based on that factor.
             foreach ($this->user->getChildren() as $child) {
