@@ -44,7 +44,12 @@ class AssessmentListMutatorTest extends TestCase
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 
-        $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
+        // Create mock student user.
+        $studentRole = new Role();
+        $studentRole->setType(Role::STUDENT);
+        $this->student = (new User())->setId(9)
+            ->setRole($studentRole)
+            ->setChildren(new GenericCollection(User::class));
 
         // Create mock parent user with child.
         $parentRole = new Role();
