@@ -173,13 +173,9 @@ class Cronterpreter
                 return '';
             case 1:
                 return $terms[0];
-            case 2:
-                return "$terms[0] and $terms[1]";
             default:
                 $lastTerm = array_pop($terms);
-                $lastIndex = count($terms) - 1;
-                $terms[$lastIndex] = "$terms[$lastIndex] and $lastTerm";
-                return implode(', ', $terms);
+                return implode(', ', $terms) . " and $lastTerm";
         }
     }
 }
