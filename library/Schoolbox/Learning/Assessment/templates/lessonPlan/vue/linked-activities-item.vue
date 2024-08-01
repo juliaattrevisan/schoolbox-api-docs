@@ -143,7 +143,10 @@ const activityLink = window.Vue.computed(() => {
             Due <time :datetime="activity.dueAt.atom || undefined">{{ activity.dueAt.relative }}</time>
         </p>
     </div>
-    <nav v-if="activity.progressTick !== null" class="progress-tick-container">
+    <nav v-if="props.canModify">
+        <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
+    </nav>
+    <nav v-else-if="activity.progressTick !== null" class="progress-tick-container">
         <form
             v-if="activity.progressTick.postRouteUrl !== ''"
             :action="activity.progressTick.postRouteUrl || undefined"
@@ -162,9 +165,6 @@ const activityLink = window.Vue.computed(() => {
             :class="'no-text progress-tick ' + activity.progressTick.progressClass"
             :title="getProgressTickMouseoverTitle(activity)"
         ></span>
-    </nav>
-    <nav v-if="props.canModify">
-        <a class="icon-close no-text" title="Unlink Assessment" @click.prevent="handleUnlinkClick()"></a>
     </nav>
 </template>
 
