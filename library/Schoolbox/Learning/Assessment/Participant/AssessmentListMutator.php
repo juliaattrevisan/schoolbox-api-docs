@@ -32,53 +32,25 @@ use Schoolbox\User;
 class AssessmentListMutator
 {
     /**
-     * The user for whom assessments are filtered; usually the logged-in user.
-     *
-     * @var User
-     */
-    private $user;
-
-    /**
-     * Helper class for determining visibility of assessments.
-     *
-     * @var Visibility
-     */
-    private $visibility;
-
-    /**
-     * The time at which to determine visibility for; usually now, but can be
-     * passed in constructor.
-     *
-     * @var Alaress_Date_Format
-     */
-    private $now;
-
-    /**
-     * Should closed assessments be shown?
-     *
-     * @var bool
-     */
-    private $showClosed;
-
-    /**
      * @var array<int,bool>
      */
-    private $visibilityCache = [];
+    private array $visibilityCache = [];
 
     /**
      * Constructor
      *
-     * @param User                $user
-     * @param Visibility          $visibility
-     * @param Alaress_Date_Format $now
-     * @param bool                $showClosed
+     * @param User                $user       The user for whom assessments are filtered; usually the logged-in user.
+     * @param Visibility          $visibility Helper class for determining visibility of assessments.
+     * @param Alaress_Date_Format $now        The time at which to determine visibility for; usually now, but can be passed in constructor.
+     * @param bool                $showClosed Should closed assessments be shown?
      */
-    public function __construct(User $user, Visibility $visibility, Alaress_Date_Format $now, bool $showClosed)
+    public function __construct(
+        private User $user,
+        private Visibility $visibility,
+        private Alaress_Date_Format $now,
+        private bool $showClosed
+    )
     {
-        $this->user       = $user;
-        $this->visibility = $visibility;
-        $this->now        = $now;
-        $this->showClosed = $showClosed;
     }
 
     /**
