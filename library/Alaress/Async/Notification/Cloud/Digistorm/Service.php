@@ -14,8 +14,10 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\Cloud\RateLimitException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
 use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use SensitiveParameter;
@@ -104,32 +106,7 @@ class Service extends AbstractService
                     RequestOptions::HEADERS => $headers,
                 ]
             );
-
-            // Check the response: maybe not all IDs exist?
-            // That might be an issue worth checking?
-            $responseContent = json_decode($response->getBody()->getContents(), true);
-            $errors          = $responseContent['errors'] ?? [];
-            $keyedErrors     = [];
-            if (is_iterable($errors)) {
-                foreach ($errors as $error) {
-                    if (isset($error['id'], $error['description'])) {
-                        $keyedErrors[$error['id']] = $error['description'];
-                    }
-                }
-            }
-            foreach ($tokens as $token) {
-                $reportToken = "$id@$token";
-                if (isset($keyedErrors[$token])) {
-                    $this->report(
-                        $reportToken,
-                        'Possible error: ' . $keyedErrors[$token]['description'],
-                        Logger::NOTICE,
-                        '?',
-                    );
-                } else {
-                    $this->report($reportToken, 'No error', Logger::NOTICE);
-                }
-            }
+            $this->reportOnResponse($response, $tokens, $id, true);
             return true;
         } catch (GuzzleException $e) {
             $responseCode = $e->getCode();
@@ -137,6 +114,11 @@ class Service extends AbstractService
                 // your API key is bad: don't try to do anything else
                 $this->getLog()->error('Received response code 401: this means the API key is incorrect');
                 throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            // Does this have a response? If so report on each token
+            if ($e instanceof RequestException) {
+                $this->reportOnResponse($e->getResponse(), $tokens, $id, false);
             }
 
             // Some error other than rate-limit? raise an error
@@ -147,6 +129,46 @@ class Service extends AbstractService
 
             // Throw a rate limit exception for later handling
             throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
+        }
+    }
+
+    /**
+     * Report on the errors (or absence of errors) in the response.
+     *
+     * @param ResponseInterface $response
+     * @param array             $tokens
+     * @param int               $id
+     * @param bool              $success  Was this successful in the first place?
+     * @return void
+     */
+    private function reportOnResponse(ResponseInterface $response, array $tokens, int $id, bool $success): void
+    {
+        // Check the response: maybe not all IDs exist?
+        // That might be an issue worth checking?
+        $responseContent = json_decode($response->getBody()->getContents(), true);
+        $errors          = $responseContent['errors'] ?? [];
+        $keyedErrors     = [];
+        if (is_iterable($errors)) {
+            foreach ($errors as $error) {
+                if (isset($error['id'], $error['description'])) {
+                    $keyedErrors[$error['id']] = $error['description'];
+                }
+            }
+        }
+        foreach ($tokens as $token) {
+            $reportToken = "$id@$token";
+            if (isset($keyedErrors[$token])) {
+                $this->report(
+                    $reportToken,
+                    'Error: ' . $keyedErrors[$token]['description'],
+                    Logger::NOTICE,
+                    '?',
+                );
+            } elseif ($success) {
+                $this->report($reportToken, 'No error', Logger::INFO);
+            } else {
+                $this->report($reportToken, 'Unknown error', Logger::NOTICE, '?');
+            }
         }
     }
 }
