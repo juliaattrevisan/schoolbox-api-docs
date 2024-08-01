@@ -19,7 +19,7 @@ class CronterpreterTest extends TestCase
     private array $testDataSets = [
         [
             // Tests for standard weekend [Sunday, Saturday] - implies weekdays are [Monday, Tuesday, Wednesday, Thursday, Friday].
-            'weekendDayIndexes' => [0, 6],
+            'weekendDays' => '0,6',
             'timeFormat' => 'g:ia',
             'data' => [
                 [
@@ -79,8 +79,8 @@ class CronterpreterTest extends TestCase
         ],
         [
              // Tests for custom weekend [Saturday, Sunday, Monday] - implies weekdays are [Tuesday, Wednesday, Thursday, Friday].
-            'weekendDayIndexes' => [6, 0, 1],
-             'timeFormat' => 'g:i a',
+            'weekendDays' => '6,0,1',
+            'timeFormat' => 'g:i a',
             'data' => [
                 [
                     // Crontab format is: 'minute hour dayOfMonth month dayOfWeek'.
@@ -145,10 +145,10 @@ class CronterpreterTest extends TestCase
      */
     public function testInterpretations(): void
     {
-        $cronterpreter = new Cronterpreter('g:ia', [0,6]);
+        $cronterpreter = new Cronterpreter('g:ia', '0,6');
 
         foreach ($this->testDataSets as $testDataSet) {
-            $cronterpreter->setWeekendDayIndexes($testDataSet['weekendDayIndexes']);
+            $cronterpreter->setWeekendDayIndexes($testDataSet['weekendDays']);
             $cronterpreter->setTimeFormat($testDataSet['timeFormat']);
 
             foreach ($testDataSet['data'] as $pair) {

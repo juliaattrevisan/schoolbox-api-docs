@@ -20,12 +20,20 @@ use InvalidArgumentException;
  */
 class Cronterpreter
 {
+    private array $weekendDayIndexes;
+
     /**
      * @param string $timeFormat
-     * @param array  $weekendDayIndexes
+     *  - PHP time format string e.g. 'g:ia'.
+     *    This value should come straight out of the `config` db table for name 'date_time'.
+     * @param string $weekendDays
+     *  - Comma-separated string of integers representing days (0 = Sunday, 6 = Saturday).
+     *    This value should come straight out of the `config` db table for name 'locale_weekend'.
      */
-    public function __construct(protected string $timeFormat, protected array $weekendDayIndexes)
+    public function __construct(private string $timeFormat, private string $weekendDays)
     {
+        $this->setTimeFormat($timeFormat);
+        $this->setWeekendDayIndexes($weekendDays);
     }
 
     /**
@@ -39,7 +47,7 @@ class Cronterpreter
     /**
      * This *should* be set to config.date_time
      *
-     * @param string $timeFormat
+     * @param string $timeFormat - PHP time format string e.g. 'g:ia'.
      * @return static
      */
     public function setTimeFormat(string $timeFormat): static
@@ -57,12 +65,13 @@ class Cronterpreter
     }
 
     /**
-     * @param array $weekendDayIndexes
+     * @param string $weekendDays
+     *  - Comma-separated string of integers representing days (0 = Sunday, 6 = Saturday).
      * @return static
      */
-    public function setWeekendDayIndexes(array $weekendDayIndexes): static
+    public function setWeekendDayIndexes(string $weekendDays): static
     {
-        $this->weekendDayIndexes = $weekendDayIndexes;
+        $this->weekendDayIndexes = array_map('intval', explode(',', $weekendDays));
         return $this;
     }
 
