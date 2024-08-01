@@ -18,13 +18,6 @@ const emit = defineEmits(["modifyClicked"]);
 const store = useUnitPlannerStore();
 const textboxStore = useUnitPlannerTextboxStore();
 
-// Whether the textbox exists in the backend, or if it still needs to be created
-const textboxIsCreated = window.Vue.computed(() => {
-    return (
-        (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].textboxId || 0) >= 0
-    );
-});
-
 const contentIsFocused = window.Vue.computed(() => {
     return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
 });
@@ -54,7 +47,7 @@ const storeTextbox = window.Vue.computed(() => {
  */
 const displayActionBar = window.Vue.computed(() => {
     if (storeUnit.value === undefined) return false;
-    if (!textboxIsCreated.value) {
+    if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) {
         return storeUnit.value.textboxes._routes.createComponent && storeUnit.value.textboxes._routes.createTextbox;
     }
 
@@ -113,7 +106,7 @@ function onSaveClicked() {
             <button v-if="isContentSaving" class="button">Saving...</button>
             <button v-else-if="isCreatingTextbox" class="button">Creating...</button>
             <button
-                v-else-if="!textboxIsCreated"
+                v-else-if="!textboxStore.textboxIsCreated(props.unit.id, props.column)"
                 class="button"
                 :data-test="`unit-planner-textbox-action-create-${props.unit.id}-${props.column.id}`"
                 @click="onCreateClicked"

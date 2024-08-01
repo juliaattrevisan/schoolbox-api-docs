@@ -1,9 +1,23 @@
 import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
-import { TextboxContent } from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import { Column } from "../unitPlannerConfig";
+import type { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
+
+interface TextboxCreateComponentResponseJSON {
+    instanceID: number;
+}
+
+interface TextboxCreateTextboxResponseJSON {
+    id: number;
+    heading: string;
+    body: string;
+    folder: unknown; // It's set, but not relevant to us (should be an object)
+    _links: {
+        update: string;
+        delete: unknown; // It's set, but not relevant to us (should be a string)
+    };
+}
 
 export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore", () => {
     const unitPlannerStore = useUnitPlannerStore();
@@ -85,7 +99,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                     throw new Error(await extractErrorMessage(responseComponent));
                 }
 
-                const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
+                const responseComponentJSON = (await responseComponent.json()) as TextboxCreateComponentResponseJSON;
                 selectedTextbox.componentId = responseComponentJSON.instanceID;
             }
 
@@ -110,11 +124,17 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 throw new Error(await extractErrorMessage(response));
             }
 
-            // If we just created a textbox, then we need to update the store
-            // with the new textbox.
-            const responseJSON = (await response.json()) as TextboxContent;
-            responseJSON.inTemplate = true;
-            storeUnit.textboxes.items[column.label] = responseJSON;
+            // If we just created a textbox, then we need to update the store with the new textbox.
+            const responseJSON = (await response.json()) as TextboxCreateTextboxResponseJSON;
+            storeUnit.textboxes.items[column.label] = {
+                componentId: selectedTextbox.componentId,
+                textboxId: responseJSON.id,
+                body: responseJSON.body,
+                inTemplate: true,
+                _links: {
+                    update: responseJSON._links.update,
+                },
+            };
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
@@ -180,10 +200,31 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
     }
 
+    /**
+     * Determine for a given unit+column if the textbox exists in the backend
+     * @param { number } unitId - the unit to check the textbox for
+     * @param { Column } column - the column to check the textbox for
+     * @returns { boolean } true if the textbox and component exist, false otherwise
+     */
+    function textboxIsCreated(unitId: number, column: Column): boolean {
+        const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
+        if (!storeUnit) {
+            return false;
+        }
+
+        const selectedTextbox = storeUnit.textboxes.items[column.label];
+        if (!selectedTextbox) {
+            return false;
+        }
+
+        return selectedTextbox.textboxId >= 0 && selectedTextbox.componentId >= 0;
+    }
+
     return {
         unsavedTextboxes,
         createTextbox,
         updateTextboxContent,
         saveTextboxContent,
+        textboxIsCreated,
     };
 });

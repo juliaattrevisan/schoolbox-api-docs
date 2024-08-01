@@ -20,15 +20,6 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
-const storeUnit = window.Vue.computed(() => {
-    return store.units.find((unit) => unit.id === props.unit.id);
-});
-
-// Whether the textbox exists in the backend, or if it still needs to be created
-const textboxIsCreated = window.Vue.computed(() => {
-    return (storeUnit.value?.textboxes.items[props.column.label].textboxId || 0) >= 0;
-});
-
 const initialTextboxContent: string = props.unit.textboxes.items[props.column.label]?.body ?? "";
 
 const editorContent = window.Vue.ref(initialTextboxContent);
@@ -125,7 +116,7 @@ async function initEditor() {
  */
 async function focusEditor() {
     // Don't focus if the textbox hasn't been created yet
-    if (!textboxIsCreated.value) return;
+    if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) return;
 
     // Don't focus if the user doesn't have permission to edit the textbox
     if (props.unit.textboxes._routes.createTextbox === null) return;
@@ -148,7 +139,10 @@ defineExpose({ focusEditor, isEmpty });
 </script>
 
 <template>
-    <div class="editor-wrapper" :style="{ display: textboxIsCreated ? 'block' : 'none' }">
+    <div
+        class="editor-wrapper"
+        :style="{ display: textboxStore.textboxIsCreated(props.unit.id, props.column) ? 'block' : 'none' }"
+    >
         <media-article
             :id="editorId"
             ref="editorContentEl"
