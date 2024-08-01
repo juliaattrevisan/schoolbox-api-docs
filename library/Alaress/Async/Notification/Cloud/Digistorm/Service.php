@@ -147,24 +147,28 @@ class Service extends AbstractService
         // That might be an issue worth checking?
         $responseContent = json_decode($response->getBody()->getContents(), true);
         $errors          = $responseContent['errors'] ?? [];
-        $keyedErrors     = [];
+
+        // Report on each error
         if (is_iterable($errors)) {
             foreach ($errors as $error) {
                 if (isset($error['id'], $error['description'])) {
-                    $keyedErrors[$error['id']] = $error['description'];
+                    $this->report(
+                        "$id@{$error['id']}",
+                        'Error: ' . $error['description'],
+                        Logger::NOTICE,
+                        '?',
+                    );
+
+                    // Remove error ID from tokens, for later output
+                    $tokens = array_diff($tokens, [$error['id']]);
                 }
             }
         }
+
+        // Log existing tokens
         foreach ($tokens as $token) {
             $reportToken = "$id@$token";
-            if (isset($keyedErrors[$token])) {
-                $this->report(
-                    $reportToken,
-                    'Error: ' . $keyedErrors[$token]['description'],
-                    Logger::NOTICE,
-                    '?',
-                );
-            } elseif ($success) {
+            if ($success) {
                 $this->report($reportToken, 'No error', Logger::INFO);
             } else {
                 $this->report($reportToken, 'Unknown error', Logger::NOTICE, '?');
