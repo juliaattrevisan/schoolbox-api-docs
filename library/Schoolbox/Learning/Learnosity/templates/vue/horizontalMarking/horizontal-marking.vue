@@ -19,6 +19,7 @@ import HmNextItem from "./items/hm-next-item.vue";
 import HmFinaliseReview from "./items/hm-finalise-review.vue";
 
 interface Props {
+    assessmentId: number; // the assessment id
     title: string; // the title of the quiz
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
@@ -46,7 +47,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.submissionStates, props.statusPage);
+    store.init(props.assessmentId, props.submissionStates, props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into

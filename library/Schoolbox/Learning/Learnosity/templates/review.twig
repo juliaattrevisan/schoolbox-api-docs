@@ -35,6 +35,7 @@
     {% endif %}
     <div id="quiz-feedback-container">
         <quiz-feedback
+            :assessment-id="{{ assessment.id }}"
             :student="{{ student|json_encode }}"
             :report-init-options="{{ reportInitOptions }}"
             :item-responses="{{ itemResponses|json_encode }}"
