@@ -48,12 +48,10 @@
         {% if hasColourPicker %}
         document.querySelectorAll("[data-colour-picker]").forEach((el) => {
             document.dispatchEvent(
-                new CustomEvent("colourPickerInitialize", {
+                new CustomEvent("colourPickerInitialise", {
                     detail: {
-                        target: `#${el.id}`,
-                        options: {
-                            format: "rgb",
-                        }
+                        el: `#${el.id}`,
+                        format: "rgb"
                     }
                 })
             )

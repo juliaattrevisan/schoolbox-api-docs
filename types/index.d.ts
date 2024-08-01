@@ -22,7 +22,12 @@ declare global {
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
-            colourDefaults: { [key: string]: any };
+            colourDefaults: {
+                skin: string[];
+                skinUnique: string[];
+                constant: string[];
+                swatches: string[];
+            };
             editors: { [key: string]: Editor };
             hasEditorAI: true | undefined; // to display the AI features within the editor
             openAIModel: string | undefined; // chosen open AI model to use

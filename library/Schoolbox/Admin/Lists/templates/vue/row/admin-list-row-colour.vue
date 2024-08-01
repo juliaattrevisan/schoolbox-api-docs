@@ -4,6 +4,7 @@
  * Make use of v-model to keep track of <input> changes
  */
 import { mapActions } from "pinia";
+import { initColourPicker } from "@js/colour-picker/colourPickerEvent";
 import { useAdminListStore } from "../store/adminListStore";
 
 export default {
@@ -46,30 +47,15 @@ export default {
     },
 
     mounted() {
-        this.initColourPicker();
+        initColourPicker({
+            el: `#${this.uid}`,
+            alpha: false,
+            clearButton: true,
+        });
     },
 
     methods: {
         ...mapActions(useAdminListStore, ["getNewColourPickerId"]),
-
-        /**
-         * Set up the Coloris colour picker, passing in the required parameters
-         * Refer to https://coloris.js.org/ for further info
-         */
-        initColourPicker() {
-            document.dispatchEvent(
-                // dispatched to www/static/js/colour-picker/colour-picker.ts
-                new CustomEvent("colourPickerInitialize", {
-                    detail: {
-                        target: `#${this.uid}`,
-                        options: {
-                            alpha: false,
-                            clearButton: true,
-                        },
-                    },
-                })
-            );
-        },
     },
 };
 </script>

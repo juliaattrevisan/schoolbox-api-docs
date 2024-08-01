@@ -125,10 +125,9 @@
                         <input type="text" id="pantry-colour-picker" value="#86ACFF" required />
                         <script>
                             document.dispatchEvent(
-                                new CustomEvent("colourPickerInitialize", {
+                                new CustomEvent("colourPickerInitialise", {
                                     detail: {
-                                        target: `#pantry-colour-picker`,
-                                        options: {},
+                                        el: `#pantry-colour-picker`
                                     },
                                 })
                             );
