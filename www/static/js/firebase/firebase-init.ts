@@ -12,9 +12,11 @@ window.sbProps.firebaseApps.forEach((app) => {
 
             // Receipt of a message
             onMessage(messaging, (payload) => {
-                console.log("Message received. ", payload);
+                if (payload.notification === undefined) {
+                    return; // No notification to display
+                }
 
-                const notificationOptions = {
+                const notificationOptions: NotificationOptions = {
                     body: payload.notification.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
@@ -24,16 +26,15 @@ window.sbProps.firebaseApps.forEach((app) => {
                 if (payload.notification.timestamp !== "0") {
                     notificationOptions.timestamp = payload.notification.timestamp;
                 }
-                let notif = new Notification(payload.notification.title, notificationOptions);
+
+                // TODO: Fall back to site name instead of "Notification" if no title is provided
+                const notificationTitle: string = payload.notification.title ?? "Notification";
+
+                const notif = new Notification(notificationTitle, notificationOptions);
                 notif.onclick = (event) => {
-                    // debug log?
-                    console.log("On notification click: .ts");
                     event.preventDefault(); // prevent the browser from focusing the Notification's tab
                     // some notifications have a href, some don't just load the dashboard for those missing hrefs.
-                    const notifHref = payload.notification.href ?? "/";
-
-                    // debug log?
-                    console.log("opening: ", notifHref);
+                    const notifHref: string = payload.notification.href ?? "/";
 
                     // open the notification destination
                     window.open(notifHref, "_blank");
