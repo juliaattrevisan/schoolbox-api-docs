@@ -15,12 +15,16 @@ use Alaress\Async\Notification\Cloud\RateLimitException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use SensitiveParameter;
 
 /**
- * Digistorm notification service
+ * Digistorm notification service.
+ *
+ * Implements the Digistorm notifications API as documented on
+ * https://notifications.digistorm.io/docs/v1/Getting_Started.html.
  */
 class Service extends AbstractService
 {
@@ -105,18 +109,26 @@ class Service extends AbstractService
             // That might be an issue worth checking?
             $responseContent = json_decode($response->getBody()->getContents(), true);
             $errors          = $responseContent['errors'] ?? [];
-            if (is_iterable($errors) && count($errors) > 0) {
+            $keyedErrors     = [];
+            if (is_iterable($errors)) {
                 foreach ($errors as $error) {
-                    $this->getLog()->notice(
-                        sprintf(
-                            'Possible error response: %s: %s',
-                            $error['description'] ?? '',
-                            $error['id'] ?? '',
-                        )
-                    );
+                    if (isset($error['id'], $error['description'])) {
+                        $keyedErrors[$error['id']] = $error['description'];
+                    }
                 }
-            } else {
-                $this->getLog()->info('Sent successfully');
+            }
+            foreach ($tokens as $token) {
+                $reportToken = "$id@$token";
+                if (isset($keyedErrors[$token])) {
+                    $this->report(
+                        $reportToken,
+                        'Possible error: ' . $keyedErrors[$token]['description'],
+                        Logger::NOTICE,
+                        '?',
+                    );
+                } else {
+                    $this->report($reportToken, 'No error', Logger::NOTICE);
+                }
             }
             return true;
         } catch (GuzzleException $e) {
