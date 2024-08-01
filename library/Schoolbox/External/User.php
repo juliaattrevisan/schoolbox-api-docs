@@ -40,11 +40,7 @@ class User
         private ?\External_User $externalUser = null,
         private ?UserMapper $userMapper = null
     ) {
-        $this->externalType = $externalType;
-        $this->externalClass = $externalClass;
-        $this->externalUser = $externalUser;
-        $this->userMapper = $userMapper;
-        //if we are in a space where we are not injecting, spawn these classes correctly...
+        // If we are in a space where we are not injecting, spawn these classes correctly...
         if (null === $externalType) {
             $this->externalType = ConfigMapper::getInstance()->getConfigLoader()->get('external_type');
         }
