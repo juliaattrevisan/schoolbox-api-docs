@@ -51,8 +51,7 @@ class AssessmentListMutator
         private readonly ExternalUser $externalUser,
         private readonly Alaress_Date_Format $now,
         private readonly bool $showClosed
-    )
-    {
+    ) {
     }
 
     /**
