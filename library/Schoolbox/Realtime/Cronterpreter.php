@@ -30,7 +30,7 @@ class Cronterpreter
      *  - Comma-separated string of integers representing days (0 = Sunday, 6 = Saturday).
      *    This value should come straight out of the `config` db table for name 'locale_weekend'.
      */
-    public function __construct(private string $timeFormat, private string $weekendDays)
+    public function __construct(private string $timeFormat, string $weekendDays)
     {
         $this->setTimeFormat($timeFormat);
         $this->setWeekendDayIndexes($weekendDays);
