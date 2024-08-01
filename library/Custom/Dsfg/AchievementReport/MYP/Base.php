@@ -39,7 +39,6 @@ class Base extends AchievementReportBase
         $query = "
             SELECT
                 ID,
-                ClassCampus,
                 ClassCode,
                 SubjectName,
                 Overview,
@@ -47,11 +46,10 @@ class Base extends AchievementReportBase
                 ShortHeading,
                 HdgAbbrev1,
                 ResultNumeric,
-                -- Comment,
                 StaffMailNamePrimary,
                 StaffEmail
             FROM
-                uvSchoolBoxMYPResults
+                uvSchoolBoxMYPResults_CurrentOverview
             WHERE
                 SubjectName IS NOT NULL
                 AND ID = :externalId
