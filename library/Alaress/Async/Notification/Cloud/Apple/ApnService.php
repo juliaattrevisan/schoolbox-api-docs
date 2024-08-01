@@ -129,11 +129,11 @@ class ApnService extends AbstractService
             $prefix   = "$id@$token";
             try {
                 $sender->send($receiver, $notification);
-                $this->report($prefix, "All ok!", Logger::DEBUG);
+                $this->report($prefix, "All ok!", Logger::INFO);
             } catch (\Exception $e) {
                 // Exception in doc block is SendNotificationException,
                 // but the actual exception thrown is HttpSenderException...
-                $this->report($prefix, 'Error: ' . $e->getMessage(), Logger::INFO, '?');
+                $this->report($prefix, 'Error: ' . $e->getMessage(), Logger::NOTICE, '?');
             }
         }
         return true;

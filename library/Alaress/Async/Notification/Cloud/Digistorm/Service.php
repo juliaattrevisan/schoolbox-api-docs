@@ -105,7 +105,7 @@ class Service extends AbstractService
             // That might be an issue worth checking?
             $responseContent = json_decode($response->getBody()->getContents(), true);
             $errors          = $responseContent['errors'] ?? [];
-            if (is_iterable($errors)) {
+            if (is_iterable($errors) && count($errors) > 0) {
                 foreach ($errors as $error) {
                     $this->getLog()->notice(
                         sprintf(
@@ -115,6 +115,8 @@ class Service extends AbstractService
                         )
                     );
                 }
+            } else {
+                $this->getLog()->info('Sent successfully');
             }
             return true;
         } catch (GuzzleException $e) {
