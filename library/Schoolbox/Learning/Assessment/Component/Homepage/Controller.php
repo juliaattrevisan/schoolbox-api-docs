@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -92,7 +93,14 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $user    = $this->getUser();
-        $mutator = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
+        $mutator = new AssessmentListMutator(
+            $this->getUser(),
+            new Visibility($this->getAccess()),
+            new ExternalUser(),
+            $now,
+            $showClosed
+        );
+
         $this->assessments = $this->getAssessmentMapper()
             ->findAllByFolderIdForReview(
                 $this->getSource()->getId(),

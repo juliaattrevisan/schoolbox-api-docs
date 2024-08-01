@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -99,7 +100,13 @@ class AssessmentListMutatorTest extends TestCase
                 return $v->getId() === 1;
             });
 
-        $mutator = new AssessmentListMutator($this->student, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator(
+            $this->student,
+            $mockVisibility,
+            new ExternalUser(),
+            \Alaress_Date_Format::now(),
+            true
+        );
 
         // Mapping: won't have filtered any participants
         $mappedAssessments = $this->assessments->map([$mutator, 'map']);
@@ -132,7 +139,13 @@ class AssessmentListMutatorTest extends TestCase
                 return $v->getId() === 2;
             });
 
-        $mutator = new AssessmentListMutator($this->parent, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator(
+            $this->parent,
+            $mockVisibility,
+            new ExternalUser(),
+            \Alaress_Date_Format::now(),
+            true
+        );
 
         // Mapping: has filtered out $parent's child from assessment 1
         $mappedAssessments = $this->assessments->map([$mutator, 'map']);

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use Alaress_Date_Format;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -45,10 +46,11 @@ class AssessmentListMutator
      * @param bool                $showClosed Should closed assessments be shown?
      */
     public function __construct(
-        private User $user,
-        private Visibility $visibility,
-        private Alaress_Date_Format $now,
-        private bool $showClosed
+        private readonly User $user,
+        private readonly Visibility $visibility,
+        private readonly ExternalUser $externalUser,
+        private readonly Alaress_Date_Format $now,
+        private readonly bool $showClosed
     )
     {
     }
@@ -78,7 +80,7 @@ class AssessmentListMutator
 
         if ($this->user->getRole()->isParent()) {
             // Check if the user's children have been loaded, and attempt to load them if not.
-            (new \Schoolbox\External\User())->loadChildren([$this->user]);
+            $this->externalUser->loadChildren([$this->user]);
 
             // Unset children who don't have visibility, and set visibility based on that factor.
             foreach ($this->user->getChildren() as $child) {
