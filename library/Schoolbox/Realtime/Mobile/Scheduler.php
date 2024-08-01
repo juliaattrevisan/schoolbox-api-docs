@@ -102,6 +102,16 @@ class Scheduler extends AbstractScheduler implements IConsumer
             $resolver->acknowledge();
             return;
         }
+
+        $this->log->info(
+            sprintf(
+                'Received message (hash: %s:%s, topic: %s)',
+                $payload->getBaseHash(),
+                $payload->getParamHash(),
+                !empty($payload->getTopics()) ? $payload->getTopics()[0] : '',
+            )
+        );
+
         if (!is_array($context)) {
             $this->log->warning('Message received has no context, thus receiving user cannot be determined: not retrying delivery');
             $resolver->acknowledge();
