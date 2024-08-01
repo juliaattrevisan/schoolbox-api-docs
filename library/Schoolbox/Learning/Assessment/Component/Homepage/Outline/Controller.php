@@ -18,7 +18,7 @@ use Component_Instance;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\User;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
