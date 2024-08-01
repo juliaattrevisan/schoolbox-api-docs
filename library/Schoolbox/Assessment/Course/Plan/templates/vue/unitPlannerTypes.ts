@@ -67,7 +67,7 @@ export type Unit = {
             createComponent: string | null;
             createTextbox: string | null;
         };
-        items: Record<string, TextboxContent>;
+        items: Partial<Record<string, TextboxContent>>;
     };
 
     extraTextboxes: number;

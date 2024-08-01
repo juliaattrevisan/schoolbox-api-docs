@@ -36,6 +36,15 @@ const contentIsSaved = window.Vue.computed(() => {
 const isCreatingTextbox = window.Vue.ref(false);
 const isContentSaving = window.Vue.ref(false);
 
+const storeUnit = window.Vue.computed(() => {
+    return store.units.find((unit) => unit.id === props.unit.id);
+});
+
+const storeTextbox = window.Vue.computed(() => {
+    if (storeUnit.value === undefined) return undefined;
+    return storeUnit.value.textboxes.items[props.column.label];
+});
+
 /**
  * Condition for displaying the action bar:
  * - If the textbox exists in the backend:
@@ -44,11 +53,13 @@ const isContentSaving = window.Vue.ref(false);
  *   allow if the textbox's modify route is set
  */
 const displayActionBar = window.Vue.computed(() => {
+    if (storeUnit.value === undefined) return false;
     if (!textboxIsCreated.value) {
-        return props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox;
+        return storeUnit.value.textboxes._routes.createComponent && storeUnit.value.textboxes._routes.createTextbox;
     }
 
-    return Boolean(props.unit.textboxes.items[props.column.label]._links.update ?? false);
+    if (storeTextbox.value === undefined) return false;
+    return storeTextbox.value._links.update !== null;
 });
 
 /**

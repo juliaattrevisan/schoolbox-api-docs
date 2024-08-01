@@ -46,9 +46,22 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             throw new Error("Unit not found");
         }
 
+        if (storeUnit.textboxes._routes.createComponent === null) {
+            throw new Error("No route to create a component");
+        }
+
+        if (storeUnit.textboxes._routes.createTextbox === null) {
+            throw new Error("No route to create a textbox");
+        }
+
         const selectedTextbox = storeUnit.textboxes.items[column.label];
+
+        if (selectedTextbox === undefined) {
+            throw new Error(`A textbox does not exist for the column '${column.label}'`);
+        }
+
         if (selectedTextbox.textboxId >= 0) {
-            return;
+            return; // The textbox already exists, no action required
         }
 
         activate("Creating text box...");
@@ -60,7 +73,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 formData.append("cid", storeUnit.folderId.toString());
                 formData.append("add", componentDefinition.toString());
 
-                const responseComponent = await fetch(`${storeUnit.textboxes._routes.createComponent}`, {
+                const responseComponent = await fetch(storeUnit.textboxes._routes.createComponent, {
                     method: "POST",
                     body: formData,
                     headers: {
@@ -73,12 +86,12 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 }
 
                 const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
-                storeUnit.textboxes.items[column.label].componentId = responseComponentJSON.instanceID;
+                selectedTextbox.componentId = responseComponentJSON.instanceID;
             }
 
             // Then create the textbox
             const response = await fetch(
-                `${storeUnit.textboxes._routes.createTextbox}/component/${storeUnit.textboxes.items[column.label].componentId}`,
+                `${storeUnit.textboxes._routes.createTextbox}/component/${selectedTextbox.componentId}`,
                 {
                     method: "POST",
                     body: JSON.stringify({
@@ -105,7 +118,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            timeout({ text: (error as Error).message, isSuccess: false });
         }
     }
 
@@ -121,6 +134,18 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
         const selectedTextbox = storeUnit.textboxes.items[column.label];
 
+        if (selectedTextbox === undefined) {
+            throw new Error(`A textbox does not exist for the column '${column.label}'`);
+        }
+
+        if (selectedTextbox.textboxId < 0) {
+            throw new Error("This textbox does not exist yet, it must be created first");
+        }
+
+        if (selectedTextbox._links.update === null) {
+            throw new Error("No route to update the textbox");
+        }
+
         const content = unsavedTextboxes.value[unitId]?.[column.id];
         if (content === undefined) {
             return;
@@ -129,8 +154,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         activate("Saving...");
 
         try {
-            let response = null;
-            response = await fetch(`${selectedTextbox._links.update}`, {
+            const response = await fetch(selectedTextbox._links.update, {
                 method: "PUT",
                 body: JSON.stringify({
                     body: content,
@@ -147,12 +171,12 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             }
 
             // To finish off, update the store with the new content and remove the unsaved state
-            storeUnit.textboxes.items[column.label].body = content;
+            selectedTextbox.body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
             timeout({ text: "Text box saved successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            timeout({ text: (error as Error).message, isSuccess: false });
         }
     }
 

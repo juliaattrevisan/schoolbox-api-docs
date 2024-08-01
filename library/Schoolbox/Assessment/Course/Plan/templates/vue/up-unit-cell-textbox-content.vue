@@ -29,7 +29,9 @@ const textboxIsCreated = window.Vue.computed(() => {
     return (storeUnit.value?.textboxes.items[props.column.label].textboxId || 0) >= 0;
 });
 
-const editorContent = window.Vue.ref(props.unit.textboxes.items[props.column.label].body);
+const initialTextboxContent: string = props.unit.textboxes.items[props.column.label]?.body ?? "";
+
+const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
@@ -152,7 +154,7 @@ defineExpose({ focusEditor, isEmpty });
             ref="editorContentEl"
             tag="div"
             class="editor-content"
-            :content="props.unit.textboxes.items[props.column.label].body"
+            :content="initialTextboxContent"
         ></media-article>
         <div class="clearfix"></div>
     </div>
