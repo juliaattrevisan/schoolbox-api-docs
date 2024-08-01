@@ -19,7 +19,7 @@
     /* make a little longer, only seen in the Link plugin for Link URL */
     --ck-input-width: 19rem;
     /* to sit above the side menus */
-    --ck-z-modal: 1003;
+    --ck-z-modal: var(--sbx-depth-ui-overlay);
 
     /* The colours that are referenced in the overrides below */
     --sb-ck-active: #cae3fa;
