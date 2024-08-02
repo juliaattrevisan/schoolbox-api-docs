@@ -95,24 +95,24 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('award.reasonedBy.pronoun', 'awrbp')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
-            INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
+            INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr', true)}
             LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'r', 'rp')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar', true)}
             LEFT JOIN {$this->getJoinSql('awardedBy.pronoun', 'a', 'ap')}
             LEFT  JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
-            LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'rb', 'rbr')}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'rb', 'rbr', true)}
             LEFT  JOIN {$this->getJoinSql('reasonedBy.pronoun', 'rb', 'rbp')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
             LEFT  JOIN {$this->getJoinSql('award.badge', 'aw', 'awb')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
-            LEFT  JOIN {$this->getJoinSql('award.recipient.role', 'awr', 'awrr')}
+            LEFT  JOIN {$this->getJoinSql('award.recipient.role', 'awr', 'awrr', true)}
             LEFT  JOIN {$this->getJoinSql('award.recipient.pronoun', 'awr', 'awrp')}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy', 'aw', 'awa', true)}
-            LEFT  JOIN {$this->getJoinSql('award.awardedBy.role', 'awa', 'awar')}
+            LEFT  JOIN {$this->getJoinSql('award.awardedBy.role', 'awa', 'awar', true)}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy.pronoun', 'awa', 'awap')}
             LEFT  JOIN {$this->getJoinSql('award.reasonedBy', 'aw', 'awrb', true)}
-            LEFT  JOIN {$this->getJoinSql('award.reasonedBy.role', 'awrb', 'awrbr')}
+            LEFT  JOIN {$this->getJoinSql('award.reasonedBy.role', 'awrb', 'awrbr', true)}
             LEFT  JOIN {$this->getJoinSql('award.reasonedBy.pronoun', 'awrb', 'awrbp')}
         ";
     }
