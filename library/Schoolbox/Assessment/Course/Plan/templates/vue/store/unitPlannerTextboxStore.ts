@@ -1,9 +1,23 @@
 import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import { Column } from "../unitPlannerConfig";
+import type { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
-import {TextboxContent} from "@schoolboxAssessment/Course/Plan/templates/vue/unitPlannerTypes";
+
+interface TextboxCreateComponentResponseJSON {
+    instanceID: number;
+}
+
+interface TextboxCreateTextboxResponseJSON {
+    id: number;
+    heading: string;
+    body: string;
+    folder: unknown; // It's set, but not relevant to us (should be an object)
+    _links: {
+        update: string;
+        delete: unknown; // It's set, but not relevant to us (should be a string)
+    };
+}
 
 export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore", () => {
     const unitPlannerStore = useUnitPlannerStore();
@@ -46,36 +60,52 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             throw new Error("Unit not found");
         }
 
+        if (storeUnit.textboxes._routes.createComponent === null) {
+            throw new Error("No route to create a component");
+        }
+
+        if (storeUnit.textboxes._routes.createTextbox === null) {
+            throw new Error("No route to create a textbox");
+        }
+
         const selectedTextbox = storeUnit.textboxes.items[column.label];
-        if (selectedTextbox.id >= 0) {
-            return;
+
+        if (selectedTextbox === undefined) {
+            throw new Error(`A textbox does not exist for the column '${column.label}'`);
+        }
+
+        if (selectedTextbox.textboxId >= 0) {
+            return; // The textbox already exists, no action required
         }
 
         activate("Creating text box...");
 
         try {
-            // First create a new component
-            const formData = new FormData();
-            formData.append("cid", storeUnit.folderId.toString());
-            formData.append("add", componentDefinition.toString());
+            // First create a new component if it doesn't already exist
+            if (selectedTextbox.componentId < 0) {
+                const formData = new FormData();
+                formData.append("cid", storeUnit.folderId.toString());
+                formData.append("add", componentDefinition.toString());
 
-            const responseComponent = await fetch(`${storeUnit.textboxes._routes.createComponent}`, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    Accept: "application/json",
-                },
-            });
+                const responseComponent = await fetch(storeUnit.textboxes._routes.createComponent, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Accept: "application/json",
+                    },
+                });
 
-            if (!responseComponent.ok) {
-                throw new Error(await extractErrorMessage(responseComponent));
+                if (!responseComponent.ok) {
+                    throw new Error(await extractErrorMessage(responseComponent));
+                }
+
+                const responseComponentJSON = (await responseComponent.json()) as TextboxCreateComponentResponseJSON;
+                selectedTextbox.componentId = responseComponentJSON.instanceID;
             }
-
-            const responseComponentJSON = (await responseComponent.json()) as { instanceID: number };
 
             // Then create the textbox
             const response = await fetch(
-                `${storeUnit.textboxes._routes.createTextbox}/component/${responseComponentJSON.instanceID}`,
+                `${storeUnit.textboxes._routes.createTextbox}/component/${selectedTextbox.componentId}`,
                 {
                     method: "POST",
                     body: JSON.stringify({
@@ -94,15 +124,21 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 throw new Error(await extractErrorMessage(response));
             }
 
-            // If we just created a textbox, then we need to update the store
-            // with the new textbox.
-            let responseJSON = (await response.json()) as TextboxContent;
-            responseJSON.inTemplate = true;
-            storeUnit.textboxes.items[column.label] = responseJSON;
+            // If we just created a textbox, then we need to update the store with the new textbox.
+            const responseJSON = (await response.json()) as TextboxCreateTextboxResponseJSON;
+            storeUnit.textboxes.items[column.label] = {
+                componentId: selectedTextbox.componentId,
+                textboxId: responseJSON.id,
+                body: responseJSON.body,
+                inTemplate: true,
+                _links: {
+                    update: responseJSON._links.update,
+                },
+            };
 
             timeout({ text: "Text box created successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            timeout({ text: (error as Error).message, isSuccess: false });
         }
     }
 
@@ -118,6 +154,18 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         }
         const selectedTextbox = storeUnit.textboxes.items[column.label];
 
+        if (selectedTextbox === undefined) {
+            throw new Error(`A textbox does not exist for the column '${column.label}'`);
+        }
+
+        if (selectedTextbox.textboxId < 0) {
+            throw new Error("This textbox does not exist yet, it must be created first");
+        }
+
+        if (selectedTextbox._links.update === null) {
+            throw new Error("No route to update the textbox");
+        }
+
         const content = unsavedTextboxes.value[unitId]?.[column.id];
         if (content === undefined) {
             return;
@@ -126,8 +174,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         activate("Saving...");
 
         try {
-            let response = null;
-            response = await fetch(`${selectedTextbox._links.update}`, {
+            const response = await fetch(selectedTextbox._links.update, {
                 method: "PUT",
                 body: JSON.stringify({
                     body: content,
@@ -144,13 +191,33 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             }
 
             // To finish off, update the store with the new content and remove the unsaved state
-            storeUnit.textboxes.items[column.label].body = content;
+            selectedTextbox.body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
             timeout({ text: "Text box saved successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            timeout({ text: (error as Error).message, isSuccess: false });
         }
+    }
+
+    /**
+     * Determine for a given unit+column if the textbox exists in the backend
+     * @param { number } unitId - the unit to check the textbox for
+     * @param { Column } column - the column to check the textbox for
+     * @returns { boolean } true if the textbox and component exist, false otherwise
+     */
+    function textboxIsCreated(unitId: number, column: Column): boolean {
+        const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
+        if (!storeUnit) {
+            return false;
+        }
+
+        const selectedTextbox = storeUnit.textboxes.items[column.label];
+        if (!selectedTextbox) {
+            return false;
+        }
+
+        return selectedTextbox.textboxId >= 0 && selectedTextbox.componentId >= 0;
     }
 
     return {
@@ -158,5 +225,6 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
         createTextbox,
         updateTextboxContent,
         saveTextboxContent,
+        textboxIsCreated,
     };
 });

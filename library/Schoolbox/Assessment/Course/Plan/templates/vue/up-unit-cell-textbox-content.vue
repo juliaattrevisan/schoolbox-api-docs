@@ -20,16 +20,9 @@ interface Props {
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
 
-const storeUnit = window.Vue.computed(() => {
-    return store.units.find((unit) => unit.id === props.unit.id);
-});
+const initialTextboxContent: string = props.unit.textboxes.items[props.column.label]?.body ?? "";
 
-// Whether the textbox exists in the backend, or if it still needs to be created
-const textboxIsCreated = window.Vue.computed(() => {
-    return (storeUnit.value?.textboxes.items[props.column.label].id || 0) >= 0;
-});
-
-const editorContent = window.Vue.ref(props.unit.textboxes.items[props.column.label].body);
+const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
@@ -123,7 +116,7 @@ async function initEditor() {
  */
 async function focusEditor() {
     // Don't focus if the textbox hasn't been created yet
-    if (!textboxIsCreated.value) return;
+    if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) return;
 
     // Don't focus if the user doesn't have permission to edit the textbox
     if (props.unit.textboxes._routes.createTextbox === null) return;
@@ -146,13 +139,16 @@ defineExpose({ focusEditor, isEmpty });
 </script>
 
 <template>
-    <div class="editor-wrapper" :style="{ display: textboxIsCreated ? 'block' : 'none' }">
+    <div
+        class="editor-wrapper"
+        :style="{ display: textboxStore.textboxIsCreated(props.unit.id, props.column) ? 'block' : 'none' }"
+    >
         <media-article
             :id="editorId"
             ref="editorContentEl"
             tag="div"
             class="editor-content"
-            :content="props.unit.textboxes.items[props.column.label].body"
+            :content="initialTextboxContent"
         ></media-article>
         <div class="clearfix"></div>
     </div>

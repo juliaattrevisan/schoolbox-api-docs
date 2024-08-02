@@ -18,11 +18,6 @@ const emit = defineEmits(["modifyClicked"]);
 const store = useUnitPlannerStore();
 const textboxStore = useUnitPlannerTextboxStore();
 
-// Whether the textbox exists in the backend, or if it still needs to be created
-const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].id || 0) >= 0;
-});
-
 const contentIsFocused = window.Vue.computed(() => {
     return (store.focusedUnitCells[props.unit.id] ?? []).includes(props.column.id);
 });
@@ -34,19 +29,30 @@ const contentIsSaved = window.Vue.computed(() => {
 const isCreatingTextbox = window.Vue.ref(false);
 const isContentSaving = window.Vue.ref(false);
 
+const storeUnit = window.Vue.computed(() => {
+    return store.units.find((unit) => unit.id === props.unit.id);
+});
+
+const storeTextbox = window.Vue.computed(() => {
+    if (storeUnit.value === undefined) return undefined;
+    return storeUnit.value.textboxes.items[props.column.label];
+});
+
 /**
  * Condition for displaying the action bar:
- * * If the textbox exists in the backend:
+ * - If the textbox exists in the backend:
  *   allow if the create component and textbox routes are set
- * * Otherwise:
+ * - Otherwise:
  *   allow if the textbox's modify route is set
  */
 const displayActionBar = window.Vue.computed(() => {
-    if (!textboxIsCreated.value) {
-        return (props.unit.textboxes._routes.createComponent && props.unit.textboxes._routes.createTextbox);
+    if (storeUnit.value === undefined) return false;
+    if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) {
+        return storeUnit.value.textboxes._routes.createComponent && storeUnit.value.textboxes._routes.createTextbox;
     }
 
-    return Boolean(props.unit.textboxes.items[props.column.label]._links.update ?? false);
+    if (storeTextbox.value === undefined) return false;
+    return storeTextbox.value._links.update !== null;
 });
 
 /**
@@ -91,7 +97,7 @@ function onSaveClicked() {
 </script>
 
 <template>
-    <div class="component-action" v-if="displayActionBar">
+    <div v-if="displayActionBar" class="component-action">
         <section>
             <button v-if="!contentIsSaved && !isContentSaving" data-role="dirty-indicator" disabled>
                 Changes not saved
@@ -100,7 +106,7 @@ function onSaveClicked() {
             <button v-if="isContentSaving" class="button">Saving...</button>
             <button v-else-if="isCreatingTextbox" class="button">Creating...</button>
             <button
-                v-else-if="!textboxIsCreated"
+                v-else-if="!textboxStore.textboxIsCreated(props.unit.id, props.column)"
                 class="button"
                 :data-test="`unit-planner-textbox-action-create-${props.unit.id}-${props.column.id}`"
                 @click="onCreateClicked"

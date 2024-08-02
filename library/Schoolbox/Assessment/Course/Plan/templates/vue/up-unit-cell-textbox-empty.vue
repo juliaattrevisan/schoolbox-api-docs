@@ -8,6 +8,7 @@
 import type { Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
 
 interface Props {
     unit: Unit;
@@ -16,12 +17,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useUnitPlannerStore();
+const textboxStore = useUnitPlannerTextboxStore();
 const emit = defineEmits(["modifyClicked", "createClicked"]);
-
-// Whether the textbox exists in the backend, or if it still needs to be created
-const textboxIsCreated = window.Vue.computed(() => {
-    return (store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label].id || 0) >= 0;
-});
 
 const emptyStateTemplateMessage = window.Vue.computed(() => {
     const unitTemplateTextbox = store.template?.textboxes.find((textbox) => textbox.heading === props.column.label);
@@ -36,7 +33,7 @@ function onModifyClicked() {
     // so that it can handle the action. E.g. focus the ckeditor
 
     // If the textbox was not created yet, send createClicked instead
-    if (!textboxIsCreated.value) {
+    if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) {
         emit("createClicked");
         return;
     }
