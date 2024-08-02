@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use Alaress_Date_Format;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -32,53 +33,26 @@ use Schoolbox\User;
 class AssessmentListMutator
 {
     /**
-     * The user for whom assessments are filtered; usually the logged-in user.
-     *
-     * @var User
-     */
-    private $user;
-
-    /**
-     * Helper class for determining visibility of assessments.
-     *
-     * @var Visibility
-     */
-    private $visibility;
-
-    /**
-     * The time at which to determine visibility for; usually now, but can be
-     * passed in constructor.
-     *
-     * @var Alaress_Date_Format
-     */
-    private $now;
-
-    /**
-     * Should closed assessments be shown?
-     *
-     * @var bool
-     */
-    private $showClosed;
-
-    /**
      * @var array<int,bool>
      */
-    private $visibilityCache = [];
+    private array $visibilityCache = [];
 
     /**
      * Constructor
      *
-     * @param User                $user
-     * @param Visibility          $visibility
-     * @param Alaress_Date_Format $now
-     * @param bool                $showClosed
+     * @param User                $user         The user for whom assessments are filtered; usually the logged-in user.
+     * @param Visibility          $visibility   Helper class for determining visibility of assessments.
+     * @param ExternalUser        $externalUser Helper class for finding children of parent users.
+     * @param Alaress_Date_Format $now          The time at which to determine visibility for; usually now, but can be passed in constructor.
+     * @param bool                $showClosed   Should closed assessments be shown?
      */
-    public function __construct(User $user, Visibility $visibility, Alaress_Date_Format $now, bool $showClosed)
-    {
-        $this->user       = $user;
-        $this->visibility = $visibility;
-        $this->now        = $now;
-        $this->showClosed = $showClosed;
+    public function __construct(
+        private readonly User $user,
+        private readonly Visibility $visibility,
+        private readonly ExternalUser $externalUser,
+        private readonly Alaress_Date_Format $now,
+        private readonly bool $showClosed
+    ) {
     }
 
     /**
@@ -99,21 +73,27 @@ class AssessmentListMutator
             $this->showClosed,
             $this->now
         );
+
         if ($this->visibilityCache[$assessmentId]) {
             return $assessment;
         }
 
-        // Unset children who don't have visibility, and set visibility
-        // based on that factor
-        foreach ($this->user->getChildren() as $child) {
-            if ($assessment->isParticipant($child)) {
-                if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
-                    $this->visibilityCache[$assessmentId] = true;
-                } else {
-                    $assessment->unsetUserParticipation($child);
+        if ($this->user->getRole()->isParent()) {
+            // Check if the user's children have been loaded, and attempt to load them if not.
+            $this->externalUser->loadChildren([$this->user]);
+
+            // Unset children who don't have visibility, and set visibility based on that factor.
+            foreach ($this->user->getChildren() as $child) {
+                if ($assessment->isParticipant($child)) {
+                    if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
+                        $this->visibilityCache[$assessmentId] = true;
+                    } else {
+                        $assessment->unsetUserParticipation($child);
+                    }
                 }
             }
         }
+
         return $assessment;
     }
 

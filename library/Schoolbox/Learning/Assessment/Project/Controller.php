@@ -16,6 +16,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
@@ -205,7 +206,13 @@ class Controller extends Assessment\Controller
         // filter out any sub-activities that have not yet been published
         $visibility    = new Assessment\Visibility($this->getAccess());
         $now           = Alaress_Date_Format::now();
-        $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
+        $mutator       = new Participant\AssessmentListMutator(
+            $this->getUser(),
+            $visibility,
+            new ExternalUser(),
+            $now,
+            true
+        );
         $classFolder          = $assessment->getBaseContext()->getFolder();
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
 

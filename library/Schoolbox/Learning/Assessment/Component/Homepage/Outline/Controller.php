@@ -18,6 +18,7 @@ use Component_Instance;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
@@ -194,7 +195,13 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             if ($this->readOnly) {
                 $now         = Alaress_Date_Format::now();
-                $mutator     = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, true);
+                $mutator     = new AssessmentListMutator(
+                    $this->getUser(),
+                    new Visibility($this->getAccess()),
+                    new ExternalUser(),
+                    $now,
+                    true
+                );
                 $user        = $this->getUser();
                 $assessments = $this->assessmentMapperProxy
                     ->findAllByUnitImplementationIdsForCourseOutline(

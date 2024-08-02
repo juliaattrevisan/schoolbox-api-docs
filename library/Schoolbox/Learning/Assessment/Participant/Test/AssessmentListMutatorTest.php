@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -17,6 +18,7 @@ use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class AssessmentListMutatorTest extends TestCase
@@ -36,6 +38,8 @@ class AssessmentListMutatorTest extends TestCase
      */
     private $assessments;
 
+    private $externalUser;
+
     /**
      * Set up student, parent, user methods
      */
@@ -43,9 +47,27 @@ class AssessmentListMutatorTest extends TestCase
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 
-        $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
-        $this->parent  = (new User())->setId(10)->setChildren(new GenericCollection(User::class));
+        // Create mock student user.
+        $studentRole = new Role();
+        $studentRole->setType(Role::STUDENT);
+        $this->student = (new User())->setId(9)
+            ->setRole($studentRole)
+            ->setChildren(new GenericCollection(User::class));
+
+        // Create mock parent user with child.
+        $parentRole = new Role();
+        $parentRole->setType(Role::PARENT);
+        $this->parent = (new User())->setId(10)
+            ->setRole($parentRole)
+            ->setChildren(new GenericCollection(User::class));
         $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
+
+        $this->externalUser = $this->createConfiguredMock(
+            ExternalUser::class,
+            [
+                'loadChildren' => $this->parent->getChildren()
+            ]
+        );
 
         // Set up assessments
         $assessment1 = new DueWork\Model();
@@ -87,7 +109,13 @@ class AssessmentListMutatorTest extends TestCase
                 return $v->getId() === 1;
             });
 
-        $mutator = new AssessmentListMutator($this->student, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator(
+            $this->student,
+            $mockVisibility,
+            $this->externalUser,
+            \Alaress_Date_Format::now(),
+            true
+        );
 
         // Mapping: won't have filtered any participants
         $mappedAssessments = $this->assessments->map([$mutator, 'map']);
@@ -120,7 +148,13 @@ class AssessmentListMutatorTest extends TestCase
                 return $v->getId() === 2;
             });
 
-        $mutator = new AssessmentListMutator($this->parent, $mockVisibility, \Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator(
+            $this->parent,
+            $mockVisibility,
+            $this->externalUser,
+            \Alaress_Date_Format::now(),
+            true
+        );
 
         // Mapping: has filtered out $parent's child from assessment 1
         $mappedAssessments = $this->assessments->map([$mutator, 'map']);

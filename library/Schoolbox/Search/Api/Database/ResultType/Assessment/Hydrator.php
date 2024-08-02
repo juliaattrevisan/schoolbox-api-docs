@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\External\User as ExternalUser;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -100,7 +101,13 @@ class Hydrator extends BaseHydrator
         //     - Should see assessments in units that they have permission to access
         // The Visibility class is relied on to check (most of the) above conditions.  However, it was found that this
         // check is insufficient, so more permission checks have been added below.
-        $mutator = new AssessmentListMutator($viewer, new Visibility($this->access), Alaress_Date_Format::now(), true);
+        $mutator = new AssessmentListMutator(
+            $viewer,
+            new Visibility($this->access),
+            new ExternalUser(),
+            Alaress_Date_Format::now(),
+            true
+        );
         $assessments = $assessments
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);
