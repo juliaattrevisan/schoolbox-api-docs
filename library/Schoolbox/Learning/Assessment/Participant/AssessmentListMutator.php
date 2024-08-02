@@ -40,10 +40,11 @@ class AssessmentListMutator
     /**
      * Constructor
      *
-     * @param User                $user       The user for whom assessments are filtered; usually the logged-in user.
-     * @param Visibility          $visibility Helper class for determining visibility of assessments.
-     * @param Alaress_Date_Format $now        The time at which to determine visibility for; usually now, but can be passed in constructor.
-     * @param bool                $showClosed Should closed assessments be shown?
+     * @param User                $user         The user for whom assessments are filtered; usually the logged-in user.
+     * @param Visibility          $visibility   Helper class for determining visibility of assessments.
+     * @param ExternalUser        $externalUser Helper class for finding children of parent users.
+     * @param Alaress_Date_Format $now          The time at which to determine visibility for; usually now, but can be passed in constructor.
+     * @param bool                $showClosed   Should closed assessments be shown?
      */
     public function __construct(
         private readonly User $user,
