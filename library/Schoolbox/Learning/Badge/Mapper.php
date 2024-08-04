@@ -127,10 +127,10 @@ class Mapper extends \Schoolbox\Mapper
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
+            INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr', true)}
             LEFT  JOIN {$this->getJoinSql('createdBy.pronoun', 'c', 'cp')}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
-            INNER JOIN {$this->getJoinSql('updatedBy.role', 'u', 'ur')}
+            INNER JOIN {$this->getJoinSql('updatedBy.role', 'u', 'ur', true)}
             LEFT  JOIN {$this->getJoinSql('updatedBy.pronoun', 'u', 'up')}
             LEFT JOIN {$this->getJoinSql('badge_year_level', '', 'byl')}
         ";
