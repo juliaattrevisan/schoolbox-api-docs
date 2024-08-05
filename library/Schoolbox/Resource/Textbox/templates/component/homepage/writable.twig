@@ -32,6 +32,10 @@
 
     <div class="component-action">
         <section>
+            {# Optionally show a Back To Top button if it was enabled #}
+            {% if component.config('showBackToTop') %}
+                <a class='button' href="#" target="_self">Back To Top</a>
+            {% endif %}
 
             {# This has a button-like styling, but isn't actually a button #}
             <button data-role="dirty-indicator" class="hide" disabled>Changes not saved</button>

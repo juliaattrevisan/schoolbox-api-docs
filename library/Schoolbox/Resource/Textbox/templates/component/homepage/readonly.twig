@@ -30,4 +30,15 @@
     <div class="content">
         <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
     </div>
+
+    {# Optionally show a Back To Top button if it was enabled
+     # So far, this is th e only reason to provide a component actions bar for readonly users
+     #}
+    {% if component.config('showBackToTop') %}
+        <div class="component-action">
+            <section>
+                <a class='button' href="#" target="_self">Back To Top</a>
+            </section>
+        </div>
+    {% endif %}
 {% endif %}

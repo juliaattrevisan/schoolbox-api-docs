@@ -487,7 +487,6 @@ abstract class Component_ControllerAbstract
         $configCount = 0;
 
         // Conditionally decide whether to render each config ingredient
-
         // If you didn't need to display it, don't iterate through every element and set it up, to save some processing
         // every config key has a corresponding controller and template to be called
 
