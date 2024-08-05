@@ -36,6 +36,7 @@
             :is-read-only="false"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="true"
+            :mark-type="{{ assessment.markScheme|json_encode }}"
             :submission-states="{{ errors|json_encode }}"
             :urls="{{ urls|json_encode }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"

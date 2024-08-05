@@ -22,6 +22,7 @@ interface Props {
     isReadOnly: boolean; // whether is in feedback mode, where the teacher can provide feedback to the student
     isReviewed: boolean; // whether the teacher has reviewed the attempt
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
+    markType: object; // the mark type to use for the student
     submissionStates: string[]; // the submission states that be used to override the automatically set mark
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
     statusPage?: string; // the status page to link to once user has finished marking
