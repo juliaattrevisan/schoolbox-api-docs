@@ -88,6 +88,7 @@ class Controller extends Base
      *
      * @param Values $params
      * @return void
+     * @throws MapperException\NotFound If param folder is set but doesn't exist.
      */
     private function createMail(Values $params)
     {
@@ -129,6 +130,7 @@ class Controller extends Base
             try {
                 $folder = $this->folderMapper->findById((int)$params->get('folderId'));
             } catch (MapperException $e) {
+                throw new MapperException\NotFound("Folder not found");
             }
         }
 
