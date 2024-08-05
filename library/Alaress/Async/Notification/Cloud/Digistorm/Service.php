@@ -143,30 +143,39 @@ class Service extends AbstractService
      */
     private function reportOnResponse(ResponseInterface $response, array $tokens, int $id, bool $success): void
     {
-        // Check the response: maybe not all IDs exist?
-        // That might be an issue worth checking?
         $responseContent = json_decode($response->getBody()->getContents(), true);
-        $errors          = $responseContent['errors'] ?? [];
+        if (!is_array($responseContent)) {
+            $this->getLog()->warning('Response could not be parsed as JSON');
+            return;
+        }
 
-        // Report on each error
+        // Extract errors from the response content
+        $errors = $responseContent['errors'] ?? [];
+
+        // Report on each error in the content
+        $seenErrors = [];
         if (is_iterable($errors)) {
             foreach ($errors as $error) {
                 if (isset($error['id'], $error['description'])) {
+                    $token = $error['id'];
                     $this->report(
-                        "$id@{$error['id']}",
+                        "$id@$token",
                         'Error: ' . $error['description'],
                         Logger::NOTICE,
                         '?',
                     );
 
-                    // Remove error ID from tokens, for later output
-                    $tokens = array_diff($tokens, [$error['id']]);
+                    // Don't log any other message for this token
+                    $seenErrors[$token] = true;
                 }
             }
         }
 
-        // Log existing tokens
+        // Log messages for tokens not seen in the errors
         foreach ($tokens as $token) {
+            if (isset($seenErrors[$token])) {
+                continue;
+            }
             $reportToken = "$id@$token";
             if ($success) {
                 $this->report($reportToken, 'No error', Logger::INFO);
