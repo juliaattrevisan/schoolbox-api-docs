@@ -93,6 +93,12 @@ $app = new class extends CliTool\App {
         // process a specified table,column for a specified object ID.
     }
 
+    /**
+     * Get the primary key for the db table, so when we update the fields, we can re inject correctly.
+     *
+     * @param string $table
+     * @return mixed
+     */
     private function getPrimKey(string $table)
     {
         $query = $this->database->prepareQuery(
@@ -102,6 +108,13 @@ $app = new class extends CliTool\App {
         return $query->fetchColumnArray('Column_name')[0];
     }
 
+    /**
+     * Find and return entries that contain base64 data
+     *
+     * @param string $table
+     * @param array $columns
+     * @return array
+     */
     private function findBase64(string $table, array $columns)
     {
         // get primary
