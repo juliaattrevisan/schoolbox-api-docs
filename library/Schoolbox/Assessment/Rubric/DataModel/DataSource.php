@@ -1226,8 +1226,8 @@ class DataSource
             $averageStatement = $this->database->prepare(
                 "
                 SELECT
-                    rcm.rubric_capability_id AS capability_id,
-                    rd.rubric_indicator_id AS indicator_id,
+                    rc.id AS capability_id,
+                    ri.id AS indicator_id,
                     a.id AS assessment_id,
                     a.due_date,
                     rim.value,
@@ -1236,14 +1236,14 @@ class DataSource
                     rd.description,
                     rl.name AS level
                 FROM       rubric_capability_mark rcm
-                JOIN       rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-                JOIN       rubric_indicator        ri ON ri.rubric_capability_id = rc.id
-                LEFT  JOIN rubric_indicator_mark  rim ON rcm.id = rim.rubric_capability_mark_id
-                LEFT  JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                LEFT  JOIN rubric_level            rl ON rd.level_id = rl.id
+                INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                INNER JOIN rubric_indicator        ri ON ri.rubric_capability_id = rc.id
                 INNER JOIN submission_return       sr ON rcm.return_id = sr.id
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
+                LEFT  JOIN rubric_indicator_mark  rim ON rcm.id = rim.rubric_capability_mark_id
+                LEFT  JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
+                LEFT  JOIN rubric_level            rl ON rd.level_id = rl.id
                 WHERE {$where}
                 AND rc.deleted_at IS NULL
                 AND ri.deleted_at IS NULL
