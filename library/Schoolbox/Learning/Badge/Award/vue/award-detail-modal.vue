@@ -405,21 +405,8 @@ export default {
                     <media-article v-if="award.badge.body" :content="award.badge.body"></media-article>
                     <div class="component-action">
                         <section>
-                            <a
-                                v-if="!hasAwardUpdateLink()"
-                                title="View award"
-                                class="button"
-                                :href="getViewAwardLink()"
-                            >
+                            <a v-if="!award.isGoal" title="View award" class="button" :href="getViewAwardLink()">
                                 View Award
-                            </a>
-                            <a
-                                v-else-if="hasAwardUpdateLink()"
-                                title="Add evidence"
-                                class="button"
-                                :href="getAddEvidenceLink()"
-                            >
-                                Add Evidence
                             </a>
                             <a
                                 v-if="hasGoalAwardLink() && isUnawardedGoal() && !hasEvidence(award)"
