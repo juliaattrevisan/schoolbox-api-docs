@@ -1299,6 +1299,8 @@ class DataSource
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
                 WHERE {$where}
+                AND sr.deleted_at IS NULL
+                AND a.deleted_at IS NULL
                 ORDER BY a.due_date ASC;
             "
             );
