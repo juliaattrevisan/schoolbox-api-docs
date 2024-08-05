@@ -1257,10 +1257,7 @@ class DataSource
             while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
                 if (
                     !isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']])
-                    // Coalesce to 0 below to avoid "Undefined array key 'max_value'" warning found in logs.
-                    // The error will occur if the query above finds capabilities not found by the first query.
-                    // Should all required capabilities have been found by the first query?  Not sure.
-                    && ($longitude[$row['capability_id']]['max_value'][$row['assessment_id']] ?? 0) > 0
+                    && $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] > 0
                     && $row['capability_value'] !== null
                     && isset($dueWorks[$row['assessment_id']])
                 ) {
