@@ -375,12 +375,7 @@ class TimetableUsers
                          * of the mutations. This does not affect timetables, just
                          * folder access and shortcuts.
                          */
-                        $superposition = array_merge($manifest, $data['usuals']);
-
-                        new \Alaress_Probe('externalId', 'eventid', 'usuals', 'overrides', 'manifest', 'superposition');
-                        new \Alaress_Probe($user->getExternalId(), $eventId, $data['usuals'], $overrides, $manifest, array_merge($manifest, $data['usuals']));
-                        new \Alaress_Probe($user->getExternalId(), $eventId, $data['usuals'], $overrides, $manifest, $manifest + $data['usuals']);
-                        new \Alaress_Probe('<hr>');
+                        $superposition = $manifest + $data['usuals'];
 
                         $data['manifest'][$eventId] = $superposition;
 
