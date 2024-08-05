@@ -377,6 +377,11 @@ class TimetableUsers
                          */
                         $superposition = array_merge($manifest, $data['usuals']);
 
+                        new \Alaress_Probe('externalId', 'eventid', 'usuals', 'overrides', 'manifest', 'superposition');
+                        new \Alaress_Probe($user->getExternalId(), $eventId, $data['usuals'], $overrides, $manifest, array_merge($manifest, $data['usuals']));
+                        new \Alaress_Probe($user->getExternalId(), $eventId, $data['usuals'], $overrides, $manifest, $manifest + $data['usuals']);
+                        new \Alaress_Probe('<hr>');
+
                         $data['manifest'][$eventId] = $superposition;
 
                         /* If you were involved in this class at any point within the
