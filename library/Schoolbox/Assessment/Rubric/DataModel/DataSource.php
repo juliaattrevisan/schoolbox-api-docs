@@ -1179,7 +1179,7 @@ class DataSource
                     vr.assessment_mark_type AS mark_type,
                     vr.indicator_max_value AS max_value
                 FROM v_rubric vr
-                JOIN assessment a ON vr.assessment_id = a.id
+                INNER JOIN assessment a ON vr.assessment_id = a.id
                 WHERE {$where}
                 AND a.deleted_at IS NULL
                 ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence, a.id;
