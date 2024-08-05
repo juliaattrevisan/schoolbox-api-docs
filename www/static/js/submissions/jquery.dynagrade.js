@@ -110,7 +110,7 @@
         sortedConf.sort(function (a, b) {
             return b.lowerBound - a.lowerBound;
         });
-
+        console.warn(sortedConf);
         $.each(conf, function (k, v) {
             var lowerBound = Number(v.lowerBound),
                 caption = v.caption;

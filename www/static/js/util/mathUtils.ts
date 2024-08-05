@@ -22,7 +22,7 @@ export function isRounded(value: number): boolean {
  * @returns {string} - the percentage, for example 30% or 45.67%
  */
 export function getPercentage(value: number, max: number, decimalPlaces: number = 2): string {
-    const invalidValue = "0%";
+    const invalidValue = "-";
     // check if both are numbers
     if (typeof value !== "number" || typeof max !== "number") {
         return invalidValue;
