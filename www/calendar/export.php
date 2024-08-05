@@ -205,10 +205,8 @@ try {
     }
 
     // Report errors in this thing
-    /** @var HubInterface|null $sentry */
-    $sentry = $kernel->getDependencyInjector()->has('sentry')
-        ? $kernel->getDependencyInjector()->get('sentry')
-        : null;
+    /** @var HubInterface $sentry */
+    $sentry = $kernel->getDependencyInjector()->get('sentry');
 
     switch ($export_type) {
         case 'personal':

@@ -298,11 +298,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     throw $e;
                 }
 
-                if ($this->getPage()->getDi()->has('sentry')) {
-                    /** @var HubInterface $sentry */
-                    $sentry = $this->getPage()->getDi()->get('sentry');
-                    $sentry->captureException($e);
-                }
+                /** @var HubInterface $sentry */
+                $sentry = $this->getPage()->getDi()->get('sentry');
+                $sentry->captureException($e);
             }
         }
 

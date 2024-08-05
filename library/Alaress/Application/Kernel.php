@@ -237,7 +237,7 @@ abstract class Kernel
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
-        $this->installDependencies($this->di);
+        static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
     }
@@ -395,7 +395,7 @@ abstract class Kernel
      * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function installDependencies(Di\Container $di): Di\Container
+    public static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();
@@ -421,16 +421,6 @@ abstract class Kernel
         $di->set('redis.signalQueue.pub', function () {
             return Redis::getSignalQueueClientInstance();
         });
-
-        // Default Redis connection:
-        // uses cache, and raises a warning telling you to choose a connector
-        $di->set('redis', $di->lazy(function () use ($di) {
-            trigger_error(
-                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
-                E_USER_WARNING,
-            );
-            return $di->get('redis.storage');
-        }));
 
         $di->set(
             'moduleCache',
@@ -630,7 +620,7 @@ abstract class Kernel
             return $router->getGenerator();
         }));
 
-        $this->installSessionService($di);
+        static::installSessionService($di);
 
         // User from session
         $di->set(
@@ -960,7 +950,7 @@ abstract class Kernel
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
 
-                    $knownUserClasses = $this->getKnownUserClassesFromSession($di);
+                    $knownUserClasses = static::getKnownUserClassesFromSession($di);
 
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
@@ -1845,34 +1835,24 @@ abstract class Kernel
         );
 
 
-        // install sentry
-        $sentryClient  = null;
-        // `$sentryToken` and `$sentryProject` are never defined in PHPStan
-        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
-        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-        /** @phpstan-ignore-next-line */
-        if (\strlen($sentryToken) && \strlen($sentryProject)) {
-            // add sentry to the DI
-            $di->set(
-                'sentry',
-                $di->lazy(
-                    static function () use ($di, $sentryToken, $sentryProject) {
-                        try {
-                            /** @var Instance $sb */
-                            $sb = $di->get('instance');
-                            return (new \Alaress\Sentry\Factory())->build(
-                                $sb,
-                                Instance::APPLICATION_NAME,
-                                $sentryToken,
-                                $sentryProject
-                            );
-                        } catch (Di\Exception\ServiceNotFound $e) {
-                            // do nothing; sentry is not installed
-                        }
-                    }
-                )
-            );
-        }
+        // add sentry to the DI
+        $di->set(
+            'sentry',
+            $di->lazy(
+                static function () use ($di) {
+                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
+                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
+                    /** @var Instance $sb */
+                    $sb = $di->get('instance');
+                    return (new \Alaress\Sentry\Factory())->build(
+                        $sb,
+                        Instance::APPLICATION_NAME,
+                        $sentryToken,
+                        $sentryProject,
+                    );
+                }
+            )
+        );
 
 
         // Filter factory factory
@@ -2176,7 +2156,7 @@ abstract class Kernel
      * @param Di\Container $di
      * @return array
      */
-    abstract protected function getKnownUserClassesFromSession(Di\Container $di): array;
+    abstract protected static function getKnownUserClassesFromSession(Di\Container $di): array;
 
 
     /**
@@ -2187,7 +2167,7 @@ abstract class Kernel
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotObject
      */
-    protected function installSessionService(Di\Container $di): Di\Container
+    protected static function installSessionService(Di\Container $di): Di\Container
     {
         $di->set(
             'session',

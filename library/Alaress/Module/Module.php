@@ -687,7 +687,7 @@ class Module
             ->setAuthorizer($container->get('authorizer'))
             ->setDi($container)
             ->setExceptionGenerator($container->get('mapperFactory')->get(ErrorMapper::class))
-            ->setSentry($container->has('sentry') ? $container->get('sentry') : null)
+            ->setSentry($container->get('sentry'))
             ->setIsJsonSpec(new IsJson())
             ->setIsXhrSpec(new IsXhr());
         return $controller;

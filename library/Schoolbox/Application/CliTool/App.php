@@ -521,10 +521,6 @@ abstract class App
      */
     protected function captureException(Throwable $e): ?EventId
     {
-        if (!$this->di->has('sentry')) {
-            return null;
-        }
-
         try {
             /** @var HubInterface $sentry */
             $sentry = $this->di->get('sentry');

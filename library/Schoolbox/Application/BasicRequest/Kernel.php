@@ -19,6 +19,7 @@ use GuzzleHttp;
 use League\Flysystem\Filesystem;
 use Proxy\Server as ProxyServer;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
@@ -80,7 +81,7 @@ class Kernel extends WebKernelAbstract
      * @throws Di\Exception\ServiceNotObject
      * @throws \RuntimeException
      */
-    protected function installDependencies(Di\Container $di): Di\Container
+    public static function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
         $config = new ConfigLoader();
@@ -101,15 +102,14 @@ class Kernel extends WebKernelAbstract
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
         $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
-        // Default Redis connection:
-        // uses cache, and raises a warning telling you to choose a connector
-        $di->set('redis', $di->lazy(function () use ($di) {
-            trigger_error(
-                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
-                E_USER_WARNING,
-            );
-            return $di->get('redis.storage');
-        }));
+        // User token generator
+        $di->set(
+            'user.tokenBuilder',
+            $di->lazyNew(
+                Jwt::class,
+                ['configLoader' => $config]
+            )
+        );
 
         // Task daemon message producer
         $di->set(
@@ -127,7 +127,10 @@ class Kernel extends WebKernelAbstract
             'taskd.messageFactory',
             $di->lazyNew(
                 MessageFactory::class,
-                ['instance' => $di->lazyGet('instance')],
+                [
+                    'instance'     => $di->lazyGet('instance'),
+                    'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                ],
             )
         );
 
@@ -217,7 +220,7 @@ class Kernel extends WebKernelAbstract
         );
 
         // Session
-        $this->installSessionService($di);
+        static::installSessionService($di);
 
         // User from session
         $di->set(
@@ -271,32 +274,24 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
-        // install sentry
-        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
-        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
-        /** @phpstan-ignore-next-line */
-        if (\strlen($sentryToken) && \strlen($sentryProject)) {
-            // add sentry to the DI
-            $di->set(
-                'sentry',
-                $di->lazy(
-                    static function () use ($di, $sentryToken, $sentryProject) {
-                        try {
-                            /** @var Instance $sb */
-                            $sb = $di->get('instance');
-                            return (new \Alaress\Sentry\Factory())->build(
-                                $sb,
-                                Instance::APPLICATION_NAME,
-                                $sentryToken,
-                                $sentryProject
-                            );
-                        } catch (Di\Exception\ServiceNotFound $e) {
-                            // do nothing; sentry is not installed
-                        }
-                    }
-                )
-            );
-        }
+        // add sentry to the DI
+        $di->set(
+            'sentry',
+            $di->lazy(
+                static function () use ($di) {
+                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
+                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
+                    /** @var Instance $sb */
+                    $sb = $di->get('instance');
+                    return (new \Alaress\Sentry\Factory())->build(
+                        $sb,
+                        Instance::APPLICATION_NAME,
+                        $sentryToken,
+                        $sentryProject,
+                    );
+                }
+            )
+        );
 
         // JWT parser
         $di->set(

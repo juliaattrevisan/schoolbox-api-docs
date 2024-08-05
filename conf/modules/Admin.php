@@ -69,6 +69,9 @@ class Admin extends ModuleLoader
         // Route list
         $this->loadModule($di, \Schoolbox\Admin\RouteSummary\Module::class, '/adminv2/routes');
 
+        // Dependency list
+        $this->loadModule($di, \Schoolbox\Admin\DependencySummary\Module::class, '/adminv2/dependencies');
+
         // Service Roster
         $this->loadModule($di, \Schoolbox\Admin\Service\Module::class, '/adminv2/service');
 
