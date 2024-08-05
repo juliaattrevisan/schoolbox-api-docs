@@ -111,10 +111,17 @@ class Service extends AbstractService
         } catch (GuzzleException $e) {
             $responseCode = $e->getCode();
             $this->getLog()->error(sprintf('Received response code %d', $responseCode));
+
+            // Special handling of specific response codes
             if ($responseCode === 401) {
                 // your API key is bad: don't try to do anything else
                 $this->getLog()->error('This response code likely means the API key is incorrect');
                 throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            // Some error other than rate-limit? raise an error
+            if ($responseCode === 429) {
+                throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
             }
 
             // Does this have a response? If so report on each token
@@ -122,14 +129,8 @@ class Service extends AbstractService
                 $this->reportOnResponse($e->getResponse(), $tokens, $id, false);
             }
 
-            // Some error other than rate-limit? raise an error
-            if ($responseCode !== 429) {
-                $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
-                return false;
-            }
-
-            // Throw a rate limit exception for later handling
-            throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
+            $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
+            return false;
         }
     }
 
