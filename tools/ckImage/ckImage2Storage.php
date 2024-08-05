@@ -37,37 +37,22 @@ $app = new class extends CliTool\App {
      * @var array[table][column]
      */
     private $CK_FIELDS = [
-        'config' => [
-                'value'
-        ],
-        'assess' => [
-                'description',
-                'completion_message'
-        ],
-        'assess_answer' => [ // surveys still exist
-                'answer'
-        ],
-        'assess_attempt' => [ // surveys still exist
-                'comment',
-                '_comment' // do we care about these deprecated fields?
-        ],
-        'assess_question' => [ // surveys still exist
-                'question'
-        ],
-        'assess_question_bank' => [ // surveys still exist
-                'question',
-                'answer'
-        ],
-        'assess_response' => [
-                'response', // serialised data... will need to think how we parse this :thinking_spin:
-                'comment'
-        ],
-        'assess_section' => [ // surveys still exist
-                'description'
-        ],
         'assessment' => [
-                'description'
-        ]
+            'description'
+        ],
+        'comms_news_article' => [
+            'body',
+        ],
+        'forumPost' => [
+            'body'
+        ],
+        'pastoral' => [
+            'body_private',
+            'body_public',
+        ],
+        'textbox' => [
+            'body'
+        ],
     ];
 
     /**
