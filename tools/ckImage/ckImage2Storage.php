@@ -9,9 +9,9 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use League\Flysystem\Filesystem;
-use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -50,10 +50,12 @@ $app = new class extends CliTool\App {
             'body_private',
             'body_public',
         ],
-        'textbox' => [
+        'textBox' => [
             'body'
         ],
     ];
+
+    private ?IConnector $database = null;
 
     /**
      * This process needs to write to storage, thus it must run as `www-data`.
@@ -77,14 +79,46 @@ $app = new class extends CliTool\App {
 
         /** @var Filesystem $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
+        $this->database = $this->getDatabaseInternal();
 
         // scan/process all defined known tables / columns
+        foreach ($this->CK_FIELDS as $table => $columns) {
+            new Alaress_Probe($this->findBase64($table, $columns));
+        }
         //
         // scan / process all defined columns within a specified table
         //
         // scan / process a specified table,column
         //
         // process a specified table,column for a specified object ID.
+    }
+
+    private function getPrimKey(string $table)
+    {
+        $query = $this->database->prepareQuery(
+            "SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'"
+        );
+        $query->execute();
+        return $query->fetchColumnArray('Column_name')[0];
+    }
+
+    private function findBase64(string $table, array $columns)
+    {
+        // get primary
+        $primary = $this->getPrimKey($table);
+
+        // get all entries that contain base64
+        $pb = $this->database->buildPredicateBuilder($table);
+        foreach ($columns as $column) {
+            $pb = $pb->like($column, '%base64%');
+        }
+
+        $query = $this->database->prepareQuery(
+            "SELECT * FROM $table WHERE {$pb->getWhereUnion()}"
+        );
+        $params = $pb->getParams();
+        $query->execute($params);
+        return $query->fetchAll();
     }
 };
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
