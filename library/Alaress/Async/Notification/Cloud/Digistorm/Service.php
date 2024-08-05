@@ -110,9 +110,10 @@ class Service extends AbstractService
             return true;
         } catch (GuzzleException $e) {
             $responseCode = $e->getCode();
+            $this->getLog()->error(sprintf('Received response code %d', $responseCode));
             if ($responseCode === 401) {
                 // your API key is bad: don't try to do anything else
-                $this->getLog()->error('Received response code 401: this means the API key is incorrect');
+                $this->getLog()->error('This response code likely means the API key is incorrect');
                 throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
             }
 
@@ -180,7 +181,7 @@ class Service extends AbstractService
             if ($success) {
                 $this->report($reportToken, 'No error', Logger::INFO);
             } else {
-                $this->report($reportToken, 'Unknown error', Logger::NOTICE, '?');
+                $this->report($reportToken, 'No error, but response itself was an error', Logger::NOTICE, '?');
             }
         }
     }
