@@ -119,8 +119,8 @@ class Service extends AbstractService
                 throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
             }
 
-            // Some error other than rate-limit? raise an error
             if ($responseCode === 429) {
+                // Rate limit: raise an exception
                 throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
             }
 
