@@ -63,6 +63,9 @@ $f-dropdown-line-height: rem-calc(18) !default;
                 text-decoration: none;
             }
         }
+        [class^="icon-"]::before {
+            color: var(--content-ui-foreground);
+        }
     }
 
     a.menu_disabled {
