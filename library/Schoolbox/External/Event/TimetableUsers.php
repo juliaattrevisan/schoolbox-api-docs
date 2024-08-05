@@ -375,7 +375,7 @@ class TimetableUsers
                          * of the mutations. This does not affect timetables, just
                          * folder access and shortcuts.
                          */
-                        $superposition = array_merge($manifest, $data['usuals']);
+                        $superposition = $manifest + $data['usuals'];
 
                         $data['manifest'][$eventId] = $superposition;
 
