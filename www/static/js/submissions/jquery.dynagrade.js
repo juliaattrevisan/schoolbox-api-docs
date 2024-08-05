@@ -106,11 +106,10 @@
         // Thus it no longer needs to be mapped to a list, and then reversed:
         // we'll make sure it's correct though.
         var sortedConf = Array.from(conf);
-
         sortedConf.sort(function (a, b) {
             return b.lowerBound - a.lowerBound;
         });
-        console.warn(sortedConf);
+
         $.each(conf, function (k, v) {
             var lowerBound = Number(v.lowerBound),
                 caption = v.caption;
@@ -119,7 +118,7 @@
             if (percentage < lowerBound) {
                 return true; // jq:continue
             }
-            console.warn(caption);
+
             // first bound that is below our percentage; apply it
             callback.call($el, caption);
 
