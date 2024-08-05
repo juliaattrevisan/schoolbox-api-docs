@@ -1181,6 +1181,7 @@ class DataSource
                 FROM v_rubric vr
                 JOIN assessment a ON vr.assessment_id = a.id
                 WHERE {$where}
+                AND a.deleted_at IS NULL
                 ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence, a.id;
             "
         );
@@ -1235,6 +1236,8 @@ class DataSource
                     rd.description,
                     rl.name AS level
                 FROM       rubric_capability_mark rcm
+                JOIN       rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                JOIN       rubric_indicator        ri ON ri.rubric_capability_id = rc.id
                 LEFT  JOIN rubric_indicator_mark  rim ON rcm.id = rim.rubric_capability_mark_id
                 LEFT  JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
                 LEFT  JOIN rubric_level            rl ON rd.level_id = rl.id
@@ -1242,6 +1245,8 @@ class DataSource
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
                 WHERE {$where}
+                AND rc.deleted_at IS NULL
+                AND ri.deleted_at IS NULL
                 AND sr.deleted_at IS NULL
                 AND a.deleted_at IS NULL
                 ORDER BY a.due_date ASC;
@@ -1299,6 +1304,8 @@ class DataSource
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
                 WHERE {$where}
+                AND rc.deleted_at IS NULL
+                AND ri.deleted_at IS NULL
                 AND sr.deleted_at IS NULL
                 AND a.deleted_at IS NULL
                 ORDER BY a.due_date ASC;
