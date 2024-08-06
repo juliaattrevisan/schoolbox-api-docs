@@ -15,7 +15,6 @@ import QfStudent from "./student/qf-student.vue";
 import QfFinaliseReview from "./qf-finalise-review.vue";
 
 interface Props {
-    assessmentId: number; // the assessment id
     student: Student; // the student who has attempted the quiz
     reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
@@ -37,7 +36,7 @@ const studentStore = useStudentStore();
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.assessmentId, props.isReadOnly, props.hasMarkVisibility, props.markData, props.statusPage);
+    store.init(props.isReadOnly, props.hasMarkVisibility, props.markData, props.statusPage);
     useStudentStore().init(props.student, props.itemResponses, props.attemptResponse, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions, props.hasMarkVisibility);

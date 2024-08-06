@@ -20,7 +20,6 @@ import HmNextItem from "./items/hm-next-item.vue";
 import HmFinaliseReview from "./items/hm-finalise-review.vue";
 
 interface Props {
-    assessmentId: number; // the assessment id
     title: string; // the title of the quiz
     items: Item[]; // the items linked to quiz
     students: Student[]; // the students who have attempted the quiz
@@ -48,7 +47,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.assessmentId, props.markData, props.statusPage);
+    store.init(props.markData, props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
@@ -58,7 +57,6 @@ window.Vue.onMounted(async () => {
 
 <template>
     <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
-        <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <hm-items-header />
