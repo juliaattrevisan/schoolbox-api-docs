@@ -6,11 +6,13 @@
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import { getAttemptScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the student to display
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
+    markData: AssessmentMarkData; // the mark type data linked to the assessment
 }
 const props = defineProps<Props>();
 

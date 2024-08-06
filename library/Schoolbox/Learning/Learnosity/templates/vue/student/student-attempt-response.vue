@@ -4,12 +4,14 @@
  */
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import StudentAttemptResponseMark from "./student-attempt-response-mark.vue";
 import StudentAttemptResponseComment from "./student-attempt-response-comment.vue";
 
 interface Props {
     student: Student; // the student to display
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
+    markData: AssessmentMarkData; // the mark type data linked to the assessment
 }
 const props = defineProps<Props>();
 
@@ -41,6 +43,7 @@ function onAttemptCommentUpdated(comment: string) {
             <student-attempt-response-mark
                 :student="props.student"
                 :is-read-only="props.isReadOnly"
+                :mark-data="props.markData"
                 @updated-mark="onAttemptMarkUpdated"
             />
             <student-attempt-response-comment
