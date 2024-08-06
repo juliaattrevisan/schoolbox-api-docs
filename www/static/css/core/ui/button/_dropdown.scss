@@ -62,6 +62,9 @@ $f-dropdown-line-height: rem-calc(18) !default;
                 background-color: var(--content-ui-hover);
                 text-decoration: none;
             }
+            &::before {
+                color: var(--content-ui-foreground);
+            }
         }
     }
 
