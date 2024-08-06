@@ -1,0 +1,1 @@
+DROP TABLE eportfolio_component_blog_image_backup;
