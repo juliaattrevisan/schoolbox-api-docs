@@ -36,17 +36,13 @@ class Result extends Base
         $query = "
             SELECT
                 {$mapper->getColumnString('t')},
-                {$mapper->getJoinMapper('category')->getColumnString('c')},
-                MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+                {$mapper->getJoinMapper('category')->getColumnString('c')}
             FROM
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
                 t.deleted_at IS NULL AND
-                (
-                  MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
-                  `heading` LIKE :like
-                )
+                `heading` LIKE :like
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
@@ -93,10 +89,7 @@ class Result extends Base
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
                 t.deleted_at IS NULL AND
-                (
-                  MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
-                  `heading` LIKE :like
-                )
+                `heading` LIKE :like
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
