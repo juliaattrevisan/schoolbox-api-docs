@@ -11,7 +11,7 @@ export class CreateFolder {
 
     static readonly DATATEST_FOLDER_FORM_SELECT_TEMPLATE = "folder-form-select-template";
 
-    static readonly DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP = "folder-form-radio-access-group-read"; // Append "-[type]-[groupID]"
+    static readonly DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP = "folder-form-radio-access-group"; // Append "-[type]-[groupID]"
 
     static readonly DATATEST_FOLDER_FORM_SUBMIT = "folder-form-submit";
 
@@ -60,7 +60,7 @@ export class CreateFolder {
      */
     async setAccessPermission(groupId: string | number, permissionLevel: "none" | "read" | "write") {
         await this.page
-            .getByTestId(`CreateFolder.DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP-${permissionLevel}-${groupId}`)
+            .getByTestId(`${CreateFolder.DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP}-${permissionLevel}-${groupId}`)
             .check();
     }
 
@@ -85,6 +85,6 @@ export class CreateFolder {
      * Clicks the create folder button
      */
     async submit() {
-        await this.page.click(CreateFolder.DATATEST_FOLDER_FORM_SUBMIT);
+        await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_SUBMIT).click();
     }
 }
