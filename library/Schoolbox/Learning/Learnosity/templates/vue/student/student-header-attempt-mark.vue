@@ -29,6 +29,20 @@ const hasSubmissionState = window.Vue.computed(() => {
 });
 
 /**
+ *
+ * @returns {number|null} -
+ */
+const normaliseAs = window.Vue.computed(() => {
+    if (hasSubmissionState.value) {
+        const submissionState = props.markData.submissionStates.find(
+            (state) => state.displayAs === props.student.attemptResponse.mark,
+        );
+        return submissionState?.normaliseAs ? submissionState.normaliseAs : null;
+    }
+    return null;
+});
+
+/**
  * Get the current total score for all items, so the total of all questions within each item
  * @returns {number} - the total score
  */
@@ -53,10 +67,13 @@ const hasScore = window.Vue.computed(() => {
 });
 
 /**
- *
- * @returns {string} -
+ * Get the current mark, which also shows the relevant mark type
+ * @returns {string} - the current mark
  */
 const mark = window.Vue.computed(() => {
+    if (hasSubmissionState.value) {
+        return props.student.attemptResponse.mark;
+    }
     const score = `${totalScore.value}/${maxScore.value}`;
     if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
         return `${getPercentage(totalScore.value, maxScore.value)} (${score})`;
@@ -72,7 +89,10 @@ const mark = window.Vue.computed(() => {
  * @returns {string} - the style to add a background colour that reflects the score
  */
 const statusStyles = window.Vue.computed(() => {
-    if (!props.student.isReviewed) {
+    if (hasSubmissionState.value && normaliseAs.value !== null) {
+        return `${getGradient(normaliseAs.value, 100)}-bg`;
+    }
+    if (!props.student.isReviewed || (hasSubmissionState.value && normaliseAs.value === null)) {
         return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
     }
     return `${getGradient(totalScore.value, maxScore.value)}-bg`;
@@ -80,11 +100,8 @@ const statusStyles = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="hasSubmissionState">
-        <p>{{ props.student.attemptResponse.mark }}</p>
-    </div>
     <!-- this is the matched DOM structure of a Learnosity score -->
-    <div v-else-if="hasScore" class="lrn learnosity-report session-detail-by-item mark">
+    <div v-if="hasSubmissionState || hasScore" class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
             <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
@@ -100,3 +117,9 @@ const statusStyles = window.Vue.computed(() => {
         </h3>
     </div>
 </template>
+
+<style scoped>
+.lrn-circle {
+    padding: 0.5rem 1rem; /* add some extra padding to the circle */
+}
+</style>
