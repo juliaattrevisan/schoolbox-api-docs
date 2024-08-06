@@ -399,7 +399,7 @@
                                     <td>{{ role.getName }}</td>
                                     <td>
                                         <input type="radio" class="no_permission required" id="groupNone{{ role.getId }}" name="group[{{ role.getId }}]" value="0" {% if (rolePermissions[role.getId] ?? deny) == deny %}checked{% endif %} />
-                                        <label class="radio-label" for="groupNone{{ role.getId }}"></label>
+                                        <label class="radio-label" for="groupNone{{ role.getId }}" data-test="folder-form-radio-access-group-none-{{ role.getId }}"></label>
                                     </td>
                                     <td>
                                         <input type="radio" name="group[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1" {% if (rolePermissions[role.getId] ?? deny) == read %}checked{% endif %} />
