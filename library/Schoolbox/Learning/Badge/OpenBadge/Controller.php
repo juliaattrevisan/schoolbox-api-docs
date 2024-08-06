@@ -113,15 +113,24 @@ class Controller extends Base
                                    ->withStatus(404);
         }
 
+        if ($award->getRecipient()->getEmail()) {
+            $recipient = [
+                'type'      => 'email',
+                'hashed'    => true,
+                'identity'  => 'sha256$' . hash('sha256', $award->getRecipient()->getEmail()),
+            ];
+        } else {
+            $recipient = [
+                'type'      => 'url',
+                'identity'  => $fqdn->withPath($this->routeGenerator->generate('searchUser.getProfile', ['userId' => $award->getRecipient()->getId()])),
+            ];
+        }
+
         $assertionJson = [
             '@context'      => self::CONTEXT,
             'type'          => 'Assertion',
             'id'            => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeAssertion', ['awardId' => $award->getId()])),
-            'recipient' => [
-                'type'      => 'email',
-                'hashed'    => true,
-                'identity'  => 'sha256$' . hash('sha256', $award->getRecipient()->getEmail()),
-            ],
+            'recipient'     => $recipient,
             'badge'         => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeJson', ['badgeId' => $award->getBadge()->getId()])),
             'verification'  => [
                 'type'      => 'hosted',
