@@ -1,0 +1,52 @@
+{% set appId = app.appIdentifier | replace({'.': '-'}) %}
+<div class="small-12 column content">
+    <dl class="inline-dl">
+        <dt class="small-12 medium-4">App ID</dt>
+        <dd class="small-12 medium-4"><p>{{ app.appIdentifier }}</p></dd>
+        <dd class="small-12 medium-4"><a class="right icon-delete" data-id="{{ app.id }}" href="#" title="Delete" data-delete-provider ></a></dd>
+
+        <dt class="small-12 medium-4">Provider</dt>
+        <dd class="small-12 medium-8"><p>TASS Orbit</p></dd>
+
+        <dt class="small-12 medium-4">Configuration</dt>
+        <dd class="small-12 medium-8">
+            <p>
+                <code>{{ app.key }}</code>
+                (<a href="#" data-open="change-tassorbit-{{ appId }}">Change</a>)
+            </p>
+        </dd>
+    </dl>
+    <div class="row">
+        <div class="small-12 column">
+            <form style="display:none;" id="change-tassorbit-{{ appId }}" action="{{ routeLookup('adminNotifications.postModifyApp') }}" method="post">
+                <input type="hidden" name="id" value="{{ app.id }}" />
+                <input type="hidden" name="app" value="{{ app.appIdentifier }}" />
+                <input type="hidden" name="provider" value="{{ app.providerName }}" />
+                <div class="row">
+                    <div class="small-12 column">
+                        <label>Configuration
+                            <p class="meta">Configuration for TASS Orbit app for this Schoolbox instance.</p>
+                            <p class="meta">
+                                This is a JSON object containing required config properties <strong>token, company and domain</strong>
+                                in the following format:
+                            </p>
+                            <p>
+                                <code>
+                                    {
+                                        "token": "[token]",
+                                        "company": "[company_id]",
+                                        "domain": "[host_name]"
+                                    }
+                                </code>
+                            </p>
+                            <textarea name="key"></textarea>
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <input type="submit" value="Install New Key">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

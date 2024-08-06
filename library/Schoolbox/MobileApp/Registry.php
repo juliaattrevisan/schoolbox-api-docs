@@ -25,6 +25,7 @@ class Registry implements ISoftDeletable
     const PROVIDER_APPLE     = 'APNS';
     const PROVIDER_DIGISTORM = 'Digistorm';
     const PROVIDER_FIREBASE  = 'Firebase';
+    const PROVIDER_TASS_ORBIT  = 'TassOrbit';
 
 
     /** @var User */

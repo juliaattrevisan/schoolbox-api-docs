@@ -213,6 +213,10 @@ class Controller extends BaseController
                     'template'    => '@adminNotifications/providers/Digistorm/entity.twig',
                     'description' => 'Digistorm',
                 ],
+                MobileApp\Registry::PROVIDER_TASS_ORBIT => [
+                    'template'    => '@adminNotifications/providers/TASS/entity.twig',
+                    'description' => 'TASS Orbit',
+                ],
             ],
         ];
 
@@ -245,6 +249,10 @@ class Controller extends BaseController
 
             case MobileApp\Registry::PROVIDER_FIREBASE:
                 $template = '@adminNotifications/providers/Firebase/create.twig';
+                break;
+
+            case MobileApp\Registry::PROVIDER_TASS_ORBIT:
+                $template = '@adminNotifications/providers/TASS/create.twig';
                 break;
 
             default:
@@ -310,7 +318,26 @@ class Controller extends BaseController
                 }
 
                 break;
+            case MobileApp\Registry::PROVIDER_TASS_ORBIT:
+                // require keys for TASS Orbit
+                $error = "Unable to setup TASS Orbit service,";
 
+                if (empty($key)) {
+                    $this->sendError("$error please provide a valid configuration.");
+                    return;
+                }
+
+                $keyObject = json_decode($key);
+                if (null === $keyObject) {
+                    $this->sendError("$error please provide a valid JSON format.");
+                    return;
+                }
+
+                if (!isset($keyObject->domain) || !isset($keyObject->token) || !isset($keyObject->company)) {
+                    $this->sendError("$error please provide a valid configuration.");
+                    return;
+                }
+                break;
             default:
                 $this->sendError('Service does not exist');
                 return;

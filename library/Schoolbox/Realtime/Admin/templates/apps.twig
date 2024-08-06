@@ -112,7 +112,7 @@
                             {#<label>Select the provider of your new application to register:</label>#}
                         </div>
                         {% for provider, providerInfo in providers %}
-                            <div class="column small-12 medium-4{%  if loop.last %} end{% endif %}">
+                            <div class="column small-12 medium-6 xlarge-3{%  if loop.last %} end{% endif %}">
                                 <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" />
                                 <label for="provider-{{ provider }}" class="block">
                                     <i class="icon-mobile"></i> {{ providerInfo.description }}
