@@ -1,4 +1,5 @@
 Admin,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
+Admin,Go admin dependencies,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies
 Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
 Admin,Go to reports group,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6
 Admin,User Management Activity Report,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all
