@@ -1,25 +1,17 @@
 <input type="hidden" name="provider" value="{{ provider }}" />
 
+<label>Endpoint
+    <input type="text" name="domain" value=""/>
+</label>
+
 <label>App Code
     <input type="text" name="app" value="" />
 </label>
 
-<label>Configuration
-    <p class="meta">Configuration for TASS Orbit app for this Schoolbox instance.</p>
-    <p class="meta">
-        This is a JSON object containing required config properties <strong>token, company and domain</strong>
-        in the following format:
-    </p>
-    <p>
-        <code>
-            {
-                "token": "[token]",
-                "company": "[company_id]",
-                "domain": "[host_name]"
-            }
-        </code>
-    </p>
-    <textarea name="key"></textarea>
+<label>Token
+    <input type="text" name="key" value=""/>
 </label>
 
-
+<label>Company Code
+    <input type="text" name="company" value=""/>
+</label>
