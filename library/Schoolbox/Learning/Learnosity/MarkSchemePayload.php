@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+
 /**
  * Takes a Mark Scheme and any assorted Grade Group info
  * and compiles it into a minimal flat array struct
@@ -18,7 +21,7 @@ class MarkSchemePayload
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(private MarkType $markType, private ?Model $gradeGroup)
     {
     }
 
@@ -35,7 +38,28 @@ class MarkSchemePayload
      */
     public function convert(): array
     {
-        $struct = [];
+        $struct = [
+            'type' => [
+                'name' => $this->markType->getName(),
+                'slug' => $this->markType->getSlug()
+            ],
+            'levels' => null
+        ];
+
+
+        /* Only supply grade groups if we needed to use them
+         */
+        if ($this->gradeGroup && MarkType::SLUG_LETTER === $this->markType->getSlug()) {
+            $struct['levels'] = [];
+
+            foreach ($this->gradeGroup->getGradeLevels() as $level) {
+                $struct['levels'][] = [
+                    'lowerBound' => $level->getLowerBound(),
+                    'rawGrade' => $level->getRawGrade(),
+                    'caption' => $level->getCaption()
+                ];
+            }
+        }
 
         return $struct;
     }
