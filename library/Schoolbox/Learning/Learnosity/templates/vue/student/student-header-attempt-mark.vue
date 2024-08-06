@@ -5,13 +5,13 @@
 
 import { getGradient } from "@js/util/cssUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import type { SubmissionState } from "@schoolboxAssessment/Types/SubmissionState";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the item to display
-    submissionStates: SubmissionState[]; // the submission states that be used to override the automatically set mark
+    markData: AssessmentMarkData; // the mark type data linked to the assessment
 }
 const props = defineProps<Props>();
 
@@ -20,7 +20,7 @@ const props = defineProps<Props>();
  * @returns {boolean} - whether the student has a submission state
  */
 const hasSubmissionState = window.Vue.computed(() => {
-    const submissionStateNames = props.submissionStates.map((state) => state.displayAs);
+    const submissionStateNames = props.markData.submissionStates.map((state) => state.displayAs);
     return props.student.attemptResponse.mark && submissionStateNames.includes(props.student.attemptResponse.mark);
 });
 
