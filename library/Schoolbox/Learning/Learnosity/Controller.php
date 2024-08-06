@@ -1089,6 +1089,10 @@ class Controller extends Base
             'maxMarks' => $attempt->getMaxMark(),
             'errors' => $this->stateMapper->listDisplayValues(),
             'submissionStates' => $this->stateMapper->findAll(),
+            'markData' => [
+                'type' => $assessment->getMarkType(),
+                'levels' => $assessment->getGradeGroup()?->getGradeLevels(),
+            ]
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
