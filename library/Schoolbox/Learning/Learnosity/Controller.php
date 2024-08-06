@@ -988,7 +988,7 @@ class Controller extends Base
             'hasMarkVisibility' => $hasMarkVisibility,
             /* For submission states
              */
-            'submissionStates' => $this->stateMapper->listDisplayValues(),
+            'errors' => $this->stateMapper->listDisplayValues(),
             'submissionStates' => $this->stateMapper->findAll(),
         ], "Result for {$assessment->getTitle()}");
     }
