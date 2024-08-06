@@ -4,12 +4,12 @@ const CACHE_NAME = "static-cache-v1";
 
 // Add site version to ensure the cache is invalidated when we update the site
 const OFFLINE_CACHE_PAGE = "/manifest/offline?v={{ config.site_version }}";
-const OFFLINE_CACHE_IMAGE = "{{ CDN_PREFIX }}/images/core/fail-whale.png?v={{ config.site_version }}";
 
 const CACHE_FILES = [
-    OFFLINE_CACHE_IMAGE,
-    OFFLINE_CACHE_PAGE,
-]
+    OFFLINE_CACHE_PAGE, // The offline page
+    "{{ CDN_PREFIX }}/images/core/fail-whale.png?v={{ config.site_version }}", // Main fail whale image
+    "{{ CDN_PREFIX }}/images/core/icons/fail-whale-16x16.png?v={{ config.site_version }}", // Fail whale icon
+];
 
 self.addEventListener("install", (evt) => {
     {% if debug %}console.log("[ServiceWorker] Install");{% endif %}
@@ -49,12 +49,30 @@ self.addEventListener("activate", (evt) => {
 self.addEventListener("fetch", (evt) => {
     // If the request matches an item in CACHE_FILES, return it
     // This allows access to things like images when offline despite the evt.request.mode not being "navigate"
-    if (CACHE_FILES.includes(evt.request.url)) {
+    const matchedCacheFileName = CACHE_FILES.find((file) => {
+        if (evt.request.url.includes(file)) return true;
+
+        // If the request URL doesn't exactly match the cache file, but the cache is relative (beings with /),
+        // then remove the origin and see if it matches
+        if (file.startsWith("/")) {
+            return evt.request.url.includes(self.location.origin + file);
+        }
+
+        // otherwise, don't match
+        return false;
+    });
+
+    if (matchedCacheFileName) {
         evt.respondWith(
             caches.open(CACHE_NAME).then((cache) => {
-                return cache.match(evt.request.url);
-            })
+                return cache.match(matchedCacheFileName);
+            }),
         );
+        return;
+    }
+
+    // If this request is not to our site, don't try to handle it
+    if (!evt.request.url.startsWith(self.location.origin)) {
         return;
     }
 
