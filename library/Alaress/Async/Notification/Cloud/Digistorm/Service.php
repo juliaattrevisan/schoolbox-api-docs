@@ -139,11 +139,11 @@ class Service extends AbstractService
      *
      * @param ResponseInterface $response
      * @param array             $tokens
-     * @param int               $id
+     * @param string            $id
      * @param bool              $success  Was this successful in the first place?
      * @return void
      */
-    private function reportOnResponse(ResponseInterface $response, array $tokens, int $id, bool $success): void
+    private function reportOnResponse(ResponseInterface $response, array $tokens, string $id, bool $success): void
     {
         $responseContent = json_decode($response->getBody()->getContents(), true);
         if (!is_array($responseContent)) {
