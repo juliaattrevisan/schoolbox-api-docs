@@ -19,6 +19,7 @@ table.rb {
         p {
             white-space: pre-wrap;
             font-weight: inherit;
+            overflow-wrap: break-word; // Added to prevent a word from breaking onto the next line in the rubric table
         }
     }
 
