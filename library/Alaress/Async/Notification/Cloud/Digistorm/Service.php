@@ -158,8 +158,8 @@ class Service extends AbstractService
         $seenErrors = [];
         if (is_iterable($errors)) {
             foreach ($errors as $error) {
-                if (isset($error['id'], $error['description'])) {
-                    $token = $error['id'];
+                $token = $error['id'] ?? $error['username'] ?? null;
+                if (isset($token, $error['description'])) {
                     $this->report(
                         "$id@$token",
                         'Error: ' . $error['description'],
