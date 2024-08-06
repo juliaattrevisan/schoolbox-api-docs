@@ -13,6 +13,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
@@ -109,6 +110,26 @@ class Controller extends Base
                 )
             ]
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function textboxSearch(): void
+    {
+        $textboxMapper = new TextboxMapper();
+        $arrayToReturn = [];
+        $allTextboxes  = $textboxMapper->search($this->user, $this->requestQuery->get('query'));
+
+        foreach ($allTextboxes->getResult() as $currentTextbox) {
+            $arrayToReturn[] = array(
+                'id'   => $currentTextbox->getId(),
+                'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
+            );
+        }
+
+        header('Content-type: application/json');
+        echo json_encode($arrayToReturn);
     }
 
     /**
