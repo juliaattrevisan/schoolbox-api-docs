@@ -113,6 +113,8 @@ class Controller extends Base
     }
 
     /**
+     * Specialised search function for use when searching for textboxes while building dashboard templates.
+     *
      * @return void
      */
     public function textboxSearch(): void
