@@ -14,13 +14,19 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\Cloud\RateLimitException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
+use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use SensitiveParameter;
 
 /**
- * Digistorm notification service
+ * Digistorm notification service.
+ *
+ * Implements the Digistorm notifications API as documented on
+ * https://notifications.digistorm.io/docs/v1/Getting_Started.html.
  */
 class Service extends AbstractService
 {
@@ -100,41 +106,84 @@ class Service extends AbstractService
                     RequestOptions::HEADERS => $headers,
                 ]
             );
-
-            // Check the response: maybe not all IDs exist?
-            // That might be an issue worth checking?
-            $responseContent = json_decode($response->getBody()->getContents(), true);
-            $errors          = $responseContent['errors'] ?? [];
-            if (is_iterable($errors) && count($errors) > 0) {
-                foreach ($errors as $error) {
-                    $this->getLog()->notice(
-                        sprintf(
-                            'Possible error response: %s: %s',
-                            $error['description'] ?? '',
-                            $error['id'] ?? '',
-                        )
-                    );
-                }
-            } else {
-                $this->getLog()->info('Sent successfully');
-            }
+            $this->reportOnResponse($response, $tokens, (string)$id, true);
             return true;
         } catch (GuzzleException $e) {
             $responseCode = $e->getCode();
+            $this->getLog()->error(sprintf('Received response code %d', $responseCode));
+
+            // Special handling of specific response codes
             if ($responseCode === 401) {
                 // your API key is bad: don't try to do anything else
-                $this->getLog()->error('Received response code 401: this means the API key is incorrect');
+                $this->getLog()->error('This response code likely means the API key is incorrect');
                 throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
             }
 
-            // Some error other than rate-limit? raise an error
-            if ($responseCode !== 429) {
-                $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
-                return false;
+            if ($responseCode === 429) {
+                // Rate limit: raise an exception
+                throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
             }
 
-            // Throw a rate limit exception for later handling
-            throw new RateLimitException('Digistorm service is rate-limited', 0, $e);
+            // Does this have a response? If so report on each token
+            if ($e instanceof RequestException) {
+                $this->reportOnResponse($e->getResponse(), $tokens, (string)$id, false);
+            }
+
+            $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
+            return false;
+        }
+    }
+
+    /**
+     * Report on the errors (or absence of errors) in the response.
+     *
+     * @param ResponseInterface $response
+     * @param array             $tokens
+     * @param string            $id
+     * @param bool              $success  Was this successful in the first place?
+     * @return void
+     */
+    private function reportOnResponse(ResponseInterface $response, array $tokens, string $id, bool $success): void
+    {
+        $responseContent = json_decode($response->getBody()->getContents(), true);
+        if (!is_array($responseContent)) {
+            $this->getLog()->warning('Response could not be parsed as JSON');
+            return;
+        }
+
+        // Extract errors from the response content
+        $errors = $responseContent['errors'] ?? [];
+
+        // Report on each error in the content
+        $seenErrors = [];
+        if (is_iterable($errors)) {
+            foreach ($errors as $error) {
+                $token = $error['id'] ?? $error['username'] ?? null;
+                if (isset($token, $error['description'])) {
+                    $this->report(
+                        "$id@$token",
+                        'Error: ' . $error['description'],
+                        Logger::NOTICE,
+                        '?',
+                    );
+
+                    // Don't log any other message for this token
+                    $seenErrors[$token] = true;
+                }
+            }
+        }
+
+        // Log messages for tokens not seen in the errors
+        foreach ($tokens as $token) {
+            if (isset($seenErrors[$token])) {
+                continue;
+            }
+            $reportToken = "$id@$token";
+            if ($success) {
+                $this->report($reportToken, 'No error', Logger::INFO);
+            } else {
+                $this->report($reportToken, 'No error, but response itself was an error', Logger::NOTICE, '?');
+            }
         }
     }
 }
