@@ -119,15 +119,19 @@ class Controller extends Base
      */
     public function textboxSearch(): void
     {
-        $textboxMapper = new TextboxMapper();
+        $query = trim($this->requestQuery->get('query', ''));
         $arrayToReturn = [];
-        $allTextboxes  = $textboxMapper->search($this->user, $this->requestQuery->get('query'));
 
-        foreach ($allTextboxes->getResult() as $currentTextbox) {
-            $arrayToReturn[] = array(
-                'id'   => $currentTextbox->getId(),
-                'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
-            );
+        if ($query !== '') {
+            $textboxMapper = new TextboxMapper();
+            $allTextboxes  = $textboxMapper->search($this->user, $query);
+
+            foreach ($allTextboxes->getResult() as $currentTextbox) {
+                $arrayToReturn[] = array(
+                    'id'   => $currentTextbox->getId(),
+                    'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
+                );
+            }
         }
 
         header('Content-type: application/json');
