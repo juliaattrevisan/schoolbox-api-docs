@@ -108,9 +108,11 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_COLOUR:
                 return new FieldType\Colour\Renderer();
             case ConfigMapper::FIELD_FILE:
-                return new FieldType\File\Renderer();
+                $valueSerializer = $this->makeValueSerializer($fieldId);
+                return new FieldType\File\Renderer($valueSerializer);
             case ConfigMapper::FIELD_FILE_MULTI:
-                return new FieldType\FileMulti\Renderer();
+                $valueSerializer = $this->makeValueSerializer($fieldId);
+                return new FieldType\FileMulti\Renderer($valueSerializer);
             case ConfigMapper::FIELD_PASSWORD:
                 return new FieldType\Password\Renderer();
             case ConfigMapper::FIELD_TIME_PICKER:

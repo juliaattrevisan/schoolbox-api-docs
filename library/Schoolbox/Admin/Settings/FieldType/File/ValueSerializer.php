@@ -53,4 +53,18 @@ class ValueSerializer implements IFieldValueSerializer
     {
         return $this->collectorFactory;
     }
+
+
+    /**
+     * Converts a string representation of options into an array form
+     * The options for the file FieldType are a JSON object with the following keys:
+     * - mimeFilter: string - The mime filter for the file input (e.g. "image/* for images)
+     *
+     * @param string $optionsString
+     * @return array{mimeFilter:string}
+     */
+    public function buildOptions(string $optionsString): array
+    {
+        return json_decode($optionsString, true);
+    }
 }
