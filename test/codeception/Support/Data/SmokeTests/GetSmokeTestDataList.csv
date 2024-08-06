@@ -2,6 +2,10 @@ Admin,"Go admin dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
+Admin,"Go admin dependencies",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,200
+Admin,"Go admin dependencies",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,401
+Admin,"Go admin dependencies",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,401
+Admin,"Go admin dependencies",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,401
 Admin,"Go to user admin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user,200
 Admin,"Go to user admin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user,401
 Admin,"Go to user admin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user,401
