@@ -42,7 +42,7 @@
             :is-read-only="true"
             :is-reviewed="{{ attempt.reviewed ? 'true' : 'false' }}"
             :has-mark-visibility="{{ hasMarkVisibility ? 'true' : 'false' }}"
-            :submission-states="{{ submissionStates|json_encode }}"
+            :mark-data="{{ markData|json_encode }}"
         />
     </div>
 </div>
