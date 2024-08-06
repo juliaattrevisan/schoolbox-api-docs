@@ -33,8 +33,8 @@ class TestService extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
     {
-        $this->getLog()->debug('This is a test message: it is not sent anywhere');
-        $this->getLog()->debug(
+        $this->getLog()->info('This is a test message: it is not sent anywhere');
+        $this->getLog()->info(
             $title,
             [
                 'app_tokens'   => $tokens,

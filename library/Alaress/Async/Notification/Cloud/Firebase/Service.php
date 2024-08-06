@@ -65,19 +65,19 @@ class Service extends AbstractService
 
         // Create message
         $config = Firebase\Messaging\WebPushConfig::fromArray([
-                                               'notification' => [
-                                                   'title' => $this->appTitle,
-                                                   'body' => $title,
-                                                   'icon' => $notification->getIcon(),
-                                                   'timestamp' => $notification->getTimestamp(),
-                                                   'href'      => $notification->getHref(),
-                                                   'unread'    => $unreadCount,
-                                                   'meta'      => json_encode($notification->getMeta())
-                                               ],
-                                               'fcm_options' => [
-                                                   'link' => $notification->getHref(),
-                                               ],
-                                           ]);
+            'notification' => [
+                'title' => $this->appTitle,
+                'body' => $title,
+                'icon' => $notification->getIcon(),
+                'timestamp' => $notification->getTimestamp(),
+                'href'      => $notification->getHref(),
+                'unread'    => $unreadCount,
+                'meta'      => json_encode($notification->getMeta())
+            ],
+            'fcm_options' => [
+                'link' => $notification->getHref(),
+            ],
+        ]);
         $message = Firebase\Messaging\CloudMessage::new()->withWebPushConfig($config);
 
         // Try to send it to all recipients
@@ -108,20 +108,20 @@ class Service extends AbstractService
             $error       = $item->error()?->getMessage();
             if ($item->messageWasInvalid()) {
                 $status   = 'Invalid message';
-                $severity = Logger::INFO;
+                $severity = Logger::NOTICE;
             } elseif ($item->messageTargetWasInvalid()) {
                 $status   = 'Invalid message target';
-                $severity = Logger::INFO;
+                $severity = Logger::NOTICE;
             } elseif ($item->messageWasSentToUnknownToken()) {
                 $status   = 'Unknown recipient';
-                $severity = Logger::INFO;
+                $severity = Logger::NOTICE;
             } elseif ($item->isFailure()) {
                 $status   = 'Unknown error';
-                $severity = Logger::INFO;
+                $severity = Logger::NOTICE;
             } else {
                 // Presumed valid
                 $status   = 'OK';
-                $severity = Logger::DEBUG;
+                $severity = Logger::INFO;
             }
             if (isset($error)) {
                 $status .= ': ' . $error;

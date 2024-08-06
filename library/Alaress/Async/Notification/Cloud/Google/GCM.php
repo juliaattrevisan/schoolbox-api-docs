@@ -132,14 +132,14 @@ class GCM extends AbstractService
                     $regId = $tokens[$i];
 
                     if (isset($result['error'])) {
-                        $this->report("$regId", $result['error'], Logger::INFO, '?');
+                        $this->report("$regId", $result['error'], Logger::NOTICE, '?');
 
                         if ($result['error'] == 'NotRegistered') {
                             // we need to delete this token, it will only break things
                             $this->deleteToken($regId);
                         }
                     } else {
-                        $this->report("$regId", "All ok!", Logger::DEBUG);
+                        $this->report("$regId", "All ok!", Logger::INFO);
                     }
                 }
             } catch (RuntimeException $e) {

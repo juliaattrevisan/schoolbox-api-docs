@@ -86,7 +86,14 @@ class Scheduler extends AbstractScheduler implements IConsumer
     {
         // Basic checks: payload type, context
         if (!$payload instanceof Instance) {
-            $this->log->warning(sprintf('Message received payload is not a %s instance: not retrying delivery', Instance::class));
+            $this->log->warning(
+                sprintf(
+                    'Message received payload is not a %s (received: %s): not retrying delivery',
+                    Instance::class,
+                    /** @phpstan-ignore-next-line - just in case this is not an object at all **/
+                    is_object($payload) ? get_class($payload) : gettype($payload),
+                ),
+            );
             // acknowledge instead of reject looks weird here,
             // but rejecting a message ends with it being put back in the queue
             // to be processed forever.
@@ -95,6 +102,16 @@ class Scheduler extends AbstractScheduler implements IConsumer
             $resolver->acknowledge();
             return;
         }
+
+        $this->log->info(
+            sprintf(
+                'Received message (hash: %s:%s, topic: %s)',
+                $payload->getBaseHash(),
+                $payload->getParamHash(),
+                !empty($payload->getTopics()) ? $payload->getTopics()[0] : '',
+            )
+        );
+
         if (!is_array($context)) {
             $this->log->warning('Message received has no context, thus receiving user cannot be determined: not retrying delivery');
             $resolver->acknowledge();
@@ -128,9 +145,11 @@ class Scheduler extends AbstractScheduler implements IConsumer
      */
     private function attemptPush(string $instanceId, int $userId, Instance $payload, IResolver $resolver, int $attemptNum = 1): void
     {
-        $this->log->debug(
+        $this->log->info(
             sprintf(
-                'Attempting to deliver message to instance:user %s:%d, attempt %d',
+                'Attempting to deliver message %s:%s to instance:user %s:%d, attempt %d',
+                $payload->getBaseHash(),
+                $payload->getParamHash(),
                 $instanceId,
                 $userId,
                 $attemptNum,
@@ -146,7 +165,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
             if ($this->jitter->tooManyAttempts($attemptNum)) {
                 $this->log->warning(
                     sprintf(
-                        'Message received could not be delivered to instance:user %s:%d after %d attempts: not retrying delivery',
+                        'Message %s:%s could not be delivered to instance:user %s:%d after %d attempts: not retrying delivery',
+                        $payload->getBaseHash(),
+                        $payload->getParamHash(),
                         $instanceId,
                         $userId,
                         $attemptNum,
@@ -180,7 +201,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
             }
             $this->log->notice(
                 sprintf(
-                    'Message delivery to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
+                    'Delivery of message %s:%s to instance:user %s:%d is likely rate-limited (%s): waiting %dms before trying again',
+                    $payload->getBaseHash(),
+                    $payload->getParamHash(),
                     $instanceId,
                     $userId,
                     $e->getMessage(),
