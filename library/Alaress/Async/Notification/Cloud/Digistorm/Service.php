@@ -106,7 +106,7 @@ class Service extends AbstractService
                     RequestOptions::HEADERS => $headers,
                 ]
             );
-            $this->reportOnResponse($response, $tokens, $id, true);
+            $this->reportOnResponse($response, $tokens, (string)$id, true);
             return true;
         } catch (GuzzleException $e) {
             $responseCode = $e->getCode();
@@ -126,7 +126,7 @@ class Service extends AbstractService
 
             // Does this have a response? If so report on each token
             if ($e instanceof RequestException) {
-                $this->reportOnResponse($e->getResponse(), $tokens, $id, false);
+                $this->reportOnResponse($e->getResponse(), $tokens, (string)$id, false);
             }
 
             $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
