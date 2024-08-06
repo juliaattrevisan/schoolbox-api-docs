@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 
 export const useStore = defineStore("quizFeedback", () => {
     const assessmentId = window.Vue.ref<number>(0); // the id of the assessment
@@ -12,27 +13,27 @@ export const useStore = defineStore("quizFeedback", () => {
     const isFinaliseReviewModalOpen = window.Vue.ref<boolean>(false); // to show the finalise review modal
     const hasMarkVisibility = window.Vue.ref<boolean>(false); // whether marks and feedback are visible to the user
     const statusPage = window.Vue.ref<string>(""); // the link to the status page
-    const submissionStates = window.Vue.ref<string[]>([]); // the submission states that be used to override the automatically set mark
+    const markData = window.Vue.ref<AssessmentMarkData>(); // the mark type data linked to the assessment
 
     /**
      * store any passed through properties
      * @param {number} $assessmentId - the id of the assessment
      * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
      * @param {boolean} $hasMarkVisibility - whether marks and feedback are visible to the user
-     * @param {string[]} $submissionStates - the submission states that be used to override the automatically set mark
+     * @param {AssessmentMarkData} $markData - the mark type data linked to the assessment
      * @param {string|undefined} $statusPage - the link to the status page
      */
     function init(
         $assessmentId: number,
         $isReadOnly: boolean,
         $hasMarkVisibility: boolean,
-        $submissionStates: string[],
+        $markData: AssessmentMarkData,
         $statusPage: string | undefined,
     ) {
         assessmentId.value = $assessmentId;
         isReadOnly.value = $isReadOnly;
         hasMarkVisibility.value = $hasMarkVisibility;
-        submissionStates.value = $submissionStates;
+        markData.value = $markData;
         if ($statusPage !== undefined) {
             statusPage.value = $statusPage;
         }
@@ -46,7 +47,7 @@ export const useStore = defineStore("quizFeedback", () => {
         init,
         isFinaliseReviewModalOpen,
         hasMarkVisibility,
-        submissionStates,
+        markData,
         statusPage,
     };
 });
