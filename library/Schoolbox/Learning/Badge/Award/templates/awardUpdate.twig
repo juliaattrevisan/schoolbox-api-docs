@@ -6,7 +6,13 @@
     [ award.status | capitalize ~ 's', profile ~ '#goals' ],
     [ award.badge.name ]
 ) }}
-{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy}) %}
+{%
+    set awardedByRoute = (
+        (award.awardedBy.isDeleted)
+        ? ''
+        : routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy})
+    )
+%}
 {%  include '@learningBadgeAward/awardMeta.twig' with {award: award, awardedByRoute: awardedByRoute, profile: profile} only %}
 {% include '@learningBadgeAward/awardBadgeList.twig'
     with {badges: badges, isGoal: award.isGoal} only %}
