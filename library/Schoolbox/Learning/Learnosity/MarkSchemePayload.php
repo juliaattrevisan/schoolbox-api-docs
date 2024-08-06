@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity;
 
+use DebugBar\DebugBarException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 
@@ -21,7 +22,11 @@ class MarkSchemePayload
     /**
      * Constructor.
      */
-    public function __construct(private MarkType $markType, private ?Model $gradeGroup)
+    public function __construct(
+        private \Schoolbox\GenericCollection $submissionStates,
+        private MarkType $markType,
+        private ?Model $gradeGroup
+    )
     {
     }
 
@@ -35,10 +40,12 @@ class MarkSchemePayload
      * even when you didn't use it.
      *
      * @return array
+     * @throws DebugBarException
      */
     public function convert(): array
     {
         $struct = [
+            'submissionStates' => [],
             'type' => [
                 'name' => $this->markType->getName(),
                 'slug' => $this->markType->getSlug()
@@ -46,6 +53,15 @@ class MarkSchemePayload
             'levels' => null
         ];
 
+        /* Cram these boys in too, for frontend usage
+         */
+        foreach ($this->submissionStates as $submissionState) {
+            $struct['submissionStates'][] = [
+                'code' => $submissionState->getCode(),
+                'displayAs' => $submissionState->getDisplayAs(),
+                'normaliseAs' => $submissionState->getNormaliseAs(),
+            ];
+        }
 
         /* Only supply grade groups if we needed to use them
          */
