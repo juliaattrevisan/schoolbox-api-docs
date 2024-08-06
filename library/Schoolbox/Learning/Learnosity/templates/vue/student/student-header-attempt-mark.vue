@@ -5,7 +5,7 @@
 
 import { getGradient } from "@js/util/cssUtils";
 import { getPercentage } from "@js/util/mathUtils";
-import { getLetterGrade } from "@js/util/sbx/markUtils";
+import { getLetterGrade, getLowerBound } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
@@ -29,8 +29,16 @@ const hasSubmissionState = window.Vue.computed(() => {
 });
 
 /**
- *
- * @returns {number|null} -
+ * Has a valid mark override that isn't a submission state
+ * @returns {boolean} - whether the student has a mark override
+ */
+const hasMarkOverride = window.Vue.computed(() => {
+    return props.student.attemptResponse.mark && !hasSubmissionState.value;
+});
+
+/**
+ * Get the normaliseAs value for the student, which is the value to normalise the score to
+ * @returns {number|null} - the normaliseAs value
  */
 const normaliseAs = window.Vue.computed(() => {
     if (hasSubmissionState.value) {
@@ -74,6 +82,16 @@ const mark = window.Vue.computed(() => {
     if (hasSubmissionState.value) {
         return props.student.attemptResponse.mark;
     }
+    // If the mark is a percentage, we want to show the percentage
+    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+        return props.student.attemptResponse.mark?.includes("%")
+            ? props.student.attemptResponse.mark
+            : `${props.student.attemptResponse.mark}%`;
+    }
+    // If the mark is a letter, we want to show the letter
+    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+        return props.student.attemptResponse.mark;
+    }
     const score = `${totalScore.value}/${maxScore.value}`;
     if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
         return `${getPercentage(totalScore.value, maxScore.value)} (${score})`;
@@ -85,12 +103,26 @@ const mark = window.Vue.computed(() => {
 });
 
 /**
- * Get the current tooltip for the item
- * @returns {string} - the style to add a background colour that reflects the score
+ * Get the current mark style, which is a background colour that reflects the score
+ * @returns {string} - the current mark style
  */
 const statusStyles = window.Vue.computed(() => {
+    // use the normaliseAs value if it exists to set the background colour
     if (hasSubmissionState.value && normaliseAs.value !== null) {
         return `${getGradient(normaliseAs.value, 100)}-bg`;
+    }
+    // ensure the background colour reflects the overridden percentage mark
+    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+        const markAsNum = Number(props.student.attemptResponse.mark?.replace("%", ""));
+        return `${getGradient(markAsNum, 100)}-bg`;
+    }
+    // ensure the background colour reflects the overridden letter grade mark
+    if (hasMarkOverride.value && props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+        const lowerBound = getLowerBound(
+            props.student.attemptResponse.mark as string,
+            props.markData.levels as LetterGradeItem[],
+        ) as number;
+        return `${getGradient(lowerBound, 100)}-bg`;
     }
     if (!props.student.isReviewed || (hasSubmissionState.value && normaliseAs.value === null)) {
         return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
