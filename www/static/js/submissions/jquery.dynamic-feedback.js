@@ -312,9 +312,7 @@
                     $actionBar.attr("data-published", "");
 
                     toast.call($participant, config.publishedText, true, false);
-                    if (!resubmissionRequired) {
-                        config.onPublishCallback(participantId, response.success, response.message, response.id);
-                    }
+                    config.onPublishCallback(participantId, response.success, response.message, response.id);
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
