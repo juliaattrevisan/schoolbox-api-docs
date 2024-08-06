@@ -1,4 +1,5 @@
 import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
+import type { SubmissionState } from "@schoolboxAssessment/Types/SubmissionState";
 
 /**
  * The mark type data linked to the assessment, currently an
@@ -10,10 +11,5 @@ export type AssessmentMarkData = {
         slug: string; // the slug of the mark type
     };
     levels?: LetterGradeItem[];
-    submissionStates: {
-        // the submission states that can be used, set at: https://vagrant.dev.schoolbox.cloud/adminv2/lists/submission-errors
-        code: string;
-        displayAs: string;
-        normaliseAs: number | null;
-    };
+    submissionStates: SubmissionState[];
 };
