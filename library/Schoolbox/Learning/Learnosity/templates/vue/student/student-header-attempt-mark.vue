@@ -4,8 +4,12 @@
  */
 
 import { getGradient } from "@js/util/cssUtils";
+import { getPercentage } from "@js/util/mathUtils";
+import { getLetterGrade } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
+import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
+import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
 import { StudentItemMarkTypes } from "@schoolboxLearnosity/js/types/StudentItemMarkTypes";
 import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
@@ -49,6 +53,21 @@ const hasScore = window.Vue.computed(() => {
 });
 
 /**
+ *
+ * @returns {string} -
+ */
+const mark = window.Vue.computed(() => {
+    const score = `${totalScore.value}/${maxScore.value}`;
+    if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+        return `${getPercentage(totalScore.value, maxScore.value)} (${score})`;
+    }
+    if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+        return `${getLetterGrade(totalScore.value, maxScore.value, props.markData.levels as LetterGradeItem[])} (${score})`;
+    }
+    return score;
+});
+
+/**
  * Get the current tooltip for the item
  * @returns {string} - the style to add a background colour that reflects the score
  */
@@ -76,7 +95,7 @@ const statusStyles = window.Vue.computed(() => {
                 tabindex="0"
             >
                 <canvas width="24" height="24"></canvas>
-                <span>{{ totalScore }}/{{ maxScore }}</span>
+                <span>{{ mark }}</span>
             </div>
         </h3>
     </div>

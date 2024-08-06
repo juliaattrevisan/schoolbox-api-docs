@@ -15,7 +15,7 @@ export function isRounded(value: number): boolean {
 }
 
 /**
- * Calculate the percentage of a value
+ * Calculate the percentage (from 100%) of a value
  * @param {number} value - the value to calculate the percentage of
  * @param {number} max - the maximum value
  * @param {number} decimalPlaces - the number of decimal places to round to
