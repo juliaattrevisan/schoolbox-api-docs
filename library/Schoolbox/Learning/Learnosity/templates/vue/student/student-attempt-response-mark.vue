@@ -5,8 +5,12 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { getPercentage } from "@js/util/mathUtils";
+import { getLetterGrade, getLowerBound } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
+import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
+import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
 import { getAttemptScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
@@ -175,6 +179,16 @@ const currentScore = window.Vue.computed(() => {
  * @returns {string} - the current mark
  */
 const currentMark = window.Vue.computed(() => {
+    if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+        return getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
+    }
+    if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+        return getLetterGrade(
+            currentScore.value,
+            props.student.attemptResponse.maxMarks as number,
+            props.markData.levels as LetterGradeItem[],
+        );
+    }
     return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
 });
 
