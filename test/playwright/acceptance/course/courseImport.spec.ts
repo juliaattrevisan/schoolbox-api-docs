@@ -3,6 +3,7 @@
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import { CreateFolder } from "@schoolboxTest/playwright/support/page/folder/createFolder";
+import { CourseModify } from "@schoolboxTest/playwright/support/page/courses/courseModify";
 import { CourseList } from "@schoolboxTest/playwright/support/page/courses/courseList";
 import { ImportCourseIntoClass } from "@schoolboxTest/playwright/support/page/courses/importCourseIntoClass";
 
@@ -108,6 +109,70 @@ test.describe("Course import tests", () => {
         await page.goto(`/homepage/${folderId}`);
 
         await expect(page.locator("#container")).toContainText("Romeo and Juliet"); // TODO: Use data-test
+    });
+
+    /**
+     * Copy activity into a class
+     * - navigate to /course/modify/6
+     * - copy activity into a class for the unticked quiz, due work and quiz above
+     * - fill the dates fields and click export to selected class
+     * - ensure the assessment is presented in that class
+     */
+    test("Copy activity into class", async ({ tester, page, db }) => {
+        const courseModify = new CourseModify(page);
+
+        const folderId = (await db.grabFromDatabase("folder", "id", {
+            name: "Automation Course Import Folder1",
+            deleted_at: null,
+        })) as string;
+
+        tester.isGoingTo("navigate to Year 9 English Modify course page");
+        await courseModify.goto(6);
+
+        tester.isGoingTo("click the arrow to expand Romeo and Juliet unit");
+        await courseModify.clickUnitArrow(15);
+
+        tester.isGoingTo("click the export icon for Romeo and Juliet Key Quote Activity");
+        await courseModify.clickExportIcon(52);
+
+        tester.isGoingTo("tick the checkbox");
+        const courseImplementationId = (await db.grabFromDatabase("course_implementation", "id", {
+            folder_id: folderId,
+        })) as string;
+        const importId = (await db.grabFromDatabase("course_unit_implementation", "id", {
+            course_implementation_id: courseImplementationId,
+        })) as string;
+        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+
+        tester.isGoingTo("click export the selected classes button");
+        await page.click("input[type=submit]");
+
+        tester.isGoingTo("click the export icon for Present a scene of Romeo and Juliet");
+        await courseModify.clickExportIcon(146);
+
+        tester.isGoingTo("tick the checkbox");
+        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+
+        tester.isGoingTo("click export the selected classes button");
+        await page.click("input[type=submit]");
+
+        tester.isGoingTo("click the export icon for Post-Unit Quiz");
+        await courseModify.clickExportIcon(151);
+
+        tester.isGoingTo("tick the checkbox");
+        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+
+        tester.isGoingTo("click export the selected classes button");
+        await page.click("input[type=submit]");
+
+        tester.isGoingTo(
+            "navigate to the class homepage to check if the assessments are presented in the course outline",
+        );
+        await page.goto(`/homepage/${folderId}`);
+
+        await expect(page.locator("#container")).toContainText("Romeo and Juliet Key Quote Activity"); // TODO: Use data-test
+        await expect(page.locator("#container")).toContainText("Present a scene of Romeo and Juliet"); // TODO: Use data-test
+        await expect(page.locator("#container")).toContainText("Post-Unit Quiz"); // TODO: Use data-test
     });
 
     test.afterEach(async ({ tester }) => {
