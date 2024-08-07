@@ -281,8 +281,7 @@ class Controller extends Base
             }
         }
 
-        header('Content-type: application/json');
-        echo json_encode($arrayToReturn);
+        $this->response = $this->responseAsJson($arrayToReturn);
     }
 
     /**
