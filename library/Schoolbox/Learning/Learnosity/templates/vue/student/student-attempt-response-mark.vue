@@ -1,6 +1,8 @@
 <script setup lang="ts">
 /**
- * To provide a final mark response for a student that will override the calculated mark
+ * To provide a final mark (grade) response for a student that can override the calculated mark.
+ * Note the variation between mark and grade, which is a little confusing...
+ * It's referred to the 'mark' in the backend, but the front end element is called 'grade', hence the variation.
  */
 
 import { watchDebounced, computedEager } from "@vueuse/core";
