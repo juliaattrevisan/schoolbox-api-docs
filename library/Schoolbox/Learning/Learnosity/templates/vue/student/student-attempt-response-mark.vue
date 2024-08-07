@@ -211,13 +211,20 @@ const showAssignButton = computedEager(() => {
 });
 
 /**
- * Update the mark when the assign button is clicked,
- * which will fire the watchDebounced and save the mark
+ * Update the mark which will fire the
+ * watchDebounced and save the mark
  */
-function onAssignSelected() {
+function assignMark() {
     const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
     formElement.value = actualMark.value;
     mark.value = actualMark.value;
+}
+
+/**
+ * Assign the mark when selected
+ */
+function onAssignSelected() {
+    assignMark();
 }
 
 /**
@@ -230,6 +237,11 @@ window.Vue.onMounted(async () => {
     }
     await window.Vue.nextTick();
     addGradeElement();
+    // check if the mark is empty, and if so assign the mark so when Finalise review is selected, the grade is visible on the quiz status page
+    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
+        assignMark();
+        void saveMark();
+    }
 });
 
 /**
