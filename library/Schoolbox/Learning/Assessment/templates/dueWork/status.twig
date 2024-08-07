@@ -352,14 +352,14 @@
 {#                    <label class="checkbox-label" data-participant-name>#}{# populated by JS (jquery.bulky.js) #}{#</label>#}
 {#                </div>#}
 {#            </section>#}
-{#            <div class="component-action">#}
-{#                <section>#}
-{#                    {%- apply spaceless -%}#}
-{#                        <a class="button">Cancel</a>#}
-{#                        <a class="button" data-submit>All Received</a>#}
-{#                    {%- endapply -%}#}
-{#                </section>#}
-{#            </div>#}
+            <div class="component-action">
+                <section>
+                    {%- apply spaceless -%}
+                        <a class="button">Cancel</a>
+                        <a class="button" data-submit>Save</a>
+                    {%- endapply -%}
+                </section>
+            </div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
@@ -534,19 +534,13 @@
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
                         submitText: function (len, all) {
-                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                                $('#checkbox-switch-container').show();
-                            } else {
-                                $('#checkbox-switch-container').hide();
-                            }
+                            {#if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {#}
+                            {#    $('#checkbox-switch-container').show();#}
+                            {#} else {#}
+                            {#    $('#checkbox-switch-container').hide();#}
+                            {#}#}
 
-                            if (!len) {
-                                return 'Acknowledge None Received';
-                            }
-                            if (len === all) {
-                                return 'Acknowledge All Received';
-                            }
-                            return 'Acknowledge ' + len + ' of ' + all + ' Received';
+                            return 'Save';
                         },
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
