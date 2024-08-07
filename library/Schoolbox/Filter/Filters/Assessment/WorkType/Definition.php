@@ -148,8 +148,7 @@ class Definition extends Filter\AbstractDefinition
      */
     public function preprocess($input): void
     {
-        /* Preprocess worktypes.
-         * Note that this breaks the IDefinition interface
+        /* Preprocess worktypes, removing SIVO worktypes if you're a non-staff
          */
         $this->workTypes = $this->workTypes->shallowClone()
             ->filter(static function ($elem) use ($input) {
