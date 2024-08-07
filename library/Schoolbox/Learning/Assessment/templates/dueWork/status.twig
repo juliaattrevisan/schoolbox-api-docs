@@ -355,19 +355,21 @@
                      # the due date is reached, despite having practically done the work on time; they
                      # just didn't complete the workflow.
                      #}
-                    <div id="mass-submit-draft-on-time-container"data-mass-available>
-                        <hr />
-                        <p>
-                            Did these students submit their work on time? <br />
-                            <span class="switch">
-                                <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                                <label for="onTimeCheckboxSwitch">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </span>
-                        </p>
-                    </div>
+                    {% if assessment.overdue %}
+                        <div id="mass-submit-draft-on-time-container" data-mass-available>
+                            <hr />
+                            <p>
+                                Did these students submit their work on time? <br />
+                                <span class="switch">
+                                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
+                                    <label for="onTimeCheckboxSwitch">
+                                        <span>Yes</span>
+                                        <span>No</span>
+                                    </label>
+                                </span>
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
                     <p data-mass-unavailable>You have no students requiring submission.</p>
@@ -388,19 +390,21 @@
                      # the due date is reached, despite having practically done the work on time; they
                      # just didn't complete the workflow.
                      #}
-                    <div id="mass-submit-offline-on-time-container" data-mass-available>
-                        <hr />
-                        <p>
-                            Did these students submit their work on time? <br />
-                            <span class="switch">
-                                <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                                <label for="onTimeCheckboxSwitch">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </span>
-                        </p>
-                    </div>
+                    {% if assessment.overdue %}
+                        <div id="mass-submit-offline-on-time-container" data-mass-available>
+                            <hr />
+                            <p>
+                                Did these students submit their work on time? <br />
+                                <span class="switch">
+                                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
+                                    <label for="onTimeCheckboxSwitch">
+                                        <span>Yes</span>
+                                        <span>No</span>
+                                    </label>
+                                </span>
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 {#            <h2>Acknowledge Receipt of Submission</h2>#}
