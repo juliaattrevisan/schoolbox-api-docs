@@ -25,19 +25,19 @@ describe("getPercentage()", () => {
     test("26/26 to be 100%", () => {
         expect(getPercentage(26, 26)).toBe("100%");
     });
-    test("0/0 to be invalid as both numbers are zero", () => {
-        expect(getPercentage(0, 0)).toBe("-");
+    test("0/0 to be undefined as both numbers are zero", () => {
+        expect(getPercentage(0, 0)).toBe(undefined);
     });
-    test("26/0 to be invalid as value is higher than max", () => {
-        expect(getPercentage(26, 0)).toBe("-");
+    test("26/0 to be undefined as value is higher than max", () => {
+        expect(getPercentage(26, 0)).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getPercentage("26", 0)).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getPercentage("26", 0)).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getPercentage(26, "0")).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getPercentage(26, "0")).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getPercentage("26", "0")).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getPercentage("26", "0")).toBe(undefined);
     });
 });

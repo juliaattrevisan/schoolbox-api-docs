@@ -14,29 +14,29 @@ describe("getLetterGrade()", () => {
     test("77/77 to be an A+", () => {
         expect(getLetterGrade(77, 77, letterGradeSet)).toBe("A+");
     });
-    test("100/50 to be invalid, as value is higher than total", () => {
-        expect(getLetterGrade(100, 50, letterGradeSet)).toBe("-");
+    test("100/50 to be undefined, as value is higher than total", () => {
+        expect(getLetterGrade(100, 50, letterGradeSet)).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getLetterGrade("100", 50, letterGradeSet)).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getLetterGrade("100", 50, letterGradeSet)).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getLetterGrade(100, "50", letterGradeSet)).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getLetterGrade(100, "50", letterGradeSet)).toBe(undefined);
     });
-    test("not passing numbers to be invalid", () => {
-        expect(getLetterGrade("100", "50", letterGradeSet)).toBe("-");
+    test("not passing numbers to be undefined", () => {
+        expect(getLetterGrade("100", "50", letterGradeSet)).toBe(undefined);
     });
-    test("passing an empty letterGradeSet to be invalid", () => {
-        expect(getLetterGrade(45, 100, [])).toBe("-");
+    test("passing an empty letterGradeSet to be undefined", () => {
+        expect(getLetterGrade(45, 100, [])).toBe(undefined);
     });
-    const invalidLetterGradeSet = [
+    const undefinedLetterGradeSet = [
         { grade: "A", min: 80, max: 100 },
         { grade: "B", min: 60, max: 79 },
         { grade: "C", min: 40, max: 59 },
         { grade: "D", min: 20, max: 39 },
     ];
-    test("passing an invalid letterGradeSet to be invalid", () => {
-        expect(getLetterGrade(45, 100, invalidLetterGradeSet)).toBe("-");
+    test("passing an undefined letterGradeSet to be undefined", () => {
+        expect(getLetterGrade(45, 100, undefinedLetterGradeSet)).toBe(undefined);
     });
     const anotherInvalidLetterGradeSet = [
         { caption: "A", lowerBound: 91.11 },
@@ -44,8 +44,8 @@ describe("getLetterGrade()", () => {
         { caption: "C" },
         { caption: "D", lowerBound: 37.77 },
     ];
-    test("passing an invalid letterGradeSet to be invalid", () => {
-        expect(getLetterGrade(45, 100, anotherInvalidLetterGradeSet)).toBe("-");
+    test("passing an undefined letterGradeSet to be undefined", () => {
+        expect(getLetterGrade(45, 100, anotherInvalidLetterGradeSet)).toBe(undefined);
     });
 });
 
@@ -62,14 +62,14 @@ describe("getLowerBound()", () => {
     test("passing an empty letterGradeSet to return undefined", () => {
         expect(getLowerBound("A+", [])).toBe(undefined);
     });
-    const invalidLetterGradeSet = [
+    const undefinedLetterGradeSet = [
         { grade: "A", min: 80, max: 100 },
         { grade: "B", min: 60, max: 79 },
         { grade: "C", min: 40, max: 59 },
         { grade: "D", min: 20, max: 39 },
     ];
-    test("passing an invalid letterGradeSet to return undefined", () => {
-        expect(getLowerBound("A+", invalidLetterGradeSet)).toBe(undefined);
+    test("passing an undefined letterGradeSet to return undefined", () => {
+        expect(getLowerBound("A+", undefinedLetterGradeSet)).toBe(undefined);
     });
     const anotherInvalidLetterGradeSet = [
         { caption: "A", lowerBound: 91.11 },
@@ -77,7 +77,7 @@ describe("getLowerBound()", () => {
         { caption: "C" },
         { caption: "D", lowerBound: 37.77 },
     ];
-    test("passing an invalid letterGradeSet to return undefined", () => {
+    test("passing an undefined letterGradeSet to return undefined", () => {
         expect(getLowerBound("A+", anotherInvalidLetterGradeSet)).toBe(undefined);
     });
 });

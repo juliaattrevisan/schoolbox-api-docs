@@ -19,21 +19,20 @@ export function isRounded(value: number): boolean {
  * @param {number} value - the value to calculate the percentage of
  * @param {number} max - the maximum value
  * @param {number} decimalPlaces - the number of decimal places to round to
- * @returns {string} - the percentage, for example 30% or 45.67%
+ * @returns {string | undefined} - the percentage, for example 30% or 45.67%
  */
-export function getPercentage(value: number, max: number, decimalPlaces: number = 2): string {
-    const invalidValue = "-";
+export function getPercentage(value: number, max: number, decimalPlaces: number = 2): string | undefined {
     // check if both are numbers
     if (typeof value !== "number" || typeof max !== "number") {
-        return invalidValue;
+        return undefined;
     }
     // check if either are negative
     if (value < 0 || max <= 0) {
-        return invalidValue;
+        return undefined;
     }
     // check if value is greater than max
     if (max < value) {
-        return invalidValue;
+        return undefined;
     }
     const percentageNum = (value / max) * 100;
     // if percentage is a whole number then return as a whole number

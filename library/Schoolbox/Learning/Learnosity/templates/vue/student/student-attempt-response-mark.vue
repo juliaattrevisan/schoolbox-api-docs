@@ -181,7 +181,12 @@ const currentScore = window.Vue.computed(() => {
  */
 const actualMark = computedEager(() => {
     if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
-        return getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
+        const percentage = getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
+        // percentage is returned from the back end with a space between the value and the %
+        // so we need to set this up to match the format to compare the values for showAssignButton
+        const percentageWithSpace =
+            percentage !== undefined ? `${percentage.substring(0, percentage.length - 1)} %` : "";
+        return percentageWithSpace;
     }
     if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
         return getLetterGrade(
