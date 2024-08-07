@@ -36,9 +36,10 @@ export function getPercentage(value: number, max: number, decimalPlaces: number 
         return invalidValue;
     }
     const percentageNum = (value / max) * 100;
-    // If sum isn't a whole number then return to decimalPlaces
-    if (!isRounded(percentageNum)) {
-        return `${percentageNum.toFixed(decimalPlaces)}%`;
+    // if percentage is a whole number then return as a whole number
+    if (isRounded(percentageNum)) {
+        return `${Math.round(percentageNum)}%`;
     }
-    return `${Math.round(percentageNum)}%`;
+    // if sum isn't a whole number then return to decimalPlaces, also removing any trailing zeros using parseFloat
+    return `${parseFloat(percentageNum.toFixed(decimalPlaces))}%`;
 }

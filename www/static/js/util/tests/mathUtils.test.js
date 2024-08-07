@@ -16,6 +16,9 @@ describe("getPercentage()", () => {
     test("5/10 to be 50%", () => {
         expect(getPercentage(5, 10)).toBe("50%");
     });
+    test("8/21 to be 38.1%", () => {
+        expect(getPercentage(8, 21)).toBe("38.1%");
+    });
     test("0/26 to be 0%", () => {
         expect(getPercentage(0, 26)).toBe("0%");
     });
