@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Component\Eportfolio;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineController;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -469,15 +470,13 @@ class Component_InstanceMapper extends BaseMapper
     {
         $instanceCollection = $this->getModelAsCollection($object);
 
-        // Container for parents if configs that need deletion
-
-        $instanceIDs = [];
-
+        // Resequence components living in the same location as the deleted
+        // component.
+        // (Why was `module = 'dashboard'` in the query?)
         foreach ($instanceCollection as $instance) {
             /* @var $instance Component_Instance */
-            $instanceIDs[]            = $this->database->legacyQuote($instance->getId());
             $sourceInstanceCollection = $this->findByColumnList([
-                'module'     => 'dashboard',
+                'module'     => $instance->getModule(),
                 'identifier' => $instance->getIdentifier(),
                 'position'   => $instance->getPosition()
             ]);
@@ -497,20 +496,24 @@ class Component_InstanceMapper extends BaseMapper
             parent::save($sourceInstanceCollection);
         }
 
-        // Delete associated configs
+        // Delete everything related in a transaction.
+        $this->getDatabase()->transact(function () use ($instanceCollection) {
+            // Delete related eportfolio items:
+            // these are a hard delete, so they must be deleted before deleting
+            // the instance.
+            $instanceIds = $instanceCollection->getPropertyValues('id');
+            Eportfolio\AdvancedListMapper::getInstance()->deleteByColumn('component_instance_id', $instanceIds);
+            Eportfolio\BasicListMapper::getInstance()->deleteByColumn('component_instance_id', $instanceIds);
+            Eportfolio\LinkListMapper::getInstance()->deleteByColumn('component_instance_id', $instanceIds);
+            Eportfolio\TextboxMapper::getInstance()->deleteByColumn('component_instance_id', $instanceIds);
 
-        if (parent::delete($instanceCollection) && !empty($instanceIDs)) {
-            $deleteIDs = implode(',', $instanceIDs);
+            // Delete component config
+            $this->componentConfigMapper->deleteByColumn('component_instance_id', $instanceIds);
 
-            $this->database->query("
-                DELETE FROM     `component_config_instance`
-                WHERE           `component_instance_id` IN ({$deleteIDs});
-            ");
-
-            return true;
-        }
-
-        return false;
+            // Finally delete instances themselves
+            parent::delete($instanceCollection);
+        });
+        return true;
     }
 
     /**
