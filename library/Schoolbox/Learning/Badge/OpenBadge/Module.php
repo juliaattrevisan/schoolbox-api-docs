@@ -29,13 +29,13 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/issuer.json',
+            '/2.0/issuer.json',
             'getIssuerJson'
         );
 
         $this->register(
             self::METHOD_GET,
-            '/badge/{badgeId}.json',
+            '/2.0/badge/{badgeId}.json',
             'getBadgeJson',
             null,
             Closure::fromCallable([$this, 'preloadBadge']),
@@ -43,7 +43,7 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
-            '/assertion/{awardId}.json',
+            '/2.0/assertion/{awardId}.json',
             'getBadgeAssertion',
             null,
             Closure::fromCallable([$this, 'preloadAward']),

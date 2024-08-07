@@ -39,7 +39,7 @@ class Controller extends Base
     public function getIssuerJson(): void
     {
         $config = $this->getConfigLoader();
-        $issuerUrl = (string)(new Url($config))->buildFullyQualified()->withPath('/learning/badge/api/issuer.json');
+        $issuerUrl = (string)(new Url($config))->buildFullyQualified()->withPath($this->routeGenerator->generate('learningBadgeApi.getIssuerJson'));
 
 
         $issuerJson = [
@@ -64,7 +64,7 @@ class Controller extends Base
     {
         $config = $this->getConfigLoader();
         $fqdn = (new Url($config))->buildFullyQualified();
-        $issuerUrl = (string)$fqdn->withPath('/learning/badge/api/issuer.json');
+        $issuerUrl = (string)$fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getIssuerJson'));
 
         $image = null;
         if ($badge->getIcon()) {
@@ -81,11 +81,11 @@ class Controller extends Base
 
         $badgeJson = [
             '@context'  => self::CONTEXT,
-            'id'        => $fqdn->withPath('/learning/badge/api/badge/' . $badge->getId() . '.json'),
+            'id'        => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeJson', ['badgeId' => $badge->getId()])),
             'type'      => 'BadgeClass',
             'name'      => $badge->getName(),
-            'description' => Scrub::html($badge->getBody()),
-            'criteria'  => '',
+            'description' => Scrub::html2text($badge->getBody()),
+            'criteria'  => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeJson', ['badgeId' => $badge->getId()])),
             'image'     => $image,
             'issuer'       => $issuerUrl,
 
@@ -113,16 +113,25 @@ class Controller extends Base
                                    ->withStatus(404);
         }
 
+        if ($award->getRecipient()->getEmail()) {
+            $recipient = [
+                'type'      => 'email',
+                'hashed'    => true,
+                'identity'  => 'sha256$' . hash('sha256', $award->getRecipient()->getEmail()),
+            ];
+        } else {
+            $recipient = [
+                'type'      => 'url',
+                'identity'  => $fqdn->withPath($this->routeGenerator->generate('searchUser.getProfile', ['userId' => $award->getRecipient()->getId()])),
+            ];
+        }
+
         $assertionJson = [
             '@context'      => self::CONTEXT,
             'type'          => 'Assertion',
-            'id'            => $fqdn->withPath('/learning/badge/api/assertion/' . $award->getId() . '.json'),
-            'recipient' => [
-                'type'      => 'email',
-                'hashed'    => true,
-                'identity'  => 'sha256' . hash('sha256', $award->getRecipient()->getEmail()),
-            ],
-            'badge'         => $fqdn->withPath('/learning/badge/api/badge/' . $award->getBadge()->getId() . '.json'),
+            'id'            => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeAssertion', ['awardId' => $award->getId()])),
+            'recipient'     => $recipient,
+            'badge'         => $fqdn->withPath($this->routeGenerator->generate('learningBadgeApi.getBadgeJson', ['badgeId' => $award->getBadge()->getId()])),
             'verification'  => [
                 'type'      => 'hosted',
             ] ,
