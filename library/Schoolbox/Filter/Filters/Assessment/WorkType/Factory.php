@@ -23,13 +23,6 @@ use Schoolbox\User;
  */
 class Factory extends Filter\AbstractFactory
 {
-
-    /**
-     * @var WorkType\Mapper
-     */
-    private $workTypeMapper;
-
-
     /**
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
@@ -40,10 +33,9 @@ class Factory extends Filter\AbstractFactory
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
-        WorkType\Mapper $workTypeMapper
+        private WorkType\Mapper $workTypeMapper
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
-        $this->workTypeMapper = $workTypeMapper;
     }
 
 
