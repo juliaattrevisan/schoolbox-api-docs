@@ -259,7 +259,17 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        // Only display download link if there are actually files to download
+        /* Find out which users have a draft submission
+         */
+        $draftResponses = [];
+
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $draftResponse = $participant->findMostRecentDraftResponse();
+
+            if ($draftResponse) {
+                $draftResponses[$participant->getUser()->getId()] = $draftResponse->getId();
+            }
+        }
 
         $twigData = [
             'errors'            => $this->stateMapper->listDisplayValues(),
@@ -271,6 +281,7 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment'        => $assessment,
+            // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
@@ -283,6 +294,9 @@ class Controller extends Assessment\Controller
                 null,
                 $assessment
             ))->getFirstUrl(),
+            /* Draft Responses made by each guy
+             */
+            'draftResponses' => $draftResponses
         ];
 
         $this->response = $this->responseFromTemplate(

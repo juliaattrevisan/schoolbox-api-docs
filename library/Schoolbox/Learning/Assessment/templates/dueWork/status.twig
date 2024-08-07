@@ -12,7 +12,9 @@
      - selfAssess:        bool            Is this being viewed in a self assessment context?
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
-#}
+
+ # @param array $draftSubmissions  A lookup of (user id, response id) for thsoe who have drafts
+ #}
 
 {% extends '@learningAssessment/status.twig' %}
 
@@ -255,6 +257,7 @@
         {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
         {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
         {% set massActions = massActions ~ (download ? ' data-mass-download' : '') %}
+        {% set massActions = massActions ~ (draftResponses[participant.user.id] ?? false ? ' data-mass-submit-draft=' ~ draftResponses[participant.user.id] : '') %}
         {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
         {% set buttons %}
@@ -551,17 +554,18 @@
                     let confirmDialogDisabled            = false;
                     let confirmDialogDisabledOnTimeValue = false;
 
+                    $('#mass-submit-draft').bulky({
+                        modal: $('#manage-submissions'),
+                        userSelector: '[data-mass-submit-draft]',
+                        userList: $userList
+                    });
+
                     $('#mass-submit-offline').bulky({
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
                         userList: $userList
                     });
 
-                    $('#mass-submit-draft').bulky({
-                        modal: $('#manage-submissions'),
-                        userSelector: '[data-mass-submit]',
-                        userList: $userList
-                    });
 
                     {# Mass acknowledge receipt of submissions #}
                     {#$('#mass-submit').bulky({#}
