@@ -127,6 +127,15 @@ class Module extends BaseModule
         $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
         $this->register('GET', '/{id:\d+}', 'getTextbox', $folderAuthView, $textboxPreload);
+        $this->register(
+            'GET',
+            '/textboxSearch',
+            'textboxSearch',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\IsSuperuser()
+            )
+        );
     }
 
     /**

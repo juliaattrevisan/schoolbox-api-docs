@@ -15,7 +15,6 @@ use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
-use Scrub;
 
 /**
  * Controller for textbox actions.
@@ -259,6 +258,30 @@ class Controller extends Base
         $this->response = $this->responseFromTemplateUnthemed('@textbox/blank.twig', [
             'textbox'         => $textbox,
         ]);
+    }
+
+    /**
+     * Specialised search function for use when searching for textboxes while building dashboard templates.
+     *
+     * @return void
+     */
+    public function textboxSearch(): void
+    {
+        $query = trim($this->requestQuery->get('query', ''));
+        $arrayToReturn = [];
+
+        if ($query !== '') {
+            $allTextboxes  = $this->mapper->search($this->user, $query);
+
+            foreach ($allTextboxes->getResult() as $currentTextbox) {
+                $arrayToReturn[] = array(
+                    'id'   => $currentTextbox->getId(),
+                    'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
+                );
+            }
+        }
+
+        $this->response = $this->responseAsJson($arrayToReturn);
     }
 
     /**
