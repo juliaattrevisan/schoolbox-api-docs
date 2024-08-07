@@ -67,11 +67,11 @@ const maxScore = window.Vue.computed(() => {
 });
 
 /**
- * If the student has no score, we don't want to show any score
- * @returns {boolean} - whether the student has a score to display
+ * Only show the attempt mark when it actually exists
+ * @returns {boolean} - whether the student has a mark
  */
-const hasScore = window.Vue.computed(() => {
-    return maxScore.value !== 0;
+const hasMark = window.Vue.computed(() => {
+    return props.student.attemptResponse.mark !== undefined && props.student.attemptResponse.mark !== "";
 });
 
 /**
@@ -133,7 +133,7 @@ const statusStyles = window.Vue.computed(() => {
 
 <template>
     <!-- this is the matched DOM structure of a Learnosity score -->
-    <div v-if="hasSubmissionState || hasScore" class="lrn learnosity-report session-detail-by-item mark">
+    <div v-if="hasMark" class="lrn learnosity-report session-detail-by-item mark">
         <h3 class="lrn-report-item-title">
             <span class="visually-hidden">{{ totalScore }}/{{ maxScore }}</span>
             <div
