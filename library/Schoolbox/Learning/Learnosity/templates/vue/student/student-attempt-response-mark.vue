@@ -201,16 +201,24 @@ const actualMark = computedEager(() => {
 });
 
 /**
+ * Only show the attempt mark when it actually exists
+ * @returns {boolean} - whether the student has a mark
+ */
+const hasNoMark = window.Vue.computed(() => {
+    return (
+        props.student.attemptResponse.mark === undefined &&
+        props.student.attemptResponse.mark === null &&
+        props.student.attemptResponse.mark === ""
+    );
+});
+
+/**
  * Whether to show the assign button, shown when the actual mark doesn't match the set overridden mark,
  * so users can easily re-assign the mark from the item scores
  * @returns {boolean} - whether to show the assign button
  */
 const showAssignButton = computedEager(() => {
-    if (
-        props.student.attemptResponse.mark === undefined ||
-        props.student.attemptResponse.mark === "" ||
-        getAttemptMaxScore(props.student) === 0
-    ) {
+    if (hasNoMark.value || getAttemptMaxScore(props.student) === 0) {
         return false;
     }
     return actualMark.value !== mark.value;
@@ -253,7 +261,7 @@ window.Vue.onMounted(async () => {
     await window.Vue.nextTick();
     addGradeElement();
     // check if the mark is empty, and if so assign the mark so when Finalise review is selected, the grade is visible on the quiz status page
-    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
+    if (hasNoMark.value) {
         assignMark();
         void saveMark();
     }
@@ -273,13 +281,7 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <div
-        v-if="
-            (props.isReadOnly && props.student.attemptResponse.mark === null) ||
-            (props.isReadOnly && props.student.attemptResponse.mark === '')
-        "
-        class="l-flex-col l-gap-s"
-    >
+    <div v-if="hasNoMark" class="l-flex-col l-gap-s">
         <label>Grade</label>
         <p>
             <em>No grade added.</em>

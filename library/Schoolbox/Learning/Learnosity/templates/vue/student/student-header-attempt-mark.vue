@@ -71,7 +71,11 @@ const maxScore = window.Vue.computed(() => {
  * @returns {boolean} - whether the student has a mark
  */
 const hasMark = window.Vue.computed(() => {
-    return props.student.attemptResponse.mark !== undefined && props.student.attemptResponse.mark !== "";
+    return (
+        props.student.attemptResponse.mark !== undefined &&
+        props.student.attemptResponse.mark !== null &&
+        props.student.attemptResponse.mark !== ""
+    );
 });
 
 /**
