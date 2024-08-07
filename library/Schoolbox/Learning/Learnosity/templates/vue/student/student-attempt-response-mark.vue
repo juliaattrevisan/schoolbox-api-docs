@@ -13,7 +13,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
 import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
-import { getAttemptScore } from "@schoolboxLearnosity/js/util/markingUtils";
+import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the student to display
@@ -209,7 +209,7 @@ const showAssignButton = computedEager(() => {
     if (
         props.student.attemptResponse.mark === undefined ||
         props.student.attemptResponse.mark === "" ||
-        props.student.attemptResponse.maxMarks === 0
+        getAttemptMaxScore(props.student) === 0
     ) {
         return false;
     }
