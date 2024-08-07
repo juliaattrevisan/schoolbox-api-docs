@@ -228,6 +228,15 @@ function onAssignSelected() {
 }
 
 /**
+ * If the user has updated the score, it's assumed that they wish
+ * to override anything that they may have previously set in the grade field
+ */
+window.Vue.watch(currentScore, () => {
+    assignMark();
+    void saveMark();
+});
+
+/**
  * To add the grade field in
  */
 window.Vue.onMounted(async () => {
