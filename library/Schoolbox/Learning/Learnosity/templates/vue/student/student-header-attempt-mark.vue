@@ -45,7 +45,7 @@ const normaliseAs = window.Vue.computed(() => {
         const submissionState = props.markData.submissionStates.find(
             (state) => state.displayAs === props.student.attemptResponse.mark,
         );
-        return submissionState?.normaliseAs ? submissionState.normaliseAs : null;
+        return submissionState?.normaliseAs ?? null;
     }
     return null;
 });
