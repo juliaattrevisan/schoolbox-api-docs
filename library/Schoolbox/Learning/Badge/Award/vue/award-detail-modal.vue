@@ -376,8 +376,9 @@ export default {
                         <template v-else> Awarded </template>
                         <relative-time :datetime="award.awardedAt" :key="`${award.id}-awardedAt`"></relative-time>
                         by
-                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a
-                        ><template v-if="award.expiresAt"
+                        <template v-if="award.awardedBy.isDeleted">{{ award.awardedBy.fullName }}</template>
+                        <a v-else :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                        <template v-if="award.expiresAt"
                             >,
                             <template v-if="isExpired">expired</template>
                             <template v-else>expires</template>

@@ -1,3 +1,11 @@
+{%
+    set awardedByRoute = (
+    (award.awardedBy.isDeleted)
+    ? ''
+    : routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy})
+    )
+%}
+
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js?v={{ config.site_version }}"></script>
 <script>
     var client = new ClipboardJS('#copy-button');

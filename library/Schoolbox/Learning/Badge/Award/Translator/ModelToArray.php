@@ -110,6 +110,7 @@ class ModelToArray
             'badge'      => call_user_func($this->badgeTranslator, $model->getBadge()),
             'status'     => $model->getStatus(),
             'reason'     => $model->getReason(),
+            'isDeleted'  => $model->isDeleted(),
             'isGoal'     => $model->isGoal(),
             'award'      => $translateParentAward && $model->getAward()
                 ? $this->__invoke($model->getAward(), false)
