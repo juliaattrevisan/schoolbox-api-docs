@@ -260,6 +260,9 @@ class Controller extends Assessment\Controller
     public function getStatus(IAssessable $assessment): void
     {
         /* Find out which users have a draft submission
+         * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making
+         * those sort of data collecting maneuvers mainly because they don't know when their
+         * calls access a potentially expensive method.
          */
         $draftResponses = [];
 
