@@ -27,30 +27,27 @@ class Definition extends Filter\AbstractDefinition
     // The name to expose in the UI
     protected const NAME = 'Work Type';
 
-    /**
-     * Indexed by workType.id.
-     *
-     * @var GenericCollection|WorkType\Model[]
-     */
-    private $workTypes;
-
 
     /**
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param GenericCollection|WorkType\Model[] $workTypes
+     * @param GenericCollection                  $workTypes WorkType\Model[] Indexed by workType.id
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        GenericCollection $workTypes
+        private GenericCollection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->workTypes = $workTypes->shallowClone()->indexByCallback(static function (WorkType\Model $workType): int {
-            return $workType->getId();
-        });
+
+        /* Something in twig land requires this to exist really early on
+         */
+        $this->workTypes = $workTypes->shallowClone()
+            ->indexByCallback(static function (WorkType\Model $workType): int {
+                return $workType->getId();
+            });
     }
 
 
@@ -109,7 +106,7 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        return $this->workTypes[$key]->getName();
+        return $this->workTypes[$key]?->getName() ?? '';
     }
 
 
@@ -143,5 +140,31 @@ class Definition extends Filter\AbstractDefinition
     protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/WorkType/templates';
+    }
+
+
+    /**
+     * Allows you to modify the Work Types collection after this class
+     * has been instantiated (required for further preprocessing)
+     *
+     * @return GenericCollection
+     */
+    public function getWorkTypes(): GenericCollection
+    {
+        return $this->workTypes;
+    }
+
+
+    /**
+     * Allows you to modify the Work Types collection after this class
+     * has been instantiated (required for further preprocessing)
+     *
+     * @param GenericCollection $workTypes
+     * @return $this
+     */
+    public function setWorkTypes(GenericCollection $workTypes): self
+    {
+        $this->workTypes = $workTypes;
+        return $this;
     }
 }

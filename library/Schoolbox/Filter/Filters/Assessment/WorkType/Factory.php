@@ -11,7 +11,12 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\BaseComponent;
+use Schoolbox\Filter\IComponent;
+use Schoolbox\Filter\IDefinition;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\User;
 
 /**
  * A factory for building 'WorkType' filter objects
@@ -66,5 +71,43 @@ class Factory extends Filter\AbstractFactory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         return new KeyConverter($filter, new Collection($this->workTypeMapper->findAllIds()));
+    }
+
+
+    /**
+     * @inheritDoc
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
+     */
+    public function buildComponent(
+        IDefinition $definition,
+        User $user,
+        \Schoolbox\Filter\Page\Model $pageFilter,
+        ?GenericCollection $selections,
+        ?User $viewee,
+        array $routeArgs,
+        GenericCollection $overrides
+    ): IComponent {
+        /* Preprocess worktypes.
+         * Note that this breaks the IDefinition interface
+         */
+        $workTypes = $definition->getWorkTypes()->shallowClone()
+            ->filter(static function ($elem) use ($user) {
+                /* If you're not a staff user, subject yourself to the
+                 * SIVO limitation: only worktypes that *aren't* restricted
+                 * should be made available to you
+                 */
+                return !(null !== $user && $elem->getStaffOrInstructorVisibleOnly() && !$user->getRole()->isStaff());
+            });
+
+        $definition->setWorkTypes($workTypes);
+
+        return new BaseComponent(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper()
+        );
     }
 }
