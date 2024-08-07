@@ -3,10 +3,10 @@
  * To provide a final mark response for a student
  */
 
-import { watchDebounced } from "@vueuse/core";
+import { watchDebounced, computedEager } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
 import { getPercentage } from "@js/util/mathUtils";
-import { getLetterGrade, getLowerBound } from "@js/util/sbx/markUtils";
+import { getLetterGrade } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
@@ -130,7 +130,6 @@ async function saveMark() {
     if (props.student.urls === undefined) {
         return;
     }
-    emit("updatedMark", mark.value);
     try {
         isSaving.value = true;
         window.addEventListener("beforeunload", beforeUnloadHandler);
@@ -141,6 +140,7 @@ async function saveMark() {
             body: formData,
         });
         if (response.ok) {
+            emit("updatedMark", mark.value);
             hasSaved.value = true;
         } else {
             hasError.value = true;
@@ -175,10 +175,11 @@ const currentScore = window.Vue.computed(() => {
 });
 
 /**
- * Get the current mark, which includes any updates made by the user since .mark was last updated
+ * Get the ACTUAL mark, which is the mark that's the accurate
+ * representation of the calculated score, not something overridden by the user
  * @returns {string} - the current mark
  */
-const currentMark = window.Vue.computed(() => {
+const actualMark = computedEager(() => {
     if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
         return getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
     }
@@ -193,15 +194,15 @@ const currentMark = window.Vue.computed(() => {
 });
 
 /**
- * Whether to show the assign button, shown when the mark doesn't match the currentScore,
+ * Whether to show the assign button, shown when the actual mark doesn't match the set overridden mark,
  * so users can easily re-assign the mark from the item scores
  * @returns {boolean} - whether to show the assign button
  */
-const showAssignButton = window.Vue.computed(() => {
+const showAssignButton = computedEager(() => {
     if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
         return false;
     }
-    return currentMark.value !== props.student.attemptResponse.mark;
+    return actualMark.value !== mark.value;
 });
 
 /**
@@ -210,9 +211,8 @@ const showAssignButton = window.Vue.computed(() => {
  */
 function onAssignSelected() {
     const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
-    formElement.value = currentMark.value;
-    mark.value = currentMark.value;
-    void saveMark();
+    formElement.value = actualMark.value;
+    mark.value = actualMark.value;
 }
 
 /**
@@ -267,7 +267,7 @@ window.Vue.onBeforeUnmount(async () => {
             </div>
         </div>
         <button v-if="showAssignButton" class="full-width btn-assign" @click.prevent="onAssignSelected">
-            Assign <b>{{ currentMark }}</b> from item scores
+            Assign <b>{{ actualMark }}</b> from item scores
         </button>
     </div>
 </template>
