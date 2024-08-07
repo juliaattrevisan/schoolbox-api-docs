@@ -11,6 +11,9 @@ describe("getLetterGrade()", () => {
     test("0/50 to be an E-", () => {
         expect(getLetterGrade(0, 50, letterGradeSet)).toBe("E-");
     });
+    test("8/14 to be a C", () => {
+        expect(getLetterGrade(8, 14, letterGradeSet)).toBe("C");
+    });
     test("77/77 to be an A+", () => {
         expect(getLetterGrade(77, 77, letterGradeSet)).toBe("A+");
     });

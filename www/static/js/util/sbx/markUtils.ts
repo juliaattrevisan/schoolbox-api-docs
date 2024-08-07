@@ -30,8 +30,10 @@ export function getLetterGrade(value: number, max: number, items: LetterGradeIte
     }
     // to ensure the items are sorted by lowerBound
     const sortedItems = items.sort((a: LetterGradeItem, b: LetterGradeItem) => a.lowerBound - b.lowerBound);
+    // reverse the sorted items to find the correct letter grade
+    const reversedSortedItems = sortedItems.slice().reverse();
     // find the first item that the percentage is greater than or equal to the lowerBound
-    return sortedItems.reverse().find((grade) => percentageNum >= grade.lowerBound)?.caption || undefined;
+    return reversedSortedItems.find((grade) => percentageNum >= grade.lowerBound)?.caption || undefined;
 }
 
 /**

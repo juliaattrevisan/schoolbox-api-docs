@@ -193,7 +193,7 @@ const actualMark = computedEager(() => {
             currentScore.value,
             props.student.attemptResponse.maxMarks as number,
             props.markData.levels as LetterGradeItem[],
-        );
+        ) as string;
     }
     return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
 });
