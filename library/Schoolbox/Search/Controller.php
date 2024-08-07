@@ -113,32 +113,6 @@ class Controller extends Base
     }
 
     /**
-     * Specialised search function for use when searching for textboxes while building dashboard templates.
-     *
-     * @return void
-     */
-    public function textboxSearch(): void
-    {
-        $query = trim($this->requestQuery->get('query', ''));
-        $arrayToReturn = [];
-
-        if ($query !== '') {
-            $textboxMapper = new TextboxMapper();
-            $allTextboxes  = $textboxMapper->search($this->user, $query);
-
-            foreach ($allTextboxes->getResult() as $currentTextbox) {
-                $arrayToReturn[] = array(
-                    'id'   => $currentTextbox->getId(),
-                    'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
-                );
-            }
-        }
-
-        header('Content-type: application/json');
-        echo json_encode($arrayToReturn);
-    }
-
-    /**
      * @return array - Array of filter names indexed by group name.
      */
     private function getFiltersRawArray(): array

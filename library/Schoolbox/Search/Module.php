@@ -28,7 +28,6 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $this->register('GET', '', 'search', new Rule\IsLoggedIn());
-        $this->register('GET', '/textboxSearch', 'textboxSearch', new Rule\IsLoggedIn());
     }
 
     /**
