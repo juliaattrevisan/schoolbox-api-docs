@@ -473,11 +473,14 @@ class Component_InstanceMapper extends BaseMapper
 
         $instanceIDs = [];
 
+        // Resequence components living in the same location as the deleted
+        // component.
+        // (Why was `module = 'dashboard'` in the query?)
         foreach ($instanceCollection as $instance) {
             /* @var $instance Component_Instance */
             $instanceIDs[]            = $this->database->legacyQuote($instance->getId());
             $sourceInstanceCollection = $this->findByColumnList([
-                'module'     => 'dashboard',
+                'module'     => $instance->getModule(),
                 'identifier' => $instance->getIdentifier(),
                 'position'   => $instance->getPosition()
             ]);
