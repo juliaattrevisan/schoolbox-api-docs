@@ -144,27 +144,20 @@ class Definition extends Filter\AbstractDefinition
 
 
     /**
-     * Allows you to modify the Work Types collection after this class
-     * has been instantiated (required for further preprocessing)
-     *
-     * @return GenericCollection
+     * @inheritDoc
      */
-    public function getWorkTypes(): GenericCollection
+    public function preprocess($input): void
     {
-        return $this->workTypes;
-    }
-
-
-    /**
-     * Allows you to modify the Work Types collection after this class
-     * has been instantiated (required for further preprocessing)
-     *
-     * @param GenericCollection $workTypes
-     * @return $this
-     */
-    public function setWorkTypes(GenericCollection $workTypes): self
-    {
-        $this->workTypes = $workTypes;
-        return $this;
+        /* Preprocess worktypes.
+         * Note that this breaks the IDefinition interface
+         */
+        $this->workTypes =  $this->workTypes->shallowClone()
+            ->filter(static function ($elem) use ($input) {
+                /* If you're not a staff user, subject yourself to the
+                 * SIVO limitation: only worktypes that *aren't* restricted
+                 * should be made available to you
+                 */
+                return !(null !== $input && $elem->getStaffOrInstructorVisibleOnly() && !$input->getRole()->isStaff());
+            });
     }
 }

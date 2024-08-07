@@ -369,6 +369,19 @@ abstract class AbstractDefinition implements IDefinition
         return $templateDir . DIRECTORY_SEPARATOR . 'component.twig';
     }
 
+
+    /**
+     * Allow subclasses to optionally preprocess/mutate its own properties,
+     * using a mixed $input param which could be literally anything
+     *
+     * @param $input
+     * @return void
+     */
+    public function preprocess($input): void
+    {
+    }
+
+
     /* Getters
      */
 

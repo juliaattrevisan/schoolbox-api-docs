@@ -87,19 +87,7 @@ class Factory extends Filter\AbstractFactory
         array $routeArgs,
         GenericCollection $overrides
     ): IComponent {
-        /* Preprocess worktypes.
-         * Note that this breaks the IDefinition interface
-         */
-        $workTypes = $definition->getWorkTypes()->shallowClone()
-            ->filter(static function ($elem) use ($user) {
-                /* If you're not a staff user, subject yourself to the
-                 * SIVO limitation: only worktypes that *aren't* restricted
-                 * should be made available to you
-                 */
-                return !(null !== $user && $elem->getStaffOrInstructorVisibleOnly() && !$user->getRole()->isStaff());
-            });
-
-        $definition->setWorkTypes($workTypes);
+        $definition->preprocess($user);
 
         return new BaseComponent(
             $definition,
