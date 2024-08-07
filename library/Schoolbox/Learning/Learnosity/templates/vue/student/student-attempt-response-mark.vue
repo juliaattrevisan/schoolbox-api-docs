@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To provide a final mark response for a student
+ * To provide a final mark response for a student that will override the calculated mark
  */
 
 import { watchDebounced, computedEager } from "@vueuse/core";
