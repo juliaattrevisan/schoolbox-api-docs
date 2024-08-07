@@ -325,7 +325,15 @@
 
         {# The div below is used by bulky.js to create the manage-submissions modal. #}
         <div id="manage-submissions" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-            <h2>Manage submissions</h2>
+            <h2>Manage Submissions</h2>
+
+            {# Decide if this assessment is overdue
+             # If so, blind users with a big orange box
+             #}
+            {% if assessment.overdue %}
+            <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
+            {% endif %}
+
 
             <div class="row">
                 <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
@@ -340,6 +348,26 @@
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
+
+                    {# Submission Date override: this is used to state that despite when the action
+                     # to submit a draft actually occurred, the student should have been considered on
+                     # time. This occurs when teachers submit drafts on behalf of their students after
+                     # the due date is reached, despite having practically done the work on time; they
+                     # just didn't complete the workflow.
+                     #}
+                    <div id="mass-submit-draft-on-time-container"data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
+                                <label for="onTimeCheckboxSwitch">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
                 </div>
                 <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
                     <p data-mass-unavailable>You have no students requiring submission.</p>
@@ -353,20 +381,30 @@
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
+
+                    {# Submission Date override: this is used to state that despite when the action
+                     # to submit a draft actually occurred, the student should have been considered on
+                     # time. This occurs when teachers submit drafts on behalf of their students after
+                     # the due date is reached, despite having practically done the work on time; they
+                     # just didn't complete the workflow.
+                     #}
+                    <div id="mass-submit-offline-on-time-container" data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
+                                <label for="onTimeCheckboxSwitch">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
 {#            <h2>Acknowledge Receipt of Submission</h2>#}
-{#            <p id="checkbox-switch-container">#}
-{#                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>#}
-{#                Did these students submit their work on time? <br />#}
-{#                <span class="switch">#}
-{#                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">#}
-{#                    <label for="onTimeCheckboxSwitch">#}
-{#                        <span>Yes</span>#}
-{#                        <span>No</span>#}
-{#                    </label>#}
-{#                </span>#}
-{#            </p>#}
+
 {#            <p data-mass-unavailable>You have no students requiring submission.</p>#}
 {#            <p data-mass-available>Acknowledge receipt of submission for:</p>#}
 {#            <section class="checklist" id="mass-submit-list">#}
@@ -554,30 +592,51 @@
                     let confirmDialogDisabled            = false;
                     let confirmDialogDisabledOnTimeValue = false;
 
+                    {# Decide if we've gone past the due date
+                     # If we did, provide a checkbox to allow teachers to override when this action occurred
+                     #}
+                    let overdue = new Boolean('{{ assessment.overdue }}');
+
                     $('#mass-submit-draft').bulky({
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit-draft]',
-                        userList: $userList
+                        userList: $userList,
+                        submitText: function (len, all) {
+                            let onTimeContainer = $('#mass-submit-draft-on-time-container');
+
+                            {# Initially hide this checkbox thing until we actually need it #}
+                            onTimeContainer.hide();
+
+                            if (overdue) {
+                                onTimeContainer.show();
+                            }
+
+                            return 'Save';
+                        },
                     });
 
                     $('#mass-submit-offline').bulky({
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
-                        userList: $userList
+                        userList: $userList,
+                        submitText: function (len, all) {
+                            let onTimeContainer = $('#mass-submit-offline-on-time-container');
+
+                            {# Initially hide this checkbox thing until we actually need it #}
+                            onTimeContainer.hide();
+
+                            if (overdue) {
+                                onTimeContainer.show();
+                            }
+
+                            return 'Save';
+                        },
                     });
 
 
                     {# Mass acknowledge receipt of submissions #}
                     {#$('#mass-submit').bulky({#}
-                    {#    submitText: function (len, all) {#}
-                    {#        #}{#if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) #}{#}#}
-                    {#        #}{#    $('#checkbox-switch-container').show();#}
-                    {#        #}{#} else #}{#}#}
-                    {#        #}{#    $('#checkbox-switch-container').hide();#}
-                    {#        #}{#}#}
 
-                    {#        return 'Save';#}
-                    {#    },#}
                     {#    userSelector: '[data-mass-submit]',#}
                     {#    userList: $userList,#}
                     {#    onSubmit: function (toSubmit) {#}
