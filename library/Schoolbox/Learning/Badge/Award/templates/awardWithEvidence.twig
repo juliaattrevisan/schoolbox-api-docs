@@ -5,7 +5,6 @@
     [ award.status | capitalize ~ 's', profile ~ '#' ~ award.status ~'s' ],
     [ award.badge.name ]
 ) }}
-{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id, award: award}) %}
 {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id, award: award}) %}
 {% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id, award: award}) %}
@@ -34,7 +33,7 @@
         });
     });
 </script>
-{%  include '@learningBadgeAward/awardMeta.twig' with {award: award, awardedByRoute: awardedByRoute, profile: profile} only %}
+{%  include '@learningBadgeAward/awardMeta.twig' with {award: award, profile: profile} only %}
 {% include '@learningBadgeAward/awardBadgeList.twig'
     with {badges: badges, isGoal: award.isGoal} only %}
 <div class="row">
