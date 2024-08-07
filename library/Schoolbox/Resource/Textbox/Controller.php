@@ -15,7 +15,6 @@ use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 /**
  * Controller for textbox actions.
@@ -272,8 +271,7 @@ class Controller extends Base
         $arrayToReturn = [];
 
         if ($query !== '') {
-            $textboxMapper = new TextboxMapper();
-            $allTextboxes  = $textboxMapper->search($this->user, $query);
+            $allTextboxes  = $this->mapper->search($this->user, $query);
 
             foreach ($allTextboxes->getResult() as $currentTextbox) {
                 $arrayToReturn[] = array(
