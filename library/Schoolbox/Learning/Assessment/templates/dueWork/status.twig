@@ -58,7 +58,7 @@
     {% endif %}
     {% if not readonly %}
         <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="submit" data-reveal-id="mass-submit">Manage submissions</a></li>
+        <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
         <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish draft feedback</a></li>
     {% endif %}
 {% endblock %}
@@ -320,16 +320,28 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        {# The div below is used by bulky.js to create the mass-submit modal. #}
-        <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true" role="dialog">
+        {# The div below is used by bulky.js to create the manage-submissions modal. #}
+        <div id="manage-submissions" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
             <h2>Manage submissions</h2>
 
             <div class="row">
-                <div class="small-12 medium-6 columns">
-                    <p>Submit draft submissions on behalf of:</p>
+                <div class="small-12 medium-6 columns" id="mass-submit-draft">
+                    <p data-mass-unavailable>You have no students with draft submissions.</p>
+                    <p data-mass-available>Submit draft submissions on behalf of:</p>
                 </div>
-                <div class="small-12 medium-6 columns">
-                    <p>Acknowledge receipt of submission for:</p>
+                <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
+                    <p data-mass-unavailable>You have no students requiring submission.</p>
+                    <p data-mass-available>Acknowledge receipt of submission for:</p>
+
+                    <section class="checklist" id="mass-submit-offline-list">
+                        {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                        <div data-template>
+                            <input type="checkbox" data-selected checked/>
+
+                            {# populated by JS (jquery.bulky.js) #}
+                            <label class="checkbox-label" data-participant-name></label>
+                        </div>
+                    </section>
                 </div>
             </div>
 {#            <h2>Acknowledge Receipt of Submission</h2>#}
@@ -531,28 +543,35 @@
                     let confirmDialogDisabled            = false;
                     let confirmDialogDisabledOnTimeValue = false;
 
-                    {# Mass acknowledge receipt of submissions #}
-                    $('#mass-submit').bulky({
-                        submitText: function (len, all) {
-                            {#if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {#}
-                            {#    $('#checkbox-switch-container').show();#}
-                            {#} else {#}
-                            {#    $('#checkbox-switch-container').hide();#}
-                            {#}#}
-
-                            return 'Save';
-                        },
+                    $('#mass-submit-offline').bulky({
+                        modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
-                        userList: $userList,
-                        onSubmit: function (toSubmit) {
-                            confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
-                            confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.
-                            toSubmit.each(function () {
-                                $(this).find('[data-sobo]').trigger('click');
-                            });
-                            confirmDialogDisabled = false; // Re-enable the confirm dialog.
-                        }
+                        userList: $userList
                     });
+
+
+                    {# Mass acknowledge receipt of submissions #}
+                    {#$('#mass-submit').bulky({#}
+                    {#    submitText: function (len, all) {#}
+                    {#        #}{#if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) #}{#}#}
+                    {#        #}{#    $('#checkbox-switch-container').show();#}
+                    {#        #}{#} else #}{#}#}
+                    {#        #}{#    $('#checkbox-switch-container').hide();#}
+                    {#        #}{#}#}
+
+                    {#        return 'Save';#}
+                    {#    },#}
+                    {#    userSelector: '[data-mass-submit]',#}
+                    {#    userList: $userList,#}
+                    {#    onSubmit: function (toSubmit) {#}
+                    {#        confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');#}
+                    {#        confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.#}
+                    {#        toSubmit.each(function () {#}
+                    {#            $(this).find('[data-sobo]').trigger('click');#}
+                    {#        });#}
+                    {#        confirmDialogDisabled = false; // Re-enable the confirm dialog.#}
+                    {#    }#}
+                    {#});#}
 
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
@@ -756,7 +775,7 @@
                             $feedbackButtons = $draftedSpan.add($publishButton);
 
                         $actionBar.removeAttr('data-mass-publish');
-                        $actionBar.removeAttr('data-mass-submit');
+                        $actionBar.removeAttr('data-manage-submissions');
 
                         // Cannot sobo an acknowledgment once published feedback exists
                         $soboButton.fadeOut({

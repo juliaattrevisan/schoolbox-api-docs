@@ -89,10 +89,20 @@
          */
         this.element.on("change", opt.checkboxSelector, setupActionButton);
 
+        /* Usually this.element is a data-reveal modal div; we can assume that to be the default.
+         * If you're running two Bulky Lists inside one modal, you need to specify the modal itself;
+         * you can do that, explicitly, with options.modal
+         */
+        let modalElement = this.element;
+
+        if (options.modal) {
+            modalElement = options.modal;
+        }
+
         /**
          * When the modal opens
          */
-        this.element.on("open.fndtn.reveal", function () {
+        modalElement.on("open.fndtn.reveal", function () {
             var $checks;
 
             /* Number of invalid checkboxes
