@@ -206,7 +206,11 @@ const actualMark = computedEager(() => {
  * @returns {boolean} - whether to show the assign button
  */
 const showAssignButton = computedEager(() => {
-    if (props.student.attemptResponse.mark === undefined || props.student.attemptResponse.mark === "") {
+    if (
+        props.student.attemptResponse.mark === undefined ||
+        props.student.attemptResponse.mark === "" ||
+        props.student.attemptResponse.maxMarks === 0
+    ) {
         return false;
     }
     return actualMark.value !== mark.value;
