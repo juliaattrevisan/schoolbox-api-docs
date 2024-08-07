@@ -321,36 +321,45 @@
         </div>
 
         {# The div below is used by bulky.js to create the mass-submit modal. #}
-        <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
-             role="dialog">
-            <h2>Acknowledge Receipt of Submission</h2>
-            <p id="checkbox-switch-container">
-                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
-                Did these students submit their work on time? <br />
-                <span class="switch">
-                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                    <label for="onTimeCheckboxSwitch">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
-                </span>
-            </p>
-            <p data-mass-unavailable>You have no students requiring submission.</p>
-            <p data-mass-available>Acknowledge receipt of submission for:</p>
-            <section class="checklist" id="mass-submit-list">
-                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
+        <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true" role="dialog">
+            <h2>Manage submissions</h2>
+
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <p>Submit draft submissions on behalf of:</p>
                 </div>
-            </section>
-            <div class="component-action">
-                <section>
-                    {%- apply spaceless -%}
-                        <a class="button">Cancel</a>
-                        <a class="button" data-submit>All Received</a>
-                    {%- endapply -%}
-                </section>
+                <div class="small-12 medium-6 columns">
+                    <p>Acknowledge receipt of submission for:</p>
+                </div>
             </div>
+{#            <h2>Acknowledge Receipt of Submission</h2>#}
+{#            <p id="checkbox-switch-container">#}
+{#                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>#}
+{#                Did these students submit their work on time? <br />#}
+{#                <span class="switch">#}
+{#                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">#}
+{#                    <label for="onTimeCheckboxSwitch">#}
+{#                        <span>Yes</span>#}
+{#                        <span>No</span>#}
+{#                    </label>#}
+{#                </span>#}
+{#            </p>#}
+{#            <p data-mass-unavailable>You have no students requiring submission.</p>#}
+{#            <p data-mass-available>Acknowledge receipt of submission for:</p>#}
+{#            <section class="checklist" id="mass-submit-list">#}
+{#                <div data-template>#}{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+{#                    <input type="checkbox" data-selected checked/>#}
+{#                    <label class="checkbox-label" data-participant-name>#}{# populated by JS (jquery.bulky.js) #}{#</label>#}
+{#                </div>#}
+{#            </section>#}
+{#            <div class="component-action">#}
+{#                <section>#}
+{#                    {%- apply spaceless -%}#}
+{#                        <a class="button">Cancel</a>#}
+{#                        <a class="button" data-submit>All Received</a>#}
+{#                    {%- endapply -%}#}
+{#                </section>#}
+{#            </div>#}
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
