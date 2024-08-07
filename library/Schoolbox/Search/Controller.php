@@ -13,7 +13,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
