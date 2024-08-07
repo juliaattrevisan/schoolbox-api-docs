@@ -151,7 +151,7 @@ class Definition extends Filter\AbstractDefinition
         /* Preprocess worktypes.
          * Note that this breaks the IDefinition interface
          */
-        $this->workTypes =  $this->workTypes->shallowClone()
+        $this->workTypes = $this->workTypes->shallowClone()
             ->filter(static function ($elem) use ($input) {
                 /* If you're not a staff user, subject yourself to the
                  * SIVO limitation: only worktypes that *aren't* restricted
