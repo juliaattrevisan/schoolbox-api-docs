@@ -187,7 +187,7 @@
         /**
          * When the modal finishes opening
          */
-        this.element.on("opened.fndtn.reveal", function () {
+        modalElement.on("opened.fndtn.reveal", function () {
             currentlyOpenModal = $(this);
             // start listening
             $(window).on("resize", refreshModalHeight);
@@ -230,7 +230,7 @@
         /**
          * When the modal finishes closing
          */
-        this.element.on("closed.fndtn.reveal", function () {
+        modalElement.on("closed.fndtn.reveal", function () {
             currentlyOpenModal = null;
 
             // stop listening
@@ -264,7 +264,7 @@
          * Typically it's "Cancel" or the Action button itself, after which
          * the modal can be dismissed
          */
-        this.element.on("click", ".button", function () {
+        modalElement.on("click", ".button", function () {
             if (opt.onClose === null) {
                 // Do the default thing, which is to close the modal.  Note that this will close any other open
                 // foundation modals as well due to the firing of the closeme.zf.reveal event.
