@@ -46,6 +46,8 @@ export const useStore = defineStore("manageCurriculum", () => {
      */
     function checkForStorybook() {
         if (typeof window.STORYBOOK_ENV !== "undefined") {
+            // @ts-expect-error - this is available within a pinia store
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             $reset();
             useViewNodesStore().$reset();
             useActiveNodeStore().$reset();

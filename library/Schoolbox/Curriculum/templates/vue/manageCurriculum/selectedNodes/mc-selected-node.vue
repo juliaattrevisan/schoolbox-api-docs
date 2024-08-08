@@ -5,46 +5,26 @@
  */
 
 import { shortenLength } from "@js/util/stringUtils";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 
-const props = defineProps({
-    /**
-     * the selected curriculum node
-     */
-    node: {
-        type: Object,
-        required: true,
-        default: () => {
-            return {
-                id: 0,
-                code: "",
-                name: "",
-                breadcrumb: "",
-            };
-        },
-    },
-});
+interface Props {
+    node: Node;
+}
+
+const props = defineProps<Props>();
 
 const selectedNodesStore = useSelectedNodesStore();
 
 /**
- * Prevent rapid fire while loading the selected node
- *
- * @returns { boolean }
- */
-const isDisabled = window.Vue.computed(() => selectedNodesStore.isLoading);
-
-/**
  * Add in the code if it's available otherwise just show the title
- *
- * @returns { String }
  */
-const title = window.Vue.computed(() => {
+const title = window.Vue.computed<string>(() => {
     if (props.node.code && props.node.code !== "") {
         return `${props.node.code}`;
-    } else {
-        return shortenLength(props.node.name, 50);
     }
+
+    return shortenLength(props.node.name, 50);
 });
 
 /**
@@ -68,9 +48,8 @@ function onRemoveSelected() {
             type="button"
             class="title-button"
             :title="`View ${props.node.name}`"
-            :disabled="isDisabled"
-            @click.prevent="onTitleSelected"
             data-test-title-button
+            @click.prevent="onTitleSelected"
         >
             {{ title }}
         </button>
@@ -78,8 +57,8 @@ function onRemoveSelected() {
             type="button"
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
-            @click.prevent="onRemoveSelected"
             data-test-remove-button
+            @click.prevent="onRemoveSelected"
         ></button>
     </div>
 </template>
