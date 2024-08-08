@@ -106,7 +106,7 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        return $this->workTypes[$key]?->getName() ?? '';
+        return $this->workTypes[$key]->getName();
     }
 
 

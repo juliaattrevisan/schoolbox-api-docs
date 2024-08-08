@@ -100,11 +100,11 @@ interface IDefinition
      *     '2'   => '2016-1 (current)'
      *
      * @param string $key
-     * @return string|null
+     * @return string
      * @throws \InvalidArgumentException If key is recognised as invalid
      * @todo This should be a view-layer responsibility
      */
-    public function getLabel(string $key): ?string;
+    public function getLabel(string $key): string;
 
 
     /**
