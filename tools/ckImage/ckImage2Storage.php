@@ -62,6 +62,11 @@ $app = new class extends CliTool\App {
     ];
 
     /**
+     * So we don't miss or alter the search param without specific intention
+     */
+    private const BASE64_SEARCH = '%;base64,%';
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -174,7 +179,7 @@ HELP;
         // get all entries that contain base64
         $pb = $this->database->buildPredicateBuilder($table);
         foreach ($columns as $column) {
-            $pb = $pb->like($column, '%;base64,%');
+            $pb = $pb->like($column, self::BASE64_SEARCH);
         }
 
         $selectColumns = implode(',', $columns);
