@@ -174,7 +174,7 @@ HELP;
         // get all entries that contain base64
         $pb = $this->database->buildPredicateBuilder($table);
         foreach ($columns as $column) {
-            $pb = $pb->like($column, '%base64%');
+            $pb = $pb->like($column, '%;base64,%');
         }
 
         $selectColumns = implode(',', $columns);
