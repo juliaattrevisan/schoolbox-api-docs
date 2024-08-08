@@ -97,6 +97,15 @@ $app = new class extends CliTool\App {
     private ?InlineImageConverter $inlineImageConverter = null;
 
     /**
+     * Counters to keep track of the run
+     * @var int
+     */
+    private int $tables = 0;
+    private int $processed = 0;
+    private int $item = 0;
+    private int $errors = 0;
+
+    /**
      * This process needs to write to storage, thus it must run as `www-data`.
      */
     public function getRequiredProcessUser(): ?string
@@ -144,9 +153,18 @@ HELP;
         foreach ($this->CK_FIELDS as $table => $columns) {
             $data = $this->findBase64($table, $columns);
             if ($data->rowCount()) {
+                $this->tables++;
                 $this->extractImage($table, $data);
             }
         }
+        $this->getLogger()->info("CKEditor image to storage extract Complete; Stats:");
+        $stats = [
+                'tables' => $this->tables,
+                'items' => $this->item,
+                'processed' => $this->processed,
+                'errors' => $this->errors,
+        ];
+        $this->getLogger()->info(json_encode($stats));
     }
 
     /**
@@ -206,6 +224,9 @@ HELP;
                 if ($column === $primary) {
                     continue;
                 }
+
+                // record this item that needs updating
+                $this->item++;
                 if ($this->perform()) {
                     $this->getLogger()->info(sprintf("Extracting image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                     try {
@@ -215,6 +236,9 @@ HELP;
                         $this->getLogger()->error($e->getMessage());
                         $this->getLogger()->debug($e->getTraceAsString());
 
+                        // record this failure
+                        $this->errors++;
+
                         continue;
                     }
                     $statement = $this->database->executeQuery(
@@ -223,6 +247,10 @@ HELP;
                             'value' => $newValue, 'key' => $row[$primary]
                         ]
                     );
+
+                    // record this success
+                    $this->processed++;
+                    $this->getLogger()->info(sprintf("Successfully extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                 } else {
                     $this->getLogger()->info(sprintf("Planning, Would have extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                 }
