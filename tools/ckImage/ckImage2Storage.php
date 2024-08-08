@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use League\Flysystem\Filesystem;
+use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -58,6 +59,11 @@ $app = new class extends CliTool\App {
     private ?IConnector $database = null;
 
     /**
+     * @var InlineImageConverter|null
+     */
+    private ?InlineImageConverter $inlineImageConverter = null;
+
+    /**
      * This process needs to write to storage, thus it must run as `www-data`.
      */
     public function getRequiredProcessUser(): ?string
@@ -80,10 +86,15 @@ $app = new class extends CliTool\App {
         /** @var Filesystem $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
         $this->database = $this->getDatabaseInternal();
+        $this->inlineImageConverter = new InlineImageConverter($storageMapper, $this->getLogger());
 
         // scan/process all defined known tables / columns
         foreach ($this->CK_FIELDS as $table => $columns) {
-            new Alaress_Probe($this->findBase64($table, $columns));
+//            new Alaress_Probe($this->findBase64($table, $columns));
+            $data = $this->findBase64($table, $columns);
+            if (!empty($data)) {
+                $this->extractImage($table, $data);
+            }
         }
         //
         // scan / process all defined columns within a specified table
@@ -115,7 +126,7 @@ $app = new class extends CliTool\App {
      * @param array $columns
      * @return array
      */
-    private function findBase64(string $table, array $columns)
+    private function findBase64(string $table, array $columns): array
     {
         // get primary
         $primary = $this->getPrimKey($table);
@@ -126,12 +137,43 @@ $app = new class extends CliTool\App {
             $pb = $pb->like($column, '%base64%');
         }
 
+        $selectColumns = implode(',', $columns);
         $query = $this->database->prepareQuery(
-            "SELECT * FROM $table WHERE {$pb->getWhereUnion()}"
+            "SELECT $primary, $selectColumns  FROM $table WHERE {$pb->getWhereUnion()}"
         );
         $params = $pb->getParams();
         $query->execute($params);
         return $query->fetchAll();
+    }
+
+    /**
+     * Extract base64 and update table field data
+     *
+     * @param string $table
+     * @param array $tableData
+     * @return void
+     */
+    private function extractImage(string $table, array $tableData): void
+    {
+        $primary = $this->getPrimKey($table);
+        foreach ($tableData as $row) {
+            foreach ($row as $column => $value) {
+                if ($column === $primary) {
+                    continue;
+                }
+                if ($this->perform()) {
+                    $this->getLogger()->info(sprintf("Extracting image from %s.%s", $table, $column));
+                    $statement = $this->database->executeQuery(
+                        "UPDATE $table SET $column = :value WHERE $primary = :key",
+                        [
+                            'value' => $this->inlineImageConverter->convert($value), 'key' => $row[$primary]
+                        ]
+                    );
+                } else {
+                    $this->getLogger()->info(sprintf("Planning, Would have extracted image from %s.%s", $table, $column));
+                }
+            }
+        }
     }
 };
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
