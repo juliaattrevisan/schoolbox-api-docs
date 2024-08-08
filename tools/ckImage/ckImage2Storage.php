@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\Base;
 use Schoolbox\Application\CliTool;
 use League\Flysystem\Filesystem;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
@@ -124,9 +125,9 @@ $app = new class extends CliTool\App {
      *
      * @param string $table
      * @param array $columns
-     * @return array
+     * @return Base
      */
-    private function findBase64(string $table, array $columns): array
+    private function findBase64(string $table, array $columns): Base
     {
         // get primary
         $primary = $this->getPrimKey($table);
@@ -143,26 +144,26 @@ $app = new class extends CliTool\App {
         );
         $params = $pb->getParams();
         $query->execute($params);
-        return $query->fetchAll();
+        return $query;
     }
 
     /**
      * Extract base64 and update table field data
      *
      * @param string $table
-     * @param array $tableData
+     * @param Base $tableData
      * @return void
      */
-    private function extractImage(string $table, array $tableData): void
+    private function extractImage(string $table, Base $tableData): void
     {
         $primary = $this->getPrimKey($table);
-        foreach ($tableData as $row) {
+        while ($row = $tableData->fetch()) {
             foreach ($row as $column => $value) {
                 if ($column === $primary) {
                     continue;
                 }
                 if ($this->perform()) {
-                    $this->getLogger()->info(sprintf("Extracting image from %s.%s", $table, $column));
+                    $this->getLogger()->info(sprintf("Extracting image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                     $statement = $this->database->executeQuery(
                         "UPDATE $table SET $column = :value WHERE $primary = :key",
                         [
@@ -170,7 +171,7 @@ $app = new class extends CliTool\App {
                         ]
                     );
                 } else {
-                    $this->getLogger()->info(sprintf("Planning, Would have extracted image from %s.%s", $table, $column));
+                    $this->getLogger()->info(sprintf("Planning, Would have extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                 }
             }
         }
