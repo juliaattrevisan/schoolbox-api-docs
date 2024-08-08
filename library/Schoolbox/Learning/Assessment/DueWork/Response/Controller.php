@@ -329,7 +329,7 @@ class Controller extends Base
         // Don't attempt to get a view session if not done processing
         $session = null;
         if ($kami->isStatusDone()) {
-            $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
+            $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false, showSave: false, showPrint: false, showHelp: false, showMenu: false);
         }
 
         $this->response = $this->responseFromTemplate('@learningDueWorkResponse/kamiView.twig', [
