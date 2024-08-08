@@ -3,8 +3,8 @@
  * the teacher views and marks the submission, the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { CreateFolder } from "@schoolboxTest/playwright/support/page/folder/createFolder";
-import { AssessmentForm } from "@schoolboxTest/playwright/support/page/dueWork/assessmentForm";
+import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
+import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 
 // TODO: Move selectors into relevant support page files
 const SELECTOR_RESOURCE_ACTION_HOMEPAGE = "resource-action-homepage";

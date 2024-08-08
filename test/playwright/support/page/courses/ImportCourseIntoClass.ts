@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export class ImportCourseIntoClass {
+export default class ImportCourseIntoClass {
     private page: Page;
 
     static readonly SELECTOR_CLASS_NAME = "input.search-input";

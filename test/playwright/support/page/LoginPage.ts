@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 
-export class LoginPage {
+export default class LoginPage {
     public static LOGIN_URL = "/login";
 
     public static LOGOUT_URL = "/logout";

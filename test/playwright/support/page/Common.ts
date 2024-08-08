@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export class Common {
+export default class Common {
     private page: Page;
 
     // sales data

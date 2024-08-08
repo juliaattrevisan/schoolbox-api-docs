@@ -2,10 +2,10 @@
  * This test imports the course into a class, copies an activity into a class
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { CreateFolder } from "@schoolboxTest/playwright/support/page/folder/createFolder";
-import { CourseModify } from "@schoolboxTest/playwright/support/page/courses/courseModify";
-import { CourseList } from "@schoolboxTest/playwright/support/page/courses/courseList";
-import { ImportCourseIntoClass } from "@schoolboxTest/playwright/support/page/courses/importCourseIntoClass";
+import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
+import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
+import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
+import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
 
 test.describe("Course import tests", () => {
     /**

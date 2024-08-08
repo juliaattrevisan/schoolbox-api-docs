@@ -1,7 +1,7 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
-import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
-import { BaseTester } from "@schoolboxTest/playwright/support/baseTester";
+import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
+import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
 
 /**
  * AcceptanceTester class to provide common functionality for acceptance tests
@@ -10,7 +10,7 @@ import { BaseTester } from "@schoolboxTest/playwright/support/baseTester";
  *  as the Page and Context integrations are created on a per-test basis and not available in those hooks
  * @param { Page } page - The Playwright Page object to interact with the browser
  */
-export class AcceptanceTester extends BaseTester {
+export default class AcceptanceTester extends BaseTester {
     private page: Page;
 
     constructor(page: Page) {

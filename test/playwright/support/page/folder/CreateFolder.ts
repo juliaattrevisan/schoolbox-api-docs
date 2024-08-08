@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export class CreateFolder {
+export default class CreateFolder {
     private page: Page;
 
     static readonly URL = "/resource/folder/0/create";

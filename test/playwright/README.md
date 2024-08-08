@@ -116,6 +116,16 @@ See https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/1825406996/TypeScript 
 
 ESLint is also enabled for these tests, so you will see warnings and errors in the editor if there are any issues with the code. I also recommend ensuring Prettier is enabled in your editor to keep the code consistent between developers.
 
+#### File naming conventions
+When writing tests, the file name should be the name of the feature being tested, followed by `.spec.ts`. \
+For example, if you are testing the login functionality, the file could be named `login.spec.ts`.
+
+Test files should use camelCase for the file name, (e.g. `searchPage.spec.ts`) and should be placed in the `acceptance` directory.\
+
+Page support files should be placed in the `support/page` directory, and use PascalCase for the file name as they export default a class (e.g. `LoginPage.ts`).
+
+We currently use the airbnb style guide for TypeScript files, you can read more about it at https://github.com/airbnb/javascript
+
 #### Using safe selectors
 
 Playwright tests, in their simplest form, are a list of actions that take place in a browser:
@@ -178,7 +188,7 @@ You can find an example of a page object in `test/playwright/support/page/LoginP
 Rewriting the previous test now, as well as adding an additional test, we get:
 ```ts
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
+import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
 
 test.describe("Login functionality tests", () => {
     let loginPage: LoginPage;
@@ -244,7 +254,7 @@ You'll notice that in the above example, a `tester` was added to the test functi
 Playwright allows us to add [fixtures](https://playwright.dev/docs/test-fixtures) to our tests, which can provide additional functionality and helper methods to our tests, without having to duplicate code. \
 We have named these **"integrations"** instead to avoid confusion with our own Fixture system.
 
-In the above example, `tester` is a custom fixture, from `acceptanceTester.ts`, which provides various methods used across many tests. This includes things like logging in, impersonating a user, filling in a CKEditor, or other common actions like the isGoingTo() method.
+In the above example, `tester` is a custom fixture, from `AcceptanceTester.ts`, which provides various methods used across many tests. This includes things like logging in, impersonating a user, filling in a CKEditor, or other common actions like the isGoingTo() method.
 
 The available integrations are defined in `integrations.ts`, and can be added to any test by adding them to the test function parameters.
 

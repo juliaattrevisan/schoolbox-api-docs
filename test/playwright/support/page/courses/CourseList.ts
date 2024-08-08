@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export class CourseList {
+export default class CourseList {
     private page: Page;
 
     static readonly URL = "/course/list";

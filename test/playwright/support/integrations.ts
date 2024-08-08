@@ -6,9 +6,9 @@
  * https://playwright.dev/docs/test-fixtures
  */
 import { test as base } from "@playwright/test";
-import { BaseTester } from "@schoolboxTest/playwright/support/baseTester";
-import { AcceptanceTester } from "@schoolboxTest/playwright/support/acceptanceTester";
-import { DatabaseHelper } from "@schoolboxTest/playwright/support/databaseHelper";
+import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
+import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 type Integrations = {
     db: DatabaseHelper;
