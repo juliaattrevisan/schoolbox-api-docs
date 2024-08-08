@@ -417,7 +417,7 @@ export default {
                                 View Award
                             </a>
                             <a
-                                v-if="awardedGoalHasEvidence() || hasEvidence(award)"
+                                v-else-if="awardedGoalHasEvidence() || hasEvidence(award)"
                                 title="View evidence"
                                 class="button"
                                 :href="getViewEvidenceLink()"
