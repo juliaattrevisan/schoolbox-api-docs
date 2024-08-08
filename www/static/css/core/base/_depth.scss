@@ -4,12 +4,13 @@
 */
 :root {
     --sbx-depth-default: 1;
-    --sbx-depth-ui-overlay: 10;
-    --sbx-depth-menu: 20;
-    --sbx-depth-pop-over: 30;
-    --sbx-depth-modal: 40;
-    --sbx-depth-modal-ui-overlay: 50;
-    --sbx-depth-toast: 60;
-    --sbx-depth-intro: 70;
-    --sbx-depth-fullscreen: 80;
+    --sbx-depth-ui-sticky: 10;
+    --sbx-depth-ui-overlay: 20;
+    --sbx-depth-menu: 30;
+    --sbx-depth-pop-over: 40;
+    --sbx-depth-modal: 50;
+    --sbx-depth-modal-ui-overlay: 60;
+    --sbx-depth-toast: 70;
+    --sbx-depth-intro: 80;
+    --sbx-depth-fullscreen: 90;
 }
