@@ -5,14 +5,13 @@
  * view upcoming tasks that require action
  */
 
-import { timeout } from "@js/util/jsUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
 
 interface Props {
-    getPaperlyViewEndpoint: string //The endpoint for fetching the list of Paperly items and its iframe urls
+    getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
 }
 
 const props = defineProps<Props>();
@@ -76,7 +75,10 @@ const upcoming = window.Vue.computed(() => {
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
             <li v-if="paperlyPayload?.features.find((item) => 'Forms' in item)">
-                <a class="icon-paperly-forms" :href="paperlyPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''">
+                <a
+                    class="icon-paperly-forms"
+                    :href="paperlyPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''"
+                >
                     Forms</a
                 >
             </li>
@@ -88,9 +90,13 @@ const upcoming = window.Vue.computed(() => {
                 >
             </li>
             <li v-if="paperlyPayload?.features.find((item) => 'Parent Teacher Interview' in item)">
-                <a class="icon-paperly-pti"
-                   :href="paperlyPayload.features
-                   .find((item) => 'Parent Teacher Interview' in item)?.['Parent Teacher Interview'] ?? ''"
+                <a
+                    class="icon-paperly-pti"
+                    :href="
+                        paperlyPayload.features.find((item) => 'Parent Teacher Interview' in item)?.[
+                            'Parent Teacher Interview'
+                        ] ?? ''
+                    "
                     >Parent/Teacher Interview</a
                 >
             </li>
