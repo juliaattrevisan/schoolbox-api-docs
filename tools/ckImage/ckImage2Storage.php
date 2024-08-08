@@ -12,7 +12,6 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\Query;
 use Schoolbox\Application\CliTool;
-use League\Flysystem\Filesystem;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
