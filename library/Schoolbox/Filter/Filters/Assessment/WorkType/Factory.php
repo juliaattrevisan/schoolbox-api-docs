@@ -95,10 +95,17 @@ class Factory extends Filter\AbstractFactory
          *
           *    - Staff looking at a student's due work calendar shows what the student would have seen,
          *       hiding SIVO assessments from staff by sheer circumstance.
+         *
+         * ...but there are numerous other contexts (such as markbooks) where SIVO assessments
+         * need to be visible to $user.
          */
-        $pb = $this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0);
+        if ($user->getRole()->isStaff()) {
+            $workTypes = $this->workTypeMapper->findAll();
+        } else {
+            $pb = $this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0);
 
-        $workTypes = $this->workTypeMapper->findByPredicates($pb);
+            $workTypes = $this->workTypeMapper->findByPredicates($pb);
+        }
 
         return new Component(
             $definition,
