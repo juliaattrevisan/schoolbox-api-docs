@@ -7,7 +7,7 @@
  * @param {number} value - the number to check
  * @returns {boolean} - true if the number is a whole number
  */
-export function isRounded(value: number): boolean {
+export function isWholeNumber(value: number): boolean {
     if (typeof value !== "number") {
         return false;
     }
@@ -36,7 +36,7 @@ export function getPercentage(value: number, max: number, decimalPlaces: number 
     }
     const percentageNum = (value / max) * 100;
     // if percentage is a whole number then return as a whole number
-    if (isRounded(percentageNum)) {
+    if (isWholeNumber(percentageNum)) {
         return `${Math.round(percentageNum)}%`;
     }
     // if sum isn't a whole number then return to decimalPlaces, also removing any trailing zeros using parseFloat

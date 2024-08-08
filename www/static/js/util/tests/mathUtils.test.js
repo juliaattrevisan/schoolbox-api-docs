@@ -1,11 +1,14 @@
-import { isRounded, getPercentage } from "../mathUtils";
+import { isWholeNumber, getPercentage } from "../mathUtils";
 
-describe("isRounded()", () => {
+describe("isWholeNumber()", () => {
     test("1.23 to be false", () => {
-        expect(isRounded(1.23)).toBe(false);
+        expect(isWholeNumber(1.23)).toBe(false);
     });
     test("1.00 to be true", () => {
-        expect(isRounded(1.0)).toBe(true);
+        expect(isWholeNumber(1.0)).toBe(true);
+    });
+    test("a string to be false", () => {
+        expect(isWholeNumber("1")).toBe(false);
     });
 });
 
