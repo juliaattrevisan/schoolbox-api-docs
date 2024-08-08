@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\File;
 
+use Schoolbox\Admin\Settings\FieldType\File\ValueSerializer;
 use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -16,6 +17,16 @@ use Schoolbox\Resource\Attachment\Zone;
 
 class Renderer extends AbstractRenderer
 {
+    /** @var ValueSerializer */
+    private ValueSerializer $valueSerializer;
+
+    /**
+     * @param ValueSerializer  $valueSerializer
+     */
+    public function __construct(ValueSerializer $valueSerializer)
+    {
+        $this->valueSerializer = $valueSerializer;
+    }
 
     /**
      * @inheritdoc
@@ -32,7 +43,7 @@ class Renderer extends AbstractRenderer
      */
     protected function getData(Config $config): array
     {
-        $mimeFilter = (strpos($config->getName(), '_logo') || strpos($config->getName(), '_bg')) ? 'image/*' : '*/*';
+        $options = $this->valueSerializer->buildOptions($config->getOptions());
 
         $zone = new Zone($config->getName());
         $zone->setThumbnailSize(64);
@@ -42,7 +53,7 @@ class Renderer extends AbstractRenderer
             $zone->setMulti(true);
         }
         $zone->setFileVar($this->getFileVar($config));
-        $zone->setMimeFilter($mimeFilter);
+        $zone->setMimeFilter($options['mimeFilter']);
         $zone->setModalTitle('Select ' . strtolower($config->getTitle()));
         $this->attachFiles($config, $zone);
 
