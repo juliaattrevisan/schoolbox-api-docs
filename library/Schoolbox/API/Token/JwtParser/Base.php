@@ -12,6 +12,8 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
+use Schoolbox\IConfigLoader;
+use Schoolbox\UserMapper;
 use SensitiveParameter;
 use UnexpectedValueException;
 
@@ -37,6 +39,18 @@ abstract class Base implements IParser
      * @see IParser::bypassIpTracking()
      */
     public bool $bypassIpTracking = false;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader $config     Standard configuration store.
+     */
+    public function __construct(
+        protected UserMapper $userMapper,
+        protected IConfigLoader $config,
+    ) {
+    }
 
     /**
      * @inheritdoc

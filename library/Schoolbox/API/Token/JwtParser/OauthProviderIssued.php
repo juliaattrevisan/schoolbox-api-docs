@@ -46,11 +46,12 @@ class OauthProviderIssued extends Base
      * @param CacheInterface $oidcCache  Required for caching discovery response and keys
      */
     public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private Client $httpClient,
         private CacheInterface $oidcCache,
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**

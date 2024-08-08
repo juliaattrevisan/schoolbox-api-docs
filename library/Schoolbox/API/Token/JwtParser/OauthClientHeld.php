@@ -44,10 +44,11 @@ class OauthClientHeld extends Base
      *                                                access token contains no subject.
      */
     public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private RelyingParty\Mapper $relyingPartyMapper
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**

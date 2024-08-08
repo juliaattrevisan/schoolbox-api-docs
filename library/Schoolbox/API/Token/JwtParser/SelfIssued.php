@@ -29,15 +29,16 @@ class SelfIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper        $userMapper   Mapper for retrieving users once the user in the JWT is identified.
-     * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
-     * @param IConfigLoader     $config       Standard configuration store.
+     * @param UserMapper        $userMapper  Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader     $config      Standard configuration store.
+     * @param User\Token\Mapper $tokenMapper Mapper for retrieving user tokens.
      */
     public function __construct(
-        private UserMapper $userMapper,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private User\Token\Mapper $tokenMapper,
-        private IConfigLoader $config,
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**

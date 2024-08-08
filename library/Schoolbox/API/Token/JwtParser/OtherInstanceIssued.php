@@ -14,9 +14,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use SensitiveParameter;
 
 /**
@@ -34,19 +32,6 @@ class OtherInstanceIssued extends Base
      * JWT, so that its key may be used to decode and verify the JWT.
      */
     public const CLAIM_INSTANCE_ID = self::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
-
-    /**
-     * Constructor
-     *
-     * @param UserMapper             $userMapper             Mapper for retrieving users once the user in the JWT is
-     *                                                       identified.
-     * @param IConfigLoader          $config                 Standard configuration store.
-     */
-    public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
-    ) {
-    }
 
     /**
      * @inheritdoc

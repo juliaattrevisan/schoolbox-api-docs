@@ -15,7 +15,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
@@ -38,17 +37,6 @@ class InstanceRegistryIssued extends Base
      * not provided in the key.
      */
     private const DEFAULT_SIGNING_ALGORITHM = 'RS256';
-
-    /**
-     * Constructor
-     * @param UserMapper    $userMapper
-     * @param IConfigLoader $config
-     */
-    public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
-    ) {
-    }
 
     /**
      * @inheritdoc
