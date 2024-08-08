@@ -82,7 +82,7 @@ class InstanceRegistryIssued extends Base
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
-            return $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+            return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN);
         }
 
         throw new Rejected('Unable to verify JWT');

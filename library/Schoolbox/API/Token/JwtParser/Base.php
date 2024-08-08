@@ -13,6 +13,7 @@ use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
 use UnexpectedValueException;
@@ -141,5 +142,28 @@ abstract class Base implements IParser
     public function bypassIpTracking(): bool
     {
         return $this->bypassIpTracking;
+    }
+
+    /**
+     * Finds the user identified by `$username`:
+     * * by standard username lookup
+     * * if that fails, and `config.auth_email_enabled` is enabled, looks up a
+     *   user whose email address matches `$username`
+     *
+     * @param string $username
+     * @return User|null
+     */
+    protected function findUser(string $username): ?User
+    {
+        $user = $this->userMapper->findByUsername($username);
+        if ($user) {
+            return $user;
+        }
+
+        if ($this->config->get('auth_email_enabled')) {
+            return $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
+        }
+
+        return null;
     }
 }
