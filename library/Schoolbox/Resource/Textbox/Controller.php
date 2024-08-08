@@ -34,6 +34,11 @@ class Controller extends Base
 
 
     /**
+     * Minimum number of characters required to complete a search
+     */
+    private const SEARCH_MIN_CHARACTER_LIMIT = 2;
+
+    /**
      * Constructor
      *
      * @param Mapper                 $mapper
@@ -270,7 +275,7 @@ class Controller extends Base
         $query = trim($this->requestQuery->get('query', ''));
         $arrayToReturn = [];
 
-        if ($query !== '') {
+        if (strlen($query) >= self::SEARCH_MIN_CHARACTER_LIMIT) {
             $allTextboxes  = $this->mapper->search($this->user, $query);
 
             foreach ($allTextboxes->getResult() as $currentTextbox) {
