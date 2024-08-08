@@ -74,6 +74,9 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 
     editorCreated.value = true;
 
+    // Fix the balloon toolbar position
+    setTimeout(() => editor.ui.update());
+
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
         if (editor.ui.focusTracker.isFocused) {
