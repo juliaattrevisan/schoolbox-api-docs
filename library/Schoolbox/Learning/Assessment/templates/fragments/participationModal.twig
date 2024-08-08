@@ -35,7 +35,7 @@
                             {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              , 'data-datepicker-endofday data-datepicker-endofperiod') }}
                         {% else %}
                             {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              , 'data-datepicker-endofday data-datepicker-endofperiod') }}
                         {% endif %}
                     </div>
                 </fieldset>
