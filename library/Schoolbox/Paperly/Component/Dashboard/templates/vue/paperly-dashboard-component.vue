@@ -9,6 +9,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
+import { UpcomingItem } from "../js/types/UpcomingItem";
 
 interface Props {
     getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
