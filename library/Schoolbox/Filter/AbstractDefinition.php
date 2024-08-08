@@ -360,18 +360,6 @@ abstract class AbstractDefinition implements IDefinition
     }
 
 
-    /**
-     * Allow subclasses to optionally preprocess/mutate its own properties,
-     * using a mixed $input param which could be literally anything
-     *
-     * @param $input
-     * @return void
-     */
-    public function preprocess($input): void
-    {
-    }
-
-
     /* Getters
      */
 

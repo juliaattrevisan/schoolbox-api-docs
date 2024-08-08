@@ -141,25 +141,4 @@ class Definition extends Filter\AbstractDefinition
     {
         return '@filterDefinitions/Assessment/WorkType/templates';
     }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function preprocess($input): void
-    {
-        /* Preprocess worktypes, removing SIVO worktypes if you're a non-staff
-         * Ensure $input is a User instance, otherwise we'll die
-         */
-        if ($input instanceof \Schoolbox\User) {
-            $this->workTypes = $this->workTypes->shallowClone()
-                ->filter(static function ($elem) use ($input) {
-                    /* If you're not a staff user, subject yourself to the
-                     * SIVO limitation: only worktypes that *aren't* restricted
-                     * should be made available to you
-                     */
-                    return !(null !== $input && $elem->getStaffOrInstructorVisibleOnly() && !$input->getRole()->isStaff());
-                });
-        }
-    }
 }

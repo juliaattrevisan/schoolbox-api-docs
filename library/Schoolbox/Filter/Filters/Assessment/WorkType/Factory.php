@@ -9,11 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\BaseComponent;
 use Schoolbox\Filter\IComponent;
 use Schoolbox\Filter\IDefinition;
+use Schoolbox\Filter\Page\Model;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\User;
@@ -68,6 +69,15 @@ class Factory extends Filter\AbstractFactory
 
     /**
      * @inheritDoc
+     * @param IDefinition $definition
+     * @param User $user
+     * @param Model $pageFilter
+     * @param GenericCollection|null $selections
+     * @param User|null $viewee
+     * @param array $routeArgs
+     * @param GenericCollection $overrides
+     * @return IComponent
+     * @throws InvalidColumnException
      * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
@@ -79,15 +89,25 @@ class Factory extends Filter\AbstractFactory
         array $routeArgs,
         GenericCollection $overrides
     ): IComponent {
-        $definition->preprocess($user);
+        /* Staff members can see all work types
+         * Everyone else has a restricted view where staff-only work types are omitted
+         */
+        if ($user->getRole()->isStaff()) {
+            $workTypes = $this->workTypeMapper->findAll();
+        } else {
+            $pb = $this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0);
 
-        return new BaseComponent(
+            $workTypes = $this->workTypeMapper->findByPredicates($pb);
+        }
+
+        return new Component(
             $definition,
             $user,
             $pageFilter,
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
-            $this->getSelectionMapper()
+            $this->getSelectionMapper(),
+            $workTypes
         );
     }
 }

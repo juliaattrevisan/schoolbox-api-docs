@@ -122,14 +122,4 @@ interface IDefinition
      * @return bool
      */
     public static function getUserConfigurableInitialState(string $page): bool;
-
-
-    /**
-     * Allow subclasses to optionally preprocess/mutate its own properties,
-     * using a mixed $input param which could be literally anything
-     *
-     * @param $input
-     * @return void
-     */
-    public function preprocess($input): void;
 }
