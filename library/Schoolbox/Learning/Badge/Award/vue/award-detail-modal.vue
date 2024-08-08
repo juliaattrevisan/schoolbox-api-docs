@@ -317,11 +317,14 @@ export default {
         },
 
         /**
-         * If the award is an achieved goal, we should provide access to
-         * the badge award page linked to the achievement.
-         * @returns {string} - the link to the award page
+         * If the award is an achieved goal that has evidence, we should show
+         * the evidence linked to the achievement. Not the evidence that may
+         * be linked to the goal. Accessing this link assumes the existence
+         * and ability to add evidence has been checked elsewhere.
+         *
+         * @returns { string }
          */
-        getViewAwardLink() {
+        getViewEvidenceLink() {
             // check if it's a goal that's been achieved which has evidence, otherwise a goal/achievement with evidence
             const awardId = this.awardedGoalHasEvidence(this.award) ? this.award.award.id : this.award.id;
             return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`;
@@ -406,12 +409,20 @@ export default {
                     <div class="component-action">
                         <section>
                             <a
-                                v-if="!hasAwardUpdateLink()"
+                                v-if="!award.isGoal && !hasGoalAwardLink()"
                                 title="View award"
                                 class="button"
-                                :href="getViewAwardLink()"
+                                :href="getViewEvidenceLink()"
                             >
                                 View Award
+                            </a>
+                            <a
+                                v-else-if="awardedGoalHasEvidence() || hasEvidence(award)"
+                                title="View evidence"
+                                class="button"
+                                :href="getViewEvidenceLink()"
+                            >
+                                View Evidence
                             </a>
                             <a
                                 v-else-if="hasAwardUpdateLink()"
