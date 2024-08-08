@@ -1,3 +1,5 @@
+{% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
 {#
  # Modal for creating/modifying a custom learning plan on an assessment.
  # This is split out into a separate file in order to include this outside of the main form (this contains a form).
@@ -25,79 +27,16 @@
                         </label>
                     </div>
                     <div class="columns medium-12 large-5">
-                        <div data-plan-date-container>
-                            <label>
-                                Publish Date
-                                <input
-                                    type="text"
-                                    name="plan-publish-date"
-                                    id="plan-publish-date"
-                                    data-datepicker data-datepicker-time
-                                    data-datepicker-format="datetime"
-                                    data-datepicker-alldayswitch
-                                    data-datepicker-call="duework"
-                                    data-datesync-enddate="#plan-open-date"
-                                >
-                            </label>
-                        </div>
-
-                        <div data-plan-date-container>
-                            <label>
-                                Open Date
-                                <input
-                                    type="text"
-                                    name="plan-open-date"
-                                    id="plan-open-date"
-                                    data-datepicker
-                                    data-datepicker-time
-                                    data-datepicker-format="datetime"
-                                    data-datepicker-alldayswitch
-                                    data-datepicker-call="duework"
-                                    data-datesync-startdate="#plan-publish-date"
-                                    data-datesync-enddate="#plan-due-date"
-                                >
-                            </label>
-                        </div>
-
-                        <div data-plan-date-container>
-                            <label>
-                                Due Date
-                                <input
-                                    type="text"
-                                    name="plan-due-date"
-                                    id="plan-due-date"
-                                    data-test="participation-plan-customise-modal-input-due-date"
-                                    data-datepicker
-                                    data-datepicker-time
-                                    data-datepicker-format="datetime"
-                                    data-datepicker-alldayswitch
-                                    data-datepicker-call="duework"
-                                    data-datepicker-endofday
-                                    data-datepicker-endofperiod
-                                    data-datesync-startdate="#plan-open-date"
-                                    data-datesync-enddate="#plan-close-date"
-                                >
-                            </label>
-                        </div>
-
-                        <div data-plan-date-container>
-                            <label>
-                                Late Date
-                                <input
-                                    type="text"
-                                    name="plan-close-date"
-                                    id="plan-close-date"
-                                    data-datepicker
-                                    data-datepicker-time
-                                    data-datepicker-format="datetime"
-                                    data-datepicker-alldayswitch
-                                    data-datepicker-call="duework"
-                                    data-datepicker-endofday
-                                    data-datepicker-endofperiod
-                                    data-datesync-startdate="#plan-due-date"
-                                >
-                            </label>
-                        </div>
+                        {% set dummyDate = {local: ''} %}
+                        {% if acceptingResponses %}
+                            {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
+                            {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
+                            {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              ) }}
+                        {% else %}
+                            {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
+                        {% endif %}
                     </div>
                 </fieldset>
 
