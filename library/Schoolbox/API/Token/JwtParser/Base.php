@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -160,7 +161,7 @@ abstract class Base implements IParser
             return $user;
         }
 
-        if ($this->config->get('auth_email_enabled')) {
+        if ($this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
             return $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
         }
 
