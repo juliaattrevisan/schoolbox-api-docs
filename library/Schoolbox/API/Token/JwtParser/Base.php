@@ -151,20 +151,32 @@ abstract class Base implements IParser
      * * if that fails, and `config.auth_email_enabled` is enabled, looks up a
      *   user whose email address matches `$username`
      *
-     * @param string $username
+     * @param string      $username    The username of the user to find
+     * @param string|null $sourceClaim The claim from which `$username` was
+     *                                 derived, if any: used for logging
      * @return User|null
+     * @throws Exception\InvalidIdentity if no user is found, or the user found is deactivated
      */
-    protected function findUser(string $username): ?User
+    protected function findUser(string $username, ?string $sourceClaim): ?User
     {
         $user = $this->userMapper->findByUsername($username);
-        if ($user) {
-            return $user;
+        if (!$user && $this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
+            $user = $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
         }
 
-        if ($this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
-            return $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
+        if (!$user) {
+            $message = isset($sourceClaim)
+                ? sprintf('JWT "%s" claim does not match a user', $sourceClaim)
+                : sprintf('No user with username "%s" found', $username);
+            throw new Exception\InvalidIdentity($message);
+        }
+        if (!$user->getEnabled()) {
+            $message = isset($sourceClaim)
+                ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)
+                : sprintf('User with username "%s" is deactivated', $username);
+            throw new Exception\InvalidIdentity($message);
         }
 
-        return null;
+        return $user;
     }
 }

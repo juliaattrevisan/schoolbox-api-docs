@@ -89,7 +89,7 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
-            $user = $this->findUser($claims[self::CLAIM_SUB]);
+            $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
             if ($user) {
                 return $user;
             }

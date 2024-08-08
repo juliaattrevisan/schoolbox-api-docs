@@ -83,7 +83,7 @@ class InstanceRegistryIssued extends Base
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
-            $user = $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN);
+            $user = $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
             if ($user) {
                 return $user;
             }

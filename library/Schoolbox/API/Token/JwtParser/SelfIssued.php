@@ -71,7 +71,7 @@ class SelfIssued extends Base
                 sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB)
             );
         }
-        $user = $this->findUser($claims[self::CLAIM_SUB]);
+        $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         if ($user && isset($claims[self::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
             try {

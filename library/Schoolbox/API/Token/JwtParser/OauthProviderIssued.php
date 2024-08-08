@@ -116,7 +116,7 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
-                $user = $this->findUser($claims[$candidateClaim]);
+                $user = $this->findUser($claims[$candidateClaim], $candidateClaim);
                 if (!$user) {
                     $failureMessage = sprintf(
                         'JWT "%s" claim does not match a user',
