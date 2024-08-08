@@ -89,7 +89,11 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
-            return $this->findUser($claims[self::CLAIM_SUB]);
+            $user = $this->findUser($claims[self::CLAIM_SUB]);
+            if ($user) {
+                return $user;
+            }
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_SUB));
         }
 
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
