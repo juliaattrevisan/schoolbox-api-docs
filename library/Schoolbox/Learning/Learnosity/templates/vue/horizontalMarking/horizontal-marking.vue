@@ -8,6 +8,7 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import { useStore } from "./store/horizontalMarkingStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
@@ -26,6 +27,7 @@ interface Props {
     attemptResponses: StudentAttemptResponse[]; // all the overall attempt comments for the quiz
     urls: StudentUrls[]; // the urls to use for the students to update their scores and comments
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
+    markData: AssessmentMarkData; // the mark type data linked to the assessment
     statusPage: string; // the status page to link to once user has finished marking
 }
 const props = defineProps<Props>();
@@ -45,7 +47,7 @@ const hasStudents = window.Vue.computed(() => {
  * when the reports are loaded they look for the students in the store/DOM tree
  */
 window.Vue.onMounted(async () => {
-    store.init(props.statusPage);
+    store.init(props.markData, props.statusPage);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
@@ -55,7 +57,6 @@ window.Vue.onMounted(async () => {
 
 <template>
     <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
-        <!-- Title. But add the metadata etc. when you get up to that bit -->
         <h1>Horizontal Marking for {{ props.title }}</h1>
         <template v-if="hasStudents">
             <hm-items-header />

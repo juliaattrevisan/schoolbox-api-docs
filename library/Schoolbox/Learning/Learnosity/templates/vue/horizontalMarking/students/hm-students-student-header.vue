@@ -6,6 +6,7 @@
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentItemMark from "@schoolboxLearnosity/vue/student/student-item-mark.vue";
 import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
+import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 
 interface Props {
@@ -37,13 +38,14 @@ function onToggleSelected() {
                     props.student.isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'
                 }`"
                 :disabled="!props.student.isReportLoaded"
+                aria-label="Toggle student response"
                 @click.prevent="onToggleSelected"
             ></button>
             <span v-else class="loader"></span>
             <div class="c-img c-img--round c-img--s">
                 <div class="c-img__wrapper">
                     <img
-                        :src="`/portrait.php?id=${props.student.id}&size=square32`"
+                        :src="`/portrait.php?id=${props.student.id}&size=square64`"
                         :alt="`Photo of ${props.student.name}`"
                     />
                 </div>
@@ -61,7 +63,11 @@ function onToggleSelected() {
                 :is-shown="item.reference === itemsStore.activeItem.reference"
                 :show-title="false"
             />
-            <student-header-attempt-mark v-if="itemsStore.isAttemptComment" :student="props.student" />
+            <student-header-attempt-mark
+                v-if="itemsStore.isAttemptComment"
+                :student="props.student"
+                :mark-data="useStore().markData"
+            />
         </div>
     </div>
 </template>

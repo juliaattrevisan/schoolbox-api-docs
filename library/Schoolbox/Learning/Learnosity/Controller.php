@@ -986,6 +986,14 @@ class Controller extends Base
             'attemptResponse' => $this->getAttemptResponse($attempt, $feedback),
             'returnUrl' => "/homepage/{$assessment->getContext()->getId()}",
             'hasMarkVisibility' => $hasMarkVisibility,
+            /* For submission states
+             */
+            'errors' => $this->stateMapper->listDisplayValues(),
+            'markData' => (new MarkSchemePayload(
+                $this->stateMapper->findAll(),
+                $assessment->getMarkType(),
+                $assessment->getGradeGroup()
+            ))->convert()
         ], "Result for {$assessment->getTitle()}");
     }
 
@@ -1084,6 +1092,12 @@ class Controller extends Base
             'feedback' => $feedback,
             'maxMarks' => $attempt->getMaxMark(),
             'errors' => $this->stateMapper->listDisplayValues(),
+            'submissionStates' => $this->stateMapper->findAll(),
+            'markData' => (new MarkSchemePayload(
+                $this->stateMapper->findAll(),
+                $assessment->getMarkType(),
+                $assessment->getGradeGroup()
+            ))->convert()
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1388,6 +1402,11 @@ class Controller extends Base
             /* A list of submission states
              */
             'errors' => $this->stateMapper->listDisplayValues(),
+            'markData' => (new MarkSchemePayload(
+                $this->stateMapper->findAll(),
+                $assessment->getMarkType(),
+                $assessment->getGradeGroup()
+            ))->convert(),
             /* This list of learnosity references is used for the finalisation step
              */
             'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),

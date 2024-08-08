@@ -37,6 +37,7 @@
         :attempt-responses="{{ attemptResponses|json_encode }}"
         :urls="{{ urls|json_encode }}"
         :report-payloads="{{ reportPayloads }}"
+        :mark-data="{{ markData|json_encode }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
     />
 </div>

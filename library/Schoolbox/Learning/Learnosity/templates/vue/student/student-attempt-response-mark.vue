@@ -1,15 +1,24 @@
 <script setup lang="ts">
 /**
- * To provide a final mark response for a student
+ * To provide a final mark (grade) response for a student that can override the calculated mark.
+ * Note the variation between mark and grade, which is a little confusing...
+ * It's referred to the 'mark' in the backend, but the front end element is called 'grade', hence the variation.
  */
 
-import { watchDebounced } from "@vueuse/core";
+import { watchDebounced, computedEager } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { getPercentage } from "@js/util/mathUtils";
+import { getLetterGrade } from "@js/util/sbx/markUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
+import type { LetterGradeItem } from "@schoolboxAssessment/Types/LetterGradeItem";
+import { MARK_TYPE_PERCENTAGE, MARK_TYPE_LETTER_GRADE } from "@schoolboxAssessment/Types/MarkType";
+import { getAttemptScore, getAttemptMaxScore } from "@schoolboxLearnosity/js/util/markingUtils";
 
 interface Props {
     student: Student; // the student to display
     isReadOnly: boolean; // whether the question is readonly, we don't need to init the ckeditor if it's readonly
+    markData: AssessmentMarkData; // the mark type data linked to the assessment
 }
 const props = defineProps<Props>();
 
@@ -123,7 +132,6 @@ async function saveMark() {
     if (props.student.urls === undefined) {
         return;
     }
-    emit("updatedMark", mark.value);
     try {
         isSaving.value = true;
         window.addEventListener("beforeunload", beforeUnloadHandler);
@@ -134,6 +142,7 @@ async function saveMark() {
             body: formData,
         });
         if (response.ok) {
+            emit("updatedMark", mark.value);
             hasSaved.value = true;
         } else {
             hasError.value = true;
@@ -160,6 +169,88 @@ watchDebounced(
 );
 
 /**
+ * Get the current total score for all items, so the total of all questions within each item
+ * @returns {number} - the total score
+ */
+const currentScore = window.Vue.computed(() => {
+    return getAttemptScore(props.student);
+});
+
+/**
+ * Get the ACTUAL mark, which is the mark that's the accurate
+ * representation of the calculated score, not something overridden by the user
+ * @returns {string} - the current mark
+ */
+const actualMark = computedEager(() => {
+    if (props.markData.type.slug === MARK_TYPE_PERCENTAGE) {
+        const percentage = getPercentage(currentScore.value, props.student.attemptResponse.maxMarks as number);
+        // percentage is returned from the back end with a space between the value and the %
+        // so we need to set this up to match the format to compare the values for showAssignButton
+        const percentageWithSpace =
+            percentage !== undefined ? `${percentage.substring(0, percentage.length - 1)} %` : "";
+        return percentageWithSpace;
+    }
+    if (props.markData.type.slug === MARK_TYPE_LETTER_GRADE) {
+        return getLetterGrade(
+            currentScore.value,
+            props.student.attemptResponse.maxMarks as number,
+            props.markData.levels as LetterGradeItem[],
+        ) as string;
+    }
+    return `${currentScore.value} / ${props.student.attemptResponse.maxMarks}`;
+});
+
+/**
+ * Only show the attempt mark when it actually exists
+ * @returns {boolean} - whether the student has a mark
+ */
+const hasNoMark = window.Vue.computed(() => {
+    return (
+        props.student.attemptResponse.mark === undefined ||
+        props.student.attemptResponse.mark === null ||
+        props.student.attemptResponse.mark === ""
+    );
+});
+
+/**
+ * Whether to show the assign button, shown when the actual mark doesn't match the set overridden mark,
+ * so users can easily re-assign the mark from the item scores
+ * @returns {boolean} - whether to show the assign button
+ */
+const showAssignButton = computedEager(() => {
+    if (hasNoMark.value || getAttemptMaxScore(props.student) === 0) {
+        return false;
+    }
+    return actualMark.value !== mark.value;
+});
+
+/**
+ * Update the mark which will fire the
+ * watchDebounced and save the mark
+ */
+function assignMark() {
+    const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
+    formElement.value = actualMark.value;
+    mark.value = actualMark.value;
+}
+
+/**
+ * Assign the mark when selected
+ */
+function onAssignSelected() {
+    assignMark();
+}
+
+/**
+ * If the user has updated the score, it's assumed that they wish
+ * to override anything that they may have previously set in the grade field
+ */
+window.Vue.watch(currentScore, () => {
+    assignMark();
+    void saveMark();
+});
+
+/**
  * To add the grade field in
  */
 window.Vue.onMounted(async () => {
@@ -169,6 +260,11 @@ window.Vue.onMounted(async () => {
     }
     await window.Vue.nextTick();
     addGradeElement();
+    // check if the mark is empty, and if so assign the mark so when Finalise review is selected, the grade is visible on the quiz status page
+    if (hasNoMark.value) {
+        assignMark();
+        void saveMark();
+    }
 });
 
 /**
@@ -210,10 +306,17 @@ window.Vue.onBeforeUnmount(async () => {
                 </div>
             </div>
         </div>
+        <button v-if="showAssignButton" class="full-width btn-assign" @click.prevent="onAssignSelected">
+            Assign <b>{{ actualMark }}</b> from item scores
+        </button>
     </div>
 </template>
 
 <style lang="scss" scoped>
+.btn-assign {
+    font-size: 0.8125rem;
+}
+
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
     transition: grid-template-rows 300ms;

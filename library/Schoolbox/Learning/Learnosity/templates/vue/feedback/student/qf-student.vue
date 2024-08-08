@@ -71,6 +71,7 @@ function onAttemptMarkUpdated(mark: string) {
                 <student-attempt-response
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
+                    :mark-data="store.markData"
                     @updated-comment="onAttemptCommentUpdated"
                     @updated-mark="onAttemptMarkUpdated"
                 />
