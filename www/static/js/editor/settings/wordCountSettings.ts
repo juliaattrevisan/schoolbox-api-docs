@@ -1,13 +1,14 @@
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { WordCountConfig } from "@ckeditor/ckeditor5-word-count";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
 import { EditorEvent, EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
 import { insertElementAfter } from "@js/util/domUtils";
 
 /**
  * Returns the settings for the word count plugin
- * @returns { object } - the word count settings
+ * @returns {{ wordCount: WordCountConfig }} - the word count settings
  */
-export function getWordCountSettings() {
+export function getWordCountSettings(): { wordCount: WordCountConfig } {
     return {
         wordCount: {
             // we handle character, so we can count html as well to more accurately count
@@ -131,7 +132,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
 function addListenersForDisablingSubmitButtons(
     ckeditorSourceEl: HTMLElement,
     containingForm: HTMLFormElement | null,
-    submitButtons: Array<HTMLElement>
+    submitButtons: Array<HTMLElement>,
 ) {
     for (const button of submitButtons) {
         // Now we know we have a button, assign it to a const.
@@ -171,7 +172,7 @@ function setupOnUpdateTextEventHandler(
     sourceElement: HTMLElement,
     editor: ClassicEditor,
     config: EditorConfig,
-    wordCountContainer: HTMLDivElement
+    wordCountContainer: HTMLDivElement,
 ) {
     if (config.maxCharCount === undefined || config.maxCharCount === -1) {
         throw new Error("No maxCharCount has been set, so this function should not have been called.");

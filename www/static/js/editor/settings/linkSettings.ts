@@ -1,8 +1,10 @@
+import type { LinkConfig } from "@ckeditor/ckeditor5-link/src/linkconfig";
+
 /**
  * Returns the settings for the links
- * @returns { object } - the links settings
+ * @returns {{ link: LinkConfig }} - the links settings
  */
-export function getLinkSettings() {
+export function getLinkSettings(): { link: LinkConfig } {
     return {
         link: {
             // see https://ckeditor.com/docs/ckeditor5/latest/features/link.html
@@ -61,7 +63,7 @@ export function addRelToNewTabLinks(sourceElementHTML: HTMLElement) {
 export function addPrefixToElementIDs(sourceElementHTML: HTMLElement) {
     // these elements are allowed to have an id, specified in www/static/js/editor/settings/htmlSupportSettings.ts
     const elementsWithId = sourceElementHTML.querySelectorAll(
-        "div[id], p[id], h2[id], h3[id], h4[id], h5[id], span[id]"
+        "div[id], p[id], h2[id], h3[id], h4[id], h5[id], span[id]",
     );
     const prefix = "page-anchor-";
     // filter out elements that already have an id starting with the prefix

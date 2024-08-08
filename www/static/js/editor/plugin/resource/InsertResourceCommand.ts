@@ -9,6 +9,8 @@ import type { Resource } from "./resourceUtils";
 export default class InsertResourceCommand extends Command {
     messageBinding; // as .bind() returns a new function object, we need to store it in a variable
 
+    value: boolean = false; // has no value (its just a button), so always false to show as de-selected
+
     /**
      * display the resource modal and listen for if a resource is returned
      */

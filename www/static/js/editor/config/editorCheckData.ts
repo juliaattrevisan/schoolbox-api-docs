@@ -10,7 +10,7 @@ import { wrapTokens } from "@js/editor/settings/tokensSettings";
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @returns { HTMLElement } - the sourceElement content as HTML
  */
-function getSourceElementHTML(sourceElement: HTMLElement) {
+function getSourceElementHTML(sourceElement: HTMLElement): HTMLElement {
     // if the sourceElement is a textarea, use .sourceElementContent as .innerHTML will return HTML as escaped text
     const sourceElementContent = (sourceElement as HTMLTextAreaElement).value
         ? (sourceElement as HTMLTextAreaElement).value
@@ -25,7 +25,7 @@ function getSourceElementHTML(sourceElement: HTMLElement) {
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { HTMLElement } - the sourceElement content as HTML
  */
-function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
+function runChecks(sourceElement: HTMLElement, config: EditorConfig): HTMLElement {
     let sourceElementHTML = getSourceElementHTML(sourceElement);
     sourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
     sourceElementHTML = addPrefixToElementIDs(sourceElementHTML);
@@ -47,14 +47,23 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
  * @param { CustomEvent } event - the custom event
  */
 function onEditorCheckData(event: CustomEvent) {
-    if (event.target === null) {
-        return;
+    const eventTarget = event.target;
+    if (eventTarget === null) throw new Error("onEditorCheckData: Event target is null");
+
+    let editor: (typeof window.sbProps.editors)[string] | null = null;
+    if (eventTarget instanceof HTMLElement && eventTarget.id) {
+        editor = window.sbProps.editors[eventTarget.id] ?? null;
+    } else if (eventTarget instanceof HTMLTextAreaElement && eventTarget.name) {
+        editor = window.sbProps.editors[eventTarget.name] ?? null;
     }
-    const editor = window.sbProps.editors[event.target.id || event.target.name];
-    if (editor.config.get("sbConfig").hasTokens) {
+
+    if (editor === null) throw new Error("onEditorCheckData: Unable to find editor in window.sbProps.editors");
+
+    const editorConfig = editor.config.get("sbConfig") as EditorConfig;
+    if (editorConfig.hasTokens) {
         const parser = new DOMParser();
         const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
-        editor.setData(runChecks(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
+        editor.setData(runChecks(sourceElementHTML, editorConfig).innerHTML);
     }
 }
 

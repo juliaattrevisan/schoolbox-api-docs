@@ -1,3 +1,5 @@
+import type { GeneralHtmlSupportConfig } from "@ckeditor/ckeditor5-html-support";
+
 /**
  * Add support for the listed HTML, so the editor doesn't automatically remove what's listed
  * https://ckeditor.com/docs/ckeditor5/latest/features/html/general-html-support.html
@@ -16,9 +18,9 @@
  *
  * So the below is a translation of this into the new format, to ensure legacy data is not lost.
  * Note that some of these would already be enabled in CKEditor5, but we're explicitly enabling them here to match exactly the previous settings.
- * @returns { object } - the html support settings
+ * @returns {{ htmlSupport: GeneralHtmlSupportConfig }} - the html support settings
  */
-export function getHTMLSupportSettings() {
+export function getHTMLSupportSettings(): { htmlSupport: GeneralHtmlSupportConfig } {
     return {
         htmlSupport: {
             disallow: [

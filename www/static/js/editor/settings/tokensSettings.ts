@@ -2,7 +2,8 @@
  * Returns the tokens settings for the editor
  */
 
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import type { MentionConfig } from "@ckeditor/ckeditor5-mention";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
 import { replaceAllStringSections, StringSection } from "@js/util/stringUtils";
 
 const DEFAULT_TOKENS = [
@@ -23,9 +24,9 @@ const DEFAULT_TOKENS = [
 /**
  * If tokens are enabled, return the tokens settings
  * @param { EditorConfig } config - the config to use when creating the editor
- * @returns { object } - the tokens settings
+ * @returns { { mention: MentionConfig } | Record<string, never> } - the tokens settings if enabled
  */
-export function getTokensSettings(config: EditorConfig) {
+export function getTokensSettings(config: EditorConfig): { mention: MentionConfig } | Record<string, never> {
     if (config.hasTokens) {
         return {
             mention: {

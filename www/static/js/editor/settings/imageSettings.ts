@@ -1,8 +1,10 @@
+import type { ImageConfig } from "@ckeditor/ckeditor5-image";
+
 /**
  * Returns the settings for the Images
- * @returns { object } - the image settings
+ * @returns {{ image: ImageConfig }} - the image settings
  */
-export function getImageSettings() {
+export function getImageSettings(): { image: ImageConfig } {
     return {
         image: {
             toolbar: ["linkImage", "|", "resizeImage", "fullWidth"],

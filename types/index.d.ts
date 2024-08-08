@@ -77,4 +77,9 @@ declare global {
         const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>;
         export default component;
     }
+
+    declare module "*.svg" {
+        const content: string;
+        export default content;
+    }
 }

@@ -26,7 +26,6 @@ import type { ImageUtils } from "@ckeditor/ckeditor5-image";
 
 import LinkUI from "@js/editor/plugin/link/LinkUI";
 import LinkEditing from "@ckeditor/ckeditor5-link/src/linkediting";
-import type LinkCommand from "@ckeditor/ckeditor5-link";
 
 import { LINK_KEYSTROKE } from "@ckeditor/ckeditor5-link/src/utils";
 
@@ -57,7 +56,7 @@ export default class LinkImageUI extends Plugin {
      * @inheritDoc
      */
     public init(): void {
-        const editor = this.editor;
+        const { editor } = this;
         const viewDocument = editor.editing.view.document;
 
         this.listenTo<ViewDocumentClickEvent>(
@@ -73,7 +72,7 @@ export default class LinkImageUI extends Plugin {
                     evt.stop();
                 }
             },
-            { priority: "high" }
+            { priority: "high" },
         );
 
         this._createToolbarLinkImageButton();
@@ -87,17 +86,16 @@ export default class LinkImageUI extends Plugin {
      * {@link module:link/linkui~LinkUI#formView} if it is not.
      */
     private _createToolbarLinkImageButton(): void {
-        const editor = this.editor;
-        const t = editor.t;
+        const { editor } = this;
 
         editor.ui.componentFactory.add("linkImage", (locale) => {
             const button = new ButtonView(locale);
             const plugin = editor.plugins.get("LinkUI");
-            const linkCommand: LinkCommand = editor.commands.get("link")!;
+            const linkCommand = editor.commands.get("link")!;
 
             button.set({
                 isEnabled: true,
-                label: t("Link image"),
+                label: editor.t("Link image"),
                 icon: linkIcon,
                 keystroke: LINK_KEYSTROKE,
                 tooltip: true,
@@ -124,6 +122,8 @@ export default class LinkImageUI extends Plugin {
     /**
      * Returns true if a linked image (either block or inline) is the only selected element
      * in the model document.
+     * @param {DocumentSelection | Selection} selection The selection to check.
+     * @returns {boolean} `true` if the selected element is a linked image, `false` otherwise.
      */
     private _isSelectedLinkedImage(selection: DocumentSelection | Selection): boolean {
         const selectedModelElement = selection.getSelectedElement();

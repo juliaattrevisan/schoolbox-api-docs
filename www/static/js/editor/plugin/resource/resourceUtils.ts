@@ -2,9 +2,46 @@
  * Various utility functions/helpers for the resource plugins
  */
 
-import type { Editor, EditorConfig } from "@js/editor/types/editorTypes";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 import type { Element } from "@ckeditor/ckeditor5-engine";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
 import { getWithoutExtension } from "@js/util/fileUtils";
+
+export interface AsyncUploadResponseError {
+    success: false;
+    error: number;
+    message: string;
+    hash: "";
+}
+
+export interface AsyncUploadResponseSuccess {
+    success: true;
+    error: 200;
+    message: "OK";
+    hash: string[];
+    meta: {
+        type: string | null;
+        size: number;
+        name: string;
+        file: {
+            name: string;
+            hash: string;
+            mime: string;
+            type: ResourceType;
+            size: number | null;
+            _links: {
+                fetch?: string;
+                icon?: string;
+                image?: string;
+                stream?: string;
+                poster?: string;
+            };
+        };
+    };
+}
+
+// A response from /storage/asyncUpload.php
+export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponseSuccess;
 
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that

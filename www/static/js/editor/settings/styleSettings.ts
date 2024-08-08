@@ -1,8 +1,10 @@
+import type { StyleConfig } from "@ckeditor/ckeditor5-style";
+
 /**
  * Returns the settings for the Styles dropdown
- * @returns { object } - the style settings
+ * @returns {{ style: StyleConfig }} - the style settings
  */
-export function getStyleSettings() {
+export function getStyleSettings(): { style: StyleConfig } {
     return {
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
