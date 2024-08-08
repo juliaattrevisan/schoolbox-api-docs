@@ -31,11 +31,11 @@
                         {% if acceptingResponses %}
                             {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
                             {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate', 'data-datepicker-endofday data-datepicker-endofperiod') }}
-                            {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              , 'data-datepicker-endofday data-datepicker-endofperiod') }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
+                            {{ dateForm.dateField('Late'   , 'planClose'  , dummyDate, '#planDueDate'    , ''              ) }}
                         {% else %}
                             {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              , 'data-datepicker-endofday data-datepicker-endofperiod') }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planPublishDate', ''              ) }}
                         {% endif %}
                     </div>
                 </fieldset>
