@@ -154,10 +154,10 @@ abstract class Base implements IParser
      * @param string      $username    The username of the user to find
      * @param string|null $sourceClaim The claim from which `$username` was
      *                                 derived, if any: used for logging
-     * @return User|null
+     * @return User
      * @throws Exception\InvalidIdentity if no user is found, or the user found is deactivated
      */
-    protected function findUser(string $username, ?string $sourceClaim): ?User
+    protected function findUser(string $username, ?string $sourceClaim): User
     {
         $user = $this->userMapper->findByUsername($username);
         if (!$user && $this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {

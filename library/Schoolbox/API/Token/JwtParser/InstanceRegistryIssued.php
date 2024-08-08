@@ -83,11 +83,7 @@ class InstanceRegistryIssued extends Base
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
-            $user = $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
-            if ($user) {
-                return $user;
-            }
-            throw new InvalidIdentity('Schoolbox Admin user does not exist');
+            return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
         }
 
         throw new Rejected('Unable to verify JWT');

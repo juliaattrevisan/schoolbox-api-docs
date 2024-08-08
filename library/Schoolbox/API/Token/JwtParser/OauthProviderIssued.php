@@ -116,19 +116,10 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
-                $user = $this->findUser($claims[$candidateClaim], $candidateClaim);
-                if (!$user) {
-                    $failureMessage = sprintf(
-                        'JWT "%s" claim does not match a user',
-                        $candidateClaim
-                    );
-                } elseif (!$user->getEnabled()) {
-                    $failureMessage = sprintf(
-                        'JWT "%s" claim matches a deactivated user',
-                        $candidateClaim
-                    );
-                } else {
-                    return $user;
+                try {
+                    return $this->findUser($claims[$candidateClaim], $candidateClaim);
+                } catch (Exception\InvalidIdentity $e) {
+                    $failureMessage = $e->getMessage();
                 }
             } else {
                 $failureMessage = sprintf(
