@@ -10,15 +10,11 @@
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Query\Base;
+use Alaress\Database\Statement\Query;
 use Schoolbox\Application\CliTool;
 use League\Flysystem\Filesystem;
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\Resource\Storage\Sanitizer;
-
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -36,7 +32,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App {
     /**
      * array to contain the known list of tables.columns that can contain ckeditor data
-     * @var array[table][column]
+     * @var array[string][string] // table[column]
      */
     private $CK_FIELDS = [
         'assessment' => [
@@ -93,7 +89,7 @@ $app = new class extends CliTool\App {
         foreach ($this->CK_FIELDS as $table => $columns) {
 //            new Alaress_Probe($this->findBase64($table, $columns));
             $data = $this->findBase64($table, $columns);
-            if (!empty($data)) {
+            if ($data->rowCount()) {
                 $this->extractImage($table, $data);
             }
         }
@@ -125,9 +121,9 @@ $app = new class extends CliTool\App {
      *
      * @param string $table
      * @param array $columns
-     * @return Base
+     * @return Query\Base|Query\IQuery
      */
-    private function findBase64(string $table, array $columns): Base
+    private function findBase64(string $table, array $columns): Query\Base|Query\IQuery
     {
         // get primary
         $primary = $this->getPrimKey($table);
@@ -151,10 +147,10 @@ $app = new class extends CliTool\App {
      * Extract base64 and update table field data
      *
      * @param string $table
-     * @param Base $tableData
+     * @param Query\Base|Query\IQuery $tableData
      * @return void
      */
-    private function extractImage(string $table, Base $tableData): void
+    private function extractImage(string $table, Query\Base|Query\IQuery $tableData): void
     {
         $primary = $this->getPrimKey($table);
         while ($row = $tableData->fetch()) {
