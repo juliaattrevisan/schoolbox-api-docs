@@ -164,10 +164,19 @@ $app = new class extends CliTool\App {
                 }
                 if ($this->perform()) {
                     $this->getLogger()->info(sprintf("Extracting image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
+                    try {
+                        $newValue = $this->inlineImageConverter->convert($value);
+                    } catch (RuntimeException $e) {
+                        $this->getLogger()->error("Image Extraction Failed");
+                        $this->getLogger()->error($e->getMessage());
+                        $this->getLogger()->debug($e->getTraceAsString());
+
+                        continue;
+                    }
                     $statement = $this->database->executeQuery(
                         "UPDATE $table SET $column = :value WHERE $primary = :key",
                         [
-                            'value' => $this->inlineImageConverter->convert($value), 'key' => $row[$primary]
+                            'value' => $newValue, 'key' => $row[$primary]
                         ]
                     );
                 } else {
