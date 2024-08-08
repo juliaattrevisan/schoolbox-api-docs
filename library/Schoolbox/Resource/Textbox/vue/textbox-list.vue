@@ -181,7 +181,7 @@ export default {
                         requests.push(axios.put(updateEndpoint, textbox).then(() => this.markAsClean(index)));
                     } else {
                         requests.push(
-                            axios.post(this.createTextboxEndpoint, textbox).then(() => this.markAsClean(index))
+                            axios.post(this.createTextboxEndpoint, textbox).then(() => this.markAsClean(index)),
                         );
                     }
                 }
@@ -250,7 +250,7 @@ export default {
                                 targetElements: [`#${this.id}`],
                                 fileBrowserCategoryId: self.folderId,
                             },
-                        })
+                        }),
                     );
                 }
             });
@@ -470,14 +470,17 @@ export default {
                                         <p class="meta" v-if="usage.folders.length > 0">
                                             Pages:
                                             <template v-if="inUseOnThisFolder(usage)">
-                                                this page<template v-if="otherFolders(usage).length > 0">, </template>
+                                                this page<template v-if="otherFolders(usage).length > 0">; </template>
                                             </template>
                                             <a
                                                 v-for="(folder, index) in otherFolders(usage)"
                                                 :href="folder._links.view"
                                                 :key="index"
-                                                >{{ folder.name }}</a
-                                            ><template v-if="index + 1 < otherFolders(usage).length">, </template>
+                                                >{{ folder.name
+                                                }}<template v-if="index + 1 < otherFolders(usage).length"
+                                                    >;
+                                                </template></a
+                                            >
                                         </p>
 
                                         <p class="meta" v-if="usage.dashboards.length > 0">
