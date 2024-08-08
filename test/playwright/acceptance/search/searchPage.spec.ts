@@ -4,7 +4,7 @@
  * view search results by passing filters in the URL
  */
 import { test } from "@schoolboxTest/playwright/support/integrations";
-import { SearchPage } from "@schoolboxTest/playwright/support/page/search/searchPage";
+import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 
 test.describe("Search functionality tests", () => {
     let searchPage: SearchPage;

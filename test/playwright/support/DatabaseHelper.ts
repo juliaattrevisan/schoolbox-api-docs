@@ -4,7 +4,7 @@ export interface DataPairs {
     [key: string]: string | number | boolean | null;
 }
 
-export class DatabaseHelper {
+export default class DatabaseHelper {
     private pool: Pool;
 
     /**

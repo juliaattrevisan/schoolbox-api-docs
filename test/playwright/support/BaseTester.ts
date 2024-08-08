@@ -6,7 +6,7 @@ import { existsSync } from "fs";
  * Can be used in any context, including .beforeAll and .afterAll
  * The page fixture is not available in this class, so it cannot interact with the browser
  */
-export class BaseTester {
+export default class BaseTester {
     /**
      * Executes a shell command and returns the result.
      * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command via `vagrant ssh -c '...'`

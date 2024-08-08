@@ -3,7 +3,7 @@
  * SAML tests do not exist in the Playwright implementation yet, see codeception
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { LoginPage } from "@schoolboxTest/playwright/support/page/loginPage";
+import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
 
 test.describe("Login functionality tests", () => {
     let loginPage: LoginPage;

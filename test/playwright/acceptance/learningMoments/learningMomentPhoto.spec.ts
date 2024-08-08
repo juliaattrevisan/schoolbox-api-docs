@@ -2,8 +2,8 @@
  * This test creates, modifies and delete a learning moment, add a comment and delete it
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { LearningMomentsPage } from "@schoolboxTest/playwright/support/page/learningMoments/learningMomentsPage";
-import { Common } from "@schoolboxTest/playwright/support/page/common";
+import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsPage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Learning Moment Photo Tests", () => {
     /**

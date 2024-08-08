@@ -3,15 +3,10 @@
  * the teacher views and marks the submission, the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-import { AssessmentForm } from "@schoolboxTest/playwright/support/page/dueWork/assessmentForm";
+import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
+import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 
 // TODO: Move selectors into relevant support page files
-const SELECTOR_FOLDER_FORM_INPUT_NAME = "folder-form-input-name";
-const SELECTOR_FOLDER_FORM_SELECT_TEMPLATE = "folder-form-select-template";
-const SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_READ = "folder-form-radio-access-group-read"; // Append "-[groupID]"
-const SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_WRITE = "folder-form-radio-access-group-write"; // Append "-[groupID]"
-const SELECTOR_FOLDER_FORM_SUBMIT = "folder-form-submit";
-
 const SELECTOR_RESOURCE_ACTION_HOMEPAGE = "resource-action-homepage";
 
 const SELECTOR_HOMEPAGE_COMPONENT_LOCK_TOGGLE = "homepage-component-lock-toggle";
@@ -61,6 +56,7 @@ test.describe("Initial Due Work functionality tests", () => {
     });
 
     test("Create 2 Assessments", async ({ tester, page }) => {
+        const createFolder = new CreateFolder(page);
         const assessmentForm = new AssessmentForm(tester, page);
 
         const teacher = "Jack Coles";
@@ -71,17 +67,17 @@ test.describe("Initial Due Work functionality tests", () => {
         // Simulate creating a homepage and adding members
         folderName = `Test Class Homepage ${Date.now()}`; // Timestamp to ensure uniqueness
         tester.isGoingTo(`create a homepage named "${folderName}"`);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
-        await page.getByTestId(SELECTOR_FOLDER_FORM_SELECT_TEMPLATE).selectOption({ label: "Blank" });
-        await page.getByTestId(SELECTOR_FOLDER_FORM_INPUT_NAME).fill(folderName);
+        await createFolder.goto();
+        await createFolder.setHomepageTemplate("Blank");
+        await createFolder.typeName(folderName);
 
-        await page.getByTestId(`${SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_WRITE}-1`).check();
-        await page.getByTestId(`${SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_WRITE}-2`).check();
-        await page.getByTestId(`${SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_READ}-3`).check();
-        await page.getByTestId(`${SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_READ}-4`).check();
-        await page.getByTestId(`${SELECTOR_FOLDER_FORM_RADIO_ACCESS_GROUP_READ}-5`).check();
+        await createFolder.setAccessPermission(1, "write");
+        await createFolder.setAccessPermission(2, "write");
+        await createFolder.setAccessPermission(3, "read");
+        await createFolder.setAccessPermission(4, "read");
+        await createFolder.setAccessPermission(5, "read");
 
-        await page.getByTestId(SELECTOR_FOLDER_FORM_SUBMIT).click();
+        await createFolder.submit();
 
         // Navigate to newly created folder
         tester.isGoingTo("navigate to the newly created folder and store its location for later tests");

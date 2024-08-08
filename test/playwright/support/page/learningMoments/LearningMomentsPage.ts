@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test";
-import { AcceptanceTester } from "@schoolboxTest/playwright/support/acceptanceTester";
+import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
-export class LearningMomentsPage {
+export default class LearningMomentsPage {
     private tester: AcceptanceTester;
 
     private page: Page;

@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 
-export class SearchPage {
+export default class SearchPage {
     private page: Page;
 
     static readonly URL = "/search";
