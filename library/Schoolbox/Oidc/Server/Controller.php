@@ -116,10 +116,14 @@ class Controller extends Base
      */
     public function getAccessTokenRequest(): void
     {
-        $this->response = $this->authServer->respondToAccessTokenRequest(
-            $this->request,
-            $this->responseEmpty(),
-        );
+        try {
+            $this->response = $this->authServer->respondToAccessTokenRequest(
+                $this->request,
+                $this->responseEmpty(),
+            );
+        } catch (Server\Exception\OAuthServerException $e) {
+            $this->response = $e->generateHttpResponse($this->responseEmpty());
+        }
     }
 
     /**
