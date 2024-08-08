@@ -80,25 +80,16 @@ $app = new class extends CliTool\App {
         }
         $storageMapper = new StorageMapper();
 
-        /** @var Filesystem $storageFilesystem */
-        $storageFilesystem = $this->getDi()->get('filesystem.storage');
         $this->database = $this->getDatabaseInternal();
         $this->inlineImageConverter = new InlineImageConverter($storageMapper, $this->getLogger());
 
         // scan/process all defined known tables / columns
         foreach ($this->CK_FIELDS as $table => $columns) {
-//            new Alaress_Probe($this->findBase64($table, $columns));
             $data = $this->findBase64($table, $columns);
             if ($data->rowCount()) {
                 $this->extractImage($table, $data);
             }
         }
-        //
-        // scan / process all defined columns within a specified table
-        //
-        // scan / process a specified table,column
-        //
-        // process a specified table,column for a specified object ID.
     }
 
     /**
