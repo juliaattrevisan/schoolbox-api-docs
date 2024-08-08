@@ -78,9 +78,15 @@ $app = new class extends CliTool\App {
         ];
     }
 
+    /**
+     * Direct DB connection, so we don't need to use mappers
+     * @var IConnector|null
+     */
     private ?IConnector $database = null;
 
     /**
+     * Extract image and send to storage tool
+     *
      * @var InlineImageConverter|null
      */
     private ?InlineImageConverter $inlineImageConverter = null;
