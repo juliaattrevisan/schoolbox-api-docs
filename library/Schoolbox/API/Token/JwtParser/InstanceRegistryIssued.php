@@ -13,6 +13,7 @@ use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
+use Schoolbox\API\Token\JwtParser\Exception\InvalidIdentity;
 use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
@@ -82,7 +83,11 @@ class InstanceRegistryIssued extends Base
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
-            return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN);
+            $user = $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN);
+            if ($user) {
+                return $user;
+            }
+            throw new InvalidIdentity('Schoolbox Admin user does not exist');
         }
 
         throw new Rejected('Unable to verify JWT');
