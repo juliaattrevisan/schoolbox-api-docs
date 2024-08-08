@@ -36,20 +36,29 @@ $app = new class extends CliTool\App {
      */
     private $CK_FIELDS = [
         'assessment' => [
-            'description'
+            'description',
         ],
         'comms_news_article' => [
             'body',
         ],
+        'event' => [
+                'detail',
+        ],
+        'evidence' => [
+                'body',
+        ],
         'forumPost' => [
-            'body'
+            'body',
         ],
         'pastoral' => [
             'body_private',
             'body_public',
         ],
         'textBox' => [
-            'body'
+            'body',
+        ],
+        'wikiRevision' => [
+            'body',
         ],
     ];
 
