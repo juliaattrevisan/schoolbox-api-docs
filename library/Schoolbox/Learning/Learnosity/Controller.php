@@ -992,8 +992,8 @@ class Controller extends Base
             'markData' => (new MarkSchemePayload(
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
-                $assessment->getGradeGroup())
-            )->convert()
+                $assessment->getGradeGroup()
+            ))->convert()
         ], "Result for {$assessment->getTitle()}");
     }
 
@@ -1096,8 +1096,8 @@ class Controller extends Base
             'markData' => (new MarkSchemePayload(
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
-                $assessment->getGradeGroup())
-            )->convert()
+                $assessment->getGradeGroup()
+            ))->convert()
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1405,8 +1405,8 @@ class Controller extends Base
             'markData' => (new MarkSchemePayload(
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
-                $assessment->getGradeGroup())
-            )->convert(),
+                $assessment->getGradeGroup()
+            ))->convert(),
             /* This list of learnosity references is used for the finalisation step
              */
             'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),

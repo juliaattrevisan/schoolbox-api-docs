@@ -26,8 +26,7 @@ class MarkSchemePayload
         private \Schoolbox\GenericCollection $submissionStates,
         private MarkType $markType,
         private ?Model $gradeGroup
-    )
-    {
+    ) {
     }
 
 
