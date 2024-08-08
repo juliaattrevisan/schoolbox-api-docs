@@ -5,7 +5,6 @@
 
 import { slideUp, slideDown } from "@js/util/animateUtils";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -113,7 +112,7 @@ function onAttemptMarkUpdated(mark: string) {
                     v-if="itemsStore.isAttemptComment"
                     :student="props.student"
                     :is-read-only="false"
-                    :mark-data="useStore().markData as AssessmentMarkData"
+                    :mark-data="useStore().markData"
                     @updated-comment="onAttemptCommentUpdated"
                     @updated-mark="onAttemptMarkUpdated"
                 />

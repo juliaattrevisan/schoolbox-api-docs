@@ -5,7 +5,6 @@
 
 import StudentAttemptResponse from "@schoolboxLearnosity/vue/student/student-attempt-response.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
-import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import QfStudentHeader from "./qf-student-header.vue";
 import QfStudentItem from "./qf-student-item.vue";
 import QfStudentShowMarked from "./qf-student-show-marked.vue";
@@ -72,7 +71,7 @@ function onAttemptMarkUpdated(mark: string) {
                 <student-attempt-response
                     :student="props.student"
                     :is-read-only="store.isReadOnly"
-                    :mark-data="store.markData as AssessmentMarkData"
+                    :mark-data="store.markData"
                     @updated-comment="onAttemptCommentUpdated"
                     @updated-mark="onAttemptMarkUpdated"
                 />

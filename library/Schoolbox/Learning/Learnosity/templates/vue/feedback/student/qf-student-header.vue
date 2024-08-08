@@ -5,7 +5,6 @@
 
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import StudentHeaderAttemptMark from "@schoolboxLearnosity/vue/student/student-header-attempt-mark.vue";
-import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import { useStore } from "../store/quizFeedbackStore";
 
 interface Props {
@@ -35,7 +34,7 @@ const store = useStore();
             <student-header-attempt-mark
                 v-if="props.student.isReportLoaded"
                 :student="props.student"
-                :mark-data="useStore().markData as AssessmentMarkData"
+                :mark-data="useStore().markData"
             />
         </div>
     </div>
