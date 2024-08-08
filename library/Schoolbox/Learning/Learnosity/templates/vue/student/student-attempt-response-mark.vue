@@ -206,8 +206,8 @@ const actualMark = computedEager(() => {
  */
 const hasNoMark = window.Vue.computed(() => {
     return (
-        props.student.attemptResponse.mark === undefined &&
-        props.student.attemptResponse.mark === null &&
+        props.student.attemptResponse.mark === undefined ||
+        props.student.attemptResponse.mark === null ||
         props.student.attemptResponse.mark === ""
     );
 });
@@ -281,7 +281,13 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <div v-if="hasNoMark" class="l-flex-col l-gap-s">
+    <div
+        v-if="
+            (props.isReadOnly && props.student.attemptResponse.mark === null) ||
+            (props.isReadOnly && props.student.attemptResponse.mark === '')
+        "
+        class="l-flex-col l-gap-s"
+    >
         <label>Grade</label>
         <p>
             <em>No grade added.</em>
