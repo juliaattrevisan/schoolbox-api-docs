@@ -1,15 +1,21 @@
--- Initially set all fields to accept all mime types
-UPDATE `config` SET `options` = '{"mimeFilter": "*/*"}';
+-- Set the mimeFilter for each field as it is currently handled:
+UPDATE `config` co
+JOIN `lu_config_field` lu ON co.field_id = lu.id
+SET
+    co.`options` = '{"mimeFilter": "*/*"}'
+WHERE
+    lu.field IN ('file', 'fileMulti');
 
--- Now, restrict according to the old logic (_logo and _bg fields only accept images)
 UPDATE `config`
 SET
     `options` = '{"mimeFilter": "image/*"}'
 WHERE
-    `name` LIKE '%_logo%'
-    OR `name` LIKE '%_bg%';
+    `name` = 'skin_logo_square'
+    OR `name` = 'skin_logo_large'
+    OR `name` = 'skin_logo_login'
+    OR `name` = 'skin_login_bg';
 
--- 4 fields need to be restricted to accept only images, these are:
+-- 4 fields need to be restricted to accept only images, where previously they were not, these are:
 --   email_banner_image     (currently */*)
 --   skin_favicon           (currently */*)
 --   saml_login_icon        (currently */*)
@@ -19,11 +25,10 @@ UPDATE `config`
 SET
     `options` = '{"mimeFilter": "image/*"}'
 WHERE
-    `name` = 'email_banner_image';
-
-OR `name` = 'skin_favicon'
-OR `name` = 'saml_login_icon'
-OR `name` = 'oidc_login_icon';
+    `name` = 'email_banner_image'
+    OR `name` = 'skin_favicon'
+    OR `name` = 'saml_login_icon'
+    OR `name` = 'oidc_login_icon';
 
 -- They are now:
 --   push_apns_cert_path    */*
