@@ -9,6 +9,9 @@ import { useSearchStore } from "../store/spSearchStore";
 const filterDateRangeStore = useFilterDateRangeStore();
 const searchStore = useSearchStore();
 
+const startDateInputEl = window.Vue.ref<HTMLInputElement | null>(null);
+const endDateInputEl = window.Vue.ref<HTMLInputElement | null>(null);
+
 /**
  * Ensure the error message is hidden on clear filters
  * @param {string} selector - The selector for the error message
@@ -27,10 +30,12 @@ window.Vue.watch(
     () => filterDateRangeStore.startDate,
     (newValue) => {
         if (newValue === EMPTY_DATE) {
-            $("#sp-start-date-input").val(EMPTY_DATE);
+            if (startDateInputEl.value) {
+                startDateInputEl.value.value = EMPTY_DATE;
+            }
             clearErrorMessage("#sp-start-date-input-error");
         }
-    }
+    },
 );
 
 /**
@@ -40,10 +45,12 @@ window.Vue.watch(
     () => filterDateRangeStore.endDate,
     (newValue) => {
         if (newValue === EMPTY_DATE) {
-            $("#sp-end-date-input").val(EMPTY_DATE);
+            if (endDateInputEl.value) {
+                endDateInputEl.value.value = EMPTY_DATE;
+            }
             clearErrorMessage("#sp-end-date-input-error");
         }
-    }
+    },
 );
 
 /**
@@ -59,7 +66,7 @@ window.Vue.watch(
         if (isSearching && filterDateRangeStore.endDate === INVALID_DATE) {
             filterDateRangeStore.endDate = EMPTY_DATE;
         }
-    }
+    },
 );
 
 /**
@@ -77,7 +84,10 @@ function getDateFormatted(date: string) {
  * called when the component is not mounted yet.
  */
 function initDatePickers() {
+    // For now, disable eslint as we need to use jQuery to attach the date picker
+    /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
     $("[data-datepicker-vue]").each(function attachAlaressDatePicker() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const $dateInput = $(this);
         if ($dateInput.attr("data-datepicker-id") === undefined) {
             $dateInput.alaressDateTimePicker();
@@ -91,6 +101,7 @@ function initDatePickers() {
         const dateFromDom = (event.currentTarget as HTMLInputElement).value;
         filterDateRangeStore.endDate = dateFromDom === EMPTY_DATE ? EMPTY_DATE : getDateFormatted(dateFromDom);
     });
+    /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 }
 
 window.Vue.onMounted(() => {
@@ -104,6 +115,7 @@ window.Vue.onMounted(() => {
             <label for="sp-start-date-input">Start date</label>
             <input
                 id="sp-start-date-input"
+                ref="startDateInputEl"
                 type="text"
                 data-datepicker-vue
                 data-datepicker-buttontext
@@ -116,6 +128,7 @@ window.Vue.onMounted(() => {
             <label for="sp-end-date-input">End date</label>
             <input
                 id="sp-end-date-input"
+                ref="endDateInputEl"
                 type="text"
                 data-test="sp-filter-date-range-end"
                 data-datepicker-vue

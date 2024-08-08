@@ -108,8 +108,8 @@ const filterResults = debounce(() => {
     fetch(`${paths.searchEndpoint}${keyword.value}`)
         .then((response) => response.json())
         .then((data: AllResults) => {
-            totalCountUsers.value = data.metadata.totalCountUsers;
-            totalCountFolders.value = data.metadata.totalCountFolders;
+            totalCountUsers.value = data.metadata.totalCountUsers ?? 0;
+            totalCountFolders.value = data.metadata.totalCountFolders ?? 0;
             results.value = data.data;
         })
         .finally(() => {
