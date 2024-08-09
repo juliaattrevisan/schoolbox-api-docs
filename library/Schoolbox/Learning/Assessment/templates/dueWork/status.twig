@@ -647,10 +647,33 @@
                     $('#manage-submissions').find('[data-submit]').on('click', function(event) {
                         event.preventDefault();
 
-                        {# Compile the list of draftees #}
-                        let elems = $('#mass-submit-draft-list').find('input[type=checkbox]:checked');
+                        {# Compile the list of selected draftees and selected offliners #}
+                        let payload = {
+                            'draft': {
+                                'ids': [],
+                                'overdue': false
+                            },
+                            'offline': {
+                                'ids': [],
+                                'overdue': false
+                            }
+                        }
 
-                        console.log(elems);
+                        {# Compile the list of selected draftees #}
+                        $('#mass-submit-draft-list')
+                                .find('input[type=checkbox]:checked')
+                                .each(function(index, element) {
+                                    payload.draft.ids.push($(element).attr('data-mass-draft'));
+                                });
+
+                        {# Compile the list of selected offliners #}
+                        $('#mass-submit-offline-list')
+                                .find('input[type=checkbox]:checked')
+                                .each(function(index, element) {
+                                    payload.offline.ids.push($(element).attr('data-mass-offline'));
+                                });
+
+                        console.log(payload);
                     });
 
 
