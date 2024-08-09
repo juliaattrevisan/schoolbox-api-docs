@@ -130,6 +130,11 @@ class CalendarFactory implements IFactory
                 return null;
         }
 
+        // exit early if composite doesn't exist
+        // we probably shouldn't continue if the sis calendar import failed
+        if (!$composites) {
+            return null;
+        }
         return $composites
             ->prepend(
                 new ShadowTable\Calendar\Enable(
