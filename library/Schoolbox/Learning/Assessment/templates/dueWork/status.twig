@@ -449,7 +449,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        <div class="toast" data-alert data-save-draft></div>
+        <div class="toast" data-alert data-toast></div>
 
         {# Dynamic Feedback
          #
@@ -538,7 +538,7 @@
                         onSubmit: function (toPublish) {
                             let draftFeedbackIds = [],
                                 $actionBars      = [],
-                                $toast = $('[data-save-draft]');
+                                $toast = $('[data-toast]');
 
                             $toast.toastActivate({text: 'Publishing drafts...'});
 
@@ -784,7 +784,7 @@
                             $participant = $actionBar.closest('[data-participant]'),
                             $statusIcon  = $participant.find('[data-status]'),
                             $statusLabel = $participant.find('[data-status-label]'),
-                            $toast       = $('[data-save-draft]');
+                            $toast       = $('[data-toast]');
 
                         $toast.toastActivate({text: 'Marking submission as received...'});
                         $button.html('Working...');
