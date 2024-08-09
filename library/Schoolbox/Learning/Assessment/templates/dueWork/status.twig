@@ -638,6 +638,11 @@
                         },
                     });
 
+                    {# Construct mega-payload of forcibly-submitted drafts and receipt of submissions.
+                     # This sends everything to the backend for processing, then reloads this very screen,
+                     # otherwise users won't see the latest outcome of submissions (offline or otherwise)
+                     #}
+
 
                     {# Mass acknowledge receipt of submissions #}
                     {#$('#mass-submit').bulky({#}
