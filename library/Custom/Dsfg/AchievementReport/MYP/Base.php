@@ -54,6 +54,7 @@ class Base extends AchievementReportBase
                 SubjectName IS NOT NULL
                 AND ID = :externalId
                 AND FileYear = :year
+            ORDER BY SubjectName ASC, TopicHeading ASC
         ";
 
         $rows     = $this->db->executeQuery($query, $params)->fetchAll();

@@ -877,6 +877,8 @@ class Controller extends Base
             ];
         }
 
+        krsort($historical); // Ensure historical tabs are displayed in reverse chronological order.
+
         $this->response = $this->responseFromTemplate(
             '@myp/index.twig',
             [
