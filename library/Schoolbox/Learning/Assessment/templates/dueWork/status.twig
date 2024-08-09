@@ -359,21 +359,19 @@
                      # the due date is reached, despite having practically done the work on time; they
                      # just didn't complete the workflow.
                      #}
-                    {% if assessment.overdue %}
-                        <div id="mass-submit-draft-punctual-container" data-mass-available>
-                            <hr />
-                            <p>
-                                Did these students submit their work on time? <br />
-                                <span class="switch">
-                                    <input id="draft-punctual" type="checkbox" checked="">
-                                    <label for="draft-punctual">
-                                        <span>Yes</span>
-                                        <span>No</span>
-                                    </label>
-                                </span>
-                            </p>
-                        </div>
-                    {% endif %}
+                    <div id="mass-submit-draft-punctual-container" data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="draft-punctual" type="checkbox" checked="">
+                                <label for="draft-punctual">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
                 </div>
                 <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
                     <p data-mass-unavailable>You have no students requiring submission.</p>
@@ -399,21 +397,19 @@
                      # the due date is reached, despite having practically done the work on time; they
                      # just didn't complete the workflow.
                      #}
-                    {% if assessment.overdue %}
-                        <div id="mass-submit-offline-punctual-container" data-mass-available>
-                            <hr />
-                            <p>
-                                Did these students submit their work on time? <br />
-                                <span class="switch">
-                                    <input id="offline-punctual" type="checkbox" checked="">
-                                    <label for="offline-punctual">
-                                        <span>Yes</span>
-                                        <span>No</span>
-                                    </label>
-                                </span>
-                            </p>
-                        </div>
-                    {% endif %}
+                    <div id="mass-submit-offline-punctual-container" data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="offline-punctual" type="checkbox" checked="">
+                                <label for="offline-punctual">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </div>
 {#            <h2>Acknowledge Receipt of Submission</h2>#}
@@ -481,6 +477,16 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
+                    {# Decide if this assessment is overdue during runtime
+                     # This accommodates a temporal edge case where you loaded the status screen,
+                     # then waited around for a while before executing a time-sensitive action
+                     # What we knew at the time of loading the screen is different to what's actually
+                     # happening now.
+                     #}
+                    function isOverdue() {
+                        return (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}');
+                    }
+
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
@@ -603,8 +609,6 @@
                     {# Decide if we've gone past the due date
                      # If we did, provide a checkbox to allow teachers to override when this action occurred
                      #}
-                    let overdue = new Boolean('{{ assessment.overdue }}');
-
                     $('#mass-submit-draft').bulky({
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit-draft]',
@@ -616,7 +620,7 @@
                             {# Initially hide this checkbox thing until we actually need it #}
                             onTimeContainer.hide();
 
-                            if (overdue) {
+                            if (isOverdue()) {
                                 onTimeContainer.show();
                             }
 
@@ -660,7 +664,7 @@
                             {# Initially hide this checkbox thing until we actually need it #}
                             onTimeContainer.hide();
 
-                            if (overdue) {
+                            if (isOverdue()) {
                                 onTimeContainer.show();
                             }
 
@@ -807,7 +811,7 @@
                     $('[data-sobo]').on('click', function () {
                         let $buttonClicked = $(this);
 
-                        if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                        if (isOverdue()) {
                             $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
                             {# Handle clicks on confirm popup buttons. #}
