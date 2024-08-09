@@ -339,6 +339,9 @@
                     <p data-mass-unavailable>You have no students with draft submissions.</p>
                     <p data-mass-available>Submit draft submissions on behalf of:</p>
 
+                    <input type="checkbox" id="mass-submit-draft-selectall" />
+                    <label class="checkbox-label" for="mass-submit-draft-selectall">Select all</label>
+
                     <section class="checklist" id="mass-submit-draft-list">
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                         {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
@@ -373,6 +376,9 @@
                 <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
                     <p data-mass-unavailable>You have no students requiring submission.</p>
                     <p data-mass-available>Acknowledge receipt of submission for:</p>
+
+                    <input type="checkbox" id="mass-submit-offline-selectall" />
+                    <label class="checkbox-label" for="mass-submit-offline-selectall">Select all</label>
 
                     <section class="checklist" id="mass-submit-offline-list">
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
@@ -610,6 +616,13 @@
                                 onTimeContainer.show();
                             }
 
+                            {# Select All for each of the draftees/offliners checkbox lists
+                             # because now you need extra micromanagement abilities
+                             #}
+                            $('#mass-submit-draft-selectall').selectAllBasic({
+                                selector: 'input[data-mass-draft]',
+                            });
+
                             {# Both bulkys alter the same ui element #}
                             return 'Save';
                         },
@@ -629,6 +642,13 @@
                             if (overdue) {
                                 onTimeContainer.show();
                             }
+
+                            {# Select All for each of the draftees/offliners checkbox lists
+                             # because now you need extra micromanagement abilities
+                             #}
+                            $('#mass-submit-offline-selectall').selectAllBasic({
+                                selector: 'input[data-mass-offline]',
+                            });
 
                             {# Both bulkys alter the same ui element #}
                             return 'Save';
