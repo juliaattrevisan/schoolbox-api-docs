@@ -330,9 +330,7 @@
             {# Decide if this assessment is overdue
              # If so, blind users with a big orange box
              #}
-            {% if assessment.overdue %}
-            <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
-            {% endif %}
+            <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue</span>
 
             <div class="row">
                 <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
@@ -621,6 +619,7 @@
                             onTimeContainer.hide();
 
                             if (isOverdue()) {
+                                $('[data-overdue-warning]').show();
                                 onTimeContainer.show();
                             }
 
@@ -665,6 +664,7 @@
                             onTimeContainer.hide();
 
                             if (isOverdue()) {
+                                $('[data-overdue-warning]').show();
                                 onTimeContainer.show();
                             }
 
