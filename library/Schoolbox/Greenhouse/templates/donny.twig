@@ -1,60 +1,56 @@
-<div class="swiper" id="slideshow-whats-new">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide">
-            <img src="{{ CDN_PREFIX }}/images/tour/24.0/1_interactive-worksheets.png" alt="" loading="lazy">
-            <div class="loader"></div>
+<div class='swiper' id='slideshow-whats-new'>
+    <div class='swiper-wrapper'>
+        <div class='swiper-slide'>
+            <img src='{{ CDN_PREFIX }}/images/tour/24.0/1_interactive-worksheets.png' alt='image showing interactive worksheets' loading='lazy'>
+            <div class='loader'></div>
         </div>
-        <div class="swiper-slide">
-            <img src="{{ CDN_PREFIX }}/images/tour/24.0/2_unit-planner.png" alt="" loading="lazy">
-            <div class="loader"></div>
+        <div class='swiper-slide'>
+            <img src='{{ CDN_PREFIX }}/images/tour/24.0/2_unit-planner.png' alt='image showing unit planner updates' loading='lazy'>
+            <div class='loader'></div>
         </div>
-        <div class="swiper-slide">
-            <img src="{{ CDN_PREFIX }}/images/tour/24.0/3_notifications.png" alt="" loading="lazy">
-            <div class="loader"></div>
+        <div class='swiper-slide'>
+            <img src='{{ CDN_PREFIX }}/images/tour/24.0/3_notifications.png' alt='Image showing web app: notifications' loading='lazy'>
+            <div class='loader'></div>
         </div>
     </div>
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
+    <div class='swiper-pagination' style='background: rgba(0, 0, 0, 0.8);'></div>
+    <div class='swiper-button-prev'></div>
+    <div class='swiper-button-next'></div>
 </div>
-<div>
-    <div id="slideshow-whats-new-details-0">
+<div class='l-pad-m'>
+    <div id='slideshow-whats-new-details-0'>
         <h2>Interactive Worksheets</h2>
         <p>Assign interactive worksheets for students to edit with teachers having a live, bird's eye view of student progress before they submit.</p>
     </div>
-    <div id="slideshow-whats-new-details-1" hidden>
+    <div id='slideshow-whats-new-details-1' hidden>
         <h2>Unit Planner: Enhancements</h2>
         <p>Further enhancements including the ability to sequence units and activities, make edits, and create new activities directly in the unit planner.</p>
     </div>
-    <div id="slideshow-whats-new-details-2" hidden>
+    <div id='slideshow-whats-new-details-2' hidden>
         <h2>Web App: Notifications</h2>
         <p>Access Schoolbox and receive notifications directly on more devices than ever before, including iPhones.</p>
     </div>
 <div>
-<script src="/static/js/bundle/slideshow.js"></script>
+<p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>
+<script src='{{ CDN_PREFIX }}/js/bundle/slideshow.js'></script>
 <script>
-document.dispatchEvent(
-    new CustomEvent("swiperInitialize", {
-        detail: {
-            target: document.getElementById("slideshow-whats-new"),
-            options: {
-                delay: 5000,
-                loop: false,
-                on: {
-                    init: () => {
-                        console.warn("swiper initialized ya");
-                    },
-                    slideChange: (event) => {
-                        const details = document.querySelectorAll("[id^=slideshow-whats-new-details-]");
-                        details.forEach((detail) => {
-                            detail.hidden = true;
-                        });
-                        const detail = document.getElementById(`slideshow-whats-new-details-${event.realIndex}`);
-                        detail.hidden = false;
-                    },
+document.dispatchEvent(new CustomEvent('swiperInitialize', {
+    detail: {
+        target: document.getElementById('slideshow-whats-new'),
+        options: {
+            delay: 5000,
+            loop: false,
+            on: {
+                slideChange: (event) => {
+                    const details = document.querySelectorAll('[id^=slideshow-whats-new-details-]');
+                    details.forEach((detail) => {
+                        detail.hidden = true;
+                    });
+                    const detail = document.getElementById(`slideshow-whats-new-details-${event.realIndex}`);
+                    detail.hidden = false;
                 },
             },
         },
-    })
-);
+    },
+}));
 </script>
