@@ -75,31 +75,8 @@ const upcoming = window.Vue.computed(() => {
     <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
-            <li v-if="paperlyPayload?.features.find((item) => 'Forms' in item)">
-                <a
-                    class="icon-paperly-forms"
-                    :href="paperlyPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''"
-                >
-                    Forms</a
-                >
-            </li>
-            <li v-if="paperlyPayload?.features.find((item) => 'Excursions' in item)">
-                <a
-                    class="icon-paperly-excursions"
-                    :href="paperlyPayload.features.find((item) => 'Excursions' in item)?.Excursions ?? ''"
-                    >Excursions</a
-                >
-            </li>
-            <li v-if="paperlyPayload?.features.find((item) => 'Parent Teacher Interview' in item)">
-                <a
-                    class="icon-paperly-pti"
-                    :href="
-                        paperlyPayload.features.find((item) => 'Parent Teacher Interview' in item)?.[
-                            'Parent Teacher Interview'
-                        ] ?? ''
-                    "
-                    >Parent/Teacher Interview</a
-                >
+            <li v-for="feature in paperlyPayload?.features" :key="feature.url">
+                <a class="icon-paperly-forms" :href="feature.url ?? ''">{{ feature.title ?? "" }}</a>
             </li>
         </ul>
         <div class="c-island l-flex-col">

@@ -4,5 +4,7 @@
  */
 
 export type FeatureItem = {
-    [key: string]: string;
+    title: string;
+    url: string;
+    icon: string;
 };
