@@ -61,7 +61,7 @@
     {% if not readonly %}
         <li class="separator">Bulk Actions</li>
         <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
-        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish draft feedback</a></li>
+        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
     {% endif %}
 {% endblock %}
 
@@ -330,12 +330,12 @@
             {# Decide if this assessment is overdue
              # If so, blind users with a big orange box
              #}
-            <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue</span>
+            <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue.</span>
 
             <div class="row">
                 <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
                     <p data-mass-unavailable>You have no students with draft submissions.</p>
-                    <p data-mass-available>Submit draft submissions on behalf of:</p>
+                    <p data-mass-available>Submit students' drafts:</p>
 
                     <div>
                         <input type="checkbox" id="mass-submit-draft-selectall" />
@@ -373,7 +373,7 @@
                 </div>
                 <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
                     <p data-mass-unavailable>You have no students requiring submission.</p>
-                    <p data-mass-available>Acknowledge receipt of submission for:</p>
+                    <p data-mass-available>Mark students as submitted:</p>
 
                     <div>
                         <input type="checkbox" id="mass-submit-offline-selectall" />
