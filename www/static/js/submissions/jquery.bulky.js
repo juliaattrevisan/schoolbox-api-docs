@@ -135,6 +135,7 @@
                         /* Assign ids
                          */
                         $chk.attr("id", opt.checkboxPrefix + id);
+                        $chk.attr("data-" + opt.checkboxPrefix, id);
                         $lbl.attr("for", opt.checkboxPrefix + id);
 
                         // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
