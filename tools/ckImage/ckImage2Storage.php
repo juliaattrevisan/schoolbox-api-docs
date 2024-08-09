@@ -101,6 +101,7 @@ $app = new class extends CliTool\App {
      * @var int
      */
     private int $tables = 0;
+    private int $tablesSkipped = 0;
     private int $processed = 0;
     private int $item = 0;
     private int $errors = 0;
@@ -156,11 +157,15 @@ HELP;
             if ($data->rowCount()) {
                 $this->tables++;
                 $this->extractImage($table, $data);
+            } else {
+                $this->tablesSkipped++;
+                $this->getLogger()->debug(sprintf("Table '%s' skipped as no base64 data was found", $table));
             }
         }
         $this->getLogger()->info("CKEditor image to storage extract Complete; Stats:");
         $stats = [
                 'tables' => $this->tables,
+                'tablesSkipped' => $this->tablesSkipped,
                 'items' => $this->item,
                 'processed' => $this->processed,
                 'errors' => $this->errors,
