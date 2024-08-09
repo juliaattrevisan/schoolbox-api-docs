@@ -1573,6 +1573,16 @@ class Controller extends Assessment\Controller
      */
     public function postManageSubmissions(IAssessable $assessment): void
     {
+        $postData = $this->requestPost->getArrayCopy();
+        print_r($postData);
+        $code = 200;
+
+        $data = [
+            'success' => true,
+            'message' => null
+        ];
+
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 
 

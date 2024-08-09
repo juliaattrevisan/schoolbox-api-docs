@@ -677,8 +677,13 @@
 
                         payload.offline.overdue = $('#offline-on-time').is(':checked');
 
-                        {# Mass acknowledge receipt of submissions #}
-                        console.log(payload, '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}');
+                        let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
+
+                        if (route.length) {
+                            $.post(route, payload, function(responseText) {
+
+                            })
+                        }
                     });
 
                     {#$('#mass-submit').bulky({#}
