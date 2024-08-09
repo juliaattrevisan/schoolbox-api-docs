@@ -1574,7 +1574,29 @@ class Controller extends Assessment\Controller
     public function postManageSubmissions(IAssessable $assessment): void
     {
         $postData = $this->requestPost->getArrayCopy();
-        print_r($postData);
+
+        /* Process the latest drafts from each of these user ids in $assessment and
+         * forcibly submit them.
+         */
+
+        /* If the assessment was overdue, we need to micromanage submission times.
+         */
+
+        /* If the postData[draft][punctual] was selected,
+         * set the submission time to be just before the due date.
+         *
+         * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+         */
+
+        /* Acknowledge receipts of submission for each of these user ids in $assessment.
+         */
+
+        /* If the postData[offline][punctual] was selected,
+         * set the submission time to be just before the due date.
+         *
+         * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+         */
+
         $code = 200;
 
         $data = [

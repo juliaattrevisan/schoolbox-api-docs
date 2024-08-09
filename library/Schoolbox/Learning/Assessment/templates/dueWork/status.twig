@@ -355,13 +355,13 @@
                      # just didn't complete the workflow.
                      #}
                     {% if assessment.overdue %}
-                        <div id="mass-submit-draft-on-time-container" data-mass-available>
+                        <div id="mass-submit-draft-punctual-container" data-mass-available>
                             <hr />
                             <p>
                                 Did these students submit their work on time? <br />
                                 <span class="switch">
-                                    <input id="draft-on-time" type="checkbox" checked="">
-                                    <label for="draft-on-time">
+                                    <input id="draft-punctual" type="checkbox" checked="">
+                                    <label for="draft-punctual">
                                         <span>Yes</span>
                                         <span>No</span>
                                     </label>
@@ -390,13 +390,13 @@
                      # just didn't complete the workflow.
                      #}
                     {% if assessment.overdue %}
-                        <div id="mass-submit-offline-on-time-container" data-mass-available>
+                        <div id="mass-submit-offline-punctual-container" data-mass-available>
                             <hr />
                             <p>
                                 Did these students submit their work on time? <br />
                                 <span class="switch">
-                                    <input id="offline-on-time" type="checkbox" checked="">
-                                    <label for="offline-on-time">
+                                    <input id="offline-punctual" type="checkbox" checked="">
+                                    <label for="offline-punctual">
                                         <span>Yes</span>
                                         <span>No</span>
                                     </label>
@@ -606,7 +606,7 @@
                         userList: $userList,
                         checkboxPrefix: 'mass-draft',
                         submitText: function (len, all) {
-                            let onTimeContainer = $('#mass-submit-draft-on-time-container');
+                            let onTimeContainer = $('#mass-submit-draft-punctual-container');
 
                             {# Initially hide this checkbox thing until we actually need it #}
                             onTimeContainer.hide();
@@ -626,7 +626,7 @@
                         userList: $userList,
                         checkboxPrefix: 'mass-offline',
                         submitText: function (len, all) {
-                            let onTimeContainer = $('#mass-submit-offline-on-time-container');
+                            let onTimeContainer = $('#mass-submit-offline-punctual-container');
 
                             {# Initially hide this checkbox thing until we actually need it #}
                             onTimeContainer.hide();
@@ -651,11 +651,11 @@
                         let payload = {
                             'draft': {
                                 'ids': [],
-                                'overdue': false
+                                'punctual': false
                             },
                             'offline': {
                                 'ids': [],
-                                'overdue': false
+                                'punctual': false
                             }
                         }
 
@@ -666,7 +666,7 @@
                                     payload.draft.ids.push($(element).attr('data-mass-draft'));
                                 });
 
-                        payload.draft.overdue = $('#draft-on-time').is(':checked');
+                        payload.draft.punctual = $('#draft-punctual').is(':checked');
 
                         {# Compile the list of selected offliners #}
                         $('#mass-submit-offline-list')
@@ -675,7 +675,7 @@
                                     payload.offline.ids.push($(element).attr('data-mass-offline'));
                                 });
 
-                        payload.offline.overdue = $('#offline-on-time').is(':checked');
+                        payload.offline.punctual = $('#offline-punctual').is(':checked');
 
                         let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
 
