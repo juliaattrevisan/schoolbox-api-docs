@@ -89,7 +89,7 @@ abstract class AbstractService implements ServiceInterface
      * @throws \Exception
      * @return bool
      */
-    public function send(array $tokens, Instance $instance, $unreadCount = 0)
+    public function send(array $tokens, Instance $instance, $unreadCount = 0, ?string $recipientExternalId = null)
     {
         // it's like reconstituting orange juice... it's just not right *sigh*
         $n = new Notification([ $instance ]);
@@ -98,7 +98,7 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title, $unreadCount, $n);
+        return $this->propagate($tokens, $id, $title, $unreadCount, $n, $recipientExternalId);
     }
 
 
@@ -141,5 +141,5 @@ abstract class AbstractService implements ServiceInterface
      * @param Notification|null $notification
      * @return bool
      */
-    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null);
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null);
 }

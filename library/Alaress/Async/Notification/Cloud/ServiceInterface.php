@@ -33,7 +33,7 @@ interface ServiceInterface
      * @param int   $unreadCount
      * @return bool
      */
-    public function send(array $tokens, Instance $instance, $unreadCount = 0);
+    public function send(array $tokens, Instance $instance, $unreadCount = 0, ?string $recipientExternalId = null);
 
 
     /**

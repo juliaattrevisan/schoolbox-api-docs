@@ -56,7 +56,7 @@ class Service extends AbstractService
      * @param null|Notification $notification
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
     {
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())

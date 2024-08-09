@@ -85,7 +85,7 @@ class Service extends AbstractService
     /**
      * @inheritdoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
     {
         $headers = [
             'X-Auth-Token' => $this->key,

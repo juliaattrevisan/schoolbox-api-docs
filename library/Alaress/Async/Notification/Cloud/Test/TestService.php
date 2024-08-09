@@ -31,7 +31,7 @@ class TestService extends AbstractService
      * @param Notification|null $notification
      * @return bool
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
     {
         $this->getLog()->info('This is a test message: it is not sent anywhere');
         $this->getLog()->info(

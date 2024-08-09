@@ -101,7 +101,7 @@ class ApnService extends AbstractService
     /**
      * @inheritdoc
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?\Alaress\Async\Notification\Notification $notification = null): bool
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?\Alaress\Async\Notification\Notification $notification = null, ?string $recipientExternalId = null): bool
     {
         // Try to set up the protocol
         try {

@@ -81,7 +81,7 @@ class GCM extends AbstractService
      *@throws OverflowException if the max payload size (4KB) is exceeded
      * @throws RuntimeException if your API key is bad
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
     {
         $data = [
             'id'           => $id,
