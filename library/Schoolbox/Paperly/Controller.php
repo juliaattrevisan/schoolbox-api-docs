@@ -21,6 +21,12 @@ class Controller extends Base
     private Base64 $base64Codec;
     private const PAPERLY_API_CACHE_DEFAULT_TTL = 600;
     private const PAPERLY_API_CACHE_KEY = 'paperly_dashboard_user_%s';
+    private const PAPERLY_ICON_CLASSES = [
+        'parent teacher interview' => 'icon-paperly-pti',
+        'excursions' => 'icon-paperly-excursions',
+        'forms' => 'icon-paperly-forms',
+        'details' => 'icon-paperly-details',
+    ];
 
 
     /**
@@ -160,7 +166,12 @@ class Controller extends Base
             return;
         }
         foreach ($paperlyPayload['features'] as $feature) {
-            $paperlyLinks['features'][][$feature['title']] = $this->preparePaperlyRoute($feature);
+            $featureTitle = $feature['title'];
+            $paperlyLinks['features'][] = [
+                'url' => $this->preparePaperlyRoute($feature),
+                'title' => $featureTitle,
+                'icon' => self::PAPERLY_ICON_CLASSES[strtolower($featureTitle)] ?? ''
+            ];
         }
 
         $upcomingActions = [];
