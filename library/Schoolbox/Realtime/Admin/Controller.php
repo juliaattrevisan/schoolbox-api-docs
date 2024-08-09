@@ -321,10 +321,10 @@ class Controller extends BaseController
             case MobileApp\Registry::PROVIDER_TASS_ORBIT:
                 // require keys for TASS Orbit
                 $error = "Unable to setup TASS Orbit service,";
-                $domain = trim($post->get('domain', ''));
-                $company    = trim($post->get('company', ''));
+                $host = trim($post->get('host', ''));
+                $companycode    = trim($post->get('companycode', ''));
 
-                if (empty($key) || empty($company) || empty($domain)) {
+                if (empty($key) || empty($companycode) || empty($host)) {
                     $this->sendError("$error please provide all configurations.");
                     return;
                 }
@@ -332,8 +332,8 @@ class Controller extends BaseController
                 $key = json_encode(
                     [
                         "token" => $key,
-                        "domain" => $domain,
-                        "company" => $company
+                        "host" => $host,
+                        "companycode" => $companycode
                     ]
                 );
 
@@ -593,6 +593,8 @@ class Controller extends BaseController
             $liveMessage
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
+            //Getting length of par_code
+            $this->getConfigLoader()->get('external_tass_parent_id_length'),
         );
 
         $content = [
