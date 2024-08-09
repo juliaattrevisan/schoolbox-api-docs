@@ -339,8 +339,10 @@
                     <p data-mass-unavailable>You have no students with draft submissions.</p>
                     <p data-mass-available>Submit draft submissions on behalf of:</p>
 
-                    <input type="checkbox" id="mass-submit-draft-selectall" />
-                    <label class="checkbox-label" for="mass-submit-draft-selectall">Select all</label>
+                    <div>
+                        <input type="checkbox" id="mass-submit-draft-selectall" />
+                        <label class="checkbox-label" for="mass-submit-draft-selectall">Select all</label>
+                    </div>
 
                     <section class="checklist" id="mass-submit-draft-list">
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
@@ -377,8 +379,10 @@
                     <p data-mass-unavailable>You have no students requiring submission.</p>
                     <p data-mass-available>Acknowledge receipt of submission for:</p>
 
-                    <input type="checkbox" id="mass-submit-offline-selectall" />
-                    <label class="checkbox-label" for="mass-submit-offline-selectall">Select all</label>
+                    <div>
+                        <input type="checkbox" id="mass-submit-offline-selectall" />
+                        <label class="checkbox-label" for="mass-submit-offline-selectall">Select all</label>
+                    </div>
 
                     <section class="checklist" id="mass-submit-offline-list">
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
@@ -627,6 +631,22 @@
                             {# Both bulkys alter the same ui element #}
                             return 'Save';
                         },
+                        onAfterBuildList: function() {
+                            {# Select All for each of the draftees/offliners checkbox lists
+                             # because now you need extra micromanagement abilities. This only
+                             # creates a Select All if you have guys in the list
+                             #}
+                            let selectAllCheckbox = $('#mass-submit-draft-selectall');
+
+                            if ($('#mass-submit-draft-list').find('input').length > 0) {
+                                selectAllCheckbox.selectAllBasic({
+                                    selector: 'input[data-mass-draft]',
+                                    defaultState: true
+                                });
+                            } else {
+                                selectAllCheckbox.closest('div').remove();
+                            }
+                        }
                     });
 
                     $('#mass-submit-offline').bulky({
@@ -644,17 +664,25 @@
                                 onTimeContainer.show();
                             }
 
-                            {# Select All for each of the draftees/offliners checkbox lists
-                             # because now you need extra micromanagement abilities
-                             #}
-                            $('#mass-submit-offline-selectall').selectAllBasic({
-                                selector: 'input[data-mass-offline]',
-                                defaultState: true
-                            });
-
                             {# Both bulkys alter the same ui element #}
                             return 'Save';
                         },
+                        onAfterBuildList: function() {
+                            {# Select All for each of the draftees/offliners checkbox lists
+                             # because now you need extra micromanagement abilities. This only
+                             # creates a Select All if you have guys in the list
+                             #}
+                            let selectAllCheckbox = $('#mass-submit-offline-selectall');
+
+                            if ($('#mass-submit-offline-list').find('input').length > 0) {
+                                selectAllCheckbox.selectAllBasic({
+                                    selector: 'input[data-mass-offline]',
+                                    defaultState: true
+                                });
+                            } else {
+                                selectAllCheckbox.closest('div').remove();
+                            }
+                        }
                     });
 
                     {# Construct mega-payload of forcibly-submitted drafts and receipt of submissions.

@@ -29,6 +29,9 @@
          * It's optional; without it, checkboxes will have the id of the  user.
          */
         checkboxPrefix: '',
+        /* This callback fires immediately after the bulky checkbox list is injected
+         */
+        onAfterBuildList: $.noop,
 
         /* A function to determine whether an element should be submittable
          */
@@ -162,6 +165,10 @@
                     .get()
                     .join("")
             );
+
+            /* A callback that fires immediately after the bulky checkbox list is built
+             */
+            opt.onAfterBuildList();
 
             /* All the checkboxes that have been ticked
              * Change contents of modal accordingly
