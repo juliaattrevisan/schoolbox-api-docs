@@ -33,7 +33,7 @@ $app = new class extends CliTool\App {
      * array to contain the known list of tables.columns that can contain ckeditor data
      * @var array[string][string] // table[column]
      */
-    private $CK_FIELDS = [
+    private const CK_FIELDS = [
         'assessment' => [
             'description',
         ],
@@ -101,6 +101,7 @@ $app = new class extends CliTool\App {
      * @var int
      */
     private int $tables = 0;
+    private int $tablesSkipped = 0;
     private int $processed = 0;
     private int $item = 0;
     private int $errors = 0;
@@ -151,16 +152,20 @@ HELP;
         $this->inlineImageConverter = new InlineImageConverter($storageMapper, $this->getLogger());
 
         // scan/process all defined known tables / columns
-        foreach ($this->CK_FIELDS as $table => $columns) {
+        foreach (self::CK_FIELDS as $table => $columns) {
             $data = $this->findBase64($table, $columns);
             if ($data->rowCount()) {
                 $this->tables++;
                 $this->extractImage($table, $data);
+            } else {
+                $this->tablesSkipped++;
+                $this->getLogger()->debug(sprintf("Table '%s' skipped as no base64 data was found", $table));
             }
         }
         $this->getLogger()->info("CKEditor image to storage extract Complete; Stats:");
         $stats = [
                 'tables' => $this->tables,
+                'tablesSkipped' => $this->tablesSkipped,
                 'items' => $this->item,
                 'processed' => $this->processed,
                 'errors' => $this->errors,
@@ -173,9 +178,9 @@ HELP;
      * Get the primary key for the db table, so when we update the fields, we can re inject correctly.
      *
      * @param string $table
-     * @return mixed
+     * @return string
      */
-    private function getPrimKey(string $table)
+    private function getPrimKey(string $table): string
     {
         $query = $this->database->prepareQuery(
             "SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'"
