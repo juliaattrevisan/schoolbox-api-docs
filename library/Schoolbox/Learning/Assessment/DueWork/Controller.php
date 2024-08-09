@@ -1570,6 +1570,7 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable $assessment
      * @return void
+     * @throws MapperException Occurs when you can't spawn a User model for whatever reason
      */
     public function postManageSubmissions(IAssessable $assessment): void
     {
@@ -1631,6 +1632,9 @@ class Controller extends Assessment\Controller
             $this->persistAcknowledgementResponse($assessment, $userStub, $submittedAt);
         }
 
+        /* Not sure how else we'd die in here
+         * Add more error handling as we uncover usages
+         */
         $code = 200;
 
         $data = [
