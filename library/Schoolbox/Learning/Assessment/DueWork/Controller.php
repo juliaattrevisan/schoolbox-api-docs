@@ -1547,6 +1547,36 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * This takes a combined asynchronous payload:
+     *
+     * let payload = {
+     *     'draft': {
+     *         'ids': [],
+     *         'overdue': false
+     *     },
+     *     'offline': {
+     *         'ids': [],
+     *         'overdue': false
+     *     }
+     * }
+     *
+     * ...and forcibly submits the latest draft for the ids specified in payload.draft.ids
+     * and creates a receipt of submission for the ids specified in payload.offline.ids
+     *
+     * In the case of assessments that are overdue:
+     * If the teacher elects, they can decide if these submissions will use the current time
+     * (penalising students for being late) or use teacher discretion to set the submission
+     * time to be just before the formal due date.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function postManageSubmissions(IAssessable $assessment): void
+    {
+    }
+
+
+    /**
      * Acknowledge receipt of (potentially offline) submission from dueWork status page
      *
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
