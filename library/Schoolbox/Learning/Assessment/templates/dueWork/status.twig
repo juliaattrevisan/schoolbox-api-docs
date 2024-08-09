@@ -666,12 +666,16 @@
                                     payload.draft.ids.push($(element).attr('data-mass-draft'));
                                 });
 
+                        payload.draft.overdue = $('#draft-on-time').is(':checked');
+
                         {# Compile the list of selected offliners #}
                         $('#mass-submit-offline-list')
                                 .find('input[type=checkbox]:checked')
                                 .each(function(index, element) {
                                     payload.offline.ids.push($(element).attr('data-mass-offline'));
                                 });
+
+                        payload.offline.overdue = $('#offline-on-time').is(':checked');
 
                         console.log(payload);
                     });
