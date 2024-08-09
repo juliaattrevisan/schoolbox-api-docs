@@ -241,16 +241,20 @@ HELP;
 
                         continue;
                     }
-                    $statement = $this->database->executeQuery(
-                        "UPDATE $table SET $column = :value WHERE $primary = :key",
-                        [
-                            'value' => $newValue, 'key' => $row[$primary]
-                        ]
-                    );
+                    if ($newValue !== $value) {
+                        $statement = $this->database->executeQuery(
+                            "UPDATE $table SET $column = :value WHERE $primary = :key",
+                            [
+                                'value' => $newValue, 'key' => $row[$primary]
+                            ]
+                        );
 
-                    // record this success
-                    $this->processed++;
-                    $this->getLogger()->info(sprintf("Successfully extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
+                        // record this success
+                        $this->processed++;
+                        $this->getLogger()->info(sprintf("Successfully extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
+                    } else {
+                        $this->getLogger()->info(sprintf("False positive, found '%s' in %s.%s (%s: %s)", self::BASE64_SEARCH, $table, $column, $primary, $row[$primary]));
+                    }
                 } else {
                     $this->getLogger()->info(sprintf("Planning, Would have extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                 }
