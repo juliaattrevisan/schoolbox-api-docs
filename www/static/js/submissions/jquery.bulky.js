@@ -25,6 +25,10 @@
         participantSelector: "[data-participant]",
         actionBarSelector: "[data-action-bar]",
         userSelector: null,
+        /* Specify an arbitrary prefix to deconflict multiple sets of checkboxes in the same modal
+         * It's optional; without it, checkboxes will have the id of the  user.
+         */
+        checkboxPrefix: '',
 
         /* A function to determine whether an element should be submittable
          */
@@ -130,8 +134,8 @@
 
                         /* Assign ids
                          */
-                        $chk.attr("id", id);
-                        $lbl.attr("for", id);
+                        $chk.attr("id", opt.checkboxPrefix + id);
+                        $lbl.attr("for", opt.checkboxPrefix + id);
 
                         // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
                         // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).

@@ -604,6 +604,7 @@
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit-draft]',
                         userList: $userList,
+                        checkboxPrefix: 'draft-',
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-draft-on-time-container');
 
@@ -623,6 +624,7 @@
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
+                        checkboxPrefix: 'offline-',
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-offline-on-time-container');
 
@@ -642,6 +644,14 @@
                      # This sends everything to the backend for processing, then reloads this very screen,
                      # otherwise users won't see the latest outcome of submissions (offline or otherwise)
                      #}
+                    $('#manage-submissions').find('[data-submit]').on('click', function(event) {
+                        event.preventDefault();
+
+                        {# Compile the list of draftees #}
+                        let elems = $('#mass-submit-draft-list').find('input[type=checkbox]:checked');
+
+                        console.log(elems);
+                    });
 
 
                     {# Mass acknowledge receipt of submissions #}
