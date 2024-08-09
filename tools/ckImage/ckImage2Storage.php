@@ -33,7 +33,7 @@ $app = new class extends CliTool\App {
      * array to contain the known list of tables.columns that can contain ckeditor data
      * @var array[string][string] // table[column]
      */
-    private $CK_FIELDS = [
+    private const CK_FIELDS = [
         'assessment' => [
             'description',
         ],
@@ -151,7 +151,7 @@ HELP;
         $this->inlineImageConverter = new InlineImageConverter($storageMapper, $this->getLogger());
 
         // scan/process all defined known tables / columns
-        foreach ($this->CK_FIELDS as $table => $columns) {
+        foreach (self::CK_FIELDS as $table => $columns) {
             $data = $this->findBase64($table, $columns);
             if ($data->rowCount()) {
                 $this->tables++;
