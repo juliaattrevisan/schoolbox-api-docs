@@ -17,7 +17,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const paperlyPayload = window.Vue.ref<PaperlyPayload | undefined>();
+const paperlyPayload = window.Vue.ref<PaperlyPayload>({ features: [], upcoming: [] }); // the payload from paperly
 const viewMore = window.Vue.ref(false); // to show all upcoming tasks, only show the first three by default
 const isProcessing = window.Vue.ref(false); // to display loading while the payload is being loaded
 const hasLoadError = window.Vue.ref(false); // to show an error message if the payload fails to load
@@ -30,7 +30,13 @@ async function loadPayload() {
         isProcessing.value = true;
         const response = await fetch(props.getPaperlyViewEndpoint);
         if (response.ok) {
-            paperlyPayload.value = (await response.json()) as PaperlyPayload;
+            const responseJson = (await response.json()) as PaperlyPayload;
+            // check the response has the expected properties
+            if (responseJson.features && responseJson.upcoming) {
+                paperlyPayload.value = responseJson;
+            } else {
+                hasLoadError.value = true;
+            }
         } else {
             hasLoadError.value = true;
         }
@@ -75,7 +81,7 @@ const upcoming = window.Vue.computed(() => {
     <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
-            <li v-for="feature in paperlyPayload?.features" :key="feature.url">
+            <li v-for="feature in paperlyPayload.features" :key="feature.url">
                 <a class="icon-paperly-forms" :href="feature.url ?? ''">{{ feature.title ?? "" }}</a>
             </li>
         </ul>
