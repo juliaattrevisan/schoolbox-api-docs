@@ -194,11 +194,11 @@
             rules: {
                 "plan-name": "requiredNotBlank",
                 "plan-description": "required",
-                "plan-publish-date": {
+                planPublishDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                "plan-open-date": {
+                planOpenDate: {
                     required: function () {
                         return $.inArray("open", options.getAvailableDateFields()) > -1;
                     },
@@ -206,11 +206,11 @@
                         return $.inArray("open", options.getAvailableDateFields()) > -1;
                     },
                 },
-                "plan-due-date": {
+                planDueDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                "plan-close-date": {
+                planCloseDate: {
                     required: function () {
                         return $.inArray("close", options.getAvailableDateFields()) > -1;
                     },
@@ -239,10 +239,10 @@
                     id: newPlan ? newPlanId : oldPlanId,
                     name: $customiseModal.find("#plan-name").val(),
                     description: window.sbProps.editors["plan-desc"].getData(),
-                    publishDate: $customiseModal.find("#plan-publish-date").val(),
-                    openDate: $customiseModal.find("#plan-open-date").val(),
-                    dueDate: $customiseModal.find("#plan-due-date").val(),
-                    closeDate: $customiseModal.find("#plan-close-date").val(),
+                    publishDate: $customiseModal.find("#planPublishDate").val(),
+                    openDate: $customiseModal.find("#planOpenDate").val(),
+                    dueDate: $customiseModal.find("#planDueDate").val(),
+                    closeDate: $customiseModal.find("#planCloseDate").val(),
                 };
 
                 newPlan ? addPlanData(planDetails) : updatePlanData(planDetails);
@@ -556,12 +556,10 @@
         var $planId = $customiseModal.find("#plan-id");
         var $planName = $customiseModal.find("#plan-name");
         var $planDesc = $customiseModal.find("#plan-desc");
-        var $planPublishDate = $customiseModal.find("#plan-publish-date");
-        var $planOpenDate = $customiseModal.find("#plan-open-date");
-        var $planDueDate = $customiseModal.find("#plan-due-date");
-        var $planCloseDate = $customiseModal.find("#plan-close-date");
-
-        var dates = options.getAvailableDateFields();
+        var $planPublishDate = $customiseModal.find("#planPublishDate");
+        var $planOpenDate = $customiseModal.find("#planOpenDate");
+        var $planDueDate = $customiseModal.find("#planDueDate");
+        var $planCloseDate = $customiseModal.find("#planCloseDate");
 
         var participantArray = $(defaults.participants)
             .find("[data-participant-select]")
@@ -588,33 +586,6 @@
 
         // Wait for CKE to init to ensure we can set its value correctly below
         await initCKE();
-
-        // Disable/hide dates if they aren't in the config
-        if ($.inArray("publish", dates) == -1) {
-            $("#plan-publish-date").closest("[data-plan-date-container]").addClass("hide");
-        } else {
-            $("#plan-publish-date").closest("[data-plan-date-container]").removeClass("hide");
-        }
-
-        if ($.inArray("open", dates) == -1) {
-            // Disable/hi
-            $("#plan-open-date").closest("[data-plan-date-container]").addClass("hide");
-        } else {
-            $("#plan-open-date").closest("[data-plan-date-container]").removeClass("hide");
-        }
-
-        if ($.inArray("due", dates) == -1) {
-            $("#plan-due-date").closest("[data-plan-date-container]").addClass("hide");
-        } else {
-            $("#plan-due-date").closest("[data-plan-date-container]").removeClass("hide");
-            // Disable/hi
-        }
-
-        if ($.inArray("close", dates) == -1) {
-            $("#plan-close-date").closest("[data-plan-date-container]").addClass("hide");
-        } else {
-            $("#plan-close-date").closest("[data-plan-date-container]").removeClass("hide");
-        }
 
         // Fill the selectize with the checked students
         participantSelectize.clear();
@@ -643,10 +614,10 @@
 
         // Clear any validation errors
         $("#plan-name-error").hide();
-        $("#plan-publish-date-error").hide();
-        $("#plan-open-date-error").hide();
-        $("#plan-due-date-error").hide();
-        $("#plan-close-date-error").hide();
+        $("#planPublishDate-error").hide();
+        $("#planOpenDate-error").hide();
+        $("#planDueDate-error").hide();
+        $("#planCloseDate-error").hide();
         $("#plan-participants-error").hide();
 
         // Set dates & description to whatever is currently set on the main form

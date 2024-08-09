@@ -14,7 +14,7 @@
                    data-datepicker-format="datetime"
                    data-datepicker-alldayswitch
                    {% if USER.getRole.isStaff and dateProperty == 'due' and config.assessment_picker_enabled %}data-datepicker-call="duework"{% endif %}
-                   {% if dateProperty in ['due','late','close'] %}data-datepicker-endofday data-datepicker-endofperiod{% endif %}
+                   {% if dateProperty in ['due','late','close','planDue','planClose'] %}data-datepicker-endofday data-datepicker-endofperiod{% endif %}
                    {% if syncStartDate is not empty %}data-datesync-startdate='{{ syncStartDate }}'{% endif %}
                    {% if syncEndDate is not empty %}data-datesync-enddate='{{ syncEndDate }}'{% endif %}
                    required
