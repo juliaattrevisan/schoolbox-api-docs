@@ -16,6 +16,7 @@ class Candidacy
      */
     public const SUPERSTAR = 'superstar';
     public const STAR = 'star';
+    public const STARTER = 'starter';
 
 
     /**
@@ -39,6 +40,7 @@ class Candidacy
     {
         $superstar = true;
         $star = true;
+        $starter = true;
 
         /* No grades here; someone in the megaquery came back with a project_result.mark
          * that was actually null in the db; that doesn't count for anything and will
@@ -76,6 +78,6 @@ class Candidacy
             return self::STAR;
         }
 
-        return null;
+        return self::STARTER;
     }
 }
