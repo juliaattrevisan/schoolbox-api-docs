@@ -173,9 +173,9 @@ HELP;
      * Get the primary key for the db table, so when we update the fields, we can re inject correctly.
      *
      * @param string $table
-     * @return mixed
+     * @return string
      */
-    private function getPrimKey(string $table)
+    private function getPrimKey(string $table): string
     {
         $query = $this->database->prepareQuery(
             "SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'"
