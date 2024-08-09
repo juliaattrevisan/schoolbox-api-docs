@@ -590,11 +590,6 @@
                         }
                     });
 
-                    {# These variables allow the confirm-dialog to be disabled in the case of bulk acknowledgements, #}
-                    {# and set whether bulk acknowledgements should confirm submissions as having been on-time.      #}
-                    let confirmDialogDisabled            = false;
-                    let confirmDialogDisabledOnTimeValue = false;
-
                     {# Decide if we've gone past the due date
                      # If we did, provide a checkbox to allow teachers to override when this action occurred
                      #}
@@ -686,20 +681,6 @@
                         }
                     });
 
-                    {#$('#mass-submit').bulky({#}
-
-                    {#    userSelector: '[data-mass-submit]',#}
-                    {#    userList: $userList,#}
-                    {#    onSubmit: function (toSubmit) {#}
-                    {#        confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');#}
-                    {#        confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.#}
-                    {#        toSubmit.each(function () {#}
-                    {#            $(this).find('[data-sobo]').trigger('click');#}
-                    {#        });#}
-                    {#        confirmDialogDisabled = false; // Re-enable the confirm dialog.#}
-                    {#    }#}
-                    {#});#}
-
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
                         includeSelectAllCheckbox: true,
@@ -776,20 +757,16 @@
                     $('[data-sobo]').on('click', function () {
                         let $buttonClicked = $(this);
 
-                        if (!confirmDialogDisabled) {
-                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                                $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
+                        if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                            $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
-                                {# Handle clicks on confirm popup buttons. #}
-                                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
-                                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
-                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
-                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
-                            } else {
-                                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
-                            }
+                            {# Handle clicks on confirm popup buttons. #}
+                            {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                            {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
+                            $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                            $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
                         } else {
-                            postSobo($buttonClicked, confirmDialogDisabledOnTimeValue); {# Use default value for whether submission was confirmed to be on-time. #}
+                            postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                         }
                     });
 
