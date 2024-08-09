@@ -1586,14 +1586,14 @@ class Controller extends Assessment\Controller
         foreach ($postData['draft']['ids'] as $studentId) {
             $userStub = $this->getUserMapper()->createModel()->setId($studentId);
 
-            /** @var \Schoolbox\Learning\Assessment\DueWork\Response $latestResponse */
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model $latestResponse */
             $latestResponse = $assessment->getParticipant($userStub)->findMostRecentDraftResponse();
 
             /* This existed when the modal was submitted, but not when the payload was received
              * The draft submission no longer exists (might already be published or otherwise deleted)
              * Just keep going
              */
-            if (!$latestResponse) {
+            if (null === $latestResponse) {
                 continue;
             }
 
