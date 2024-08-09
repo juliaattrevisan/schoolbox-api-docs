@@ -777,3 +777,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
     border-left: unset;
     border-bottom: 1px solid #ccc;
 }
+
+.lrn_response .lrn_textinput > input[type="text"] {
+    pointer-events: auto !important;
+}
