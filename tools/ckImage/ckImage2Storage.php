@@ -104,6 +104,7 @@ $app = new class extends CliTool\App {
     private int $processed = 0;
     private int $item = 0;
     private int $errors = 0;
+    private int $falsePositive = 0;
 
     /**
      * This process needs to write to storage, thus it must run as `www-data`.
@@ -163,6 +164,7 @@ HELP;
                 'items' => $this->item,
                 'processed' => $this->processed,
                 'errors' => $this->errors,
+                'falsePositive' => $this->falsePositive
         ];
         $this->getLogger()->info(json_encode($stats));
     }
@@ -253,6 +255,8 @@ HELP;
                         $this->processed++;
                         $this->getLogger()->info(sprintf("Successfully extracted image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                     } else {
+                        // record this false positive
+                        $this->falsePositive++;
                         $this->getLogger()->info(sprintf("False positive, found '%s' in %s.%s (%s: %s)", self::BASE64_SEARCH, $table, $column, $primary, $row[$primary]));
                     }
                 } else {
