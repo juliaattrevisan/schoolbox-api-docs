@@ -46,11 +46,12 @@ class OauthProviderIssued extends Base
      * @param CacheInterface $oidcCache  Required for caching discovery response and keys
      */
     public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private Client $httpClient,
         private CacheInterface $oidcCache,
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**
@@ -115,19 +116,10 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
-                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
-                if (!$user) {
-                    $failureMessage = sprintf(
-                        'JWT "%s" claim does not match a user',
-                        $candidateClaim
-                    );
-                } elseif (!$user->getEnabled()) {
-                    $failureMessage = sprintf(
-                        'JWT "%s" claim matches a deactivated user',
-                        $candidateClaim
-                    );
-                } else {
-                    return $user;
+                try {
+                    return $this->findUser($claims[$candidateClaim], $candidateClaim);
+                } catch (Exception\InvalidIdentity $e) {
+                    $failureMessage = $e->getMessage();
                 }
             } else {
                 $failureMessage = sprintf(

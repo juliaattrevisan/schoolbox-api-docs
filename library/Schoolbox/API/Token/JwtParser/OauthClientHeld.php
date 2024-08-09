@@ -44,10 +44,11 @@ class OauthClientHeld extends Base
      *                                                access token contains no subject.
      */
     public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private RelyingParty\Mapper $relyingPartyMapper
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**
@@ -88,7 +89,7 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
-            return $this->userMapper->findByUsername($claims[self::CLAIM_SUB]);
+            return $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         }
 
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);

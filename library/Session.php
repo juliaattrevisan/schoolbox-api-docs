@@ -8,6 +8,7 @@
 use League\Flysystem\FilesystemException;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\API\Token\JwtParser\SelfIssued;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -107,7 +108,7 @@ class Session
             $_SESSION['lasttime'] = time();
             $_SESSION['username'] = $user->getUsername();
             if (
-                Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+                Config::get(ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
                 && !empty(Config::get('external_portal'))
             ) {
                 $_SESSION['password'] = $_POST['password'] ?? null;
@@ -210,7 +211,7 @@ class Session
 
         // Fall back to using email address
         if (!$user instanceof \Schoolbox\User) {
-            if (Config::get('auth_email_enabled')) {
+            if (Config::get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
                 $user = $userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
                 //Override username with actual username, rather than email address so user can proceed
                 if ($user instanceof \Schoolbox\User) {
@@ -540,7 +541,7 @@ class Session
         $synUser = new External_User();
         $subjectMapper = new \Schoolbox\External\SubjectMapper();
         $externalUser = new \Schoolbox\External\User(
-            \Schoolbox\Config\ConfigMapper::getInstance()->getConfigLoader()->get('external_type'),
+            ConfigMapper::getInstance()->getConfigLoader()->get('external_type'),
             new \External_Class(),
             $synUser,
             UserMapper::getInstance()

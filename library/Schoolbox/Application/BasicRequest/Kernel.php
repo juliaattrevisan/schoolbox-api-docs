@@ -307,7 +307,7 @@ class Kernel extends WebKernelAbstract
                     $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $config),
-                        new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
+                        new JwtParser\SelfIssued($userMapper, $config, $tokenMapper),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
                         new JwtParser\InstanceRegistryIssued($userMapper, $config),
                         new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),

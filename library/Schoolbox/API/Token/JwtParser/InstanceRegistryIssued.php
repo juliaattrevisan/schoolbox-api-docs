@@ -13,9 +13,9 @@ use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
+use Schoolbox\API\Token\JwtParser\Exception\InvalidIdentity;
 use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
@@ -38,17 +38,6 @@ class InstanceRegistryIssued extends Base
      * not provided in the key.
      */
     private const DEFAULT_SIGNING_ALGORITHM = 'RS256';
-
-    /**
-     * Constructor
-     * @param UserMapper    $userMapper
-     * @param IConfigLoader $config
-     */
-    public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
-    ) {
-    }
 
     /**
      * @inheritdoc
@@ -94,7 +83,7 @@ class InstanceRegistryIssued extends Base
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             )
         ) {
-            return $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+            return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
         }
 
         throw new Rejected('Unable to verify JWT');

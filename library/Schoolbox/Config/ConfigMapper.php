@@ -143,6 +143,7 @@ class ConfigMapper extends Mapper
     public const NAME_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
     public const NAME_MAIL_FROM_ADDRESS      = 'mail_from_address';
     public const NAME_MAIL_FROM_NAME         = 'mail_from_name';
+    public const NAME_AUTH_EMAIL_ENABLED     = 'auth_email_enabled';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';

@@ -29,15 +29,16 @@ class SelfIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper        $userMapper   Mapper for retrieving users once the user in the JWT is identified.
-     * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
-     * @param IConfigLoader     $config       Standard configuration store.
+     * @param UserMapper        $userMapper  Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader     $config      Standard configuration store.
+     * @param User\Token\Mapper $tokenMapper Mapper for retrieving user tokens.
      */
     public function __construct(
-        private UserMapper $userMapper,
+        UserMapper $userMapper,
+        IConfigLoader $config,
         private User\Token\Mapper $tokenMapper,
-        private IConfigLoader $config,
     ) {
+        parent::__construct($userMapper, $config);
     }
 
     /**
@@ -70,8 +71,8 @@ class SelfIssued extends Base
                 sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB)
             );
         }
-        $user   = $this->userMapper->findByUsername($claims[self::CLAIM_SUB]);
-        if ($user && isset($claims[self::CLAIM_JTI])) {
+        $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
+        if (isset($claims[self::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
             try {
                 /** @var User\Token\Model $token */
@@ -88,14 +89,6 @@ class SelfIssued extends Base
                 // could not find a token with user id and jwt id
                 throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
-        }
-        if (!$user) {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_SUB));
-        }
-        if (!$user->getEnabled()) {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim matches a deactivated user', self::CLAIM_SUB)
-            );
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
             $this->bypassIpTracking = true;

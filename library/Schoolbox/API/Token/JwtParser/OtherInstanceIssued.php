@@ -14,9 +14,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use SensitiveParameter;
 
 /**
@@ -34,19 +32,6 @@ class OtherInstanceIssued extends Base
      * JWT, so that its key may be used to decode and verify the JWT.
      */
     public const CLAIM_INSTANCE_ID = self::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
-
-    /**
-     * Constructor
-     *
-     * @param UserMapper             $userMapper             Mapper for retrieving users once the user in the JWT is
-     *                                                       identified.
-     * @param IConfigLoader          $config                 Standard configuration store.
-     */
-    public function __construct(
-        private UserMapper $userMapper,
-        private IConfigLoader $config,
-    ) {
-    }
 
     /**
      * @inheritdoc
@@ -115,15 +100,6 @@ class OtherInstanceIssued extends Base
         if (trim($email) === '') {
             throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
         }
-        $user = $this->userMapper->findByUsername($email);
-        if (!$user) {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_EMAIL));
-        }
-        if (!$user->getEnabled()) {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim matches a deactivated user', self::CLAIM_EMAIL)
-            );
-        }
-        return $user;
+        return $this->findUser($email, self::CLAIM_EMAIL);
     }
 }

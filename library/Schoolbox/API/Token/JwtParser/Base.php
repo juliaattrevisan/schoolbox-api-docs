@@ -12,6 +12,10 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use SensitiveParameter;
 use UnexpectedValueException;
 
@@ -37,6 +41,18 @@ abstract class Base implements IParser
      * @see IParser::bypassIpTracking()
      */
     public bool $bypassIpTracking = false;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader $config     Standard configuration store.
+     */
+    public function __construct(
+        protected UserMapper $userMapper,
+        protected IConfigLoader $config,
+    ) {
+    }
 
     /**
      * @inheritdoc
@@ -127,5 +143,40 @@ abstract class Base implements IParser
     public function bypassIpTracking(): bool
     {
         return $this->bypassIpTracking;
+    }
+
+    /**
+     * Finds the user identified by `$username`:
+     * * by standard username lookup
+     * * if that fails, and `config.auth_email_enabled` is enabled, looks up a
+     *   user whose email address matches `$username`
+     *
+     * @param string      $username    The username of the user to find
+     * @param string|null $sourceClaim The claim from which `$username` was
+     *                                 derived, if any: used for logging
+     * @return User
+     * @throws Exception\InvalidIdentity if no user is found, or the user found is deactivated
+     */
+    protected function findUser(string $username, ?string $sourceClaim): User
+    {
+        $user = $this->userMapper->findByUsername($username);
+        if (!$user && $this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
+            $user = $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
+        }
+
+        if (!$user) {
+            $message = isset($sourceClaim)
+                ? sprintf('JWT "%s" claim does not match a user', $sourceClaim)
+                : sprintf('No user with username "%s" found', $username);
+            throw new Exception\InvalidIdentity($message);
+        }
+        if (!$user->getEnabled()) {
+            $message = isset($sourceClaim)
+                ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)
+                : sprintf('User with username "%s" is deactivated', $username);
+            throw new Exception\InvalidIdentity($message);
+        }
+
+        return $user;
     }
 }
