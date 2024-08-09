@@ -1575,27 +1575,60 @@ class Controller extends Assessment\Controller
     {
         $postData = $this->requestPost->getArrayCopy();
 
+        /* By default, assume we're submitting now
+         */
+        $submittedAt = \Alaress_Date_Format::now();
+
         /* Process the latest drafts from each of these user ids in $assessment and
          * forcibly submit them.
          */
+        foreach ($postData['draft']['ids'] as $studentId) {
+            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
 
-        /* If the assessment was overdue, we need to micromanage submission times.
-         */
+            $latestResponse = $assessment->getParticipant($userStub)->findMostRecentDraftResponse();
 
-        /* If the postData[draft][punctual] was selected,
-         * set the submission time to be just before the due date.
-         *
-         * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-         */
+            /* This existed when the modal was submitted, but not when the payload was received
+             * The draft submission no longer exists (might already be published or otherwise deleted)
+             * Just keep going
+             */
+            if (!$latestResponse) {
+                continue;
+            }
+
+            /* If the assessment was overdue, we need to micromanage submission times.
+             */
+            if ($assessment->isOverdue()) {
+                /* If the postData[draft][punctual] was selected,
+                 * set the submission time to be just before the due date.
+                 *
+                 * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+                 */
+                if ('true' === $postData['draft']['punctual']) {
+                    $submittedAt = $assessment->getDueAt()->addseconds(-1);
+                }
+            }
+
+            $latestResponse->setSubmittedAt($submittedAt);
+
+            $this->dueWorkResponseMapper->save($latestResponse);
+        }
 
         /* Acknowledge receipts of submission for each of these user ids in $assessment.
          */
+        foreach ($postData['offline']['ids'] as $studentId) {
+            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
 
-        /* If the postData[offline][punctual] was selected,
-         * set the submission time to be just before the due date.
-         *
-         * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
-         */
+            /* If the postData[offline][punctual] was selected,
+             * set the submission time to be just before the due date.
+             *
+             * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+             */
+            if ('true' === $postData['offline']['punctual']) {
+                $submittedAt = $assessment->getDueAt()->addseconds(-1);
+            }
+
+            $this->persistAcknowledgementResponse($assessment, $userStub, $submittedAt);
+        }
 
         $code = 200;
 
