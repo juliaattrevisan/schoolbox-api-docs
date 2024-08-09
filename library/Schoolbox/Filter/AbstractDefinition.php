@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
 
 /**
@@ -23,15 +22,6 @@ abstract class AbstractDefinition implements IDefinition
      *       to map from filter definition to a human-readable name
      */
     protected const NAME = '';
-
-    /** @var Model */
-    private $filter;
-
-    /** @var Page\Option\Mapper */
-    private $filterOptionMapper;
-
-    /** @var Page\Option\Defaults\Mapper */
-    private $filterDefaultMapper;
 
 
     /**
@@ -51,11 +41,11 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Option\Mapper          $filterOptionMapper
      * @param Page\Option\Defaults\Mapper $filterDefaultMapper
      */
-    public function __construct(Model $filter, Page\Option\Mapper $filterOptionMapper, Page\Option\Defaults\Mapper $filterDefaultMapper)
-    {
-        $this->filter              = $filter;
-        $this->filterOptionMapper  = $filterOptionMapper;
-        $this->filterDefaultMapper = $filterDefaultMapper;
+    public function __construct(
+        private Model $filter,
+        private Page\Option\Mapper $filterOptionMapper,
+        private Page\Option\Defaults\Mapper $filterDefaultMapper
+    ) {
     }
 
 
@@ -368,6 +358,7 @@ abstract class AbstractDefinition implements IDefinition
 
         return $templateDir . DIRECTORY_SEPARATOR . 'component.twig';
     }
+
 
     /* Getters
      */

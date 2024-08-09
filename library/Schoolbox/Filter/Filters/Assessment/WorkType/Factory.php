@@ -9,22 +9,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\IComponent;
+use Schoolbox\Filter\IDefinition;
+use Schoolbox\Filter\Page\Model;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\User;
 
 /**
  * A factory for building 'WorkType' filter objects
  */
 class Factory extends Filter\AbstractFactory
 {
-
-    /**
-     * @var WorkType\Mapper
-     */
-    private $workTypeMapper;
-
-
     /**
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
@@ -35,10 +34,9 @@ class Factory extends Filter\AbstractFactory
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
-        WorkType\Mapper $workTypeMapper
+        private WorkType\Mapper $workTypeMapper
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
-        $this->workTypeMapper = $workTypeMapper;
     }
 
 
@@ -66,5 +64,70 @@ class Factory extends Filter\AbstractFactory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         return new KeyConverter($filter, new Collection($this->workTypeMapper->findAllIds()));
+    }
+
+
+    /**
+     * @inheritDoc
+     * @param IDefinition $definition
+     * @param User $user
+     * @param Model $pageFilter
+     * @param GenericCollection|null $selections
+     * @param User|null $viewee
+     * @param array $routeArgs
+     * @param GenericCollection $overrides
+     * @return IComponent
+     * @throws InvalidColumnException
+     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
+     */
+    public function buildComponent(
+        IDefinition $definition,
+        User $user,
+        \Schoolbox\Filter\Page\Model $pageFilter,
+        ?GenericCollection $selections,
+        ?User $viewee,
+        array $routeArgs,
+        GenericCollection $overrides
+    ): IComponent {
+        /* lol...nobody can see a SIVO assessment:
+        *
+         *     - Students can never see a SIVO assessment in their due work calendar
+         *
+          *    - Staff looking at a student's due work calendar shows what the student would have seen,
+         *       hiding SIVO assessments from staff by sheer circumstance.
+         *
+         * ...but there are numerous other contexts (such as markbooks) where SIVO assessments
+         * need to be visible to $user based on their role type.
+         */
+        $limitedAvailability = [
+            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS => true,
+            Filter\Page\Model::PAGE_GRADES => true
+        ];
+
+        if (isset($limitedAvailability[$pageFilter->getPage()])) {
+            /* These shared pages need a roletype detection
+             */
+            if ($user->getRole()->isStaff()) {
+                $workTypes = $this->workTypeMapper->findAll();
+            } else {
+                $pb = $this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0);
+
+                $workTypes = $this->workTypeMapper->findByPredicates($pb);
+            }
+        } else {
+            /* Everything else is a staff-only page
+             */
+            $workTypes = $this->workTypeMapper->findAll();
+        }
+
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper(),
+            $workTypes
+        );
     }
 }

@@ -20,7 +20,6 @@ use Schoolbox\IConfigLoader;
  */
 interface IDefinition
 {
-
     /**
      * Returns a string by which to identify this filter
      *
