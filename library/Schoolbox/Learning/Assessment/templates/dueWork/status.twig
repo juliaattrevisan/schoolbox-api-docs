@@ -334,7 +334,6 @@
             <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
             {% endif %}
 
-
             <div class="row">
                 <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
                     <p data-mass-unavailable>You have no students with draft submissions.</p>
@@ -361,8 +360,8 @@
                             <p>
                                 Did these students submit their work on time? <br />
                                 <span class="switch">
-                                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                                    <label for="onTimeCheckboxSwitch">
+                                    <input id="draft-on-time" type="checkbox" checked="">
+                                    <label for="draft-on-time">
                                         <span>Yes</span>
                                         <span>No</span>
                                     </label>
@@ -396,8 +395,8 @@
                             <p>
                                 Did these students submit their work on time? <br />
                                 <span class="switch">
-                                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                                    <label for="onTimeCheckboxSwitch">
+                                    <input id="offline-on-time" type="checkbox" checked="">
+                                    <label for="offline-on-time">
                                         <span>Yes</span>
                                         <span>No</span>
                                     </label>
@@ -615,6 +614,7 @@
                                 onTimeContainer.show();
                             }
 
+                            {# Both bulkys alter the same ui element #}
                             return 'Save';
                         },
                     });
@@ -633,6 +633,7 @@
                                 onTimeContainer.show();
                             }
 
+                            {# Both bulkys alter the same ui element #}
                             return 'Save';
                         },
                     });
