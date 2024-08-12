@@ -30,11 +30,18 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         // The agent is currently only for Synergetic instances.
+        $permission = new IsConfigSetTo(ConfigMapper::NAME_EXTERNAL_TYPE, 'synergetic', $this->getConfig());
         $this->register(
             self::METHOD_POST,
             '',
             'postAgentRequest',
-            new IsConfigSetTo(ConfigMapper::NAME_EXTERNAL_TYPE, 'synergetic', $this->getConfig()),
+            $permission,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '',
+            'getAgentRequest',
+            $permission,
         );
     }
 

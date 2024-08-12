@@ -15,7 +15,7 @@ INSERT INTO config (
     'paperly_agent_ip_whitelist',
     NULL,
     'Paperly Agent IP Address Whitelist',
-    'A comma-separated list of IP addresses which are allowed to access the Paperly agent.  Note that the agent currently supports Synergetic only.',
+    'A comma-separated list of IP addresses or CIDR ranges which are allowed to access the Paperly agent.  Note that the agent currently supports Synergetic only.',
     (SELECT id FROM lu_config_field WHERE `field` = 'input'),
     '',
     (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),

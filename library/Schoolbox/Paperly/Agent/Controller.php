@@ -37,6 +37,17 @@ class Controller extends Base
     }
 
     /**
+     * @api GET /paperly/agent
+     * @since 24.0
+     *
+     * @return void
+     */
+    public function getAgentRequest(): void
+    {
+        $this->handlePaperlyRequest($this->request->getQueryParams());
+    }
+
+    /**
      * @api POST /paperly/agent
      * @since 24.0
      *
@@ -44,12 +55,22 @@ class Controller extends Base
      */
     public function postAgentRequest(): void
     {
+        $this->handlePaperlyRequest($this->request->getParsedBody());
+    }
+
+    /**
+     * Handle incoming Paperly request.
+     *
+     * @param array $data
+     * @return void
+     */
+    private function handlePaperlyRequest(array $data): void
+    {
         // Check IP address
         if (!IpUtils::checkIp($this->getSession()->get('ip'), $this->ipWhitelist)) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
         }
 
-        $data   = $this->request->getParsedBody();
         $secret = $data['v'] ?? null;
         if (!isset($secret) && $this->secret !== $secret) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
