@@ -1,0 +1,34 @@
+tour:
+  title: '24.0 Release'
+  description: 'Introduce staff to the new features of the 24.0 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/24.0/1_interactive-worksheets.jpg' style='width:100%;margin-bottom:16px;'>
+                  <h3>Interactive Worksheets</h3>
+                  <p>Assign interactive worksheets for students to edit and maintain a bird's eye view of student progress before they submit.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/24.0/2_unit-planner.jpg' style='width:100%;margin-bottom:16px;'>
+                  <h3>Unit Planner: Enhancements</h3>
+                  <p>Sequence units and activities, make edits, map curriculum and create new activities directly in the unit planner.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/24.0/3_notifications.jpg' style='width:100%;margin-bottom:16px;'>
+                  <h3>Web App: Notifications</h3>
+                  <p>Now you can install and receive notifications directly on your device, including iPhones.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal

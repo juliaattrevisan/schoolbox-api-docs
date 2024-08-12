@@ -93,6 +93,30 @@ $tooltip-padding: 1rem;
     }
 }
 
+.introjs-whatsnewmodal {
+    min-width: 40rem;
+    padding: 0;
+    .introjs-tooltiptext {
+        padding-right: 0;
+    }
+
+    h2 {
+        display: none;
+    }
+
+    h3 {
+        margin-left: 1rem;
+    }
+    p {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+    .introjs-tooltipbuttons {
+        margin: 0 1rem 1rem 1rem;
+    }
+}
+
+
 // ----------------------------------------------------------------
 // Highlighted area
 // ----------------------------------------------------------------

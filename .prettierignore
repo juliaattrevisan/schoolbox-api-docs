@@ -4,6 +4,7 @@
 *.yml
 *.json
 *.md
+*.yaml
 **/vendor
 **/www/static/css/vendors
 **/www/static/js/bundle
