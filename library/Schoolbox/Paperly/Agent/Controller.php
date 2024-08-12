@@ -115,6 +115,13 @@ class Controller extends Base
         }
     }
 
+    /**
+     * Handle request for all year levels.
+     *
+     * @param array $data `$data['code']` may be an array or CSV list of codes:
+     *                    if set, return only levels which match these codes.
+     * @return void
+     */
     private function handleAllYearLevelsRequest(array $data): void
     {
         $yearLevelArr = [];
@@ -139,6 +146,13 @@ class Controller extends Base
         $this->response = $this->responseAsJson($yearLevelArr);
     }
 
+    /**
+     * Handle request for all classes.
+     *
+     * @param array $data `$data['code']` may be an array or CSV list of codes:
+     *                    if set, return only classes which match these codes.
+     * @return void
+     */
     private function handleAllClassesRequest(array $data): void
     {
         $yearLevelArr = [];
@@ -173,6 +187,18 @@ class Controller extends Base
         $this->response = $this->responseAsJson($yearLevelArr);
     }
 
+    /**
+     * Handle request for all staff members.
+     *
+     * @param array $data `$data['id']` may be an array or CSV list of IDs:
+     *                    if set, return only staff which match these IDs.
+     *                    `$data['email']` may be an email address: if set,
+     *                    return only this staff member.
+     *                    `$data['year_level']` may be an array or CSV list of
+     *                    year levels: if set, return only staff which teach
+     *                    these year levels.
+     * @return void
+     */
     private function handleAllStaffsRequest(array $data): void
     {
         $stfArr = [];
@@ -235,10 +261,24 @@ class Controller extends Base
             ];
         }
 
-
         $this->response = $this->responseAsJson($stfArr);
     }
 
+    /**
+     * Handle request for all students.
+     *
+     * @param array $data `$data['id']` may be an array or CSV list of IDs:
+     *                    if set, return only students which match these IDs.
+     *                    `$data['email']` may be an email address: if set,
+     *                    return only this student.
+     *                    `$data['year_level']` may be an array or CSV list of
+     *                    year levels: if set, return only students within these
+     *                    year levels.
+     *                    `$data['class']` may be an array or CSV list of
+     *                    classes: if set, return only students within these
+     *                    classes.
+     * @return void
+     */
     private function handleAllStudentsRequest(array $data): void
     {
         $stuArr = [];
@@ -327,6 +367,13 @@ class Controller extends Base
         $this->response = $this->responseAsJson($stuArr);
     }
 
+    /**
+     * Handle request for student avatars (profile pictures).
+     *
+     * @param array $data `$data['id']` may be an array or CSV list of IDs:
+     *                    if set, return only avatars for these students.
+     * @return void
+     */
     private function handleGetStudentsAvatarRequest(array $data): void
     {
         $avatarArr = [];
@@ -353,6 +400,13 @@ class Controller extends Base
         $this->response = $this->responseAsJson($avatarArr);
     }
 
+    /**
+     * Handle request for student medical data.
+     *
+     * @param array $data `$data['id']` may be an array or CSV list of IDs:
+     *                    if set, return only medical data for these students.
+     * @return void
+     */
     private function handleGetStudentsMedicalRequest(array $data): void
     {
         $stuMedicalArr = [];
@@ -390,6 +444,12 @@ class Controller extends Base
         $this->response = $this->responseAsJson($stuMedicalArr);
     }
 
+    /**
+     * Handle request for fetching students for a parent.
+     *
+     * @param array $data `$data['id']` must be a parent ID.
+     * @return void
+     */
     private function handleGetStudentsFromParentRequest(array $data): void
     {
         $id = $data['id'] ?? null;
@@ -422,6 +482,12 @@ class Controller extends Base
         $this->response = $this->responseAsJson($stuArr);
     }
 
+    /**
+     * Handle request for fetching a parent.
+     *
+     * @param array $data `$data['email']` must be a parent's email address.
+     * @return void
+     */
     private function handleGetParentRequest(array $data): void
     {
         $email = $data['email'] ?? null;
@@ -448,6 +514,11 @@ class Controller extends Base
         $this->response = $this->responseAsJson($parentArr);
     }
 
+    /**
+     * Handle health check request.
+     *
+     * @return void
+     */
     private function handleHealthCheckRequest(): void
     {
         $sql = "SELECT count(*) FROM luYearLevel";
