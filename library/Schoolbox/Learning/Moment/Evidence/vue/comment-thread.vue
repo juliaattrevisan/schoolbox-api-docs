@@ -268,8 +268,20 @@ export default {
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card small-12 compact">
-                                    <a :href="comment.author._links.profile.href" title="View Profile">
-                                        <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                    <!--
+                                        Infer that a user is deleted by absence of a profile link.
+                                        Note that adding an isDeleted property can't be done easily due to use of
+                                        decorators in Evidence/Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
+                                    -->
+                                    <component
+                                        :is="comment.author._links.profile ? 'a' : 'span'"
+                                        :href="comment.author._links.profile ? comment.author._links.profile.href : ''"
+                                        :title="comment.author._links.profile ? 'View Profile' : null"
+                                    >
+                                        <img
+                                            :src="comment.author._links.avatar.href"
+                                            :alt="comment.author._links.profile ? 'View Profile' : null"
+                                        />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time
                                             class="pipe meta"
@@ -279,7 +291,7 @@ export default {
                                             "
                                             >{{ fromNow(comment.createdAt.json) }}</time
                                         >
-                                    </a>
+                                    </component>
                                 </div>
                             </div>
                             <nav>

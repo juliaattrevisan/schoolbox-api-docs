@@ -609,8 +609,19 @@ export default {
                                         }"
                                     >
                                         <div class="card small-12 compact">
-                                            <a :href="evidence.object.creator._links.profile" title="View Profile">
-                                                <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
+                                            <component
+                                                :is="!evidence.object.creator.isDeleted ? 'a' : 'span'"
+                                                :href="
+                                                    !evidence.object.creator.isDeleted
+                                                        ? evidence.object.creator._links.profile
+                                                        : null
+                                                "
+                                                :title="!evidence.object.creator.isDeleted ? 'View Profile' : null"
+                                            >
+                                                <img
+                                                    :src="evidence.object.creator._links.avatar"
+                                                    :alt="!evidence.object.creator.isDeleted ? 'View Profile' : null"
+                                                />
                                                 <p>{{ evidence.object.creator.fullName }}</p>
                                                 <time
                                                     class="pipe meta"
@@ -628,7 +639,7 @@ export default {
                                                         )
                                                     }}</time
                                                 >
-                                            </a>
+                                            </component>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
                                             <sbx-pop-out
