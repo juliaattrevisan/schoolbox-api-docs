@@ -246,6 +246,8 @@ class ConfigMapper extends Mapper
 
     public const NAME_PAPERLY_API_HOSTNAME = 'paperly_iframe_api_host';
     public const NAME_PAPERLY_API_KEY = 'paperly_iframe_api_key';
+    public const NAME_PAPERLY_AGENT_IP_WHITELIST = 'paperly_agent_ip_whitelist';
+    public const NAME_PAPERLY_AGENT_SECRET = 'paperly_agent_secret';
 
     public const NAME_KAMI_ENABLED = 'kami_enabled';
 
