@@ -11,6 +11,7 @@ namespace Schoolbox\Paperly\Agent;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -65,7 +66,7 @@ class Controller extends Base
     private function handlePaperlyRequest(array $data): void
     {
         // Check IP address
-        if (!IpUtils::checkIp($this->getSession()->get('ip'), $this->ipWhitelist)) {
+        if (!IpUtils::checkIp(Session::getIP(), $this->ipWhitelist)) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
         }
 
