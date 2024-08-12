@@ -268,8 +268,13 @@ export default {
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card small-12 compact">
+                                    <!--
+                                        Infer that a user is deleted by absence of a profile link.
+                                        Note that adding an isDeleted property can't be done easily due to complications
+                                        in Evidence/Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
+                                    -->
                                     <component
-                                        :is="!comment.author.isDeleted ? 'a' : 'span'"
+                                        :is="comment.author._links.profile ? 'a' : 'span'"
                                         :href="comment.author._links.profile ? comment.author._links.profile.href : ''"
                                         title="View Profile"
                                     >
