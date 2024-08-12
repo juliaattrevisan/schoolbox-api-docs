@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Paperly\Agent;
 
 use Alaress\Authorizer\Rule\IsConfigSetTo;
+use Alaress\Database\Factory;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
@@ -56,12 +57,22 @@ class Module extends BaseModule
                 explode(',', $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_IP_WHITELIST) ?? '')
             ),
         );
+
+        // Create the database connection for the Paperly agent
+        $connectorFactory = new Factory();
+        $connector        = $connectorFactory->createSqlsrv();
+        $connector->connect(
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_HOST_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_HOST),
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_NAME_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_NAME),
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_USER_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_USER),
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_PASSWORD_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_PASSWORD),
+            ['Encrypt' => $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_ENCRYPTION)],
+        );
+
         return new Controller(
             $ipWhitelist,
             $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
-            // This should use a differently configured external DB:
-            // need extra config options here.
-            $this->injector->get('databaseExternal'),
+            $connector,
         );
     }
 }
