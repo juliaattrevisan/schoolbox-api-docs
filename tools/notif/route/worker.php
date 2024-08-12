@@ -76,6 +76,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
                 $filesystemProxy,
                 new UnreadRetriever($client),
                 ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+                $config->get('external_tass_parent_id_length'),
             ),
         );
 
