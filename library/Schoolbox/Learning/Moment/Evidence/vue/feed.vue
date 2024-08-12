@@ -611,7 +611,11 @@ export default {
                                         <div class="card small-12 compact">
                                             <component
                                                 :is="!evidence.object.creator.isDeleted ? 'a' : 'span'"
-                                                :href="evidence.object.creator._links.profile"
+                                                :href="
+                                                    !evidence.object.creator.isDeleted
+                                                        ? evidence.object.creator._links.profile
+                                                        : null
+                                                "
                                                 :title="!evidence.object.creator.isDeleted ? 'View Profile' : null"
                                             >
                                                 <img
