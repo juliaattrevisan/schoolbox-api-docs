@@ -2,10 +2,10 @@
  * The payload that comes from paperly to the dashboard.
  */
 
-import type { FeatureItems } from "./FeatureItems";
+import type { FeatureItem } from "./FeatureItem";
 import type { UpcomingItem } from "./UpcomingItem";
 
 export type PaperlyPayload = {
-    features: FeatureItems;
+    features: FeatureItem[];
     upcoming: UpcomingItem[];
 };

@@ -5,19 +5,19 @@
  * view upcoming tasks that require action
  */
 
-import { timeout } from "@js/util/jsUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
+import { UpcomingItem } from "../js/types/UpcomingItem";
 
 interface Props {
-    getPaperlyViewEndpoint: string //The endpoint for fetching the list of Paperly items and its iframe urls
+    getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
 }
 
 const props = defineProps<Props>();
 
-const paperlyPayload = window.Vue.ref<PaperlyPayload | undefined>();
+const paperlyPayload = window.Vue.ref<PaperlyPayload>({ features: [], upcoming: [] }); // the payload from paperly
 const viewMore = window.Vue.ref(false); // to show all upcoming tasks, only show the first three by default
 const isProcessing = window.Vue.ref(false); // to display loading while the payload is being loaded
 const hasLoadError = window.Vue.ref(false); // to show an error message if the payload fails to load
@@ -30,7 +30,13 @@ async function loadPayload() {
         isProcessing.value = true;
         const response = await fetch(props.getPaperlyViewEndpoint);
         if (response.ok) {
-            paperlyPayload.value = (await response.json()) as PaperlyPayload;
+            const responseJson = (await response.json()) as PaperlyPayload;
+            // check the response has the expected properties
+            if (responseJson.features && responseJson.upcoming) {
+                paperlyPayload.value = responseJson;
+            } else {
+                hasLoadError.value = true;
+            }
         } else {
             hasLoadError.value = true;
         }
@@ -75,24 +81,8 @@ const upcoming = window.Vue.computed(() => {
     <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
-            <li v-if="paperlyPayload?.features.find((item) => 'Forms' in item)">
-                <a class="icon-paperly-forms" :href="paperlyPayload.features.find((item) => 'Forms' in item)?.Forms ?? ''">
-                    Forms</a
-                >
-            </li>
-            <li v-if="paperlyPayload?.features.find((item) => 'Excursions' in item)">
-                <a
-                    class="icon-paperly-excursions"
-                    :href="paperlyPayload.features.find((item) => 'Excursions' in item)?.Excursions ?? ''"
-                    >Excursions</a
-                >
-            </li>
-            <li v-if="paperlyPayload?.features.find((item) => 'Parent Teacher Interview' in item)">
-                <a class="icon-paperly-pti"
-                   :href="paperlyPayload.features
-                   .find((item) => 'Parent Teacher Interview' in item)?.['Parent Teacher Interview'] ?? ''"
-                    >Parent/Teacher Interview</a
-                >
+            <li v-for="feature in paperlyPayload.features" :key="feature.url">
+                <a :class="feature.icon ?? ''" :href="feature.url ?? ''">{{ feature.title ?? "" }}</a>
             </li>
         </ul>
         <div class="c-island l-flex-col">
