@@ -485,6 +485,18 @@
                         return (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}');
                     }
 
+                    {# Decide if the Save button should show
+                     # You only know the lists of humans after they've been built; if there's at least
+                     # one input, show the Save button. Otherwise there's nothing we can do; hide it
+                     #}
+                    function renderCallToAction() {
+                        if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input').length) {
+                            $('#manage-submissions').find('[data-submit]').hide();
+                        } else {
+                            $('#manage-submissions').find('[data-submit]').show();
+                        }
+                    }
+
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
@@ -649,6 +661,10 @@
                             } else {
                                 selectAllCheckbox.closest('div').remove();
                             }
+
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
                         }
                     });
 
@@ -686,6 +702,10 @@
                             } else {
                                 selectAllCheckbox.closest('div').remove();
                             }
+
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
                         }
                     });
 
