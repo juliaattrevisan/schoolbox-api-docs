@@ -268,7 +268,11 @@ export default {
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card small-12 compact">
-                                    <a :href="comment.author._links.profile.href" title="View Profile">
+                                    <component
+                                        :is="!comment.author.isDeleted ? 'a' : 'span'"
+                                        :href="comment.author._links.profile ? comment.author._links.profile.href : ''"
+                                        title="View Profile"
+                                    >
                                         <img :src="comment.author._links.avatar.href" alt="View Profile" />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time
@@ -279,7 +283,7 @@ export default {
                                             "
                                             >{{ fromNow(comment.createdAt.json) }}</time
                                         >
-                                    </a>
+                                    </component>
                                 </div>
                             </div>
                             <nav>
