@@ -298,7 +298,7 @@ class Controller extends Base
                 scd.DefaultEmail, scd.ContactSpouseID,
                 c2.Title AS SpouseTitle, c2.Surname AS SpouseSurname,
                 c2.Preferred AS SpousePreferred, c2.MobilePhone AS SpouseMobile,
-                c2.email AS SpouseDefaultEmail, c2.occupemail AS SpouseOccupEmail,
+                c2.email AS SpouseDefaultEmail, c2.occupemail AS SpouseOccupEmail
             FROM vstudents s
             LEFT JOIN FileSemesters fs ON fs.fileyear = s.fileyear AND fs.FileSemester = s.FileSemester
             LEFT JOIN vStudentClasses sc ON sc.StudentID = s.StudentID AND sc.fileyear = fs.fileyear AND sc.FileSemester = fs.FileSemester
