@@ -293,7 +293,8 @@ class Controller extends Base
                 GROUP BY scd.ID
             )
             SELECT DISTINCT s.StudentID, s.StudentSurname, s.StudentPreferred, s.StudentEmail, s.StudentGender,
-                s.StudentBirthDate, s.StudentYearLevel, s.StudentYearLevelDescription, s.StudentBoarder, s.StudentTutor, s.StudentHouse, s.StudentHouseDescription, scd.ContactID,
+                CAST(s.StudentBirthDate AS date) AS StudentBirthDate,
+                s.StudentYearLevel, s.StudentYearLevelDescription, s.StudentBoarder, s.StudentTutor, s.StudentHouse, s.StudentHouseDescription, scd.ContactID,
                 c1.Title, c1.Surname, c1.Preferred, c1.MobilePhone, c1.email, c1.occupemail,
                 scd.DefaultEmail, scd.ContactSpouseID,
                 c2.Title AS SpouseTitle, c2.Surname AS SpouseSurname,
