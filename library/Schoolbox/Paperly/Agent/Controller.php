@@ -253,12 +253,12 @@ class Controller extends Base
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $stfArr[] = [
-                "ID"            => $row["staffid"],
-                "Preferred"     => $row["staffpreferredname"],
-                "Surname"       => $row["staffsurname"],
-                "Email"         => $row["staffoccupemail"],
+                "ID"            => $row["StaffID"],
+                "Preferred"     => $row["StaffPreferredName"],
+                "Surname"       => $row["StaffSurname"],
+                "Email"         => $row["StaffOccupEmail"],
                 "ActiveFlag"    => $row["ActiveFlag"],
-                'YearLevelCode' => $row["StaffYearLevel"],
+                'YearLevelCode' => $row["NormalYearLevel"] ?? null,
             ];
         }
 
