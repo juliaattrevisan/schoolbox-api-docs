@@ -188,6 +188,12 @@ window.Vue.onMounted(() => {
                 );
             });
     }
+
+    // Remove disabled from input
+    const inputElement = document.querySelector(".lrn_textinput input");
+    if (inputElement) {
+        inputElement.removeAttribute("disabled");
+    }
 });
 
 /**
