@@ -276,9 +276,12 @@ export default {
                                     <component
                                         :is="comment.author._links.profile ? 'a' : 'span'"
                                         :href="comment.author._links.profile ? comment.author._links.profile.href : ''"
-                                        title="View Profile"
+                                        :title="comment.author._links.profile ? 'View Profile' : null"
                                     >
-                                        <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                        <img
+                                            :src="comment.author._links.avatar.href"
+                                            :alt="comment.author._links.profile ? 'View Profile' : null"
+                                        />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time
                                             class="pipe meta"
