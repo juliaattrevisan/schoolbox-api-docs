@@ -13,22 +13,22 @@ tour:
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/24.0/1_interactive-worksheets.jpg' style='width:100%;margin-bottom:16px;'>
                   <h3>Interactive Worksheets</h3>
-                  <p>Assign interactive worksheets for students to edit with teachers having a live, bird's eye view of student progress before they submit.</p>
-                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
-        class: introjs-newsmodal
+                  <p>Assign interactive worksheets for students to edit and maintain a bird's eye view of student progress before they submit.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal
     - step:
         title: What's New
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/24.0/2_unit-planner.jpg' style='width:100%;margin-bottom:16px;'>
                   <h3>Unit Planner: Enhancements</h3>
-                  <p>Further enhancements including the ability to sequence units and activities, make edits, and create new activities directly in the unit planner.</p>
-                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
-        class: introjs-newsmodal
+                  <p>Sequence units and activities, make edits, map curriculum and create new activities directly in the unit planner.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal
     - step:
         title: What's New
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/24.0/3_notifications.jpg' style='width:100%;margin-bottom:16px;'>
                   <h3>Web App: Notifications</h3>
-                  <p>Access Schoolbox and receive notifications directly on more devices than ever before, including iPhones.</p>
-                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
-        class: introjs-newsmodal
+                  <p>Now you can install and receive notifications directly on your device, including iPhones.</p>
+                  <p>To know more, see the <a href='/help/sso/send?returnUrl=/homepage/5133' target='_blank'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal

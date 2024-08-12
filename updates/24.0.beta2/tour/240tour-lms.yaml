@@ -12,31 +12,7 @@ tour:
         title: What's New
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/24_0_release_648x216.jpg' style='width:100%;margin-bottom:16px;'>
-                  <h3>1</h3>
-                  <p>Make sure you never miss any events by subscribing to receive notifications directly to your device. To receive notifications on your Apple iPhone, make sure you install the web application.</p>
-                  <h3>Unit Planner</h3>
-                  <p>The Unit Planner has now been updated to allow you to update your units on the fly. This allows you to manage unit overviews, activities, lesson plans, and curriculum alignment from one place.</p>
-                  <h3>Interactive Worksheets</h3>
-                  <p>Create due work activities with interactive worksheets, to enable real-time with students before and after submission, allowing constructive feedback.</p>
-                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
-        class: introjs-newsmodal
-    - step:
-        title: What's New
-        type: modal
-        content: "<img src='{CDN_PREFIX}/images/tour/24_0_release_648x216.jpg' style='width:100%;margin-bottom:16px;'>
-                  <h3>2</h3>
-                  <p>Make sure you never miss any events by subscribing to receive notifications directly to your device. To receive notifications on your Apple iPhone, make sure you install the web application.</p>
-                  <h3>Unit Planner</h3>
-                  <p>The Unit Planner has now been updated to allow you to update your units on the fly. This allows you to manage unit overviews, activities, lesson plans, and curriculum alignment from one place.</p>
-                  <h3>Interactive Worksheets</h3>
-                  <p>Create due work activities with interactive worksheets, to enable real-time with students before and after submission, allowing constructive feedback.</p>
-                  <p>To know more, see the <a href='help/sso/send?returnUrl=/homepage/5133'>release notes</a>.</p>"
-        class: introjs-newsmodal
-    - step:
-        title: What's New
-        type: modal
-        content: "<img src='{CDN_PREFIX}/images/tour/24_0_release_648x216.jpg' style='width:100%;margin-bottom:16px;'>
-                  <h3>3</h3>
+                  <h3>Web Push Notifications</h3>
                   <p>Make sure you never miss any events by subscribing to receive notifications directly to your device. To receive notifications on your Apple iPhone, make sure you install the web application.</p>
                   <h3>Unit Planner</h3>
                   <p>The Unit Planner has now been updated to allow you to update your units on the fly. This allows you to manage unit overviews, activities, lesson plans, and curriculum alignment from one place.</p>
