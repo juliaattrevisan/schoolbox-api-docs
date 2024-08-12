@@ -11,8 +11,6 @@ namespace Schoolbox\Paperly\Agent;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Crell\ApiProblem\ApiProblem;
-use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,13 +22,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param string     $ipWhitelist A comma-separated whitelist of IP addresses which may access the agent.
-     * @param string     $secret      A shared secret between the agent and this instance.
-     * @param IConnector $externalDb  A connection to whatever external database the agent uses:
-     *                                currently only Synergetic is supported.
+     * @param array<string> $ipWhitelist A whitelist of IP addresses or CIDR ranges which may access the agent.
+     * @param string        $secret      A shared secret between the agent and this instance.
+     * @param IConnector    $externalDb  A connection to whatever external database the agent uses:
+     *                                   currently only Synergetic is supported.
      */
     public function __construct(
-        private string $ipWhitelist,
+        private array $ipWhitelist,
         private string $secret,
         private IConnector $externalDb,
     ) {
@@ -71,12 +69,14 @@ class Controller extends Base
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
         }
 
+        // Check secret
         $secret = $data['v'] ?? null;
         if (!isset($secret) && $this->secret !== $secret) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
             return;
         }
 
+        // Check method
         $method = $data['m'] ?? null;
         if (!isset($method)) {
             $this->sendJsonError('Method does not exist', Response::HTTP_NOT_FOUND);

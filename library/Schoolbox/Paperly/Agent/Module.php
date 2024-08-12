@@ -50,11 +50,17 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $ipWhitelist = array_filter(
+            array_map(
+                trim(...),
+                explode(',', $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_IP_WHITELIST) ?? '')
+            ),
+        );
         return new Controller(
-            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_IP_WHITELIST) ?? '',
+            $ipWhitelist,
             $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
             // This should use a differently configured external DB:
-
+            // need extra config options here.
             $this->injector->get('databaseExternal'),
         );
     }
