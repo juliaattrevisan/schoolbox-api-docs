@@ -131,7 +131,7 @@ class Controller extends Base
         if (isset($data['code'])) {
             $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
             $placeholders = implode(',', array_fill(0, count($codes), '?'));
-            $sql          .= " AND Code IN ($placeholders)";
+            $sql          .= " WHERE Code IN ($placeholders)";
             $params       = array_merge($params, $codes);
         }
 
@@ -170,7 +170,7 @@ class Controller extends Base
         if (isset($data['code'])) {
             $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
             $placeholders = implode(',', array_fill(0, count($codes), '?'));
-            $sql          .= " AND sc.classcode IN ($placeholders)";
+            $sql          .= " WHERE sc.classcode IN ($placeholders)";
             $params       = array_merge($params, $codes);
         }
 
