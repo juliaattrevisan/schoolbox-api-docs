@@ -609,7 +609,11 @@ export default {
                                         }"
                                     >
                                         <div class="card small-12 compact">
-                                            <a :href="evidence.object.creator._links.profile" title="View Profile">
+                                            <component
+                                                :is="!evidence.object.creator.isDeleted ? 'a' : 'span'"
+                                                :href="evidence.object.creator._links.profile"
+                                                title="View Profile"
+                                            >
                                                 <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
                                                 <p>{{ evidence.object.creator.fullName }}</p>
                                                 <time
@@ -628,7 +632,7 @@ export default {
                                                         )
                                                     }}</time
                                                 >
-                                            </a>
+                                            </component>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
                                             <sbx-pop-out
