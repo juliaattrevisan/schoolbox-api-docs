@@ -43,6 +43,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_IP_WHITELIST) ?? '',
+            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
+            // This should use a differently configured external DB:
+
+            $this->injector->get('databaseExternal'),
+        );
     }
 }
