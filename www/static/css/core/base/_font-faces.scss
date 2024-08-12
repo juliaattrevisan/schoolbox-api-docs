@@ -4,9 +4,10 @@
 
 @font-face {
     font-family: "schoolbox";
-    src: url("#{$cdn-prefix}/fonts/schoolbox.ttf?ntgvjh") format("truetype"),
-        url("#{$cdn-prefix}/fonts/schoolbox.woff?ntgvjh") format("woff"),
-        url("#{$cdn-prefix}/fonts/schoolbox.svg?ntgvjh#schoolbox") format("svg");
+    src:
+        url("#{$cdn-prefix}/fonts/schoolbox.ttf?73h780") format("truetype"),
+        url("#{$cdn-prefix}/fonts/schoolbox.woff?73h780") format("woff"),
+        url("#{$cdn-prefix}/fonts/schoolbox.svg?73h780#schoolbox") format("svg");
     font-weight: normal;
     font-style: normal;
 }
