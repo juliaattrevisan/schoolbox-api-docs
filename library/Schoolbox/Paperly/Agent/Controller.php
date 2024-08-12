@@ -380,7 +380,7 @@ class Controller extends Base
         $avatarArr = [];
         $params    = [];
 
-        $sql = "SELECT DISTINCT ID, PhotoMediumRes FROM vphotos";
+        $sql = "SELECT DISTINCT ID, Photo FROM vPhotos";
 
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
@@ -392,9 +392,8 @@ class Controller extends Base
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $avatarArr[$row["ID"]] = [
-                "ID"        => $row["ID"],
-                "Avatar"    => base64_encode($row["PhotoMediumRes"]),
-                "Thumbnail" => base64_encode($row["PhotoThumnail"]),
+                "ID"     => $row["ID"],
+                "Avatar" => base64_encode($row["Photo"]),
             ];
         }
 
