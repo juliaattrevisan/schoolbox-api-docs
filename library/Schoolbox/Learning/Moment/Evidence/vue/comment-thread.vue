@@ -270,8 +270,8 @@ export default {
                                 <div class="card small-12 compact">
                                     <!--
                                         Infer that a user is deleted by absence of a profile link.
-                                        Note that adding an isDeleted property can't be done easily due to complications
-                                        in Evidence/Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
+                                        Note that adding an isDeleted property can't be done easily due to use of
+                                        decorators in Evidence/Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
                                     -->
                                     <component
                                         :is="comment.author._links.profile ? 'a' : 'span'"
