@@ -42,6 +42,7 @@ class DSN implements IDSN
     public const MODULE_IDENTITY_MANAGEMENT = 'identitymanagement';
     public const MODULE_SCHOOL_CALENDAR_AND_NOTICES = 'schoolcalendarandnotices';
     public const MODULE_EMPLOYEE_HR = 'employeehr';
+    public const MODULE_PARENT_PUSH_NOTIFICATION = 'parentpushnotification';
 
 
     /**
