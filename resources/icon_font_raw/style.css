@@ -450,6 +450,9 @@
 .icon-paperly-pti:before {
   content: "\e931";
 }
+.icon-paperly-details:before {
+    content: "\e932";
+  }
 .icon-pause:before {
   content: "\e650";
 }
