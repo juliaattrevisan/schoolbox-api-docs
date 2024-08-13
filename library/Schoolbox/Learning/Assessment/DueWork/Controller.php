@@ -1552,11 +1552,11 @@ class Controller extends Assessment\Controller
      * let payload = {
      *     'draft': {
      *         'ids': [],
-     *         'punctual': false
+     *         'punctual': 'false'
      *     },
      *     'offline': {
      *         'ids': [],
-     *         'punctual': false
+     *         'punctual': 'false'
      *     }
      * }
      *

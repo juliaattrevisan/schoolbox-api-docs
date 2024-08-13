@@ -629,10 +629,10 @@
                             {# Select All for each of the draftees/offliners checkbox lists
                              # because now you need extra micromanagement abilities
                              #}
-                            $('#mass-submit-draft-selectall').selectAllBasic({
-                                selector: 'input[data-mass-draft]',
-                                defaultState: true
-                            });
+                            // $('#mass-submit-draft-selectall').selectAllBasic({
+                            //     selector: 'input[data-mass-draft]',
+                            //     defaultState: true
+                            // });
 
                             {# Both bulkys alter the same ui element #}
                             return 'Save';
@@ -644,14 +644,14 @@
                              #}
                             let selectAllCheckbox = $('#mass-submit-draft-selectall');
 
-                            if ($('#mass-submit-draft-list').find('input').length > 0) {
-                                selectAllCheckbox.selectAllBasic({
-                                    selector: 'input[data-mass-draft]',
-                                    defaultState: true
-                                });
-                            } else {
-                                selectAllCheckbox.closest('div').remove();
-                            }
+                            // if ($('#mass-submit-draft-list').find('input').length > 0) {
+                            //     selectAllCheckbox.selectAllBasic({
+                            //         selector: 'input[data-mass-draft]',
+                            //         defaultState: true
+                            //     });
+                            // } else {
+                            //     selectAllCheckbox.closest('div').remove();
+                            // }
 
                             /* Maybe hide the call to action if there's nobody to choose
                              */
@@ -685,14 +685,14 @@
                              #}
                             let selectAllCheckbox = $('#mass-submit-offline-selectall');
 
-                            if ($('#mass-submit-offline-list').find('input').length > 0) {
-                                selectAllCheckbox.selectAllBasic({
-                                    selector: 'input[data-mass-offline]',
-                                    defaultState: true
-                                });
-                            } else {
-                                selectAllCheckbox.closest('div').remove();
-                            }
+                            // if ($('#mass-submit-offline-list').find('input').length > 0) {
+                            //     selectAllCheckbox.selectAllBasic({
+                            //         selector: 'input[data-mass-offline]',
+                            //         defaultState: true
+                            //     });
+                            // } else {
+                            //     selectAllCheckbox.closest('div').remove();
+                            // }
 
                             /* Maybe hide the call to action if there's nobody to choose
                              */
@@ -711,11 +711,11 @@
                         let payload = {
                             'draft': {
                                 'ids': [],
-                                'punctual': false
+                                'punctual': 'false'
                             },
                             'offline': {
                                 'ids': [],
-                                'punctual': false
+                                'punctual': 'false'
                             }
                         }
 
