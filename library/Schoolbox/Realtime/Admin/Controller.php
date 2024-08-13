@@ -594,7 +594,7 @@ class Controller extends BaseController
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
             //Getting length of par_code
-            $this->getConfigLoader()->get('external_tass_parent_id_length'),
+            $this->getConfigLoader(),
         );
 
         $content = [
