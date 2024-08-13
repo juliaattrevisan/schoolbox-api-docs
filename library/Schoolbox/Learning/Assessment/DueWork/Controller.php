@@ -259,7 +259,20 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        // Only display download link if there are actually files to download
+        /* Find out which users have a draft submission
+         * MAYBE you can do this purely in twig...but I'm not enamourd by frontend making
+         * those sort of data collecting maneuvers mainly because they don't know when their
+         * calls access a potentially expensive method.
+         */
+        $draftResponses = [];
+
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $draftResponse = $participant->findMostRecentDraftResponse();
+
+            if ($draftResponse) {
+                $draftResponses[$participant->getUser()->getId()] = $draftResponse->getId();
+            }
+        }
 
         $twigData = [
             'errors'            => $this->stateMapper->listDisplayValues(),
@@ -271,6 +284,7 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment'        => $assessment,
+            // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
@@ -283,6 +297,9 @@ class Controller extends Assessment\Controller
                 null,
                 $assessment
             ))->getFirstUrl(),
+            /* Draft Responses made by each guy
+             */
+            'draftResponses' => $draftResponses
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -1526,6 +1543,106 @@ class Controller extends Assessment\Controller
                 )
             );
         }
+    }
+
+
+    /**
+     * This takes a combined asynchronous payload:
+     *
+     * let payload = {
+     *     'draft': {
+     *         'ids': [],
+     *         'punctual': 'false'
+     *     },
+     *     'offline': {
+     *         'ids': [],
+     *         'punctual': 'false'
+     *     }
+     * }
+     *
+     * ...and forcibly submits the latest draft for the ids specified in payload.draft.ids
+     * and creates a receipt of submission for the ids specified in payload.offline.ids
+     *
+     * In the case of assessments that are overdue:
+     * If the teacher elects, they can decide if these submissions will use the current time
+     * (penalising students for being late) or use teacher discretion to set the submission
+     * time to be just before the formal due date.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException Occurs when you can't spawn a User model for whatever reason
+     */
+    public function postManageSubmissions(IAssessable $assessment): void
+    {
+        $postData = $this->requestPost->getArrayCopy();
+
+        /* By default, assume we're submitting now
+         */
+        $submittedAt = \Alaress_Date_Format::now();
+
+        /* Process the latest drafts from each of these user ids in $assessment and
+         * forcibly submit them.
+         */
+        foreach ($postData['draft']['ids'] ?? [] as $studentId) {
+            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model|null $latestResponse */
+            $latestResponse = $assessment->getParticipant($userStub)->findMostRecentDraftResponse();
+
+            /* This existed when the modal was submitted, but not when the payload was received
+             * The draft submission no longer exists (might already be published or otherwise deleted)
+             * Just keep going
+             */
+            if (null === $latestResponse) {
+                continue;
+            }
+
+            /* If the assessment was overdue, we need to micromanage submission times.
+             */
+            if ($assessment->isOverdue()) {
+                /* If the postData[draft][punctual] was selected,
+                 * set the submission time to be just before the due date.
+                 *
+                 * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+                 */
+                if ('true' === $postData['draft']['punctual']) {
+                    $submittedAt = $assessment->getDueAt()->addseconds(-1);
+                }
+            }
+
+            $latestResponse->setSubmittedAt($submittedAt);
+
+            $this->dueWorkResponseMapper->save($latestResponse);
+        }
+
+        /* Acknowledge receipts of submission for each of these user ids in $assessment.
+         */
+        foreach ($postData['offline']['ids'] ?? [] as $studentId) {
+            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+
+            /* If the postData[offline][punctual] was selected,
+             * set the submission time to be just before the due date.
+             *
+             * Otherwise, penalise the student and accept it whenever the teacher sent this payload.
+             */
+            if ('true' === $postData['offline']['punctual']) {
+                $submittedAt = $assessment->getDueAt()->addseconds(-1);
+            }
+
+            $this->persistAcknowledgementResponse($assessment, $userStub, $submittedAt);
+        }
+
+        /* Not sure how else we'd die in here
+         * Add more error handling as we uncover usages
+         */
+        $code = 200;
+
+        $data = [
+            'success' => true,
+            'message' => null
+        ];
+
+        $this->response = $this->responseAsJson($data)->withStatus($code);
     }
 
 

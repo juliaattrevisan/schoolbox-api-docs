@@ -211,6 +211,11 @@ class Module extends BaseModule
 
         $this->register('POST', "$assRoute/locations", 'getLocationForm', $canModify, $preloadAssessment);
 
+        /* Manage Submissions modal payload
+         * Arguably this $canWrite perm could be $canModify or $canViewStatus, maybe
+         */
+        $this->register('POST', "$assRoute/submissions/manage", 'postManageSubmissions', $canWrite, $preloadAssessment);
+
         /* Similarity Report report
          */
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);

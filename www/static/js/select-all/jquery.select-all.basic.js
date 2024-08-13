@@ -43,6 +43,11 @@
                     indeterminate: "indeterminate",
                 },
 
+                /* Decide the default state of the checkbox
+                 * By default, it'll be unticked (false) by default
+                 */
+                defaultState: false,
+
                 /* Callbacks
                  * Use these callbacks to augment the default behaviour with whatever
                  * specialty actions you need. Add more callbacks as required instead
@@ -91,6 +96,10 @@
             const selector = config.selector;
             const allCheckboxes = $(selector);
             const selectedCheckboxes = selector + ":checked";
+
+            /* Assign default state
+             */
+            selectAll.prop('checked', config.defaultState);
 
             selectAll.on("click", function (event) {
                 if ($(this).is(":checked")) {

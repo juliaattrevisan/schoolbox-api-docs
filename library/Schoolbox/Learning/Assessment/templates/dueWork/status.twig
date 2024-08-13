@@ -12,7 +12,9 @@
      - selfAssess:        bool            Is this being viewed in a self assessment context?
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
-#}
+
+ # @param array $draftResponses  A lookup of (user id, response id) for those who have drafts
+ #}
 
 {% extends '@learningAssessment/status.twig' %}
 
@@ -58,8 +60,8 @@
     {% endif %}
     {% if not readonly %}
         <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a></li>
-        <li><a class="icon-approve" data-mass="submit" data-reveal-id="mass-submit">Mark as Submitted&hellip;</a></li>
+        <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
+        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
     {% endif %}
 {% endblock %}
 
@@ -255,6 +257,7 @@
         {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
         {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
         {% set massActions = massActions ~ (download ? ' data-mass-download' : '') %}
+        {% set massActions = massActions ~ (draftResponses[participant.user.id] ?? false ? ' data-mass-submit-draft=' ~ draftResponses[participant.user.id] : '') %}
         {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
         {% set buttons %}
@@ -320,34 +323,89 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        {# The div below is used by bulky.js to create the mass-submit modal. #}
-        <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
-             role="dialog">
-            <h2>Acknowledge Receipt of Submission</h2>
-            <p id="checkbox-switch-container">
-                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
-                Did these students submit their work on time? <br />
-                <span class="switch">
-                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
-                    <label for="onTimeCheckboxSwitch">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
-                </span>
-            </p>
-            <p data-mass-unavailable>You have no students requiring submission.</p>
-            <p data-mass-available>Acknowledge receipt of submission for:</p>
-            <section class="checklist" id="mass-submit-list">
-                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
+        {# The div below is used by bulky.js to create the manage-submissions modal. #}
+        <div id="manage-submissions" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+            <h2>Manage Submissions</h2>
+
+            {# Decide if this assessment is overdue
+             # If so, blind users with a big orange box
+             #}
+            <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue.</span>
+
+            <div class="row">
+                <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
+                    <p data-mass-unavailable>You have no students with draft submissions.</p>
+                    <p data-mass-available>Submit students' drafts:</p>
+
+                    <section class="checklist" id="mass-submit-draft-list">
+                        {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                        {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
+                        <div data-template>
+                            <input type="checkbox" data-selected checked/>
+                            <label class="checkbox-label" data-participant-name></label>
+                        </div>
+                    </section>
+
+                    {# Submission Date override: this is used to state that despite when the action
+                     # to submit a draft actually occurred, the student should have been considered on
+                     # time. This occurs when teachers submit drafts on behalf of their students after
+                     # the due date is reached, despite having practically done the work on time; they
+                     # just didn't complete the workflow.
+                     #}
+                    <div id="mass-submit-draft-punctual-container" data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="draft-punctual" type="checkbox" checked="">
+                                <label for="draft-punctual">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
                 </div>
-            </section>
+                <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
+                    <p data-mass-unavailable>You have no students requiring submission.</p>
+                    <p data-mass-available>Mark students as submitted:</p>
+
+                    <section class="checklist" id="mass-submit-offline-list">
+                        {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                        {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
+                        <div data-template>
+                            <input type="checkbox" data-selected checked/>
+                            <label class="checkbox-label" data-participant-name></label>
+                        </div>
+                    </section>
+
+                    {# Submission Date override: this is used to state that despite when the action
+                     # to submit offline actually occurred, the student should have been considered on
+                     # time. This occurs when teachers Mark As Submitted on behalf of their students after
+                     # the due date is reached, despite having practically done the work on time; they
+                     # just didn't complete the workflow.
+                     #}
+                    <div id="mass-submit-offline-punctual-container" data-mass-available>
+                        <hr />
+                        <p>
+                            Did these students submit their work on time? <br />
+                            <span class="switch">
+                                <input id="offline-punctual" type="checkbox" checked="">
+                                <label for="offline-punctual">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div class="component-action">
                 <section>
                     {%- apply spaceless -%}
                         <a class="button">Cancel</a>
-                        <a class="button" data-submit>All Received</a>
+                        <a class="button" data-submit>Save</a>
                     {%- endapply -%}
                 </section>
             </div>
@@ -376,7 +434,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        <div class="toast" data-alert data-save-draft></div>
+        <div class="toast" data-alert data-toast></div>
 
         {# Dynamic Feedback
          #
@@ -398,6 +456,28 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
+                    {# Decide if this assessment is overdue during runtime
+                     # This accommodates a temporal edge case where you loaded the status screen,
+                     # then waited around for a while before executing a time-sensitive action
+                     # What we knew at the time of loading the screen is different to what's actually
+                     # happening now.
+                     #}
+                    function isOverdue() {
+                        return (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}');
+                    }
+
+                    {# Decide if the Save button should show
+                     # You only know the lists of humans after they've been built; if there's at least
+                     # one input, show the Save button. Otherwise there's nothing we can do; hide it
+                     #}
+                    function renderCallToAction() {
+                        if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input:checked').length) {
+                            $('#manage-submissions').find('[data-submit]').hide();
+                        } else {
+                            $('#manage-submissions').find('[data-submit]').show();
+                        }
+                    }
+
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
@@ -465,7 +545,7 @@
                         onSubmit: function (toPublish) {
                             let draftFeedbackIds = [],
                                 $actionBars      = [],
-                                $toast = $('[data-save-draft]');
+                                $toast = $('[data-toast]');
 
                             $toast.toastActivate({text: 'Publishing drafts...'});
 
@@ -517,37 +597,126 @@
                         }
                     });
 
-                    {# These variables allow the confirm-dialog to be disabled in the case of bulk acknowledgements, #}
-                    {# and set whether bulk acknowledgements should confirm submissions as having been on-time.      #}
-                    let confirmDialogDisabled            = false;
-                    let confirmDialogDisabledOnTimeValue = false;
-
-                    {# Mass acknowledge receipt of submissions #}
-                    $('#mass-submit').bulky({
+                    {# Decide if we've gone past the due date
+                     # If we did, provide a checkbox to allow teachers to override when this action occurred
+                     #}
+                    $('#mass-submit-draft').bulky({
+                        includeSelectAllCheckbox: true,
+                        modal: $('#manage-submissions'),
+                        userSelector: '[data-mass-submit-draft]',
+                        userList: $userList,
+                        checkboxPrefix: 'mass-draft',
                         submitText: function (len, all) {
-                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                                $('#checkbox-switch-container').show();
-                            } else {
-                                $('#checkbox-switch-container').hide();
+                            let onTimeContainer = $('#mass-submit-draft-punctual-container');
+
+                            {# Initially hide this checkbox thing until we actually need it #}
+                            onTimeContainer.hide();
+
+                            if (isOverdue()) {
+                                $('[data-overdue-warning]').show();
+                                onTimeContainer.show();
                             }
 
-                            if (!len) {
-                                return 'Acknowledge None Received';
-                            }
-                            if (len === all) {
-                                return 'Acknowledge All Received';
-                            }
-                            return 'Acknowledge ' + len + ' of ' + all + ' Received';
+                            {# Both bulkys alter the same ui element #}
+                            return 'Save';
                         },
+                        onAfterBuildList: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterSelectAllChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterCheckboxChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        }
+                    });
+
+                    $('#mass-submit-offline').bulky({
+                        includeSelectAllCheckbox: true,
+                        modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
-                        onSubmit: function (toSubmit) {
-                            confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
-                            confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.
-                            toSubmit.each(function () {
-                                $(this).find('[data-sobo]').trigger('click');
-                            });
-                            confirmDialogDisabled = false; // Re-enable the confirm dialog.
+                        checkboxPrefix: 'mass-offline',
+                        submitText: function (len, all) {
+                            let onTimeContainer = $('#mass-submit-offline-punctual-container');
+
+                            {# Initially hide this checkbox thing until we actually need it #}
+                            onTimeContainer.hide();
+
+                            if (isOverdue()) {
+                                $('[data-overdue-warning]').show();
+                                onTimeContainer.show();
+                            }
+
+                            {# Both bulkys alter the same ui element #}
+                            return 'Save';
+                        },
+                        onAfterBuildList: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterSelectAllChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterCheckboxChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        }
+                    });
+
+                    {# Construct mega-payload of forcibly-submitted drafts and receipt of submissions.
+                     # This sends everything to the backend for processing, then reloads this very screen,
+                     # otherwise users won't see the latest outcome of submissions (offline or otherwise)
+                     #}
+                    $('#manage-submissions').find('[data-submit]').on('click', function(event) {
+                        event.preventDefault();
+
+                        {# Compile the list of selected draftees and selected offliners #}
+                        let payload = {
+                            'draft': {
+                                'ids': [],
+                                'punctual': 'false'
+                            },
+                            'offline': {
+                                'ids': [],
+                                'punctual': 'false'
+                            }
+                        }
+
+                        {# Compile the list of selected draftees #}
+                        $('#mass-submit-draft-list')
+                                .find('input[type=checkbox]:checked')
+                                .each(function(index, element) {
+                                    payload.draft.ids.push($(element).attr('data-mass-draft'));
+                                });
+
+                        payload.draft.punctual = $('#draft-punctual').is(':checked');
+
+                        {# Compile the list of selected offliners #}
+                        $('#mass-submit-offline-list')
+                                .find('input[type=checkbox]:checked')
+                                .each(function(index, element) {
+                                    payload.offline.ids.push($(element).attr('data-mass-offline'));
+                                });
+
+                        payload.offline.punctual = $('#offline-punctual').is(':checked');
+
+                        let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
+
+                        if (route.length) {
+                            $.post(route, payload, function(responseText) {
+                                window.location.reload();
+                            })
                         }
                     });
 
@@ -627,20 +796,16 @@
                     $('[data-sobo]').on('click', function () {
                         let $buttonClicked = $(this);
 
-                        if (!confirmDialogDisabled) {
-                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                                $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
+                        if (isOverdue()) {
+                            $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
-                                {# Handle clicks on confirm popup buttons. #}
-                                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
-                                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
-                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
-                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
-                            } else {
-                                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
-                            }
+                            {# Handle clicks on confirm popup buttons. #}
+                            {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                            {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
+                            $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                            $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
                         } else {
-                            postSobo($buttonClicked, confirmDialogDisabledOnTimeValue); {# Use default value for whether submission was confirmed to be on-time. #}
+                            postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                         }
                     });
 
@@ -658,7 +823,7 @@
                             $participant = $actionBar.closest('[data-participant]'),
                             $statusIcon  = $participant.find('[data-status]'),
                             $statusLabel = $participant.find('[data-status-label]'),
-                            $toast       = $('[data-save-draft]');
+                            $toast       = $('[data-toast]');
 
                         $toast.toastActivate({text: 'Marking submission as received...'});
                         $button.html('Working...');
@@ -753,7 +918,7 @@
                             $feedbackButtons = $draftedSpan.add($publishButton);
 
                         $actionBar.removeAttr('data-mass-publish');
-                        $actionBar.removeAttr('data-mass-submit');
+                        $actionBar.removeAttr('data-manage-submissions');
 
                         // Cannot sobo an acknowledgment once published feedback exists
                         $soboButton.fadeOut({

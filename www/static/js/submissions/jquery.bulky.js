@@ -25,7 +25,18 @@
         participantSelector: "[data-participant]",
         actionBarSelector: "[data-action-bar]",
         userSelector: null,
-
+        /* Specify an arbitrary prefix to deconflict multiple sets of checkboxes in the same modal
+         * It's optional; without it, checkboxes will have the id of the  user.
+         */
+        checkboxPrefix: '',
+        /* This callback fires immediately after the bulky checkbox list is injected
+         */
+        onAfterBuildList: $.noop,
+        /* This is a passthrough method to bulky's usage of selectAllBasic. If you enabled the select-all
+         * checkbox you can access its callback via this method
+         */
+        onAfterSelectAllChange: $.noop,
+        onAfterCheckboxChange: $.noop,
         /* A function to determine whether an element should be submittable
          */
         checkboxConditionality: function (id) {
@@ -89,10 +100,20 @@
          */
         this.element.on("change", opt.checkboxSelector, setupActionButton);
 
+        /* Usually this.element is a data-reveal modal div; we can assume that to be the default.
+         * If you're running two Bulky Lists inside one modal, you need to specify the modal itself;
+         * you can do that, explicitly, with options.modal
+         */
+        let modalElement = this.element;
+
+        if (options.modal) {
+            modalElement = options.modal;
+        }
+
         /**
          * When the modal opens
          */
-        this.element.on("open.fndtn.reveal", function () {
+        modalElement.on("open.fndtn.reveal", function () {
             var $checks;
 
             /* Number of invalid checkboxes
@@ -120,12 +141,13 @@
 
                         /* Assign ids
                          */
-                        $chk.attr("id", id);
-                        $lbl.attr("for", id);
+                        $chk.attr("id", opt.checkboxPrefix + id);
+                        $chk.attr("data-" + opt.checkboxPrefix, id);
+                        $lbl.attr("for", opt.checkboxPrefix + id);
 
                         // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
                         // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
-                        $chk.attr("data-bulky-checkbox", "");
+                        $chk.attr("data-bulky-checkbox-" + opt.checkboxPrefix, "");
 
                         // apply the name
                         $lbl.text($(this).data("participantName"));
@@ -147,6 +169,10 @@
                     .get()
                     .join("")
             );
+
+            /* A callback that fires immediately after the bulky checkbox list is built
+             */
+            opt.onAfterBuildList();
 
             /* All the checkboxes that have been ticked
              * Change contents of modal accordingly
@@ -177,7 +203,7 @@
         /**
          * When the modal finishes opening
          */
-        this.element.on("opened.fndtn.reveal", function () {
+        modalElement.on("opened.fndtn.reveal", function () {
             currentlyOpenModal = $(this);
             // start listening
             $(window).on("resize", refreshModalHeight);
@@ -186,25 +212,33 @@
             if (opt.includeSelectAllCheckbox) {
                 // Insert a 'select all' checkbox at the top of the other checkboxes, and use jquery.selectAllBasic()
                 // to control its behaviour.
+                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix)
 
                 // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
-                if (0 === $("#data-bulky-select-all-checkbox").length) {
+                /* Also, only apply a Select All checkbox if there are actually checkbkoxes in the list
+                 * Otherwise you have nothing to select.
+                 */
+                if (0 === $selectAllCheckbox.length && bulky.list.find('input').length > 0) {
                     bulky.list.before(
                         "<div>" +
-                            "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
-                            "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select All</label>" +
+                            "<input id='data-bulky-select-all-checkbox-" + opt.checkboxPrefix + "' type='checkbox' />" +
+                            "<label for='data-bulky-select-all-checkbox-" + opt.checkboxPrefix + "' class='checkbox-label'>Select All</label>" +
                             "</div>"
                     );
                 }
 
+                /* Reselect this, in case we spawned it
+                 */
+                $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix)
+
                 // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
                 // of the indeterminate state.
-                $("#data-bulky-select-all-checkbox").selectAllBasic({
-                    selector: "[data-bulky-checkbox]:enabled",
+                $selectAllCheckbox.selectAllBasic({
+                    selector: "[data-bulky-checkbox-" + opt.checkboxPrefix + "]:enabled",
+                    onAfterCheckboxChange: opt.onAfterCheckboxChange,
+                    onAfterSelectAllChange: opt.onAfterSelectAllChange,
                 });
-
-                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
 
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
                 // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
@@ -220,7 +254,7 @@
         /**
          * When the modal finishes closing
          */
-        this.element.on("closed.fndtn.reveal", function () {
+        modalElement.on("closed.fndtn.reveal", function () {
             currentlyOpenModal = null;
 
             // stop listening
@@ -254,7 +288,7 @@
          * Typically it's "Cancel" or the Action button itself, after which
          * the modal can be dismissed
          */
-        this.element.on("click", ".button", function () {
+        modalElement.on("click", ".button", function () {
             if (opt.onClose === null) {
                 // Do the default thing, which is to close the modal.  Note that this will close any other open
                 // foundation modals as well due to the firing of the closeme.zf.reveal event.
