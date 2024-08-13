@@ -29,7 +29,6 @@ use Monolog\Logger;
  */
 class Helper
 {
-
     /**
      * @var MatchupMapper
      */
