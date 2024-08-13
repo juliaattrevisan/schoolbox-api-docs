@@ -20,7 +20,7 @@
                 confirmEvent: function () {
 
                     {# A toast #}
-                    var $toast = $history.find('[data-alert]');
+                    var $toast = $('[data-alert]');
                     $toast.toastActivate({text: 'Deleting interaction...'});
 
                     $.ajax($a.data('delete'), {
