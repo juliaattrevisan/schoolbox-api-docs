@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 /**
  * A general badge modal containing a sequential modal showing the badge details
  * then a selected curriculum code details
@@ -6,37 +6,35 @@
 
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import type { Node, BadgeUsageObject } from "@schoolboxCurriculum/types/Node";
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import BadgeDetail from "./badgeDetail.vue";
 
-const props = defineProps({
+interface Props {
     /**
      * whether the modal is open
      */
-    isOpen: {
-        type: Boolean,
-        required: true,
-        default: false,
-    },
+    isOpen: boolean;
     /**
      * the badge to display
      */
-    badge: {
-        required: true,
-    },
+    badge: Badge | BadgeUsageObject | null;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isOpen: false,
 });
 
 const emit = defineEmits(["closed"]);
 const isNextSelected = window.Vue.ref(false);
-const selectedNodeDetails = window.Vue.ref(getEmptyNode());
+const selectedNodeId = window.Vue.ref<number | null>(null);
 
 /**
  * a code has been selected in the detail modal
- *
- * @param { object } node - the selected node
+ * @param { Node } node - the selected node
  */
-function onCodeSelected(node) {
-    selectedNodeDetails.value = node;
+function onCodeSelected(node: Node) {
+    selectedNodeId.value = node.id;
     isNextSelected.value = true;
 }
 
@@ -60,7 +58,7 @@ function onModalClosed() {
             <badge-detail v-if="props.badge" :badge="props.badge" @code-selected="onCodeSelected" />
         </template>
         <template #sequence-2>
-            <node-details :node="selectedNodeDetails" />
+            <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
         </template>
     </sequential-reveal-modal>
 </template>

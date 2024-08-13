@@ -11,7 +11,6 @@ import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 export default {
     components: {
@@ -65,7 +64,7 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
-            selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
+            selectedNodeId: null, // number|null, The selected curriculum code to display further details for.
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
             selectedFilters: {
                 // NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
@@ -300,7 +299,7 @@ export default {
          * @param {object} node -
          */
         onCodeSelected(node) {
-            this.selectedNode = node;
+            this.selectedNodeId = node.id;
             this.$refs.nodeDetailsModal.open();
         },
 
@@ -981,7 +980,7 @@ export default {
         </div>
 
         <reveal-modal ref="nodeDetailsModal">
-            <node-details :node="selectedNode" />
+            <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
         </reveal-modal>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
