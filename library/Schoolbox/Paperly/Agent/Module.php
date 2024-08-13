@@ -58,10 +58,13 @@ class Module extends BaseModule
             ),
         );
 
+        $connection = (new ConnectionFactory(new Factory(), $this->getConfig()))->build();
+        $handler    = new Handler($connection);
+
         return new Controller(
             $ipWhitelist,
             $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
-            (new ConnectionFactory(new Factory(), $this->getConfig()))->build(),
+            $handler,
         );
     }
 }

@@ -27,6 +27,44 @@ class Handler
     }
 
     /**
+     * Handle action.
+     *
+     * @param array $data
+     * @return array
+     * @throws OutOfBoundsException if something was missing in `$data`
+     */
+    public function handle(array $data): array
+    {
+        $method = $data['m'] ?? null;
+        if (!isset($method)) {
+            throw new OutOfBoundsException('Method does not exist');
+        }
+
+        switch ($method) {
+            case 'allYearLevels':
+                return $this->handleAllYearLevelsRequest($data);
+            case 'allClasses':
+                return $this->handleAllClassesRequest($data);
+            case 'allStaffs':
+                return $this->handleAllStaffsRequest($data);
+            case 'allStudents':
+                return $this->handleAllStudentsRequest($data);
+            case 'getStudentsAvatar':
+                return $this->handleGetStudentsAvatarRequest($data);
+            case 'getStudentsMedical':
+                return $this->handleGetStudentsMedicalRequest($data);
+            case 'getStudentsFromParent':
+                return $this->handleGetStudentsFromParentRequest($data);
+            case 'getParent':
+                return $this->handleGetParentRequest($data);
+            case 'healthcheck':
+                return $this->handleHealthCheckRequest();
+            default:
+                throw new OutOfBoundsException('Method does not exist');
+        }
+    }
+
+    /**
      * Handle request for all year levels.
      *
      * @param array $data `$data['code']` may be an array or CSV list of codes:
