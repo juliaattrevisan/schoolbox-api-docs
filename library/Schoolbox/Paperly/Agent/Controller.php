@@ -158,7 +158,7 @@ class Controller extends Base
     {
         $yearLevelArr = [];
         $params       = [];
-        $sql          = "SELECT DISTINCT sc.classcode, sc.Description, scs.StaffID, CONCAT(c.Preferred, ' ', c.Surname) AS TeacherName, c.OccupEmail
+        $sql          = "SELECT DISTINCT sc.ClassCode, sc.Description, scs.StaffID, CONCAT(c.Preferred, ' ', c.Surname) AS TeacherName, c.OccupEmail
         FROM SubjectClasses sc
         LEFT JOIN FileSemesters fs ON fs.fileyear = sc.FileYear AND fs.filesemester = sc.filesemester
         LEFT JOIN SubjectClassStaff scs ON scs.ClassCode = sc.ClassCode AND scs.FileYear = sc.FileYear AND scs.FileSemester = sc.FileSemester
@@ -171,7 +171,7 @@ class Controller extends Base
         if (isset($data['code'])) {
             $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
             $placeholders = implode(',', array_fill(0, count($codes), '?'));
-            $sql          .= " WHERE sc.classcode IN ($placeholders)";
+            $sql          .= " AND sc.classcode IN ($placeholders)";
             $params       = array_merge($params, $codes);
         }
 
