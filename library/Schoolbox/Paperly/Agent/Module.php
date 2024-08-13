@@ -58,21 +58,10 @@ class Module extends BaseModule
             ),
         );
 
-        // Create the database connection for the Paperly agent
-        $connectorFactory = new Factory();
-        $connector        = $connectorFactory->createSqlsrv();
-        $connector->connect(
-            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_HOST_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_HOST),
-            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_NAME_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_NAME),
-            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_USER_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_USER),
-            $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_EXTERNAL_DB_PASSWORD_OVERRIDE) ?: $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_PASSWORD),
-            ['Encrypt' => $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_DB_ENCRYPTION)],
-        );
-
         return new Controller(
             $ipWhitelist,
             $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
-            $connector,
+            (new ConnectionFactory(new Factory(), $this->getConfig()))->build(),
         );
     }
 }
