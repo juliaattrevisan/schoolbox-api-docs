@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use InvalidArgumentException;
+use League\Flysystem\FilesystemException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use RangeException;
@@ -67,6 +68,7 @@ class ServiceManager implements IServiceManager
         private Storage\FilesystemProxy $filesystemProxy,
         private UnreadRetriever $unreadRetriever,
         private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+        private ?Schoolbox\IConfigLoader $configLoader = null,
     ) {
     }
 
@@ -79,7 +81,17 @@ class ServiceManager implements IServiceManager
     {
         $registrations = $this->registryMapper->countByColumn('user_id', $userId);
 
-        if ($registrations === 0) {
+        $recipient = (new Schoolbox\UserMapper())->findById($userId);
+
+        $isRecipientParent = $recipient->getRole()->isParent();
+        //Check to see if TASS Orbit is set up as a delivery provider
+        //Only parents should receive the notifications through TASS Orbit
+        $tassProvider = $isRecipientParent ?
+            (new ServiceMapper())->countByColumn('provider', Registry::PROVIDER_TASS_ORBIT) :
+            0;
+
+        //User didn't registered anything and TASS is not set up
+        if ($registrations === 0 && $tassProvider === 0) {
             $this->log->notice("Received push for user $userId, but they have no devices registered");
             return;
         }
@@ -87,7 +99,9 @@ class ServiceManager implements IServiceManager
         $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $userId);
         $unreadCount = count($unread);
 
-        foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
+        $recipientExternalId = $recipient->getExternalId();
+
+        foreach ($this->findRegistrationsByUser($recipient) as $provider => $appRegistrations) {
             foreach ($appRegistrations as $appIdentifier => $reg) {
                 $service = $this->getService($reg['service']);
 
@@ -100,7 +114,7 @@ class ServiceManager implements IServiceManager
                 $service->setLog($this->log);
 
                 try {
-                    $this->pushToService($service, $tokens, $instance, $unreadCount);
+                    $this->pushToService($service, $tokens, $instance, $unreadCount, $recipientExternalId);
                 } catch (InvalidArgumentException $e) {
                     // service not available
                     $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ 'exception' => $e ]);
@@ -116,14 +130,14 @@ class ServiceManager implements IServiceManager
      * @param Instance         $instance
      * @param int              $unreadCount
      */
-    protected function pushToService(ServiceInterface $service, $tokens, Instance $instance, $unreadCount = 0)
+    protected function pushToService(ServiceInterface $service, $tokens, Instance $instance, $unreadCount = 0, ?string $recipientExternalId = null)
     {
         $provider = $service->getProviderName();
         $appId    = $service->getAppIdentifier();
 
         try {
             $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
-            $service->send($tokens, $instance, $unreadCount);
+            $service->send($tokens, $instance, $unreadCount, $recipientExternalId);
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
             $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ 'exception' => $e ]);
@@ -138,15 +152,23 @@ class ServiceManager implements IServiceManager
     /**
      * Returns the list of app registrations for the given user, indexed by provider and then app identifier
      *
-     * @param int $userId
+     * @param Schoolbox\User $user
      * @return Registry[][]
      */
-    private function findRegistrationsByUser($userId)
+    private function findRegistrationsByUser($user)
     {
         /** @var array<string, array<string, Registry>> $registrations */
         $registrations = [];
 
-        foreach (RegistryMapper::getInstance()->findByColumn('user_id', $userId) as $registration) {
+        $registryOfUser = RegistryMapper::getInstance()->findByColumn('user_id', $user->getId());
+
+        //Should only attempt to check if the recipient is a parent and has external id
+        if ($user->getRole()->isParent() && !!$user->getExternalId()) {
+            //Check if user should receive notifications through TASS Orbit
+            $registryOfUser = $this->appendTassOrbit($registryOfUser, $user);
+        }
+
+        foreach ($registryOfUser as $registration) {
             $srv = $registration->getService();
 
             // by-reference for convenience
@@ -154,7 +176,6 @@ class ServiceManager implements IServiceManager
                 $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
             }
 
-            // @phpstan-ignore-next-line: WTF is this?
             if (empty($p)) {
                 $p['service'] = $srv;
                 $p['registrations'] = new GenericCollection(Registry::class);
@@ -170,7 +191,7 @@ class ServiceManager implements IServiceManager
     /**
      * @param Service $service
      * @return ServiceInterface
-     * @throws Mapper\Exception
+     * @throws Mapper\Exception|FilesystemException
      */
     public function getService(Service $service)
     {
@@ -224,10 +245,18 @@ class ServiceManager implements IServiceManager
                         $key,
                         $this->appTitle,
                     );
+                case Registry::PROVIDER_TASS_ORBIT:
+                    return new Cloud\TassOrbit\Service(
+                        $this->registryMapper,
+                        $identifier,
+                        $key,
+                        $this->configLoader
+                    );
             }
 
             throw new Mapper\Exception(
-                "Invalid provider: must be one of APNS, GCM or Digistorm: '$provider' given."
+                "Invalid provider: must be one of APNS, GCM, " . "
+                Digistorm, Firebase or TASS Orbit: '$provider' given."
             );
         }
 
@@ -240,6 +269,7 @@ class ServiceManager implements IServiceManager
      *
      * @param Storage\Model $storage
      * @return string
+     * @throws FilesystemException
      */
     private function getPemPath(Storage\Model $storage)
     {
@@ -312,5 +342,40 @@ class ServiceManager implements IServiceManager
         }
 
         return false;
+    }
+
+    /**
+     * @param Collection|Registry[]         $registryOfUser
+     * @param Schoolbox\User                $user
+     * @return Collection|Registry[]
+     */
+    private function appendTassOrbit(Collection|array $registryOfUser, Schoolbox\User $user): Collection|array
+    {
+        //If the TASS Orbit is set up as delivery provider, append it to the list of registry
+        try {
+            $tassOrbitService =
+                (new ServiceMapper())
+                    ->findOneByColumn(
+                        'provider',
+                        Registry::PROVIDER_TASS_ORBIT
+                    );
+
+            $tass_registry = new Registry();
+            //Mocking registry to send to notifications
+            $tass_registry
+                ->setUser($user)
+                ->setToken(uniqid('tass_orbit_'))
+                ->setService(
+                    $tassOrbitService
+                );
+
+            $registryOfUser->add($tass_registry);
+        } catch (Mapper\Exception\NotFound $e) {
+            //TASS Orbit is not set up as delivery provider. Skip.
+        } catch (Mapper\Exception $e) {
+            $this->log->warning($e->getMessage(), [ 'exception' => $e ]);
+        }
+
+        return $registryOfUser;
     }
 }
