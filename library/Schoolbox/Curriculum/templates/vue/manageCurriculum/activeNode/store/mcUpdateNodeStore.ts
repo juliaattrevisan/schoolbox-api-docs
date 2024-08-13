@@ -11,7 +11,7 @@ import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
  * @param { NodeToUpdate } node - the node to copy
  * @returns { Node } the copy of the node details
  */
-function getActiveNodeCopy(node: NodeToUpdate): Node {
+function getActiveNodeCopy(node: NodeToUpdate): NodeToUpdate {
     return {
         name: node.name,
         code: node.code,
@@ -43,7 +43,7 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
      */
     function prompt(node: Node) {
         useActiveNodeStore().set(node);
-        activeNodeCopy.value = getActiveNodeCopy(node as NodeToUpdate);
+        activeNodeCopy.value = getActiveNodeCopy(node);
         isOpen.value = true;
     }
 

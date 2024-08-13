@@ -12,7 +12,7 @@ import type {
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
-import BadgeImage from "@schoolboxBadge/vue/badge-image";
+import BadgeImage from "@schoolboxBadge/vue/badge-image.vue";
 
 interface Props {
     usage: Usage; // the usage to display
@@ -46,7 +46,7 @@ function onSelect() {
 <template>
     <li class="usage">
         <a
-            :href="props.usage.discriminator === ActivityTypes.BADGE ? null : getUsageHref(props.usage)"
+            :href="props.usage.discriminator === ActivityTypes.BADGE ? undefined : getUsageHref(props.usage)"
             :title="
                 props.usage.discriminator === ActivityTypes.BADGE ? props.usage.object.name : props.usage.object.title
             "

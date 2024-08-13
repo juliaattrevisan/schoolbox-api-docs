@@ -16,7 +16,6 @@ const selectedNodesStore = useSelectedNodesStore();
 
 /**
  * if the node is a child of one that's selected it should be disabled
- *
  * @returns { boolean } whether the checkbox should be disabled
  */
 const isDisabled = window.Vue.computed(() => {
@@ -25,7 +24,6 @@ const isDisabled = window.Vue.computed(() => {
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
- *
  * @returns { boolean }
  */
 const isChecked = window.Vue.computed(() => {
@@ -36,7 +34,6 @@ const isChecked = window.Vue.computed(() => {
 
 /**
  * add or remove based on the current status
- *
  * @param { boolean } isCheckedChange - whether the Node is selected or not
  */
 function onChange(isCheckedChange: boolean) {
@@ -52,7 +49,7 @@ function onChange(isCheckedChange: boolean) {
             :value="props.node.id"
             :disabled="isDisabled"
             :checked="isChecked"
-            @change="onChange($event.target.checked)"
+            @change="onChange(($event.target as HTMLInputElement).checked)"
         />
         <label :for="`checkbox-${props.node.id}`"></label>
     </div>

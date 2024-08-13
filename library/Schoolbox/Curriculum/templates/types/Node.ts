@@ -47,15 +47,33 @@ export enum ActivityTypes {
     LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",
     LEARNING_ACTIVITY_LTI = "lti",
     BADGE = "badge",
+    FOLDER = "folder",
 }
 
 /**
  * An activity linked to the node
  */
-export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.LEARNING_ACTIVITY | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | LearningActivityUsageObject | BadgeUsageObject;
-};
+export type Usage =
+    | {
+          discriminator: ActivityTypes.COURSE;
+          object: CourseUsageObject;
+      }
+    | {
+          discriminator: ActivityTypes.UNIT;
+          object: UnitUsageObject;
+      }
+    | {
+          discriminator: ActivityTypes.LEARNING_ACTIVITY;
+          object: LearningActivityUsageObject;
+      }
+    | {
+          discriminator: ActivityTypes.BADGE;
+          object: BadgeUsageObject;
+      }
+    | {
+          discriminator: ActivityTypes.FOLDER;
+          object: UsageObject; // UNIMPLEMENTED - ACTUAL TYPE DIFFERS
+      };
 
 /**
  * The further details of the the usage
@@ -100,7 +118,7 @@ export interface LearningActivityUsageObject extends UsageObject {
     _links: {
         view: string;
     };
-    type: string;
+    type: ActivityTypes;
     unit: {
         title: string;
     };

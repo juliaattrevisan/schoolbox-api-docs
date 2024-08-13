@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { useModalActiveNodeStore } from "./csModalActiveNodeStore";
 
@@ -22,7 +23,7 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
             if (usageResponse.ok) {
                 const usage = (await usageResponse.json()) as { data: Usage[] };
                 // we are not currently displaying folders in the usage list
-                const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== "folder");
+                const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== ActivityTypes.FOLDER);
                 modalActiveNodeStore.node.usage = withoutFolders;
             } else {
                 hasLoadError.value = true;

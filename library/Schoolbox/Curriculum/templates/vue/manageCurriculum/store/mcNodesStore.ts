@@ -51,6 +51,19 @@ export const useNodesStore = defineStore("mcNodes", () => {
             order: 0,
             parent: null,
             name: "Curricula",
+            _links: {
+                delete: "",
+                getUsage: "",
+                read: "",
+                update: "",
+            }, // TODO: ... review this, it seems like it could lead to a bug
+            _usageCounts: {
+                course: 0,
+                unit: 0,
+                assessment: 0,
+                badge: 0,
+                folder: 0,
+            },
         };
         $nodes.forEach((node) => useSelectedNodesStore().checkIfSelected(node)); // ensure isSelected is kept up to date
     }
