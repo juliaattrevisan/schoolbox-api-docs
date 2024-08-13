@@ -94,12 +94,33 @@ class IndexBuilder extends BaseBuilder
             WHERE (COALESCE(t.deleted_at, tl.deleted_at, f.deleted_at) IS NOT NULL OR t.title_text='')
         ";
         $params = [];
-        if ($fromDate) {
-            $queryString .= ' AND COALESCE(t.deleted_at, tl.deleted_at) >= :fromDate';
+        if ($fromDate && $toDate) {
+            $queryString .= (
+                ' AND (
+                    t.deleted_at BETWEEN :fromDate AND :toDate OR
+                    tl.deleted_at BETWEEN :fromDate AND :toDate OR
+                    f.deleted_at BETWEEN :fromDate AND :toDate
+                )'
+            );
             $params['fromDate'] = $fromDate->getDatabase();
-        }
-        if ($toDate) {
-            $queryString .= ' AND COALESCE(t.deleted_at, tl.deleted_at) <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        } elseif ($fromDate) {
+            $queryString .= (
+                ' AND (
+                    t.deleted_at >= :fromDate OR
+                    tl.deleted_at >= :fromDate OR
+                    f.deleted_at >= :fromDate
+                )'
+            );
+            $params['fromDate'] = $fromDate->getDatabase();
+        } elseif ($toDate) {
+            $queryString .= (
+                ' AND (
+                    t.deleted_at <= :toDate OR
+                    tl.deleted_at <= :toDate OR
+                    f.deleted_at <= :toDate
+                )'
+            );
             $params['toDate'] = $toDate->getDatabase();
         }
         $query = $this->connector->prepareQuery($queryString);
