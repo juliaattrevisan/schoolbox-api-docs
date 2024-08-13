@@ -156,6 +156,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->addTopic("{$this->getSlug()}.{$evidence->getId()}." . self::TRIGGER_POSTED)
             ->setTimestamp($evidence->getCreatedAt()->getUnixTimeStamp())
+            ->putMeta('studentExternalId', $evidence->getRecipient()->getExternalId())
             ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
         $params = ['evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION)];

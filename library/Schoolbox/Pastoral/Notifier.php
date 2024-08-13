@@ -166,7 +166,9 @@ class Notifier extends AbstractModuleNotifier
                 ->setSeverity(Logger::ERROR)
                 ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
                 ->putMeta('type', $method) // to provide different key for $instance->getBaseHash() . $instance->getParamHash()
-                ->addTopic(sprintf("pastoral.%s.%s", $pastoral->getId(), $method));
+                ->addTopic(sprintf("pastoral.%s.%s", $pastoral->getId(), $method))
+                ->putMeta('studentExternalId', $pastoral->getStudent()->getExternalId());
+
         $message = $builder->build();
 
         // Work out who to send the message to
@@ -326,7 +328,8 @@ class Notifier extends AbstractModuleNotifier
                     ->setNamespace($this->getSlug())
                     ->setSeverity(Logger::ERROR)
                     ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
-                    ->addTopic(sprintf("pastoral.%s.%s.%s", $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT));
+                    ->addTopic(sprintf("pastoral.%s.%s.%s", $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT))
+                    ->putMeta('studentExternalId', $pastoral->getStudent()->getExternalId());
 
             $message     = $builder->build();
             $targetUsers = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))

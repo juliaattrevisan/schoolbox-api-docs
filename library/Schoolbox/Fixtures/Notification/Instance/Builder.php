@@ -53,6 +53,17 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @param string $metaName
+     * @param string $metaValue
+     * @return self
+     */
+    public function putMatchMeta(string $metaName, string $metaValue)
+    {
+        $this->internalBuilder->putMeta($metaName, $metaValue);
+        return $this;
+    }
+
+    /**
      * @param Matchup $matchup
      * @param Team $team
      * @return self

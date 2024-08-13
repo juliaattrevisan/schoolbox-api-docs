@@ -201,6 +201,7 @@ class CommentNotifier extends AbstractModuleNotifier
         if ($comment->getParentVisibility()) {
             // parents don't need to see their child's surname in the message
             $bob->setParam('student', new ChildParam($student, ParameterInterface::STACKING_APPEND));
+            $bob->putMeta('studentExternalId', $student->getExternalId());
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
