@@ -17,7 +17,9 @@ import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
 import type { OAuthClient } from "../js/types/OAuthClient";
 
+// @ts-expect-error - This is expected as per https://vue-select.org/guide/components.html#vue-3x
 vSelect.props.components.default = () => ({ Deselect });
+
 type VueSelectData = {
     // the loaded user search results
     data: VueSelectOption[];
@@ -82,7 +84,7 @@ function showAddModal() {
 /**
  * To hide any error messages that may be displayed
  */
-function resetValidationChecks () {
+function resetValidationChecks() {
     hasNoName.value = false;
     hasNoRedirect.value = false;
 }
@@ -100,7 +102,7 @@ function closeModal() {
 /**
  * When the modal is closed
  */
-function onModalClosed () {
+function onModalClosed() {
     resetValidationChecks();
 }
 
