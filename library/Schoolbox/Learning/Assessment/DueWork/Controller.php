@@ -1583,7 +1583,7 @@ class Controller extends Assessment\Controller
         /* Process the latest drafts from each of these user ids in $assessment and
          * forcibly submit them.
          */
-        foreach ($postData['draft']['ids'] as $studentId) {
+        foreach ($postData['draft']['ids'] ?? [] as $studentId) {
             $userStub = $this->getUserMapper()->createModel()->setId($studentId);
 
             /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model|null $latestResponse */
@@ -1617,7 +1617,7 @@ class Controller extends Assessment\Controller
 
         /* Acknowledge receipts of submission for each of these user ids in $assessment.
          */
-        foreach ($postData['offline']['ids'] as $studentId) {
+        foreach ($postData['offline']['ids'] ?? [] as $studentId) {
             $userStub = $this->getUserMapper()->createModel()->setId($studentId);
 
             /* If the postData[offline][punctual] was selected,
