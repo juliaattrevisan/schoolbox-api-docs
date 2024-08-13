@@ -32,7 +32,11 @@
         /* This callback fires immediately after the bulky checkbox list is injected
          */
         onAfterBuildList: $.noop,
-
+        /* This is a passthrough method to bulky's usage of selectAllBasic. If you enabled the select-all
+         * checkbox you can access its callback via this method
+         */
+        onAfterSelectAllChange: $.noop,
+        onAfterCheckboxChange: $.noop,
         /* A function to determine whether an element should be submittable
          */
         checkboxConditionality: function (id) {
@@ -232,6 +236,8 @@
                 // of the indeterminate state.
                 $selectAllCheckbox.selectAllBasic({
                     selector: "[data-bulky-checkbox-" + opt.checkboxPrefix + "]:enabled",
+                    onAfterCheckboxChange: opt.onAfterCheckboxChange,
+                    onAfterSelectAllChange: opt.onAfterSelectAllChange,
                 });
 
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time

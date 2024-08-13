@@ -471,7 +471,7 @@
                      # one input, show the Save button. Otherwise there's nothing we can do; hide it
                      #}
                     function renderCallToAction() {
-                        if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input').length) {
+                        if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input:checked').length) {
                             $('#manage-submissions').find('[data-submit]').hide();
                         } else {
                             $('#manage-submissions').find('[data-submit]').show();
@@ -624,6 +624,16 @@
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+                        },
+                        onAfterSelectAllChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterCheckboxChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
                         }
                     });
 
@@ -648,6 +658,16 @@
                             return 'Save';
                         },
                         onAfterBuildList: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterSelectAllChange: function() {
+                            /* Maybe hide the call to action if there's nobody to choose
+                             */
+                            renderCallToAction();
+                        },
+                        onAfterCheckboxChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
