@@ -4,6 +4,11 @@
  * but has been moved into a module so we can use the image compression on upload extension.
  */
 
+// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
+// @ts-nocheck
+
 import { LT } from "@caspingus/lt/src/authoring/core";
 import * as imageUploader from "@caspingus/lt/src/authoring/extensions/ui/imageUploader/index";
 
