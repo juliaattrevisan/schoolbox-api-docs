@@ -188,8 +188,8 @@ window.Vue.onMounted(() => {
                 );
             });
 
-        // Remove disabled attribute from the input field so field can be selected to view all the text within
-        const inputElement = response.querySelector(".lrn_textinput input");
+        // Remove disabled attribute from the input field so field can be selected to view all the text within on smaller screens
+        const inputElement = response?.querySelector(".lrn_textinput input");
         if (inputElement) {
             inputElement.removeAttribute("disabled");
         }
