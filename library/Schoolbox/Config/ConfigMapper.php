@@ -104,6 +104,12 @@ class ConfigMapper extends Mapper
     public const COMMS_STATISTICS_ENABLED        = 'comms_statistics_enabled';
     public const COMMS_STICKY_ENABLED            = 'comms_sticky_enabled';
     public const NAME_EXTERNAL_TYPE              = 'external_type';
+    public const NAME_EXTERNAL_DB_HOST           = 'external_db_host';
+    public const NAME_EXTERNAL_DB_USER           = 'external_db_user';
+    public const NAME_EXTERNAL_DB_PASSWORD       = 'external_db_passwd';
+    public const NAME_EXTERNAL_DB_NAME           = 'external_db_db';
+    public const NAME_EXTERNAL_DB_ENCRYPTION     = 'external_db_encryption';
+
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
     public const NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
 
@@ -246,6 +252,13 @@ class ConfigMapper extends Mapper
 
     public const NAME_PAPERLY_API_HOSTNAME = 'paperly_iframe_api_host';
     public const NAME_PAPERLY_API_KEY = 'paperly_iframe_api_key';
+    public const NAME_PAPERLY_AGENT_IP_WHITELIST = 'paperly_agent_ip_whitelist';
+    public const NAME_PAPERLY_AGENT_SECRET = 'paperly_agent_secret';
+    public const NAME_PAPERLY_AGENT_EXTERNAL_DB_HOST_OVERRIDE = 'paperly_agent_external_db_host_override';
+    public const NAME_PAPERLY_AGENT_EXTERNAL_DB_USER_OVERRIDE = 'paperly_agent_external_db_user_override';
+    public const NAME_PAPERLY_AGENT_EXTERNAL_DB_PASSWORD_OVERRIDE = 'paperly_agent_external_db_password_override';
+    public const NAME_PAPERLY_AGENT_EXTERNAL_DB_NAME_OVERRIDE = 'paperly_agent_external_db_name_override';
+
 
     public const NAME_KAMI_ENABLED = 'kami_enabled';
 

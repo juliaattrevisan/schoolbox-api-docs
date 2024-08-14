@@ -30,5 +30,8 @@ class Paperly extends ModuleLoader
         $module->registerModule("/$namespace");
 
         $this->loadModule($di, DashboardModule::class, 'paperlyDashboard');
+
+        $agentModule = new \Schoolbox\Paperly\Agent\Module($di);
+        $agentModule->registerModule("/$namespace/agent");
     }
 }

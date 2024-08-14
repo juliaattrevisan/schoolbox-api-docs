@@ -1,0 +1,67 @@
+INSERT INTO config (
+    name,
+    value,
+    title,
+    description,
+    field_id,
+    options,
+    type_id,
+    editable,
+    hidden,
+    required,
+    module,
+    sequence
+) VALUES (
+    'paperly_agent_external_db_host_override',
+    NULL,
+    'Paperly Agent Database Host Override',
+    'If provided, the Paperly agent will connect to the database server at this host; otherwise, connect to the host defined in "Database Host".',
+    (SELECT id FROM lu_config_field WHERE `field` = 'input'),
+    '',
+    (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
+    'true',
+    'false',
+    'false',
+    'settings',
+    (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings')
+), (
+    'paperly_agent_external_db_user_override',
+    NULL,
+    'Paperly Agent Database User Override',
+    'If provided, the Paperly agent will authenticate to the database server with this username; otherwise, authenticate with the username defined in "Database User".',
+    (SELECT id FROM lu_config_field WHERE `field` = 'input'),
+    '',
+    (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
+    'true',
+    'false',
+    'false',
+    'settings',
+    (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings')
+), (
+    'paperly_agent_external_db_password_override',
+    NULL,
+    'Paperly Agent Database Password Override',
+    'If provided, the Paperly agent will authenticate to the database server with this password; otherwise, authenticate with the password defined in "Database Password".',
+    (SELECT id FROM lu_config_field WHERE `field` = 'password'),
+    '',
+    (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
+    'true',
+    'false',
+    'false',
+    'settings',
+    (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings')
+), (
+    'paperly_agent_external_db_name_override',
+    NULL,
+    'Paperly Agent Database Name Override',
+    'If provided, the Paperly agent will connect to this database; otherwise, connect to the database defined in "Database Name".',
+    (SELECT id FROM lu_config_field WHERE `field` = 'input'),
+    '',
+    (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
+    'true',
+    'false',
+    'false',
+    'settings',
+    (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings')
+);
+
