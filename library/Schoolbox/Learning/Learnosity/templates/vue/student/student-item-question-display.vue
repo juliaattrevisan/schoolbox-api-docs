@@ -187,12 +187,12 @@ window.Vue.onMounted(() => {
                     oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
                 );
             });
-    }
 
-    // Remove disabled from input
-    const inputElement = document.querySelector(".lrn_textinput input");
-    if (inputElement) {
-        inputElement.removeAttribute("disabled");
+        // Remove disabled attribute from the input field so field can be selected to view all the text within
+        const inputElement = response.querySelector(".lrn_textinput input");
+        if (inputElement) {
+            inputElement.removeAttribute("disabled");
+        }
     }
 });
 
