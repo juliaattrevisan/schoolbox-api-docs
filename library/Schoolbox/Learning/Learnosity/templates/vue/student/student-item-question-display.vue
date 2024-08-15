@@ -161,9 +161,7 @@ window.Vue.onMounted(() => {
     if (props.question.response) {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
-        if (response) {
-            responsesEl.value?.appendChild(response);
-        }
+        responsesEl.value?.appendChild(response);
         // hide any incorrect/correct styling if we're not showing feedback
         if (response && !props.hasMarkVisibility) {
             removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
@@ -174,7 +172,7 @@ window.Vue.onMounted(() => {
          * ensuring we only do this on the first mount by checking if the replacement
          * container is already present
          */
-        if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+        if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
 
@@ -189,12 +187,6 @@ window.Vue.onMounted(() => {
                     oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
                 );
             });
-
-        // Remove disabled attribute from the input field so field can be selected to view all the text within on smaller screens
-        const inputElement = response?.querySelector(".lrn_textinput input");
-        if (inputElement) {
-            inputElement.removeAttribute("disabled");
-        }
     }
 });
 
