@@ -161,7 +161,9 @@ window.Vue.onMounted(() => {
     if (props.question.response) {
         const selector = `[data-lrn-widget-container="${props.question.response.learnosityReference}"]`;
         const response = props.container.querySelector(selector) as HTMLDivElement;
-        responsesEl.value?.appendChild(response);
+        if (response) {
+            responsesEl.value?.appendChild(response);
+        }
         // hide any incorrect/correct styling if we're not showing feedback
         if (response && !props.hasMarkVisibility) {
             removeClasses(response, ["lrn_incorrect", "lrn_correct"]);
@@ -172,7 +174,7 @@ window.Vue.onMounted(() => {
          * ensuring we only do this on the first mount by checking if the replacement
          * container is already present
          */
-        if (!response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+        if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
 
