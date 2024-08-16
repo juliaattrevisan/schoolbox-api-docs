@@ -341,7 +341,7 @@
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                         {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
                         <div data-template>
-                            <input type="checkbox" data-selected checked/>
+                            <input type="checkbox" data-selected />
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
@@ -374,7 +374,7 @@
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                         {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
                         <div data-template>
-                            <input type="checkbox" data-selected checked/>
+                            <input type="checkbox" data-selected />
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
@@ -661,6 +661,7 @@
                         userSelector: '[data-mass-submit-draft]',
                         userList: $userList,
                         checkboxPrefix: 'mass-draft',
+                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-draft-punctual-container');
 
@@ -704,6 +705,7 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         checkboxPrefix: 'mass-offline',
+                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-offline-punctual-container');
 

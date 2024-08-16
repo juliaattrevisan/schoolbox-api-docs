@@ -37,6 +37,10 @@
          */
         onAfterSelectAllChange: $.noop,
         onAfterCheckboxChange: $.noop,
+        /* A passthrough method to bulky's usage of selectAllBasic.
+         * Default is true to emulate original behaviour before worfklows merged
+         */
+        defaultState: true,
         /* A function to determine whether an element should be submittable
          */
         checkboxConditionality: function (id) {
@@ -245,7 +249,7 @@
                 // ordinary checkboxes will always be checked, and so the select-all checkbox should also be checked.
                 // We need to ensure the 'indeterminate' class is removed as well, because although the ordinary
                 // checkboxes are rebuilt every time the modal opens, the select-all checkbox is not.
-                $selectAllCheckbox.prop("checked", true).removeClass("indeterminate");
+                $selectAllCheckbox.prop("checked", opt.defaultState).removeClass("indeterminate");
 
                 $selectAllCheckbox.click(setupActionButton);
             }
