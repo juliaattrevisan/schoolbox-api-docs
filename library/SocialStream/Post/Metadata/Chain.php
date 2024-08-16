@@ -45,6 +45,8 @@ class Chain
 
             // Convert UTF-8 characters in the $data string to HTML entities.
             // This is done to prevent \DomDocument below from messing up character encoding.
+            // Converting UTF-8 to HTML entities prior to using DomDocument seems cleaner to me than trying to
+            // get DomDocument to correctly recognise the document's encoding by inserting meta tags into the HTML.
             // References:
             //  * https://stackoverflow.com/questions/11309194/php-domdocument-failing-to-handle-utf-8-characters#answer-11310258
             //  * https://stackoverflow.com/questions/8218230/php-domdocument-loadhtml-not-encoding-utf-8-correctly#answer-8218649
