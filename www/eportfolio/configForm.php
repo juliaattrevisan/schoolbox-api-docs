@@ -70,7 +70,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             // Check if the component has been deleted, so the client can display a warning
             // otherwise, the client will just re-render the component
             if ($_POST['movedComponentId']) {
-                $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $_REQUEST['page_id']);
+                $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $eportfolioHandler->getPageInstance()->getPageId());
                 if (null === $instance) {
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
@@ -115,7 +115,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             // Retrieve the instance definition controller
             $factory = new Component_Eportfolio_Factory(new User(), $page);
 
-            $instance = $componentInstanceMapper->findByInstanceId($instanceID, $_REQUEST['page_id']);
+            $instance = $componentInstanceMapper->findByInstanceId($instanceID, $eportfolioHandler->getPageInstance()->getPageId());
             if (null === $instance) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
@@ -218,7 +218,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             $config = $_GET;
 
             /** @var Component_Instance $instance */
-            $instance                        = $componentInstanceMapper->findByInstanceId($config['component'], $_REQUEST['page_id']);
+            $instance                        = $componentInstanceMapper->findByInstanceId($config['component'], $eportfolioHandler->getPageInstance()->getPageId());
             if (null === $instance) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
