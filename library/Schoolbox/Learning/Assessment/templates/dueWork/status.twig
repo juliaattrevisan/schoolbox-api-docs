@@ -478,6 +478,21 @@
                         }
                     }
 
+                    {# If you appear in both lists, ensure only one of your checkboxes
+                     # can be active at a given time
+                     #}
+                    function mutex(thisName, otherName) {
+                        let modal = $('#manage-submissions');
+
+                        modal.find('[' + thisName + ']').on('change', function(event) {
+                            if ($(this).is(':checked')) {
+                                let id = $(this).attr(thisName);
+
+                                modal.find('[' + otherName + '="' + id + '"]').prop('checked', false);
+                            }
+                        });
+                    }
+
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
                         statusFailed: '{{ statusFailed }}',
@@ -624,6 +639,10 @@
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+
+                            /* Mutex checkboxes with other list
+                             */
+                            mutex('data-mass-draft', 'data-mass-offline');
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
@@ -661,6 +680,10 @@
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+
+                            /* Mutex checkboxes with other list
+                             */
+                            mutex('data-mass-offline', 'data-mass-draft');
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
