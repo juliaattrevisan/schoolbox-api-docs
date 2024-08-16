@@ -5,6 +5,7 @@
 // it can use Twig to generate component content.
 
 use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
@@ -66,7 +67,7 @@ if (($_POST['type'] ?? '') == 'components') {
     // Was any one component requested?
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId'] ?? false) {
-        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $_POST['cid'] ?? null);
         if (is_object($instance)) {
             $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         } else {
@@ -112,7 +113,10 @@ if (($_POST['type'] ?? '') == 'components') {
     $factory        = $factoryFactory->build($_POST['context'], $page->getDi()->get('session')->get('user'), $page, true);
 
     // $component instanceof Component_ControllerAbstract
-    $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+    $instance = $componentInstanceMapper->findByInstanceId($instanceID, $_POST['cid'] ?? null);
+    if (null === $instance) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+    }
     $component = $factory->buildComponent($instance);
 
     if (!($component instanceof Component_ControllerAbstract)) {
@@ -126,7 +130,7 @@ if (($_POST['type'] ?? '') == 'components') {
     $config = $_GET;
 
     /** @var Component_Instance|null $instance */
-    $instance = $componentInstanceMapper->findByInstanceId($config['component']);
+    $instance = $componentInstanceMapper->findByInstanceId($config['component'], $_POST['cid'] ?? null);
 
     if (is_object($instance)) {
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -175,7 +179,10 @@ if (($_POST['type'] ?? '') == 'components') {
         }
         if (SitePage::detectAjax()) {
             // Just refetch the instance
-            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId());
+            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId(), $_POST['cid'] ?? null);
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
             $factoryFactory   = new Component_FactoryFactory();
             $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
             $renderer         = new Component_Renderer();
