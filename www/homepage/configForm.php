@@ -133,9 +133,9 @@ if (is_numeric($_REQUEST['cid'])) {
             $homepage->updateGrid($_POST['width']);
         }
         $homepage->saveDisplayProperties($_POST['colors']);
-    } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
+    } elseif ($cid && $_POST['type'] == 'config' && $_POST['component']) {
         // GET config options from homepage
-        $config = $_GET;
+        $config = $_POST;
 
         /** @var Component_Instance $instance */
         $instance = $componentInstanceMapper->findByInstanceId($config['component'], $config['cid']);
@@ -216,7 +216,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 $renderer->renderHomepageComponent($page, $folder, $controller);
                 exit;
             } else {
-                SitePage::localRedir("/homepage/" . $_GET['cid']);
+                SitePage::localRedir("/homepage/" . $_POST['cid']);
             }
         }
         $page->outputJson('error: component does not exist', false, 409);
