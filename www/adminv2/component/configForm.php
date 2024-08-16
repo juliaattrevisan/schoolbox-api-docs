@@ -30,6 +30,8 @@ if (!($user->isSuperuser())) {
     error(19);
 }
 
+$cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
+
 $componentInstanceMapper       = Component_InstanceMapper::getInstance();
 $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
@@ -67,7 +69,7 @@ if (($_POST['type'] ?? '') == 'components') {
     // Was any one component requested?
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId'] ?? false) {
-        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $_POST['cid'] ?? null);
+        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $cid);
         if (is_object($instance)) {
             $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         } else {
@@ -87,7 +89,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $componentInstanceMapper->delete($instance);
     } catch (Schoolbox\Mapper\Exception $e) {
     }
-} elseif (is_numeric($_POST['cid'] ?? null) && (is_numeric($_POST['add'] ?? null) || is_numeric($_POST['reload'] ?? null))) {
+} elseif ($cid && (is_numeric($_POST['add'] ?? null) || is_numeric($_POST['reload'] ?? null))) {
     // POST new component to page and output render of component
     if (is_numeric($_POST['add'])) {
         $componentDefinitionId = (int)$_POST['add'];
@@ -95,7 +97,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $newComp = new Component_Instance();
         $newComp
             ->setDefinitionId($componentDefinitionId)
-            ->setIdentifier($_POST['cid'])
+            ->setIdentifier($cid)
             ->setModule($_POST['context'])
             ->setSequence(0)
             ->setPosition('top');
@@ -104,7 +106,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $instanceID = $ids[0];
 
         $componentConfigInstanceMapper->injectDefaultConfigCollection($instanceID, $componentDefinitionId);
-        $componentInstanceMapper->cascadeSequence($_POST['cid']);
+        $componentInstanceMapper->cascadeSequence($cid);
     } else {
         $instanceID = $_POST['reload'];
     }
@@ -113,7 +115,7 @@ if (($_POST['type'] ?? '') == 'components') {
     $factory        = $factoryFactory->build($_POST['context'], $page->getDi()->get('session')->get('user'), $page, true);
 
     // $component instanceof Component_ControllerAbstract
-    $instance = $componentInstanceMapper->findByInstanceId($instanceID, $_POST['cid'] ?? null);
+    $instance = $componentInstanceMapper->findByInstanceId($instanceID, $cid);
     if (null === $instance) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
     }
@@ -125,12 +127,12 @@ if (($_POST['type'] ?? '') == 'components') {
     $renderer       = new Component_Renderer();
     $renderer->renderAdminComponent($page, $component);
     $page->outputPage(true);
-} elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
-    // GET config options from homepage
-    $config = $_GET;
+} elseif ($cid && $_POST['type'] == 'config' && $_POST['component']) {
+    // POST config options from homepage
+    $config = $_POST;
 
     /** @var Component_Instance|null $instance */
-    $instance = $componentInstanceMapper->findByInstanceId($config['component'], $_POST['cid'] ?? null);
+    $instance = $componentInstanceMapper->findByInstanceId($config['component'], $cid);
 
     if (is_object($instance)) {
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -179,7 +181,7 @@ if (($_POST['type'] ?? '') == 'components') {
         }
         if (SitePage::detectAjax()) {
             // Just refetch the instance
-            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId(), $_POST['cid'] ?? null);
+            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId(), $cid);
             if (null === $instance) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
@@ -193,5 +195,4 @@ if (($_POST['type'] ?? '') == 'components') {
     } else {
         $page->outputJson('error: component does not exist', false, 409);
     }
-    //    SitePage::localRedir("/homepage/" . $_GET['cid']);
 }
