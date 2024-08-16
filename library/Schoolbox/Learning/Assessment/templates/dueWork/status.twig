@@ -501,27 +501,36 @@
                      #}
                     function mutexSelectAll() {
                         let modal = $('#manage-submissions');
+                        let cssIndeterminate = 'indeterminate';
 
-                        let numChecked = modal.find('[data-mass-draft]:checked').length;
-                        let numElems = modal.find('[data-mass-draft]').length;
+                        let lists = [
+                            {
+                                'numElems': modal.find('[data-mass-draft]').length,
+                                'numChecked': modal.find('[data-mass-draft]:checked').length,
+                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-draft')
+                            },
+                            {
+                                'numElems': modal.find('[data-mass-offline]').length,
+                                'numChecked': modal.find('[data-mass-offline]:checked').length,
+                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-offline')
+                            },
+                        ];
 
-                        if (0 === numChecked) {
-                            modal.find('#data-bulky-select-all-checkbox-mass-draft').removeClass('indeterminate').prop('checked', false);
-                        } else if (numChecked === numElems) {
-                            modal.find('#data-bulky-select-all-checkbox-mass-draft').removeClass('indeterminate').prop('checked', true);
-                        } else {
-                            modal.find('#data-bulky-select-all-checkbox-mass-draft').addClass('indeterminate');
-                        }
-                         numChecked = modal.find('[data-mass-offline]:checked').length;
-                         numElems = modal.find('[data-mass-offline]').length;
-
-                        if (0 === modal.find('[data-mass-offline]:checked').length) {
-                            modal.find('#data-bulky-select-all-checkbox-mass-offline').removeClass('indeterminate').prop('checked', false);
-                        } else if (numChecked === numElems) {
-                            modal.find('#data-bulky-select-all-checkbox-mass-offline').removeClass('indeterminate').prop('checked', true);
-                        } else {
-                            modal.find('#data-bulky-select-all-checkbox-mass-offline').addClass('indeterminate');
-                        }
+                        {# Despite what's coded in select-all.basic, for whatever jquery-based reason,
+                         # programmatically changing a checkbox state doesn't recalculate the select-all's
+                         # state, especially when one list causes the last element in another list to be
+                         # unticked. The select-all for this latter list will no longer represent the correct
+                         # state it's in. That forces me to micromanage (and maybe double-handle) this usage.
+                         #}
+                        $.each(lists, function(index, element) {
+                            if (0 === element.numChecked) {
+                                element.selectAll.removeClass(cssIndeterminate).prop('checked', false);
+                            } else if (element.numChecked === element.numElems) {
+                                element.selectAll.removeClass(cssIndeterminate).prop('checked', true);
+                            } else {
+                                element.selectAll.addClass(cssIndeterminate);
+                            }
+                        });
                     }
 
                     $.fn.dynamicFeedback({
