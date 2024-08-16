@@ -266,8 +266,8 @@ class Component_InstanceMapper extends BaseMapper
 
     /**
      * @param int $id
-     * @param ?int $parent
-     * @return Component_Instance|null
+     * @param ?int $parent // ensure the instance you are searching for actually exists on this (page / template)
+     * @return Component_Instance|null // null if not found
      */
     public function findByInstanceId($id, $parent = null)
     {
