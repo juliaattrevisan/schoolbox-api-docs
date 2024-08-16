@@ -1001,7 +1001,7 @@ class Controller extends Base\Base
                 $componentInstance = null;
                 // Was a componentId supplied?
                 if ($componentId) {
-                    $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
+                    $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId, $classFolderId);
                 } else {
                     $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId);
                 }

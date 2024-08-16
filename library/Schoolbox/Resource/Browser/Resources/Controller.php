@@ -132,7 +132,7 @@ class Controller extends AbstractController
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolder->getId());
-        $homepageId   = $componentID ? $filesBuilder->getHomepage($componentID) : null;
+        $homepageId   = $componentID ? $filesBuilder->getHomepage($componentID, $sourceFolder->getId()) : null;
         // local component or not from component
         if (!$homepageId || $sourceFolder->getId() === $homepageId) {
             $homepage   = $sourceFolder;
@@ -155,7 +155,7 @@ class Controller extends AbstractController
 
         if ($componentID) {
             //lets get the config for the component
-            $componentConfig = $filesBuilder->getComponentConf($componentID);
+            $componentConfig = $filesBuilder->getComponentConf($componentID, $sourceFolder->getId());
 
             //build the filter object
             $filter        = \Component_Config_Filter::getSelectedFilters(

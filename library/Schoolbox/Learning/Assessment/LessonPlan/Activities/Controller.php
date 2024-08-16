@@ -65,7 +65,7 @@ class Controller extends Base
         $dateEnd = null;
         $readOnly = $this->accessMapper->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE;
         // if there is a component specified grab the active date range
-        $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
+        $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId, $folder->getId());
         if ($componentInstance) {
             $instanceConfig = $componentInstance->getConfigArray();
 

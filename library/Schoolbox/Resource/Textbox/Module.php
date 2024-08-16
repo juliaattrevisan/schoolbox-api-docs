@@ -54,7 +54,7 @@ class Module extends BaseModule
 
             /** @var Component_InstanceMapper $componentMapper */
             $componentMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
-            $component       = $componentMapper->findByInstanceId($params['componentId']);
+            $component       = $componentMapper->findByInstanceId($params['componentId'], $result['folder']->getId());
             if (!$component) {
                 throw new NotFound('Unable to find component');
             }

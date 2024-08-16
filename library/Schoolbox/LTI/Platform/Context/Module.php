@@ -69,7 +69,7 @@ class Module extends BaseModule
                     $page = $this->injector->get('sitePage');
 
                     $factory           = new Component_Homepage_Factory(new User(), $page);
-                    $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId']);
+                    $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId'], $params['folderId']);
                     $component         = $factory->buildComponent($componentInstance);
                     $toolId            = $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER);
 
