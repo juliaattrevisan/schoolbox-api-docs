@@ -65,8 +65,6 @@ class Service extends AbstractService
                 $matches
             );
 
-            $this->getLog()->warning(json_encode($matches));
-
             $parCode = $matches[2] ?? null;
             $sfaNum  = $matches[3] ?? '';
 
