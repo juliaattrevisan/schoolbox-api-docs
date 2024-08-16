@@ -128,7 +128,7 @@
                         <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post" data-blog-comment-form>
                             <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
                             <input type="hidden" name="component" value="1">
-                            <textarea name="commentBody" rows="2" cols="100" placeholder="Add a comment"></textarea>
+                            <textarea name="commentBody" rows="2" cols="100" maxlength="{{ blogCommentMaxLength }}" placeholder="Add a comment"></textarea>
                             <input type="submit" name="comment" value="Post comment"/>
                         </form>
                     </div>
