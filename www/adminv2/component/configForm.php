@@ -21,13 +21,13 @@ $page->initSession();
 $user = $_SESSION['user'];
 
 if (!($user->isSuperuser())) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (!($user->isSuperuser())) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
