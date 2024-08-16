@@ -266,23 +266,33 @@ class Component_InstanceMapper extends BaseMapper
 
     /**
      * @param int $id
+     * @param ?int $parent
      * @return Component_Instance|null
      */
-    public function findByInstanceId($id)
+    public function findByInstanceId($id, $parent = null)
     {
         $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
+        $params = [
+            ':id' => $id
+        ];
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
-			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
+			";
+        if (null !== $parent) {
+            $sql .= "
+            AND {$componentInstanceTable}.`identifier` = :parent
+            ";
+            $params[':parent'] = $parent;
+        }
+        $sql .= "
+            ORDER BY    {$componentInstanceTable}.`identifier` ASC,
 			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
 		";
 
-        return $this->findByFields($sql, [
-            ':id' => $id
-        ])->first();
+        return $this->findByFields($sql, $params)->first();
     }
 
     /**
