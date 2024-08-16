@@ -15,7 +15,6 @@ namespace SocialStream\Post\Metadata;
  */
 class Chain
 {
-
     /**
      * Resultant thumbnail url
      *
