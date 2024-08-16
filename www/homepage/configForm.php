@@ -27,6 +27,14 @@ if (is_numeric($_REQUEST['cid'])) {
 
     $cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
 
+    try {
+        $folder                          = $folderMapper->findById($cid);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $page->outputJson('folder was deleted or does not exist', false, 400);
+        return;
+    }
+
+
     // AJAX request for drag and drop of components
     if ($cid && ($_POST['type'] ?? '') == 'components') {
         $columns = array(
@@ -61,7 +69,7 @@ if (is_numeric($_REQUEST['cid'])) {
         // Check if the component has been deleted, so the client can display a warning
         // otherwise, the client will just re-render the component
         if ($_POST['movedComponentId']) {
-            $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $folder->getId());
             if (is_object($instance)) {
                 $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
             } else {
@@ -105,7 +113,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $factory = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
-        $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+        $instance = $componentInstanceMapper->findByInstanceId($instanceID, $folder->getId());
         /** @var Component_Homepage_ControllerAbstract $component */
         $component = $factory->buildComponent($instance);
 
@@ -121,7 +129,6 @@ if (is_numeric($_REQUEST['cid'])) {
             if (!($component instanceof Component_ControllerAbstract)) {
                 exit("<div class='alert alert-box'>Couldn't create component.</div>");
             }
-            $folder   = $folderMapper->findById($cid);
             $renderer = new Component_Renderer();
             $renderer->renderHomepageComponent($page, $folder, $component);
         }
@@ -138,16 +145,10 @@ if (is_numeric($_REQUEST['cid'])) {
         $config = $_POST;
 
         /** @var Component_Instance $instance */
-        $instance = $componentInstanceMapper->findByInstanceId($config['component'], $config['cid']);
+        $instance = $componentInstanceMapper->findByInstanceId($config['component'], $folder->getId());
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-            try {
-                $folder                          = $folderMapper->findById($config['cid']);
-            } catch (Schoolbox\Mapper\Exception $e) {
-                $page->outputJson('folder was deleted or does not exist', false, 400);
-                return;
-            }
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
                 'component_definition_id',
@@ -209,7 +210,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
-                $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
+                $instance   = $componentInstanceMapper->findByInstanceId($instance->getId(), $folder->getId());
 
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
