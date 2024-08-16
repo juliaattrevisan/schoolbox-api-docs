@@ -80,7 +80,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $componentInstanceMapper->delete($instance);
         } catch (Schoolbox\Mapper\Exception $e) {
         }
-    } elseif (is_numeric($cid) && (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
+    } elseif (is_numeric($cid) && (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload'] ?? null))) { // POST new component to page and output render of component
         if (is_numeric($_POST['add'] ?? false)) {
             $newComp = new Component_Instance();
             $newComp
@@ -125,7 +125,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $renderer = new Component_Renderer();
             $renderer->renderHomepageComponent($page, $folder, $component);
         }
-    } elseif ($cid && is_array($_POST['colors'])) { // AJAX Save homepage colours
+    } elseif ($cid && is_array($_POST['colors'] ?? null)) { // AJAX Save homepage colours
         $homepage = new Homepage($cid);
         // Also try to save width
         if (!empty($_POST['width'])) {
