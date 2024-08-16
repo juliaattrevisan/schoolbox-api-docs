@@ -53,7 +53,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 foreach ($components[$position] as $sequence => $componentID) {
                     if ($componentID) {
                         try {
-                            $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                            $inst = $componentInstanceMapper->findById($componentID);
                             $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
                             $inst->setPosition($position);
                             $instanceCollection->add($inst);
@@ -63,7 +63,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 }
 
                 if ($instanceCollection->count()) {
-                    Component_InstanceMapper::getInstance()->save($instanceCollection);
+                    $componentInstanceMapper->save($instanceCollection);
                 }
             }
 
@@ -165,7 +165,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 foreach ($componentInstance->getConfig() as $currentConfig) {
                     if (in_array($currentConfig->getKey(), $configurationToCopy)) {
                         try {
-                            $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                            $configInstance = $componentConfigInstanceMapper->findOneByColumnList([
                                 'component_config_definition_id' => $currentConfig->getId(),
                                 'component_instance_id'          => $_POST['from'],
                             ]);
@@ -178,7 +178,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                             $newConfigInstance->setInstanceId($componentInstance->getId());
                             $newConfigInstance->setValue($value);
 
-                            Component_ConfigMapper::getInstance()->save($newConfigInstance);
+                            $componentConfigInstanceMapper->save($newConfigInstance);
 
                             // Update the configuration item on the component in memory so that it renders properly later
 
@@ -334,7 +334,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
 
         // Apply permissions to the newly-created page
 
-        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
+        EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
 
         // Redirect to newly created page
 
