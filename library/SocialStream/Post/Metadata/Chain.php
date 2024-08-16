@@ -43,6 +43,18 @@ class Chain
          */
         if (($curl != null) && strlen($curl->getResult())) {
             $data = $curl->getResult();
+
+            // Convert UTF-8 characters in the $data string to HTML entities.
+            // This is done to prevent \DomDocument below from messing up character encoding.
+            // References:
+            //  * https://stackoverflow.com/questions/11309194/php-domdocument-failing-to-handle-utf-8-characters#answer-11310258
+            //  * https://stackoverflow.com/questions/8218230/php-domdocument-loadhtml-not-encoding-utf-8-correctly#answer-8218649
+            //  * https://stackoverflow.com/questions/35854535/better-explanation-of-convmap-in-mb-encode-numericentity
+            // Simpler but deprecated version of the below line:
+            //  * $data = mb_convert_encoding($data, 'HTML-ENTITIES', 'UTF-8');
+            //  * The hex range used below ([0x80, 0x10FFFF]) defines UTF-8 characters that are not ASCII characters.
+            //  * https://en.wikipedia.org/wiki/UTF-8
+            $data = mb_encode_numericentity($data, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
         } else {
             /* Use a default xml-parser friendly version of empty string
              * in case someone links to a nonexistent file or something
