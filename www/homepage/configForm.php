@@ -19,7 +19,7 @@ $folderMapper = FolderMapper::getInstance();
 
 if (is_numeric($_REQUEST['cid'])) {
     if ($groupHandler->getPermission($_REQUEST['cid']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
@@ -222,5 +222,5 @@ if (is_numeric($_REQUEST['cid'])) {
         $page->outputJson('error: component does not exist', false, 409);
     }
 } else { // no cid provided
-    error(2);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
