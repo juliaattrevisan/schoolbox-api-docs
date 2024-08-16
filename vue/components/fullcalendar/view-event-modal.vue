@@ -939,102 +939,98 @@ export default {
             <template v-else></template>
 
             <template v-if="hasComponentActions()">
-                <div class="component-action">
-                    <section>
-                        <template
-                            v-if="
-                                this.canRsvp(
-                                    eventExtendedProps.attendance.payload.level,
-                                    eventExtendedProps.attendance.payload.attendees.guests,
-                                    eventExtendedProps.attendance.payload.currentUser.user.id,
-                                    eventExtendedProps.attendance.payload.currentUser.status,
-                                    eventExtendedProps.attendance.payload.attendees.max,
-                                    eventExtendedProps.attendance.payload.attendees.available,
-                                )
-                            "
-                        >
-                            <div :class="'rsvp'">
-                                <span :class="'attend-label'">Attending?</span>
-                                <span>
-                                    <a
-                                        :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
-                                        @click.prevent="rsvpAccept"
-                                        :class="{
-                                            button: true,
-                                            accepted: this.isAccepted(
-                                                eventExtendedProps.attendance.payload.currentUser.status,
-                                            ),
-                                            disabled: this.isTransacting,
-                                        }"
-                                        data-rsvp="accept"
-                                        >Yes</a
-                                    >
-                                </span>
-                                <span>
-                                    <a
-                                        :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
-                                        @click.prevent="rsvpDecline"
-                                        :class="{
-                                            button: true,
-                                            disabled: this.isTransacting,
-                                            declined: this.isDeclined(
-                                                eventExtendedProps.attendance.payload.currentUser.status,
-                                            ),
-                                        }"
-                                        data-rsvp="decline"
-                                        >No</a
-                                    >
-                                </span>
-                            </div>
-                        </template>
-                        <template v-else></template>
-
-                        <span class="spacer"></span>
-
-                        <div>
-                            <!-- Various buttons -->
-                            <span v-if="eventExtendedProps.links.path">
-                                <a class="button" :href="eventExtendedProps.links.path">View details</a>
-                            </span>
-                            <span v-if="eventExtendedProps.folder.id">
-                                <a class="button" :href="'/homepage/' + String(eventExtendedProps.folder.id)"
-                                    >Go to homepage</a
+                <div class="component-action l-grid l-grid--12">
+                    <template
+                        v-if="
+                            this.canRsvp(
+                                eventExtendedProps.attendance.payload.level,
+                                eventExtendedProps.attendance.payload.attendees.guests,
+                                eventExtendedProps.attendance.payload.currentUser.user.id,
+                                eventExtendedProps.attendance.payload.currentUser.status,
+                                eventExtendedProps.attendance.payload.attendees.max,
+                                eventExtendedProps.attendance.payload.attendees.available,
+                            )
+                        "
+                    >
+                        <div :class="['rsvp', 'large-6', 'medium-12', 'small-12']">
+                            <span :class="'attend-label'">Attending?</span>
+                            <span>
+                                <a
+                                    :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
+                                    @click.prevent="rsvpAccept"
+                                    :class="{
+                                        button: true,
+                                        accepted: this.isAccepted(
+                                            eventExtendedProps.attendance.payload.currentUser.status,
+                                        ),
+                                        disabled: this.isTransacting,
+                                    }"
+                                    data-rsvp="accept"
+                                    >Yes</a
                                 >
                             </span>
-                            <span v-if="eventExtendedProps.links.view">
-                                <a class="button" :href="eventExtendedProps.links.view">View More Details</a>
-                            </span>
-                            <span v-if="eventExtendedProps.classAttendance.url">
+                            <span>
                                 <a
-                                    class="button"
-                                    :href="eventExtendedProps.classAttendance.url"
-                                    :target="eventExtendedProps.classAttendance.target"
-                                    >Mark Attendance</a
-                                >
-                            </span>
-                            <span v-if="eventExtendedProps.links.modify">
-                                <a class="button" :href="eventExtendedProps.links.modify">Modify</a>
-                            </span>
-                            <span v-if="eventExtendedProps.links.delete">
-                                <a
-                                    class="button"
-                                    :href="eventExtendedProps.links.delete"
-                                    @click.prevent="$refs.eventDeleteModal.open"
-                                    >Delete</a
-                                >
-                            </span>
-                            <!-- Booking buttons: handle random events -->
-                            <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
-                                <a
-                                    class="button"
-                                    :data-booking-action="String(action.action)"
-                                    @click="clickBookingButton($event)"
-                                    :href="action.href || '#'"
-                                    >{{ action.label }}</a
+                                    :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
+                                    @click.prevent="rsvpDecline"
+                                    :class="{
+                                        button: true,
+                                        disabled: this.isTransacting,
+                                        declined: this.isDeclined(
+                                            eventExtendedProps.attendance.payload.currentUser.status,
+                                        ),
+                                    }"
+                                    data-rsvp="decline"
+                                    >No</a
                                 >
                             </span>
                         </div>
-                    </section>
+                    </template>
+                    <template v-else></template>
+
+                    <div class="large-6 medium-12 small-12 text-right">
+                        <!-- Various buttons -->
+                        <span v-if="eventExtendedProps.links.path">
+                            <a class="button" :href="eventExtendedProps.links.path">View details</a>
+                        </span>
+                        <span v-if="eventExtendedProps.folder.id">
+                            <a class="button" :href="'/homepage/' + String(eventExtendedProps.folder.id)"
+                                >Go to homepage</a
+                            >
+                        </span>
+                        <span v-if="eventExtendedProps.links.view">
+                            <a class="button" :href="eventExtendedProps.links.view">View More Details</a>
+                        </span>
+                        <span v-if="eventExtendedProps.classAttendance.url">
+                            <a
+                                class="button"
+                                :href="eventExtendedProps.classAttendance.url"
+                                :target="eventExtendedProps.classAttendance.target"
+                                >Mark Attendance</a
+                            >
+                        </span>
+                        <span v-if="eventExtendedProps.links.modify">
+                            <a class="button" :href="eventExtendedProps.links.modify">Modify</a>
+                        </span>
+                        <span v-if="eventExtendedProps.links.delete">
+                            <a
+                                class="button"
+                                :href="eventExtendedProps.links.delete"
+                                @click.prevent="$refs.eventDeleteModal.open"
+                                >Delete</a
+                            >
+                        </span>
+                        <!-- Booking buttons: handle random events -->
+                        <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
+                            <a
+                                class="button"
+                                :data-booking-action="String(action.action)"
+                                @click="clickBookingButton($event)"
+                                :href="action.href || '#'"
+                                >{{ action.label }}</a
+                            >
+                        </span>
+                    </div>
                 </div>
             </template>
             <!--
