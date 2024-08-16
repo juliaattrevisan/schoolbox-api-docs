@@ -17,10 +17,10 @@ use InvalidArgumentException;
 
 class Notification
 {
-
     /** @var string */
     protected $hash;
 
+    /** @var string */
     protected $baseParamHash;
 
     /** @var Instance[] */
