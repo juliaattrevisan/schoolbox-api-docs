@@ -286,7 +286,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 // Just rebuild and refetch the component
                 $factory = new Component_Eportfolio_Factory(new User(), $page);
 
-                $componentInstance = $componentInstanceMapper->findByInstanceId($instance->getId(), $_REQUEST['page_id']);
+                $componentInstance = $componentInstanceMapper->findByInstanceId($instance->getId(), $eportfolioHandler->getPageInstance()->getPageId());
                 if (null === $componentInstance) {
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
