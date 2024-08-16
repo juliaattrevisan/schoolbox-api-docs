@@ -3,6 +3,7 @@
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
@@ -137,7 +138,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $config = $_GET;
 
         /** @var Component_Instance $instance */
-        $instance = $componentInstanceMapper->findByInstanceId($config['component']);
+        $instance = $componentInstanceMapper->findByInstanceId($config['component'], $config['cid']);
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
