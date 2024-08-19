@@ -22,33 +22,9 @@ use Schoolbox\User;
 class EventUsers
 {
     /**
-     * @var Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusMapper;
-
-
-    /**
-     * @var Roletype\Mapper
-     */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper;
-
-
-    /**
      * @var \Schoolbox\Resource\Folder\Mapper
      */
     private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Code\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
 
 
     /**
@@ -57,15 +33,11 @@ class EventUsers
      * @param Roletype\Mapper                          $roletypeMapper
      */
     public function __construct(
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
     ) {
-        $this->eventMapper = $eventMapper;
-        $this->campusMapper = $campusMapper;
-        $this->roletypeMapper = $roletypeMapper;
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache();
-        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance()->disableCache();
     }
 
 
@@ -132,11 +104,6 @@ class EventUsers
 
         $roleWhere = implode(' AND ', $rolePb->getWhere());
         $roleParams = $rolePb->getParams();
-
-        /* I can't join to a folder via a code (code doesn't have an identifier property)
-         */
-        $folderColumnString = $this->folderMapper->getColumnString('f');
-        $folderCodeColumnString = $this->folderCodeMapper->getColumnString('fc');
 
         /* Perhaps controversial:
          * In order for you to be involved in an event, you have to be in
@@ -232,7 +199,9 @@ class EventUsers
             return '' !== $val;
         });
 
-        $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAllByCode(array_keys($tempFolderCodes));
+        /* Fetch folder instances by their codes
+         */
+        $folders = $this->folderMapper->findAllByCode(array_keys($tempFolderCodes));
 
         /* Index each folder by their code(s)
          */
@@ -244,6 +213,8 @@ class EventUsers
             }
         }
 
+        /* Assign folder instances quickly via lookup
+         */
         foreach ($stack as $event) {
             $code = trim((string)$event->getCode());
 
