@@ -213,9 +213,9 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             // Softdelete this page and redirect back to profile
             $eportfolioHandler->softdelete();
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/profile");
-        } elseif (isset($_GET['type']) && ($_GET['type'] == 'config') && $_GET['component']) {
+        } elseif (isset($_POST['type']) && ($_POST['type'] == 'config') && $_POST['component']) {
             // Update config options from homepage
-            $config = $_GET;
+            $config = $_POST;
 
             /** @var Component_Instance $instance */
             $instance                        = $componentInstanceMapper->findByInstanceId($config['component'], $eportfolioHandler->getPageInstance()->getPageId());
