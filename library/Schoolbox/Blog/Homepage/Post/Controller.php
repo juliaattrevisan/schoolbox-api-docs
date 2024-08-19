@@ -287,7 +287,8 @@ class Controller extends Base
         }
 
         if (strlen($trimmedComment) > ColumnBase::TEXT_MAX_LENGTH) {
-            $trimmedComment = substr($trimmedComment, 0, ColumnBase::TEXT_MAX_LENGTH);
+            // Use mb_strcut() instead of substr() to avoid cutting the string in the middle of a two-byte character.
+            $trimmedComment = mb_strcut($trimmedComment, 0, ColumnBase::TEXT_MAX_LENGTH);
         }
 
         /** @var BlogCommentModel $comment */
