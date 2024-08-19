@@ -99,6 +99,10 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             }
         }
 
+        if (!$this->outputList->count()) {
+            return false; // No videos found on configured source page.  Behave as if no source set.
+        }
+
         if ($this->getConfig('video')) {
             try {
                 $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
