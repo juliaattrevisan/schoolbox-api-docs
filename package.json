@@ -75,7 +75,7 @@
     "jquery-ui": "~1.14.0",
     "jquery-validation": "~1.21.0",
     "lightgallery": "~2.7.2",
-    "locutus": "~2.0.16",
+    "locutus": "~2.0.32",
     "lodash": "~4.17.21",
     "mediaelement": "~4.2.17",
     "pinia": "~2.1.7",
