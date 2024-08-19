@@ -152,7 +152,6 @@
                         /* Default checkbox states
                          */
                         $chk.attr('checked', opt.defaultState);
-                        $chk.prop('checked', opt.defaultState);
 
                         // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
                         // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
