@@ -78,8 +78,8 @@
         "intro.js": "~2.9.3",
         "jquery": "~3.7.1",
         "jquery-ui": "~1.14.0",
-        "jquery-validation": "^1.21.0",
-        "lightgallery": "~2.7.1",
+        "jquery-validation": "~1.21.0",
+        "lightgallery": "^2.7.2",
         "locutus": "~2.0.16",
         "lodash": "~4.17.21",
         "mediaelement": "~4.2.17",
@@ -21122,9 +21122,9 @@
       }
     },
     "node_modules/lightgallery": {
-      "version": "2.7.1",
-      "resolved": "https://registry.npmjs.org/lightgallery/-/lightgallery-2.7.1.tgz",
-      "integrity": "sha512-NbXOzD2APY1OhOOn464jDsBZBaCRahUoLvBxhDFxvwJeC8hCkCIPYSjGgGTYINxVK09DKMsNDJzRr1ngH5nDdg==",
+      "version": "2.7.2",
+      "resolved": "https://registry.npmjs.org/lightgallery/-/lightgallery-2.7.2.tgz",
+      "integrity": "sha512-Ewdcg9UPDqV0HGZeD7wNE4uYejwH2u0fMo5VAr6GHzlPYlhItJvjhLTR0cL0V1HjhMsH39PAom9iv69ewitLWw==",
       "engines": {
         "node": ">=6.0.0"
       }
@@ -46301,9 +46301,9 @@
       }
     },
     "lightgallery": {
-      "version": "2.7.1",
-      "resolved": "https://registry.npmjs.org/lightgallery/-/lightgallery-2.7.1.tgz",
-      "integrity": "sha512-NbXOzD2APY1OhOOn464jDsBZBaCRahUoLvBxhDFxvwJeC8hCkCIPYSjGgGTYINxVK09DKMsNDJzRr1ngH5nDdg=="
+      "version": "2.7.2",
+      "resolved": "https://registry.npmjs.org/lightgallery/-/lightgallery-2.7.2.tgz",
+      "integrity": "sha512-Ewdcg9UPDqV0HGZeD7wNE4uYejwH2u0fMo5VAr6GHzlPYlhItJvjhLTR0cL0V1HjhMsH39PAom9iv69ewitLWw=="
     },
     "lilconfig": {
       "version": "2.0.6",
