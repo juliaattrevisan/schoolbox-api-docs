@@ -57,12 +57,12 @@
         "@fullcalendar/resource-timeline": "~6.1.15",
         "@fullcalendar/timegrid": "~6.1.15",
         "@fullcalendar/vue3": "~6.1.15",
-        "@melloware/coloris": "^0.24.0",
+        "@melloware/coloris": "~0.24.0",
         "@microsoft/immersive-reader-sdk": "~1.4.0",
         "@phudak/ckeditor5-emoji": "~1.1.1",
         "@storybook/test": "~8.0.4",
-        "@vueuse/components": "~10.7.2",
-        "@vueuse/core": "~10.7.2",
+        "@vueuse/components": "^11.0.0",
+        "@vueuse/core": "^11.0.0",
         "axios": "~1.6.7",
         "canvas-confetti": "~1.9.2",
         "clipboard": "~2.0.11",
@@ -10606,19 +10606,19 @@
       }
     },
     "node_modules/@vueuse/components": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/components/-/components-10.7.2.tgz",
-      "integrity": "sha512-r39DLLtRo1hEKI/SQzVQjCts7yelwFyUrTxDFi821NdyU3EfQ9GCNNBcMirXcn3IQApFBRKrvTTtQ9cJGrb/+A==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/components/-/components-11.0.0.tgz",
+      "integrity": "sha512-z/0GI23j2NrmamhHmJKN9QMoMQIStxFKvyvEGsvCQEobEAdAJCO7B8ixw388k3Idf36dpvqXpawA5ELWT+r6GA==",
       "dependencies": {
-        "@vueuse/core": "10.7.2",
-        "@vueuse/shared": "10.7.2",
-        "vue-demi": ">=0.14.6"
+        "@vueuse/core": "11.0.0",
+        "@vueuse/shared": "11.0.0",
+        "vue-demi": ">=0.14.10"
       }
     },
     "node_modules/@vueuse/components/node_modules/vue-demi": {
-      "version": "0.14.7",
-      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-      "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+      "version": "0.14.10",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+      "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
       "hasInstallScript": true,
       "bin": {
         "vue-demi-fix": "bin/vue-demi-fix.js",
@@ -10641,23 +10641,23 @@
       }
     },
     "node_modules/@vueuse/core": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/core/-/core-10.7.2.tgz",
-      "integrity": "sha512-AOyAL2rK0By62Hm+iqQn6Rbu8bfmbgaIMXcE3TSr7BdQ42wnSFlwIdPjInO62onYsEMK/yDMU8C6oGfDAtZ2qQ==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/core/-/core-11.0.0.tgz",
+      "integrity": "sha512-shibzNGjmRjZucEm97B8V0NO5J3vPHMCE/mltxQ3vHezbDoFQBMtK11XsfwfPionxSbo+buqPmsCljtYuXIBpw==",
       "dependencies": {
         "@types/web-bluetooth": "^0.0.20",
-        "@vueuse/metadata": "10.7.2",
-        "@vueuse/shared": "10.7.2",
-        "vue-demi": ">=0.14.6"
+        "@vueuse/metadata": "11.0.0",
+        "@vueuse/shared": "11.0.0",
+        "vue-demi": ">=0.14.10"
       },
       "funding": {
         "url": "https://github.com/sponsors/antfu"
       }
     },
     "node_modules/@vueuse/core/node_modules/vue-demi": {
-      "version": "0.14.7",
-      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-      "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+      "version": "0.14.10",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+      "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
       "hasInstallScript": true,
       "bin": {
         "vue-demi-fix": "bin/vue-demi-fix.js",
@@ -10680,28 +10680,28 @@
       }
     },
     "node_modules/@vueuse/metadata": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/metadata/-/metadata-10.7.2.tgz",
-      "integrity": "sha512-kCWPb4J2KGrwLtn1eJwaJD742u1k5h6v/St5wFe8Quih90+k2a0JP8BS4Zp34XUuJqS2AxFYMb1wjUL8HfhWsQ==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/metadata/-/metadata-11.0.0.tgz",
+      "integrity": "sha512-0TKsAVT0iUOAPWyc9N79xWYfovJVPATiOPVKByG6jmAYdDiwvMVm9xXJ5hp4I8nZDxpCcYlLq/Rg9w1Z/jrGcg==",
       "funding": {
         "url": "https://github.com/sponsors/antfu"
       }
     },
     "node_modules/@vueuse/shared": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/shared/-/shared-10.7.2.tgz",
-      "integrity": "sha512-qFbXoxS44pi2FkgFjPvF4h7c9oMDutpyBdcJdMYIMg9XyXli2meFMuaKn+UMgsClo//Th6+beeCgqweT/79BVA==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/shared/-/shared-11.0.0.tgz",
+      "integrity": "sha512-i4ZmOrIEjSsL94uAEt3hz88UCz93fMyP/fba9S+vypX90fKg3uYX9cThqvWc9aXxuTzR0UGhOKOTQd//Goh1nQ==",
       "dependencies": {
-        "vue-demi": ">=0.14.6"
+        "vue-demi": ">=0.14.10"
       },
       "funding": {
         "url": "https://github.com/sponsors/antfu"
       }
     },
     "node_modules/@vueuse/shared/node_modules/vue-demi": {
-      "version": "0.14.7",
-      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-      "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+      "version": "0.14.10",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+      "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
       "hasInstallScript": true,
       "bin": {
         "vue-demi-fix": "bin/vue-demi-fix.js",
@@ -38277,59 +38277,59 @@
       }
     },
     "@vueuse/components": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/components/-/components-10.7.2.tgz",
-      "integrity": "sha512-r39DLLtRo1hEKI/SQzVQjCts7yelwFyUrTxDFi821NdyU3EfQ9GCNNBcMirXcn3IQApFBRKrvTTtQ9cJGrb/+A==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/components/-/components-11.0.0.tgz",
+      "integrity": "sha512-z/0GI23j2NrmamhHmJKN9QMoMQIStxFKvyvEGsvCQEobEAdAJCO7B8ixw388k3Idf36dpvqXpawA5ELWT+r6GA==",
       "requires": {
-        "@vueuse/core": "10.7.2",
-        "@vueuse/shared": "10.7.2",
-        "vue-demi": ">=0.14.6"
+        "@vueuse/core": "11.0.0",
+        "@vueuse/shared": "11.0.0",
+        "vue-demi": ">=0.14.10"
       },
       "dependencies": {
         "vue-demi": {
-          "version": "0.14.7",
-          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-          "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+          "version": "0.14.10",
+          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+          "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
           "requires": {}
         }
       }
     },
     "@vueuse/core": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/core/-/core-10.7.2.tgz",
-      "integrity": "sha512-AOyAL2rK0By62Hm+iqQn6Rbu8bfmbgaIMXcE3TSr7BdQ42wnSFlwIdPjInO62onYsEMK/yDMU8C6oGfDAtZ2qQ==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/core/-/core-11.0.0.tgz",
+      "integrity": "sha512-shibzNGjmRjZucEm97B8V0NO5J3vPHMCE/mltxQ3vHezbDoFQBMtK11XsfwfPionxSbo+buqPmsCljtYuXIBpw==",
       "requires": {
         "@types/web-bluetooth": "^0.0.20",
-        "@vueuse/metadata": "10.7.2",
-        "@vueuse/shared": "10.7.2",
-        "vue-demi": ">=0.14.6"
+        "@vueuse/metadata": "11.0.0",
+        "@vueuse/shared": "11.0.0",
+        "vue-demi": ">=0.14.10"
       },
       "dependencies": {
         "vue-demi": {
-          "version": "0.14.7",
-          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-          "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+          "version": "0.14.10",
+          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+          "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
           "requires": {}
         }
       }
     },
     "@vueuse/metadata": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/metadata/-/metadata-10.7.2.tgz",
-      "integrity": "sha512-kCWPb4J2KGrwLtn1eJwaJD742u1k5h6v/St5wFe8Quih90+k2a0JP8BS4Zp34XUuJqS2AxFYMb1wjUL8HfhWsQ=="
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/metadata/-/metadata-11.0.0.tgz",
+      "integrity": "sha512-0TKsAVT0iUOAPWyc9N79xWYfovJVPATiOPVKByG6jmAYdDiwvMVm9xXJ5hp4I8nZDxpCcYlLq/Rg9w1Z/jrGcg=="
     },
     "@vueuse/shared": {
-      "version": "10.7.2",
-      "resolved": "https://registry.npmjs.org/@vueuse/shared/-/shared-10.7.2.tgz",
-      "integrity": "sha512-qFbXoxS44pi2FkgFjPvF4h7c9oMDutpyBdcJdMYIMg9XyXli2meFMuaKn+UMgsClo//Th6+beeCgqweT/79BVA==",
+      "version": "11.0.0",
+      "resolved": "https://registry.npmjs.org/@vueuse/shared/-/shared-11.0.0.tgz",
+      "integrity": "sha512-i4ZmOrIEjSsL94uAEt3hz88UCz93fMyP/fba9S+vypX90fKg3uYX9cThqvWc9aXxuTzR0UGhOKOTQd//Goh1nQ==",
       "requires": {
-        "vue-demi": ">=0.14.6"
+        "vue-demi": ">=0.14.10"
       },
       "dependencies": {
         "vue-demi": {
-          "version": "0.14.7",
-          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.7.tgz",
-          "integrity": "sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==",
+          "version": "0.14.10",
+          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+          "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
           "requires": {}
         }
       }
