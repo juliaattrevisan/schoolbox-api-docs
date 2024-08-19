@@ -63,7 +63,7 @@
     "clipboard": "~2.0.11",
     "datatables.net": "~1.13.8",
     "datatables.net-fixedcolumns": "~4.3.0",
-    "dayjs": "~1.11.10",
+    "dayjs": "~1.11.12",
     "dropzone": "~6.0.0-beta.2",
     "firebase": "~10.8.1",
     "flatpickr": "~4.6.13",
