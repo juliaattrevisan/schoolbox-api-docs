@@ -39,7 +39,7 @@
     "@ckeditor/ckeditor5-utils": "~40.2.0",
     "@ckeditor/ckeditor5-widget": "~40.2.0",
     "@ckeditor/ckeditor5-word-count": "~40.2.0",
-    "@floating-ui/dom": "~1.6.1",
+    "@floating-ui/dom": "~1.6.10",
     "@floating-ui/vue": "~1.0.6",
     "@fullcalendar/adaptive": "~6.1.10",
     "@fullcalendar/core": "~6.1.10",
