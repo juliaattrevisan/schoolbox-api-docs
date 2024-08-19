@@ -67,23 +67,6 @@ $app = new class extends CliTool\App {
     private const BASE64_SEARCH = '%;base64,%';
 
     /**
-     * --help
-     *
-     * Print help text for those who don't know how to use this tool
-     */
-    private const OPT_LONG_HELP = 'help';
-
-    /**
-     * @inheritdoc
-     */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-        ];
-    }
-
-    /**
      * Direct DB connection, so we don't need to use mappers
      * @var IConnector|null
      */
@@ -112,29 +95,6 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-CKEditor image to storage
-
-Extracts base64 images from CKEditor db entries, dumps them into storage, then replaces the HTML DOM with the relative storage file
-
-Planning mode by default, will show what entries require image extraction.
-
-Verbosity
----------
-As usual, verbose mode tells you all the debugging-level info about what the algorithm does.
-
-Example Usage
--------------
-Usage: ckImage2Storage.php [--perform] [-vvv]
-
-HELP;
-            return;
-        }
-
-        $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
-
         $storageMapper = new StorageMapper();
 
         $this->database = $this->getDatabaseInternal();
@@ -255,6 +215,11 @@ HELP;
                 }
             }
         }
+    }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
     }
 };
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
