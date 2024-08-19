@@ -83,7 +83,7 @@
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
         "mediaelement": "~4.2.17",
-        "pinia": "~2.1.7",
+        "pinia": "^2.2.2",
         "qrcode.vue": "~3.4.1",
         "qs": "~6.11.2",
         "sanitize-html": "~2.13.0",
@@ -93,7 +93,7 @@
         "ts-ebml": "~2.0.2",
         "v-tables-3-select-rows": "~0.4.9",
         "videojs-record": "~4.6.0",
-        "vue": "^3.4.38",
+        "vue": "~3.4.38",
         "vue-select": "~4.0.0-beta.6",
         "vuejs-paginate-next": "~1.0.2"
       },
@@ -10521,9 +10521,9 @@
       }
     },
     "node_modules/@vue/devtools-api": {
-      "version": "6.5.0",
-      "resolved": "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.5.0.tgz",
-      "integrity": "sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q=="
+      "version": "6.6.3",
+      "resolved": "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.6.3.tgz",
+      "integrity": "sha512-0MiMsFma/HqA6g3KLKn+AGpL1kgKhFWszC9U29NfpWK5LE7bjeXxySWJrOJ77hBz+TBrBQ7o4QJqbPbqbs8rJw=="
     },
     "node_modules/@vue/reactivity": {
       "version": "3.4.38",
@@ -24113,12 +24113,12 @@
       }
     },
     "node_modules/pinia": {
-      "version": "2.1.7",
-      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.1.7.tgz",
-      "integrity": "sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==",
+      "version": "2.2.2",
+      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.2.2.tgz",
+      "integrity": "sha512-ja2XqFWZC36mupU4z1ZzxeTApV7DOw44cV4dhQ9sGwun+N89v/XP7+j7q6TanS1u1tdbK4r+1BUx7heMaIdagA==",
       "dependencies": {
-        "@vue/devtools-api": "^6.5.0",
-        "vue-demi": ">=0.14.5"
+        "@vue/devtools-api": "^6.6.3",
+        "vue-demi": "^0.14.10"
       },
       "funding": {
         "url": "https://github.com/sponsors/posva"
@@ -24138,9 +24138,9 @@
       }
     },
     "node_modules/pinia/node_modules/vue-demi": {
-      "version": "0.14.5",
-      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.5.tgz",
-      "integrity": "sha512-o9NUVpl/YlsGJ7t+xuqJKx8EBGf1quRhCiT6D/J0pfwmk9zUwYkC7yrF4SZCe6fETvSM3UNL2edcbYrSyc4QHA==",
+      "version": "0.14.10",
+      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+      "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
       "hasInstallScript": true,
       "bin": {
         "vue-demi-fix": "bin/vue-demi-fix.js",
@@ -38218,9 +38218,9 @@
       }
     },
     "@vue/devtools-api": {
-      "version": "6.5.0",
-      "resolved": "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.5.0.tgz",
-      "integrity": "sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q=="
+      "version": "6.6.3",
+      "resolved": "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.6.3.tgz",
+      "integrity": "sha512-0MiMsFma/HqA6g3KLKn+AGpL1kgKhFWszC9U29NfpWK5LE7bjeXxySWJrOJ77hBz+TBrBQ7o4QJqbPbqbs8rJw=="
     },
     "@vue/reactivity": {
       "version": "3.4.38",
@@ -48432,18 +48432,18 @@
       "dev": true
     },
     "pinia": {
-      "version": "2.1.7",
-      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.1.7.tgz",
-      "integrity": "sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==",
+      "version": "2.2.2",
+      "resolved": "https://registry.npmjs.org/pinia/-/pinia-2.2.2.tgz",
+      "integrity": "sha512-ja2XqFWZC36mupU4z1ZzxeTApV7DOw44cV4dhQ9sGwun+N89v/XP7+j7q6TanS1u1tdbK4r+1BUx7heMaIdagA==",
       "requires": {
-        "@vue/devtools-api": "^6.5.0",
-        "vue-demi": ">=0.14.5"
+        "@vue/devtools-api": "^6.6.3",
+        "vue-demi": "^0.14.10"
       },
       "dependencies": {
         "vue-demi": {
-          "version": "0.14.5",
-          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.5.tgz",
-          "integrity": "sha512-o9NUVpl/YlsGJ7t+xuqJKx8EBGf1quRhCiT6D/J0pfwmk9zUwYkC7yrF4SZCe6fETvSM3UNL2edcbYrSyc4QHA==",
+          "version": "0.14.10",
+          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz",
+          "integrity": "sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==",
           "requires": {}
         }
       }
