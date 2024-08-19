@@ -172,7 +172,7 @@ async function saveComponentSettings(component, form) {
             getMasonryConfig().settings.updateUrl,
             {
                 method: "POST",
-                body: formData,
+                body: getSaveComponentSettingsParams(form),
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
@@ -188,6 +188,31 @@ async function saveComponentSettings(component, form) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_END));
     }
 }
+
+/**
+ * To pass through the required FormData to update the component in the DB
+ *
+ * @param { Element }
+ *
+ * @returns { Object }
+ */
+function getSaveComponentSettingsParams(form) {
+    const formData = new FormData(form);
+    // Replace cid parameter if it is empty or not set and getMasonryConfig().pageInfo.type === "cid"
+    if (
+        getMasonryConfig().settings.formData.pageInfo.type === "cid" &&
+        (!formData.has("cid") || formData.get("cid") === "")
+    ) {
+        formData.append("cid", encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
+    }
+    // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
+    const context = getMasonryConfig().settings.formData.pageInfo.context;
+    if (context) {
+        formData.append("context", encodeURIComponent(context));
+    }
+    return formData;
+}
+
 /**
  * Now we have the returned response from the settings save, replace the old component with the new component
  *
