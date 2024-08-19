@@ -177,7 +177,8 @@ class Calendar_Api_Factory
                 \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache()
             ));
         }
 
@@ -376,7 +377,8 @@ class Calendar_Api_Factory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache()
                 );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");

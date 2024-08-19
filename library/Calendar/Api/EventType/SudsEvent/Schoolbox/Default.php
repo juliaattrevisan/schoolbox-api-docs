@@ -23,7 +23,8 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
     }
@@ -72,7 +73,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $this->eventMapper,
             $this->campusMapper,
             $this->roletypeMapper,
-            \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache()
+            $this->folderMapper
         ))->findForUser(
             $this->getUser(),
             $startTimestamp,
