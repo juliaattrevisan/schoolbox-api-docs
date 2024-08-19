@@ -5,6 +5,7 @@
 // it can use Twig to generate component content.
 
 use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
@@ -20,14 +21,16 @@ $page->initSession();
 $user = $_SESSION['user'];
 
 if (!($user->isSuperuser())) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (!($user->isSuperuser())) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
+
+$cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
 
 $componentInstanceMapper       = Component_InstanceMapper::getInstance();
 $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
@@ -86,7 +89,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $componentInstanceMapper->delete($instance);
     } catch (Schoolbox\Mapper\Exception $e) {
     }
-} elseif (is_numeric($_POST['cid'] ?? null) && (is_numeric($_POST['add'] ?? null) || is_numeric($_POST['reload'] ?? null))) {
+} elseif ($cid && (is_numeric($_POST['add'] ?? null) || is_numeric($_POST['reload'] ?? null))) {
     // POST new component to page and output render of component
     if (is_numeric($_POST['add'])) {
         $componentDefinitionId = (int)$_POST['add'];
@@ -94,7 +97,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $newComp = new Component_Instance();
         $newComp
             ->setDefinitionId($componentDefinitionId)
-            ->setIdentifier($_POST['cid'])
+            ->setIdentifier($cid)
             ->setModule($_POST['context'])
             ->setSequence(0)
             ->setPosition('top');
@@ -103,7 +106,7 @@ if (($_POST['type'] ?? '') == 'components') {
         $instanceID = $ids[0];
 
         $componentConfigInstanceMapper->injectDefaultConfigCollection($instanceID, $componentDefinitionId);
-        $componentInstanceMapper->cascadeSequence($_POST['cid']);
+        $componentInstanceMapper->cascadeSequence($cid);
     } else {
         $instanceID = $_POST['reload'];
     }
@@ -112,7 +115,10 @@ if (($_POST['type'] ?? '') == 'components') {
     $factory        = $factoryFactory->build($_POST['context'], $page->getDi()->get('session')->get('user'), $page, true);
 
     // $component instanceof Component_ControllerAbstract
-    $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+    $instance = $componentInstanceMapper->findByInstanceId($instanceID, $cid);
+    if (null === $instance) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+    }
     $component = $factory->buildComponent($instance);
 
     if (!($component instanceof Component_ControllerAbstract)) {
@@ -121,9 +127,9 @@ if (($_POST['type'] ?? '') == 'components') {
     $renderer       = new Component_Renderer();
     $renderer->renderAdminComponent($page, $component);
     $page->outputPage(true);
-} elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
-    // GET config options from homepage
-    $config = $_GET;
+} elseif ($cid && $_POST['type'] == 'config' && $_POST['component']) {
+    // POST config options from homepage
+    $config = $_POST;
 
     /** @var Component_Instance|null $instance */
     $instance = $componentInstanceMapper->findByInstanceId($config['component']);
@@ -176,6 +182,9 @@ if (($_POST['type'] ?? '') == 'components') {
         if (SitePage::detectAjax()) {
             // Just refetch the instance
             $instance         = $componentInstanceMapper->findByInstanceId($instance->getId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
             $factoryFactory   = new Component_FactoryFactory();
             $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
             $renderer         = new Component_Renderer();
@@ -186,5 +195,4 @@ if (($_POST['type'] ?? '') == 'components') {
     } else {
         $page->outputJson('error: component does not exist', false, 409);
     }
-    //    SitePage::localRedir("/homepage/" . $_GET['cid']);
 }

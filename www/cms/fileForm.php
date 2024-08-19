@@ -140,7 +140,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
         // Did caller request to inject the file into a specific component?
         if (isset($_POST['component']) && is_numeric($_POST['component']) && $_POST['component'] > 0) {
             // Retrieve component
-            $componentInstance = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component']);
+            $componentInstance = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component'], $_POST['category']);
 
             // Ensure this component resides on the specified page (extra sanity test, not strictly required)
             if ($componentInstance->getIdentifier() != $_POST['category']) {

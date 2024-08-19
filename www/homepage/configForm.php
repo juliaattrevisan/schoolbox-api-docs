@@ -3,6 +3,7 @@
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
@@ -18,13 +19,21 @@ $folderMapper = FolderMapper::getInstance();
 
 if (is_numeric($_REQUEST['cid'])) {
     if ($groupHandler->getPermission($_REQUEST['cid']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
     $cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
+
+    try {
+        $folder                          = $folderMapper->findById($cid);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $page->outputJson('folder was deleted or does not exist', false, 400);
+        return;
+    }
+
 
     // AJAX request for drag and drop of components
     if ($cid && ($_POST['type'] ?? '') == 'components') {
@@ -45,7 +54,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 if ($componentID) {
                     try {
                         /** @var Component_Instance $inst */
-                        $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                        $inst = $componentInstanceMapper->findById($componentID);
                         $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                         $inst->setPosition($position);
                         $instanceList[] = $inst;
@@ -54,13 +63,13 @@ if (is_numeric($_REQUEST['cid'])) {
                 }
             }
 
-            Component_InstanceMapper::getInstance()->save($instanceList);
+            $componentInstanceMapper->save($instanceList);
         }
 
         // Check if the component has been deleted, so the client can display a warning
         // otherwise, the client will just re-render the component
         if ($_POST['movedComponentId']) {
-            $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $folder->getId());
             if (is_object($instance)) {
                 $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
             } else {
@@ -79,7 +88,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $componentInstanceMapper->delete($instance);
         } catch (Schoolbox\Mapper\Exception $e) {
         }
-    } elseif (is_numeric($cid) && (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
+    } elseif (is_numeric($cid) && (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload'] ?? null))) { // POST new component to page and output render of component
         if (is_numeric($_POST['add'] ?? false)) {
             $newComp = new Component_Instance();
             $newComp
@@ -104,7 +113,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $factory = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
-        $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+        $instance = $componentInstanceMapper->findByInstanceId($instanceID, $folder->getId());
         /** @var Component_Homepage_ControllerAbstract $component */
         $component = $factory->buildComponent($instance);
 
@@ -120,11 +129,10 @@ if (is_numeric($_REQUEST['cid'])) {
             if (!($component instanceof Component_ControllerAbstract)) {
                 exit("<div class='alert alert-box'>Couldn't create component.</div>");
             }
-            $folder   = $folderMapper->findById($cid);
             $renderer = new Component_Renderer();
             $renderer->renderHomepageComponent($page, $folder, $component);
         }
-    } elseif ($cid && is_array($_POST['colors'])) { // AJAX Save homepage colours
+    } elseif ($cid && is_array($_POST['colors'] ?? null)) { // AJAX Save homepage colours
         $homepage = new Homepage($cid);
         // Also try to save width
         if (!empty($_POST['width'])) {
@@ -132,21 +140,15 @@ if (is_numeric($_REQUEST['cid'])) {
             $homepage->updateGrid($_POST['width']);
         }
         $homepage->saveDisplayProperties($_POST['colors']);
-    } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
+    } elseif ($cid && $_POST['type'] == 'config' && $_POST['component']) {
         // GET config options from homepage
-        $config = $_GET;
+        $config = $_POST;
 
         /** @var Component_Instance $instance */
-        $instance = $componentInstanceMapper->findByInstanceId($config['component']);
+        $instance = $componentInstanceMapper->findByInstanceId($config['component'], $folder->getId());
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-            try {
-                $folder                          = $folderMapper->findById($config['cid']);
-            } catch (Schoolbox\Mapper\Exception $e) {
-                $page->outputJson('folder was deleted or does not exist', false, 400);
-                return;
-            }
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
                 'component_definition_id',
@@ -208,18 +210,18 @@ if (is_numeric($_REQUEST['cid'])) {
 
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
-                $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
+                $instance   = $componentInstanceMapper->findByInstanceId($instance->getId(), $folder->getId());
 
                 $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($page, $folder, $controller);
                 exit;
             } else {
-                SitePage::localRedir("/homepage/" . $_GET['cid']);
+                SitePage::localRedir("/homepage/" . $_POST['cid']);
             }
         }
         $page->outputJson('error: component does not exist', false, 409);
     }
 } else { // no cid provided
-    error(2);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

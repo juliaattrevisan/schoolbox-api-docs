@@ -53,7 +53,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 foreach ($components[$position] as $sequence => $componentID) {
                     if ($componentID) {
                         try {
-                            $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                            $inst = $componentInstanceMapper->findById($componentID);
                             $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
                             $inst->setPosition($position);
                             $instanceCollection->add($inst);
@@ -63,14 +63,17 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 }
 
                 if ($instanceCollection->count()) {
-                    Component_InstanceMapper::getInstance()->save($instanceCollection);
+                    $componentInstanceMapper->save($instanceCollection);
                 }
             }
 
             // Check if the component has been deleted, so the client can display a warning
             // otherwise, the client will just re-render the component
             if ($_POST['movedComponentId']) {
-                $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+                $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $eportfolioHandler->getPageInstance()->getPageId());
+                if (null === $instance) {
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
                 if (is_object($instance)) {
                     $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
                 } else {
@@ -112,7 +115,10 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             // Retrieve the instance definition controller
             $factory = new Component_Eportfolio_Factory(new User(), $page);
 
-            $instance = $componentInstanceMapper->findByInstanceId($instanceID);
+            $instance = $componentInstanceMapper->findByInstanceId($instanceID, $eportfolioHandler->getPageInstance()->getPageId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
             /** @var Component_Eportfolio_ControllerAbstract $component */
             $component = $factory->buildComponent($instance);
@@ -159,7 +165,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 foreach ($componentInstance->getConfig() as $currentConfig) {
                     if (in_array($currentConfig->getKey(), $configurationToCopy)) {
                         try {
-                            $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                            $configInstance = $componentConfigInstanceMapper->findOneByColumnList([
                                 'component_config_definition_id' => $currentConfig->getId(),
                                 'component_instance_id'          => $_POST['from'],
                             ]);
@@ -172,7 +178,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                             $newConfigInstance->setInstanceId($componentInstance->getId());
                             $newConfigInstance->setValue($value);
 
-                            Component_ConfigMapper::getInstance()->save($newConfigInstance);
+                            $componentConfigInstanceMapper->save($newConfigInstance);
 
                             // Update the configuration item on the component in memory so that it renders properly later
 
@@ -207,12 +213,15 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
             // Softdelete this page and redirect back to profile
             $eportfolioHandler->softdelete();
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/profile");
-        } elseif (isset($_GET['type']) && ($_GET['type'] == 'config') && $_GET['component']) {
+        } elseif (isset($_POST['type']) && ($_POST['type'] == 'config') && $_POST['component']) {
             // Update config options from homepage
-            $config = $_GET;
+            $config = $_POST;
 
             /** @var Component_Instance $instance */
-            $instance                        = $componentInstanceMapper->findByInstanceId($config['component']);
+            $instance                        = $componentInstanceMapper->findByInstanceId($config['component'], $eportfolioHandler->getPageInstance()->getPageId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
@@ -277,7 +286,10 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 // Just rebuild and refetch the component
                 $factory = new Component_Eportfolio_Factory(new User(), $page);
 
-                $componentInstance = $componentInstanceMapper->findByInstanceId($instance->getId());
+                $componentInstance = $componentInstanceMapper->findByInstanceId($instance->getId(), $eportfolioHandler->getPageInstance()->getPageId());
+                if (null === $componentInstance) {
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
 
                 /** @var Component_Eportfolio_ControllerAbstract $component */
                 $component = $factory->buildComponent($componentInstance);
@@ -322,7 +334,7 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
 
         // Apply permissions to the newly-created page
 
-        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
+        EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
 
         // Redirect to newly created page
 

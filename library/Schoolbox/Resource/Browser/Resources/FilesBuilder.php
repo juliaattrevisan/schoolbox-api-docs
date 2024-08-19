@@ -44,12 +44,13 @@ class FilesBuilder
      * get homepageId from the componentID
      *
      * @param int $componentId
+     * @param int $folderId
      * @return int
      * @throws Mapper\Exception\NotFound
      */
-    public function getHomepage(int $componentId): int
+    public function getHomepage(int $componentId, int $folderId): int
     {
-        $component = $this->componentInstanceMapper->findByInstanceId($componentId);
+        $component = $this->componentInstanceMapper->findByInstanceId($componentId, $folderId);
 
         if ($component && $component->getDefinition()->getClass() === \Component_Homepage_FileListController::class) {
             return $component->getIdentifier();
@@ -98,13 +99,14 @@ class FilesBuilder
      * find the supplied component config, or build from the default if required
      * returns array (sourceId, title, sorting, direction, filter)
      * @param int $componentId
+     * @param int $folderId
      * @return array componentConfig
      */
-    public function getComponentConf(int $componentId): array
+    public function getComponentConf(int $componentId, int $folderId): array
     {
         //get the instance config.
         $instanceMapper = $this->componentInstanceMapper;
-        $instanceConfig = $instanceMapper->findByInstanceId($componentId)->getConfigArray();
+        $instanceConfig = $instanceMapper->findByInstanceId($componentId, $folderId)?->getConfigArray();
 
         //if there is no source, update to the current homepage
         if ('' === trim($instanceConfig['componentname']['value'])) {
