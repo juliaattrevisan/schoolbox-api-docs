@@ -83,12 +83,12 @@
         "locutus": "~2.0.32",
         "lodash": "~4.17.21",
         "mediaelement": "~4.2.17",
-        "pinia": "^2.2.2",
+        "pinia": "~2.2.2",
         "qrcode.vue": "~3.4.1",
         "qs": "~6.11.2",
         "sanitize-html": "~2.13.0",
         "strtotime": "~1.0.0",
-        "swiper": "~11.0.6",
+        "swiper": "^11.1.9",
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~2.0.2",
         "v-tables-3-select-rows": "~0.4.9",
@@ -27515,9 +27515,9 @@
       "dev": true
     },
     "node_modules/swiper": {
-      "version": "11.0.6",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.6.tgz",
-      "integrity": "sha512-W/Me7MQl5rNgdM5x9i3Gll76WsyVpnHn91GhBOyL7RCFUeg62aVnflzlVfIpXzZ/87FtJOfAoDH79ZH2Yq76zA==",
+      "version": "11.1.9",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.1.9.tgz",
+      "integrity": "sha512-rflu8zvfGa3x1v/aeSufk4zRJffhOQowyvtJlp46sUBnOqAuk1Rdv5Ldj0AWWBV595iZ+ZMk7VB35ZRtRUomtA==",
       "funding": [
         {
           "type": "patreon",
@@ -50891,9 +50891,9 @@
       }
     },
     "swiper": {
-      "version": "11.0.6",
-      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.0.6.tgz",
-      "integrity": "sha512-W/Me7MQl5rNgdM5x9i3Gll76WsyVpnHn91GhBOyL7RCFUeg62aVnflzlVfIpXzZ/87FtJOfAoDH79ZH2Yq76zA=="
+      "version": "11.1.9",
+      "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.1.9.tgz",
+      "integrity": "sha512-rflu8zvfGa3x1v/aeSufk4zRJffhOQowyvtJlp46sUBnOqAuk1Rdv5Ldj0AWWBV595iZ+ZMk7VB35ZRtRUomtA=="
     },
     "tapable": {
       "version": "2.2.1",
