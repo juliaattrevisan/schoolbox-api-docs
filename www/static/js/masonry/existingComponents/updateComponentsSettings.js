@@ -153,19 +153,6 @@ async function saveComponentSettings(component, form) {
         document.dispatchEvent(new Event(UpdateMasonryEvents.PROCESSING_START));
         submitFormButton.disabled = true;
         submitFormButton.value = "Updating...";
-        var formData = new FormData(form);
-        // Replace cid parameter if it is empty or not set and getMasonryConfig().pageInfo.type === "cid"
-        if (
-            getMasonryConfig().settings.formData.pageInfo.type === "cid" &&
-            (!formData.has("cid") || formData.get("cid") === "")
-        ) {
-            formData.append("cid", encodeURIComponent(getMasonryConfig().settings.formData.pageInfo.id));
-        }
-        // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set
-        const context = getMasonryConfig().settings.formData.pageInfo.context;
-        if (context) {
-            formData.append("context", encodeURIComponent(context));
-        }
 
         // Set X-Requested-With header to allow for AJAX specific processing in the backend controller
         const response = await fetch(
