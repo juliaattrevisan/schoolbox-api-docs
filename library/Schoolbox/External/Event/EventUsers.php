@@ -22,22 +22,17 @@ use Schoolbox\User;
 class EventUsers
 {
     /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
-     * @param \Schoolbox\External\Event\Mapper         $eventMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
-     * @param Roletype\Mapper                          $roletypeMapper
+     * @param Mapper $eventMapper
+     * @param Campus\Mapper $campusMapper
+     * @param Roletype\Mapper $roletypeMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache();
     }
 
 
