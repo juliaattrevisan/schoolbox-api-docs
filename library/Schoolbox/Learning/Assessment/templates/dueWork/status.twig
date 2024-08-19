@@ -341,7 +341,7 @@
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                         {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
                         <div data-template>
-                            <input type="checkbox" data-selected checked/>
+                            <input type="checkbox" data-selected />
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
@@ -374,7 +374,7 @@
                         {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                         {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
                         <div data-template>
-                            <input type="checkbox" data-selected checked/>
+                            <input type="checkbox" data-selected />
                             <label class="checkbox-label" data-participant-name></label>
                         </div>
                     </section>
@@ -476,6 +476,61 @@
                         } else {
                             $('#manage-submissions').find('[data-submit]').show();
                         }
+                    }
+
+                    {# If you appear in both lists, ensure only one of your checkboxes
+                     # can be active at a given time
+                     #}
+                    function mutex(thisName, thisSelectAll, otherName, otherSelectAll) {
+                        let modal = $('#manage-submissions');
+
+                        modal.find('[' + thisName + ']').on('change', function(event) {
+                            if ($(this).is(':checked')) {
+                                let id = $(this).attr(thisName);
+
+                                modal.find('[' + otherName + '="' + id + '"]').prop('checked', false);
+                            }
+
+                            mutexSelectAll(modal, thisName, thisSelectAll);
+                            mutexSelectAll(modal, otherName, otherSelectAll);
+                        });
+                    }
+
+                    {# Micromanage select-all checkbox
+                     # There's now a really delicate interplay between all these checkboxes.
+                     #}
+                    function mutexSelectAll() {
+                        let modal = $('#manage-submissions');
+                        let cssIndeterminate = 'indeterminate';
+
+                        let lists = [
+                            {
+                                'numElems': modal.find('[data-mass-draft]').length,
+                                'numChecked': modal.find('[data-mass-draft]:checked').length,
+                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-draft')
+                            },
+                            {
+                                'numElems': modal.find('[data-mass-offline]').length,
+                                'numChecked': modal.find('[data-mass-offline]:checked').length,
+                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-offline')
+                            },
+                        ];
+
+                        {# Despite what's coded in select-all.basic, for whatever jquery-based reason,
+                         # programmatically changing a checkbox state doesn't recalculate the select-all's
+                         # state, especially when one list causes the last element in another list to be
+                         # unticked. The select-all for this latter list will no longer represent the correct
+                         # state it's in. That forces me to micromanage (and maybe double-handle) this usage.
+                         #}
+                        $.each(lists, function(index, element) {
+                            if (0 === element.numChecked) {
+                                element.selectAll.removeClass(cssIndeterminate).prop('checked', false);
+                            } else if (element.numChecked === element.numElems) {
+                                element.selectAll.removeClass(cssIndeterminate).prop('checked', true);
+                            } else {
+                                element.selectAll.addClass(cssIndeterminate);
+                            }
+                        });
                     }
 
                     $.fn.dynamicFeedback({
@@ -606,6 +661,7 @@
                         userSelector: '[data-mass-submit-draft]',
                         userList: $userList,
                         checkboxPrefix: 'mass-draft',
+                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-draft-punctual-container');
 
@@ -624,16 +680,22 @@
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+
+                            /* Mutex checkboxes with other list
+                             */
+                            mutex('data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', 'data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline');
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+                            mutexSelectAll();
                         },
                         onAfterCheckboxChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+                            mutexSelectAll();
                         }
                     });
 
@@ -643,6 +705,7 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         checkboxPrefix: 'mass-offline',
+                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-offline-punctual-container');
 
@@ -661,16 +724,22 @@
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+
+                            /* Mutex checkboxes with other list
+                             */
+                            mutex('data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', 'data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft');
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+                            mutexSelectAll();
                         },
                         onAfterCheckboxChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
                              */
                             renderCallToAction();
+                            mutexSelectAll();
                         }
                     });
 
