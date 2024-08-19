@@ -70,13 +70,13 @@
         "datatables.net-fixedcolumns": "~4.3.0",
         "dayjs": "~1.11.12",
         "dropzone": "~6.0.0-beta.2",
-        "firebase": "^10.13.0",
+        "firebase": "~10.13.0",
         "flatpickr": "~4.6.13",
         "gsap": "npm:@gsap/business@~3.12.5",
         "highcharts": "~9.3.3",
         "highcharts-vue": "~1.4.0",
         "intro.js": "~2.9.3",
-        "jquery": "~3.7.0",
+        "jquery": "^3.7.1",
         "jquery-ui": "~1.13.2",
         "jquery-validation": "~1.20.0",
         "lightgallery": "~2.7.1",
@@ -20735,9 +20735,9 @@
       }
     },
     "node_modules/jquery": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.7.0.tgz",
-      "integrity": "sha512-umpJ0/k8X0MvD1ds0P9SfowREz2LenHsQaxSohMZ5OMNEU2r0tf8pdeEFTHMFxWVxKNyU9rTtK3CWzUCTKJUeQ=="
+      "version": "3.7.1",
+      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",
+      "integrity": "sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg=="
     },
     "node_modules/jquery-ui": {
       "version": "1.13.2",
@@ -46004,9 +46004,9 @@
       }
     },
     "jquery": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.7.0.tgz",
-      "integrity": "sha512-umpJ0/k8X0MvD1ds0P9SfowREz2LenHsQaxSohMZ5OMNEU2r0tf8pdeEFTHMFxWVxKNyU9rTtK3CWzUCTKJUeQ=="
+      "version": "3.7.1",
+      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",
+      "integrity": "sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg=="
     },
     "jquery-ui": {
       "version": "1.13.2",
