@@ -657,11 +657,14 @@
                      #}
                     $('#mass-submit-draft').bulky({
                         includeSelectAllCheckbox: true,
+                        /* Default state of select-all checkbox
+                         * Ensure the mutex also has this value
+                         */
+                        defaultState: false,
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit-draft]',
                         userList: $userList,
                         checkboxPrefix: 'mass-draft',
-                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-draft-punctual-container');
 
@@ -701,11 +704,14 @@
 
                     $('#mass-submit-offline').bulky({
                         includeSelectAllCheckbox: true,
+                        /* Default state of select-all checkbox
+                         * Ensure the mutex also has this value
+                         */
+                        defaultState: false,
                         modal: $('#manage-submissions'),
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         checkboxPrefix: 'mass-offline',
-                        defaultState: false,
                         submitText: function (len, all) {
                             let onTimeContainer = $('#mass-submit-offline-punctual-container');
 
