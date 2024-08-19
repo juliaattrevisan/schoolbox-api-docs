@@ -209,25 +209,47 @@ class EventUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute($params);
 
+        /* Process folder codes separately; the megaquery kept timing out, so we
+         * can bolt these on after the fact. It changes nothing in the query itself;
+         * just what we ultimately produce in $stack for frontend
+         */
+        $tempFolderCodes = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $event = $this->eventMapper->hydrate($row, 'se');
 
-            /* If a folder code x folder join can be found, shove it in
-             */
-            if ($row['f.id']) {
-                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
-                $folder = $this->folderMapper->hydrate($row, 'f');
-
-                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
-                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
-
-                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
-
-                $event->setFolder($folder);
-            }
+//            /* If a folder code x folder join can be found, shove it in
+//             */
+//            if ($row['f.id']) {
+//                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
+//                $folder = $this->folderMapper->hydrate($row, 'f');
+//
+//                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
+//                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
+//
+//                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
+//
+//                $event->setFolder($folder);
+//            }
 
             $stack->add($event);
+
+            /* Remember this folder code: we need to hydrate their instances separately
+             */
+            $tempFolderCodes[] = trim((string)$row['se.code']);
         }
+
+        /* Ignore useless folder codes
+         *
+         * Filter out all the empty strings, null values
+         * Use a custom callback so 0 is a valid outcome
+         */
+        $tempFolderCodes = array_filter($tempFolderCodes, static function ($val) {
+            return '' !== $val;
+        });
+
+        $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByColumn('code', $tempFolderCodes);
+
 
         return $stack;
     }
