@@ -7,42 +7,11 @@
  */
 
 use Calendar\Event\Type\EventInterface;
-use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
-    /**
-     * @var EventTypeMapper
-     */
-    private EventTypeMapper $eventTypeMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
-     */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper;
-
-
-    /**
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $folderCodes;
-
-
     /**
      * @inheritdoc
      */
@@ -50,19 +19,13 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         int $connectorId,
         User $user,
         User $viewer,
-        ?GenericCollection $folderCodes,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        private ?GenericCollection $folderCodes,
+        private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
-
-        $this->folderCodes = $folderCodes;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->eventMapper = $eventMapper;
-        $this->campusMapper = $campusMapper;
-        $this->roletypeMapper = $roletypeMapper;
     }
 
 
