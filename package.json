@@ -52,7 +52,7 @@
     "@fullcalendar/resource-timeline": "~6.1.15",
     "@fullcalendar/timegrid": "~6.1.15",
     "@fullcalendar/vue3": "~6.1.15",
-    "@melloware/coloris": "~0.22.0",
+    "@melloware/coloris": "~0.24.0",
     "@microsoft/immersive-reader-sdk": "~1.4.0",
     "@phudak/ckeditor5-emoji": "~1.1.1",
     "@storybook/test": "~8.0.4",
