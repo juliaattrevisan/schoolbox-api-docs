@@ -151,12 +151,11 @@ class EventUsers
                 {$folderColumnString},
                 {$folderCodeColumnString}
             FROM {$this->eventMapper->getTable()} se
-            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
-            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id
+            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id AND {$campusWhere}
+            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id AND {$roleWhere}
             LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
             LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
-            WHERE {$campusWhere} AND {$roleWhere}
-            AND se.classification = :classification
+            WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
 
@@ -168,12 +167,12 @@ class EventUsers
                 {$folderCodeColumnString}
             FROM {$this->eventMapper->getTable()} se
             INNER JOIN sis_event_user seu ON se.id = seu.event_id
+                AND se.classification = :classification
+                AND se.start_at >= :startDatetime
+                AND se.finish_at <= :finishDatetime
+                AND seu.external_id = :externalId
             LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
             LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
-            WHERE se.classification = :classification
-            AND se.start_at >= :startDatetime
-            AND se.finish_at <= :finishDatetime
-            AND seu.external_id = :externalId
         ";
 
         $params = array_merge([
