@@ -481,7 +481,7 @@
                     {# If you appear in both lists, ensure only one of your checkboxes
                      # can be active at a given time
                      #}
-                    function mutex(thisName, thisSelectAll, otherName, otherSelectAll) {
+                    function mutex(thisName, thisSelectAll, otherName, otherSelectAll, defaultState) {
                         let modal = $('#manage-submissions');
 
                         modal.find('[' + thisName + ']').on('change', function(event) {
@@ -491,15 +491,15 @@
                                 modal.find('[' + otherName + '="' + id + '"]').prop('checked', false);
                             }
 
-                            mutexSelectAll(modal, thisName, thisSelectAll);
-                            mutexSelectAll(modal, otherName, otherSelectAll);
+                            mutexSelectAll(modal, thisName, thisSelectAll, defaultState);
+                            mutexSelectAll(modal, otherName, otherSelectAll, defaultState);
                         });
                     }
 
                     {# Micromanage select-all checkbox
                      # There's now a really delicate interplay between all these checkboxes.
                      #}
-                    function mutexSelectAll() {
+                    function mutexSelectAll(defaultState) {
                         let modal = $('#manage-submissions');
                         let cssIndeterminate = 'indeterminate';
 
@@ -523,10 +523,10 @@
                          # state it's in. That forces me to micromanage (and maybe double-handle) this usage.
                          #}
                         $.each(lists, function(index, element) {
-                            if (0 === element.numChecked) {
-                                element.selectAll.removeClass(cssIndeterminate).prop('checked', false);
+                            if (0 === element.numChecked && !defaultState) {
+                                element.selectAll.removeClass(cssIndeterminate).attr('checked', false);
                             } else if (element.numChecked === element.numElems) {
-                                element.selectAll.removeClass(cssIndeterminate).prop('checked', true);
+                                element.selectAll.removeClass(cssIndeterminate).attr('checked', true);
                             } else {
                                 element.selectAll.addClass(cssIndeterminate);
                             }
@@ -683,7 +683,7 @@
 
                             /* Mutex checkboxes with other list
                              */
-                            mutex('data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', 'data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline');
+                            mutex('data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', 'data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', false);
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
@@ -727,7 +727,7 @@
 
                             /* Mutex checkboxes with other list
                              */
-                            mutex('data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', 'data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft');
+                            mutex('data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', 'data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', false);
                         },
                         onAfterSelectAllChange: function() {
                             /* Maybe hide the call to action if there's nobody to choose
