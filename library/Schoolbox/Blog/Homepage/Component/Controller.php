@@ -18,6 +18,7 @@ use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
+use Schoolbox\Column\Base as ColumnBase;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -96,6 +97,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'folder'                => $this->getSource(),
                 'blogs'                 => $blogs,
                 'blogComments'          => $blogComments,
+                'blogCommentMaxLength'  => ColumnBase::TEXT_MAX_LENGTH,
                 'blogImages'            => $blogImages,
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),

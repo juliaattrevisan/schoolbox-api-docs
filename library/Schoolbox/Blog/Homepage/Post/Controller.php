@@ -20,6 +20,7 @@ use Schoolbox\Blog\Homepage\Image\Model as BlogImageModel;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Column\Base as ColumnBase;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -36,6 +37,11 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+    /**
+     * @const Character encoding for fields within this database.
+     */
+    private const CHARACTER_ENCODING = 'UTF-8';
+
     /**
      * @var UserAccessMapper
      */
@@ -278,16 +284,23 @@ class Controller extends Base
      */
     public function postCommentInsert(BlogModel $blog)
     {
+        $trimmedComment = trim($this->requestPost['commentBody']);
+
         // Comments must not be empty
-        if (strlen(trim($this->requestPost['commentBody'])) === 0) {
+        if (strlen($trimmedComment) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
+        if (strlen($trimmedComment) > ColumnBase::TEXT_MAX_LENGTH) {
+            // Use mb_strcut() instead of substr() to avoid cutting the string in the middle of a two-byte character.
+            $trimmedComment = mb_strcut($trimmedComment, 0, ColumnBase::TEXT_MAX_LENGTH, self::CHARACTER_ENCODING);
         }
 
         /** @var BlogCommentModel $comment */
         $comment = $this->getBlogCommentMapper()->createModel();
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
-        $comment->setBody($this->requestPost['commentBody']);
+        $comment->setBody($trimmedComment);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
 
         $this->getBlogCommentMapper()->save($comment);
