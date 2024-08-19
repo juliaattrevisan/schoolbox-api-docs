@@ -73,8 +73,8 @@
         "firebase": "~10.13.0",
         "flatpickr": "~4.6.13",
         "gsap": "npm:@gsap/business@~3.12.5",
-        "highcharts": "~9.3.3",
-        "highcharts-vue": "~1.4.0",
+        "highcharts": "^11.4.7",
+        "highcharts-vue": "^2.0.1",
         "intro.js": "~2.9.3",
         "jquery": "~3.7.1",
         "jquery-ui": "~1.14.0",
@@ -92,7 +92,7 @@
         "tinycolor2": "~1.6.0",
         "ts-ebml": "~3.0.1",
         "v-tables-3-select-rows": "~0.4.9",
-        "videojs-record": "^4.8.0",
+        "videojs-record": "~4.8.0",
         "vue": "~3.4.38",
         "vue-select": "~4.0.0-beta.6",
         "vuejs-paginate-next": "~1.0.2"
@@ -17716,17 +17716,17 @@
       "dev": true
     },
     "node_modules/highcharts": {
-      "version": "9.3.3",
-      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-9.3.3.tgz",
-      "integrity": "sha512-QeOvm6cifeZYYdTLm4IxZsXcOE9c4xqfs0z0OJJ0z7hhA9WG0rmcVAyuIp5HBl/znjA/ayYHmpYjBYD/9PG4Fg=="
+      "version": "11.4.7",
+      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-11.4.7.tgz",
+      "integrity": "sha512-4FQTaV/9DtYal6U8rCgGeFWzzoL5QoKowpzyGlG0sp+UJKjm9G9t4bvyz+odvXt+YcqUvK9GEspdLoBnKSWGVA=="
     },
     "node_modules/highcharts-vue": {
-      "version": "1.4.0",
-      "resolved": "https://registry.npmjs.org/highcharts-vue/-/highcharts-vue-1.4.0.tgz",
-      "integrity": "sha512-fTPqJmU/wR/nUEtofbC/iJqcgULGcP3C0Hd4YYCKH2FiiteNs7UidjSM4eYj5Y4ldpOVhwPtNj/m6XwC3ajp6g==",
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/highcharts-vue/-/highcharts-vue-2.0.1.tgz",
+      "integrity": "sha512-7yVaKvsWlx7OgmKFXE2D99fi/0tr2A85H4KUz3jL7CRQhAwvEvXgtDIyTBGLHJsOC5L9VlppAI7k6KfIi0j0hg==",
       "peerDependencies": {
         "highcharts": ">=5.0.0",
-        "vue": ">=1.0.0"
+        "vue": ">=3.0.0"
       }
     },
     "node_modules/home-or-tmp": {
@@ -43538,14 +43538,14 @@
       "dev": true
     },
     "highcharts": {
-      "version": "9.3.3",
-      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-9.3.3.tgz",
-      "integrity": "sha512-QeOvm6cifeZYYdTLm4IxZsXcOE9c4xqfs0z0OJJ0z7hhA9WG0rmcVAyuIp5HBl/znjA/ayYHmpYjBYD/9PG4Fg=="
+      "version": "11.4.7",
+      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-11.4.7.tgz",
+      "integrity": "sha512-4FQTaV/9DtYal6U8rCgGeFWzzoL5QoKowpzyGlG0sp+UJKjm9G9t4bvyz+odvXt+YcqUvK9GEspdLoBnKSWGVA=="
     },
     "highcharts-vue": {
-      "version": "1.4.0",
-      "resolved": "https://registry.npmjs.org/highcharts-vue/-/highcharts-vue-1.4.0.tgz",
-      "integrity": "sha512-fTPqJmU/wR/nUEtofbC/iJqcgULGcP3C0Hd4YYCKH2FiiteNs7UidjSM4eYj5Y4ldpOVhwPtNj/m6XwC3ajp6g==",
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/highcharts-vue/-/highcharts-vue-2.0.1.tgz",
+      "integrity": "sha512-7yVaKvsWlx7OgmKFXE2D99fi/0tr2A85H4KUz3jL7CRQhAwvEvXgtDIyTBGLHJsOC5L9VlppAI7k6KfIi0j0hg==",
       "requires": {}
     },
     "home-or-tmp": {
