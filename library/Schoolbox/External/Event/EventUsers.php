@@ -147,14 +147,10 @@ class EventUsers
          */
         $query = "
             SELECT DISTINCT
-                {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString},
-                {$folderCodeColumnString}
+                {$this->eventMapper->getColumnString('se')}
             FROM {$this->eventMapper->getTable()} se
             LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id AND {$campusWhere}
             LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id AND {$roleWhere}
-            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
-            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
             WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
@@ -162,17 +158,13 @@ class EventUsers
             UNION
 
             SELECT DISTINCT
-                {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString},
-                {$folderCodeColumnString}
+                {$this->eventMapper->getColumnString('se')}
             FROM {$this->eventMapper->getTable()} se
             INNER JOIN sis_event_user seu ON se.id = seu.event_id
                 AND se.classification = :classification
                 AND se.start_at >= :startDatetime
                 AND se.finish_at <= :finishDatetime
                 AND seu.external_id = :externalId
-            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
-            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
         ";
 
         $params = array_merge([
@@ -218,25 +210,17 @@ class EventUsers
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $event = $this->eventMapper->hydrate($row, 'se');
 
-//            /* If a folder code x folder join can be found, shove it in
-//             */
-//            if ($row['f.id']) {
-//                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
-//                $folder = $this->folderMapper->hydrate($row, 'f');
-//
-//                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
-//                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
-//
-//                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
-//
-//                $event->setFolder($folder);
-//            }
-
-            $stack->add($event);
-
-            /* Remember this folder code: we need to hydrate their instances separately
+            /* Only care about valid hydrations
              */
-            $tempFolderCodes[] = trim((string)$row['se.code']);
+            if ($event instanceof \Schoolbox\External\Event\Model) {
+                $stack->add($event);
+
+                /* Remember this folder code: we need to hydrate their instances separately
+                 */
+                $code = trim((string)$row['se.code']);
+
+                $tempFolderCodes[$code] = $code;
+            }
         }
 
         /* Ignore useless folder codes
@@ -248,8 +232,25 @@ class EventUsers
             return '' !== $val;
         });
 
-        $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByColumn('code', $tempFolderCodes);
+        $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAllByCode(array_keys($tempFolderCodes));
 
+        /* Index each folder by their code(s)
+         */
+        $folderLookup = [];
+
+        foreach ($folders as $folder) {
+            foreach ($folder->getCodes() as $code) {
+                $folderLookup[$code] = $folder;
+            }
+        }
+
+        foreach ($stack as $event) {
+            $code = trim((string)$event->getCode());
+
+            if ('' !== $code) {
+                $event->setFolder($folderLookup[$code] ?? null);
+            }
+        }
 
         return $stack;
     }
