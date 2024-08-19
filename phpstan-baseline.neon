@@ -5521,11 +5521,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Mapper.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Mapper.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between int\\<min, \\-1\\>\\|int\\<1, max\\> and '0' will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Mapper.php
