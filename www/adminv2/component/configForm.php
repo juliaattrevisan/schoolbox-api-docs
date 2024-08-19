@@ -69,7 +69,7 @@ if (($_POST['type'] ?? '') == 'components') {
     // Was any one component requested?
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId'] ?? false) {
-        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId'], $cid);
+        $instance = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
         if (is_object($instance)) {
             $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         } else {
@@ -132,7 +132,7 @@ if (($_POST['type'] ?? '') == 'components') {
     $config = $_POST;
 
     /** @var Component_Instance|null $instance */
-    $instance = $componentInstanceMapper->findByInstanceId($config['component'], $cid);
+    $instance = $componentInstanceMapper->findByInstanceId($config['component']);
 
     if (is_object($instance)) {
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
@@ -181,7 +181,7 @@ if (($_POST['type'] ?? '') == 'components') {
         }
         if (SitePage::detectAjax()) {
             // Just refetch the instance
-            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId(), $cid);
+            $instance         = $componentInstanceMapper->findByInstanceId($instance->getId());
             if (null === $instance) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
