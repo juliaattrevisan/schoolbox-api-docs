@@ -26,7 +26,6 @@ use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
  */
 abstract class Base
 {
-
     /**
      * Folder permission access
      *
