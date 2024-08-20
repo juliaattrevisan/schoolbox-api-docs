@@ -59,12 +59,12 @@ class Video extends Base
         if ($eportfolioEnabled) {
             $fileListMapper = FileListMapper::getInstance();
 
-            $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
+            $files = $fileListMapper->findByColumn('file_id', $file->getId());
 
             /* If you can view one of the pages that this file is shared on,
              * break out of here
              */
-            foreach ($allFiles as $currentFile) {
+            foreach ($files as $currentFile) {
                 if ((new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId()))->canView()) {
                     return;
                 }
