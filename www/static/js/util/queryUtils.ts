@@ -30,9 +30,10 @@ export function createKeyValuePairs(obj: NestedObject) {
                     // If the value is a string, add it to the result
                     result[newKeyPath] = value;
                 } else if (typeof value === "number") {
-                    // If the value is null, add an empty string to the result
+                    // If the value is a number, convert it to a string and add it to the result
                     result[newKeyPath] = (value as number).toString();
                 } else if (value === null) {
+                    // If the value is null, add an empty string to the result
                     result[newKeyPath] = "";
                 }
             }
