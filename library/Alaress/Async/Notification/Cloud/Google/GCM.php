@@ -17,6 +17,7 @@ use OverflowException;
 use RuntimeException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 /**
@@ -81,7 +82,7 @@ class GCM extends AbstractService
      *@throws OverflowException if the max payload size (4KB) is exceeded
      * @throws RuntimeException if your API key is bad
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null)
     {
         $data = [
             'id'           => $id,

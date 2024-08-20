@@ -16,6 +16,7 @@ use Kreait\Firebase;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 /**
@@ -56,7 +57,7 @@ class Service extends AbstractService
      * @param null|Notification $notification
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null)
     {
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())

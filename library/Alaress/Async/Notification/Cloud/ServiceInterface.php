@@ -11,6 +11,7 @@ namespace Alaress\Async\Notification\Cloud;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Psr\Log\LoggerInterface;
+use Schoolbox\User;
 
 interface ServiceInterface
 {
@@ -32,7 +33,7 @@ interface ServiceInterface
      * @param int   $unreadCount
      * @return bool
      */
-    public function send(array $tokens, Instance $instance, $unreadCount = 0, ?string $recipientExternalId = null);
+    public function send(array $tokens, Instance $instance, $unreadCount = 0, ?User $recipient = null);
 
 
     /**

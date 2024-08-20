@@ -15,6 +15,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 class Service extends AbstractService
@@ -38,7 +39,7 @@ class Service extends AbstractService
     /**
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null)
     {
         try {
             $tassParentIdLength = trim($this->configLoader->get('external_tass_parent_id_length'));
@@ -62,7 +63,7 @@ class Service extends AbstractService
                     min($tassParentIdLength, self::PARENT_TASS_ORBIT_MAX_PAR_CODE_LENGTH),
                     self::PARENT_TASS_ORBIT_MAX_SFA_NUM_LENGTH,
                 ),
-                $recipientExternalId,
+                $recipient->getExternalId(),
                 $matches
             );
 

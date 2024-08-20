@@ -25,6 +25,7 @@ use Apple\ApnPush\Sender\Sender;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 
 /**
  * Abstraction for sending messages via the APN (Apple Push Notification)
@@ -101,7 +102,7 @@ class ApnService extends AbstractService
     /**
      * @inheritdoc
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?\Alaress\Async\Notification\Notification $notification = null, ?string $recipientExternalId = null): bool
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?\Alaress\Async\Notification\Notification $notification = null, ?User $recipient = null): bool
     {
         // Try to set up the protocol
         try {

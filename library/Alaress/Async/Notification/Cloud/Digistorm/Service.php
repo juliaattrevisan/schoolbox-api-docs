@@ -20,6 +20,7 @@ use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 /**
@@ -85,7 +86,7 @@ class Service extends AbstractService
     /**
      * @inheritdoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?string $recipientExternalId = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null)
     {
         $headers = [
             'X-Auth-Token' => $this->key,

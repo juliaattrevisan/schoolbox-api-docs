@@ -99,8 +99,6 @@ class ServiceManager implements IServiceManager
         $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $userId);
         $unreadCount = count($unread);
 
-        $recipientExternalId = $recipient->getExternalId();
-
         foreach ($this->findRegistrationsByUser($recipient) as $provider => $appRegistrations) {
             foreach ($appRegistrations as $appIdentifier => $reg) {
                 $service = $this->getService($reg['service']);
@@ -114,7 +112,7 @@ class ServiceManager implements IServiceManager
                 $service->setLog($this->log);
 
                 try {
-                    $this->pushToService($service, $tokens, $instance, $unreadCount, $recipientExternalId);
+                    $this->pushToService($service, $tokens, $instance, $unreadCount, $recipient);
                 } catch (InvalidArgumentException $e) {
                     // service not available
                     $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ 'exception' => $e ]);
@@ -130,14 +128,14 @@ class ServiceManager implements IServiceManager
      * @param Instance         $instance
      * @param int              $unreadCount
      */
-    protected function pushToService(ServiceInterface $service, $tokens, Instance $instance, $unreadCount = 0, ?string $recipientExternalId = null)
+    protected function pushToService(ServiceInterface $service, $tokens, Instance $instance, $unreadCount = 0, ?Schoolbox\User $recipient = null)
     {
         $provider = $service->getProviderName();
         $appId    = $service->getAppIdentifier();
 
         try {
             $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
-            $service->send($tokens, $instance, $unreadCount, $recipientExternalId);
+            $service->send($tokens, $instance, $unreadCount, $recipient);
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
             $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ 'exception' => $e ]);
