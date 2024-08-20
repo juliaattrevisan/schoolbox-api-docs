@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric;
 use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
-use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use UnexpectedValueException;
@@ -126,7 +125,6 @@ class Controller extends BaseController
         $formField = $post->get('formField', 'rb');
 
         $context = [
-            DebugTwig::DEBUG_WRAP => false,
             'formField' => $formField,
             'rubric' => [
                 'id' => $post->get('rubricId'),

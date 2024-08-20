@@ -1044,13 +1044,6 @@ abstract class Kernel
                     // do not cache when in debug mode
                     if (!$config->get('debug_mode')) {
                         $options['cache'] = $config->get('twig_cache_dir');
-                    } else {
-                        if (class_exists('\Alaress\Web\Template\DebugTwig')) {
-                            $twigClass = '\Alaress\Web\Template\DebugTwig';
-                        } else {
-                            $twigClass = 'Twig_Template';
-                        }
-                        $options['base_template_class'] = $twigClass;
                     }
 
                     $twig = new Environment($di->get('templateEngine:loader'), $options);
