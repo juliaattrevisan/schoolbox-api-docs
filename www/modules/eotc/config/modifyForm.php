@@ -55,7 +55,7 @@ if ($sessionUser->isSuperuser()) {
      */
     $arrayFileTypes = explode(',', $_POST['externalFiletypeBlacklist']);
 
-    $validFileTypes = array_map(static function($elem) {
+    $validFileTypes = array_map(static function ($elem) {
         return strtoupper(trim($elem));
     }, $arrayFileTypes);
 
