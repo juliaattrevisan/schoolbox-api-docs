@@ -116,7 +116,8 @@
         "kreait/firebase-php": "^7.9",
         "league/oauth2-server": "^8.5",
         "steverhoades/oauth2-openid-connect-server": "^2.6",
-        "google/common-protos": "^4.8"
+        "google/common-protos": "^4.8",
+        "ext-xmlreader": "*"
     },
     "autoload-dev": {
       "psr-4": {

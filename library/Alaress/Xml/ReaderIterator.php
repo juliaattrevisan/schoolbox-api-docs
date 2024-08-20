@@ -55,9 +55,7 @@ class ReaderIterator implements \Iterator
         $this->elementCount++;
 
         // Pop this node name off the stack if I'm done with it
-        /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
-            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             if ($this->reader->isEmptyElement) {
                 array_pop($this->elementStack);
             }
@@ -74,9 +72,7 @@ class ReaderIterator implements \Iterator
     public function current(): mixed
     {
         // Push this node name on the stack for navigation
-        /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
         if ($this->reader->nodeType === XMLReader::ELEMENT) {
-            /** @phpstan-ignore-next-line - the properties on XMLReader are defined */
             array_push($this->elementStack, $this->reader->name);
         }
         return new State($this->reader, $this->elementStack);
