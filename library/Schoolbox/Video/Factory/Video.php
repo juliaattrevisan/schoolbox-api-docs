@@ -53,13 +53,11 @@ class Video extends Base
 
         $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
 
+        /* If you can view one of the pages that this file is shared on,
+         * break out of here
+         */
         foreach ($allFiles as $currentFile) {
-            $authenticator = new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId());
-
-            /* If you can view one of the pages that this file is shared on,
-             * break out of here
-             */
-            if ($authenticator->canView()) {
+            if ((new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId()))->canView()) {
                 return;
             }
         }
