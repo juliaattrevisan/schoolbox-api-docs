@@ -9,6 +9,7 @@
 namespace Schoolbox\Video\Factory;
 
 use Component\Eportfolio\FileListMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -45,20 +46,28 @@ class Video extends Base
             return;
         }
 
+        /* If the eportfolio feature is globally enabled, dig a little deeper;
+         * maybe this lets you see stuff. If it's disabled, skip all this costly
+         * investigation entirely and keep going with other checks
+         */
+        $eportfolioEnabled = (bool)Loader::getInstance()->get('eportfolio_enabled');
+
         /* Check eportfolio permissions; if you can see a page that shows the video
          * (remembering that multiple eportfolio pages could show a given video)
          * then you can view the content
          */
-        $fileListMapper = FileListMapper::getInstance();
+        if ($eportfolioEnabled) {
+            $fileListMapper = FileListMapper::getInstance();
 
-        $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
+            $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
 
-        /* If you can view one of the pages that this file is shared on,
-         * break out of here
-         */
-        foreach ($allFiles as $currentFile) {
-            if ((new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId()))->canView()) {
-                return;
+            /* If you can view one of the pages that this file is shared on,
+             * break out of here
+             */
+            foreach ($allFiles as $currentFile) {
+                if ((new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId()))->canView()) {
+                    return;
+                }
             }
         }
 
