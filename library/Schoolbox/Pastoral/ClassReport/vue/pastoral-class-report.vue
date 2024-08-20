@@ -1,7 +1,7 @@
 <script>
 import Toast from "@schoolboxVue/components/toast";
 import mixinFilter from "@schoolboxVue/mixins/filter";
-import { stringify } from "qs";
+import { getSearchString } from "@js/util/queryUtils";
 
 const SORT_OPTION_CREATED = "created";
 const SORT_OPTION_OCCURRED = "occurred";
@@ -142,7 +142,7 @@ export default {
             // Add filters and cursor value, and append to endpoint
             params.filters = this.selectedFilters;
             params.cursor = this.data[studentIndex].records.metadata.cursor.next;
-            endpoint.search = stringify(params, { arrayFormat: "brackets" });
+            endpoint.search = getSearchString(params);
 
             // Fetch data from endpoint,
             // update this student's report data and metadata
@@ -225,7 +225,8 @@ export default {
                                             title="View all pastoral records"
                                             class="name"
                                         >
-                                            {{ studentData.student.lastName }}, {{ studentData.student.firstName }} {{ studentData.student.pronoun }}
+                                            {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
+                                            {{ studentData.student.pronoun }}
                                         </a>
                                     </h4>
                                     <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
