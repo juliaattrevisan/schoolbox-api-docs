@@ -8,8 +8,11 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Component\Eportfolio\FileListMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\File\IFile;
 
 /**
  * Class Video
@@ -18,20 +21,56 @@ use Schoolbox\Resource\File\Model;
  */
 class Video extends Base
 {
-
     /**
      * Check perms
      *
-     * @param Model $file
-     * @throws \Exception
+     * @param IFile $file
+     * @return void
+     * @throws Exception
+     * @throws NotFound
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
-    protected function permissionCheck($file)
+    protected function permissionCheck(IFile $file): void
     {
-
-        /* TODO: Don't throw root \Exception; should probably throw Unauthorised() or NotFound() instead.
+        /* If you are the owner
+         * then you can view the content
          */
-        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-            throw new \Exception('You do not have permission to view this video.');
+        if ($file->getOwner()->getId() === $_SESSION['user']->getId()) {
+            return;
         }
+
+        /* Check eportfolio permissions; if you can see a page that shows the video
+         * (remembering that multiple eportfolio pages could show a given video)
+         * then you can view the content
+         */
+        $fileListMapper = FileListMapper::getInstance();
+
+        $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
+
+        if ($allFiles->count()) {
+            foreach ($allFiles as $currentFile) {
+                $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $file->getOwner(), $currentFile->getPageId());
+
+                /* If you can view one of the pages that this file is shared on,
+                 * break out of here
+                 */
+                if ($authenticator->canView()) {
+                    return;
+                }
+            }
+        }
+
+        /* If the video was in a folder where you have read access,
+         * then you can view the content
+         */
+        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+            return;
+        }
+
+        /* Every other use case: you get kicked out
+         */
+        throw new NotFound('You do not have permission to view this video.');
     }
 }

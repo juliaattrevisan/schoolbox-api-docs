@@ -9,7 +9,7 @@
 namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\File\IFile;
 
 /**
  * Class Thumbnail
@@ -18,14 +18,14 @@ use Schoolbox\Resource\File\Model;
  */
 class Thumbnail extends Base
 {
-
     /**
      * Check perms
      *
-     * @param Model $file
+     * @param IFile $file
+     * @return void
      * @throws \Exception
      */
-    protected function permissionCheck($file)
+    protected function permissionCheck(IFile $file): void
     {
         if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
             \SitePage::redirectToBrokenImageOfSize(64, 64, 403);

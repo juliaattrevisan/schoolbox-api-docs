@@ -10,7 +10,7 @@ namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
@@ -92,6 +92,7 @@ abstract class Base
             case QueueMapper::FILE_TYPE_MYFILE:
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
+                $this->permissionCheck($file);
 
                 return $videoMapper->findByStorageHash($file->getHash());
         }
@@ -103,9 +104,9 @@ abstract class Base
     /**
      * Permission check prior to instantiation
      *
-     * @param Model $video
+     * @param IFile $file
      */
-    abstract protected function permissionCheck($video);
+    abstract protected function permissionCheck(IFile $file);
 
 
     /**
