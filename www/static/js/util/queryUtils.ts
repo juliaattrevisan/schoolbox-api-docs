@@ -32,6 +32,24 @@ export function createKeyValuePairs(obj: NestedObject) {
                 } else if (typeof value === "number") {
                     // If the value is a number, convert it to a string and add it to the result
                     result[newKeyPath] = (value as number).toString();
+                } else if (Array.isArray(value)) {
+                    // If the value is an array, loop through the array and add an entry for each element
+                    value.forEach((element, index) => {
+                        const arrayKeyPath = `${newKeyPath}[${index}]`;
+                        if (typeof element === "object" && element !== null) {
+                            // Recursively call the function for nested objects
+                            recurse(element, arrayKeyPath);
+                        } else if (typeof element === "string") {
+                            // If the element is a string, add it to the result
+                            result[arrayKeyPath] = element;
+                        } else if (typeof element === "number") {
+                            // If the element is a number, convert it to a string and add it to the result
+                            result[arrayKeyPath] = (element as number).toString();
+                        } else if (element === null) {
+                            // If the element is null, add an empty string to the result
+                            result[arrayKeyPath] = "";
+                        }
+                    });
                 } else if (value === null) {
                     // If the value is null, add an empty string to the result
                     result[newKeyPath] = "";
@@ -59,4 +77,22 @@ export function createQueryString(obj: NestedObject) {
     });
     // then return the searchParams object as a string
     return searchParams.toString();
+}
+
+/**
+ * Takes an object and converts it to a query string
+ * @param {NestedObject} obj - The object to be converted to a query string
+ * @returns {string} - The query string
+ */
+export function getFormDataFromObject(obj: NestedObject) {
+    // first convert the object to key-value pairs
+    const keyValuePairs = createKeyValuePairs(obj);
+    const formData = new FormData();
+    const map = new Map(Object.entries(keyValuePairs));
+    // then append each key-value pair to the searchParams object
+    map.forEach((value, key) => {
+        formData.append(key, value);
+    });
+    // then return the searchParams object as a string
+    return formData;
 }

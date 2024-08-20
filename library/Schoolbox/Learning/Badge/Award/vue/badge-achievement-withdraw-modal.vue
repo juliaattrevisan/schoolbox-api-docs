@@ -4,6 +4,7 @@ import debounce from "lodash/debounce";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
+import { getFormDataFromObject } from "@js/util/queryUtils";
 
 /* Vue select
  */
@@ -173,29 +174,25 @@ export default {
                 userIds.push(this.selected[i].id);
             }
 
-            /* Pack it up and send it
-             */
-            let request = {
-                url: this.badge._links.achievementWithdraw,
-                data: qs.stringify({ userIds: userIds }),
-                method: "post",
-                responseType: "json",
-            };
-
             /* A toast - to your valour, my sword, and our victory together
              */
             self.toastActivate("Withdrawing achievements from " + this.selected.length + " student(s)");
-
-            axios
-                .request(request)
+            fetch(this.badge._links.achievementWithdraw, {
+                method: "POST",
+                body: getFormDataFromObject({ userIds: userIds }),
+            })
                 .then(function (response) {
-                    /* Close this modal
-                     */
-                    self.close();
+                    if (response.ok) {
+                        /* Close this modal
+                         */
+                        self.close();
 
-                    /* Pop toast
-                     */
-                    self.toastSuccess("Withdraw complete");
+                        /* Pop toast
+                         */
+                        self.toastSuccess("Withdraw complete");
+                    } else {
+                        self.toastError("Unable to withdraw achievement; please try again.");
+                    }
                 })
                 .then(function () {
                     /* Clear selection after async outcome

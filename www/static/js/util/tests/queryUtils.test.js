@@ -48,6 +48,10 @@ const biggerTestObject = {
     },
 };
 
+const basicTestArray = {
+    userIds: [13, 14],
+};
+
 describe("createKeyValuePairs()", () => {
     test("converts test object to key value pairs", () => {
         expect(createKeyValuePairs(basicTestObj)).toStrictEqual({
@@ -55,6 +59,12 @@ describe("createKeyValuePairs()", () => {
             "children[age]": "5",
             "children[name][firstName]": "Jane",
             "children[name][lastName]": "Doe",
+        });
+    });
+    test("converts basic test array to key value pairs", () => {
+        expect(createKeyValuePairs(basicTestArray)).toStrictEqual({
+            "userIds[0]": "13",
+            "userIds[1]": "14",
         });
     });
 });
