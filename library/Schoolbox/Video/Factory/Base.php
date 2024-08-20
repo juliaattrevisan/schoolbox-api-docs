@@ -92,7 +92,7 @@ abstract class Base
             case QueueMapper::FILE_TYPE_MYFILE:
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
-                $this->permissionCheck($file);
+                $this->permissionCheck($file, true);
 
                 return $videoMapper->findByStorageHash($file->getHash());
         }

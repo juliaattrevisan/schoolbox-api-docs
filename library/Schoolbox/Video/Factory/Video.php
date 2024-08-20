@@ -26,6 +26,7 @@ class Video extends Base
      * Check perms
      *
      * @param IFile $file
+     * @param bool $isMyFile
      * @return void
      * @throws Exception
      * @throws NotFound
@@ -33,7 +34,7 @@ class Video extends Base
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    protected function permissionCheck(IFile $file): void
+    protected function permissionCheck(IFile $file, bool $isMyFile = false): void
     {
         /* We're not in Aura, sorry
          */
@@ -71,11 +72,18 @@ class Video extends Base
             }
         }
 
-        /* If the video was in a folder where you have read access,
-         * then you can view the content
+        /* If $isMyFile is true, then we need to have special treatment about myFile.parent = 0.
+         * This is inferred to be the root level node of the resource browzer which, in Access.php:443,
+         * is assumed to be accessible to everyone with READ access. This isn't correct when your
+         * file is a MyFile (it shouldn't be accessible to any old bro)
          */
-        if ($this->getAccess()->getFolderAccess($currentUser, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
-            return;
+        if (!$isMyFile) {
+            /* If the video was in a folder where you have read access,
+             * then you can view the content
+             */
+            if ($this->getAccess()->getFolderAccess($currentUser, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+                return;
+            }
         }
 
         /* Every other use case: you get kicked out
