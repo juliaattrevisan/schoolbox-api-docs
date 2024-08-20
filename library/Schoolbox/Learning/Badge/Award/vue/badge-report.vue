@@ -4,7 +4,7 @@
  * and from where new goals / acheievements can be assigned
  */
 
-import { stringify } from "qs";
+import { getSearchString } from "@js/util/queryUtils";
 import { isObject, convertObjectToArray } from "@js/util/jsUtils";
 import BadgeReportHeader from "./badge-report-header";
 import BadgeReportStudent from "./badge-report-student";
@@ -52,10 +52,11 @@ export default {
             type: String,
             required: true,
         },
-        hasAwardPermissions: { // does the current user have permissions to award badges?
+        hasAwardPermissions: {
+            // does the current user have permissions to award badges?
             type: Boolean,
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
@@ -125,8 +126,9 @@ export default {
          */
         async getStudentData(event) {
             try {
-                const queryString = stringify({ filters: event.detail.selectedFilters }, { arrayFormat: "brackets" }); //use stringify to help split open and convert array values to a query string
-                const response = await fetch(this.getStudentListsEndpoint + "?" + queryString);
+                const response = await fetch(
+                    this.getStudentListsEndpoint + "?" + getSearchString({ filters: event.detail.selectedFilters }),
+                );
                 const responseData = await response.json();
                 this.studentsData = responseData.data;
             } catch (error) {
@@ -162,7 +164,7 @@ export default {
                 this.selectedStudents = [...this.selectedStudents, studentID]; //add in
             } else {
                 this.selectedStudents = this.selectedStudents.filter(
-                    (selectedStudentsID) => selectedStudentsID !== studentID
+                    (selectedStudentsID) => selectedStudentsID !== studentID,
                 ); //or remove
             }
         },
@@ -189,7 +191,7 @@ export default {
             const studentBadges = isObject(student.badges) ? convertObjectToArray(student.badges) : student.badges; //needs to be converted to an array if it hasn't already
             const badgeToUpdate = studentBadges.find((badge) => badge.badge.id === awardedBadge.badge.id);
             const hasBadgeMatch = studentBadges.find(
-                (badge) => badge.badge.id === badgeToUpdate.badge.id && badge.id !== badgeToUpdate.id
+                (badge) => badge.badge.id === badgeToUpdate.badge.id && badge.id !== badgeToUpdate.id,
             );
             if (hasBadgeMatch) {
                 //if the badge has already been achieved, increment the count and pull the badge goal out of the list
@@ -225,12 +227,13 @@ export default {
     <div class="small-12 island badge-report">
         <div v-if="isDataLoaded && hasStudents">
             <section class="content">
-                <badge-report-header v-if="hasAwardPermissions"
+                <badge-report-header
+                    v-if="hasAwardPermissions"
                     :has-some-students-selected="hasSomeStudentsSelected"
                     :are-all-students-selected="areAllStudentsSelected"
                     @on-select-all-selected="onSelectAllSelected"
                 />
-                <ul class="action-list" :class="{'noHeader' : !hasAwardPermissions}">
+                <ul class="action-list" :class="{ noHeader: !hasAwardPermissions }">
                     <badge-report-student
                         v-for="student in studentsData"
                         :key="student.id"
@@ -264,12 +267,7 @@ export default {
             <h3 class="selected-count">
                 <em>{{ selectedStudentsCount }} selected</em>
             </h3>
-            <button
-                @click.prevent="onClearStudentSelection"
-                class="button-clear"
-            >
-                Clear selection
-            </button>
+            <button @click.prevent="onClearStudentSelection" class="button-clear">Clear selection</button>
             <div class="modal-actions">
                 <a :href="getUrl('goal')" title="Set goal" class="button submit icon-goal">Set goal</a>
                 <a :href="getUrl('achievement')" title="Award achievement" class="button submit icon-achievement"
@@ -281,8 +279,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
-.noHeader { //shows when the user does not have badge perms, so we need to increase the top margin
+.noHeader {
+    //shows when the user does not have badge perms, so we need to increase the top margin
     margin-top: 1rem;
 }
 

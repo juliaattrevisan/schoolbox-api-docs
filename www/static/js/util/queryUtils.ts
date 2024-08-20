@@ -7,7 +7,7 @@ type NestedObject = {
 };
 
 /**
- * Takes an object and converts it to a collection of key-value pairs, with object depth represented by array notation
+ * Takes an object and converts it to a collection of key-value pairs, with object depth represented by array bracket notation
  * @param {NestedObject} obj - The object to be converted to key-value pairs
  * @returns {Record<string, string>} - The key-value pairs
  */
