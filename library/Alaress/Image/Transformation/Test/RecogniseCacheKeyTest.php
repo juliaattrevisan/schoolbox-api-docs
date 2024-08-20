@@ -13,10 +13,10 @@ use Alaress\Image\Transformation\Icon;
 use Alaress\Image\Transformation\MyImage;
 use Alaress\Image\Transformation\Portrait;
 use Alaress\Image\Transformation\Storage;
+use InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Realtime\Message\NSMapper;
-use SebastianBergmann\RecursionContext;
 
 /**
  * Tests that:
@@ -32,7 +32,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerIconCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testIcon(string $cacheKey): void
     {
@@ -43,7 +43,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerNotIconCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testNotIcon(string $cacheKey): void
     {
@@ -54,7 +54,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerMyImageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testMyImage(string $cacheKey): void
     {
@@ -65,7 +65,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerNotMyImageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testNotMyImage(string $cacheKey): void
     {
@@ -76,7 +76,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerPortraitCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testPortrait(string $cacheKey): void
     {
@@ -87,7 +87,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerNotPortraitCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testNotPortrait(string $cacheKey): void
     {
@@ -98,7 +98,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerStorageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testStorage(string $cacheKey): void
     {
@@ -109,7 +109,7 @@ class RecogniseCacheKeyTest extends TestCase
      * @dataProvider providerNotStorageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function testNotStorage(string $cacheKey): void
     {
@@ -124,7 +124,7 @@ class RecogniseCacheKeyTest extends TestCase
      *
      * @return array
      */
-    public function providerIconCacheKeys(): array
+    public static function providerIconCacheKeys(): array
     {
         $crops = [
             'news',
@@ -190,7 +190,7 @@ class RecogniseCacheKeyTest extends TestCase
      *
      * @return array
      */
-    public function providerMyImageCacheKeys(): array
+    public static function providerMyImageCacheKeys(): array
     {
         $sizes = [1, 16, 32, 48, 64, 100, 999];
         $data  = [];
@@ -207,7 +207,7 @@ class RecogniseCacheKeyTest extends TestCase
      *
      * @return array
      */
-    public function providerPortraitCacheKeys(): array
+    public static function providerPortraitCacheKeys(): array
     {
         $sizes = [
             'square32',
@@ -234,7 +234,7 @@ class RecogniseCacheKeyTest extends TestCase
      *
      * @return array
      */
-    public function providerStorageCacheKeys(): array
+    public static function providerStorageCacheKeys(): array
     {
         $sizes = [
             'square32',
@@ -260,39 +260,39 @@ class RecogniseCacheKeyTest extends TestCase
         return $data;
     }
 
-    public function providerNotIconCacheKeys(): array
+    public static function providerNotIconCacheKeys(): array
     {
         return array_merge(
-            $this->providerMyImageCacheKeys(),
-            $this->providerPortraitCacheKeys(),
-            $this->providerStorageCacheKeys(),
+            self::providerMyImageCacheKeys(),
+            self::providerPortraitCacheKeys(),
+            self::providerStorageCacheKeys(),
         );
     }
 
-    public function providerNotMyImageCacheKeys(): array
+    public static function providerNotMyImageCacheKeys(): array
     {
         return array_merge(
-            $this->providerIconCacheKeys(),
-            $this->providerPortraitCacheKeys(),
-            $this->providerStorageCacheKeys(),
+            self::providerIconCacheKeys(),
+            self::providerPortraitCacheKeys(),
+            self::providerStorageCacheKeys(),
         );
     }
 
-    public function providerNotPortraitCacheKeys(): array
+    public static function providerNotPortraitCacheKeys(): array
     {
         return array_merge(
-            $this->providerIconCacheKeys(),
-            $this->providerMyImageCacheKeys(),
-            $this->providerStorageCacheKeys(),
+            self::providerIconCacheKeys(),
+            self::providerMyImageCacheKeys(),
+            self::providerStorageCacheKeys(),
         );
     }
 
-    public function providerNotStorageCacheKeys(): array
+    public static function providerNotStorageCacheKeys(): array
     {
         return array_merge(
-            $this->providerIconCacheKeys(),
-            $this->providerMyImageCacheKeys(),
-            $this->providerPortraitCacheKeys(),
+            self::providerIconCacheKeys(),
+            self::providerMyImageCacheKeys(),
+            self::providerPortraitCacheKeys(),
         );
     }
 }
