@@ -1,4 +1,4 @@
-import { createQueryString } from "@js/util/queryUtils";
+import { getSearchString } from "@js/util/queryUtils";
 
 const ON_FILTER_CHANGE = "on-filter-change";
 
@@ -52,7 +52,7 @@ export default {
             if (showToast) {
                 this.$refs.toast.activate("Loading...");
             }
-            fetch(`${this.filter_endpoint}?${createQueryString(params)}`)
+            fetch(`${this.filter_endpoint}?${getSearchString(params)}`)
                 .then((response) => response.json())
                 .then((response) => {
                     if (clear) {

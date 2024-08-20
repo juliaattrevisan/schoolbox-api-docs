@@ -3,7 +3,7 @@ import debounce from "lodash/debounce";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
-import { getFormDataFromObject } from "@js/util/queryUtils";
+import { getFormData, getSearchString } from "@js/util/queryUtils";
 
 /* Vue select
  */
@@ -140,9 +140,7 @@ export default {
          * Perform async request and load results into component
          */
         search: debounce(function (loading, query, vm) {
-            const searchParams = new URLSearchParams();
-            searchParams.append("query", query);
-            fetch(`${this.badge._links.achievementRecipients}?${searchParams.toString()}`)
+            fetch(`${this.badge._links.achievementRecipients}?${getSearchString({ query })}`)
                 .then((response) => response.json())
                 .then(function (response) {
                     vm.options = response;
@@ -175,7 +173,7 @@ export default {
             self.toastActivate("Withdrawing achievements from " + this.selected.length + " student(s)");
             fetch(this.badge._links.achievementWithdraw, {
                 method: "POST",
-                body: getFormDataFromObject({ userIds: userIds }),
+                body: getFormData({ userIds: userIds }),
             })
                 .then(function (response) {
                     if (response.ok) {

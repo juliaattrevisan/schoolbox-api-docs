@@ -11,7 +11,7 @@ type NestedObject = {
  * @param {NestedObject} obj - The object to be converted to key-value pairs
  * @returns {Record<string, string>} - The key-value pairs
  */
-export function createKeyValuePairs(obj: NestedObject) {
+export function getKeyValuePairs(obj: NestedObject) {
     const result: Record<string, string> = {};
     /**
      * Recursively converts an object to a collection of key-value pairs
@@ -62,13 +62,13 @@ export function createKeyValuePairs(obj: NestedObject) {
 }
 
 /**
- * Takes an object and converts it to a query string
- * @param {NestedObject} obj - The object to be converted to a query string
- * @returns {string} - The query string
+ * Takes an object and converts it to a search string
+ * @param {NestedObject} obj - The object to be converted to a search param string
+ * @returns {string} - the URLSearchParams object as a string
  */
-export function createQueryString(obj: NestedObject) {
+export function getSearchString(obj: NestedObject) {
     // first convert the object to key-value pairs
-    const keyValuePairs = createKeyValuePairs(obj);
+    const keyValuePairs = getKeyValuePairs(obj);
     const searchParams = new URLSearchParams();
     const map = new Map(Object.entries(keyValuePairs));
     // then append each key-value pair to the searchParams object
@@ -80,13 +80,13 @@ export function createQueryString(obj: NestedObject) {
 }
 
 /**
- * Takes an object and converts it to a query string
- * @param {NestedObject} obj - The object to be converted to a query string
- * @returns {string} - The query string
+ * Takes an object and converts it to a FormData
+ * @param {NestedObject} obj - The object to be converted to a FormData
+ * @returns {string} - the FormData object
  */
-export function getFormDataFromObject(obj: NestedObject) {
+export function getFormData(obj: NestedObject) {
     // first convert the object to key-value pairs
-    const keyValuePairs = createKeyValuePairs(obj);
+    const keyValuePairs = getKeyValuePairs(obj);
     const formData = new FormData();
     const map = new Map(Object.entries(keyValuePairs));
     // then append each key-value pair to the searchParams object
@@ -94,5 +94,6 @@ export function getFormDataFromObject(obj: NestedObject) {
         formData.append(key, value);
     });
     // then return the searchParams object as a string
+    console.warn("formData", formData.values());
     return formData;
 }
