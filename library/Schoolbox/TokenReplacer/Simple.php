@@ -125,7 +125,7 @@ class Simple
             throw new RuntimeException('Could not load HTML content: ' . $e->getMessage());
         }
         $xpath = new \DOMXPath($dom);
-        $nodes = $xpath->query("//*[@$targetAttributeProp]");
+        $nodes = $xpath->query("//span[@$targetAttributeProp]");
 
         foreach ($nodes as $node) {
             $class = $node->getAttribute($targetAttributeProp);
