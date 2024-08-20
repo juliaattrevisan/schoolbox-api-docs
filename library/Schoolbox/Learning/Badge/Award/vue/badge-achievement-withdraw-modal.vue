@@ -1,5 +1,4 @@
 <script>
-import axios from "axios";
 import debounce from "lodash/debounce";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -16,7 +15,6 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
-import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 
 /**
@@ -142,14 +140,12 @@ export default {
          * Perform async request and load results into component
          */
         search: debounce(function (loading, query, vm) {
-            axios
-                .get(this.badge._links.achievementRecipients, {
-                    params: {
-                        query: query,
-                    },
-                })
+            const searchParams = new URLSearchParams();
+            searchParams.append("query", query);
+            fetch(`${this.badge._links.achievementRecipients}?${searchParams.toString()}`)
+                .then((response) => response.json())
                 .then(function (response) {
-                    vm.options = response.data;
+                    vm.options = response;
                     loading(false);
                 });
         }, 350),
