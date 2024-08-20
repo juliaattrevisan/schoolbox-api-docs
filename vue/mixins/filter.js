@@ -53,6 +53,7 @@ export default {
             if (showToast) {
                 this.$refs.toast.activate("Loading...");
             }
+            console.warn("Filter append", this.filter_endpoint, params);
             let config = {
                 params: params,
                 paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
