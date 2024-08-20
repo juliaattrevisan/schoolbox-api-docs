@@ -4911,11 +4911,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
-			message: "#^Invalid array key type Schoolbox\\\\IMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
 			message: "#^Property Schoolbox\\\\Mapper\\\\RecursiveUndeleterCli\\:\\:\\$logger \\(Alaress\\\\Lumberjack\\\\Logger\\) does not accept Psr\\\\Log\\\\LoggerInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
