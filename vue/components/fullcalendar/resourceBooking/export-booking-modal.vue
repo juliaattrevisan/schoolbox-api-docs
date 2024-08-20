@@ -1,6 +1,6 @@
 <script>
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import qs from "qs";
+import { getSearchString } from "@js/util/queryUtils";
 
 export default {
     name: "export-booking-modal",
@@ -30,7 +30,7 @@ export default {
                 this.window.location.host +
                 this.bookingExportUrl +
                 "?" +
-                qs.stringify(values)
+                getSearchString(values)
             );
         },
     },
