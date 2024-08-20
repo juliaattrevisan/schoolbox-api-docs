@@ -39,11 +39,11 @@ class MyFile extends DeprecatedModel
     /**
      * @deprecated
      *
-     * @param int  $folderID
-     * @param bool $config
+     * @param int   $folderID
+     * @param array $config
      * @return array|bool
      */
-    public function getAllInFolder($folderID, $config = false)
+    public function getAllInFolder($folderID, $config = [])
     {
         $query = "
             SELECT f.*, f.submitted, af.iconFile FROM " . $this->_table . " f
