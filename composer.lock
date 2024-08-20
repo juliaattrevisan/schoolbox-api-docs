@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cab2f5923c775c40b01e285d4a298182",
+    "content-hash": "83f1b1a9f98cc62bb8fb2423cc95be28",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2590,26 +2590,34 @@
         },
         {
             "name": "google/common-protos",
-            "version": "v4.7.0",
+            "version": "v4.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/common-protos-php.git",
-                "reference": "e58068776f57605c336e32c7db373f0a81da17b8"
+                "reference": "a3040ba2c1e81f363882a4430a900e579de6849e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/e58068776f57605c336e32c7db373f0a81da17b8",
-                "reference": "e58068776f57605c336e32c7db373f0a81da17b8",
+                "url": "https://api.github.com/repos/googleapis/common-protos-php/zipball/a3040ba2c1e81f363882a4430a900e579de6849e",
+                "reference": "a3040ba2c1e81f363882a4430a900e579de6849e",
                 "shasum": ""
             },
             "require": {
-                "google/protobuf": "^v3.25.3||^4.26.1",
+                "google/protobuf": "^3.6.1",
                 "php": "^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.6"
             },
             "type": "library",
+            "extra": {
+                "component": {
+                    "id": "common-protos",
+                    "target": "googleapis/common-protos-php.git",
+                    "path": "CommonProtos",
+                    "entry": "README.md"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Google\\Api\\": "src/Api",
@@ -2636,9 +2644,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/common-protos-php/issues",
-                "source": "https://github.com/googleapis/common-protos-php/tree/v4.7.0"
+                "source": "https://github.com/googleapis/common-protos-php/tree/v4.8.1"
             },
-            "time": "2024-07-25T20:20:43+00:00"
+            "time": "2024-08-10T02:24:23+00:00"
         },
         {
             "name": "google/gax",
@@ -2788,16 +2796,16 @@
         },
         {
             "name": "google/protobuf",
-            "version": "v4.27.3",
+            "version": "v3.25.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protocolbuffers/protobuf-php.git",
-                "reference": "ff079fe467bf86ac8f3359e2eb77a1613ebd204d"
+                "reference": "749f6c8e99a7fe51d096c2db656a4af9a46a6b5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/ff079fe467bf86ac8f3359e2eb77a1613ebd204d",
-                "reference": "ff079fe467bf86ac8f3359e2eb77a1613ebd204d",
+                "url": "https://api.github.com/repos/protocolbuffers/protobuf-php/zipball/749f6c8e99a7fe51d096c2db656a4af9a46a6b5e",
+                "reference": "749f6c8e99a7fe51d096c2db656a4af9a46a6b5e",
                 "shasum": ""
             },
             "require": {
@@ -2826,9 +2834,9 @@
                 "proto"
             ],
             "support": {
-                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v4.27.3"
+                "source": "https://github.com/protocolbuffers/protobuf-php/tree/v3.25.4"
             },
-            "time": "2024-07-31T13:27:16+00:00"
+            "time": "2024-07-24T17:10:25+00:00"
         },
         {
             "name": "gotenberg/gotenberg-php",
