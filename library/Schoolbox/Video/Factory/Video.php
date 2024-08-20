@@ -47,6 +47,12 @@ class Video extends Base
             return;
         }
 
+        /* TODO Decide about staffs
+         */
+//        if ($currentUser->getRole()->isStaff()) {
+//            return;
+//        }
+
         /* If the eportfolio feature is globally enabled, dig a little deeper;
          * maybe this lets you see stuff. If it's disabled, skip all this costly
          * investigation entirely and keep going with other checks
