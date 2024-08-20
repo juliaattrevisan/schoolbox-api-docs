@@ -15,7 +15,7 @@ abstract class DebugTwig extends Template
     // To cause twig to not render a debug wrapper around templates, set this key to FALSE in the template's context data
     public const DEBUG_WRAP = 'DEBUG_WRAP';
 
-    public function display(array $context, array $blocks = array())
+    public function display(array $context, array $blocks = array()): void
     {
         $wrapInDebug = $this->renderDebugWrapper($context);
 
