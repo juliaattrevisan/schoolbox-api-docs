@@ -11,8 +11,6 @@ use Tests\Support\Payload\Request;
 use Tests\Support\Payload\PostTrait;
 use Schoolbox\Collection;
 
-use function Clue\StreamFilter\append;
-
 class Update extends Request
 {
     use PostTrait;

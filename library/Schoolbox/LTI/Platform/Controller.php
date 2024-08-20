@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
-use Http\Factory\Guzzle\ResponseFactory;
+use GuzzleHttp\Psr7\HttpFactory;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -143,7 +143,7 @@ class Controller extends Base
         $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
         $this->response = $generator->generate(
             $this->request,
-            (new ResponseFactory())->createResponse(),
+            (new HttpFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
     }

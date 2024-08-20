@@ -678,7 +678,7 @@ EXAMPLES:
     private function buildDeDuplicatedResults(array $modelsByMapperClass): array
     {
         $deDuplicatedResults = [];
-        /** @var IMapper $mapperClass */
+        /** @var class-string<IMapper> $mapperClass */
         foreach ($modelsByMapperClass as $mapperClass => $models) {
             if (!array_key_exists($mapperClass, $deDuplicatedResults)) {
                 $deDuplicatedResults[$mapperClass] = new Collection();
