@@ -991,7 +991,7 @@ export default {
 
                         <span class="spacer"></span>
 
-                        <div>
+                        <div class="actions">
                             <!-- Various buttons -->
                             <span v-if="eventExtendedProps.links.path">
                                 <a class="button" :href="eventExtendedProps.links.path">View details</a>
@@ -1137,3 +1137,20 @@ export default {
         </reveal-modal>
     </reveal-modal>
 </template>
+
+<style scoped>
+/**
+ * Adjust the layout of the event modal buttons on smaller screens:
+ * On screens 800px wide or less, stack the action buttons (View Details / Modify / Delete)
+ * below the RSVP buttons (Yes / No) for better responsiveness.
+ */
+
+@media (max-width: 800px) {
+    .component-action section {
+        flex-direction: column;
+    }
+    .actions {
+        text-align: right;
+    }
+}
+</style>
