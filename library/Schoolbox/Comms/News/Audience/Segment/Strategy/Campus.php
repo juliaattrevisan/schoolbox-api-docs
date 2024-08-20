@@ -121,7 +121,7 @@ class Campus extends SimpleStrategy
                 }
             } else {
                 foreach ($campuses as $campus) {
-                    $values[] = $campus->getId();
+                    $values[] = (string)$campus->getId();
                 }
             }
         }

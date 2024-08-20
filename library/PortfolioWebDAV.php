@@ -558,7 +558,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * @param bool $file
      * @return bool
      */
-    public function create($data, $file = false)
+    public function create($data, $file = [])
     {
         if ($data['parent'] == 0) {
             return false;

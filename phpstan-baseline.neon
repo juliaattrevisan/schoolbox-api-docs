@@ -1711,21 +1711,6 @@ parameters:
 			path: library/HtmlTemplate.php
 
 		-
-			message: "#^Cannot access offset 'name' on true\\.$#"
-			count: 1
-			path: library/PortfolioWebDAV.php
-
-		-
-			message: "#^Cannot access offset 'resource' on true\\.$#"
-			count: 2
-			path: library/PortfolioWebDAV.php
-
-		-
-			message: "#^Cannot access offset 'tmp_name' on true\\.$#"
-			count: 1
-			path: library/PortfolioWebDAV.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/PortfolioWebDAV.php
