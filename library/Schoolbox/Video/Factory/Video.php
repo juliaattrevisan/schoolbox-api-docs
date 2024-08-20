@@ -34,10 +34,14 @@ class Video extends Base
      */
     protected function permissionCheck(IFile $file): void
     {
+        /* We're not in Aura, sorry
+         */
+        $currentUser = $_SESSION['user'];
+
         /* If you are the owner
          * then you can view the content
          */
-        if ($file->getOwner()->getId() === $_SESSION['user']->getId()) {
+        if ($file->getOwner()->getId() === $currentUser->getId()) {
             return;
         }
 
@@ -51,7 +55,7 @@ class Video extends Base
 
         if ($allFiles->count()) {
             foreach ($allFiles as $currentFile) {
-                $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $file->getOwner(), $currentFile->getPageId());
+                $authenticator = new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId());
 
                 /* If you can view one of the pages that this file is shared on,
                  * break out of here
@@ -65,7 +69,7 @@ class Video extends Base
         /* If the video was in a folder where you have read access,
          * then you can view the content
          */
-        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+        if ($this->getAccess()->getFolderAccess($currentUser, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
             return;
         }
 
