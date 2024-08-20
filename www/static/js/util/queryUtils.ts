@@ -27,8 +27,13 @@ export function createKeyValuePairs(obj: NestedObject) {
                     // Recursively call the function for nested objects
                     recurse(value, newKeyPath);
                 } else if (typeof value === "string") {
-                    // Otherwise assign the key-value pair to the result object
+                    // If the value is a string, add it to the result
                     result[newKeyPath] = value;
+                } else if (typeof value === "number") {
+                    // If the value is null, add an empty string to the result
+                    result[newKeyPath] = (value as number).toString();
+                } else if (value === null) {
+                    result[newKeyPath] = "";
                 }
             }
         });
@@ -48,7 +53,7 @@ export function createQueryString(obj: NestedObject) {
     const searchParams = new URLSearchParams();
     const map = new Map(Object.entries(keyValuePairs));
     // then append each key-value pair to the searchParams object
-    map.forEach((key, value) => {
+    map.forEach((value, key) => {
         searchParams.append(key, value);
     });
     // then return the searchParams object as a string

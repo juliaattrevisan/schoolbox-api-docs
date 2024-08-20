@@ -1,5 +1,4 @@
-import { stringify } from "qs";
-import axios from "axios";
+import { createQueryString } from "@js/util/queryUtils";
 
 const ON_FILTER_CHANGE = "on-filter-change";
 
@@ -53,20 +52,15 @@ export default {
             if (showToast) {
                 this.$refs.toast.activate("Loading...");
             }
-            console.warn("Filter append", this.filter_endpoint, params);
-            let config = {
-                params: params,
-                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
-            };
-            axios
-                .get(this.filter_endpoint, config)
+            fetch(`${this.filter_endpoint}?${createQueryString(params)}`)
+                .then((response) => response.json())
                 .then((response) => {
                     if (clear) {
                         this.data = [];
                     }
-                    this.data = this.data.concat(response?.data?.data ? response.data.data : []);
-                    this.metadata.count = response?.data?.metadata?.count ? response.data.metadata.count : 0;
-                    this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
+                    this.data = this.data.concat(response?.data ? response.data : []);
+                    this.metadata.count = response?.metadata?.count ? response.metadata.count : 0;
+                    this.metadata.cursor = response?.metadata?.cursor ? response.metadata.cursor : null;
                     if (showToast) {
                         this.$refs.toast.timeout("Loaded", true);
                     }
