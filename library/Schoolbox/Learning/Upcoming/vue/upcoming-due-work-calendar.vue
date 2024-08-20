@@ -5,13 +5,12 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
-import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
+import { getSearchString } from "@js/util/queryUtils";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import { stringify } from "qs";
-import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
 
 // Various URLs that FullCalendar may make use of.
 const URL_EVENT_SOURCE = "/learning/due/events";
@@ -184,23 +183,22 @@ export default {
                 successCallback([]);
                 return;
             }
-            axios
-                .get(URL_EVENT_SOURCE + "/" + window.fullCalendarConfig.userId, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        filters: this.selectedFilters,
-                    },
-                    paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
-                })
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                filters: this.selectedFilters,
+            };
+            fetch(`${URL_EVENT_SOURCE}/${window.fullCalendarConfig.userId}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     successCallback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
                 });
             // Fail callback: consider a message saying something failed
