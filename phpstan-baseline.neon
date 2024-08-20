@@ -396,11 +396,6 @@ parameters:
 			path: library/Alaress/Session/Session.php
 
 		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: library/Alaress/Specification/NotEmpty.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Alaress/Specification/NotEmpty.php
@@ -1396,26 +1391,6 @@ parameters:
 			path: library/Evaluation/Question/Category.php
 
 		-
-			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Account\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/Bridge/Account.php
-
-		-
-			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\AssignmentOverride\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/Bridge/AssignmentOverride.php
-
-		-
-			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Course\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/Bridge/Course.php
-
-		-
-			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\CourseGroup\\:\\:codePrefix\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/Bridge/CourseGroup.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/CliDatabaseCreator.php
@@ -1734,16 +1709,6 @@ parameters:
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/HtmlTemplate.php
-
-		-
-			message: "#^Cannot access offset 'filter' on bool\\.$#"
-			count: 1
-			path: library/MyFile.php
-
-		-
-			message: "#^Cannot access offset 'published' on bool\\.$#"
-			count: 1
-			path: library/MyFile.php
 
 		-
 			message: "#^Cannot access offset 'name' on true\\.$#"
@@ -4671,16 +4636,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
@@ -4694,11 +4649,6 @@ parameters:
 			message: "#^Result of && is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Badge\\\\Award\\\\Notifier\\:\\:notifyGoalset\\(\\) is unused\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -5789,11 +5739,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\User and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/User/Password/Reset/Controller.php
-
-		-
-			message: "#^Expression in empty\\(\\) is always falsy\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Password/Reset/Mapper.php
 
 		-
 			message: "#^If condition is always true\\.$#"
