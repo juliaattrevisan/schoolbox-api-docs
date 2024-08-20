@@ -72,7 +72,7 @@
         "react/promise": "^2.7",
         "react/event-loop": "^1.1.0",
         "laravie/predis-async": "^0.4.0",
-        "sentry/sdk": "^3.1.0",
+        "sentry/sdk": "^4.0",
         "league/commonmark": "^2.1",
         "ext-imagick": "*",
         "ext-json": "*",
