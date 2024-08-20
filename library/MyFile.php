@@ -21,7 +21,7 @@ class MyFile extends DeprecatedModel
      *
      * @param int $owner
      */
-    function __construct($owner = 0)
+    public function __construct($owner = 0)
     {
         if ($owner == 0) {
             $this->owner = $_SESSION['id'];
