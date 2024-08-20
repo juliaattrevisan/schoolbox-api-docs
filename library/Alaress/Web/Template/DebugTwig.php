@@ -24,7 +24,7 @@ abstract class DebugTwig extends Template
             echo "<div class=\"twigName\" hidden><mark><small>{$this->getTemplateName()}</small></mark></div>";
         }
 
-        $this->displayWithErrorHandling($this->env->mergeGlobals($context), array_merge($this->blocks, $blocks));
+        parent::display($this->env->mergeGlobals($context), array_merge($this->blocks, $blocks));
 
         if ($wrapInDebug) {
             echo "<!-- END: {$this->getTemplateName()} -->";
