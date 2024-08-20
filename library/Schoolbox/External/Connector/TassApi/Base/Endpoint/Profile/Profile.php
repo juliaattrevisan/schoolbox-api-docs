@@ -24,6 +24,7 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
@@ -669,11 +670,14 @@ class Profile implements IStrategy
      * Services both current parents and future parents, the latter use case does not
      * have any associated students due to an idiosyncrasy in tass
      *
-     * @param string     $externalId
-     * @param array      $parent
+     * @param string $externalId
+     * @param array $parent
      * @param Model|null $studentBaseProfile
      * @return void
      * @throws Exception
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws \UnexpectedValueException
      */
     private function processParentProfile(
         string $externalId,
@@ -690,6 +694,24 @@ class Profile implements IStrategy
         $relationship = trim((string)$parent['relationship']);
         $title = '';
         $username = trim((string)$parent['username']);
+
+        /* Skip parent records that have a meaningless (firstname, surname) tuple
+         * TASS assumes someone always has two parents, which is not always true.
+         * We can't tell the difference between:
+         *    - a parent record that has no data, but the parent should exist
+         *    - a parent record that has no data, but the parent *shouldn't* exist
+         *
+         * so we'll have to make a somewhat blind assumption that a meaningless name
+         * equates to a "meaningless" record and we should skip it.
+         */
+        if ('' === ($firstname . $firstnamePreferred . $lastname)) {
+            $this->log->info(sprintf(
+                'Parent %s does not have a meaningful name - assuming they do not exist; skipping',
+                $externalId
+            ));
+
+            return;
+        }
 
         /* A shortcut for convenience in logging
          * (Sometimes people don't have all the parts of their name; odd but ok)
