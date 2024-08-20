@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\TokenReplacer;
 
+use RuntimeException;
+
 /**
  * Class Simple
  *
@@ -18,6 +20,12 @@ namespace Schoolbox\TokenReplacer;
  */
 class Simple
 {
+    /**
+     * Content type prefix: required for forcing the DOM parser to recognise
+     * the HTML to convert as UTF-8 encoded.
+     */
+    private const META_CONTENT_TYPE_PREFIX = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+
     /**
      * $replacements is a set of key-value tuples just like phplib:
      *
@@ -39,9 +47,12 @@ class Simple
      * @param string $body
      * @param array  $replacements
      * @return string
+     * @throws \DOMException
+     * @throws RuntimeException
      */
     public function replace(string $body, array $replacements): string
     {
+        $body = $this->stripTargetAttribute($body);
         $sanitisedReplacements = array_map(static function ($val) {
             return \Scrub::text($val);
         }, array_values($replacements));
@@ -55,9 +66,12 @@ class Simple
      * @param string $body
      * @param array  $replacements
      * @return string
+     * @throws \DOMException
+     * @throws RuntimeException
      */
     public function replaceHtml(string $body, array $replacements): string
     {
+        $body = $this->stripTargetAttribute($body);
         $sanitisedReplacements = array_map(static function ($val) {
             return \Scrub::html($val);
         }, array_values($replacements));
@@ -82,5 +96,52 @@ class Simple
         /* Remove dupes and reindex
          */
         return array_values(array_unique($matches[0]));
+    }
+
+
+    /**
+     * Attempt to remove attributes from the target element
+     *
+     * @param string $htmlContent
+     * @param string $targetAttributeValue
+     * @param string $targetAttributeProp
+     * @return string
+     * @throws \DOMException
+     * @throws RuntimeException
+     */
+    public function stripTargetAttribute(
+        string $htmlContent,
+        string $targetAttributeValue = 'mention',
+        string $targetAttributeProp = 'class'
+    ): string {
+        //Should exit early if no tag to replace
+        if ($htmlContent === strip_tags($htmlContent)) {
+            return $htmlContent;
+        }
+        $dom = new \DOMDocument();
+        try {
+            $dom->loadHTML(self::META_CONTENT_TYPE_PREFIX . $htmlContent);
+        } catch (\ErrorException $e) {
+            throw new RuntimeException('Could not load HTML content: ' . $e->getMessage());
+        }
+        $xpath = new \DOMXPath($dom);
+        $nodes = $xpath->query("//*[@$targetAttributeProp]");
+
+        foreach ($nodes as $node) {
+            $class = $node->getAttribute($targetAttributeProp);
+            if (str_contains($class, $targetAttributeValue)) {
+                //Replace attribute by removing the target value
+                $newClass = trim(str_replace($targetAttributeValue, '', $class));
+                if ($newClass) {
+                    $node->setAttribute($targetAttributeProp, $newClass);
+                } else {
+                    $node->removeAttribute($targetAttributeProp);
+                }
+            }
+        }
+        $body = $dom->saveHTML();
+
+        unset($dom, $xpath);
+        return $body ?: '';
     }
 }
