@@ -88,12 +88,12 @@ function configureIframelyListener(editor: Editor) {
  * No longer used, but kept for any future debugging needs
  * @param { Editor } editor - the CKEditor instance
  */
-async function attachInspector(editor: Editor) {
-    if (process.env.NODE_ENV === "development") {
-        const inspector = await import("@ckeditor/ckeditor5-inspector");
-        inspector.default.attach(editor);
-    }
-}
+// async function attachInspector(editor: Editor) {
+//     if (process.env.NODE_ENV === "development") {
+//         const inspector = await import("@ckeditor/ckeditor5-inspector");
+//         inspector.default.attach(editor);
+//     }
+// }
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready

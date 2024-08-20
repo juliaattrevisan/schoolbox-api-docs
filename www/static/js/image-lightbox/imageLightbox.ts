@@ -8,6 +8,7 @@ import lightGallery from "lightgallery";
 import type { LightGallery } from "lightgallery/lightgallery";
 import type { LightGallerySettings } from "lightgallery/lg-settings";
 import type { GalleryItem } from "lightgallery/lg-utils";
+import type { VideoSource } from "lightgallery/plugins/video/types";
 import "lightgallery/css/lightgallery-bundle.min.css";
 import imageLightboxDefaults from "./imageLightboxDefaults";
 import "./imageLightbox.css";
@@ -45,7 +46,7 @@ function initLightGallery(): void {
         // Destroy the existing lightbox to avoid creating duplicate lightboxes
         const existingLightGallery = window.sbProps.lightGalleries[key];
         if (existingLightGallery !== undefined) {
-            existingLightGallery.destroy(true);
+            existingLightGallery.destroy();
         }
         lightboxElement.setAttribute("data-lightbox-loaded", "true");
 
@@ -54,11 +55,11 @@ function initLightGallery(): void {
             dynamic: true,
             dynamicEl: lightboxGroups[key].map((image): GalleryItem => {
                 return {
-                    src: image.getAttribute("href") || image.getAttribute("data-src"),
-                    thumb: image.querySelector("img")?.getAttribute("src") || image.getAttribute("href"),
-                    subHtml: image.getAttribute("title"),
-                    video: image.getAttribute("data-video"),
-                    poster: image.getAttribute("data-poster"),
+                    src: image.getAttribute("href") || image.getAttribute("data-src") || undefined,
+                    thumb: image.querySelector("img")?.getAttribute("src") || image.getAttribute("href") || undefined,
+                    subHtml: image.getAttribute("title") || undefined,
+                    video: (image.getAttribute("data-video") as unknown as VideoSource | null) || undefined,
+                    poster: image.getAttribute("data-poster") || undefined,
                 };
             }),
         };
@@ -115,7 +116,7 @@ document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
     // Overwrite an existing lightbox to avoid creating duplicate lightboxes
     const existingLightGallery = window.sbProps.lightGalleries[eventDetail.targetKey];
     if (existingLightGallery !== undefined) {
-        existingLightGallery.destroy(true);
+        existingLightGallery.destroy();
     }
 
     targetElement.setAttribute("data-lightbox-loaded", "true");

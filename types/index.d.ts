@@ -21,7 +21,12 @@ declare global {
         dateDisplayFormats: {
             dayjs: string;
         };
-        iframely: any;
+        iframely: {
+            load: (containerElement: Element, url?: string) => void;
+            on: (eventName: "cancel", callback: (url: string, parentNode: Element) => void) => void;
+            on: (eventName: "click", callback: (href: string) => void) => void;
+        };
+        jQuery: JQueryStatic;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
@@ -46,7 +51,7 @@ declare global {
             pwaConfig: typeof pwaConfig;
             firebaseApps: Array<{
                 appIdentifier: string;
-                publicConfiguration: { [key: string]: any };
+                publicConfiguration: { [key: string]: unknown };
                 webPushPublicKey: string;
             }>;
             // Curriculum nodes global storage

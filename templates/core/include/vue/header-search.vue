@@ -334,9 +334,9 @@ const searchButtonText = window.Vue.computed(() => {
                             <h3>
                                 {{ result.title }}
                             </h3>
-                            <span v-if="result.meta && result.meta.length > 0" class="meta"
-                                ><template v-for="(context, index) in result.meta as MetaContext[]" :key="context.id"
-                                    ><a :href="context.url">{{ context.name }}</a
+                            <span v-if="result.meta && result.meta.length > 0" class="meta">
+                                <template v-for="(context, index) in result.meta as MetaContext[]" :key="context.id">
+                                    <a :href="context.url">{{ context.name }}</a
                                     ><template v-if="index < result.meta.length - 1"> > </template>
                                 </template></span
                             >

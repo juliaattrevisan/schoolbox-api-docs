@@ -33,7 +33,7 @@ const articleEl = window.Vue.ref<HTMLElement | null>(null);
  * As this is coming from Learnosity directly to the front-end
  * @returns {string} the content to display
  */
-function getContent() {
+function getContent(): string {
     if (props.sanitize) {
         return sanitizeHtml(props.content, {
             allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]), // allow img tags
@@ -47,10 +47,15 @@ function getContent() {
  * `data-schoolboxresource-type` attribute will have the appropriate media
  * player applied to it if it's not applied already.
  */
-function initMediaElementPlayer() {
+async function initMediaElementPlayer(): Promise<void> {
     const $el = window.jQuery(articleEl.value as HTMLElement);
+    // @ts-expect-error - schoolboxResource is available here, but untyped.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     $.fn.schoolboxResource_ReplaceAll($el);
-    window.Vue.nextTick(() => {
+
+    await window.Vue.nextTick(() => {
+        // @ts-expect-error - schoolboxResource is available here, but untyped.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         $.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
     });
 }
@@ -58,11 +63,14 @@ function initMediaElementPlayer() {
 /**
  * Ensure any iframely embeds are displayed correctly
  */
-function initIframely() {
+function initIframely(): void {
     articleEl.value
         ?.querySelectorAll("oembed[url]:not(:has(iframe)), div[data-oembed-url]:not(:has(iframe))")
         .forEach((oEmbedEl) => {
-            window.iframely.load(oEmbedEl, oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"));
+            window.iframely.load(
+                oEmbedEl,
+                oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url") || undefined,
+            );
         });
 }
 
@@ -70,7 +78,7 @@ function initIframely() {
  * To properly display any media within the content
  */
 window.Vue.onMounted(() => {
-    initMediaElementPlayer();
+    void initMediaElementPlayer();
     initIframely();
 });
 </script>

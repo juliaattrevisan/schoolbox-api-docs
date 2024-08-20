@@ -1,10 +1,18 @@
 /**
+ * Based on our usage of MediaElementPlayer, this is not a complete type definition.
+ * See https://github.com/mediaelement/mediaelement/blob/master/src/js/player.js
+ */
+interface MediaElementPlayer {
+    node: HTMLElement;
+    setPlayerSize: (width: number, height: number) => void;
+}
+
+/**
  * Return a config object with default Schoolbox options set.
  *
  * Usage:
  *    import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
  *    const player = new MediaElementPlayer(el, getConfigForVideo());
- *
  * @param { object } overrideValueByKey - object containing key:value pairs that will override defaults.
  * @returns { object } - configuration object including overridden values.
  */
@@ -27,7 +35,6 @@ export function getConfigForVideo(overrideValueByKey?: object) {
          * @param { HTMLElement } media - the <mediaelementwrapper> DOM node (contains the <video> node)
          * @param { HTMLElement } node - the <video> DOM node
          * @param { MediaElementPlayer } instance - the relevant instance of MediaElementPlayer
-         *
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
          */
         success(media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
