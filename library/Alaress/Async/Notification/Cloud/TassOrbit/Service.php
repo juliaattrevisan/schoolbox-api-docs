@@ -24,6 +24,7 @@ class Service extends AbstractService
     private const PARENT_TASS_ORBIT_TYPE = 'tassapi';
     private const PARENT_TASS_ORBIT_MAX_PAR_CODE_LENGTH = 8;
     private const PARENT_TASS_ORBIT_MAX_SFA_NUM_LENGTH = 5;
+    public const PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID = 'studentExternalId';
 
     public function __construct(
         RegistryMapper $registryMapper,
@@ -53,7 +54,7 @@ class Service extends AbstractService
              * Parent Code = Number of characters specified by external_tass_parent_id_length
              * Split Family Number = Appending characters up to 5 characters
              */
-            $regex = '/([P,%s])([0-9]{%d})([0-9]{0,%d})/';
+            $regex = '/(?:[P,%s])(?<parCode>[0-9]{%d})(?<sfaNum>[0-9]{0,%d})/';
             preg_match(
                 sprintf(
                     $regex,
@@ -65,8 +66,8 @@ class Service extends AbstractService
                 $matches
             );
 
-            $parCode = $matches[2] ?? null;
-            $sfaNum  = $matches[3] ?? '';
+            $parCode = $matches['parCode'] ?? null;
+            $sfaNum  = $matches['sfaNum'] ?? '';
 
             //Parent Code should exist and be a non-falsey value
             //Parent code length should be a number
@@ -110,8 +111,8 @@ class Service extends AbstractService
             $meta = $notification->getMeta();
 
             //Is the event related to their children?
-            if (isset($meta['studentExternalId'])) {
-                $notifRequest['stud_code'] = $meta['studentExternalId'];
+            if (isset($meta[self::PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID])) {
+                $notifRequest['stud_code'] = $meta[self::PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID];
             }
 
             if ($notification->getHref()) {
