@@ -705,7 +705,7 @@ class Profile implements IStrategy
          * equates to a "meaningless" record and we should skip it.
          */
         if ('' === ($firstname . $firstnamePreferred . $lastname)) {
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Parent %s does not have a meaningful name - assuming they do not exist; skipping',
                 $externalId
             ));
