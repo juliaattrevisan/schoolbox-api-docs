@@ -89,38 +89,38 @@ class AccessLevelCensorTest extends TestCase
      * Data provider
      * @return array
      */
-    public function providerRelatedRecordCollection(): array
+    public static function providerRelatedRecordCollection(): array
     {
         // (string $recordType, Pastoral\Model $originalRecord, ?Pastoral\Model $expectedFilteredRecord, User $viewer)
         $data = [];
 
         // owner
-        $owner = (new User())->setId($this->guid++)->setUsername('owner')->setRole((new Role())->setType(Role::STAFF));
+        $owner = (new User())->setId(self::$guid++)->setUsername('owner')->setRole((new Role())->setType(Role::STAFF));
         $owner->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         // no Access
-        $noAccessUser = (new User())->setId($this->guid++)->setUsername('no_access');
+        $noAccessUser = (new User())->setId(self::$guid++)->setUsername('no_access');
         $noAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         // moderator
-        $pastoralModerator = (new User())->setId($this->guid++)->setUsername('moderator');
+        $pastoralModerator = (new User())->setId(self::$guid++)->setUsername('moderator');
         $pastoralModPerm   = (new UserAccess())->setAccessLevel(UserAccess::ACCESS_FULL)->setService(UserAccess::SERVICE_PASTORAL)->setUser($pastoralModerator);
         $accessList        = UserAccess::createCollection();
         $accessList->add($pastoralModPerm);
         $pastoralModerator->setAccessList($accessList)->setPastoralGroupIds([]);
 
         // prepare records without access
-        foreach ($this->buildRelatedRecordCollection($owner) as $records) {
+        foreach (self::buildRelatedRecordCollection($owner) as $records) {
             $data[] = ['No access', $records['original'], null, $noAccessUser];
             $data[] = ['No access', $records['original'], $records['moderator'], $pastoralModerator];
             $data[] = ['No access', $records['original'], $records['owner'], $owner];
         }
 
         // prepare records with private/public access
-        $testAccesses = $this->generateAccessData();
+        $testAccesses = self::generateAccessData();
         // check each pastoral access
         foreach ($testAccesses as $testAccess) {
-            foreach ($this->buildRelatedRecordCollection($owner, $testAccess['pastoralAccess']) as $records) {
+            foreach (self::buildRelatedRecordCollection($owner, $testAccess['pastoralAccess']) as $records) {
                 $data[] = [$testAccess['record'], $records['original'], null, $noAccessUser];
                 $data[] = [$testAccess['record'], $records['original'], $records['moderator'], $pastoralModerator];
                 $data[] = [$testAccess['record'], $records['original'], $records['owner'], $owner];
@@ -147,21 +147,21 @@ class AccessLevelCensorTest extends TestCase
      * @param PastoralAccess|null $pastoralAccess
      * @return GenericCollection|Pastoral\Model[]
      */
-    private function buildRelatedRecordCollection(User $owner, ?PastoralAccess $pastoralAccess = null): array
+    private static function buildRelatedRecordCollection(User $owner, ?PastoralAccess $pastoralAccess = null): array
     {
         $studentCampus = Campus::createCollection()->add((new Campus())->setId(1));
-        $recordA       = $this->generateRecord('A', $owner, $pastoralAccess);
-        $recordB       = $this->generateRecord('B', $owner, $pastoralAccess);
-        $recordC       = $this->generateRecord('C', $owner, $pastoralAccess);
-        $recordD       = $this->generateRecord('D', $owner, $pastoralAccess);
-        $recordAPublic = $this->filterPrivate($recordA);
-        $recordBPublic = $this->filterPrivate($recordB);
-        $recordCPublic = $this->filterPrivate($recordC);
-        $recordDPublic = $this->filterPrivate($recordD);
+        $recordA       = self::generateRecord('A', $owner, $pastoralAccess);
+        $recordB       = self::generateRecord('B', $owner, $pastoralAccess);
+        $recordC       = self::generateRecord('C', $owner, $pastoralAccess);
+        $recordD       = self::generateRecord('D', $owner, $pastoralAccess);
+        $recordAPublic = self::filterPrivate($recordA);
+        $recordBPublic = self::filterPrivate($recordB);
+        $recordCPublic = self::filterPrivate($recordC);
+        $recordDPublic = self::filterPrivate($recordD);
 
         // no owner record
-        $ownerX        = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STAFF));
-        $studentX      = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT))->setCampusCollection($studentCampus);
+        $ownerX        = (new User())->setId(self::$guid++)->setRole((new Role())->setType(Role::STAFF));
+        $studentX      = (new User())->setId(self::$guid++)->setRole((new Role())->setType(Role::STUDENT))->setCampusCollection($studentCampus);
         $recordX       = (new Pastoral\Model())
             ->setHeading('X')
             ->setId(9)
@@ -226,7 +226,7 @@ class AccessLevelCensorTest extends TestCase
     /**
      * @var int random guid
      */
-    private $guid = 100;
+    private static $guid = 100;
 
     /**
      * Returns a pastoral record with comments and attachments
@@ -236,14 +236,14 @@ class AccessLevelCensorTest extends TestCase
      * @param PastoralAccess|null $pastoralAccess
      * @return Pastoral\Model
      */
-    private function generateRecord(string $name, User $owner, ?PastoralAccess $pastoralAccess = null): Pastoral\Model
+    private static function generateRecord(string $name, User $owner, ?PastoralAccess $pastoralAccess = null): Pastoral\Model
     {
         $studentCampus = Campus::createCollection()->add((new Campus())->setId(1));
 
-        $student = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT))->setCampusCollection($studentCampus);
+        $student = (new User())->setId(self::$guid++)->setRole((new Role())->setType(Role::STUDENT))->setCampusCollection($studentCampus);
         $record  = (new Pastoral\Model())
             ->setHeading($name)
-            ->setId($this->guid++)
+            ->setId(self::$guid++)
             ->setOwner($owner)
             ->setType((new Pastoral\Type\Model())->setId(1)->setName('type'))
             ->setExternalId(null)
@@ -290,7 +290,7 @@ class AccessLevelCensorTest extends TestCase
      * @param Pastoral\Model $record
      * @return Pastoral\Model
      */
-    private function filterPrivate(Pastoral\Model $record): Pastoral\Model
+    private static function filterPrivate(Pastoral\Model $record): Pastoral\Model
     {
         $publicRecord = clone $record;
 
@@ -319,35 +319,35 @@ class AccessLevelCensorTest extends TestCase
      *
      * @return array
      */
-    private function generateAccessData()
+    private static function generateAccessData()
     {
         $studentCampus     = Campus::createCollection()->add((new Campus())->setId(1));
         $noStudentCampus   = Campus::createCollection()->add((new Campus())->setId(2));
-        $privateAccessUser = (new User())->setId($this->guid++)->setUsername('private_user')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
+        $privateAccessUser = (new User())->setId(self::$guid++)->setUsername('private_user')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
         $privateAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
-        $publicAccessUser = (new User())->setId($this->guid++)->setUsername('public_user')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
+        $publicAccessUser = (new User())->setId(self::$guid++)->setUsername('public_user')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
         $publicAccessUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
-        $privateAccessRole     = (new Role())->setId($this->guid++)->setType(Role::STAFF);
-        $privateAccessRoleUser = (new User())->setId($this->guid++)->setUsername('private_role')->setRole($privateAccessRole)->setCampusCollection($noStudentCampus);
+        $privateAccessRole     = (new Role())->setId(self::$guid++)->setType(Role::STAFF);
+        $privateAccessRoleUser = (new User())->setId(self::$guid++)->setUsername('private_role')->setRole($privateAccessRole)->setCampusCollection($noStudentCampus);
         $privateAccessRoleUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
-        $publicAccessRole     = (new Role())->setId($this->guid++)->setType(Role::STAFF);
-        $publicAccessRoleUser = (new User())->setId($this->guid++)->setUsername('public_role')->setRole($publicAccessRole)->setCampusCollection($noStudentCampus);
+        $publicAccessRole     = (new Role())->setId(self::$guid++)->setType(Role::STAFF);
+        $publicAccessRoleUser = (new User())->setId(self::$guid++)->setUsername('public_role')->setRole($publicAccessRole)->setCampusCollection($noStudentCampus);
         $publicAccessRoleUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
-        $privateAccessGroupUser = (new User())->setId($this->guid++)->setUsername('private_group')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
-        $privateAccessGroup     = (new Pastoral\Group\Model())->setId($this->guid++);
+        $privateAccessGroupUser = (new User())->setId(self::$guid++)->setUsername('private_group')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
+        $privateAccessGroup     = (new Pastoral\Group\Model())->setId(self::$guid++);
         $privateAccessGroupUser->setAccessList(UserAccess::createCollection())
                                ->setPastoralGroupIds([$privateAccessGroup->getId()])->setCampusCollection($noStudentCampus);
 
         $publicAccessGroupUser = (new User())->setId(107)->setUsername('public_group')->setRole((new Role())->setType(Role::STAFF))->setCampusCollection($noStudentCampus);
-        $publicAccessGroup     = (new Pastoral\Group\Model())->setId($this->guid++);
+        $publicAccessGroup     = (new Pastoral\Group\Model())->setId(self::$guid++);
         $publicAccessGroupUser->setAccessList(UserAccess::createCollection())
                               ->setPastoralGroupIds([$publicAccessGroup->getId()])->setCampusCollection($noStudentCampus);
 
-        $publicAccessRoleCampusUser = (new User())->setId($this->guid++)->setUsername('public_role')->setRole($publicAccessRole)->setCampusCollection($studentCampus);
+        $publicAccessRoleCampusUser = (new User())->setId(self::$guid++)->setUsername('public_role')->setRole($publicAccessRole)->setCampusCollection($studentCampus);
         $publicAccessRoleCampusUser->setAccessList(UserAccess::createCollection())->setPastoralGroupIds([]);
 
         return [

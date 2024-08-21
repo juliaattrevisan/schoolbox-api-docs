@@ -15,7 +15,6 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql;
 use Alaress\DataStructures\ObjectTree;
-use Error;
 use External_UserInterface;
 use InvalidArgumentException;
 use LogicException;
@@ -39,6 +38,7 @@ use Schoolbox\Resource\Group;
 use Schoolbox\Role;
 use Schoolbox\User;
 use UnexpectedValueException;
+
 use function array_merge;
 
 
@@ -180,8 +180,8 @@ class AccessTest extends TestCase
 
 
     // Tests
+
     /**
-     * @param Access       $access
      * @param User         $user
      * @param Folder\Model $folder
      * @param bool         $expected
@@ -191,14 +191,14 @@ class AccessTest extends TestCase
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerIsInstructor')]
-    public function testIsInstructor(Access $access, User $user, Folder\Model $folder, bool $expected): void
+    public function testIsInstructor(User $user, Folder\Model $folder, bool $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->isInstructor($user, $folder));
     }
 
 
     /**
-     * @param Access       $access
      * @param User         $user
      * @param Folder\Model $folder
      * @param bool         $expected
@@ -208,26 +208,27 @@ class AccessTest extends TestCase
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerIsLearner')]
-    public function testIsLearner(Access $access, User $user, Folder\Model $folder, bool $expected): void
+    public function testIsLearner(User $user, Folder\Model $folder, bool $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->isLearner($user, $folder));
     }
 
 
     /**
-     * @param Access $access
-     * @param User   $user
-     * @param int    $service
-     * @param int    $serviceIdentifier
-     * @param int    $expected
+     * @param User $user
+     * @param int  $service
+     * @param int  $serviceIdentifier
+     * @param int  $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws LogicException
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetAccessLevel')]
-    public function testGetAccessLevel(Access $access, User $user, int $service, int $serviceIdentifier, int $expected): void
+    public function testGetAccessLevel(User $user, int $service, int $serviceIdentifier, int $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->getAccessLevel($user, $service, $serviceIdentifier));
     }
 
@@ -252,30 +253,31 @@ class AccessTest extends TestCase
 
 
     /**
-     * @param Access $access
+     * @param array  $config
      * @param string $roleType
      * @param int    $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSisClassRoleTypeAccess')]
-    public function testSisClassRoleTypeAccess(Access $access, string $roleType, int $expected): void
+    public function testSisClassRoleTypeAccess(array $config, string $roleType, int $expected): void
     {
+        $access = $this->newAccess($config);
         $this->assertSame($expected, $access->getSisClassRoleTypeAccess($roleType));
     }
 
 
     /**
-     * @param Access $access
-     * @param User   $user
-     * @param array  $folderIds
-     * @param int    $expected
+     * @param User  $user
+     * @param array $folderIds
+     * @param int   $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws LogicException
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetMinFolderAccess')]
-    public function testGetMinFolderAccess(Access $access, User $user, array $folderIds, int $expected): void
+    public function testGetMinFolderAccess(User $user, array $folderIds, int $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->getMinFolderAccess($user, $folderIds));
     }
 
@@ -297,7 +299,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @param Access $access
      * @param User   $user
      * @param string $codeString
      * @param bool   $expected
@@ -305,8 +306,9 @@ class AccessTest extends TestCase
      * @throws LogicException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvolvedInSubject')]
-    public function testInvolvedInSubject(Access $access, User $user, string $codeString, bool $expected): void
+    public function testInvolvedInSubject(User $user, string $codeString, bool $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->involvedInSubject($user, $codeString));
     }
 
@@ -327,32 +329,32 @@ class AccessTest extends TestCase
 
 
     /**
-     * @param Access $access
-     * @param User   $user
-     * @param int    $folderId
-     * @param bool   $expected
+     * @param User $user
+     * @param int  $folderId
+     * @param bool $expected
      * @throws InvalidColumnException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvolvedInGroup')]
-    public function testInvolvedInGroup(Access $access, User $user, int $folderId, bool $expected): void
+    public function testInvolvedInGroup(User $user, int $folderId, bool $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->involvedInGroup($user, $folderId));
     }
 
 
     /**
-     * @param Access $access
-     * @param User   $user
-     * @param int    $folderId
-     * @param int    $expected
+     * @param User $user
+     * @param int  $folderId
+     * @param int  $expected
      * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws LogicException
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetFolderAccess')]
-    public function testGetFolderAccess(Access $access, User $user, int $folderId, int $expected): void
+    public function testGetFolderAccess(User $user, int $folderId, int $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->getFolderAccess($user, $folderId));
     }
 
@@ -380,10 +382,9 @@ class AccessTest extends TestCase
 
 
     /**
-     * @param Access $access
-     * @param int    $roleId
-     * @param int    $folderId
-     * @param int    $expected
+     * @param int $roleId
+     * @param int $folderId
+     * @param int $expected
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
@@ -391,8 +392,9 @@ class AccessTest extends TestCase
      * @throws UnexpectedValueException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetFolderAccessForRole')]
-    public function testGetFolderAccessForRole(Access $access, int $roleId, int $folderId, int $expected): void
+    public function testGetFolderAccessForRole(int $roleId, int $folderId, int $expected): void
     {
+        $access = $this->newAccess();
         $this->assertSame($expected, $access->getFolderAccessForRole($roleId, $folderId));
     }
 
@@ -411,7 +413,7 @@ class AccessTest extends TestCase
     public function testCannotConnectToExternalUser(): void
     {
         $this->expectException(DatabaseException::class);
-        $access = $this->newAccess();
+        $access     = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');
         $instance->setAccessible(true);
@@ -430,85 +432,84 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerIsInstructor(): array
+    public static function providerIsInstructor(): array
     {
-        $access  = $this->newAccess();
-        $roles   = $this->buildRoles(self::ROLE_DATA);
-        $users   = $this->buildUsers($roles, self::USER_DATA);
-        $folders = $this->buildFolderTree(self::FOLDER_DATA);
+        $roles   = self::buildRoles(self::ROLE_DATA);
+        $users   = self::buildUsers($roles, self::USER_DATA);
+        $folders = self::buildFolderTree(self::FOLDER_DATA);
 
         return [
             // User1 is SU. Is instructor for all folders
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User2 is staff. Folder4 has role perm for staff of WRITE. Folder5 inherits from Folder4.
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User3 is student. No WRITE+ perm anywhere
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User4 is student. WRITE perm to Folder4 via GroupPerm in `userAccess` table
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User5 is student.
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User6 is parent. Parent role has WRITE to Folder2. WRITE perm via `userAccess` to Folder1.
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User7 is parent. Parent role has WRITE to Folder2.
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User8 is guest. Has CMS FULL perm. Has FULL access to Folder1 via `userAccess`. Folder3 inherits.
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
         ];
     }
 
@@ -519,85 +520,84 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerIsLearner(): array
+    public static function providerIsLearner(): array
     {
-        $access  = $this->newAccess();
-        $roles   = $this->buildRoles(self::ROLE_DATA);
-        $users   = $this->buildUsers($roles, self::USER_DATA);
-        $folders = $this->buildFolderTree(self::FOLDER_DATA);
+        $roles   = self::buildRoles(self::ROLE_DATA);
+        $users   = self::buildUsers($roles, self::USER_DATA);
+        $folders = self::buildFolderTree(self::FOLDER_DATA);
 
         return [
             // User1 is SU. Has FULL access to all folders
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_1_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User2 is staff.
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_2_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User3 is student.
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_3_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User4 is student.
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_4_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User5 is student.
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_1_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_2_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_3_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_5_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User6 is parent.
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_6_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User7 is parent.
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
-            [$access, $users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_4_ID), true],
+            [$users->getOffset(self::USER_7_ID), $folders->getElementByHash(self::FOLDER_5_ID), true],
 
             // User8 is guest.
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_8_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
-            [$access, $users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(Folder\Model::ROOT_ID), true],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_1_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_2_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_3_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_4_ID), false],
+            [$users->getOffset(self::USER_9_ID), $folders->getElementByHash(self::FOLDER_5_ID), false],
         ];
     }
 
@@ -608,11 +608,10 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerGetAccessLevel(): array
+    public static function providerGetAccessLevel(): array
     {
-        $access = $this->newAccess();
-        $roles  = $this->buildRoles(self::ROLE_DATA);
-        $users  = $this->buildUsers($roles, self::USER_DATA);
+        $roles = self::buildRoles(self::ROLE_DATA);
+        $users = self::buildUsers($roles, self::USER_DATA);
 
         $user1 = $users->getOffset(self::USER_1_ID);
         $user2 = $users->getOffset(self::USER_2_ID);
@@ -624,120 +623,120 @@ class AccessTest extends TestCase
         $user8 = $users->getOffset(self::USER_8_ID);
         $user9 = $users->getOffset(self::USER_9_ID);
 
-        // Access $access, User $user, int $service, int $serviceIdentifier, int $expected
+        // User $user, int $service, int $serviceIdentifier, int $expected
         return [
             // User1 is SU. Has FULL access to all folders
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
-            [$access, $user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
+            [$user1, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User2 is staff.
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$user2, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User3 is student.
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$user3, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User4 is student.
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$user4, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User5 is student.
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$user5, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User6 is parent.
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$user6, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User7 is parent.
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$user7, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User8 is guest. Has CMS FULL perm.
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
-            [$access, $user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
+            [$user8, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$user9, UserAccess::SERVICE_HOMEPAGE, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // Calendar perms
 
-            [$access, $user1, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user1, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_READ],
-            [$access, $user2, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_WRITE],
-            [$access, $user4, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user4, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user5, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user5, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user6, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user6, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user8, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user8, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user9, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
-            [$access, $user9, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user1, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user1, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_READ],
+            [$user2, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_WRITE],
+            [$user4, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user4, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user5, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user5, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user6, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user6, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user8, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user8, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
+            [$user9, UserAccess::SERVICE_CALENDAR, self::CALENDER_JUNIOR_ID, UserAccess::ACCESS_DENY],
+            [$user9, UserAccess::SERVICE_CALENDAR, self::CALENDER_SENIOR_ID, UserAccess::ACCESS_DENY],
 
-            [$access, $user1, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user4, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user5, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user6, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user8, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_FULL],
-            [$access, $user9, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_WRITE],
+            [$user1, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user4, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user5, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user6, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user8, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_FULL],
+            [$user9, UserAccess::SERVICE_CMS, UserAccess::SID_NONE, UserAccess::ACCESS_WRITE],
 
-            [$access, $user1, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user2, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user3, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user4, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user5, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user6, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user7, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user8, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
-            [$access, $user9, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user1, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user2, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user3, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user4, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user5, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user6, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user7, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user8, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
+            [$user9, UserAccess::SERVICE_NEWS, UserAccess::SID_NONE, UserAccess::ACCESS_DENY],
         ];
     }
 
@@ -748,18 +747,18 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerSisClassRoleTypeAccess(): array
+    public static function providerSisClassRoleTypeAccess(): array
     {
-        $accessStudentRead = $this->newAccess();
-        $accessStudentDeny = $this->newAccess(array_merge(self::CONFIG, ['allow_student_class_access' => false]));
+        $accessStudentReadConfig = self::CONFIG;
+        $accessStudentDenyConfig = array_merge(self::CONFIG, ['allow_student_class_access' => false]);
 
         return [
-            // Access $access, string $roleType, int $expected
-            [$accessStudentRead, Role::STAFF, UserAccess::ACCESS_WRITE],
-            [$accessStudentRead, Role::STUDENT, UserAccess::ACCESS_READ],
-            [$accessStudentDeny, Role::STUDENT, UserAccess::ACCESS_DENY],
-            [$accessStudentRead, Role::PARENT, UserAccess::ACCESS_DENY],
-            [$accessStudentRead, Role::GUEST, UserAccess::ACCESS_DENY],
+            // array $config, string $roleType, int $expected
+            [$accessStudentReadConfig, Role::STAFF, UserAccess::ACCESS_WRITE],
+            [$accessStudentReadConfig, Role::STUDENT, UserAccess::ACCESS_READ],
+            [$accessStudentDenyConfig, Role::STUDENT, UserAccess::ACCESS_DENY],
+            [$accessStudentReadConfig, Role::PARENT, UserAccess::ACCESS_DENY],
+            [$accessStudentReadConfig, Role::GUEST, UserAccess::ACCESS_DENY],
         ];
     }
 
@@ -770,12 +769,10 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerGetMinFolderAccess(): array
+    public static function providerGetMinFolderAccess(): array
     {
-        $access = $this->newAccess();
-
-        $roles = $this->buildRoles(self::ROLE_DATA);
-        $users = $this->buildUsers($roles, self::USER_DATA);
+        $roles = self::buildRoles(self::ROLE_DATA);
+        $users = self::buildUsers($roles, self::USER_DATA);
 
         $user1Folders = [Folder\Model::ROOT_ID, self::FOLDER_1_ID];
         $user2Folders = [self::FOLDER_3_ID, self::FOLDER_4_ID];
@@ -788,16 +785,16 @@ class AccessTest extends TestCase
         $user9Folders = [self::FOLDER_3_ID, self::FOLDER_4_ID];
 
         return [
-            // Access $access, User $user, array $folderIds, int $expected
-            [$access, $users->getOffset(self::USER_1_ID), $user1Folders, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_2_ID), $user2Folders, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_3_ID), $user3Folders, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), $user4Folders, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), $user5Folders, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_6_ID), $user6Folders, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_7_ID), $user7Folders, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_8_ID), $user8Folders, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_9_ID), $user9Folders, UserAccess::ACCESS_WRITE],
+            // User $user, array $folderIds, int $expected
+            [$users->getOffset(self::USER_1_ID), $user1Folders, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_2_ID), $user2Folders, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_3_ID), $user3Folders, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_4_ID), $user4Folders, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), $user5Folders, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_6_ID), $user6Folders, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_7_ID), $user7Folders, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_8_ID), $user8Folders, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_9_ID), $user9Folders, UserAccess::ACCESS_WRITE],
         ];
     }
 
@@ -808,47 +805,46 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerInvolvedInSubject(): array
+    public static function providerInvolvedInSubject(): array
     {
-        $access = $this->newAccess();
-        $roles  = $this->buildRoles(self::ROLE_DATA);
-        $users  = $this->buildUsers($roles, self::USER_DATA);
+        $roles = self::buildRoles(self::ROLE_DATA);
+        $users = self::buildUsers($roles, self::USER_DATA);
 
         return [
-            // Access $access, User $user, string $codeString, bool $expected
+            // User $user, string $codeString, bool $expected
 
             // Not involved in any subjects
-            [$access, $users->getOffset(self::USER_1_ID), '', false],
-            [$access, $users->getOffset(self::USER_1_ID), 'ABC', false],
-            [$access, $users->getOffset(self::USER_1_ID), 'X/ABC', false],
+            [$users->getOffset(self::USER_1_ID), '', false],
+            [$users->getOffset(self::USER_1_ID), 'ABC', false],
+            [$users->getOffset(self::USER_1_ID), 'X/ABC', false],
 
             // In ['','ABC']
-            [$access, $users->getOffset(self::USER_2_ID), '', false],
-            [$access, $users->getOffset(self::USER_2_ID), 'ABC', true],
-            [$access, $users->getOffset(self::USER_2_ID), 'ABC,someOther', true],
-            [$access, $users->getOffset(self::USER_2_ID), 'X/ABC', false],
-            [$access, $users->getOffset(self::USER_2_ID), 'XXX', false],
+            [$users->getOffset(self::USER_2_ID), '', false],
+            [$users->getOffset(self::USER_2_ID), 'ABC', true],
+            [$users->getOffset(self::USER_2_ID), 'ABC,someOther', true],
+            [$users->getOffset(self::USER_2_ID), 'X/ABC', false],
+            [$users->getOffset(self::USER_2_ID), 'XXX', false],
 
             // In [X,ABC],['',XXX]
-            [$access, $users->getOffset(self::USER_3_ID), 'ABC', true],
-            [$access, $users->getOffset(self::USER_3_ID), 'ABC,someOther', true],
-            [$access, $users->getOffset(self::USER_3_ID), 'X/ABC', true],
-            [$access, $users->getOffset(self::USER_3_ID), 'XXX', true],
-            [$access, $users->getOffset(self::USER_3_ID), 'ABC/ABC', false],
+            [$users->getOffset(self::USER_3_ID), 'ABC', true],
+            [$users->getOffset(self::USER_3_ID), 'ABC,someOther', true],
+            [$users->getOffset(self::USER_3_ID), 'X/ABC', true],
+            [$users->getOffset(self::USER_3_ID), 'XXX', true],
+            [$users->getOffset(self::USER_3_ID), 'ABC/ABC', false],
 
             // In ['',ABC],['',XXX],['','X/ABC']
-            [$access, $users->getOffset(self::USER_4_ID), 'ABC', true],
-            [$access, $users->getOffset(self::USER_4_ID), 'ABC,someOther', true],
-            [$access, $users->getOffset(self::USER_4_ID), 'X/ABC', true],
-            [$access, $users->getOffset(self::USER_4_ID), 'A/X/ABC', false],
-            [$access, $users->getOffset(self::USER_4_ID), 'XXX', true],
-            [$access, $users->getOffset(self::USER_4_ID), 'ABC/ABC', false],
+            [$users->getOffset(self::USER_4_ID), 'ABC', true],
+            [$users->getOffset(self::USER_4_ID), 'ABC,someOther', true],
+            [$users->getOffset(self::USER_4_ID), 'X/ABC', true],
+            [$users->getOffset(self::USER_4_ID), 'A/X/ABC', false],
+            [$users->getOffset(self::USER_4_ID), 'XXX', true],
+            [$users->getOffset(self::USER_4_ID), 'ABC/ABC', false],
 
             // In ['X',Y/ABC]
-            [$access, $users->getOffset(self::USER_5_ID), 'X/X/ABC', false],
-            [$access, $users->getOffset(self::USER_5_ID), 'ABC,Y/ABC', true],
-            [$access, $users->getOffset(self::USER_5_ID), 'X/ABC', false],
-            [$access, $users->getOffset(self::USER_5_ID), 'Y/ABC', true],
+            [$users->getOffset(self::USER_5_ID), 'X/X/ABC', false],
+            [$users->getOffset(self::USER_5_ID), 'ABC,Y/ABC', true],
+            [$users->getOffset(self::USER_5_ID), 'X/ABC', false],
+            [$users->getOffset(self::USER_5_ID), 'Y/ABC', true],
         ];
     }
 
@@ -859,76 +855,75 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerInvolvedInGroup(): array
+    public static function providerInvolvedInGroup(): array
     {
-        $access = $this->newAccess();
-        $roles  = $this->buildRoles(self::ROLE_DATA);
-        $users  = $this->buildUsers($roles, self::USER_DATA);
+        $roles = self::buildRoles(self::ROLE_DATA);
+        $users = self::buildUsers($roles, self::USER_DATA);
 
         return [
-            // Access $access, User $user, int $folderId, bool $expected
-            [$access, $users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, false],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_4_ID, false],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_5_ID, false],
+            // User $user, int $folderId, bool $expected
+            [$users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, false],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_4_ID, false],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_1_ID, false],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_4_ID, true],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_1_ID, false],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_4_ID, true],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_1_ID, false],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_4_ID, true],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_1_ID, false],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_4_ID, true],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_1_ID, true],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_4_ID, true],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_1_ID, true],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_4_ID, true],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_1_ID, true],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_4_ID, true],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_1_ID, true],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_4_ID, true],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_1_ID, true],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_4_ID, false],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_1_ID, true],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_4_ID, false],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_1_ID, false],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_4_ID, false],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_1_ID, false],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_4_ID, false],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_1_ID, true],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_4_ID, false],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_1_ID, true],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_4_ID, false],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_5_ID, false],
 
-            [$access, $users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, false],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_1_ID, false],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_2_ID, false],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_3_ID, false],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_4_ID, false],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_5_ID, false],
+            [$users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, false],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_1_ID, false],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_2_ID, false],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_3_ID, false],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_4_ID, false],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_5_ID, false],
 
         ];
     }
@@ -940,88 +935,87 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerGetFolderAccess(): array
+    public static function providerGetFolderAccess(): array
     {
-        $access = $this->newAccess();
-        $roles  = $this->buildRoles(self::ROLE_DATA);
-        $users  = $this->buildUsers($roles, self::USER_DATA);
+        $roles = self::buildRoles(self::ROLE_DATA);
+        $users = self::buildUsers($roles, self::USER_DATA);
 
         return [
-            // Access $access, User $user, int $folderId, int $expected
+            // User $user, int $folderId, int $expected
 
             // User1 is SU. Has FULL access to all folders
             // Intentionally repeats the first scenario to test the cache
-            [$access, $users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_1_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_1_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User2 is staff.
-            [$access, $users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_2_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_2_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_2_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User3 is student.
-            [$access, $users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_3_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_3_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_3_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User4 is student.
-            [$access, $users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_4_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_4_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_4_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // User5 is student.
-            [$access, $users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_5_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_1_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_3_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_5_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User6 is parent.
-            [$access, $users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_6_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_6_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_6_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User7 is parent.
-            [$access, $users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_7_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_7_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_7_ID), self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // User8 is guest. Has CMS FULL perm
-            [$access, $users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
-            [$access, $users->getOffset(self::USER_8_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_8_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_1_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_2_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_3_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_4_ID, UserAccess::ACCESS_FULL],
+            [$users->getOffset(self::USER_8_ID), self::FOLDER_5_ID, UserAccess::ACCESS_FULL],
 
             // User9 is guest. Has CMS WRITE perm
-            [$access, $users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, $users->getOffset(self::USER_9_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_9_ID), Folder\Model::ROOT_ID, UserAccess::ACCESS_READ],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_1_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_3_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [$users->getOffset(self::USER_9_ID), self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
         ];
     }
 
@@ -1032,44 +1026,42 @@ class AccessTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerGetFolderAccessForRole(): array
+    public static function providerGetFolderAccessForRole(): array
     {
-        $access = $this->newAccess();
-
         return [
-            // Access $access, int $roleId, int $folderId, int $expected
+            // int $roleId, int $folderId, int $expected
 
             // Staff
-            [$access, self::ROLE_1_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_1_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_1_ID, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_1_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_1_ID, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
-            [$access, self::ROLE_1_ID, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
+            [self::ROLE_1_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_1_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_1_ID, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_1_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_1_ID, self::FOLDER_4_ID, UserAccess::ACCESS_WRITE],
+            [self::ROLE_1_ID, self::FOLDER_5_ID, UserAccess::ACCESS_WRITE],
 
             // Student
-            [$access, self::ROLE_2_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_2_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_2_ID, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
-            [$access, self::ROLE_2_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_2_ID, self::FOLDER_4_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_2_ID, self::FOLDER_5_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_2_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_2_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_2_ID, self::FOLDER_2_ID, UserAccess::ACCESS_READ],
+            [self::ROLE_2_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_2_ID, self::FOLDER_4_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_2_ID, self::FOLDER_5_ID, UserAccess::ACCESS_DENY],
 
             // Parent
-            [$access, self::ROLE_3_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_3_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_3_ID, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
-            [$access, self::ROLE_3_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_3_ID, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
-            [$access, self::ROLE_3_ID, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
+            [self::ROLE_3_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_3_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_3_ID, self::FOLDER_2_ID, UserAccess::ACCESS_WRITE],
+            [self::ROLE_3_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_3_ID, self::FOLDER_4_ID, UserAccess::ACCESS_READ],
+            [self::ROLE_3_ID, self::FOLDER_5_ID, UserAccess::ACCESS_READ],
 
             // Guest
-            [$access, self::ROLE_4_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_4_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_4_ID, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_4_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_4_ID, self::FOLDER_4_ID, UserAccess::ACCESS_DENY],
-            [$access, self::ROLE_4_ID, self::FOLDER_5_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, Folder\Model::ROOT_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, self::FOLDER_1_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, self::FOLDER_2_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, self::FOLDER_3_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, self::FOLDER_4_ID, UserAccess::ACCESS_DENY],
+            [self::ROLE_4_ID, self::FOLDER_5_ID, UserAccess::ACCESS_DENY],
 
         ];
     }
@@ -1115,9 +1107,9 @@ class AccessTest extends TestCase
         $instance->setAccessible(false);
 
         // Build default hard-coded system state if not explicitly specified
-        $folderTree = $this->buildFolderTree($folderData ?? self::FOLDER_DATA);
-        $roles      = $this->buildRoles($roleData ?? self::ROLE_DATA);
-        $users      = $this->buildUsers($roles, $userData ?? self::USER_DATA);
+        $folderTree = self::buildFolderTree($folderData ?? self::FOLDER_DATA);
+        $roles      = self::buildRoles($roleData ?? self::ROLE_DATA);
+        $users      = self::buildUsers($roles, $userData ?? self::USER_DATA);
 
         // Create and return new singleton instance
         $mockFolderMapper = $this->getMockFolderMapper($folderTree);
@@ -1141,7 +1133,7 @@ class AccessTest extends TestCase
      * @param array $folderData
      * @return ObjectTree<Folder\Model>
      */
-    private function buildFolderTree(array $folderData): ObjectTree
+    private static function buildFolderTree(array $folderData): ObjectTree
     {
         $tree = new ObjectTree(static function (Folder\Model $folder): int {
             return $folder->getId();
@@ -1187,7 +1179,7 @@ class AccessTest extends TestCase
      * @return GenericCollection<Role>|Role[]
      * @throws UnexpectedValueException
      */
-    private function buildRoles(array $roleData): GenericCollection
+    private static function buildRoles(array $roleData): GenericCollection
     {
         $roles = Role::createCollection();
         foreach ($roleData as [$id, $type]) {
@@ -1211,7 +1203,7 @@ class AccessTest extends TestCase
      * @return GenericCollection<User>|User[]
      * @throws UnexpectedValueException
      */
-    private function buildUsers(GenericCollection $roles, array $userData): GenericCollection
+    private static function buildUsers(GenericCollection $roles, array $userData): GenericCollection
     {
         $users = User::createCollection();
         foreach ($userData as [$id, $roleId, $su]) {
@@ -1272,11 +1264,11 @@ class AccessTest extends TestCase
                              $serviceId          = $params['sid_0'];
                              $type               = $params['type_0'];
                              $matchingUserAccess = $allUserAccess[$userId][$serviceType][$serviceId] ?? [];
-                            foreach ($matchingUserAccess as $idx => $userAccess) {
-                                if ($userAccess->getAccessLevel() === $type) {
-                                    unset($matchingUserAccess[$idx]);
-                                }
-                            }
+                             foreach ($matchingUserAccess as $idx => $userAccess) {
+                                 if ($userAccess->getAccessLevel() === $type) {
+                                     unset($matchingUserAccess[$idx]);
+                                 }
+                             }
                              return new GenericCollection(UserAccess::class, $matchingUserAccess);
                          });
 
