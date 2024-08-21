@@ -39,7 +39,7 @@ class Api implements IApi
     /**
      * Request timeout
      */
-    private const DEFAULT_TIMEOUT = 300;
+    private const DEFAULT_TIMEOUT = 900;
 
 
     /**
