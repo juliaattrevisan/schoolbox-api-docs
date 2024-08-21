@@ -53,9 +53,9 @@ use function array_merge;
  *     |       └-- id=5, inherit=1
  *     └-- id=3, inherit=1
  *
- * @covers \Schoolbox\Permission\Access\Access
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Permission\Access\Access::class)]
 class AccessTest extends TestCase
 {
     // Default hard-coded system state for this test. Individual tests can override.
@@ -180,9 +180,7 @@ class AccessTest extends TestCase
 
 
     // Tests
-
     /**
-     * @dataProvider providerIsInstructor
      * @param Access       $access
      * @param User         $user
      * @param Folder\Model $folder
@@ -192,6 +190,7 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsInstructor')]
     public function testIsInstructor(Access $access, User $user, Folder\Model $folder, bool $expected): void
     {
         $this->assertSame($expected, $access->isInstructor($user, $folder));
@@ -199,7 +198,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerIsLearner
      * @param Access       $access
      * @param User         $user
      * @param Folder\Model $folder
@@ -209,6 +207,7 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsLearner')]
     public function testIsLearner(Access $access, User $user, Folder\Model $folder, bool $expected): void
     {
         $this->assertSame($expected, $access->isLearner($user, $folder));
@@ -216,7 +215,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetAccessLevel
      * @param Access $access
      * @param User   $user
      * @param int    $service
@@ -227,6 +225,7 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetAccessLevel')]
     public function testGetAccessLevel(Access $access, User $user, int $service, int $serviceIdentifier, int $expected): void
     {
         $this->assertSame($expected, $access->getAccessLevel($user, $service, $serviceIdentifier));
@@ -253,11 +252,11 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerSisClassRoleTypeAccess
      * @param Access $access
      * @param string $roleType
      * @param int    $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSisClassRoleTypeAccess')]
     public function testSisClassRoleTypeAccess(Access $access, string $roleType, int $expected): void
     {
         $this->assertSame($expected, $access->getSisClassRoleTypeAccess($roleType));
@@ -265,7 +264,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetMinFolderAccess
      * @param Access $access
      * @param User   $user
      * @param array  $folderIds
@@ -275,6 +273,7 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetMinFolderAccess')]
     public function testGetMinFolderAccess(Access $access, User $user, array $folderIds, int $expected): void
     {
         $this->assertSame($expected, $access->getMinFolderAccess($user, $folderIds));
@@ -298,7 +297,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerInvolvedInSubject
      * @param Access $access
      * @param User   $user
      * @param string $codeString
@@ -306,6 +304,7 @@ class AccessTest extends TestCase
      * @throws InvalidArgumentException
      * @throws LogicException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvolvedInSubject')]
     public function testInvolvedInSubject(Access $access, User $user, string $codeString, bool $expected): void
     {
         $this->assertSame($expected, $access->involvedInSubject($user, $codeString));
@@ -328,13 +327,13 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerInvolvedInGroup
      * @param Access $access
      * @param User   $user
      * @param int    $folderId
      * @param bool   $expected
      * @throws InvalidColumnException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvolvedInGroup')]
     public function testInvolvedInGroup(Access $access, User $user, int $folderId, bool $expected): void
     {
         $this->assertSame($expected, $access->involvedInGroup($user, $folderId));
@@ -342,7 +341,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetFolderAccess
      * @param Access $access
      * @param User   $user
      * @param int    $folderId
@@ -352,6 +350,7 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetFolderAccess')]
     public function testGetFolderAccess(Access $access, User $user, int $folderId, int $expected): void
     {
         $this->assertSame($expected, $access->getFolderAccess($user, $folderId));
@@ -381,7 +380,6 @@ class AccessTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetFolderAccessForRole
      * @param Access $access
      * @param int    $roleId
      * @param int    $folderId
@@ -392,6 +390,7 @@ class AccessTest extends TestCase
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetFolderAccessForRole')]
     public function testGetFolderAccessForRole(Access $access, int $roleId, int $folderId, int $expected): void
     {
         $this->assertSame($expected, $access->getFolderAccessForRole($roleId, $folderId));

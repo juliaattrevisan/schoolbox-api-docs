@@ -14,7 +14,6 @@ use ReflectionClass;
 class ClassCodeTest extends TestCase
 {
     /**
-     * @dataProvider providerForTestClassCode
      * @param string $classCode
      * @param string $expectedYear
      * @param string $expectedCode
@@ -22,6 +21,7 @@ class ClassCodeTest extends TestCase
      * @param bool   $expectWarning
      * @throws \ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForTestClassCode')]
     public function testClassCode(
         string $classCode,
         string $expectedYear,
@@ -50,7 +50,7 @@ class ClassCodeTest extends TestCase
      *
      * @return array
      */
-    public function providerForTestClassCode(): array
+    public static function providerForTestClassCode(): array
     {
         return [
             '+ve year + code + class'                  => [

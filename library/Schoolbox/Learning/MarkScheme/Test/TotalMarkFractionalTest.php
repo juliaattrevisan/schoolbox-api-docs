@@ -17,6 +17,7 @@ use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use InvalidArgumentException;
 use Schoolbox\User;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\MarkScheme\TotalMarkFractional::class)]
 class TotalMarkFractionalTest extends TestCase
 {
     /**
@@ -72,7 +73,6 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $totalMark
      * @param float  $expected
@@ -80,6 +80,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableToNormalised')]
     public function testGetNormalised($humanReadable, $totalMark, $expected)
     {
         $markScheme = new TotalMarkFractional(null);
@@ -90,7 +91,6 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider providerHumanReadableToRecurringNormalised
      * @param string $humanReadable
      * @param float  $totalMark
      * @param float  $expected
@@ -98,6 +98,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableToRecurringNormalised')]
     public function testGetRecurringNormalised($humanReadable, $totalMark, $expected)
     {
         $delta = 0.00001;
@@ -109,7 +110,6 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
@@ -117,6 +117,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalisedToHumanReadable')]
     public function testGetHumanReadable($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional();
@@ -127,7 +128,6 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider providerNormalisedToHumanReadableRecurring
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
@@ -135,6 +135,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalisedToHumanReadableRecurring')]
     public function testGetHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional();
@@ -281,13 +282,12 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableMarkData
-     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
      *
      * @param TotalMarkFractional $markScheme
      * @param string|null         $formInput
      * @param string|null         $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableMarkData')]
     public function testConvertFormInputToHumanReadableMark(
         TotalMarkFractional $markScheme,
         ?string $formInput,
@@ -299,12 +299,10 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
-     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
-     *
      * @param TotalMarkFractional $markScheme
      * @param string|null         $formInput
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableMarkInvalidData')]
     public function testConvertFormInputToHumanReadableMarkInvalid(
         TotalMarkFractional $markScheme,
         ?string $formInput
@@ -315,13 +313,12 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
-     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertHumanReadableMarkToFormInput
      *
      * @param TotalMarkFractional $markScheme
      * @param string|null         $humanReadableMark
      * @param string|null         $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getRetrieveHumanReadableMarkAsFormInputData')]
     public function testConvertHumanReadableMarkToFormInput(
         TotalMarkFractional $markScheme,
         ?string $humanReadableMark,
@@ -354,7 +351,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function providerHumanReadableToRecurringNormalised(): array
+    public static function providerHumanReadableToRecurringNormalised(): array
     {
         $totalMark = 3.0;
         return [
@@ -392,7 +389,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function providerHumanReadableToNormalised(): array
+    public static function providerHumanReadableToNormalised(): array
     {
         $totalMark = 100;
         return [
@@ -416,7 +413,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function providerNormalisedToHumanReadable(): array
+    public static function providerNormalisedToHumanReadable(): array
     {
         $totalMark = 100;
         return [
@@ -434,7 +431,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function providerNormalisedToHumanReadableRecurring(): array
+    public static function providerNormalisedToHumanReadableRecurring(): array
     {
         $totalMark = 3;
         return [
@@ -454,7 +451,7 @@ class TotalMarkFractionalTest extends TestCase
      *
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    public static function getConvertFormInputToHumanReadableMarkData(): iterable
     {
         $total = new TotalMarkFractional(12);
         yield 'total mark > 1: null form input' => [$total, null, null];
@@ -491,7 +488,7 @@ class TotalMarkFractionalTest extends TestCase
      *
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    public static function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
     {
         $total = new TotalMarkFractional(12);
         yield 'invalid valid form input 1' => [$total, 'Invalid'];
@@ -504,7 +501,7 @@ class TotalMarkFractionalTest extends TestCase
      *
      * @return iterable
      */
-    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    public static function getRetrieveHumanReadableMarkAsFormInputData(): iterable
     {
         $total = new TotalMarkFractional(12);
         yield 'null form input' => [$total, null, null];

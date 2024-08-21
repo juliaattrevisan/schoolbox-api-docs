@@ -81,7 +81,7 @@ class TokenizerTest extends TestCase
     /**
      * @return array
      */
-    public function tokenParsingData()
+    public static function tokenParsingData()
     {
         return [
             'literal'
@@ -175,11 +175,11 @@ class TokenizerTest extends TestCase
 
 
     /**
-     * @dataProvider tokenParsingData
      * @param string $token
      * @param mixed $expected
      * @param bool $useCartesian
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('tokenParsingData')]
     public function testTokenParsing($token, $expected, $useCartesian = true)
     {
         $actual = $this->tokenizer->parseToken($this->tree, $token, $useCartesian);

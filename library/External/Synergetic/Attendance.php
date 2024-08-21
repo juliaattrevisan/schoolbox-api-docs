@@ -93,7 +93,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         $result = $statement->fetchAll();
 
         if (count($result) > 0) {
-            array_walk($result, function (&$val) {
+            array_walk($result, function (&$val): void {
                 $val['SpecialNeedsDescription'] = preg_replace('/^' . self::SPECIAL_NEEDS_SYNERGETIC_STOR_PROC . '$/', '', $val['SpecialNeedsDescription']);
             });
             return $result;

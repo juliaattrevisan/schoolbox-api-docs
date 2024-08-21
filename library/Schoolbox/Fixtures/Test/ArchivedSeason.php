@@ -44,10 +44,10 @@ class ArchivedSeason extends TestCase
 
 
     /**
-     * @dataProvider providerSeasonNotFound
      * @param array $routeParams
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSeasonNotFound')]
     public function testSeasonNotFoundInParams(array $routeParams)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -57,10 +57,10 @@ class ArchivedSeason extends TestCase
 
 
     /**
-     * @dataProvider providerSeasonNotArchived
      * @param array $routeParams
-     * @doesNotPerformAssertions
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSeasonNotArchived')]
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testSeasonNotArchived(array $routeParams)
     {
         $rule = new IsSeasonNotArchived();
@@ -69,10 +69,10 @@ class ArchivedSeason extends TestCase
 
 
     /**
-     * @dataProvider providerSeasonIsArchived
      * @param array $routeParams
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSeasonIsArchived')]
     public function testSeasonIsArchived(array $routeParams)
     {
         $this->expectException(\Alaress\Authorizer\Failure\Unauthorized::class);

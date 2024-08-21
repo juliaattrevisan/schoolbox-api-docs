@@ -259,7 +259,7 @@ class ResolverTest extends TestCase
     /**
      * @return array[]
      */
-    public function dataUserCollation()
+    public static function dataUserCollation()
     {
         return [
             'i.k.jol.7.foo' => [ 'i.k.jol.7.foo', [ 1,                   9 ] ],
@@ -276,7 +276,6 @@ class ResolverTest extends TestCase
     /**
      * Test that users in nested paths are collated, deduplicated, and returned as a flat array
      *
-     * @dataProvider dataUserCollation
      *
      * @param string $path
      * @param array  $expected
@@ -284,6 +283,7 @@ class ResolverTest extends TestCase
      * @throws OutOfBoundsException
      * @throws OverflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataUserCollation')]
     public function testUserCollation($path, array $expected)
     {
         $ids = $this->newResolver($this->newLoadedRouter())->getSubscribedUserIds($path);
@@ -297,7 +297,7 @@ class ResolverTest extends TestCase
     /**
      * @return array[]
      */
-    public function dataRealWorldExample()
+    public static function dataRealWorldExample()
     {
         return [
             'guest not news' => [ self::CLASS_GUEST, 'notnews', [ self::CLASS_GUEST ] ],
@@ -312,7 +312,6 @@ class ResolverTest extends TestCase
      * Test that a simple-but-common real-world case works
      * (The news topic for homepage 10 should now also encompass everyone in homepage 61 as well)
      *
-     * @dataProvider dataRealWorldExample
      *
      * @param int   $folderId
      * @param int   $action
@@ -321,6 +320,7 @@ class ResolverTest extends TestCase
      * @throws InvalidArgumentException
      * @throws OutOfBoundsException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataRealWorldExample')]
     public function testRealWorldExample($folderId, $action, array $expectedClasses)
     {
 

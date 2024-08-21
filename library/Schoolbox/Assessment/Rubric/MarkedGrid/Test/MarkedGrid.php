@@ -20,9 +20,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::class)]
 class MarkedGrid extends TestCase
 {
     /**
@@ -222,12 +220,10 @@ class MarkedGrid extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::retrieveNormalizedMark
-     *
      * @param RubricMarkedGrid\MarkedGrid $grid
      * @param array                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveMarkData')]
     public function testRetrieveNormalizedMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
     {
         $this->assertSame($expected['normalizedMark'], $grid->retrieveNormalizedMark());
@@ -235,12 +231,10 @@ class MarkedGrid extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::calculateScaledMark
-     *
      * @param RubricMarkedGrid\MarkedGrid $grid
      * @param array                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveMarkData')]
     public function testCalculateScaledMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
     {
         $this->assertSame($expected['scaledMark'], $grid->calculateScaledMark());
@@ -248,12 +242,10 @@ class MarkedGrid extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::retrieveHumanReadableMark
-     *
      * @param RubricMarkedGrid\MarkedGrid $grid
      * @param array                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveMarkData')]
     public function testRetrieveHumanReadableMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
     {
         $this->assertSame($expected['humanReadableMark'], $grid->retrieveHumanReadableMark());

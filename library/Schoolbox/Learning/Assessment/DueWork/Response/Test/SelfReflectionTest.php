@@ -26,11 +26,11 @@ use Schoolbox\User;
 class SelfReflectionTest extends TestCase
 {
     /**
-     * @dataProvider providerValidSelfReflective
      * @param User        $currentUser  The user currently "logged in"
      * @param Participant $participant  The user whose trying to start self-reflection
      * @param int         $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidSelfReflective')]
     public function testValidSelfReflective(User $currentUser, Participant $participant, $expected)
     {
         $validation = new ValidSelfReflection();
@@ -43,7 +43,7 @@ class SelfReflectionTest extends TestCase
      *
      * @return array
      */
-    public function providerValidSelfReflective(): array
+    public static function providerValidSelfReflective(): array
     {
         $student = (new User())->setId(230);
         $otherStudent = (new User())->setId(999);

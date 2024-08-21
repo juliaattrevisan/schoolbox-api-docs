@@ -24,13 +24,13 @@ class UserAccessXORTest extends TestCase
     /**
      * $array1 and $array2 contain the same set of tuples
      *
-     * @dataProvider provider_same
      * @param array $array1
      * @param array $array2
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_same')]
     public function testSame(array $array1, array $array2, int $expected)
     {
 
@@ -46,7 +46,7 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public function provider_same(): array
+    public static function provider_same(): array
     {
         return [
 
@@ -147,13 +147,13 @@ class UserAccessXORTest extends TestCase
     /**
      * $array1 and $array2 contain different set of tuples
      *
-     * @dataProvider provider_different
      * @param array $array1
      * @param array $array2
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_different')]
     public function testDifferent(array $array1, array $array2, int $expected)
     {
 
@@ -169,7 +169,7 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public function provider_different(): array
+    public static function provider_different(): array
     {
         return [
 

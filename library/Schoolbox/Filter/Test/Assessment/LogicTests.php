@@ -25,7 +25,6 @@ use function array_merge;
 class LogicTests extends TestCase
 {
     /**
-     * @dataProvider provider_doContextFiltersGuaranteeEmptySet
      * @param null|int[] $uis      UnitImplSpec
      * @param null|int[] $f        Folder
      * @param null|int[] $p        Project
@@ -34,6 +33,7 @@ class LogicTests extends TestCase
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_doContextFiltersGuaranteeEmptySet')]
     public function test_areResultsPossible_contextFilters($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
@@ -54,7 +54,6 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_doNonContextGuaranteeEmptySet
      * @param null|int[] $a        AssessmentType
      * @param null|int[] $tc       Term Close
      * @param null|int[] $td       Term Due
@@ -63,6 +62,7 @@ class LogicTests extends TestCase
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_doNonContextGuaranteeEmptySet')]
     public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected): void
     {
         $qbt             = $this->getTester();
@@ -83,13 +83,13 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_doRubricsFiltersGuaranteeEmptySet
      * @param null|int[] $aType      AssessmentType
      * @param array|null $capInd     Capabilities/Indicators Usage
      * @param array|null $markPerCap MarkPerCap
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_doRubricsFiltersGuaranteeEmptySet')]
     public function test_areResultsPossible_RubricsFilters(?array $aType, ?array $capInd, ?array $markPerCap, bool $expected): void
     {
         $qbt             = $this->getTester();
@@ -108,7 +108,6 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_subQueriesRequired
      * @param null|int[] $uis      UnitImplSpec
      * @param null|int[] $f        Folder
      * @param null|int[] $p        Project
@@ -121,6 +120,7 @@ class LogicTests extends TestCase
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_subQueriesRequired')]
     public function test_requiredSubQueries($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
@@ -145,7 +145,6 @@ class LogicTests extends TestCase
     /**
      * Test that the simplification logic produces expected results
      *
-     * @dataProvider provider_simplificationLogic
      * @param array|null $aTypeIn
      * @param array|null $capIndIn
      * @param array|null $markPerCapIn
@@ -154,6 +153,7 @@ class LogicTests extends TestCase
      * @param array|null $markPerCapOut
      * @throws Filter\BrokenFilterException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_simplificationLogic')]
     public function test_simplificationLogic(
         ?array $aTypeIn,
         ?array $capIndIn,
@@ -303,7 +303,7 @@ class LogicTests extends TestCase
      * Returns all 3^5 = 243 permutations and whether results are possible
      * @return array
      */
-    public function provider_doContextFiltersGuaranteeEmptySet(): array
+    public static function provider_doContextFiltersGuaranteeEmptySet(): array
     {
         $nll = null;  // Filter is not applied
         $emt = [];    // Return items that do not JOIN to this filter. ie Logically a LEFT JOIN other o ON o.a_id = a.id WHERE a.id IS NULL
@@ -562,7 +562,7 @@ class LogicTests extends TestCase
      * (and hence we can short-circuit without hitting the DB)
      * @return array
      */
-    public function provider_doNonContextGuaranteeEmptySet(): array
+    public static function provider_doNonContextGuaranteeEmptySet(): array
     {
 
         $nll = null;
@@ -824,7 +824,7 @@ class LogicTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_doRubricsFiltersGuaranteeEmptySet(): array
+    public static function provider_doRubricsFiltersGuaranteeEmptySet(): array
     {
         // Activity Type keys
         $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
@@ -1016,7 +1016,7 @@ class LogicTests extends TestCase
      * For all 108 permutations that are not guaranteed to return empty sets, which subQueries are required?
      * @return array
      */
-    public function provider_subQueriesRequired(): array
+    public static function provider_subQueriesRequired(): array
     {
         $nll = null;
         $emt = [];
@@ -1139,7 +1139,7 @@ class LogicTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_simplificationLogic(): array
+    public static function provider_simplificationLogic(): array
     {
         // Activity Type keys
         $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;

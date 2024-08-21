@@ -279,7 +279,7 @@ class Api implements IApi
                 if (isset($contents['__status']) && $contents['__status'] === 'invalid') {
                     $message = '';
                     if (is_array($contents['__invalid'])) {
-                        array_walk($contents['__invalid'], function ($value, $key) use (&$message) {
+                        array_walk($contents['__invalid'], function ($value, $key) use (&$message): void {
                             $message .= " $key : $value ";
                         });
                     }

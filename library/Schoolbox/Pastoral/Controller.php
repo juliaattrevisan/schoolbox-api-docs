@@ -1132,7 +1132,7 @@ class Controller extends Base
             $record->setAttachments($newRecordAttachments);
 
             $db->onPersist(
-                function () use ($previousRecord, $record, $pastoralExternal) {
+                function () use ($previousRecord, $record, $pastoralExternal): void {
                     // raise notification
                     $action = $previousRecord ? \Schoolbox\Mapper::METHOD_UPDATE : \Schoolbox\Mapper::METHOD_CREATE;
                     $this->pastoralDataSource->resetPropagator();

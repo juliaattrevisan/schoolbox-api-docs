@@ -21,11 +21,11 @@ use PHPUnit\Framework\TestCase;
 class UserIdentifierTest extends TestCase
 {
     /**
-     * @dataProvider providerValidUserIdentifier
      * @param mixed $instanceId
      * @param mixed $userId
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidUserIdentifier')]
     public function testValidUserIdentifier($instanceId, $userId, $expected)
     {
         $outcome = (new UserIdentifier())->generate($instanceId, $userId);
@@ -40,7 +40,7 @@ class UserIdentifierTest extends TestCase
      *
      * @return array
      */
-    public function providerValidUserIdentifier(): array
+    public static function providerValidUserIdentifier(): array
     {
         return [
             'Valid 1' => [

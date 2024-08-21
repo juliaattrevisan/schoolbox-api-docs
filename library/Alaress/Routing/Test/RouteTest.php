@@ -58,7 +58,7 @@ class RouteTest extends TestCase
     /**
      * @return array
      */
-    public function dataValidConstruction()
+    public static function dataValidConstruction()
     {
         return [
             [ 'foo:42:bar',   ':' ],
@@ -73,11 +73,11 @@ class RouteTest extends TestCase
     /**
      * Test that, for a given Trie hierarchy, valid routes can be constructed
      *
-     * @dataProvider dataValidConstruction
      *
      * @param string $path
      * @param string $delim
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidConstruction')]
     public function testValidConstruction($path, $delim)
     {
         $route = $this->route($path, $delim);
@@ -88,7 +88,7 @@ class RouteTest extends TestCase
     /**
      * @return array
      */
-    public function dataInvalidConstruction()
+    public static function dataInvalidConstruction()
     {
         return [
             [ 'f00:42:bar',       ':' ], // mismatch position 1
@@ -103,12 +103,12 @@ class RouteTest extends TestCase
     /**
      * Test that, for a given Trie hierarchy, invalid routes cannot be constructed
      *
-     * @dataProvider dataInvalidConstruction
      *
      *
      * @param string $path
      * @param string $delim
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidConstruction')]
     public function testInvalidPathConstruction($path, $delim)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -119,7 +119,7 @@ class RouteTest extends TestCase
     /**
      * @return array
      */
-    public function dataValidDataFetch()
+    public static function dataValidDataFetch()
     {
         return [
             [ 'foo:2:bar', [ 'barK' => 'barV' ] ],
@@ -131,11 +131,11 @@ class RouteTest extends TestCase
     /**
      * Test that, for a given Trie hierarchy, data payloads can be retrieved
      *
-     * @dataProvider dataValidDataFetch
      *
      * @param string $path
      * @param array  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidDataFetch')]
     public function testValidDataFetch($path, $expected)
     {
         $route = $this->route($path, ':');
@@ -146,7 +146,7 @@ class RouteTest extends TestCase
     /**
      * @return array
      */
-    public function dataInvalidDataFetch()
+    public static function dataInvalidDataFetch()
     {
         // note the key inversion from the payloads set in self::$root
         return [
@@ -160,10 +160,10 @@ class RouteTest extends TestCase
      * which IS a valid pattern but does NOT contain a payload throws an exception
      *
      *
-     * @dataProvider dataInvalidDataFetch
      *
      * @param string $path
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidDataFetch')]
     public function testInvalidDataFetch($path)
     {
         $this->expectException(\InvalidArgumentException::class);

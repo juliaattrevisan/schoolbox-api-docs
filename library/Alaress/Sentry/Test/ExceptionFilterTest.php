@@ -23,6 +23,7 @@ use Throwable;
 /**
  * Class ExceptionFilterTest
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Sentry\ExceptionFilter::class)]
 class ExceptionFilterTest extends TestCase
 {
     public function getTestExclusionData(): iterable
@@ -123,12 +124,11 @@ class ExceptionFilterTest extends TestCase
 
 
     /**
-     * @covers       \Alaress\Sentry\ExceptionFilter::__invoke
-     * @dataProvider getTestExclusionData
      * @param Event           $event
      * @param ExceptionFilter $filter
      * @param bool            $expectedFiltered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestExclusionData')]
     public function testExclusion(Event $event, ExceptionFilter $filter, bool $expectedFiltered): void
     {
         $actual = $filter($event);

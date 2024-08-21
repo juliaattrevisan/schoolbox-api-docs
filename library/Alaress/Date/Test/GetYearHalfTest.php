@@ -32,11 +32,11 @@ class GetYearHalfTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestYearHalfData
      *
      * @param Alaress_Date_Format $date
      * @param int                 $expectedHalf
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestYearHalfData')]
     public function testGetYearHalf($date, $expectedHalf)
     {
         $this->assertEquals($expectedHalf, $date->getYearHalf());

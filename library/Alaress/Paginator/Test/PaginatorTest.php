@@ -63,9 +63,8 @@ class PaginatorTest extends TestCase
 
     /**
      * Tests first and last page numbers.
-     *
-     * @dataProvider getTestPageCountData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestPageCountData')]
     public function testPageCount(Paginator $paginator, $expectedPageCount)
     {
         $this->assertEquals($expectedPageCount, $paginator->getPageCount());
@@ -107,9 +106,8 @@ class PaginatorTest extends TestCase
 
     /**
      * Tests first and last items on a given page number.
-     *
-     * @dataProvider getTestItemsOnPageData
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestItemsOnPageData')]
     public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedOffset, $expectedFirst, $expectedLast)
     {
         $this->assertEquals($expectedOffset, $paginator->getOffset($pageNumber));
@@ -215,9 +213,9 @@ class PaginatorTest extends TestCase
     /**
      * Tests that requesting a page number below the minimum range is invalid.
      *
-     * @dataProvider      getTestPageNumberLowerBoundData
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestPageNumberLowerBoundData')]
     public function testPageNumberLowerBound(Paginator $paginator, $pageNumber)
     {
         $this->expectException(OutOfRangeException::class);
@@ -247,9 +245,9 @@ class PaginatorTest extends TestCase
     /**
      * Tests that requesting a page number above the minimum range is invalid.
      *
-     * @dataProvider      getTestPageNumberUpperBoundData
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestPageNumberUpperBoundData')]
     public function testPageNumberUpperBound(Paginator $paginator, $pageNumber)
     {
         $this->expectException(OutOfRangeException::class);

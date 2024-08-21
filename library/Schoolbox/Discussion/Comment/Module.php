@@ -86,7 +86,7 @@ abstract class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '.*',
-            new Auth\Rule\Callback(function (array $params) {
+            new Auth\Rule\Callback(function (array $params): void {
                 if (!array_key_exists('comment', $params)) {
                     // Authorizer callbacks may be called after a preload function has failed.
                     // @see library/Schoolbox/Application/WebRequest/Kernel.php function outputAuraContent().

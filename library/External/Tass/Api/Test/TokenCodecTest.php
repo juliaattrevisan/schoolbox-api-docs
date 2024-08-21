@@ -14,21 +14,18 @@ use PHPUnit;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
 
-/**
- * @covers \External\Tass\Api\TokenCodec
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\External\Tass\Api\TokenCodec::class)]
 class TokenCodecTest extends TestCase
 {
 
     // ======================= Tests =========================== //
-
     /**
-     * @dataProvider providerInvalidApiKey
      * @param string $invalidApiKey
      * @return void
      * @throws PHPUnit\Framework\Exception
      * @throws InvalidApiKey
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidApiKey')]
     public function testInvalidApiKey(string $invalidApiKey): void
     {
         $this->expectException(InvalidApiKey::class);
@@ -37,11 +34,11 @@ class TokenCodecTest extends TestCase
 
 
     /**
-     * @dataProvider providerReversibility
      * @param Token $codec
      * @param array $data
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerReversibility')]
     public function testReversibility(Token $codec, array $data): void
     {
         $unpacked = $codec->unpackToken($codec->generateToken($data, true));
@@ -51,7 +48,7 @@ class TokenCodecTest extends TestCase
 
     // ======================= Data Providers =========================== //
 
-    public function providerInvalidApiKey(): array
+    public static function providerInvalidApiKey(): array
     {
         return [
             [''],

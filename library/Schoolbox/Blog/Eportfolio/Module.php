@@ -98,7 +98,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
-                    function ($params, User $loggedInUser) {
+                    function ($params, User $loggedInUser): void {
                         // Use Eportfolio_Authenticator->canCreate() to determine permissions.
                         $auth = new Eportfolio_Authenticator(
                             $loggedInUser,
@@ -127,7 +127,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
-                    function ($params, User $loggedInUser) {
+                    function ($params, User $loggedInUser): void {
                         // If a blog parameter exists, permissions depend on the blog's owner.
                         if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
                             if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
@@ -171,7 +171,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
-                    function ($params, User $loggedInUser) {
+                    function ($params, User $loggedInUser): void {
                         // If a blog parameter exists, permissions depend on the blog's owner.
                         if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
                             if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
@@ -212,7 +212,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
-                    function ($params, User $loggedInUser) {
+                    function ($params, User $loggedInUser): void {
                         if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
                             $commentOwner = $params['comment']->getOwner();
 

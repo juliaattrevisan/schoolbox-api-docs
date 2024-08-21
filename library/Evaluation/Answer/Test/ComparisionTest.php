@@ -9,18 +9,18 @@ class ComparisionTest extends TestCase
 {
 
     /**
-     * @dataProvider dataStrings
      * @param string $a
      * @param string $b
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataStrings')]
     public function testCompareString(string $a, string $b, bool $expected)
     {
         $comparison = $this->getObjectForTrait(Comparison::class);
         $this->assertEquals($expected, $comparison->compareStrings($a, $b));
     }
 
-    public function dataStrings(): array
+    public static function dataStrings(): array
     {
         return [
             ['Ich werde am Samstag Tennis spielen.','Ich werde am Samstag Tennis spielen.', true],

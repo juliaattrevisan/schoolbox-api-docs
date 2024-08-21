@@ -34,8 +34,8 @@ class ISoftDeletableTest extends TestCase
      * @param IMapper         $mapper
      * @param ReflectionClass $reflection
      * @param string          $className
-     * @dataProvider providerMappers
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMappers')]
     public function testMapperAndModelConsistency(IMapper $mapper, ReflectionClass $reflection, string $className): void
     {
         $model              = $mapper->createModel();

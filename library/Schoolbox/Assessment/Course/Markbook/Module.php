@@ -66,7 +66,7 @@ class Module extends \Alaress\Module\Module
     private function buildAuthRuleCanSeeCourseMarkbook(): Rule\IAuthorizationRule
     {
         return new Rule\All(
-            new Rule\Callback(function () {
+            new Rule\Callback(function (): void {
                 if (!$this->getConfig()->get('course_markbook_enable')) {
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
                     throw new InvalidPath('Course markbook module is disabled');

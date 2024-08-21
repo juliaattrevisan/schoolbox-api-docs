@@ -16,9 +16,8 @@ use Schoolbox\Learning\Badge;
 
 /**
  * Test for `\Schoolbox\Learning\Badge\Award\ExpiryHelper`.
- *
- * @covers \Schoolbox\Learning\Badge\Award\ExpiryHelper
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Badge\Award\ExpiryHelper::class)]
 class ExpiryHelperTest extends TestCase
 {
     /**
@@ -196,10 +195,10 @@ class ExpiryHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestDetermineExpiryData
      * @param Alaress_Date_Format|null $expected
      * @param Badge\Award\Model        $award
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDetermineExpiryData')]
     public function testDetermineExpiry(?Alaress_Date_Format $expected, Badge\Award\Model $award): void
     {
         $actual = (new Badge\Award\ExpiryHelper())->determineExpiry($award);
@@ -215,7 +214,7 @@ class ExpiryHelperTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestDetermineExpiryOnIncompleteObjectData(): iterable
+    public static function getTestDetermineExpiryOnIncompleteObjectData(): iterable
     {
         $awardedAt = Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00');
         yield 'no badge' => [
@@ -259,9 +258,9 @@ class ExpiryHelperTest extends TestCase
      * Test for expected errors which occur when the badge award isn't fully
      * instantiated.
      *
-     * @dataProvider getTestDetermineExpiryOnIncompleteObjectData
      * @param Badge\Award\Model $award
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDetermineExpiryOnIncompleteObjectData')]
     public function testDetermineExpiryOnIncompleteObject(Badge\Award\Model $award): void
     {
         // Whilst warning messages can no longer be expected, errors can

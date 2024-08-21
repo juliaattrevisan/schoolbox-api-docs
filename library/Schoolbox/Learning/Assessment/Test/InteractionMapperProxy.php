@@ -21,8 +21,8 @@ class InteractionMapperProxy extends TestCase
     /**
      * @param Mapper\AbstractMapperProxy $mapperProxy
      * @param string                     $modelClass
-     * @dataProvider providerMapperProxy
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMapperProxy')]
     public function testCreateModel(Mapper\AbstractMapperProxy $mapperProxy, $modelClass)
     {
         $model = $mapperProxy->createModel();

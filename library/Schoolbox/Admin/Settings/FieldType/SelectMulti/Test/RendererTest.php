@@ -22,23 +22,22 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use SebastianBergmann\RecursionContext;
 
 /**
- * @covers \Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer::class)]
 class RendererTest extends TestCase
 {
 
     // Tests
-
     /**
      * Test the renderer provides expected data structure for the twig template
      *
-     * @dataProvider providerConfig
      * @param Config $config
      * @throws PHPUnitFramework\Exception
      * @throws FieldTypeMismatchException
      * @throws RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfig')]
     public function testTemplateData(Config $config): void
     {
         $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_MULTI);
@@ -56,11 +55,11 @@ class RendererTest extends TestCase
     /**
      * Test the renderer provides expected data structure
      *
-     * @dataProvider providerConfigAndInvalidFieldId
      * @param Config $config
      * @param int    $invalidFieldId
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfigAndInvalidFieldId')]
     public function testInvalidField(Config $config, int $invalidFieldId): void
     {
         $this->expectException(FieldTypeMismatchException::class);
@@ -74,7 +73,6 @@ class RendererTest extends TestCase
      *
      * An invalid value is one that doesn't match one of the available options
      *
-     * @dataProvider providerTransformValue
      * @param FieldType\SelectMulti\Renderer $renderer
      * @param Config                         $config
      * @param string|null                    $value
@@ -83,6 +81,7 @@ class RendererTest extends TestCase
      * @throws PHPUnitFramework\ExpectationFailedException
      * @throws RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTransformValue')]
     public function testTransformValue(FieldType\SelectMulti\Renderer $renderer, Config $config, ?string $value, ?string $expected): void
     {
         $config->setValue($value);

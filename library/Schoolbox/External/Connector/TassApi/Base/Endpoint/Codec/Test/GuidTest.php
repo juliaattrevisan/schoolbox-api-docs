@@ -29,7 +29,7 @@ class GuidTest extends TestCase
      *
      * @return array
      */
-    public function providerValidGuidEncode(): array
+    public static function providerValidGuidEncode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -69,7 +69,6 @@ class GuidTest extends TestCase
     /**
      * Test valid guid pieces
      *
-     * @dataProvider providerValidGuidEncode
      * @param string $startAt
      * @param string $ttid
      * @param string $day
@@ -79,6 +78,7 @@ class GuidTest extends TestCase
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidGuidEncode')]
     public function testValidGuidEncode(string $startAt, string $ttid, string $day, string $periodCode, string $classCode, string $expected): void
     {
         $codec = new GuidCodec();
@@ -91,7 +91,7 @@ class GuidTest extends TestCase
      *
      * @return array
      */
-    public function providerValidGuidEncodeDecode(): array
+    public static function providerValidGuidEncodeDecode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -131,12 +131,12 @@ class GuidTest extends TestCase
     /**
      * Test valid guid pieces when reencoded
      *
-     * @dataProvider providerValidGuidEncodeDecode
      * @param array  $input
      * @param array $expected
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidGuidEncodeDecode')]
     public function testValidGuidEncodeDecode(array $input, array $expected): void
     {
         $codec = new GuidCodec();

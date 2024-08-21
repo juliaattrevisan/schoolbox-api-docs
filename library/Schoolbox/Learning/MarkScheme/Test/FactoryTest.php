@@ -39,12 +39,12 @@ use Schoolbox\User;
 class FactoryTest extends TestCase
 {
     /**
-     * @dataProvider providerTaskMarkTypeInvalid
      * @param Task $task
      *
      * @throws InvalidArgumentException If assessment class not registered
      * @throws DomainException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskMarkTypeInvalid')]
     public function testTaskMarkTypeInvalid(Task $task)
     {
         $this->expectException(DomainException::class);
@@ -54,13 +54,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerTaskMarkTypeValid
      * @param Task   $task
      * @param string $expectedMarkScheme
      * @throws \PHPUnit\Framework\Exception
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskMarkTypeValid')]
     public function testTaskMarkTypeValid(Task $task, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -70,12 +70,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerQuizMarkTypeInvalid
      * @param Quiz $quiz
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuizMarkTypeInvalid')]
     public function testQuizMarkTypeInvalid(Quiz $quiz)
     {
         $this->expectException(DomainException::class);
@@ -85,13 +85,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerQuizMarkTypeValid
      * @param Quiz   $quiz
      * @param string $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuizMarkTypeValid')]
     public function testQuizMarkTypeValid(Quiz $quiz, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -101,12 +101,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerDueWOrkMarkTypeInvalid
      * @param DueWork $dueWork
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWOrkMarkTypeInvalid')]
     public function testDueWorkMarkTypeInvalid(DueWork $dueWork)
     {
         $this->expectException(DomainException::class);
@@ -116,13 +116,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerDueWorkMarkTypeValid
      * @param DueWork $dueWork
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkMarkTypeValid')]
     public function testDueWorkMarkTypeValid(DueWork $dueWork, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -132,12 +132,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMarkTypeInvalid
      * @param Project $project
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMarkTypeInvalid')]
     public function testProjectMarkTypeInvalid($project)
     {
         $this->expectException(DomainException::class);
@@ -147,13 +147,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMarkTypeValid
      * @param Project $project
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMarkTypeValid')]
     public function testProjectMarkTypeValid($project, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();

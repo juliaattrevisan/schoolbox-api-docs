@@ -13,9 +13,10 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use Schoolbox\Assessment\Rubric\Grid\ValidCapabilityMax;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\ValidCapabilityMax::class)]
 class ValidCapabilityMaxTest extends TestCase
 {
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkPerCap = true;
         $noMarkPerCap = false;
@@ -74,13 +75,12 @@ class ValidCapabilityMaxTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\ValidCapabilityMax::isSatisfiedBy
      *
      * @param bool $markPerCap
      * @param string $capabilityMax
      * @param bool $expected                 Whether this test should assert true or false
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(bool $markPerCap, string $capabilityMax, bool $expected)
     {
         $spec = new ValidCapabilityMax($markPerCap);

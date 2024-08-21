@@ -24,12 +24,12 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 class ValidStratsTest extends TestCase
 {
     /**
-     * @dataProvider providerValidWatchlistValue
      * @param string $cliArgs
      * @param array  $expected
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidWatchlistValue')]
     public function testValidStrats(string $cliArgs, array $expected)
     {
         $this->assertEquals($expected, (new ValidStrats($cliArgs))->filter($cliArgs));
@@ -41,7 +41,7 @@ class ValidStratsTest extends TestCase
      *
      * @return array
      */
-    public function providerValidWatchlistValue(): array
+    public static function providerValidWatchlistValue(): array
     {
         return [
             /* Empty strings, meaningless data
@@ -124,13 +124,13 @@ I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f,
 
 
     /**
-     * @dataProvider providerStratEnabled
      * @param string $method
      * @param string $cliArgs
      * @param bool   $expected
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStratEnabled')]
     public function testStratEnabled(string $method, string $cliArgs, bool $expected)
     {
         $validStrats = (new ValidStrats($cliArgs));
@@ -144,7 +144,7 @@ I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f,
      *
      * @return array
      */
-    public function providerStratEnabled(): array
+    public static function providerStratEnabled(): array
     {
         return [
 

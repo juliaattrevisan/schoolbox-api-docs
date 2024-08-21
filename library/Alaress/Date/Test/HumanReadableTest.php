@@ -21,7 +21,7 @@ class HumanReadableTest extends TestCase
      *
      * @return array[]
      */
-    public function dataHumanReadable()
+    public static function dataHumanReadable()
     {
         return [
             [
@@ -71,12 +71,12 @@ class HumanReadableTest extends TestCase
 
 
     /**
-     * @dataProvider dataHumanReadable
      *
      * @param string $naturalLanguage
      * @param callable $callable
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataHumanReadable')]
     public function testHumanReadable($naturalLanguage, $callable)
     {
         $adf = ADF::newNaturalDate($naturalLanguage);

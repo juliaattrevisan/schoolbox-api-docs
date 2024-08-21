@@ -24,9 +24,8 @@ use Schoolbox\User;
 /**
  * Tests for converting from an array to model representation of badges, when
  * only the subset of fields which is mutable by API calls is converted.
- *
- * @covers \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly::class)]
 class MutableFieldsOnlyTest extends TestCase
 {
     /**
@@ -344,8 +343,6 @@ class MutableFieldsOnlyTest extends TestCase
     /**
      * Test that creation of a new model from an array works as expected.
      *
-     * @dataProvider getTestInvokeCreateData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly::__invoke
      *
      * @param array                  $input
      * @param Model                  $expected
@@ -353,6 +350,7 @@ class MutableFieldsOnlyTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
     public function testInvokeCreate(array $input, Model $expected, MutableFieldsOnly $converter = null): void
     {
         $converter = $this->createConverterIfNull($converter);
@@ -365,8 +363,6 @@ class MutableFieldsOnlyTest extends TestCase
     /**
      * Test that update of an existing model from an array works as expected.
      *
-     * @dataProvider getTestInvokeUpdateData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly::__invoke
      *
      * @param array                  $input
      * @param Model                  $existing
@@ -375,6 +371,7 @@ class MutableFieldsOnlyTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateData')]
     public function testInvokeUpdate(
         array $input,
         Model $existing,

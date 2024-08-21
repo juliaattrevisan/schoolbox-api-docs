@@ -29,11 +29,11 @@ use Schoolbox\External\Connector\Watchlist;
 class WatchlistTest extends TestCase
 {
     /**
-     * @dataProvider providerValidWatchlistValue
      * @param string $externalId
      * @param string $cliArgs
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidWatchlistValue')]
     public function testValidWatchlistValue(string $externalId, string $cliArgs, bool $expected)
     {
         $watchlist = new Watchlist();
@@ -49,7 +49,7 @@ class WatchlistTest extends TestCase
      *
      * @return array
      */
-    public function providerValidWatchlistValue(): array
+    public static function providerValidWatchlistValue(): array
     {
         return [
             /* Empty watchlist allows everyone (this is the default usage)

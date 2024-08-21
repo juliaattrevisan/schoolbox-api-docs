@@ -135,7 +135,7 @@ class Controller extends Base
         $sessionUser = $this->getUser();
 
         // Do the import in a detached state so it doesn't time out
-        $this->postOutputCallbacks[] = function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
+        $this->postOutputCallbacks[] = function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords): void {
             $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
         };
         $this->response = $this->responseFromTemplate(

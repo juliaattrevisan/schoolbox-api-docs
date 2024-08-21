@@ -28,11 +28,11 @@ class IsATypeOfDateTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsWeekdayData
      *
      * @param Alaress_Date_Format $date
      * @param bool                $isWeekday
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsWeekdayData')]
     public function testIsWeekday($date, $isWeekday)
     {
         $this->assertEquals($isWeekday, $date->isWeekday());
@@ -53,11 +53,11 @@ class IsATypeOfDateTest extends TestCase
     }
 
     /**
-     * @dataProvider getIsLeapYearData
      *
      * @param Alaress_Date_Format $date
      * @param bool                $isLeapYear
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsLeapYearData')]
     public function testIsLeapYear($date, $isLeapYear)
     {
         $this->assertEquals($isLeapYear, $date->isLeapYear());
@@ -92,7 +92,6 @@ class IsATypeOfDateTest extends TestCase
     }
 
     /**
-     * @dataProvider getBetweenData
      *
      * @param Alaress_Date_Format $date
      * @param Alaress_Date_Format $start
@@ -100,6 +99,7 @@ class IsATypeOfDateTest extends TestCase
      * @param bool                $equal
      * @param bool                $result
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getBetweenData')]
     public function testBetween($date, $start, $end, $equal, $result)
     {
         $this->assertEquals($result, $date->between($start, $end, $equal));

@@ -17,9 +17,8 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 
 /**
  * Test for the CSV importer factory.
- *
- * @covers \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory::class)]
 class CsvImporterFactoryTest extends TestCase
 {
     /**
@@ -447,8 +446,6 @@ TEST;
 
 
     /**
-     * @dataProvider getTestBuildData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory::build
      *
      * @param resource     $fp
      * @param int          $maxLevels
@@ -459,6 +456,7 @@ TEST;
      * @param int|null     $expectedCapabilityMarkType
      * @param int|null     $expectedCapabilityGradeGroup
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestBuildData')]
     public function testBuild(
         $fp,
         int $maxLevels,

@@ -26,10 +26,10 @@ class QuizStatus extends TestCase
 {
 
     /**
-     * @dataProvider provider_isResponseRequired
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isResponseRequired')]
     public function test_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
@@ -41,10 +41,10 @@ class QuizStatus extends TestCase
 
 
     /**
-     * @dataProvider provider_isFeedbackRequired
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isFeedbackRequired')]
     public function test_selfAssessable_isFeedbackRequired(Participant $participant, $isFeedbackRequired)
     {
         $expected = $isFeedbackRequired;
@@ -55,10 +55,10 @@ class QuizStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_isReviewComplete
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isReviewComplete')]
     public function test_selfAssessable_isReviewComplete(Participant $participant, $isReviewComplete)
     {
         $expected = $isReviewComplete;
@@ -70,9 +70,9 @@ class QuizStatus extends TestCase
 
 
     /**
-     * @dataProvider provider_participants
      * @param Participant $participant
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_participants')]
     public function test_mutual_exclusive_states(Participant $participant)
     {
         $countStates = 0;
@@ -93,7 +93,7 @@ class QuizStatus extends TestCase
     // ================= Data Providers =================
 
 
-    public function provider_isResponseRequired()
+    public static function provider_isResponseRequired()
     {
         $quiz = DemoData::getQuiz(1);
 
@@ -107,7 +107,7 @@ class QuizStatus extends TestCase
         ];
     }
 
-    public function provider_isFeedbackRequired()
+    public static function provider_isFeedbackRequired()
     {
         $quiz = DemoData::getQuiz(1);
 
@@ -121,7 +121,7 @@ class QuizStatus extends TestCase
         ];
     }
 
-    public function provider_isReviewComplete()
+    public static function provider_isReviewComplete()
     {
         $quiz = DemoData::getQuiz(1);
 
@@ -138,7 +138,7 @@ class QuizStatus extends TestCase
     /**
      * @return Participant[][]
      */
-    public function provider_participants()
+    public static function provider_participants()
     {
         $quiz = DemoData::getQuiz(1);
 

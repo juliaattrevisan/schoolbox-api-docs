@@ -13,32 +13,31 @@ use PHPUnit\Framework\TestCase;
 class CodecTest extends TestCase
 {
     /**
-     * @dataProvider provider_testEncode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_testEncode')]
     public function testEncode($input, $expected)
     {
         $this->assertEquals($expected, Codec::encode($input));
     }
 
     /**
-     * @dataProvider provider_testDecode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_testDecode')]
     public function testDecode($input, $expected)
     {
         $this->assertEquals($expected, Codec::decode($input));
     }
 
     /**
-     * @dataProvider provider_dataIsNull
      * @param string $input
      * @param string $expected
      *
-     *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_dataIsNull')]
     public function testInvalidDecodeData($input, $expected)
     {
         $this->expectException(\TypeError::class);
@@ -46,12 +45,11 @@ class CodecTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_dataIsNull
      * @param string $input
      * @param string $expected
      *
-     *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_dataIsNull')]
     public function testInvalidEncodeData($input, $expected)
     {
         $this->expectException(\TypeError::class);
@@ -62,7 +60,7 @@ class CodecTest extends TestCase
      * Convert commas to 0x1B
      * @return array
      */
-    public function provider_testEncode()
+    public static function provider_testEncode()
     {
         return [
             [
@@ -108,7 +106,7 @@ class CodecTest extends TestCase
      * Convert 0x1B to commas
      * @return array
      */
-    public function provider_testDecode()
+    public static function provider_testDecode()
     {
         return [
             [
@@ -154,7 +152,7 @@ class CodecTest extends TestCase
      * What is the data is null? It should give us a TypeError
      * @return array
      */
-    public function provider_dataIsNull()
+    public static function provider_dataIsNull()
     {
         return [
             [
@@ -165,20 +163,20 @@ class CodecTest extends TestCase
     }
 
     /**
-     * @dataProvider  provider_testDecode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_testDecode')]
     public function testLosslessDecoded($input, $expected)
     {
         $this->assertEquals($expected, Codec::decode(Codec::encode(Codec::decode(Codec::encode($input)))));
     }
 
     /**
-     * @dataProvider  provider_testEncode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_testEncode')]
     public function testLosslessEncoded($input, $expected)
     {
         $this->assertEquals($expected, Codec::encode(Codec::decode(Codec::encode(Codec::decode($input)))));

@@ -27,7 +27,6 @@ use Schoolbox\User;
 class ConnectorTest extends TestCase
 {
     /**
-     * @dataProvider providerInvalidSiteSchoolCode
      * @param null|string $siteSchoolCode
      * @throws EmptySiteSchoolCode
      * @throws \InvalidArgumentException
@@ -37,6 +36,7 @@ class ConnectorTest extends TestCase
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidSiteSchoolCode')]
     public function testInvalidSiteSchoolCode(?string $siteSchoolCode): void
     {
         // This method must not hit Kami API
@@ -47,10 +47,10 @@ class ConnectorTest extends TestCase
 
 
     /**
-     * @dataProvider providerDisabledConnector
      * @param null|string $apiKey
      * @throws \PHPUnit_Framework_AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDisabledConnector')]
     public function testDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
@@ -60,10 +60,10 @@ class ConnectorTest extends TestCase
 
 
     /**
-     * @dataProvider providerEnabledConnector
      * @param null|string $apiKey
      * @throws \PHPUnit_Framework_AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnabledConnector')]
     public function testEnabled(?string $apiKey): void
     {
         // This method must not hit Kami API
@@ -75,11 +75,11 @@ class ConnectorTest extends TestCase
     /**
      * Test for whether Kami is online
      *
-     * @dataProvider providerOnlineResponse
      *
      * @param bool $expected
      * @param ResponseInterface $response A mocked response from Kami
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerOnlineResponse')]
     public function testOnline(bool $expected, ResponseInterface $response): void
     {
         $connector = new MockConnector($this->getMockClient($response));
@@ -91,12 +91,12 @@ class ConnectorTest extends TestCase
      * Test for whether Kami is online, if it's disabled.
      * (Obviously, it's not online!)
      *
-     * @dataProvider providerDisabledConnector
      *
      * @param null|string $apiKey
      * @throws \PHPUnit_Framework_AssertionFailedError
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDisabledConnector')]
     public function testOnlineDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
@@ -119,7 +119,6 @@ class ConnectorTest extends TestCase
     /**
      * Test uploading a document from the Mock API.
      *
-     * @dataProvider providerUpload
      *
      * @param string              $name
      * @param string              $documentIdentifier
@@ -128,6 +127,7 @@ class ConnectorTest extends TestCase
      * @param Alaress_Date_Format $createdAt
      * @param ResponseInterface   $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerUpload')]
     public function testUpload(
         string $name,
         string $documentIdentifier,
@@ -194,11 +194,10 @@ class ConnectorTest extends TestCase
     /**
      * Test upload of a document from the Mock API, if the response is bad.
      *
-     * @dataProvider providerUploadBadResponse
-     *
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerUploadBadResponse')]
     public function testUploadBadResponse(ResponseInterface $response): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
@@ -224,12 +223,12 @@ class ConnectorTest extends TestCase
     /**
      * Test listing against the mock API
      *
-     * @dataProvider providerListDocuments
      *
      * @param int               $expectedCount
      * @param array             $expectedNames
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerListDocuments')]
     public function testListDocuments(int $expectedCount, array $expectedNames, ResponseInterface $response): void
     {
         $connector = new MockConnector($this->getMockClient($response));
@@ -254,7 +253,6 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a document from the Mock API
      *
-     * @dataProvider providerGetDocument
      *
      * @param string              $name
      * @param string              $documentIdentifier
@@ -263,6 +261,7 @@ class ConnectorTest extends TestCase
      * @param Alaress_Date_Format $createdAt
      * @param ResponseInterface   $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetDocument')]
     public function testGetDocument(
         string $name,
         string $documentIdentifier,
@@ -287,7 +286,6 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a document when Kami's not enabled
      *
-     * @dataProvider providerDisabledConnector
      *
      *
      * @param null|string $apiKey
@@ -298,6 +296,7 @@ class ConnectorTest extends TestCase
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
      * @throws \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDisabledConnector')]
     public function testGetDocumentNotEnabled(?string $apiKey): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException::class);
@@ -352,11 +351,10 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a document from the Mock API, if the response is bad.
      *
-     * @dataProvider providerGetDocumentBadResponse
-     *
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetDocumentBadResponse')]
     public function testGetDocumentBadResponse(ResponseInterface $response): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
@@ -382,10 +380,10 @@ class ConnectorTest extends TestCase
     /**
      * Test deleting a document from the Mock API
      *
-     * @dataProvider providerDeleteDocument
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDeleteDocument')]
     public function testDeleteDocument(ResponseInterface $response): void
     {
         $connector = new MockConnector($this->getMockClient($response));
@@ -414,11 +412,10 @@ class ConnectorTest extends TestCase
     /**
      * Test deleting a document from the Mock API, if the response is bad.
      *
-     * @dataProvider providerDeleteDocumentBadResponse
-     *
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDeleteDocumentBadResponse')]
     public function testDeleteDocumentBadResponse(ResponseInterface $response): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
@@ -430,13 +427,13 @@ class ConnectorTest extends TestCase
     /**
      * Test creation of a view session
      *
-     * @dataProvider providerViewSession
      *
      * @param string                   $viewerUrl
      * @param string                   $viewSessionKey
      * @param Alaress_Date_Format|null $sessionExpiry
      * @param ResponseInterface        $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerViewSession')]
     public function testViewSession(
         string $viewerUrl,
         string $viewSessionKey,
@@ -488,11 +485,10 @@ class ConnectorTest extends TestCase
     /**
      * Test bad response from view session request
      *
-     * @dataProvider providerViewSessionBadResponse
-     *
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerViewSessionBadResponse')]
     public function testViewSessionBadResponse(ResponseInterface $response): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
@@ -508,7 +504,6 @@ class ConnectorTest extends TestCase
     /**
      * Test get of an export
      *
-     * @dataProvider providerGetExport
      *
      * @param string            $documentIdentifier
      * @param string            $status
@@ -516,6 +511,7 @@ class ConnectorTest extends TestCase
      * @param null|string       $errorType
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetExport')]
     public function testGetExport(
         string $documentIdentifier,
         string $status,
@@ -536,7 +532,6 @@ class ConnectorTest extends TestCase
     /**
      * Test create inline export
      *
-     * @dataProvider providerGetExport
      *
      * @param string            $documentIdentifier
      * @param string            $status
@@ -544,6 +539,7 @@ class ConnectorTest extends TestCase
      * @param null|string       $errorType
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetExport')]
     public function testCreateInlineExport(
         string $documentIdentifier,
         string $status,
@@ -582,7 +578,6 @@ class ConnectorTest extends TestCase
     /**
      * Test create annotated export
      *
-     * @dataProvider providerGetExport
      *
      * @param string            $documentIdentifier
      * @param string            $status
@@ -590,6 +585,7 @@ class ConnectorTest extends TestCase
      * @param null|string       $errorType
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetExport')]
     public function testCreateAnnotatedExport(
         string $documentIdentifier,
         string $status,
@@ -646,11 +642,10 @@ class ConnectorTest extends TestCase
     /**
      * Test exporting a document from the Mock API, if the response is bad.
      *
-     * @dataProvider providerGetExportBadResponse
-     *
      *
      * @param ResponseInterface $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetExportBadResponse')]
     public function testGetExportBadResponse(ResponseInterface $response): void
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
@@ -682,7 +677,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerDisabledConnector(): array
+    public static function providerDisabledConnector(): array
     {
         return [
             [null],
@@ -694,7 +689,7 @@ class ConnectorTest extends TestCase
     /**
      * @return string[]|null[]
      */
-    public function providerInvalidSiteSchoolCode(): array
+    public static function providerInvalidSiteSchoolCode(): array
     {
         return [
             [''],
@@ -706,7 +701,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerEnabledConnector(): array
+    public static function providerEnabledConnector(): array
     {
         return [
             ['some invalid val'],
@@ -716,7 +711,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerOnlineResponse(): array
+    public static function providerOnlineResponse(): array
     {
         return [
             'Online' => [true, new Response(404, [], json_encode(['errors' => ['Record Not Found']]))],
@@ -929,7 +924,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerListDocuments(): array
+    public static function providerListDocuments(): array
     {
         return [
             'All good' => [
@@ -1040,7 +1035,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerDeleteDocument(): array
+    public static function providerDeleteDocument(): array
     {
         return [
             '200' => [
@@ -1053,7 +1048,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerDeleteDocumentBadResponse(): array
+    public static function providerDeleteDocumentBadResponse(): array
     {
         return [
             'Bad Response Code' => [
@@ -1074,7 +1069,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerViewSession(): array
+    public static function providerViewSession(): array
     {
         return [
             'All' => [
@@ -1139,7 +1134,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerViewSessionBadResponse(): array
+    public static function providerViewSessionBadResponse(): array
     {
         return [
             'No URL' => [
@@ -1167,7 +1162,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerGetExport(): array
+    public static function providerGetExport(): array
     {
         return [
             // An ordinary document
@@ -1225,7 +1220,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerGetExportBadResponse(): array
+    public static function providerGetExportBadResponse(): array
     {
         return [
             'Unknown Error' => [

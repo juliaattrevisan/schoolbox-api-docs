@@ -38,7 +38,7 @@ class DatetimeTest extends TestCase
      *
      * @return array
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array(null, false),
@@ -53,7 +53,7 @@ class DatetimeTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(null, null),
@@ -78,10 +78,10 @@ class DatetimeTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|bool $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrate')]
     public function testHydrate($input = null, $expected_output = null)
     {
         // Silence errors: date creation warns on invalid but parseable dates
@@ -94,10 +94,10 @@ class DatetimeTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestDehydrate
      * @param mixed $input
      * @param null|string $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrate')]
     public function testDehydrate($input = null, $expected_output = null)
     {
         //

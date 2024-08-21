@@ -19,9 +19,8 @@ class CronterpreterTest extends TestCase
     /**
      * Test that running Cronterpreter->interpret() returns
      * the expected output for each crontab in the test data set.
-     *
-     * @dataProvider providerTestInterpretations
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTestInterpretations')]
     public function testInterpretations($timeFormat, $weekendDays, $crontab, $expected): void
     {
         $cronterpreter = new Cronterpreter($timeFormat, $weekendDays);

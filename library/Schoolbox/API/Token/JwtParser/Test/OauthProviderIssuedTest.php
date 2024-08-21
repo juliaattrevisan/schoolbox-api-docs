@@ -20,19 +20,16 @@ use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
 
-/**
- * @covers \Schoolbox\API\Token\JwtParser\OauthProviderIssued
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\API\Token\JwtParser\OauthProviderIssued::class)]
 class OauthProviderIssuedTest extends TestCase
 {
     /**
-     * @dataProvider getTestAcceptsData
-     * @covers \Schoolbox\API\Token\JwtParser\OauthProviderIssued::accepts
      * @param OauthProviderIssued $parser
      * @param string              $jwt
      * @param bool                $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAcceptsData')]
     public function testAccepts(
         OauthProviderIssued $parser,
         #[SensitiveParameter] string $jwt,

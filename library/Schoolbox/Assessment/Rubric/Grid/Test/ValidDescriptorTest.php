@@ -13,9 +13,10 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use Schoolbox\Assessment\Rubric\Grid\ValidDescriptor;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\ValidDescriptor::class)]
 class ValidDescriptorTest extends TestCase
 {
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkRange = true;
         $noMarkRange = false;
@@ -78,13 +79,12 @@ class ValidDescriptorTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\ValidDescriptor::isSatisfiedBy
      *
      * @param bool $usesMarkRange
      * @param string $descriptor
      * @param bool $expected                 Whether this test should assert true or false
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(bool $usesMarkRange, string $descriptor, bool $expected)
     {
         $spec = new ValidDescriptor($usesMarkRange);

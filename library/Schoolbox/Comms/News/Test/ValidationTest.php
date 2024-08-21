@@ -104,10 +104,10 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validArticle
      * @param Model $article
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validArticle')]
     public function testValidArticle(Model $article, $expected): void
     {
         $validation = new ValidArticleAttributes();
@@ -120,7 +120,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validArticle(): array
+    public static function provider_validArticle(): array
     {
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -166,10 +166,10 @@ class ValidationTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validArticleDates
      * @param Model $article
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validArticleDates')]
     public function testValidArticleDates(Model $article, $expected): void
     {
         $validation = new ValidArticleAttributes();
@@ -182,7 +182,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validArticleDates(): array
+    public static function provider_validArticleDates(): array
     {
         $date1 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $date2 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -216,10 +216,10 @@ class ValidationTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validDateOffset
      * @param string $dateOffset
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDateOffset')]
     public function testValidDateOffset(string $dateOffset, $expected): void
     {
         $validation = new ValidDateOffset();
@@ -232,7 +232,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDateOffset(): array
+    public static function provider_validDateOffset(): array
     {
         return [
             'Valid (+1 day)' => [

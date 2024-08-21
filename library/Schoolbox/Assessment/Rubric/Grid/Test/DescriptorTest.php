@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\Descriptor::class)]
 class DescriptorTest extends TestCase
 {
     /**
@@ -19,7 +20,7 @@ class DescriptorTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestAssertValidityValidData(): iterable
+    public static function getTestAssertValidityValidData(): iterable
     {
         $descriptor = new Descriptor();
         $descriptor
@@ -44,12 +45,11 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestAssertValidityValidData
-     * @doesNotPerformAssertions
      *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::assertValidity
      * @param Descriptor $descriptor
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAssertValidityValidData')]
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testAssertValidityValid(Descriptor $descriptor): void
     {
         $descriptor->assertValidity();
@@ -67,7 +67,7 @@ class DescriptorTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestAssertValidityInvalidData(): iterable
+    public static function getTestAssertValidityInvalidData(): iterable
     {
         $descriptor = new Descriptor();
         $descriptor
@@ -92,11 +92,9 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestAssertValidityInvalidData
-     *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::assertValidity
      * @param Descriptor $descriptor
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAssertValidityInvalidData')]
     public function testAssertValidityInvalid(Descriptor $descriptor): void
     {
         $this->expectException(\UnexpectedValueException::class);
@@ -109,7 +107,7 @@ class DescriptorTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveLeftRightValue(): iterable
+    public static function getTestRetrieveLeftRightValue(): iterable
     {
         // Null value descriptor
         $descriptor = new Descriptor();
@@ -161,12 +159,11 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveLeftRightValue
      *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveLeftValue
      * @param Descriptor $descriptor
      * @param float|null $expectedLeft
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveLeftRightValue')]
     public function testRetrieveLeftValue(Descriptor $descriptor, ?float $expectedLeft): void
     {
         $this->assertSame($expectedLeft, $descriptor->retrieveLeftValue());
@@ -174,13 +171,12 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveLeftRightValue
      *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveRightValue
      * @param Descriptor $descriptor
      * @param float|null $_
      * @param float|null $expectedRight
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveLeftRightValue')]
     public function testRetrieveRightValue(Descriptor $descriptor, ?float $_, ?float $expectedRight): void
     {
         $this->assertSame($expectedRight, $descriptor->retrieveRightValue());
@@ -188,11 +184,9 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestAssertValidityInvalidData
-     *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveLeftValue
      * @param Descriptor $descriptor
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAssertValidityInvalidData')]
     public function testRetrieveLeftValueInvalid(Descriptor $descriptor): void
     {
         $this->expectException(\UnexpectedValueException::class);
@@ -201,11 +195,9 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * @dataProvider getTestAssertValidityInvalidData
-     *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveRightValue
      * @param Descriptor $descriptor
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAssertValidityInvalidData')]
     public function testRetrieveRightValueInvalid(Descriptor $descriptor): void
     {
         $this->expectException(\UnexpectedValueException::class);

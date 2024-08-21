@@ -154,13 +154,13 @@ class DayCalibratorTest extends TestCase
 
 
     /**
-     * @dataProvider providerValidDayCalibrator
      * @param string $xml
      * @param int    $isamsDay
      * @param int    $schoolboxDay
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDayCalibrator')]
     public function testValidDayCalibrator(string $xml, int $isamsDay, int $schoolboxDay): void
     {
         $apiKey = 'batchxml:key=asdfg?dayNumberOffset=0';
@@ -186,7 +186,7 @@ class DayCalibratorTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDayCalibrator(): array
+    public static function providerValidDayCalibrator(): array
     {
         return [
 

@@ -15,19 +15,16 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
-/**
- * @covers \Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus::class)]
 class ValidChangeStickyStatusTest extends TestCase
 {
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus::isSatisfiedBy
      * @param ValidChangeStickyStatus $validChangeStickyStatus
      * @param User                    $user
      * @param bool                    $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(ValidChangeStickyStatus $validChangeStickyStatus, User $user, bool $expected): void
     {
         $this->assertSame($expected, $validChangeStickyStatus->isSatisfiedBy($user));

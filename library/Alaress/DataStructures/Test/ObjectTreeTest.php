@@ -15,8 +15,8 @@ use stdClass;
 
 /**
  * @codeCoverageIgnore
- * @covers \Alaress\DataStructures\ObjectTree
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\DataStructures\ObjectTree::class)]
 class ObjectTreeTest extends Framework\TestCase
 {
 

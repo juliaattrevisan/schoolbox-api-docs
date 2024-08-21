@@ -12,9 +12,7 @@ namespace Alaress\Module\Test;
 use Alaress\Module\RouteParser;
 use Schoolbox\Test\TestCase;
 
-/**
- * @covers \Alaress\Module\RouteParser
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Module\RouteParser::class)]
 class RouterParserTest extends TestCase
 {
     /** @var RouteParser */
@@ -33,8 +31,8 @@ class RouterParserTest extends TestCase
      * @param string $route
      * @param string $expectedPath
      * @param array  $expectedTokens
-     * @dataProvider providerRoutes
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRoutes')]
     public function testParse(string $route, string $expectedPath, array $expectedTokens): void
     {
         [$actualPath, $actualTokens] = self::$routeParser->parse($route);
@@ -45,7 +43,7 @@ class RouterParserTest extends TestCase
     /**
      * @return array
      */
-    public function providerRoutes(): array
+    public static function providerRoutes(): array
     {
         return [
             ['/',                                      '/',                               []],

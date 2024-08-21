@@ -33,7 +33,7 @@ class FactoryTest extends BaseTestCase
     /**
      * @inheritdoc
      */
-    public function getTestBuild()
+    public static function getTestBuild()
     {
         return array(
             array('\\Schoolbox\\Column\\Base',       Mapper::TYPE_STRING),
@@ -51,10 +51,10 @@ class FactoryTest extends BaseTestCase
     }
 
     /**
-     * @dataProvider getTestBuild
      * @param string $expected_class
      * @param string $type
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestBuild')]
     public function testBuild($expected_class = '', $type = '')
     {
         $column = $this->object->build($type);

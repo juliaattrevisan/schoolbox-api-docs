@@ -21,21 +21,20 @@ use Alaress\Database\Quoter\Mysql;
 use Schoolbox\Test\MockConnector;
 
 /**
- * @covers \Schoolbox\Resource\Folder\ValidCodesSpec
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\ValidCodesSpec::class)]
 class ValidCodesSpecTest extends TestCase
 {
     // Tests
-
     /**
      * @param array $codes
      * @param int   $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
-     * @dataProvider providerNonUniqueOnFolder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNonUniqueOnFolder')]
     public function testNonUniqueOnFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = $this->createFolderWithEmptyCodes();
@@ -54,8 +53,8 @@ class ValidCodesSpecTest extends TestCase
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
-     * @dataProvider providerUniqueOnFolder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerUniqueOnFolder')]
     public function testUniqueOnFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = $this->createFolderWithEmptyCodes();
@@ -74,8 +73,8 @@ class ValidCodesSpecTest extends TestCase
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
-     * @dataProvider providerExactCollisionWithOtherFolder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerExactCollisionWithOtherFolder')]
     public function testExactCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = $this->createFolderWithEmptyCodes();
@@ -94,8 +93,8 @@ class ValidCodesSpecTest extends TestCase
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
-     * @dataProvider providerPrefixCollisionWithOtherFolder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPrefixCollisionWithOtherFolder')]
     public function testPrefixCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = $this->createFolderWithEmptyCodes();
@@ -115,8 +114,8 @@ class ValidCodesSpecTest extends TestCase
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
-     * @dataProvider providerNoCollisionWithOtherFolder
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNoCollisionWithOtherFolder')]
     public function testNoCollisionWithOtherFolder(?int $folderId, array $codes, int $countDbMatches): void
     {
         $folderModel = $this->createFolderWithEmptyCodes()->setId($folderId);
@@ -131,7 +130,7 @@ class ValidCodesSpecTest extends TestCase
 
     // Providers
 
-    public function providerNonUniqueOnFolder(): array
+    public static function providerNonUniqueOnFolder(): array
     {
         return [
             [['a', 'A'], 0],
@@ -146,7 +145,7 @@ class ValidCodesSpecTest extends TestCase
     }
 
 
-    public function providerUniqueOnFolder(): array
+    public static function providerUniqueOnFolder(): array
     {
         return [
             [[], 0],
@@ -159,7 +158,7 @@ class ValidCodesSpecTest extends TestCase
     }
 
 
-    public function providerExactCollisionWithOtherFolder(): array
+    public static function providerExactCollisionWithOtherFolder(): array
     {
         return [
             [['a'], 1],
@@ -169,7 +168,7 @@ class ValidCodesSpecTest extends TestCase
     }
 
 
-    public function providerPrefixCollisionWithOtherFolder(): array
+    public static function providerPrefixCollisionWithOtherFolder(): array
     {
         return [
             [['a'], 1],
@@ -180,7 +179,7 @@ class ValidCodesSpecTest extends TestCase
     }
 
 
-    public function providerNoCollisionWithOtherFolder(): array
+    public static function providerNoCollisionWithOtherFolder(): array
     {
         return [
             [null, ['a'], 0],

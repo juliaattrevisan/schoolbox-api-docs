@@ -22,13 +22,13 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 class DifferentialTest extends TestCase
 {
     /**
-     * @dataProvider providerValidDifferential
      * @param array $localIds
      * @param array $remoteIds
      * @param array $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDifferential')]
     public function testValidDifferential(array $localIds, array $remoteIds, array $expected)
     {
         $this->assertEquals($expected, (new Differential())->generate($localIds, $remoteIds));
@@ -39,7 +39,7 @@ class DifferentialTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDifferential(): array
+    public static function providerValidDifferential(): array
     {
         return [
             /* Some local data exists in remote data

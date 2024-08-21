@@ -154,7 +154,7 @@ class MapperTest extends TestCase
     /**
      * @return array
      */
-    public function dataFindByParent()
+    public static function dataFindByParent()
     {
         return [
             'parent ID = 3'  => [ 3, [ 12, 13, 14 ] ],
@@ -167,10 +167,10 @@ class MapperTest extends TestCase
     /**
      * Folder\Mapper::findByParentId() is a shim through to this method
      *
-     * @dataProvider dataFindByParent
      * @param int   $parentId
      * @param int[] $childrenIds
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataFindByParent')]
     public function testFindByParent($parentId, $childrenIds)
     {
         $folderIds = $this->getSortedIds(Mapper::getInstance()->findByParent($parentId));
@@ -267,7 +267,7 @@ class MapperTest extends TestCase
     /**
      * @return array[]
      */
-    public function dataFindParents()
+    public static function dataFindParents()
     {
         return [
             'all, cheaply'       => [ 29, null, true,  [ 3, 14 ] ],
@@ -279,7 +279,6 @@ class MapperTest extends TestCase
 
 
     /**
-     * @dataProvider dataFindParents
      *
      * @param int   $folderId
      * @param int   $stopFolderId
@@ -287,6 +286,7 @@ class MapperTest extends TestCase
      * @param array $expected
      * @throws OverflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataFindParents')]
     public function testFindParents($folderId, $stopFolderId, $cheaply, array $expected)
     {
         $folder     = Mapper::getInstance()->findById($folderId);

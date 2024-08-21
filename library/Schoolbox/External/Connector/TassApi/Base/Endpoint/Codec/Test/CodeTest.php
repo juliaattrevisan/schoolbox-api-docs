@@ -28,7 +28,7 @@ class CodeTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCodeEncode(): array
+    public static function provider_validCodeEncode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -70,12 +70,12 @@ class CodeTest extends TestCase
     /**
      * Test valid folder code strings
      *
-     * @dataProvider provider_validCodeEncode
      * @param string $yearGroup
      * @param string $subjectCode
      * @param string $class
      * @param string  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCodeEncode')]
     public function testValidCodeEncode(string $yearGroup, string $subjectCode, string $class, string $expected): void
     {
         $codec = new CodeCodec();

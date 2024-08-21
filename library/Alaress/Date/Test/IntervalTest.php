@@ -20,7 +20,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getIsInvertedData()
+    public static function getIsInvertedData()
     {
         return [
             [new Interval(-1), true],
@@ -32,9 +32,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsInvertedData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsInvertedData')]
     public function testIsInverted(Interval $interval, $isInverted)
     {
         $this->assertSame($isInverted, $interval->isInverted());
@@ -43,7 +41,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getSecondTotalData()
+    public static function getSecondTotalData()
     {
         return [
             [new Interval(-1), 1],
@@ -55,9 +53,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getSecondTotalData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getSecondTotalData')]
     public function testSecondTotal(Interval $interval, $secondTotal)
     {
         $this->assertSame($secondTotal, $interval->getSecondTotal());
@@ -66,7 +62,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getSecondRemainderData()
+    public static function getSecondRemainderData()
     {
         return [
             [new Interval(-1), 1],
@@ -78,9 +74,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getSecondRemainderData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getSecondRemainderData')]
     public function testSecondRemainder(Interval $interval, $secondRemainder)
     {
         $this->assertSame($secondRemainder, $interval->getSecondRemainder());
@@ -90,7 +84,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getMinuteTotalData()
+    public static function getMinuteTotalData()
     {
         return [
             [new Interval(-1), 0],
@@ -107,9 +101,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getMinuteTotalData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getMinuteTotalData')]
     public function testMinuteTotal(Interval $interval, $minuteTotal)
     {
         $this->assertSame($minuteTotal, $interval->getMinuteTotal());
@@ -118,7 +110,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getMinuteRemainderData()
+    public static function getMinuteRemainderData()
     {
         return [
             [new Interval(-1), 0],
@@ -135,9 +127,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getMinuteRemainderData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getMinuteRemainderData')]
     public function testMinuteRemainder(Interval $interval, $minuteRemainder)
     {
         $this->assertSame($minuteRemainder, $interval->getMinuteRemainder());
@@ -146,7 +136,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getHourTotalData()
+    public static function getHourTotalData()
     {
         return [
             [new Interval(-1), 0],
@@ -163,9 +153,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getHourTotalData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHourTotalData')]
     public function testHourTotal(Interval $interval, $hourTotal)
     {
         $this->assertSame($hourTotal, $interval->getHourTotal());
@@ -174,7 +162,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getHourRemainderData()
+    public static function getHourRemainderData()
     {
         return [
             [new Interval(-1), 0],
@@ -194,9 +182,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getHourRemainderData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHourRemainderData')]
     public function testHourRemainder(Interval $interval, $hourRemainder)
     {
         $this->assertSame($hourRemainder, $interval->getHourRemainder());
@@ -205,7 +191,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getDayTotalData()
+    public static function getDayTotalData()
     {
         return [
             [new Interval(-1), 0],
@@ -216,9 +202,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getDayTotalData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDayTotalData')]
     public function testDayTotal(Interval $interval, $dayTotal)
     {
         $this->assertSame($dayTotal, $interval->getDayTotal());
@@ -227,7 +211,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getCreateFromDateIntervalData()
+    public static function getCreateFromDateIntervalData()
     {
         return [
             [new DateInterval('PT6H8M30S'), 22110],
@@ -237,9 +221,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getCreateFromDateIntervalData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateFromDateIntervalData')]
     public function testCreateFromDateInterval(DateInterval $interval, $secondTotal)
     {
         $this->assertSame($secondTotal, Interval::createFromDateInterval($interval)->getSecondTotal());
@@ -248,7 +230,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getCreateFromDateTimeDifferenceData()
+    public static function getCreateFromDateTimeDifferenceData()
     {
         return [
             [new DateTime("2014-03-16T22:29:35Z"), new DateTime("2014-03-17T22:29:35Z"), 86400],
@@ -256,9 +238,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getCreateFromDateTimeDifferenceData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateFromDateTimeDifferenceData')]
     public function testCreateFromDateTimeDifference(DateTime $from, DateTime $to, $secondTotal)
     {
         $this->assertSame(
@@ -270,7 +250,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getFormatData()
+    public static function getFormatData()
     {
         return [
             [new Interval(0), '%S seconds', '0 seconds'],
@@ -327,9 +307,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getFormatData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getFormatData')]
     public function testFormat(Interval $interval, $format, $expectedOutput)
     {
         $this->assertSame($expectedOutput, $interval->format($format));
@@ -338,7 +316,7 @@ class IntervalTest extends TestCase
     /**
      * @return array
      */
-    public function getJsonSerializeData()
+    public static function getJsonSerializeData()
     {
         return [
             [new Interval(1), 1],
@@ -347,9 +325,7 @@ class IntervalTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getJsonSerializeData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getJsonSerializeData')]
     public function testJsonSerialize(Interval $interval, $expectedOutput)
     {
         $this->assertSame($expectedOutput, $interval->jsonSerialize());

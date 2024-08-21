@@ -22,7 +22,6 @@ use Schoolbox\Learning\Assessment\Seb\ValidSebCheck;
 class SebCheckTest extends TestCase
 {
     /**
-     * @dataProvider providerSebCheck
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
      * @param string $configKey
@@ -30,6 +29,7 @@ class SebCheckTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSebCheck')]
     public function testValidSebCheck(
         array $serverSuperglobal,
         string $browserExamKey,
@@ -54,7 +54,7 @@ class SebCheckTest extends TestCase
      *
      * @return array
      */
-    public function providerSebCheck(): array
+    public static function providerSebCheck(): array
     {
 
         return [

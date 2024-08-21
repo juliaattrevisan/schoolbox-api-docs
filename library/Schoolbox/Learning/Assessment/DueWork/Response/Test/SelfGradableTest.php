@@ -27,12 +27,12 @@ use UnexpectedValueException;
 class SelfGradableTest extends TestCase
 {
     /**
-     * @dataProvider providerValidSelfAssessable
      * @param User        $currentUser The user currently "logged in"
      * @param Participant $participant The user whose trying to start self-assessment
      * @param int         $expected
      * @throws UnexpectedValueException If due work model not hydrated
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidSelfAssessable')]
     public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
     {
         $validation = new ValidSelfGradable();
@@ -45,7 +45,7 @@ class SelfGradableTest extends TestCase
      *
      * @return array
      */
-    public function providerValidSelfAssessable(): array
+    public static function providerValidSelfAssessable(): array
     {
         $student = (new User())->setId(230);
         $otherStudent = (new User())->setId(999);

@@ -20,7 +20,7 @@ class ValidButtonTest extends TestCase
      *
      * @return array
      */
-    public function provider_validButtonRequirements(): array
+    public static function provider_validButtonRequirements(): array
     {
 
         return [
@@ -215,9 +215,9 @@ class ValidButtonTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validButtonRequirements
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validButtonRequirements')]
     public function testValidButtonRequirements(array $post, $expected): void
     {
         $validation = new ValidButton();

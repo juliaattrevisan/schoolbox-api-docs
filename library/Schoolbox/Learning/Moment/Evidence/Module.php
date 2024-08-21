@@ -47,7 +47,7 @@ class Module extends BaseModule
 
         // In addition: if posting a moment for someone else,
         // that someone else must be a student in a year level which learning_moments_enabled is true
-        $isTargetUserSelfOrStudentRule = new Rule\Callback(function (array $params, User $user) {
+        $isTargetUserSelfOrStudentRule = new Rule\Callback(function (array $params, User $user): void {
             $this->authorizeAllUsersAreSelfOrStudent($params, $user);
         });
 
@@ -60,7 +60,7 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Rule\LazyCallback(function () use ($createRule) {
-                    return new Rule\Callback(function (array $params, User $user) use ($createRule) {
+                    return new Rule\Callback(function (array $params, User $user) use ($createRule): void {
                         $this->authorizeAllUsers($params, $user, $createRule);
                     });
                 })

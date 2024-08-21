@@ -70,8 +70,8 @@ class VisibilityTests extends TestCase
      * @param bool                $showClosed
      * @param Alaress_Date_Format $now
      * @param bool                $expected
-     * @dataProvider providerIsVisible
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsVisible')]
     public function testIsVisible(
         bool $isParticipant,
         Role $role,

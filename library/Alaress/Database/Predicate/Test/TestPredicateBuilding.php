@@ -287,7 +287,6 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @dataProvider providerBetween
      * @param string|int|null $from
      * @param string|int|null $to
      * @param string[]        $where
@@ -295,6 +294,7 @@ class TestPredicateBuilding extends TestCase
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \TypeError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBetween')]
     public function testBetween($from, $to, array $where, array $params)
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -305,13 +305,13 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @dataProvider providerBetweenDates
      * @param string|int|null $from
      * @param string|int|null $to
      * @param string[]        $where
      * @param mixed[]         $params
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBetweenDates')]
     public function testBetweenDates($from, $to, array $where, array $params)
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -322,13 +322,13 @@ class TestPredicateBuilding extends TestCase
 
 
     /**
-     * @dataProvider providerTableNames
      * @param string $column
      * @param string $table
      * @param string $quotedColumnAndTable
      * @throws InvalidColumnException
      * @throws TypeError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTableNames')]
     public function testTableNames(string $column, string $table, string $quotedColumnAndTable)
     {
         $pb = new Builder($this->mySqlQuoter, $table);
@@ -345,7 +345,7 @@ class TestPredicateBuilding extends TestCase
     /**
      * @return mixed[][]
      */
-    public function providerBetween(): array
+    public static function providerBetween(): array
     {
         return [
             [null, null, [], []],
@@ -359,7 +359,7 @@ class TestPredicateBuilding extends TestCase
     /**
      * @return mixed[][]
      */
-    public function providerBetweenDates(): array
+    public static function providerBetweenDates(): array
     {
         $date1    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $date2    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -382,7 +382,7 @@ class TestPredicateBuilding extends TestCase
     /**
      * @return string[][]
      */
-    public function providerTableNames(): array
+    public static function providerTableNames(): array
     {
         return [
             ['column', 'table', '`table`.`column`'],

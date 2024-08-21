@@ -16,20 +16,19 @@ use Schoolbox\Version\Version;
 /**
  * Tests for checking the version of the running instance
  *
- * @covers \Schoolbox\Version\Version
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Version\Version::class)]
 class VersionTest extends TestCase
 {
     /**
      * Confirm we are able to extract the major section from the full site_version
      *
-     * @dataProvider getTestGetMajorData
-     * @covers       \Schoolbox\Version\Version::getMajor
      *
      * @param array       $config
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetMajorData')]
     public function testGetMajor(?string $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -41,7 +40,7 @@ class VersionTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetMajorData(): iterable
+    public static function getTestGetMajorData(): iterable
     {
         yield 'match major version 21.1' => [
             '21.0',
@@ -68,12 +67,11 @@ class VersionTest extends TestCase
     /**
      * Confirm we are able to extract the minor section from the full site_version
      *
-     * @dataProvider getTestGetMinorData
-     * @covers       \Schoolbox\Version\Version::getMinor
      *
      * @param string|null $expected
      * @param array       $config
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetMinorData')]
     public function testGetMinor(?string $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -84,7 +82,7 @@ class VersionTest extends TestCase
      * Data provider for `testGetMinor`
      * @return iterable
      */
-    public function getTestGetMinorData(): iterable
+    public static function getTestGetMinorData(): iterable
     {
         yield 'match minor version 2-1' => [
             '2-1',
@@ -111,12 +109,11 @@ class VersionTest extends TestCase
     /**
      * Confirm we can accurately identify a client hosted instance
      *
-     * @dataProvider getTestIsClientHostedData
-     * @covers       \Schoolbox\Version\Version::isClientHosted
      *
      * @param bool  $expected
      * @param array $config
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsClientHostedData')]
     public function testIsClientHosted(?bool $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -128,7 +125,7 @@ class VersionTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsClientHostedData(): iterable
+    public static function getTestIsClientHostedData(): iterable
     {
         yield 'match client hosted is true' => [
             true,
@@ -158,12 +155,11 @@ class VersionTest extends TestCase
     /**
      * Confirm we can accurately identify a cloud hosted instance
      *
-     * @dataProvider getTestIsCloudHostedData(): iterable
-     * @covers       \Schoolbox\Version\Version::isCloudHosted
      *
      * @param bool|null $expected
      * @param array     $config
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCloudHostedData(): iterable')]
     public function testIsCloudHosted(?bool $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -202,10 +198,7 @@ class VersionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getTestShowUpgradeReminderData
-     * @covers       \Schoolbox\Version\Version::showUpgradeReminder
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestShowUpgradeReminderData')]
     public function testShowUpgradeReminder(?bool $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -218,7 +211,7 @@ class VersionTest extends TestCase
      * @todo InstanceRegistry calls are not handled and need better coverage
      *
      */
-    public function getTestShowUpgradeReminderData(): iterable
+    public static function getTestShowUpgradeReminderData(): iterable
     {
         yield 'cloud hosted never needs a upgrade reminder' => [
             false,

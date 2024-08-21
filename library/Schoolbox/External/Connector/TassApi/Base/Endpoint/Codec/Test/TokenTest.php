@@ -28,7 +28,6 @@ class TokenTest extends TestCase
     /**
      * Take a data struct and encrypt it into a string token
      *
-     * @dataProvider providerTokenGeneration
      *
      * @param string $tassProductToken
      * @param array  $data
@@ -37,6 +36,7 @@ class TokenTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTokenGeneration')]
     public function testTokenGeneration(string $tassProductToken, array $data, string $encrypted)
     {
         $outcome = (new Token($tassProductToken))->generateToken($data, true);
@@ -49,7 +49,6 @@ class TokenTest extends TestCase
      * Take the encrypted token and unpack it into the original data struct we used
      * This is the inverse of token generation
      *
-     * @dataProvider providerTokenGeneration
      *
      * @param string $tassProductToken
      * @param array  $data
@@ -58,6 +57,7 @@ class TokenTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTokenGeneration')]
     public function testTokenUnpack(string $tassProductToken, array $data, string $encrypted)
     {
         $outcome = (new Token($tassProductToken))->unpackToken($encrypted);
@@ -71,7 +71,7 @@ class TokenTest extends TestCase
      *
      * @return array
      */
-    public function providerTokenGeneration(): array
+    public static function providerTokenGeneration(): array
     {
         return [
 

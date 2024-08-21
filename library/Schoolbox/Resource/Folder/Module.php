@@ -100,7 +100,7 @@ class Module extends BaseModule
         $writeAccessAndNotRoot = new Rule\All(
             $folderWriteAccess,
             new Rule\Callback(
-                static function (array $params = []) {
+                static function (array $params = []): void {
                     if (!array_key_exists('folder', $params)) {
                         throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
                     }
@@ -120,7 +120,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
-                    function (array $params = []) {
+                    function (array $params = []): void {
                         if (!array_key_exists('folder', $params)) {
                             throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
                         }

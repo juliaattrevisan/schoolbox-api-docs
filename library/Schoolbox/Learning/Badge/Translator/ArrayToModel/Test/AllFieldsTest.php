@@ -24,9 +24,8 @@ use TypeError;
 
 /**
  * Tests for converting from an array to model representation of badges.
- *
- * @covers \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::class)]
 class AllFieldsTest extends TestCase
 {
     /**
@@ -364,7 +363,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeUpdateInvalidValuesData(): iterable
+    public static function getTestInvokeUpdateInvalidValuesData(): iterable
     {
         $oldDate   = '2020-01-01T00:00:00+00:00';
         $oldId     = 1;
@@ -423,7 +422,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeInvalidAchievementExpiryData(): iterable
+    public static function getTestInvokeInvalidAchievementExpiryData(): iterable
     {
         return [
             '0 days' => [0],
@@ -437,8 +436,6 @@ class AllFieldsTest extends TestCase
     /**
      * Test that creation of a new model from an array works as expected.
      *
-     * @dataProvider getTestInvokeCreateData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array          $input
      * @param Model          $expected
@@ -446,6 +443,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
     public function testInvokeCreate(array $input, Model $expected, AllFields $converter = null): void
     {
         $converter = $this->createConverterIfNull($converter);
@@ -458,8 +456,6 @@ class AllFieldsTest extends TestCase
     /**
      * Test that update of an existing model from an array works as expected.
      *
-     * @dataProvider getTestInvokeUpdateData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array          $input
      * @param Model          $existing
@@ -468,6 +464,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateData')]
     public function testInvokeUpdate(
         array $input,
         Model $existing,
@@ -486,8 +483,6 @@ class AllFieldsTest extends TestCase
      * set fields which would cause an error: these fields should raise a
      * warning message, and leave the value as is.
      *
-     * @dataProvider getTestInvokeUpdateInvalidValuesData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array $input
      * @param Model $existing
@@ -495,6 +490,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateInvalidValuesData')]
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
         $this->expectException(TypeError::class);
@@ -511,12 +507,11 @@ class AllFieldsTest extends TestCase
      * This only tests int values: `null` is a valid value, and other non-int
      * values are covered by type definitions.
      *
-     * @dataProvider getTestInvokeInvalidAchievementExpiryData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param int $invalidValue
      * @noinspection PhpDocMissingThrowsInspection We know this will be thrown, and catch it
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeInvalidAchievementExpiryData')]
     public function testInvokeInvalidAchievementExpiry(int $invalidValue): void
     {
         $converter = $this->createConverterIfNull();
@@ -534,12 +529,11 @@ class AllFieldsTest extends TestCase
      * The invalid values for goal expiry are the same as achievement expiry, so
      * the data provider is the same.
      *
-     * @dataProvider getTestInvokeInvalidAchievementExpiryData
-     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param int $invalidValue
      * @noinspection PhpDocMissingThrowsInspection We know this will be thrown, and catch it
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeInvalidAchievementExpiryData')]
     public function testInvokeInvalidGoalExpiry(int $invalidValue): void
     {
         $converter = $this->createConverterIfNull();

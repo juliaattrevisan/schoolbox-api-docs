@@ -16,9 +16,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\ValidUploadableFile;
 
-/**
- * @covers \Schoolbox\Resource\Storage\ValidUploadableFile
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Storage\ValidUploadableFile::class)]
 class ValidUploadableFileTest extends TestCase
 {
     /**
@@ -31,12 +29,11 @@ class ValidUploadableFileTest extends TestCase
     private static ?Alaress_Date_Format $baseTime = null;
 
     /**
-     * @dataProvider getTestIsSatisfiedByValidCaseData
-     * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param Model $file
      * @return void
      * @noinspection PhpDocMissingThrowsInspection this should never throw
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByValidCaseData')]
     public function testIsSatisfiedByValidCase(Model $file)
     {
         /** @noinspection PhpUnhandledExceptionInspection this should never throw */
@@ -81,12 +78,11 @@ class ValidUploadableFileTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByInvalidCaseData
-     * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param Model  $file
      * @param string $errorPattern
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByInvalidCaseData')]
     public function testIsSatisfiedByInvalidCase(
         Model $file,
         string $errorPattern,

@@ -24,9 +24,9 @@ use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
 
 /**
- * @covers \Schoolbox\Pastoral\AccessLevelCensor
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Pastoral\AccessLevelCensor::class)]
 class AccessLevelCensorTest extends TestCase
 {
     /** @var Pastoral\AccessLevelCensor */
@@ -44,17 +44,16 @@ class AccessLevelCensorTest extends TestCase
     }
 
     // ======================== Tests ======================== //
-
     /**
      * Tests filtering the record, and related records
      *
-     * @dataProvider providerRelatedRecordCollection
      * @param string              $recordType
      * @param Pastoral\Model      $originalRecord
      * @param Pastoral\Model|null $expectedFilteredRecord
      * @param User                $viewer
      * @throws \Schoolbox\Mapper\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRelatedRecordCollection')]
     public function testFilterRecordsForUser(
         string $recordType,
         Pastoral\Model $originalRecord,

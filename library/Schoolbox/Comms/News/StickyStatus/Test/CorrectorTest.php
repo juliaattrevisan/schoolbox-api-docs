@@ -13,22 +13,19 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\StickyStatus\Corrector;
 
-/**
- * @covers \Schoolbox\Comms\News\StickyStatus\Corrector
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\StickyStatus\Corrector::class)]
 class CorrectorTest extends TestCase
 {
     /**
      * Test that `\Schoolbox\Comms\News\StickyStatus\Corrector::__invoke`
      * returns an article with the sticky flag set correctly.
      *
-     * @dataProvider getTestInvokeData
-     * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::__invoke
      * @param Corrector $corrector
      * @param Model     $article
      * @param bool|null $expectedStickyStatus
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(
         Corrector $corrector,
         Model $article,
@@ -41,13 +38,12 @@ class CorrectorTest extends TestCase
      * Test that `\Schoolbox\Comms\News\StickyStatus\Corrector::__invoke`
      * modifies the article passed to it correctly.
      *
-     * @dataProvider getTestInvokeData
-     * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::__invoke
      * @param Corrector $corrector
      * @param Model     $article
      * @param bool|null $expectedStickyStatus
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvokeModifiesArticleInPlace(
         Corrector $corrector,
         Model $article,
@@ -62,7 +58,7 @@ class CorrectorTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         yield 'config enabled, article enabled => enabled' => [
             new Corrector(true),

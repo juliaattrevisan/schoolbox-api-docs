@@ -15,9 +15,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Translator\ModelToArray;
 
-/**
- * @covers \Schoolbox\Resource\Storage\Translator\ModelToArray
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Storage\Translator\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
@@ -25,7 +23,7 @@ class ModelToArrayTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         yield 'empty fields' => [
             new Model(),
@@ -138,11 +136,10 @@ class ModelToArrayTest extends TestCase
 
 
     /**
-     * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\Resource\Storage\Translator\ModelToArray::__invoke
      * @param Model $input
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(Model $input, array $expected): void
     {
         $mockPrefixGenerator = $this->createMock(PrefixGenerator::class);

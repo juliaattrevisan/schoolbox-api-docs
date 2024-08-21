@@ -20,7 +20,7 @@ class IsPastAndFutureDateTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsPastAndFutureDateData()
+    public static function getTestIsPastAndFutureDateData()
     {
         return [
             [
@@ -51,12 +51,12 @@ class IsPastAndFutureDateTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsPastAndFutureDateData
      *
      * @param Alaress_Date_Format $date
      * @param bool                $isPast
      * @param bool                $isFuture
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsPastAndFutureDateData')]
     public function testIsPastAndFutureDate(Alaress_Date_Format $date, $isPast, $isFuture)
     {
         $this->assertEquals($isPast, $date->isPastDate());

@@ -94,7 +94,7 @@ class TaskTest extends TestCase
      *
      * @return array
      */
-    public function getTestTranslateToDomainModelData()
+    public static function getTestTranslateToDomainModelData()
     {
         // Instance vars defined in setUp() aren't available to data providers
         // I am not sure if this is a bug.
@@ -128,13 +128,13 @@ class TaskTest extends TestCase
     /**
      * Test translating task-specific data model fields
      *
-     * @dataProvider getTestTranslateToDomainModelData
      *
      * @param TaskModel $taskModel
      * @param string    $link
      * @param bool      $selfAssessable
      * @param int       $creatorId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateToDomainModelData')]
     public function testTranslateToDomainModel(TaskModel $taskModel, $link, $selfAssessable, $creatorId)
     {
         /** @var Task $task */

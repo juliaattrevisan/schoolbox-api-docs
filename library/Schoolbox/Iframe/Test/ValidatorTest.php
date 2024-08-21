@@ -23,13 +23,13 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 class ValidatorTest extends TestCase
 {
     /**
-     * @dataProvider providerValidExample
      * @param $safeSources
      * @param $url
      * @param int $expected
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidExample')]
     public function testValidExample($safeSources, $url, $expected)
     {
         $outcome = (new Validator($safeSources))->isValid($url);
@@ -42,7 +42,7 @@ class ValidatorTest extends TestCase
      *
      * @return array
      */
-    public function providerValidExample(): array
+    public static function providerValidExample(): array
     {
         $safeSources = "
             soundcloud.com/

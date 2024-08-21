@@ -14,18 +14,15 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
-/**
- * @covers \Schoolbox\Application\WebRequest\RequestUriParser
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Application\WebRequest\RequestUriParser::class)]
 class RequestUriParserTest extends TestCase
 {
     /**
-     * @dataProvider getTestParseUrlPathData
-     * @covers \Schoolbox\Application\WebRequest\RequestUriParser::parseUrlPath
      * @param string $requestUri
      * @param string $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestParseUrlPathData')]
     public function testParseUrlPath(string $requestUri, string $expected): void
     {
         $this->assertSame(
@@ -39,7 +36,7 @@ class RequestUriParserTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestParseUrlPathData(): iterable
+    public static function getTestParseUrlPathData(): iterable
     {
         yield 'empty' => [
             '',
@@ -88,7 +85,6 @@ class RequestUriParserTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\Application\WebRequest\RequestUriParser::parseUrlPath
      * @return void
      */
     public function testParseUrlPathWithNoRequestUri(): void
@@ -98,11 +94,10 @@ class RequestUriParserTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestParseUrlPathWithMultipleLeadingSlashesData
-     * @covers \Schoolbox\Application\WebRequest\RequestUriParser::parseUrlPath
      * @param string $requestUri
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestParseUrlPathWithMultipleLeadingSlashesData')]
     public function testParseUrlPathWithMultipleLeadingSlashes(string $requestUri): void
     {
         $this->expectException(BadRequestException::class);
@@ -114,7 +109,7 @@ class RequestUriParserTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestParseUrlPathWithMultipleLeadingSlashesData(): iterable
+    public static function getTestParseUrlPathWithMultipleLeadingSlashesData(): iterable
     {
         yield 'empty w/ two leading slashes' => [
             '//',

@@ -25,10 +25,10 @@ use Schoolbox\Learning\Assessment\Participant;
 class DueWorkStatus extends TestCase
 {
     /**
-     * @dataProvider provider_isResponseRequired
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isResponseRequired')]
     public function test_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
@@ -40,10 +40,10 @@ class DueWorkStatus extends TestCase
 
 
     /**
-     * @dataProvider providerIsResubmissionRequired
      * @param Participant $participant
      * @param bool        $isResubmissionRequired
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsResubmissionRequired')]
     public function testIsResubmissionRequired(Participant $participant, bool $isResubmissionRequired): void
     {
         $expected = $isResubmissionRequired;
@@ -54,10 +54,10 @@ class DueWorkStatus extends TestCase
 
 
     /**
-     * @dataProvider provider_isFeedbackRequired
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isFeedbackRequired')]
     public function test_selfAssessable_isFeedbackRequired(Participant $participant, $isFeedbackRequired)
     {
         $expected = $isFeedbackRequired;
@@ -68,10 +68,10 @@ class DueWorkStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_isReviewComplete
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isReviewComplete')]
     public function test_selfAssessable_isReviewComplete(Participant $participant, $isReviewComplete)
     {
         $expected = $isReviewComplete;
@@ -83,9 +83,9 @@ class DueWorkStatus extends TestCase
 
 
     /**
-     * @dataProvider provider_participants
      * @param Participant $participant
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_participants')]
     public function test_mutual_exclusive_states(Participant $participant)
     {
         $countStates = 0;
@@ -105,7 +105,7 @@ class DueWorkStatus extends TestCase
 
     // ================= Data Providers =================
 
-    public function provider_isResponseRequired()
+    public static function provider_isResponseRequired()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -166,7 +166,7 @@ class DueWorkStatus extends TestCase
     }
 
 
-    public function providerIsResubmissionRequired()
+    public static function providerIsResubmissionRequired()
     {
         $dueWork = DemoData::getDueWork(1)->setAcceptsNone();
 
@@ -242,7 +242,7 @@ class DueWorkStatus extends TestCase
         ];
     }
 
-    public function provider_isFeedbackRequired()
+    public static function provider_isFeedbackRequired()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -302,7 +302,7 @@ class DueWorkStatus extends TestCase
         ];
     }
 
-    public function provider_isReviewComplete()
+    public static function provider_isReviewComplete()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -366,7 +366,7 @@ class DueWorkStatus extends TestCase
     /**
      * @return Participant[][]
      */
-    public function provider_participants()
+    public static function provider_participants()
     {
         $dueWork = DemoData::getDueWork(1);
 

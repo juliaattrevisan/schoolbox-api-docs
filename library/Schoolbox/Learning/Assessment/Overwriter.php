@@ -163,7 +163,7 @@ class Overwriter
         // Callback to URL which replicates constituents:
         // only trigger once the transaction closes
         $this->quizMapper->getDatabase()->onPersist(
-            function () use ($source, $destination, $creator) {
+            function () use ($source, $destination, $creator): void {
                 $baseUrl = (new \Schoolbox\Url\Factory($this->quizMapper->getConfigLoader()))->buildFullyQualified();
                 $message = $this->messageFactory
                     ->setUser($creator)

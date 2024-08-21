@@ -26,12 +26,12 @@ class FilterCodecTest extends TestCase
 {
 
     /**
-     * @dataProvider providerFilterCodecEncodeDecode
      * @param string|null $input
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFilterCodecEncodeDecode')]
     public function testFilterCodecEncodeDecode(?string $input, string $expected)
     {
         $codec = new FilterCodec();
@@ -47,7 +47,7 @@ class FilterCodecTest extends TestCase
      *
      * @return array
      */
-    public function providerFilterCodecEncodeDecode(): array
+    public static function providerFilterCodecEncodeDecode(): array
     {
         return [
             'cycling re-encode 1' => [
@@ -59,12 +59,12 @@ class FilterCodecTest extends TestCase
 
 
     /**
-     * @dataProvider providerFilterCodecDecode
      * @param string|null $input
      * @param array $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFilterCodecDecode')]
     public function testFilterCodecDecode(?string $input, array $expected)
     {
         $outcome = (new FilterCodec())->decode($input);
@@ -78,7 +78,7 @@ class FilterCodecTest extends TestCase
      *
      * @return array
      */
-    public function providerFilterCodecDecode(): array
+    public static function providerFilterCodecDecode(): array
     {
         $codec = new FilterCodec();
 

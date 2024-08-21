@@ -62,7 +62,7 @@ class Controller extends Base
 
             // Handle the response when it arrives
             $promise->then(
-                function ($response) {
+                function ($response): void {
                     http_response_code(200);
                     //header('X-Accel-Buffering: no');
                     header('Content-Type: application/json');
@@ -80,7 +80,7 @@ class Controller extends Base
                         //flush();
                     }
                 },
-                function ($reason) {
+                function ($reason): void {
                     /* @var ClientException $reason */
                     http_response_code($reason->getCode());
                     echo $reason->getMessage();

@@ -20,12 +20,12 @@ class UniqueErrorConstTest extends TestCase
     /**
      * Ensure that all errorId constant values are unique
      *
-     * @dataProvider providerErrorConstants
      * @param array  $errorConstants
      * @param string $errorName
      * @param int    $errorValue
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerErrorConstants')]
     public function testErrorIdUniqueness(array $errorConstants, string $errorName, int $errorValue): void
     {
         $collisions = [];

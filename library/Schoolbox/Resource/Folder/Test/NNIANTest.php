@@ -35,8 +35,8 @@ use UnexpectedValueException;
  *     └-- id=3, inherit=1
  *
  * @codeCoverageIgnore
- * @covers \Schoolbox\Resource\Folder\NNIAN
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\NNIAN::class)]
 class NNIANTest extends TestCase
 {
     // ===================================== Hard-coded state =====================================
@@ -174,7 +174,6 @@ class NNIANTest extends TestCase
     /**
      * Test non-inheriting folders
      *
-     * @dataProvider providerNnianAncestorsNotInheriting
      * @param Folder\NNIAN $nnian
      * @param Folder\Model $nonInheritingFolder
      * @throws InsufficientHydrationException
@@ -185,6 +184,7 @@ class NNIANTest extends TestCase
      * @throws Mapper\Exception\NotFound
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsNotInheriting')]
     public function testGetNnianAncestorsNotInheriting(Folder\NNIAN $nnian, Folder\Model $nonInheritingFolder): void
     {
         $this->assertEquals(
@@ -197,7 +197,6 @@ class NNIANTest extends TestCase
     /**
      * Test inheriting folders
      *
-     * @dataProvider providerNnianAncestorsInheriting
      * @param Folder\NNIAN $nnian
      * @param Folder\Model $inheritingFolder
      * @param Folder\Model $expectedNnian
@@ -209,6 +208,7 @@ class NNIANTest extends TestCase
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsInheriting')]
     public function testGetNnianAncestorsInheriting(
         Folder\NNIAN $nnian,
         Folder\Model $inheritingFolder,
@@ -224,7 +224,6 @@ class NNIANTest extends TestCase
     /**
      * Tests a folder that does not have parent hydrated can be hydrated on the fly
      *
-     * @dataProvider providerNnianAncestorsNotInheriting
      * @param Folder\NNIAN $nnian
      * @param Folder\Model $notInheritingFolder
      * @throws InsufficientHydrationException
@@ -235,6 +234,7 @@ class NNIANTest extends TestCase
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsNotInheriting')]
     public function testFindNearestNonInheritingAncestralNodeParentNotHydrated(
         Folder\NNIAN $nnian,
         Folder\Model $notInheritingFolder
@@ -250,7 +250,6 @@ class NNIANTest extends TestCase
     /**
      * Tests that the code throws an appropriate exception if a circular inheritance graph is encountered.
      *
-     * @dataProvider providerDetectCycle
      * @param bool $beforeCycle Should we test a node prior to cycle, or inside cycle?
      * @param int  $n           Number of nodes in cycle. Must be >= 2
      * @throws Framework\Exception
@@ -261,6 +260,7 @@ class NNIANTest extends TestCase
      * @throws UnexpectedValueException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDetectCycle')]
     public function testDetectCycle(bool $beforeCycle, int $n): void
     {
         $this->expectException(MapperException::class);
@@ -342,7 +342,7 @@ class NNIANTest extends TestCase
     /**
      * @return array
      */
-    public function providerDetectCycle(): array
+    public static function providerDetectCycle(): array
     {
         // bool $beforeCycle, int $n
         return [

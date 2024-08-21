@@ -97,7 +97,7 @@ class Cache extends BaseCache
             $this->invalidate($key);
         } else {
             // Avoid race condition by querying cached status and result in transaction
-            [$exists, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey) {
+            [$exists, $cachedResult] = $this->redis->transaction(function (MultiExec $tx) use ($redisKey): void {
                 $tx->exists($redisKey)
                    ->get($redisKey);
             });

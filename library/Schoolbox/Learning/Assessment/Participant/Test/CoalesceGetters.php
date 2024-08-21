@@ -33,8 +33,8 @@ class CoalesceGetters extends TestCase
      * @param Alaress_Date_Format $open
      * @param Alaress_Date_Format $due
      * @param Alaress_Date_Format $close
-     * @dataProvider providerDatesDomainObject
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDatesDomainObject')]
     public function testDatesDomainObject(
         Participant $participant,
         Alaress_Date_Format $publish,
@@ -53,8 +53,8 @@ class CoalesceGetters extends TestCase
     /**
      * @param Participant $participant
      * @param null|string $description
-     * @dataProvider providerDescriptionDomainObject
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDescriptionDomainObject')]
     public function testDescriptionDomainObject(Participant $participant, ?string $description): void
     {
         $this->assertEquals($description, $participant->getDescription());

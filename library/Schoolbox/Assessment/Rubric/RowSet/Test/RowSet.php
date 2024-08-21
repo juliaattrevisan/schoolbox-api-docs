@@ -15,9 +15,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet as RubricRowSet;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\RowSet\RowSet::class)]
 class RowSet extends TestCase
 {
     /**
@@ -25,7 +23,7 @@ class RowSet extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveCapabilityIdsData(): iterable
+    public static function getTestRetrieveCapabilityIdsData(): iterable
     {
         $rowSet = new RubricRowSet(new Folder());
         yield 'no capabilities' => [$rowSet, []];
@@ -43,12 +41,10 @@ class RowSet extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveCapabilityIdsData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveCapabilityIds
-     *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveCapabilityIdsData')]
     public function testRetrieveCapabilityIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveCapabilityIds());
@@ -60,7 +56,7 @@ class RowSet extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveIndicatorIdsData(): iterable
+    public static function getTestRetrieveIndicatorIdsData(): iterable
     {
         $rowSet = new RubricRowSet(new Folder());
         yield 'no capabilities' => [$rowSet, []];
@@ -116,12 +112,10 @@ class RowSet extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveIndicatorIdsData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveIndicatorIds
-     *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveIndicatorIdsData')]
     public function testRetrieveIndicatorIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveIndicatorIds());

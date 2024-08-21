@@ -18,10 +18,10 @@ class SyncTest extends TestCase
 {
 
     /**
-     * @dataProvider providerMultiRow
      * @param Iterator $iterator
      * @param int[]    $ids
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMultiRow')]
     public function testForEach(Iterator $iterator, array $ids)
     {
         /** @var GuardianObject $item */
@@ -32,7 +32,7 @@ class SyncTest extends TestCase
     }
 
 
-    public function providerMultiRow()
+    public static function providerMultiRow()
     {
         $keys = [
             'student_contact_id',

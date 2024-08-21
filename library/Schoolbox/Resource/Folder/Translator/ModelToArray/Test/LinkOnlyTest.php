@@ -15,19 +15,17 @@ use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
-/**
- * @covers \Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly::__invoke
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly::__invoke)]
 class LinkOnlyTest extends TestCase
 {
     /**
-     * @dataProvider getTestInvokeData
      *
      * @param Folder   $folder
      * @param LinkOnly $translator
      * @param array    $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(Folder $folder, LinkOnly $translator, array $expected): void
     {
         self::assertSame($expected, call_user_func($translator, $folder));
@@ -36,7 +34,7 @@ class LinkOnlyTest extends TestCase
     /**
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         yield 'folder without codes' => [
             (new Folder())

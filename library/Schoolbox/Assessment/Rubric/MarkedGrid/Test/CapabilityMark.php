@@ -21,9 +21,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Test\Generator as RowSetGenerator;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::class)]
 class CapabilityMark extends TestCase
 {
     /**
@@ -105,12 +103,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateScaledMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateScaledMark
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param null|float                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestCalculateScaledMarkData')]
     public function testCalculateScaledMark(RubricMarkedGrid\CapabilityMark $capabilityMark, ?float $expected): void
     {
         $this->assertSame($expected, $capabilityMark->calculateScaledMark());
@@ -172,12 +168,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateIndicatorMarkSumData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateIndicatorMarkSum
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param null|float                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestCalculateIndicatorMarkSumData')]
     public function testCalculateIndicatorMarkSum(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?float $expected
@@ -241,12 +235,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveNormalizedMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveNormalizedMark
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param null|float                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveNormalizedMarkData')]
     public function testRetrieveNormalizedMark(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?float $expected
@@ -260,7 +252,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestIterateIndicatorUsagesData(): iterable
+    public static function getTestIterateIndicatorUsagesData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -293,12 +285,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestIterateIndicatorUsagesData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::iterateIndicatorUsages
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param array                           $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIterateIndicatorUsagesData')]
     public function testIterateIndicatorUsages(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         array $expected
@@ -316,7 +306,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveIndicatorMarkData(): iterable
+    public static function getTestRetrieveIndicatorMarkData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -354,13 +344,12 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveIndicatorMarkData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveIndicatorMark
      *
      * @param RubricMarkedGrid\CapabilityMark     $capabilityMark
      * @param IndicatorUsage                      $indicatorUsage
      * @param null|RubricMarkedGrid\IndicatorMark $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveIndicatorMarkData')]
     public function testRetrieveIndicatorMark(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         IndicatorUsage $indicatorUsage,
@@ -407,13 +396,12 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestConvertFormInputToValueData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param string|null                     $formInput
      * @param float|null                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestConvertFormInputToValueData')]
     public function testConvertFormInputToValue(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?string $formInput,
@@ -447,12 +435,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestConvertFormInputToValueDataInvalid
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param string|null                     $formInput
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestConvertFormInputToValueDataInvalid')]
     public function testConvertFormInputToValueInvalid(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?string $formInput
@@ -486,12 +472,10 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getTestConvertFormInputToValueDataOutOfRange
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
-     *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param string|null                     $formInput
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestConvertFormInputToValueDataOutOfRange')]
     public function testConvertFormInputToValueOutOfRange(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?string $formInput
@@ -536,13 +520,12 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableValueData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToHumanReadableValue
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param string|null                     $formInput
      * @param string|null                     $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableValueData')]
     public function testConvertFormInputToHumanReadableValue(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?string $formInput,
@@ -589,13 +572,12 @@ class CapabilityMark extends TestCase
 
 
     /**
-     * @dataProvider getRetrieveHumanReadableValueAsFormInputData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveHumanReadableValueAsFormInput
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
      * @param string|null                     $humanReadableValue
      * @param string|null                     $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getRetrieveHumanReadableValueAsFormInputData')]
     public function testRetrieveHumanReadableValueAsFormInput(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
         ?string $humanReadableValue,

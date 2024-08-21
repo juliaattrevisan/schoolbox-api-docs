@@ -27,7 +27,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
         // these callbacks would typically be asynchronous, however due to component
         // infrastructure limitations, they need to happen synchronously here
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, function (Component_Config $model, Component_Config $previous = null) {
+        $this->registerCallback(self::CALLBACK_POSTSAVE, function (Component_Config $model, Component_Config $previous = null): void {
             if (!$this->definitionIsSource($model)) {
                 return;
             }
@@ -50,7 +50,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             }
         });
 
-        $this->registerCallback(self::CALLBACK_POSTDELETE, function (Component_Config $model) {
+        $this->registerCallback(self::CALLBACK_POSTDELETE, function (Component_Config $model): void {
             if (!$this->definitionIsSource($model)) {
                 return;
             }

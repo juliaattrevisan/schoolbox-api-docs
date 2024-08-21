@@ -28,14 +28,13 @@ use Traversable;
 class GenericCollectionTest extends TestCase
 {
     // ============= Tests =============
-
     /**
-     * @dataProvider provider_isCollectionOfInterface
      * @param GenericCollection $collection
      * @param string            $interface
      * @param bool              $expected
      * @throws ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOfInterface')]
     public function test_isCollectionOfInterface(GenericCollection $collection, string $interface, bool $expected): void
     {
         $actual = $collection->isCollectionOf($interface);
@@ -43,12 +42,12 @@ class GenericCollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isCollectionOfClass
      * @param GenericCollection $collection
      * @param string            $class
      * @param bool              $expected
      * @throws ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOfClass')]
     public function test_isCollectionOfClass(GenericCollection $collection, string $class, bool $expected): void
     {
         $actual = $collection->isCollectionOf($class);
@@ -56,12 +55,12 @@ class GenericCollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isCollectionOf
      * @param GenericCollection $collection
      * @param string            $otherType
      * @param bool              $expected
      * @throws ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOf')]
     public function test_isCollectionOf(GenericCollection $collection, string $otherType, bool $expected): void
     {
         $actual = $collection->isCollectionOf($otherType);
@@ -71,7 +70,7 @@ class GenericCollectionTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function provider_isCollectionOfInterface(): array
+    public static function provider_isCollectionOfInterface(): array
     {
         // SPL Interface inheritance tree:
         /* - Traversable
@@ -89,7 +88,7 @@ class GenericCollectionTest extends TestCase
         ];
     }
 
-    public function provider_isCollectionOfClass(): array
+    public static function provider_isCollectionOfClass(): array
     {
         // SPL Class inheritance tree:
         /* - IteratorIterator
@@ -107,7 +106,7 @@ class GenericCollectionTest extends TestCase
         ];
     }
 
-    public function provider_isCollectionOf(): array
+    public static function provider_isCollectionOf(): array
     {
         // SPL Class interfaces:
         // - IteratorIterator implements Iterator   (but not Countable)

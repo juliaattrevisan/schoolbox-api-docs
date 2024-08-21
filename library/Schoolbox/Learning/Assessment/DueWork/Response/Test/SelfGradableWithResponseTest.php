@@ -24,11 +24,11 @@ use Schoolbox\User;
 class SelfGradableWithResponseTest extends TestCase
 {
     /**
-     * @dataProvider providerValidSelfAssessable
      * @param User        $currentUser  The user currently "logged in"
      * @param Participant $participant  The user whose trying to start self-assessment
      * @param int         $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidSelfAssessable')]
     public function testValidSelfAssessable(User $currentUser, Participant $participant, $expected)
     {
         $validation = new ValidSelfGradableWithResponse();
@@ -41,7 +41,7 @@ class SelfGradableWithResponseTest extends TestCase
      *
      * @return array
      */
-    public function providerValidSelfAssessable(): array
+    public static function providerValidSelfAssessable(): array
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 

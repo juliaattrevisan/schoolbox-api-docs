@@ -31,9 +31,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification $candidate
-     * @dataProvider provider_candidate
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_candidate')]
     public function test_true($candidate): void
     {
         $spec = new TrueLeaf();
@@ -43,9 +43,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification $candidate
-     * @dataProvider provider_candidate
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_candidate')]
     public function test_false($candidate): void
     {
         $spec = new FalseLeaf();
@@ -55,9 +55,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification $candidate
-     * @dataProvider provider_negationValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_negationValid')]
     public function test_negationValid(ISpecification $candidate): void
     {
         $spec = new Negation($candidate);
@@ -67,9 +67,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification $candidate
-     * @dataProvider provider_negationInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_negationInvalid')]
     public function test_negationInvalid(ISpecification $candidate): void
     {
         $spec = new Negation($candidate);
@@ -79,9 +79,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_andValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_andValid')]
     public function test_andValid($components): void
     {
         $spec = new Conjunction($components);
@@ -91,9 +91,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_andInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_andInvalid')]
     public function test_andInvalid($components): void
     {
         $spec = new Conjunction($components);
@@ -103,9 +103,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_orValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_orValid')]
     public function test_orValid($components): void
     {
         $spec = new Disjunction($components);
@@ -115,9 +115,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_orInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_orInvalid')]
     public function test_orInvalid($components): void
     {
         $spec = new Disjunction($components);
@@ -127,9 +127,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_xorValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_xorValid')]
     public function test_xorValid($components): void
     {
         $spec = new ExclusiveOr($components);
@@ -139,9 +139,9 @@ class TestSpecificationFramework extends TestCase
 
     /**
      * @param ISpecification[] $components
-     * @dataProvider provider_xorInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_xorInvalid')]
     public function test_xorInvalid($components): void
     {
         $spec = new ExclusiveOr($components);
@@ -153,9 +153,9 @@ class TestSpecificationFramework extends TestCase
      * @param User   $candidate
      * @param mixed  $expectedValue
      * @param string $propertyName
-     * @dataProvider provider_equalsValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_equalsValid')]
     public function test_equalsValid(User $candidate, $propertyName, $expectedValue): void
     {
         $spec = new Equals($propertyName, $expectedValue);
@@ -167,9 +167,9 @@ class TestSpecificationFramework extends TestCase
      * @param User   $candidate
      * @param mixed  $expectedValue
      * @param string $propertyName
-     * @dataProvider provider_equalsInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_equalsInvalid')]
     public function test_equalsInvalid(User $candidate, $propertyName, $expectedValue): void
     {
         $spec = new Equals($propertyName, $expectedValue);
@@ -180,9 +180,9 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param mixed  $candidate
      * @param string $class
-     * @dataProvider provider_instanceOfValid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_instanceOfValid')]
     public function test_instanceOfValid($candidate, string $class): void
     {
         $spec = new IsInstanceOf($class);
@@ -193,9 +193,9 @@ class TestSpecificationFramework extends TestCase
     /**
      * @param mixed  $candidate
      * @param string $class
-     * @dataProvider provider_instanceOfInvalid
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_instanceOfInvalid')]
     public function test_instanceOfInvalid($candidate, string $class): void
     {
         $spec = new IsInstanceOf($class);
@@ -209,7 +209,7 @@ class TestSpecificationFramework extends TestCase
     /**
      * @return mixed[][]
      */
-    public function provider_candidate(): array
+    public static function provider_candidate(): array
     {
         return [
             [1],
@@ -219,7 +219,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_negationValid(): array
+    public static function provider_negationValid(): array
     {
         return [
             [new FalseLeaf()],
@@ -228,7 +228,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_negationInvalid(): array
+    public static function provider_negationInvalid(): array
     {
         return [
             [new TrueLeaf()],
@@ -237,7 +237,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_andValid(): array
+    public static function provider_andValid(): array
     {
         return [
             [[]],
@@ -248,7 +248,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_andInvalid(): array
+    public static function provider_andInvalid(): array
     {
         return [
             [[new FalseLeaf()]],
@@ -263,7 +263,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_orValid(): array
+    public static function provider_orValid(): array
     {
         return [
             [[new TrueLeaf()]],
@@ -278,7 +278,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_orInvalid(): array
+    public static function provider_orInvalid(): array
     {
         return [
             [[]],
@@ -289,7 +289,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_xorValid(): array
+    public static function provider_xorValid(): array
     {
         return [
             [[new TrueLeaf()]],
@@ -303,7 +303,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_xorInvalid(): array
+    public static function provider_xorInvalid(): array
     {
         return [
             [[]],
@@ -318,7 +318,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_equalsValid(): array
+    public static function provider_equalsValid(): array
     {
         $id        = 101;
         $firstName = 'John';
@@ -337,7 +337,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_equalsInvalid(): array
+    public static function provider_equalsInvalid(): array
     {
         $user = new User();
         $user
@@ -355,7 +355,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_instanceOfValid(): array
+    public static function provider_instanceOfValid(): array
     {
         return [
             [new User(), User::class],
@@ -367,7 +367,7 @@ class TestSpecificationFramework extends TestCase
     }
 
 
-    public function provider_instanceOfInvalid(): array
+    public static function provider_instanceOfInvalid(): array
     {
         return [
             [new Project(), User::class],

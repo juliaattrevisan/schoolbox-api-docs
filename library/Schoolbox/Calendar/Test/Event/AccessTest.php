@@ -555,11 +555,11 @@ class AccessTest extends TestCase
     }
 
     /**
-     * @dataProvider dataCheckExisting
      * @param bool $expected
      * @param User $effector
      * @param Event $event
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataCheckExisting')]
     public function testCheckExisting($expected, User $effector, Event $event)
     {
         $access = new EventAccess(
@@ -570,7 +570,6 @@ class AccessTest extends TestCase
     }
 
     /**
-     * @dataProvider dataCheckDestination
      * @param bool $expected
      * @param User $effector
      * @param int $accessLevel
@@ -579,6 +578,7 @@ class AccessTest extends TestCase
      * @param array $groups
      * @param array $campuses
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataCheckDestination')]
     public function testCheckDestination(
         $expected,
         User $effector,

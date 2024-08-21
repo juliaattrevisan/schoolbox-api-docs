@@ -14,9 +14,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator as RubricIndicator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\RowSet\Indicator::class)]
 class Indicator extends TestCase
 {
     /**
@@ -24,7 +22,7 @@ class Indicator extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsInUseData(): iterable
+    public static function getTestIsInUseData(): iterable
     {
         $indicator = (new RubricIndicator())->setId(3);
         yield 'none in use' => [$indicator, false];
@@ -37,12 +35,10 @@ class Indicator extends TestCase
 
 
     /**
-     * @dataProvider getTestIsInUseData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUse
-     *
      * @param RubricIndicator $indicator
      * @param bool            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsInUseData')]
     public function testIsInUse(RubricIndicator $indicator, bool $expected): void
     {
         $this->assertEquals($expected, $indicator->isInUse());
@@ -54,7 +50,7 @@ class Indicator extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsInUseExcludingData(): iterable
+    public static function getTestIsInUseExcludingData(): iterable
     {
         $task1 = (new Task())->setId(1);
         $task2 = (new Task())->setId(2);
@@ -81,13 +77,12 @@ class Indicator extends TestCase
 
 
     /**
-     * @dataProvider getTestIsInUseExcludingData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUseExcluding
      *
      * @param RubricIndicator $indicator
      * @param IAssessable     $assessment
      * @param bool            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsInUseExcludingData')]
     public function testIsInUseExcluding(
         RubricIndicator $indicator,
         IAssessable $assessment,

@@ -12,9 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Port of tests for `\Aura\Web\Request\Values`.
- *
- * @covers \Alaress\Web\Request\Values
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Web\Request\Values::class)]
 class ValuesTest extends TestCase
 {
     /**
@@ -35,8 +34,6 @@ class ValuesTest extends TestCase
     ];
 
     /**
-     * @dataProvider getTestGetData
-     * @covers \Alaress\Web\Request\Values::get
      *
      * @param Values $values
      * @param string $key
@@ -44,6 +41,7 @@ class ValuesTest extends TestCase
      * @param mixed  $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetData')]
     public function testGet(Values $values, string $key, mixed $alt, mixed $expected): void
     {
         $this->assertSame($expected, $values->get($key, $alt));
@@ -54,7 +52,7 @@ class ValuesTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetData(): iterable
+    public static function getTestGetData(): iterable
     {
         $values = new Values(self::TEST_VALUES);
         yield 'key exists'              => [$values, 'foo', null, 'bar'];
@@ -64,8 +62,6 @@ class ValuesTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestGetBoolData
-     * @covers \Alaress\Web\Request\Values::getBool
      *
      * @param Values    $values
      * @param string    $key
@@ -73,6 +69,7 @@ class ValuesTest extends TestCase
      * @param bool|null $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetBoolData')]
     public function testGetBool(Values $values, string $key, ?bool $alt, ?bool $expected): void
     {
         $this->assertSame($expected, $values->getBool($key, $alt));
@@ -83,7 +80,7 @@ class ValuesTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetBoolData(): iterable
+    public static function getTestGetBoolData(): iterable
     {
         $values = new Values(self::TEST_VALUES);
         yield 'true'                    => [$values, 'true', null, true];
@@ -101,8 +98,6 @@ class ValuesTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestGetIntData
-     * @covers \Alaress\Web\Request\Values::getInt
      *
      * @param Values   $values
      * @param string   $key
@@ -110,6 +105,7 @@ class ValuesTest extends TestCase
      * @param int|null $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetIntData')]
     public function testGetInt(Values $values, string $key, ?int $alt, ?int $expected): void
     {
         $this->assertSame($expected, $values->getInt($key, $alt));
@@ -120,7 +116,7 @@ class ValuesTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetIntData(): iterable
+    public static function getTestGetIntData(): iterable
     {
         $values = new Values(self::TEST_VALUES);
         yield 'true'                      => [$values, 'true', null, null];
@@ -138,8 +134,6 @@ class ValuesTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestGetFloatData
-     * @covers \Alaress\Web\Request\Values::getFloat
      *
      * @param Values     $values
      * @param string     $key
@@ -147,6 +141,7 @@ class ValuesTest extends TestCase
      * @param float|null $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetFloatData')]
     public function testGetFloat(Values $values, string $key, ?float $alt, ?float $expected): void
     {
         $this->assertSame($expected, $values->getFloat($key, $alt));
@@ -157,7 +152,7 @@ class ValuesTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetFloatData(): iterable
+    public static function getTestGetFloatData(): iterable
     {
         $values = new Values(self::TEST_VALUES);
         yield 'true'                      => [$values, 'true', null, null];

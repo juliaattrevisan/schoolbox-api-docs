@@ -26,11 +26,11 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecode')]
     public function testValidDSNDecode(string $dsn, array $expected): void
     {
         $codec = new DSN();
@@ -44,7 +44,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNDecode(): array
+    public static function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1 (parent relation IDs)' => [
@@ -80,11 +80,11 @@ class DSNTest extends TestCase
     /**
      * Test invalid DSN strings (these throw DomainExceptions)
      *
-     * @dataProvider providerInvalidDSNDecode
      * @param string $dsn
      * @throws DomainException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidDSNDecode')]
     public function testInvalidDSNDecode(string $dsn): void
     {
         $this->expectException(DomainException::class);
@@ -99,7 +99,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerInvalidDSNDecode(): array
+    public static function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1' => [
@@ -153,11 +153,11 @@ class DSNTest extends TestCase
     /**
      * Test invalid DSN strings (these throw DomainExceptions)
      *
-     * @dataProvider providerValidDSNEncodeDecode
      * @param string $dsn
      * @throws DomainException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNEncodeDecode')]
     public function testValidDSNEncodeDecode(string $dsn, string $expected): void
     {
         $codec = new DSN();
@@ -177,7 +177,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNEncodeDecode(): array
+    public static function providerValidDSNEncodeDecode(): array
     {
         return [
             'Re-encode 1' => [

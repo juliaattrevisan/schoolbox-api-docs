@@ -162,7 +162,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateMarkSchemeToDataModelData()
+    public static function getTestTranslateMarkSchemeToDataModelData()
     {
         $context = (new Folder())->setId(1);
         return [
@@ -218,7 +218,6 @@ class DueWorkTest extends TestCase
      * /**
      * Test translation of mark scheme.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
      * @param DueWork  $dueWork
      * @param int      $markTypeId
@@ -228,6 +227,7 @@ class DueWorkTest extends TestCase
      * @throws \PHPUnit\Framework\Exception
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDataModelData')]
     public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, int $markTypeId, ?int $totalMark, ?int $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
@@ -253,7 +253,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateResponseAcceptanceToDataModelData()
+    public static function getTestTranslateResponseAcceptanceToDataModelData()
     {
         $context = (new Folder())->setId(1);
         return [
@@ -290,12 +290,12 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateResponseAcceptanceToDataModelData
      *
      * @param DueWork $dueWork
      * @param bool    $acceptsOnline
      * @param bool    $acceptsMultiple
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateResponseAcceptanceToDataModelData')]
     public function testTranslateResponseAcceptanceToDataModel(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWorkModel $dueWorkModel */
@@ -486,12 +486,12 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings to domain model.
      *
-     * @dataProvider getTestTranslateResponseAcceptanceToDomainModelData
      *
      * @param DueWorkModel $dataModel
      * @param bool         $acceptsOnline
      * @param bool         $acceptsMultiple
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateResponseAcceptanceToDomainModelData')]
     public function testTranslateResponseAcceptanceToDomainModel(DueWorkModel $dataModel, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWork $dueWork */
@@ -560,13 +560,13 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDomainModelData
      *
      * @param DueWorkModel $dataModel
      * @param string       $markSchemeClass
      * @param int          $totalMark
      * @param int          $gradeGroupId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDomainModelData')]
     public function testTranslateMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass, $totalMark, $gradeGroupId)
     {
         /** @var DueWork $dueWork */

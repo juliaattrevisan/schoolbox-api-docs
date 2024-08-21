@@ -20,9 +20,9 @@ use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
- * @covers \Schoolbox\Assessment\Rubric\Grid\Grid
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\Grid::class)]
 class Grid extends TestCase
 {
     /**
@@ -30,7 +30,7 @@ class Grid extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveGroupUsageData(): iterable
+    public static function getTestRetrieveGroupUsageData(): iterable
     {
         // Default rowset
         $rowSet     = new Rowset\RowSet(new Folder());
@@ -83,13 +83,12 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveGroupUsageData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveCapabilityUsage
      *
      * @param RubricGrid\Grid                 $grid
      * @param RowSet\Capability               $group
      * @param null|RubricGrid\CapabilityUsage $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveGroupUsageData')]
     public function testRetrieveGroupUsage(
         RubricGrid\Grid $grid,
         RowSet\Capability $group,
@@ -104,7 +103,7 @@ class Grid extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveIndicatorUsageData(): iterable
+    public static function getTestRetrieveIndicatorUsageData(): iterable
     {
         // Default rowset
         $rowSet     = new Rowset\RowSet(new Folder());
@@ -164,13 +163,12 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveIndicatorUsageData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveIndicatorUsage
      *
      * @param RubricGrid\Grid                $grid
      * @param RowSet\Indicator               $indicator
      * @param null|RubricGrid\IndicatorUsage $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveIndicatorUsageData')]
     public function testRetrieveIndicatorUsage(
         RubricGrid\Grid $grid,
         RowSet\Indicator $indicator,
@@ -185,7 +183,7 @@ class Grid extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueDataFromCapabilities(): iterable
+    public static function getTestCalculateMaxValueDataFromCapabilities(): iterable
     {
         $rowSet     = new Rowset\RowSet(new Folder());
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
@@ -274,12 +272,10 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueDataFromCapabilities
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValueFromCapabilities
-     *
      * @param RubricGrid\Grid $grid
      * @param float|null      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestCalculateMaxValueDataFromCapabilities')]
     public function testCalculateMaxValueFromCapabilities(RubricGrid\Grid $grid, ?float $expected): void
     {
         $this->assertSame($expected, $grid->calculateMaxValueFromCapabilities());
@@ -291,7 +287,7 @@ class Grid extends TestCase
      *
      * @return iterable
      */
-    public function getTestIterateCapabilitiesData(): iterable
+    public static function getTestIterateCapabilitiesData(): iterable
     {
         // rowset has three capabilities
         // try grids with: none, one, all
@@ -370,12 +366,10 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestIterateCapabilitiesData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateCapabilities
-     *
      * @param RubricGrid\Grid $grid
      * @param array           $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIterateCapabilitiesData')]
     public function testIterateCapabilities(RubricGrid\Grid $grid, array $expected): void
     {
         $actual = [];
@@ -391,7 +385,7 @@ class Grid extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsCapabilityMarkShownData(): iterable
+    public static function getTestIsCapabilityMarkShownData(): iterable
     {
         $rowSet      = new Rowset\RowSet(new Folder());
         $capability1 = (new RowSet\Capability())->setId(1)->setName('Capability 1');
@@ -460,13 +454,12 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCapabilityMarkShownData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::isCapabilityMarkShown
      *
      * @param RubricGrid\Grid   $grid
      * @param RowSet\Capability $capability
      * @param bool              $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCapabilityMarkShownData')]
     public function testIsCapabilityMarkShown(
         RubricGrid\Grid $grid,
         RowSet\Capability $capability,
@@ -480,7 +473,7 @@ class Grid extends TestCase
      * Data provider for `getTestIsCompatibleWithData`.
      * @return iterable
      */
-    public function getTestIsCompatibleWithData(): iterable
+    public static function getTestIsCompatibleWithData(): iterable
     {
         $generator = new Generator();
 
@@ -725,13 +718,12 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCompatibleWithData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::isCompatibleWith
      *
      * @param RubricGrid\Grid $grid1
      * @param RubricGrid\Grid $grid2
      * @param bool            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCompatibleWithData')]
     public function testIsCompatibleWith(RubricGrid\Grid $grid1, RubricGrid\Grid $grid2, bool $expected): void
     {
         $this->assertSame($expected, $grid1->isCompatibleWith($grid2));

@@ -27,6 +27,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\ResourceBooking\Booking\Validation::class)]
 class ValidationTest extends TestCase
 {
     /**
@@ -101,7 +102,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidateBeforeTime()
+    public static function providerValidateBeforeTime()
     {
         return [
             'start before end'      => ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
@@ -111,14 +112,13 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateBeforeTime
      *
-     * @dataProvider providerValidateBeforeTime
      *
      * @param string $startDate
      * @param string $endDate
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateBeforeTime')]
     public function testValidateBeforeTime($startDate, $endDate, $expected)
     {
         $validation = $this->createValidation();
@@ -131,7 +131,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidatePastTime()
+    public static function providerValidatePastTime()
     {
         return [
             'Date in future'    => ['2027-01-01T00:00:00', 0],
@@ -141,13 +141,12 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validatePastTime
      *
-     * @dataProvider providerValidatePastTime
      *
      * @param string $startDate
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidatePastTime')]
     public function testValidatePastTime($startDate, $expected)
     {
 
@@ -161,7 +160,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidateLeadTime()
+    public static function providerValidateLeadTime()
     {
         return [
             '1h lead time, booked 2h before'    => ['PT1H', 'PT2H', 0],
@@ -172,14 +171,13 @@ class ValidationTest extends TestCase
         ];
     }
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateLeadTime
      *
-     * @dataProvider providerValidateLeadTime
      *
      * @param string $earliestInterval
      * @param string $startInterval
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateLeadTime')]
     public function testValidateLeadTime($earliestInterval, $startInterval, $expected)
     {
         $resource = new Item\Model();
@@ -198,7 +196,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidateTooShort()
+    public static function providerValidateTooShort()
     {
         return [
             '1h min reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
@@ -211,15 +209,14 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateTooShort
      *
-     * @dataProvider providerValidateTooShort
      *
      * @param string $startDate
      * @param string $endDate
      * @param string $minReservation
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateTooShort')]
     public function testValidateTooShort($startDate, $endDate, $minReservation, $expected)
     {
         $resource = new Item\Model();
@@ -235,7 +232,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidateTooLong()
+    public static function providerValidateTooLong()
     {
         return [
             '1h max reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
@@ -247,15 +244,14 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateTooLong
      *
-     * @dataProvider providerValidateTooLong
      *
      * @param string $startDate
      * @param string $endDate
      * @param string $maxReservation
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateTooLong')]
     public function testValidateTooLong($startDate, $endDate, $maxReservation, $expected)
     {
         $resource = new Item\Model();
@@ -271,7 +267,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidateCurrentTermRestriction()
+    public static function providerValidateCurrentTermRestriction()
     {
         return [
             'booked within the term'    => ['2020-12-31T00:00:00', '2020-12-31', 0],
@@ -280,14 +276,13 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateCurrentTermRestriction
      *
-     * @dataProvider providerValidateCurrentTermRestriction
      *
      * @param string $endDate
      * @param string $termEndDate
      * @param int $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidateCurrentTermRestriction')]
     public function testValidateCurrentTermRestriction($endDate, $termEndDate, $expected)
     {
         $validation = $this->createValidation();
@@ -304,7 +299,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerSimpleValidateForConflicts()
+    public static function providerSimpleValidateForConflicts()
     {
 
         $conflictingBookings3 = (new Collection())
@@ -337,15 +332,14 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
      *
-     * @dataProvider providerSimpleValidateForConflicts
      *
      * @param string $startDate
      * @param string $endDate
      * @param Collection  $conflictingBookings
      * @param int    $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSimpleValidateForConflicts')]
     public function testSimpleValidateForConflicts($startDate, $endDate, $conflictingBookings, $expected)
     {
 
@@ -369,7 +363,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerRoomValidateForConflicts()
+    public static function providerRoomValidateForConflicts()
     {
 
         $conflictingBookings3 = (new Collection())
@@ -469,9 +463,7 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
      *
-     * @dataProvider providerRoomValidateForConflicts
      *
      * @param string $startDate
      * @param string $endDate
@@ -480,6 +472,7 @@ class ValidationTest extends TestCase
      * @param Collection $roomEvents
      * @param int    $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRoomValidateForConflicts')]
     public function testRoomValidateForConflicts(
         $startDate,
         $endDate,
@@ -513,7 +506,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerSeriesValidateForConflicts()
+    public static function providerSeriesValidateForConflicts()
     {
 
         // Single booking
@@ -672,9 +665,7 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @covers \Schoolbox\ResourceBooking\Booking\Validation::validateForConflicts
      *
-     * @dataProvider providerSeriesValidateForConflicts
      *
      * @param string $startDate
      * @param string $endDate
@@ -682,6 +673,7 @@ class ValidationTest extends TestCase
      * @param Collection $conflictingBookings
      * @param int    $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSeriesValidateForConflicts')]
     public function testSeriesValidateForConflicts(
         $startDate,
         $endDate,

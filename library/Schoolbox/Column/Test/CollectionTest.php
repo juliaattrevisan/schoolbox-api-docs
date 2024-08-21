@@ -49,8 +49,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed            $input
      * @param ICollection|null $expected_output
-     * @dataProvider getTestHydrate
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrate')]
     public function testHydrate($input = null, $expected_output = null)
     {
         $actual = $this->object->hydrate($input, $this->testMapper);
@@ -74,8 +74,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestHydrateErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrateErrorCases')]
     public function testHydrateErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
@@ -85,8 +85,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed      $input
      * @param array|null $expected_output
-     * @dataProvider getTestDehydrate
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrate')]
     public function testDehydrate($input = null, $expected_output = null)
     {
         $actual = $this->object->dehydrate($input, $this->testMapper);
@@ -96,8 +96,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestDehydrateTypeErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateTypeErrorCases')]
     public function testDehydrateTypeErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
@@ -107,8 +107,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestDehydrateGetterNotDefinedErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateGetterNotDefinedErrorCases')]
     public function testDehydrateGetterNotDefinedErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(Error::class);

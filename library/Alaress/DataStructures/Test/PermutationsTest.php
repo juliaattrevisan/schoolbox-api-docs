@@ -13,9 +13,7 @@ use Alaress\DataStructures\Permutations;
 use PHPUnit\Framework;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Alaress\DataStructures\Permutations
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\DataStructures\Permutations::class)]
 class PermutationsTest extends TestCase
 {
 

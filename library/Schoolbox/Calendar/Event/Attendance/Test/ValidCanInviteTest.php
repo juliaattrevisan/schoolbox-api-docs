@@ -28,11 +28,11 @@ use Schoolbox\User;
 class ValidCanInviteTest extends TestCase
 {
     /**
-     * @dataProvider provider_validCanInvite
      * @param User $user
      * @param bool $configVar
      * @param bool $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCanInvite')]
     public function testValidCanInvite(User $user, bool $configVar, bool $expected): void
     {
         $outcome = (new ValidCanInvite())->isSatisfiedBy($user, $configVar);
@@ -45,7 +45,7 @@ class ValidCanInviteTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCanInvite(): array
+    public static function provider_validCanInvite(): array
     {
 
         /* Superuser prototypes

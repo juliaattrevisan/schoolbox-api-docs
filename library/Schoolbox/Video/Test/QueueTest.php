@@ -21,13 +21,13 @@ class QueueTest extends TestCase
     /**
      * Tests the thumbnail cover function to ensure that the video is resized to at least 64 on one of the aspects
      *
-     * @dataProvider resolutionCoverProvider
      *
      * @param array $dimensions      Resolution to test
      * @param array $coverDimensions Resolution to cover
      * @param array $output          Resolution after constraint
      * @throws \ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolutionCoverProvider')]
     public function testCoverForThumbnail($dimensions, $coverDimensions, $output)
     {
         $queue = new Queue();
@@ -41,13 +41,13 @@ class QueueTest extends TestCase
      * Tests the contain function to ensure that it returns numbers that are divisible by 2
      * and maintain the aspect ratio
      *
-     * @dataProvider resolutionContainProvider
      *
      * @param array $dimensions    Resolution to test
      * @param array $maxDimensions Resolution to contain within
      * @param array $output        Resolution after constraint
      * @throws \ReflectionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolutionContainProvider')]
     public function testContainForVideo($dimensions, $maxDimensions, $output)
     {
         $queue = new Queue();
@@ -61,7 +61,7 @@ class QueueTest extends TestCase
      * List of standard and odd video resolutions, to be contained within 1280x720
      * @return array
      */
-    public function resolutionCoverProvider()
+    public static function resolutionCoverProvider()
     {
         return [
             // 16:9
@@ -102,7 +102,7 @@ class QueueTest extends TestCase
      * List of standard and odd video resolutions, to be contained within 1280x720
      * @return array
      */
-    public function resolutionContainProvider()
+    public static function resolutionContainProvider()
     {
         return [
             // 16:9

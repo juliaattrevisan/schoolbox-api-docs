@@ -66,7 +66,7 @@ class ModelTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return [];
     }
@@ -74,7 +74,7 @@ class ModelTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return [];
     }

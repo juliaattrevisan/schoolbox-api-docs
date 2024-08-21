@@ -50,7 +50,7 @@ class Client implements IClient
         // Need to pass in a callback to subscribe method
         $this->connection->onMessage(
             $subscriptionId,
-            static function (BaseFrame $frame, IAckResolver $resolver) use ($callback) {
+            static function (BaseFrame $frame, IAckResolver $resolver) use ($callback): void {
                 $callback(new Frame($frame), $resolver);
             }
         );
@@ -66,10 +66,10 @@ class Client implements IClient
         $deferred = new Deferred();
         $promise  = $this->connection->connect();
         $promise->then(
-            function () use ($deferred) {
+            function () use ($deferred): void {
                 $deferred->resolve($this);
             },
-            function ($reason) use ($deferred) {
+            function ($reason) use ($deferred): void {
                 $deferred->reject(new ConnectionException($reason));
             }
         );

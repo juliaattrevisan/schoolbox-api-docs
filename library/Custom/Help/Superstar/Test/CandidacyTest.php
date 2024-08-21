@@ -21,10 +21,10 @@ use PHPUnit\Framework\TestCase;
 class CandidacyTest extends TestCase
 {
     /**
-     * @dataProvider providerOutcomes
      * @param mixed $input
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerOutcomes')]
     public function testOutcomes($input, $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -41,7 +41,7 @@ class CandidacyTest extends TestCase
      *
      * @return array
      */
-    public function providerOutcomes(): array
+    public static function providerOutcomes(): array
     {
         return [
             /* No marks provided; nothing to award

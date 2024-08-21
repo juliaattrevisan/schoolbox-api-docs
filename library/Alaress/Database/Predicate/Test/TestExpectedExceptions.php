@@ -42,13 +42,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnNamesAndValues
      * @param string $invalidColumnName
      * @param mixed  $value
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnNamesAndValues')]
     public function testAddColumnList(string $invalidColumnName, $value): void
     {
         $this->expectException(InvalidColumnException::class);
@@ -58,11 +58,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testIsNull($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -72,11 +72,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testNotNull($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -86,11 +86,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testIsTrue($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -100,11 +100,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testIsFalse($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -114,13 +114,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc  $invalidColumn
      * @param string|float|int $value
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testEqualsInvalidColumn($invalidColumn, $value)
     {
         $this->expectException(InvalidColumnException::class);
@@ -130,13 +130,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testEqualsInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -146,13 +146,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc  $invalidOperand
      * @param string|float|int $value
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testNotEqualsInvalidColumn($invalidOperand, $value)
     {
         $this->expectException(InvalidColumnException::class);
@@ -162,13 +162,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testNotEqualsInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -178,7 +178,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
      * @throws TypeError
@@ -186,6 +185,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValueTraversable')]
     public function testInInvalidColumn($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -195,7 +195,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
@@ -203,6 +202,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValueTraversable')]
     public function testInInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -225,7 +225,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
      * @throws TypeError
@@ -233,6 +232,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValueTraversable')]
     public function testNotInInvalidColumn($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -242,7 +242,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
@@ -250,6 +249,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValueTraversable')]
     public function testNotInInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -272,11 +272,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testLikeInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -286,11 +286,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testLikeAnyInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -300,11 +300,11 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumn')]
     public function testNotLikeInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
@@ -314,13 +314,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testLessThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -330,13 +330,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testLessThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -346,13 +346,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testLessThanOrEqualToInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -362,13 +362,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testLessThanOrEqualToValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -378,13 +378,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testGreaterThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -394,13 +394,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testGreaterThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -410,13 +410,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testGreaterThanOrEqualToInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -426,13 +426,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testGreaterThanOrEqualToValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -442,13 +442,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testNotLessThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -458,13 +458,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testNotLessThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -474,13 +474,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidColumnValidValue')]
     public function testNotGreaterThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
@@ -490,13 +490,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidColumnInvalidValue')]
     public function testNotGreaterThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
@@ -506,7 +506,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerBetweenInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validFrom
      * @param mixed           $validTo
@@ -514,6 +513,7 @@ class TestExpectedExceptions extends TestCase
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBetweenInvalidColumnValidValue')]
     public function testBetweenInvalidColumnValidValue($invalidOperand, $validFrom, $validTo)
     {
         $this->expectException(InvalidColumnException::class);
@@ -523,7 +523,6 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerBetweenValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidFrom
      * @param mixed           $invalidTo
@@ -531,6 +530,7 @@ class TestExpectedExceptions extends TestCase
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBetweenValidColumnInvalidValue')]
     public function testBetweenValidColumnInvalidValue($validOperand, $invalidFrom, $invalidTo)
     {
         $this->expectException(TypeError::class);
@@ -540,13 +540,13 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider providerBetweenDatesInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validFrom
      * @param mixed           $validTo
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBetweenDatesInvalidColumnValidValue')]
     public function testBetweenDatesInvalidColumnValidValue($invalidOperand, $validFrom, $validTo)
     {
         $this->expectException(InvalidColumnException::class);

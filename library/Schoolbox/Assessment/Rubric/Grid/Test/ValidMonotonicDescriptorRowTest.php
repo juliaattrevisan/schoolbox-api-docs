@@ -15,9 +15,10 @@ use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Collection;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\ValidMonotonicDescriptorRow::class)]
 class ValidMonotonicDescriptorRowTest extends TestCase
 {
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkRange = true;
         $noMarkRange = false;
@@ -141,13 +142,12 @@ class ValidMonotonicDescriptorRowTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\ValidMonotonicDescriptorRow::isSatisfiedBy
      *
      * @param bool $usesMarkRange
      * @param Collection $descriptorRow
      * @param bool $expected                 Whether this test should assert true or false
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(bool $usesMarkRange, Collection $descriptorRow, bool $expected)
     {
         $spec = new ValidMonotonicDescriptorRow($usesMarkRange);

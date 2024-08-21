@@ -31,7 +31,7 @@ class DecimalTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array(null,        null),
@@ -47,7 +47,7 @@ class DecimalTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(null,   null),
@@ -61,20 +61,20 @@ class DecimalTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|float $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrate')]
     public function testHydrate($input = null, $expected_output = null)
     {
         $this->assertSame($expected_output, $this->object->hydrate($input));
     }
 
     /**
-     * @dataProvider getTestDehydrate
      * @param null|float $input
      * @param null|float $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrate')]
     public function testDehydrate($input = null, $expected_output = null)
     {
         $this->assertSame($expected_output, $this->object->dehydrate($input));

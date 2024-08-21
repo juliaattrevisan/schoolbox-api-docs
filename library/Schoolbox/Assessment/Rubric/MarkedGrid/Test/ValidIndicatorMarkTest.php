@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Assessment\Rubric\MarkedGrid\ValidIndicatorMark;
 use PHPUnit\Framework\TestCase;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\MarkedGrid\ValidIndicatorMark::class)]
 class ValidIndicatorMarkTest extends TestCase
 {
     /**
@@ -20,7 +21,7 @@ class ValidIndicatorMarkTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         yield 'null descriptor, null value' => [null, null, true];
         yield 'null descriptor, zero value' => [null, 0, false];
@@ -73,13 +74,12 @@ class ValidIndicatorMarkTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidIndicatorMark::isSatisfiedBy
      *
      * @param null|Descriptor $descriptor
      * @param float|null      $value
      * @param bool            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(?Descriptor $descriptor, $value, bool $expected): void
     {
         $spec = new ValidIndicatorMark($descriptor);
@@ -88,13 +88,12 @@ class ValidIndicatorMarkTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidIndicatorMark::isSatisfiedBy
      *
      * @param null|Descriptor $descriptor
      * @param float|null      $value
      * @param bool            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedByStringValues(?Descriptor $descriptor, $value, bool $expected): void
     {
         $spec = new ValidIndicatorMark($descriptor);

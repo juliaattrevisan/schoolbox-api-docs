@@ -18,9 +18,9 @@ use Schoolbox\User;
 class CompletionTest extends TestCase
 {
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_IncompleteImplicit($normalised)
     {
         $expected = Completion::HUMAN_READABLE_INCOMPLETE;
@@ -32,9 +32,9 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_IncompleteAsNull($normalised)
     {
         $expected = Completion::HUMAN_READABLE_INCOMPLETE;
@@ -46,9 +46,9 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_studentMarkedResponseIncomplete($normalised)
     {
         $response = $this->getSelfAssessedResponseMarkedAsIncomplete();
@@ -61,9 +61,9 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_studentMarkedResponseComplete($normalised)
     {
         $response = $this->getSelfAssessedResponseMarkedAsComplete();
@@ -77,10 +77,10 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      * @throws \InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_teacherMarkedResponseIncomplete($normalised)
     {
         $response = $this->getTeacherAssessedResponseMarkedAsIncomplete();
@@ -94,10 +94,10 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalised
      * @param mixed $normalised
      * @throws \InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
     public function test_getHumanReadable_teacherMarkedResponseComplete($normalised)
     {
         $response = $this->getTeacherAssessedResponseMarkedAsComplete();
@@ -110,9 +110,9 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_humanReadable_noResponse
      * @param mixed $humanReadable
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_humanReadable_noResponse')]
     public function test_getNormalised_noResponse($humanReadable)
     {
         $expected = null;
@@ -122,10 +122,10 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_humanReadable_withResponse
      * @param mixed $humanReadable
      * @param TaskResponse $response
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_humanReadable_withResponse')]
     public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
     {
         if ($response && $response->isMarkedComplete()) {

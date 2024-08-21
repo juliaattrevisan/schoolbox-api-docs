@@ -298,7 +298,7 @@ class Payload
      */
     private function preparePlistForJsonEncoding(\Iterator $root): void
     {
-        $this->plistMap(function ($value, $key, $parent) {
+        $this->plistMap(function ($value, $key, $parent): void {
             // Convert date to ISO 8601 if date object.
             if ($value instanceof CFDate) {
                 $date = \DateTime::createFromFormat('U', $value->getValue());

@@ -23,7 +23,6 @@ class ValidHasReadMoreTest extends TestCase
 {
 
     /**
-     * @dataProvider providerValidHasReadMore
      * @param Model  $article
      * @param string $readMore
      * @param bool   $commentsAllowed
@@ -31,6 +30,7 @@ class ValidHasReadMoreTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidHasReadMore')]
     public function testValidHasReadmore(Model $article, string $readMore, bool $commentsAllowed, bool $expected)
     {
 
@@ -46,7 +46,7 @@ class ValidHasReadMoreTest extends TestCase
      *
      * @return array
      */
-    public function providerValidHasReadMore(): array
+    public static function providerValidHasReadMore(): array
     {
 
         /* Empty article, avoid of everything

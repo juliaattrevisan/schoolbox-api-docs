@@ -28,7 +28,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNDecode(): array
+    public static function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1' => [
@@ -44,12 +44,12 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecode')]
     public function testValidDSNDecode(string $dsn, $expected): void
     {
         $codec = new DSN();
@@ -63,7 +63,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNDecodeEncode(): array
+    public static function providerValidDSNDecodeEncode(): array
     {
         return [
             'Valid DSN Re-encode 1' => [
@@ -77,12 +77,12 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecodeEncode')]
     public function testValidDSNDecodeEncode(string $dsn, string $expected): void
     {
         $codec = new DSN();

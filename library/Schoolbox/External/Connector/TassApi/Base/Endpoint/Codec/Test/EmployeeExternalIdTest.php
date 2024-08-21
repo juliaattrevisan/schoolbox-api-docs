@@ -28,7 +28,7 @@ class EmployeeExternalIdTest extends TestCase
      *
      * @return array
      */
-    public function provider_validEncodeDecode(): array
+    public static function provider_validEncodeDecode(): array
     {
         return [
             'Re-encoded Employee 1' => [
@@ -52,10 +52,10 @@ class EmployeeExternalIdTest extends TestCase
     /**
      * Test valid prefixed employee code re-encode
      *
-     * @dataProvider provider_validEncodeDecode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validEncodeDecode')]
     public function testValidEncodeDecode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();
@@ -93,10 +93,10 @@ class EmployeeExternalIdTest extends TestCase
     /**
      * Test valid prefixed employee code decode
      *
-     * @dataProvider provider_validDecode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDecode')]
     public function testValidEncode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();
@@ -109,7 +109,7 @@ class EmployeeExternalIdTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDecode(): array
+    public static function provider_validDecode(): array
     {
         return [
             'Decoded Employee 1' => [
@@ -133,10 +133,10 @@ class EmployeeExternalIdTest extends TestCase
     /**
      * Test valid prefixed employee code decode
      *
-     * @dataProvider provider_validDecode
      * @param string $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDecode')]
     public function testValidDecode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();

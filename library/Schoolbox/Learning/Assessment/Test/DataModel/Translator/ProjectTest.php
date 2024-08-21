@@ -175,7 +175,7 @@ class ProjectTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateSummatorToDataModelData()
+    public static function getTestTranslateSummatorToDataModelData()
     {
         $context = (new Folder())->setId(1);
         $user    = (new User())->setId(3);
@@ -214,11 +214,11 @@ class ProjectTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateSummatorToDataModelData
      *
      * @param Project $project
      * @param string  $summatorType
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateSummatorToDataModelData')]
     public function testTranslateSummatorToDataModel(Project $project, $summatorType)
     {
         /** @var ProjectModel $projectModel */
@@ -234,7 +234,7 @@ class ProjectTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateMarkSchemeToDataModelData()
+    public static function getTestTranslateMarkSchemeToDataModelData()
     {
         $context = (new Folder())->setId(1);
         $user    = (new User())->setId(3);
@@ -274,12 +274,12 @@ class ProjectTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
      * @param Project  $project
      * @param int      $markTypeId
      * @param null|int $gradeGroupId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDataModelData')]
     public function testTranslateMarkSchemeToDataModel(Project $project, int $markTypeId, ?int $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
@@ -452,11 +452,11 @@ class ProjectTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateSummatorToDomainModelData
      *
      * @param ProjectModel $dataModel
      * @param string       $summatorClass
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateSummatorToDomainModelData')]
     public function testTranslateSummatorToDomainModel(ProjectModel $dataModel, $summatorClass)
     {
         /** @var Project $project */
@@ -516,12 +516,12 @@ class ProjectTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDomainModelData
      *
      * @param ProjectModel $dataModel
      * @param string       $markSchemeClass
      * @param int          $gradeGroupId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDomainModelData')]
     public function testTranslateMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass, $gradeGroupId)
     {
         /** @var Project $project */
@@ -742,7 +742,6 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider providerLinearDataProjectTree
      * @param ProjectModel $projectModel
      * @param int          $id           Id of this project node
      * @param int          $upExpected   How many nodes above this one?
@@ -752,6 +751,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLinearDataProjectTree')]
     public function testLinearDataProjectTree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
     {
         /** @var Project $domainObject */
@@ -921,7 +921,6 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider providerBranchedDataProjectTree
      * @param ProjectModel $projectModel
      * @param int          $id
      * @param int          $up
@@ -932,6 +931,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBranchedDataProjectTree')]
     public function testBranchedDataProjectTree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var Project $domainObject */
@@ -955,7 +955,6 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider providerLinearDomainProjectTree
      * @param Project $projectObject
      * @param int     $id           Id of this project node
      * @param int     $upExpected   How many nodes above this one?
@@ -963,6 +962,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLinearDomainProjectTree')]
     public function testLinearDomainProjectTree(Project $projectObject, int $id, int $upExpected, int $downExpected)
     {
         /** @var ProjectModel $projectModel */
@@ -1128,7 +1128,6 @@ class ProjectTest extends TestCase
 
 
     /**
-     * @dataProvider providerBranchedDomainProjectTree
      * @param Project $projectObject
      * @param int     $id
      * @param int     $up
@@ -1137,6 +1136,7 @@ class ProjectTest extends TestCase
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBranchedDomainProjectTree')]
     public function testBranchedDomainProjectTree(Project $projectObject, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var ProjectModel $projectModel */
@@ -1202,7 +1202,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function providerLinearDataProjectTree(): array
+    public static function providerLinearDataProjectTree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
                                   ->setAssessments(new GenericCollection(AssessmentModel::class))
@@ -1252,7 +1252,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function providerBranchedDataProjectTree(): array
+    public static function providerBranchedDataProjectTree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
                                   ->setAssessments(new GenericCollection(AssessmentModel::class))
@@ -1303,7 +1303,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function providerLinearDomainProjectTree(): array
+    public static function providerLinearDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -1344,7 +1344,7 @@ class ProjectTest extends TestCase
      *
      * @return array
      */
-    public function providerBranchedDomainProjectTree(): array
+    public static function providerBranchedDomainProjectTree(): array
     {
         $p1 = (new Project())->setId(1)
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);

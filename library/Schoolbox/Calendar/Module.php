@@ -110,7 +110,7 @@ class Module extends BaseModule
                     new Any(
                         new IsSuperuser(),
                         new Callback(
-                            static function (array $params = [], User $viewer = null) {
+                            static function (array $params = [], User $viewer = null): void {
                                 /* $viewee might end up being null if $params[user] is null
                                  * which can happen when you try to access a nonexistent user
                                  */

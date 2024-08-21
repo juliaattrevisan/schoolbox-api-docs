@@ -15,9 +15,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability as RubricCapability;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\RowSet\Capability
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\RowSet\Capability::class)]
 class Capability extends TestCase
 {
     /**
@@ -25,7 +23,7 @@ class Capability extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveIndicatorIdsData(): iterable
+    public static function getTestRetrieveIndicatorIdsData(): iterable
     {
         $capability = new RubricCapability();
         yield 'no indicators' => [$capability, []];
@@ -43,12 +41,10 @@ class Capability extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveIndicatorIdsData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Capability::retrieveIndicatorIds
-     *
      * @param RubricCapability $capability
      * @param array            $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveIndicatorIdsData')]
     public function testRetrieveIndicatorIds(RubricCapability $capability, array $expected): void
     {
         $this->assertEquals($expected, $capability->retrieveIndicatorIds());
@@ -60,7 +56,7 @@ class Capability extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsInUseData(): iterable
+    public static function getTestIsInUseData(): iterable
     {
         $capability = (new RubricCapability())->setId(3);
         yield 'no indicators' => [$capability, false];
@@ -113,12 +109,10 @@ class Capability extends TestCase
 
 
     /**
-     * @dataProvider getTestIsInUseData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Capability::isInUse
-     *
      * @param RubricCapability $capability
      * @param bool             $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsInUseData')]
     public function testIsInUse(RubricCapability $capability, bool $expected): void
     {
         $this->assertEquals($expected, $capability->isInUse());
@@ -130,7 +124,7 @@ class Capability extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsInUseExcludingData(): iterable
+    public static function getTestIsInUseExcludingData(): iterable
     {
         $task1 = (new Task())->setId(1);
         $task2 = (new Task())->setId(2);
@@ -191,13 +185,12 @@ class Capability extends TestCase
 
 
     /**
-     * @dataProvider getTestIsInUseExcludingData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Capability::isInUseExcluding
      *
      * @param RubricCapability $capability
      * @param IAssessable      $assessment
      * @param bool             $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsInUseExcludingData')]
     public function testIsInUseExcluding(
         RubricCapability $capability,
         IAssessable $assessment,

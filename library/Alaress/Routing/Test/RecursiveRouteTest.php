@@ -63,7 +63,7 @@ class RecursiveRouteTest extends TestCase
     /**
      * @return array[]
      */
-    public function dataMultipleRoutesMatch()
+    public static function dataMultipleRoutesMatch()
     {
         return [
             [ 'foo:2:bar',      [ 'bar', 'all' ] ],
@@ -74,12 +74,12 @@ class RecursiveRouteTest extends TestCase
 
 
     /**
-     * @dataProvider dataMultipleRoutesMatch
      *
      * @param string $path
      * @param array  $expected
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataMultipleRoutesMatch')]
     public function testMultipleRoutesMatch($path, array $expected)
     {
         $exp = [];

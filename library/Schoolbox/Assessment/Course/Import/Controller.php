@@ -447,7 +447,7 @@ class Controller extends Base\Base
     {
         // Transact this entire request, rolling back if any exception is raised
         try {
-            $this->unitImplementationMapper->getDatabase()->transact(function () {
+            $this->unitImplementationMapper->getDatabase()->transact(function (): void {
                 $this->persistCourseImplementation($this->requestPost);
             });
         } catch (\Throwable $e) {

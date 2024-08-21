@@ -78,7 +78,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '.*',
-            new Callback(function () {
+            new Callback(function (): void {
                 try {
                     new Address($this->getConfig()->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM));
                 } catch (RfcComplianceException | LogicException) {

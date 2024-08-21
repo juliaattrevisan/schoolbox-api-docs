@@ -178,13 +178,13 @@ class MapperTest extends TestCase
     /**
      * Tests for data hydration.
      *
-     * @dataProvider getHydrateData
      * @param array         $expected
      * @param array         $data
      * @param string|null   $alias
      * @param callable|null $callback
      * @throws \Schoolbox\Mapper\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHydrateData')]
     public function testHydrate($expected, $data, $alias = null, $callback = null)
     {
         $model = $this->object->hydrate($data, $alias, $callback);
@@ -209,12 +209,12 @@ class MapperTest extends TestCase
      * If an object is retrieved more than once from DB, its result should be cached.
      * The glaring exception to this is when you're saving and retrieving the previous version of the object.
      *
-     * @dataProvider getHydrateData
      * @param array         $expected
      * @param array         $data
      * @param string|null   $alias
      * @param callable|null $callback
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getHydrateData')]
     public function testObjectIdempotence($expected, $data, $alias = null, $callback = null)
     {
         if (!empty($alias)) {

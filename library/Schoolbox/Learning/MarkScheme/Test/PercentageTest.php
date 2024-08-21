@@ -13,16 +13,17 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use RangeException;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\MarkScheme\Percentage::class)]
 class PercentageTest extends TestCase
 {
 
     /**
-     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param string $expected
      * @throws RangeException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalisedToHumanReadable')]
     public function testGetHumanReadableValid($normalised, $expected)
     {
         $markScheme = new Percentage();
@@ -33,12 +34,12 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $expected
      * @throws RangeException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableToNormalised')]
     public function testGetNormalisedValid($humanReadable, $expected)
     {
         $markScheme = new Percentage();
@@ -66,12 +67,10 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableMarkData
-     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
-     *
      * @param string|null $formInput
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableMarkData')]
     public function testConvertFormInputToHumanReadableMark(
         ?string $formInput,
         ?string $expected
@@ -82,11 +81,10 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
-     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
      *
      * @param string|null $formInput
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableMarkInvalidData')]
     public function testConvertFormInputToHumanReadableMarkInvalid(?string $formInput): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -96,12 +94,10 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
-     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertHumanReadableMarkToFormInput
-     *
      * @param string|null $humanReadableMark
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getRetrieveHumanReadableMarkAsFormInputData')]
     public function testConvertHumanReadableMarkToFormInput(
         ?string $humanReadableMark,
         ?string $expected
@@ -116,7 +112,7 @@ class PercentageTest extends TestCase
     /**
      * @return array
      */
-    public function providerHumanReadableToNormalised(): array
+    public static function providerHumanReadableToNormalised(): array
     {
         return [
             ['  0 %',      0.0],
@@ -148,7 +144,7 @@ class PercentageTest extends TestCase
     /**
      * @return array
      */
-    public function providerNormalisedToHumanReadable(): array
+    public static function providerNormalisedToHumanReadable(): array
     {
         return [
             [-0.0001,     '0 %'],
@@ -178,7 +174,7 @@ class PercentageTest extends TestCase
      *
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    public static function getConvertFormInputToHumanReadableMarkData(): iterable
     {
         yield 'null form input' => [null, null];
         yield 'numeric form input' => ['50', '50 %'];
@@ -192,7 +188,7 @@ class PercentageTest extends TestCase
      *
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    public static function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
     {
         yield 'invalid valid form input 1' => ['Invalid'];
         yield 'invalid valid form input 2' => [''];
@@ -204,7 +200,7 @@ class PercentageTest extends TestCase
      *
      * @return iterable
      */
-    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    public static function getRetrieveHumanReadableMarkAsFormInputData(): iterable
     {
         yield 'null form input' => [null, null];
         yield 'numeric form input' => ['50', '50'];

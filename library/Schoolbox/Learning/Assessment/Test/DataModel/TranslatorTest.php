@@ -163,12 +163,12 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of assessment context to data model.
      *
-     * @dataProvider getTranslateAssessmentContextToDataModelData
      *
      * @param IAssessable $assessment
      * @param string      $contextClass
      * @param int         $contextId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateAssessmentContextToDataModelData')]
     public function testTranslateAssessmentContextToDataModel(IAssessable $assessment, $contextClass, $contextId)
     {
         $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
@@ -181,7 +181,7 @@ class TranslatorTest extends TestCase
      *
      * @return array
      */
-    public function getTranslateAssessmentContextToDomainModelData()
+    public static function getTranslateAssessmentContextToDomainModelData()
     {
         return [
             [
@@ -224,12 +224,12 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of assessment context to data model.
      *
-     * @dataProvider getTranslateAssessmentContextToDomainModelData
      *
      * @param IAssessableDataModel $assessmentModel
      * @param string               $contextClass
      * @param int                  $contextId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateAssessmentContextToDomainModelData')]
     public function testTranslateAssessmentContextToDomainModel(IAssessableDataModel $assessmentModel, $contextClass, $contextId)
     {
         $assessmentModel = $this->translator->translateToDomainModel($assessmentModel);
@@ -240,7 +240,7 @@ class TranslatorTest extends TestCase
     /**
      * @return array [assessmentModel, class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
      */
-    public function getTranslateSpecificationAssessmentToDomainModelData()
+    public static function getTranslateSpecificationAssessmentToDomainModelData()
     {
         return [
             [
@@ -340,7 +340,6 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of specification assessment to domain model.
      *
-     * @dataProvider getTranslateSpecificationAssessmentToDomainModelData
      *
      * @param IAssessableDataModel $assessmentModel
      * @param string               $class
@@ -350,6 +349,7 @@ class TranslatorTest extends TestCase
      * @param string               $specificationContextClass
      * @param int                  $specificationContextId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateSpecificationAssessmentToDomainModelData')]
     public function testTranslateSpecificationAssessmentToDomainModel(
         IAssessableDataModel $assessmentModel,
         $class,
@@ -442,7 +442,6 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of specification assessment to data model.
      *
-     * @dataProvider getTranslateSpecificationAssessmentToDataModelData
      *
      * @param IAssessable $assessment
      * @param int         $id
@@ -451,6 +450,7 @@ class TranslatorTest extends TestCase
      * @param string      $specificationContextClass
      * @param int         $specificationContextId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateSpecificationAssessmentToDataModelData')]
     public function testTranslateSpecificationAssessmentToDataModel(
         IAssessable $assessment,
         $id,
@@ -479,11 +479,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we translate a domainObject-to-dataModel, that identity is preserved
      *
-     * @dataProvider providerDomainObjects
      * @param IAssessable $domainObject
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDomainObjects')]
     public function testInstanceUniquenessPreservationDomain(IAssessable $domainObject)
     {
         $dataModel1 = $this->translator->translateToDataModel($domainObject);
@@ -494,11 +494,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we translate a dataModel-to-domainObject, that identity is preserved
      *
-     * @dataProvider providerDataModels
      * @param IAssessableDataModel $dataModel
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDataModels')]
     public function testInstanceUniquenessPreservationData(IAssessableDataModel $dataModel)
     {
         $domainObject1 = $this->translator->translateToDomainModel($dataModel);
@@ -509,11 +509,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we translate a domain-data-domain, that identity is preserved
      *
-     * @dataProvider providerDomainObjects
      * @param IAssessable $domainObject
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDomainObjects')]
     public function testInstanceIdentityDomainToDataToDomain(IAssessable $domainObject)
     {
         $dataModel       = $this->translator->translateToDataModel($domainObject);
@@ -525,11 +525,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we translate a data-domain-data, that identity is preserved
      *
-     * @dataProvider providerDataModels
      * @param IAssessableDataModel $dataModel
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDataModels')]
     public function testInstanceIdentityDomainToDataToData(IAssessableDataModel $dataModel)
     {
         $domainObject    = $this->translator->translateToDomainModel($dataModel);
@@ -541,11 +541,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we re-translate domain-to-data, any intervening mutations are re-applied
      *
-     * @dataProvider providerDomainObjects
      * @param IAssessable $domainObject
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDomainObjects')]
     public function testInterveningMutationsDomainToData(IAssessable $domainObject)
     {
         $titleOriginal = 'OriginalTitle';
@@ -565,11 +565,11 @@ class TranslatorTest extends TestCase
     /**
      * Ensure if we re-translate data-to-domain, any intervening mutations are re-applied
      *
-     * @dataProvider providerDataModels
      * @param IAssessableDataModel $dataModel
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDataModels')]
     public function testInterveningMutationsDataToDomain(IAssessableDataModel $dataModel)
     {
         $titleOriginal = 'OriginalTitle';

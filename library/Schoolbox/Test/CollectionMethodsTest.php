@@ -17,16 +17,17 @@ use UnexpectedValueException;
 /**
  * Logic tests for various Collection methods
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Collection::class)]
 class CollectionMethodsTest extends TestCase
 {
     /**
-     * @dataProvider providerSliceOnce
      * @param Collection $input
      * @param Collection $expected
      * @param int        $offset
      * @param int        $count
      * @param bool       $preserveKeys
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSliceOnce')]
     public function testSliceOnce(
         Collection $input,
         Collection $expected,
@@ -45,7 +46,6 @@ class CollectionMethodsTest extends TestCase
 
 
     /**
-     * @dataProvider providerSliceOnce
      * @param Collection $input
      * @param Collection $expected
      * @param int        $offset
@@ -53,6 +53,7 @@ class CollectionMethodsTest extends TestCase
      * @param bool       $preserveKeys
      * @throws \PHPUnit\Framework\SkippedTestError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSliceOnce')]
     public function testSliceInvertKeyPreservation(
         Collection $input,
         Collection $expected,
@@ -75,12 +76,12 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerSliceMultiple
      * @param Collection $input
      * @param Collection[] $expectedSlices
      * @param int[] $offsets
      * @param int[] $counts
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSliceMultiple')]
     public function testSliceMulti(Collection $input, $expectedSlices, $offsets, $counts): void
     {
         // Ensure our test data is correct
@@ -108,10 +109,10 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerMerge
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMerge')]
     public function testMerge($inputs, Collection $expected): void
     {
         $beforeMerge = [];
@@ -134,10 +135,10 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerMergeUnique
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMergeUnique')]
     public function testMergeUnique($inputs, Collection $expected): void
     {
         $beforeMerge = [];
@@ -160,10 +161,10 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerMergeUniqueObjects
      * @param Collection[] $inputs
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMergeUniqueObjects')]
     public function testMergeUniqueObjects($inputs): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -176,10 +177,10 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerMerge
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMerge')]
     public function testMergeNotUnique($inputs, Collection $expected): void
     {
         $beforeMerge = [];
@@ -202,10 +203,10 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider providerMergeEmpty
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMergeEmpty')]
     public function testMergeEmpty($inputs, Collection $expected): void
     {
         $beforeMerge = [];
@@ -229,11 +230,11 @@ class CollectionMethodsTest extends TestCase
     /**
      * Limit should NOT mutate the collection
      *
-     * @dataProvider providerLimit
      * @param Collection $input
      * @param Collection $expected
      * @param int        $count
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLimit')]
     public function testLimit(Collection $input, Collection $expected, $count): void
     {
         $beforeLimit = $input->getAll();
@@ -253,8 +254,8 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider providerLastIndexed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLastIndexed')]
     public function testLastIndexed(Collection $input, $expected): void
     {
         self::assertSame($expected, $input->last());
@@ -266,8 +267,8 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider providerLastIndexedSparse
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLastIndexedSparse')]
     public function testLastIndexedSparse(Collection $input, $expected): void
     {
         self::assertSame($expected, $input->last());
@@ -279,8 +280,8 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider providerLastAssociative
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerLastAssociative')]
     public function testLastAssociative(Collection $input, $expected): void
     {
         self::assertSame($expected, $input->last());
@@ -294,8 +295,8 @@ class CollectionMethodsTest extends TestCase
      * @param Collection    $second
      * @param callable|null $compare
      * @param Collection    $expected
-     * @dataProvider providerIntersect
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIntersect')]
     public function testIntersect(Collection $first, Collection $second, ?callable $compare, Collection $expected): void
     {
         self::assertSame($expected->getAll(), $first->intersect($second, $compare)->getAll());
@@ -308,9 +309,8 @@ class CollectionMethodsTest extends TestCase
      * @param Collection $collection
      * @param string     $property
      * @param array      $expected
-     * @covers \Schoolbox\Collection::getPropertyValues
-     * @dataProvider getTestGetPropertyValuesProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetPropertyValuesProvider')]
     public function testGetPropertyValues(Collection $collection, string $property, array $expected): void
     {
         self::assertSame($expected, $collection->getPropertyValues($property));
@@ -322,9 +322,8 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $collection
      * @param string     $property
-     * @covers \Schoolbox\Collection::getPropertyValues
-     * @dataProvider getTestGetPropertyValuesPropertyDoesNotExistProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestGetPropertyValuesPropertyDoesNotExistProvider')]
     public function testGetPropertyValuesPropertyDoesNotExist(Collection $collection, string $property): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -333,7 +332,7 @@ class CollectionMethodsTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function providerLimit(): iterable
+    public static function providerLimit(): iterable
     {
         $array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         $data = [];
@@ -345,7 +344,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerMerge(): iterable
+    public static function providerMerge(): iterable
     {
         $data = [];
 
@@ -368,7 +367,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerMergeUnique(): iterable
+    public static function providerMergeUnique(): iterable
     {
         $data = [];
 
@@ -392,7 +391,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerMergeUniqueObjects(): iterable
+    public static function providerMergeUniqueObjects(): iterable
     {
         $data = [];
 
@@ -421,7 +420,7 @@ class CollectionMethodsTest extends TestCase
     }
 
 
-    public function providerMergeEmpty(): iterable
+    public static function providerMergeEmpty(): iterable
     {
         $data = [];
 
@@ -458,7 +457,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerSliceOnce(): iterable
+    public static function providerSliceOnce(): iterable
     {
         $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
@@ -474,7 +473,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerSliceMultiple(): iterable
+    public static function providerSliceMultiple(): iterable
     {
         $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
@@ -532,7 +531,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function providerLastIndexed(): array
+    public static function providerLastIndexed(): array
     {
         return [
             [new Collection(), null],
@@ -543,7 +542,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function providerLastIndexedSparse(): array
+    public static function providerLastIndexedSparse(): array
     {
         $c1 = new Collection();
         $c1[0] = 1;
@@ -559,7 +558,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function providerLastAssociative(): array
+    public static function providerLastAssociative(): array
     {
         return [
             [new Collection(), null],
@@ -570,7 +569,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function providerIntersect(): iterable
+    public static function providerIntersect(): iterable
     {
         // Set notation refresher:
         // ∅:     Empty set
@@ -614,7 +613,7 @@ class CollectionMethodsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetPropertyValuesProvider(): iterable
+    public static function getTestGetPropertyValuesProvider(): iterable
     {
         $campusOne = new \Schoolbox\Campus();
         $campusOne->setId(1);
@@ -641,7 +640,7 @@ class CollectionMethodsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestGetPropertyValuesPropertyDoesNotExistProvider(): iterable
+    public static function getTestGetPropertyValuesPropertyDoesNotExistProvider(): iterable
     {
         $campusOne = new \Schoolbox\Campus();
         $campusOne->setId(1);

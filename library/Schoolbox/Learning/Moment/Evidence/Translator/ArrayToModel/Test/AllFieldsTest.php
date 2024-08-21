@@ -25,9 +25,8 @@ use Schoolbox\User;
 /**
  * Tests for converting from an array to model representation of learning moment
  * evidence.
- *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::class)]
 class AllFieldsTest extends TestCase
 {
     /**
@@ -351,7 +350,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeUpdateInvalidValuesData(): iterable
+    public static function getTestInvokeUpdateInvalidValuesData(): iterable
     {
         $baseModel = (new Model())
             ->setCreator((new User())->setId(1))
@@ -377,8 +376,6 @@ class AllFieldsTest extends TestCase
     /**
      * Test that creation of a new model from an array works as expected.
      *
-     * @dataProvider getTestInvokeCreateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array          $input
      * @param Model          $expected
@@ -386,6 +383,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
     public function testInvokeCreate(array $input, Model $expected, AllFields $converter = null): void
     {
         $converter = $this->createConverterIfNull($converter);
@@ -398,8 +396,6 @@ class AllFieldsTest extends TestCase
     /**
      * Test that update of an existing model from an array works as expected.
      *
-     * @dataProvider getTestInvokeUpdateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array          $input
      * @param Model          $existing
@@ -408,6 +404,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateData')]
     public function testInvokeUpdate(
         array $input,
         Model $existing,
@@ -426,8 +423,6 @@ class AllFieldsTest extends TestCase
      * set fields which would cause an error: these fields should raise a
      * warning message, and leave the value as is.
      *
-     * @dataProvider getTestInvokeUpdateInvalidValuesData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array $input
      * @param Model $existing
@@ -435,6 +430,7 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateInvalidValuesData')]
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
         $this->expectException(InvalidArgumentException::class);

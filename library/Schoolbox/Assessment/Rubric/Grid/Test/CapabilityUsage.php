@@ -14,9 +14,9 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 
 /**
- * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::class)]
 class CapabilityUsage extends TestCase
 {
     /**
@@ -24,7 +24,7 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveIndicatorUsageData(): iterable
+    public static function getTestRetrieveIndicatorUsageData(): iterable
     {
         // Default rowset
         $capability1     = (new RowSet\Capability())->setId(1)->setName('Capability 1');
@@ -76,13 +76,12 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveIndicatorUsageData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::retrieveIndicatorUsage
      *
      * @param RubricGrid\CapabilityUsage     $capabilityUsage
      * @param RowSet\Indicator               $indicator
      * @param null|RubricGrid\IndicatorUsage $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveIndicatorUsageData')]
     public function testRetrieveIndicatorUsage(
         RubricGrid\CapabilityUsage $capabilityUsage,
         RowSet\Indicator $indicator,
@@ -97,7 +96,7 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestIterateIndicatorsData(): iterable
+    public static function getTestIterateIndicatorsData(): iterable
     {
         // Default rowset
         $capability      = (new RowSet\Capability())->setId(1)->setName('Capability 1');
@@ -144,12 +143,10 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestIterateIndicatorsData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::iterateIndicators
-     *
      * @param RubricGrid\CapabilityUsage $capabilityUsage
      * @param array                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIterateIndicatorsData')]
     public function testIterateIndicators(RubricGrid\CapabilityUsage $capabilityUsage, array $expected): void
     {
         $actual = [];
@@ -165,7 +162,7 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueFromIndicatorsData(): iterable
+    public static function getTestCalculateMaxValueFromIndicatorsData(): iterable
     {
         $capability      = (new RowSet\Capability())->setId(1)->setName('Capability 1');
         $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
@@ -228,12 +225,10 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueFromIndicatorsData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::calculateMaxValueFromIndicators
-     *
      * @param RubricGrid\CapabilityUsage $capabilityUsage
      * @param float                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestCalculateMaxValueFromIndicatorsData')]
     public function testCalculateMaxValueFromIndicators(
         RubricGrid\CapabilityUsage $capabilityUsage,
         float $expected
@@ -247,7 +242,7 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestContainsDescriptorsWithValueData(): iterable
+    public static function getTestContainsDescriptorsWithValueData(): iterable
     {
         $capability = (new RowSet\Capability())->setId(1)->setName('Capability 1');
         $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
@@ -310,12 +305,10 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestContainsDescriptorsWithValueData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::containsDescriptorsWithValue
-     *
      * @param RubricGrid\CapabilityUsage $capabilityUsage
      * @param bool                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestContainsDescriptorsWithValueData')]
     public function testContainsDescriptorsWithValue(
         RubricGrid\CapabilityUsage $capabilityUsage,
         bool $expected
@@ -448,12 +441,10 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCapabilityMarkShownData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::isCapabilityMarkShown
-     *
      * @param RubricGrid\CapabilityUsage $capabilityUsage
      * @param bool                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCapabilityMarkShownData')]
     public function testIsCapabilityMarkShown(RubricGrid\CapabilityUsage $capabilityUsage, bool $expected): void
     {
         $this->assertSame($expected, $capabilityUsage->isCapabilityMarkShown());
@@ -465,7 +456,7 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsCompatibleWithData(): iterable
+    public static function getTestIsCompatibleWithData(): iterable
     {
         $generator = new Generator();
 
@@ -656,13 +647,12 @@ class CapabilityUsage extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCompatibleWithData
      *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::isCompatibleWith
      * @param RubricGrid\CapabilityUsage $usage1
      * @param RubricGrid\CapabilityUsage $usage2
      * @param bool                       $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCompatibleWithData')]
     public function testIsCompatibleWith(
         RubricGrid\CapabilityUsage $usage1,
         RubricGrid\CapabilityUsage $usage2,

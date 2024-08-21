@@ -16,33 +16,32 @@ use Url;
 class RelativeUrlTest extends TestCase
 {
     // Test __construct()
-//
-//    /**
-//     * @expectedException DomainException
-//     * TODO Uncomment for PHP7
-//     */
-//    public function testNoSiteHostImplicit()
-//    {
-//        $input = 'www.example.com';
-//        new Url($input);
-//    }
-//
-//    /**
-//     * @expectedException DomainException
-//     * TODO Uncomment for PHP7
-//     */
-//    public function testNoSiteHostDefaultImplicit()
-//    {
-//        $site = null;
-//        $input = 'www.example.com';
-//        new Url($input, $site);
-//    }
-
+    //
+    //    /**
+    //     * @expectedException DomainException
+    //     * TODO Uncomment for PHP7
+    //     */
+    //    public function testNoSiteHostImplicit()
+    //    {
+    //        $input = 'www.example.com';
+    //        new Url($input);
+    //    }
+    //
+    //    /**
+    //     * @expectedException DomainException
+    //     * TODO Uncomment for PHP7
+    //     */
+    //    public function testNoSiteHostDefaultImplicit()
+    //    {
+    //        $site = null;
+    //        $input = 'www.example.com';
+    //        new Url($input, $site);
+    //    }
     /**
-     * @dataProvider provider_invalidUrlType
      * @param mixed $url
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_invalidUrlType')]
     public function test_constructor_invalidUrlType($url)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -51,9 +50,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validUrlType
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validUrlType')]
     public function test_constructor_validUrlType($url)
     {
         $siteHost = 'www.example.com';
@@ -62,9 +61,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validSiteHost
      * @param string|null $siteHost
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validSiteHost')]
     public function test_constructor_validSiteHost($siteHost)
     {
         $url = "http://google.com";
@@ -86,9 +85,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable')]
     public function testIsParsableUrl($url)
     {
         $urlFormatter = new Url($url, 'www.example.com');
@@ -101,9 +100,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_notParsable
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_notParsable')]
     public function testNotParsableUrl($url)
     {
         $urlFormatter = new Url($url, 'www.example.com');
@@ -117,11 +116,10 @@ class RelativeUrlTest extends TestCase
 
 
     // Test isUrl()
-
     /**
-     * @dataProvider provider_isParsable_isUrl
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isUrl')]
     public function testIsUrl($url)
     {
         $siteHost = $this->getLocalSiteHost();
@@ -130,9 +128,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notUrl
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl')]
     public function testIsNotUrl($url)
     {
         $siteHost = $this->getLocalSiteHost();
@@ -141,11 +139,10 @@ class RelativeUrlTest extends TestCase
     }
 
     // Test getHostname()
-
     /**
-     * @dataProvider provider_cannotParseHostname
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_cannotParseHostname')]
     public function testCanNotGetHostname($url)
     {
         $expected = false;
@@ -159,10 +156,10 @@ class RelativeUrlTest extends TestCase
 
 
     /**
-     * @dataProvider provider_parsableHostnames
      * @param string $url
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_parsableHostnames')]
     public function testCanGetHostname($url, $expected)
     {
         $urlFormatter = new Url($url, $this->getLocalSiteHost());
@@ -172,12 +169,10 @@ class RelativeUrlTest extends TestCase
     }
 
     // Test normalise()
-
     /**
-     * @dataProvider provider_notParsable
-     *
      * @string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_notParsable')]
     public function test_normalise_unParsable($url)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -186,11 +181,11 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_normaliseLocalUrls
      * @param string $url
      * @param string $localSiteHost
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normaliseLocalUrls')]
     public function testNormaliseLocalUrl($url, $localSiteHost, $expected)
     {
         $urlFormatter = new Url($url, $localSiteHost);
@@ -201,11 +196,11 @@ class RelativeUrlTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normaliseNonLocalUrls
      * @param string $url
      * @param string $localSiteHost
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normaliseNonLocalUrls')]
     public function testNormaliseNotLocalUrl($url, $localSiteHost, $expected)
     {
         $_SERVER['HTTP_HOST'] = $localSiteHost;
@@ -218,12 +213,11 @@ class RelativeUrlTest extends TestCase
 
 
     // Test getSlug()
-
     /**
-     * @dataProvider provider_getSlugMapping
      * @param string $url
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_getSlugMapping')]
     public function testGetSlug($url, $expected)
     {
         $urlFormatter = new Url($url, $this->getLocalSiteHost());
@@ -233,11 +227,10 @@ class RelativeUrlTest extends TestCase
     }
 
     // Test prependScheme()
-
     /**
-     * @dataProvider provider_isParsable_notUrl_notRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative')]
     public function testNoProtocolUrl($url)
     {
         $urlFormatter = new Url($url, $this->getLocalSiteHost());
@@ -250,11 +243,10 @@ class RelativeUrlTest extends TestCase
 
 
     // Test isLocalUrl()
-
     /**
-     * @dataProvider provider_isParsable_isRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_IsLocalSite_IsLocalServer_IsRelative($url)
     {
         $site = $this->getLocalSiteHost();
@@ -264,9 +256,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notUrl_notRelative_isLocal
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_IsLocalSite_IsLocalServer_NotRelative($url)
     {
         $site = $this->getLocalSiteHost();
@@ -276,9 +268,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_isRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_IsLocalSite_NotLocalServer_IsRelative($url)
     {
         $site = $this->getLocalSiteHost();
@@ -288,9 +280,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notUrl_notRelative_isLocal
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_IsLocalSite_NotLocalServer_NotRelative($url)
     {
         $site = $this->getLocalSiteHost();
@@ -300,9 +292,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_isRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_NotLocalSite_IsLocalServer_IsRelative($url)
     {
         $site = $this->getNotLocalSiteHost();
@@ -312,9 +304,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notUrl_notRelative_isLocal
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_NotLocalSite_IsLocalServer_NotRelative($url)
     {
         $site = $this->getNotLocalSiteHost();
@@ -324,9 +316,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_isRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_NotLocalSite_NotLocalServer_IsRelative($url)
     {
         $site = $this->getNotLocalSiteHost();
@@ -336,9 +328,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notRelative
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notRelative')]
     public function test_NotLocalSite_NotLocalServer_NotRelative($url)
     {
         $site = 'abc.com.some.unlikely.value';
@@ -349,11 +341,10 @@ class RelativeUrlTest extends TestCase
 
 
     // Test isFTPURL()
-
     /**
-     * @dataProvider provider_isFtpUrl
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isFtpUrl')]
     public function testIsFtpUrl($url)
     {
         $site = $this->getLocalSiteHost();
@@ -362,9 +353,9 @@ class RelativeUrlTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_isParsable_notFtpUrl
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notFtpUrl')]
     public function testIsNotFtpUrl($url)
     {
         $site = 'sbvagrant.alaress.com.au';
@@ -374,13 +365,11 @@ class RelativeUrlTest extends TestCase
 
 
     // Test getRelativeURL()
-
-
     /**
-     * @dataProvider provider_relativeUrlMapping
      * @param string $url
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_relativeUrlMapping')]
     public function testGetRelativeUrl($url, $expected)
     {
         $site = $this->getLocalSiteHost();
@@ -392,11 +381,10 @@ class RelativeUrlTest extends TestCase
 
 
     // test getBase64EncodedRedirect()
-
     /**
-     * @dataProvider provider_isParsable
      * @param string $url
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable')]
     public function testRedirectUrl($url)
     {
         $site = $this->getLocalSiteHost();
@@ -456,7 +444,7 @@ class RelativeUrlTest extends TestCase
         );
     }
 
-    public function provider_getSlugMapping()
+    public static function provider_getSlugMapping()
     {
         return [
             ['/path/to/file.ext', '-path-to-fileext'],
@@ -506,7 +494,7 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_relativeUrlMapping()
+    public static function provider_relativeUrlMapping()
     {
         return [
             ['             ', ''],
@@ -537,7 +525,7 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_invalidUrlType()
+    public static function provider_invalidUrlType()
     {
         return [
             [null],
@@ -568,7 +556,7 @@ class RelativeUrlTest extends TestCase
         );
     }
 
-    public function provider_validSiteHost()
+    public static function provider_validSiteHost()
     {
         // Everything except for null
         return [
@@ -582,7 +570,7 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_notParsable()
+    public static function provider_notParsable()
     {
         return [
             ['-www.google.com'],
@@ -610,7 +598,7 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isParsable_isRelative()
+    public static function provider_isParsable_isRelative()
     {
         return [
             [''],
@@ -912,7 +900,7 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_parsableHostnames()
+    public static function provider_parsableHostnames()
     {
         return [
             ['protocol://www.example.com', 'www.example.com'],

@@ -38,12 +38,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInSecondsData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInSecondsData')]
     public function testDiffInSeconds($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInSeconds($b));
@@ -69,12 +69,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInMinutesData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInMinutesData')]
     public function testDiffInMinutes($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInMinutes($b));
@@ -100,12 +100,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInHoursData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInHoursData')]
     public function testDiffInHours($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInHours($b));
@@ -145,12 +145,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInDaysData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInDaysData')]
     public function testDiffInDays($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInDays($b));
@@ -177,12 +177,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInWeekdaysData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInWeekdaysData')]
     public function testDiffInWeekdays($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInWeekdays($b));
@@ -210,12 +210,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInWeekendDaysData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInWeekendDaysData')]
     public function testDiffInWeekendDays($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInWeekendDays($b));
@@ -241,12 +241,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInWeeksData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInWeeksData')]
     public function testDiffInWeeks($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInWeeks($b));
@@ -289,12 +289,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInMonthsData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInMonthsData')]
     public function testDiffInMonths($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInMonths($b));
@@ -321,12 +321,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getDiffInYearsData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDiffInYearsData')]
     public function testDiffInYears($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->diffInYears($b));
@@ -364,12 +364,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getCompareData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCompareData')]
     public function testCompare($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->compare($b));
@@ -408,12 +408,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getCompareDateOnlyData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCompareDateOnlyData')]
     public function testCompareDateOnly($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->compareDateOnly($b));
@@ -438,12 +438,12 @@ class DiffTest extends TestCase
     }
 
     /**
-     * @dataProvider getCompareYearOnlyData
      *
      * @param Alaress_Date_Format $a
      * @param Alaress_Date_Format $b
      * @param int                 $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCompareYearOnlyData')]
     public function testCompareYearOnly($a, $b, $expected)
     {
         $this->assertEquals($expected, $a->compareYearOnly($b));

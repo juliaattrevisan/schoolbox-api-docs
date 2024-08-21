@@ -29,7 +29,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNDecode(): array
+    public static function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1' => [
@@ -45,11 +45,11 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecode')]
     public function testValidDSNDecode(string $dsn, $expected): void
     {
         $codec = new DSN();
@@ -63,7 +63,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDSNDecodeEncode(): array
+    public static function providerValidDSNDecodeEncode(): array
     {
         return [
             'Valid DSN Re-encode 1' => [
@@ -77,13 +77,13 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param string $expected
      * @throws DomainException
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecodeEncode')]
     public function testValidDSNDecodeEncode(string $dsn, string $expected): void
     {
         $codec = new DSN();
@@ -105,7 +105,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function providerInvalidDSNDecode(): array
+    public static function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1 (empty dsn)' => [
@@ -122,11 +122,11 @@ class DSNTest extends TestCase
     /**
      * Test invalid DSN strings
      *
-     * @dataProvider providerInvalidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidDSNDecode')]
     public function testInvalidDSNDecode(string $dsn, $expected): void
     {
         $this->expectException(DomainException::class);

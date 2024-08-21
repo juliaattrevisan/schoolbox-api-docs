@@ -12,20 +12,17 @@ namespace Alaress\Rules\Lang\Test;
 use Alaress\Rules\Lang\Map;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Alaress\Rules\Lang\Map
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Rules\Lang\Map::class)]
 class MapTest extends TestCase
 {
     /**
-     * @dataProvider getTestApplyData
-     * @covers \Alaress\Rules\Lang\Map::apply
      *
      * @param array $map
      * @param array $inputValue
      * @param array $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyData')]
     public function testApply(array $map, array $inputValue, array $expected): void
     {
         $this->assertSame($expected, (new Map('', $map))->apply($inputValue));
@@ -36,7 +33,7 @@ class MapTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestApplyData(): iterable
+    public static function getTestApplyData(): iterable
     {
         yield 'Empty map, empty input' => [
             [],

@@ -14,9 +14,8 @@ use Schoolbox\Assessment\Rubric\Util;
 
 /**
  * Test for rubric utils.
- *
- * @covers \Schoolbox\Assessment\Rubric\Util
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Util::class)]
 class UtilTest extends TestCase
 {
     /**
@@ -24,7 +23,7 @@ class UtilTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestNormalizeNameData(): iterable
+    public static function getTestNormalizeNameData(): iterable
     {
         return [
             'same'             => ['123', '123'],
@@ -39,12 +38,10 @@ class UtilTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestNormalizeNameData
-     * @covers       \Schoolbox\Assessment\Rubric\Util::normalizeName
-     *
      * @param string $expected
      * @param string $name
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestNormalizeNameData')]
     public function testNormalizeName(string $expected, string $name): void
     {
         $this->assertSame($expected, Util::normalizeName($name));

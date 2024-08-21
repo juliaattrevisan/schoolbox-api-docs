@@ -12,20 +12,17 @@ namespace Schoolbox\User\Formatter\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\User;
 
-/**
- * @covers \Schoolbox\User\Formatter\Formatter
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\User\Formatter\Formatter::class)]
 class FormatterTest extends TestCase
 {
     /**
-     * @dataProvider getTestFormatObjectData
-     * @covers \Schoolbox\User\Formatter\Formatter::formatObject
      *
      * @param string $expected
      * @param User   $user
      * @param string $format
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestFormatObjectData')]
     public function testFormatObject(string $expected, User $user, string $format): void
     {
         $this->assertSame($expected, (new User\Formatter\Formatter($format))->formatObject($user));
@@ -36,7 +33,7 @@ class FormatterTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestFormatObjectData(): iterable
+    public static function getTestFormatObjectData(): iterable
     {
         yield 'empty everything' => [
             'Unknown User',
@@ -195,14 +192,13 @@ class FormatterTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestFormatArrayData
-     * @covers \Schoolbox\User\Formatter\Formatter::formatArray
      *
      * @param string $expected
      * @param array  $userInfo
      * @param string $format
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestFormatArrayData')]
     public function testFormatArray(string $expected, array $userInfo, string $format): void
     {
         $this->assertSame($expected, (new User\Formatter\Formatter($format))->formatArray($userInfo));
@@ -213,7 +209,7 @@ class FormatterTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestFormatArrayData(): iterable
+    public static function getTestFormatArrayData(): iterable
     {
         yield 'empty everything' => [
             'Unknown User',

@@ -145,7 +145,7 @@ class RedisCache implements ICache
         } else {
             $this->log->debug("Back up new key $itemKey");
             [$isset] = $this->redis->transaction(
-                function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData) {
+                function (Predis\Transaction\MultiExec $tx) use ($itemKey, $compressedData): void {
                     // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
                     $tx->setnx($itemKey, $compressedData)
                         // REGARDLESS of whether we just set the key, reset its TTL

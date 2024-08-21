@@ -20,8 +20,8 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
  * Tests that audience segments can detect equality
  *
  * @codeCoverageIgnore
- * @covers \Schoolbox\Comms\News\Audience\Model::equals
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\Audience\Model::equals)]
 class SegmentEqualityTest extends TestCase
 {
 
@@ -40,12 +40,12 @@ class SegmentEqualityTest extends TestCase
 
 
     /**
-     * @dataProvider providerEqualSimple
      * @param Audience\Model $left
      * @param Audience\Model $right
      * @param bool           $expected
      * @throws InsufficientHydrationException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEqualSimple')]
     public function testEqualSimple(Audience\Model $left, Audience\Model $right, bool $expected): void
     {
         $this->assertEquals($expected, $left->equals($right));
@@ -54,12 +54,12 @@ class SegmentEqualityTest extends TestCase
 
     /**
      *
-     * @dataProvider providerEqualSimpleVsComposite
      * @param Audience\Model $simple
      * @param Audience\Model $composite
      * @throws InsufficientHydrationException
      * @throws Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEqualSimpleVsComposite')]
     public function testEqualSimpleVsComposite(Audience\Model $simple, Audience\Model $composite): void
     {
         $this->assertFalse($simple->equals($composite));
@@ -70,12 +70,12 @@ class SegmentEqualityTest extends TestCase
     /**
      * Test we can check equality between composite segments
      *
-     * @dataProvider providerEqualComposite
      * @param Audience\Model $left
      * @param Audience\Model $right
      * @param bool           $expected
      * @throws InsufficientHydrationException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEqualComposite')]
     public function testEqualComposite(Audience\Model $left, Audience\Model $right, bool $expected): void
     {
         $this->assertEquals($expected, $left->equals($right));

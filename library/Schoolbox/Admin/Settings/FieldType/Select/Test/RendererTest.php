@@ -20,22 +20,21 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 /**
- * @covers \Schoolbox\Admin\Settings\FieldType\Select\Renderer
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Admin\Settings\FieldType\Select\Renderer::class)]
 class RendererTest extends TestCase
 {
 
     // Tests
-
     /**
      * Test the renderer provides expected data structure for the twig template
      *
-     * @dataProvider providerConfig
      * @param Config $config
      * @throws \PHPUnit\Framework\Exception
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfig')]
     public function testTemplateData(Config $config): void
     {
         $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT);
@@ -53,12 +52,12 @@ class RendererTest extends TestCase
     /**
      * Test the renderer provides expected data structure
      *
-     * @dataProvider providerConfigAndInvalidFieldId
      * @param Config $config
      * @param int    $invalidFieldId
      * @throws \PHPUnit\Framework\Exception
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfigAndInvalidFieldId')]
     public function testInvalidField(Config $config, int $invalidFieldId): void
     {
         $this->expectException(FieldTypeMismatchException::class);
@@ -72,13 +71,13 @@ class RendererTest extends TestCase
      *
      * An invalid value is one that doesn't match one of the available options
      *
-     * @dataProvider providerTransformValue
      * @param FieldType\Select\Renderer $renderer
      * @param Config                    $config
      * @param string|null               $value
      * @param string|null               $expected
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTransformValue')]
     public function testTransformValue(FieldType\Select\Renderer $renderer, Config $config, ?string $value, ?string $expected): void
     {
         $config->setValue($value);
@@ -89,7 +88,6 @@ class RendererTest extends TestCase
     /**
      * Tests whether for a combination of $required and $value, the system should insert an empty select option
      *
-     * @dataProvider providerAddEmptyOption
      * @param FieldType\Select\Renderer $renderer
      * @param Config                    $config
      * @param bool                      $required
@@ -97,6 +95,7 @@ class RendererTest extends TestCase
      * @param bool                      $expected
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAddEmptyOption')]
     public function testAddEmptyOption(FieldType\Select\Renderer $renderer, Config $config, bool $required, ?string $value, bool $expected): void
     {
         $config

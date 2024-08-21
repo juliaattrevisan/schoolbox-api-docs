@@ -15,9 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test for the CSV importer.
- *
- * @covers \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter::class)]
 class CsvImporterTest extends TestCase
 {
     /**
@@ -25,7 +24,7 @@ class CsvImporterTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveCapabilitiesWithIndicatorsData(): iterable
+    public static function getTestRetrieveCapabilitiesWithIndicatorsData(): iterable
     {
         // Set up test data: only the square passed in really matters here
         $test1 = new CsvImporter(
@@ -244,12 +243,10 @@ class CsvImporterTest extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveCapabilitiesWithIndicatorsData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter::retrieveCapabilitiesWithIndicators
-     *
      * @param CsvImporter $importer
      * @param array       $expectedIndicators
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveCapabilitiesWithIndicatorsData')]
     public function testRetrieveCapabilitiesWithIndicators(
         CsvImporter $importer,
         array $expectedIndicators

@@ -26,7 +26,7 @@ class BaseTest extends TestCase
         $this->object = new Base();
     }
 
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array(true, true),
@@ -36,7 +36,7 @@ class BaseTest extends TestCase
         );
     }
 
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(true, '1'),

@@ -84,11 +84,11 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerTaskCompletionGetHR
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskCompletionGetHR')]
     public function testTaskCompletionGetHumanReadable(Task $task, User $student, $expected)
     {
         $actual = $task->getHumanReadableMark($task->getParticipantIfExtant($student), false);
@@ -97,11 +97,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerTaskCompletionGetHRPublishedOnly
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskCompletionGetHRPublishedOnly')]
     public function testTaskCompletionGetHumanReadablePublishedOnly(Task $task, User $student, $expected)
     {
         // A student-assessed response is always published
@@ -113,11 +113,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetHR
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetHR')]
     public function testQuizTotalMarkFractionGetHumanReadable(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), false);
@@ -127,11 +127,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetHRPublishedOnly
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetHRPublishedOnly')]
     public function testQuizTotalMarkFractionGetHumanReadablePublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), true);
@@ -140,11 +140,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetNorm
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetNorm')]
     public function testQuizTotalMarkFractionGetNormalised(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), false);
@@ -153,11 +153,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetNormPublishedOnly
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetNormPublishedOnly')]
     public function testQuizTotalMarkFractionGetNormalisedPublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), true);
@@ -166,11 +166,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetHR')]
     public function testDueWorkNoneGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -179,11 +179,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetHRPublishedOnly')]
     public function testDueWorkNoneGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -192,11 +192,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetHR')]
     public function testDueWorkPercentGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -205,11 +205,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetHRPublishedOnly')]
     public function testDueWorkPercentGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -218,11 +218,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetHR')]
     public function testDueWorkTotalMarkGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -231,11 +231,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetHRPublishedOnly')]
     public function testDueWorkTotalMarkGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -244,11 +244,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetHR')]
     public function testDueWorkLetterGradeGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -257,11 +257,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetHRPublishedOnly')]
     public function testDueWorkLetterGradeGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -270,11 +270,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetNorm')]
     public function testDueWorkNoneGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -283,11 +283,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetNormPublishedOnly')]
     public function testDueWorkNoneGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -296,11 +296,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetNorm')]
     public function testDueWorkPercentGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -309,11 +309,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetNormPublishedOnly')]
     public function testDueWorkPercentGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -322,11 +322,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetNorm')]
     public function testDueWorkTotalMarkGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -335,11 +335,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetNormPublishedOnly')]
     public function testDueWorkTotalMarkGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -348,11 +348,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetNorm')]
     public function testDueWorkLetterGradeGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -361,11 +361,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetNormPublishedOnly')]
     public function testDueWorkLetterGradeGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -375,12 +375,12 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
@@ -393,12 +393,12 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -412,12 +412,12 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -430,12 +430,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -448,12 +448,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumPercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -467,12 +467,12 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumPercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -485,12 +485,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -503,12 +503,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -521,12 +521,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -539,12 +539,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -557,12 +557,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumPercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -575,12 +575,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumPercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -593,12 +593,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAverageNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -611,12 +611,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAverageNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -629,12 +629,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAverageLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -647,12 +647,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAverageLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -665,12 +665,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAveragePercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -683,12 +683,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAveragePercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -701,12 +701,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAverageNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -719,12 +719,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAverageNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -737,12 +737,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAverageLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -755,12 +755,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAverageLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -773,12 +773,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAveragePercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -791,12 +791,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAveragePercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -809,12 +809,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMinimumNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -827,12 +827,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMinimumNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
@@ -845,11 +845,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinLetterGradeGetHR')]
     public function testProjectMinimumLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -858,11 +858,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinLetterGradeGetHRPublishedOnly')]
     public function testProjectMinimumLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -871,11 +871,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinPercentageGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinPercentageGetHR')]
     public function testProjectMinimumPercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -884,11 +884,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinPercentageGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinPercentageGetHRPublishedOnly')]
     public function testProjectMinimumPercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -897,12 +897,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMaximumNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -915,12 +915,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMaximumNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
@@ -933,11 +933,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxLetterGradeGetHR')]
     public function testProjectMaximumLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -946,11 +946,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxLetterGradeGetHRPublishedOnly')]
     public function testProjectMaximumLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -959,11 +959,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxPercentageGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxPercentageGetHR')]
     public function testProjectMaximumPercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -972,11 +972,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxPercentageGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxPercentageGetHRPublishedOnly')]
     public function testProjectMaximumPercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -985,12 +985,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectAverageNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -1003,12 +1003,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectAverageNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
@@ -1021,11 +1021,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageLetterGradeGetHR')]
     public function testProjectAverageLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1034,11 +1034,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageLetterGradeGetHRPublishedOnly')]
     public function testProjectAverageLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1047,11 +1047,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAveragePercentGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAveragePercentGetHR')]
     public function testProjectAveragePercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1060,11 +1060,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAveragePercentGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAveragePercentGetHRPublishedOnly')]
     public function testProjectAveragePercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1073,12 +1073,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectWeightedAverageNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -1091,12 +1091,12 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectWeightedAverageNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
@@ -1109,11 +1109,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageLetterGradeGetHR')]
     public function testProjectWeightedAverageLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1122,11 +1122,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageLetterGradeGetHRPublishedOnly')]
     public function testProjectWeightedAverageLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1135,11 +1135,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAveragePercentGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAveragePercentGetHR')]
     public function testProjectWeightedAveragePercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1148,11 +1148,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAveragePercentGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAveragePercentGetHRPublishedOnly')]
     public function testProjectWeightedAveragePercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);

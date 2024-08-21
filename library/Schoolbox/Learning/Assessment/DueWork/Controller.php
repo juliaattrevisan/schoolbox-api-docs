@@ -1489,7 +1489,7 @@ class Controller extends Assessment\Controller
                  */
                 $instanceIdentifier = $this->getConfigLoader()->get('site_type');
                 $assessmentMapper   = $this->getAssessmentMapper();
-                $detachedFunction   = static function () use ($api, $models, $instanceIdentifier, $assessmentMapper) {
+                $detachedFunction   = static function () use ($api, $models, $instanceIdentifier, $assessmentMapper): void {
                     /* Set up a record processor
                      */
                     $processor = (new Turnitin\File\Process\Transmit(

@@ -20,10 +20,10 @@ class StatisticsTest extends TestCase
     /**
      * Tests calculation of median.
      *
-     * @dataProvider getTestMedianData
      * @param array      $values
      * @param float|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestMedianData')]
     public function testMedian(array $values, ?float $expected): void
     {
         $this->assertEqualsWithDelta($expected, Statistics::median($values), 0.0000001);
@@ -32,7 +32,7 @@ class StatisticsTest extends TestCase
     /**
      * @return array
      */
-    public function getTestMedianData(): array
+    public static function getTestMedianData(): array
     {
         return [
             'empty' => [
@@ -102,10 +102,10 @@ class StatisticsTest extends TestCase
     /**
      * Tests calculation of box plot values.
      *
-     * @dataProvider getBuildBoxPlotValuesData
      * @param array $values
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getBuildBoxPlotValuesData')]
     public function testBuildBoxPlotValues(array $values, array $expected): void
     {
         $this->assertEqualsWithDelta($expected, Statistics::buildBoxPlotValues($values), 0.0000001);
@@ -114,7 +114,7 @@ class StatisticsTest extends TestCase
     /**
      * @return array
      */
-    public function getBuildBoxPlotValuesData(): array
+    public static function getBuildBoxPlotValuesData(): array
     {
         return [
             'empty' => [

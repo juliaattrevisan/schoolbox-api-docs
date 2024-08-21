@@ -286,7 +286,7 @@ class Framework
         }
 
         // it's dangerous to go alone - take this
-        $testCase->setBuffy(function () {
+        $testCase->setBuffy(function (): void {
             foreach (array_keys($this->daemonInstances) as $name) {
                 // face your daemons
                 $this->slayDaemon($name);
@@ -355,7 +355,7 @@ class Framework
             throw new RuntimeException("Failed to launch daemon process for $name");
         }
 
-        $this->loop->addReadStream($pipes[1], function ($stream) use ($name) {
+        $this->loop->addReadStream($pipes[1], function ($stream) use ($name): void {
             $this->onRead($stream, $name);
         });
 

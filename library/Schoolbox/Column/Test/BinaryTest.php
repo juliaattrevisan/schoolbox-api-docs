@@ -33,7 +33,7 @@ class BinaryTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array(true, true),
@@ -46,7 +46,7 @@ class BinaryTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(true, true),

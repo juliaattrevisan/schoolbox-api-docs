@@ -21,11 +21,11 @@ class TupleStackTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validNormaliseValuesSplitMultiSeparator
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseValuesSplitMultiSeparator')]
     public function testNormaliseValuesSplitMultiSeparator(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ";, \r\n"));
@@ -37,7 +37,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseValuesSplitMultiSeparator(): array
+    public static function provider_validNormaliseValuesSplitMultiSeparator(): array
     {
         return [
             'Empty 6' => [
@@ -113,11 +113,11 @@ class TupleStackTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNormaliseValuesSplitNewlines
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseValuesSplitNewlines')]
     public function testNormaliseValuesSplitNewlines(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, "\r\n"));
@@ -129,7 +129,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseValuesSplitNewlines(): array
+    public static function provider_validNormaliseValuesSplitNewlines(): array
     {
         return [
             'Empty 5' => [
@@ -161,11 +161,11 @@ class TupleStackTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNormaliseValuesSplitSemicolon
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseValuesSplitSemicolon')]
     public function testNormaliseValuesSplitSemicolon(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ';'));
@@ -177,7 +177,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseValuesSplitSemicolon(): array
+    public static function provider_validNormaliseValuesSplitSemicolon(): array
     {
         return [
             'Empty 4' => [
@@ -218,11 +218,11 @@ class TupleStackTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNormaliseValuesSplitComma
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseValuesSplitComma')]
     public function testNormaliseValuesSplitComma(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack, ','));
@@ -234,7 +234,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseValuesSplitComma(): array
+    public static function provider_validNormaliseValuesSplitComma(): array
     {
         return [
             'Empty 3' => [
@@ -275,11 +275,11 @@ class TupleStackTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNormaliseValues
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseValues')]
     public function testNormaliseValues(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseValues($stack));
@@ -291,7 +291,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseValues(): array
+    public static function provider_validNormaliseValues(): array
     {
         return [
             'Empty 2' => [
@@ -324,11 +324,11 @@ class TupleStackTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNormaliseTuples
      *
      * @param array $stack
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNormaliseTuples')]
     public function testNormaliseTuples(array $stack, array $expected): void
     {
         $this->assertEquals($expected, (new TupleStack())->normaliseTuples($stack));
@@ -340,7 +340,7 @@ class TupleStackTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNormaliseTuples(): array
+    public static function provider_validNormaliseTuples(): array
     {
         return [
             'Empty 1' => [

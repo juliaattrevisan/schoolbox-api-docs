@@ -82,7 +82,7 @@ class Module extends BaseModule
             new Rule\All(
                 new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\Callback(static function (array $params, User $user) {
+                new Rule\Callback(static function (array $params, User $user): void {
                     if (
                                             $params['feedback'] instanceof IFeedback
                                             && $params['feedback']->getReviewer()->getId() === $user->getId()

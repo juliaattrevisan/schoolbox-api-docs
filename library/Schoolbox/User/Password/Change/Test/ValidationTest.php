@@ -22,13 +22,13 @@ use Schoolbox\User\Password\Change\ValidChangeRequest;
 class ValidationTest extends TestCase
 {
     /**
-     * @dataProvider provider_validChangeRequest
      * @param string $currentPassword
      * @param string $userPassword
      * @param string $newPassword
      * @param string $confirmPassword
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validChangeRequest')]
     public function testValidChangeRequest(string $currentPassword, string $userPassword, string $newPassword, string $confirmPassword, bool $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -47,7 +47,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validChangeRequest(): array
+    public static function provider_validChangeRequest(): array
     {
         return [
 

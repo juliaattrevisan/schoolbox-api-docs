@@ -29,88 +29,88 @@ use Schoolbox\Realtime\Message\NSMapper;
 class RecogniseCacheKeyTest extends TestCase
 {
     /**
-     * @dataProvider providerIconCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIconCacheKeys')]
     public function testIcon(string $cacheKey): void
     {
         self::assertTrue((new Icon())->recognisesCacheKey($cacheKey), "'$cacheKey' not recognised");
     }
 
     /**
-     * @dataProvider providerNotIconCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotIconCacheKeys')]
     public function testNotIcon(string $cacheKey): void
     {
         self::assertFalse((new Icon())->recognisesCacheKey($cacheKey), "'$cacheKey' incorrectly recognised");
     }
 
     /**
-     * @dataProvider providerMyImageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMyImageCacheKeys')]
     public function testMyImage(string $cacheKey): void
     {
         self::assertTrue((new MyImage())->recognisesCacheKey($cacheKey), "'$cacheKey' not recognised");
     }
 
     /**
-     * @dataProvider providerNotMyImageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotMyImageCacheKeys')]
     public function testNotMyImage(string $cacheKey): void
     {
         self::assertFalse((new MyImage())->recognisesCacheKey($cacheKey), "'$cacheKey' incorrectly recognised");
     }
 
     /**
-     * @dataProvider providerPortraitCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPortraitCacheKeys')]
     public function testPortrait(string $cacheKey): void
     {
         self::assertTrue((new Portrait())->recognisesCacheKey($cacheKey), "'$cacheKey' not recognised");
     }
 
     /**
-     * @dataProvider providerNotPortraitCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotPortraitCacheKeys')]
     public function testNotPortrait(string $cacheKey): void
     {
         self::assertFalse((new Portrait())->recognisesCacheKey($cacheKey), "'$cacheKey' incorrectly recognised");
     }
 
     /**
-     * @dataProvider providerStorageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStorageCacheKeys')]
     public function testStorage(string $cacheKey): void
     {
         self::assertTrue((new Storage())->recognisesCacheKey($cacheKey), "'$cacheKey' not recognised");
     }
 
     /**
-     * @dataProvider providerNotStorageCacheKeys
      * @param string $cacheKey
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotStorageCacheKeys')]
     public function testNotStorage(string $cacheKey): void
     {
         self::assertFalse((new Storage())->recognisesCacheKey($cacheKey), "'$cacheKey' incorrectly recognised");

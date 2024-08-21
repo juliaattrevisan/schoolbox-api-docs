@@ -82,7 +82,7 @@ abstract class RedisQueue implements QueueInterface
             throw new InvalidArgumentException('Unexpected redis client');
         }
 
-        $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance) {
+        $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance): void {
             $ttl = $instance->getTTL() > 0 ? $instance->getTTL() : Instance::DEFAULT_TTL;
             // insert the msg payload ONLY if it doesn't already exist
             $tx->setnx($id, $data)
