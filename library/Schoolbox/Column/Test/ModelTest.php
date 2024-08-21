@@ -50,17 +50,17 @@ class ModelTest extends TestCase
             ->expects($this->any())
             ->method('findById')
             ->with($this->logicalNot($this->isNull()))
-            ->will($this->returnValue($this->test_model));
+            ->willReturn($this->test_model);
         $this->test_mapper
             ->expects($this->any())
             ->method('findById')
             ->with($this->isNull())
-            ->will($this->returnValue(new TestModel()));
+            ->willReturn(new TestModel());
         $this->test_mapper
             ->expects($this->any())
             ->method('findOneByColumn')
             ->with('filename', 'd.txt')
-            ->will($this->returnValue($this->test_model));
+            ->willReturn($this->test_model);
     }
 
     /**
