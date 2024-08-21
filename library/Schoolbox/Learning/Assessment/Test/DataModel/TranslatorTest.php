@@ -377,7 +377,7 @@ class TranslatorTest extends TestCase
     /**
      * @return array [assessment, class, id, specificationClass, specificationId, specificationContextClass, specificationContextId]
      */
-    public function getTranslateSpecificationAssessmentToDataModelData()
+    public static function getTranslateSpecificationAssessmentToDataModelData()
     {
         return [
             [
@@ -616,10 +616,10 @@ class TranslatorTest extends TestCase
     /**
      * @return array
      */
-    public function providerDomainObjects(): array
+    public static function providerDomainObjects(): array
     {
         $data = [];
-        foreach ($this->getDomainModels() as $domainModel) {
+        foreach (self::getDomainModels() as $domainModel) {
             $data[] = [$domainModel];
         }
         return $data;
@@ -630,10 +630,10 @@ class TranslatorTest extends TestCase
      * @return array
      * @throws \UnexpectedValueException
      */
-    public function providerDataModels(): array
+    public static function providerDataModels(): array
     {
         $data = [];
-        foreach ($this->getDataModels() as $dataModel) {
+        foreach (self::getDataModels() as $dataModel) {
             $data[] = [$dataModel];
         }
         return $data;
@@ -643,7 +643,7 @@ class TranslatorTest extends TestCase
     /**
      * @return IAssessable[]
      */
-    private function getDomainModels(): array
+    private static function getDomainModels(): array
     {
         return [
             new Task(),
@@ -658,7 +658,7 @@ class TranslatorTest extends TestCase
      * @return array
      * @throws \UnexpectedValueException
      */
-    private function getDataModels(): array
+    private static function getDataModels(): array
     {
         $assessmentMapper = AssessmentMapper::getInstance();
 

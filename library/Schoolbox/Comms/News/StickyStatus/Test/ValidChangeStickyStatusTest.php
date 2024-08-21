@@ -25,8 +25,13 @@ class ValidChangeStickyStatusTest extends TestCase
      * @return void
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
-    public function testIsSatisfiedBy(ValidChangeStickyStatus $validChangeStickyStatus, User $user, bool $expected): void
-    {
+    public function testIsSatisfiedBy(
+        bool $isNewsModerator,
+        bool $configStickyStatus,
+        User $user,
+        bool $expected,
+    ): void {
+        $validChangeStickyStatus = new ValidChangeStickyStatus($this->createAccessMock($isNewsModerator), $configStickyStatus);
         $this->assertSame($expected, $validChangeStickyStatus->isSatisfiedBy($user));
     }
 
@@ -35,51 +40,57 @@ class ValidChangeStickyStatusTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
-        $superuser        = (new User())->setSuperuser(true);
-        $nonSuperuser     = (new User())->setSuperuser(false);
-        $newsModerator    = $this->createAccessMock(true);
-        $nonNewsModerator = $this->createAccessMock(false);
+        $superuser    = (new User())->setSuperuser(true);
+        $nonSuperuser = (new User())->setSuperuser(false);
 
         yield 'config enabled, user is news moderator' => [
-            new ValidChangeStickyStatus($newsModerator, true),
+            true,
+            true,
             $nonSuperuser,
             true,
         ];
         yield 'config enabled, user is news moderator and superuser' => [
-            new ValidChangeStickyStatus($newsModerator, true),
+            true,
+            true,
             $superuser,
             true,
         ];
         yield 'config enabled, user is not news moderator' => [
-            new ValidChangeStickyStatus($nonNewsModerator, true),
+            false,
+            true,
             $nonSuperuser,
             false,
         ];
         yield 'config enabled, user is not news moderator but is superuser' => [
-            new ValidChangeStickyStatus($nonNewsModerator, true),
+            false,
+            true,
             $superuser,
             true,
         ];
 
         yield 'config disabled, user is news moderator' => [
-            new ValidChangeStickyStatus($newsModerator, false),
+            true,
+            false,
             $nonSuperuser,
             false,
         ];
         yield 'config disabled, user is news moderator and superuser' => [
-            new ValidChangeStickyStatus($newsModerator, false),
+            true,
+            false,
             $superuser,
             false,
         ];
         yield 'config disabled, user is not news moderator' => [
-            new ValidChangeStickyStatus($nonNewsModerator, false),
+            false,
+            false,
             $nonSuperuser,
             false,
         ];
         yield 'config disabled, user is not news moderator but is superuser' => [
-            new ValidChangeStickyStatus($nonNewsModerator, false),
+            false,
+            false,
             $superuser,
             false,
         ];
