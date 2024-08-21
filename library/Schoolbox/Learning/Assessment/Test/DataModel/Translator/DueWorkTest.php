@@ -58,7 +58,7 @@ class DueWorkTest extends TestCase
             // Generic fields
             ->setId(908)
             ->setContext((new Folder())->setId(1))
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -91,7 +91,7 @@ class DueWorkTest extends TestCase
         ;
 
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -142,8 +142,8 @@ class DueWorkTest extends TestCase
             ->setContext((new Folder())->setId(1))
         ;
 
-        $dueWorkDataModel               = $this->translator->translateToDataModel($dueWorkDomainModel);
-        $retranslatedDueWorkDomainModel = $this->translator->translateToDomainModel($dueWorkDataModel);
+        $dueWorkDataModel               = self::getTranslator()->translateToDataModel($dueWorkDomainModel);
+        $retranslatedDueWorkDomainModel = self::getTranslator()->translateToDomainModel($dueWorkDataModel);
         $this->assertSame($dueWorkDomainModel, $retranslatedDueWorkDomainModel);
     }
 
@@ -154,7 +154,7 @@ class DueWorkTest extends TestCase
     public function testTranslateNullDomainModelToDataModel()
     {
         $nullDueWorkDomainModel = (new DueWork())->setId(null);
-        $nullDueWorkDataModel   = $this->translator->translateToDataModel($nullDueWorkDomainModel);
+        $nullDueWorkDataModel   = self::getTranslator()->translateToDataModel($nullDueWorkDomainModel);
         $this->assertNull($nullDueWorkDataModel->getId());
     }
 
@@ -231,7 +231,7 @@ class DueWorkTest extends TestCase
     public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, int $markTypeId, ?int $totalMark, ?int $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -299,7 +299,7 @@ class DueWorkTest extends TestCase
     public function testTranslateResponseAcceptanceToDataModel(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -355,7 +355,7 @@ class DueWorkTest extends TestCase
             ->setAcceptOnline(true)
             ->setAcceptMultiple(true)
             ->setUseRubric(false)
-            ->setOwner($this->teacher2)
+            ->setOwner(self::getTeacher2())
             ->setAttachments((new GenericCollection(SubmissionBox\SingleFile\Model::class))
                 ->add($file1)
                 ->add($file2)
@@ -365,7 +365,7 @@ class DueWorkTest extends TestCase
         ;
 
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dueWorkModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dueWorkModel);
 
         $this->assertInstanceOf(DueWork::class, $dueWork);
         $this->assertEquals(33, $dueWork->getId());
@@ -415,8 +415,8 @@ class DueWorkTest extends TestCase
                         ->setName('A dumb type'))
             );
 
-        $dueWorkDomainModel           = $this->translator->translateToDomainModel($dueWorkDataModel);
-        $retranslatedDueWorkDataModel = $this->translator->translateToDataModel($dueWorkDomainModel);
+        $dueWorkDomainModel           = self::getTranslator()->translateToDomainModel($dueWorkDataModel);
+        $retranslatedDueWorkDataModel = self::getTranslator()->translateToDataModel($dueWorkDomainModel);
         $this->assertSame($dueWorkDataModel, $retranslatedDueWorkDataModel);
     }
 
@@ -427,7 +427,7 @@ class DueWorkTest extends TestCase
     public function testTranslateNullDataModelToDomainModel()
     {
         $nullDueWorkDataModel   = (new DueWorkModel())->setId(null)->setAssessmentModel(new AssessmentModel());
-        $nullDueWorkDomainModel = $this->translator->translateToDomainModel($nullDueWorkDataModel);
+        $nullDueWorkDomainModel = self::getTranslator()->translateToDomainModel($nullDueWorkDataModel);
         $this->assertNull($nullDueWorkDomainModel->getId());
     }
 
@@ -495,7 +495,7 @@ class DueWorkTest extends TestCase
     public function testTranslateResponseAcceptanceToDomainModel(DueWorkModel $dataModel, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dataModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(DueWork::class, $dueWork);
@@ -570,7 +570,7 @@ class DueWorkTest extends TestCase
     public function testTranslateMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass, $totalMark, $gradeGroupId)
     {
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dataModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(DueWork::class, $dueWork);

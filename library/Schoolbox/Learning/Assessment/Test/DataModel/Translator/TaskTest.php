@@ -33,7 +33,7 @@ class TaskTest extends TestCase
             // Generic fields
             ->setId(32)
             ->setContext((new Folder())->setId(1))
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -49,7 +49,7 @@ class TaskTest extends TestCase
         ;
 
         /** @var TaskModel $taskModel */
-        $taskModel = $this->translator->translateToDataModel($task);
+        $taskModel = self::getTranslator()->translateToDataModel($task);
 
         // Test type
         $this->assertInstanceOf(TaskModel::class, $taskModel);
@@ -72,8 +72,8 @@ class TaskTest extends TestCase
             ->setContext((new Folder())->setId(1))
         ;
 
-        $taskDataModel               = $this->translator->translateToDataModel($taskDomainModel);
-        $retranslatedTaskDomainModel = $this->translator->translateToDomainModel($taskDataModel);
+        $taskDataModel               = self::getTranslator()->translateToDataModel($taskDomainModel);
+        $retranslatedTaskDomainModel = self::getTranslator()->translateToDomainModel($taskDataModel);
         $this->assertSame($taskDomainModel, $retranslatedTaskDomainModel);
     }
 
@@ -84,7 +84,7 @@ class TaskTest extends TestCase
     public function testTranslateNullDomainModelToDataModel()
     {
         $nullTaskDomainModel = (new Task())->setId(null);
-        $nullTaskDataModel   = $this->translator->translateToDataModel($nullTaskDomainModel);
+        $nullTaskDataModel   = self::getTranslator()->translateToDataModel($nullTaskDomainModel);
         $this->assertNull($nullTaskDataModel->getId());
     }
 
@@ -138,7 +138,7 @@ class TaskTest extends TestCase
     public function testTranslateToDomainModel(TaskModel $taskModel, $link, $selfAssessable, $creatorId)
     {
         /** @var Task $task */
-        $task = $this->translator->translateToDomainModel($taskModel);
+        $task = self::getTranslator()->translateToDomainModel($taskModel);
 
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($link, $task->getUrl());
@@ -161,8 +161,8 @@ class TaskTest extends TestCase
                     ->setId(33)
             );
 
-        $taskDomainModel           = $this->translator->translateToDomainModel($taskDataModel);
-        $retranslatedTaskDataModel = $this->translator->translateToDataModel($taskDomainModel);
+        $taskDomainModel           = self::getTranslator()->translateToDomainModel($taskDataModel);
+        $retranslatedTaskDataModel = self::getTranslator()->translateToDataModel($taskDomainModel);
         $this->assertSame($taskDataModel, $retranslatedTaskDataModel);
     }
 
@@ -173,7 +173,7 @@ class TaskTest extends TestCase
     public function testTranslateNullDataModelToDomainModel()
     {
         $nullTaskDataModel   = (new TaskModel())->setId(null)->setAssessmentModel(new AssessmentModel());
-        $nullTaskDomainModel = $this->translator->translateToDomainModel($nullTaskDataModel);
+        $nullTaskDomainModel = self::getTranslator()->translateToDomainModel($nullTaskDataModel);
         $this->assertNull($nullTaskDomainModel->getId());
     }
 }

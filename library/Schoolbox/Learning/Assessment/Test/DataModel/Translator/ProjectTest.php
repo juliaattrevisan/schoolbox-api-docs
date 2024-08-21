@@ -54,7 +54,7 @@ class ProjectTest extends TestCase
      *
      * @return Assessment\Mapper
      */
-    protected function getAssessmentMapper(): Assessment\Mapper
+    protected static function getAssessmentMapper(): Assessment\Mapper
     {
         return new class extends Assessment\Mapper
         {
@@ -75,7 +75,7 @@ class ProjectTest extends TestCase
             // Generic fields
             ->setContext((new Folder())->setId(1))
             ->setId(16)
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -104,7 +104,7 @@ class ProjectTest extends TestCase
                     ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL));
 
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project);
+        $projectModel = self::getTranslator()->translateToDataModel($project);
 
         // Test project-specific fields
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -138,8 +138,8 @@ class ProjectTest extends TestCase
             ->setContext((new Folder())->setId(1))
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
-        $projectDataModel               = $this->translator->translateToDataModel($projectDomainModel);
-        $retranslatedProjectDomainModel = $this->translator->translateToDomainModel($projectDataModel);
+        $projectDataModel               = self::getTranslator()->translateToDataModel($projectDomainModel);
+        $retranslatedProjectDomainModel = self::getTranslator()->translateToDomainModel($projectDataModel);
         $this->assertSame($projectDomainModel, $retranslatedProjectDomainModel);
     }
 
@@ -149,7 +149,7 @@ class ProjectTest extends TestCase
     public function testTranslateNullDomainModelToDataModel()
     {
         $nullProjectDomainModel = (new Project())->setId(null)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
-        $nullProjectDataModel   = $this->translator->translateToDataModel($nullProjectDomainModel);
+        $nullProjectDataModel   = self::getTranslator()->translateToDataModel($nullProjectDomainModel);
         $this->assertNull($nullProjectDataModel->getId());
     }
 
@@ -161,15 +161,15 @@ class ProjectTest extends TestCase
     public function testTranslateWithinProjectToDataModel()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->translator->setMaxProjectLevels(1);
+        self::getTranslator()->setMaxProjectLevels(1);
 
         $project = (new Project(new Average()))
             ->setContext((new Folder())->setId(1))
             ->setId(12)
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
-            ->setCreator($this->teacher1);
-        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
-        $this->translator->translateToDataModel($project);
+            ->setCreator(self::getTeacher1());
+        $project->getAssessables()->add((new Project(new Minimum()))->setCreator(self::getTeacher1())->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
+        self::getTranslator()->translateToDataModel($project);
     }
 
     /**
@@ -222,7 +222,7 @@ class ProjectTest extends TestCase
     public function testTranslateSummatorToDataModel(Project $project, $summatorType)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project);
+        $projectModel = self::getTranslator()->translateToDataModel($project);
 
         // Test type
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -283,7 +283,7 @@ class ProjectTest extends TestCase
     public function testTranslateMarkSchemeToDataModel(Project $project, int $markTypeId, ?int $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project);
+        $projectModel = self::getTranslator()->translateToDataModel($project);
 
         // Test type
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
@@ -311,13 +311,13 @@ class ProjectTest extends TestCase
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
         $subTask = (new TaskModel())
-            ->setOwner($this->teacher1)
+            ->setOwner(self::getTeacher1())
             ->setAssessmentModel((new AssessmentModel())->setId(1));
         $subQuiz = (new QuizModel())
-            ->setUser($this->teacher2)
+            ->setUser(self::getTeacher2())
             ->setAssessmentModel((new AssessmentModel())->setId(2));
         $subDueWork = (new DueWorkModel())
-            ->setOwner($this->teacher2)
+            ->setOwner(self::getTeacher2())
             ->setAssessmentModel((new AssessmentModel())->setId(3))
             ->setMarkType(self::buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
@@ -329,7 +329,7 @@ class ProjectTest extends TestCase
             ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
-        $project = $this->translator->translateToDomainModel($projectModel);
+        $project = self::getTranslator()->translateToDomainModel($projectModel);
 
         // Test project-specific fields
         $this->assertInstanceOf(Project::class, $project);
@@ -364,8 +364,8 @@ class ProjectTest extends TestCase
                     ->setId(33)
             );
 
-        $projectDomainModel           = $this->translator->translateToDomainModel($projectDataModel);
-        $retranslatedProjectDataModel = $this->translator->translateToDataModel($projectDomainModel);
+        $projectDomainModel           = self::getTranslator()->translateToDomainModel($projectDataModel);
+        $retranslatedProjectDataModel = self::getTranslator()->translateToDataModel($projectDomainModel);
         $this->assertSame($projectDataModel, $retranslatedProjectDataModel);
     }
 
@@ -375,7 +375,7 @@ class ProjectTest extends TestCase
     public function testTranslateNullDataModelToDomainModel()
     {
         $nullProjectDataModel = (new ProjectModel())->setId(null)->setAssessmentModel(new AssessmentModel())->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
-        $nullProjectDomainModel = $this->translator->translateToDomainModel($nullProjectDataModel);
+        $nullProjectDomainModel = self::getTranslator()->translateToDomainModel($nullProjectDataModel);
         $this->assertNull($nullProjectDomainModel->getId());
     }
 
@@ -402,7 +402,7 @@ class ProjectTest extends TestCase
                 ->setAssessmentModel((new AssessmentModel())->setId(1))
                 ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
 
-        $this->translator->translateToDomainModel($projectModel);
+        self::getTranslator()->translateToDomainModel($projectModel);
     }
 
     /**
@@ -460,7 +460,7 @@ class ProjectTest extends TestCase
     public function testTranslateSummatorToDomainModel(ProjectModel $dataModel, $summatorClass)
     {
         /** @var Project $project */
-        $project = $this->translator->translateToDomainModel($dataModel);
+        $project = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(Project::class, $project);
@@ -525,7 +525,7 @@ class ProjectTest extends TestCase
     public function testTranslateMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass, $gradeGroupId)
     {
         /** @var Project $project */
-        $project = $this->translator->translateToDomainModel($dataModel);
+        $project = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(Project::class, $project);
@@ -572,7 +572,7 @@ class ProjectTest extends TestCase
 
         // Project activities may have a specification, even though they're in the context of a project
         $subTask = (new TaskModel())
-            ->setOwner($this->teacher1)
+            ->setOwner(self::getTeacher1())
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(101)
@@ -584,7 +584,7 @@ class ProjectTest extends TestCase
                     )
             );
         $subQuiz = (new QuizModel())
-            ->setUser($this->teacher2)
+            ->setUser(self::getTeacher2())
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(102)
@@ -596,7 +596,7 @@ class ProjectTest extends TestCase
                     )
             );
         $subDueWork = (new DueWorkModel())
-            ->setOwner($this->teacher2)
+            ->setOwner(self::getTeacher2())
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(103)
@@ -622,7 +622,7 @@ class ProjectTest extends TestCase
                      ->add($subDueWork->getAssessmentModel()->setSubObject($subDueWork));
 
         /** @var Project $project */
-        $project = $this->translator->translateToDomainModel($projectModel);
+        $project = self::getTranslator()->translateToDomainModel($projectModel);
 
         // Test project-specific fields
         $this->assertInstanceOf(Project::class, $project);
@@ -658,7 +658,7 @@ class ProjectTest extends TestCase
             // Generic fields
             ->setContext((new UnitImplementation())->setId(1))
             ->setId(104)
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -671,7 +671,7 @@ class ProjectTest extends TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($unitSpec)
                     ->setId(4)
-                    ->setCreator($this->teacher1)
+                    ->setCreator(self::getTeacher1())
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             );
 
@@ -719,7 +719,7 @@ class ProjectTest extends TestCase
                 );
 
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($project);
+        $projectModel = self::getTranslator()->translateToDataModel($project);
 
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
@@ -755,7 +755,7 @@ class ProjectTest extends TestCase
     public function testLinearDataProjectTree(ProjectModel $projectModel, int $id, int $upExpected, int $downExpected)
     {
         /** @var Project $domainObject */
-        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $domainObject = self::getTranslator()->translateToDomainModel($projectModel);
         $this->assertEquals($id, $domainObject->getId());
 
         $up            = $down = 0;
@@ -780,7 +780,7 @@ class ProjectTest extends TestCase
      */
     public function testDataProjectTreeTouchingMaxDepth()
     {
-        $this->translator->setMaxProjectLevels(2);
+        self::getTranslator()->setMaxProjectLevels(2);
 
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
                                   ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -791,7 +791,7 @@ class ProjectTest extends TestCase
         $q1->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $q1->getAssessmentModel();
 
-        $this->assertInstanceOf(Project::class, $this->translator->translateToDomainModel($p1));
+        $this->assertInstanceOf(Project::class, self::getTranslator()->translateToDomainModel($p1));
     }
 
 
@@ -827,7 +827,7 @@ class ProjectTest extends TestCase
         $q4->getAssessmentModel()->setContextProject($p3);
 
         /** @var Project $p1DomainModel */
-        $p1DomainModel = $this->translator->translateToDomainModel($p1);
+        $p1DomainModel = self::getTranslator()->translateToDomainModel($p1);
 
         /** @var Project $p2DomainModel */
         $p2DomainModel = $p1DomainModel->getAssessables()[2];
@@ -868,7 +868,7 @@ class ProjectTest extends TestCase
         // Add a cyclic reference (p2 is within p1, put p1 within p2)
         $p1->getAssessmentModel()->setContextProject($p2);
 
-        $this->translator->translateToDomainModel($p1);
+        self::getTranslator()->translateToDomainModel($p1);
     }
 
 
@@ -880,7 +880,7 @@ class ProjectTest extends TestCase
     public function testDataProjectTreeExceedingMaxDepth()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->translator->setMaxProjectLevels(1);
+        self::getTranslator()->setMaxProjectLevels(1);
 
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -892,7 +892,7 @@ class ProjectTest extends TestCase
         $q1->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $q1->getAssessmentModel();
 
-        $this->translator->translateToDomainModel($p1);
+        self::getTranslator()->translateToDomainModel($p1);
     }
 
 
@@ -904,7 +904,7 @@ class ProjectTest extends TestCase
     public function testDataProjectTreeDisallowsBottomLevelProject()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->translator->setMaxProjectLevels(2);
+        self::getTranslator()->setMaxProjectLevels(2);
 
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class))
                                   ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -916,7 +916,7 @@ class ProjectTest extends TestCase
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
 
-        $this->translator->translateToDomainModel($p1);
+        self::getTranslator()->translateToDomainModel($p1);
     }
 
 
@@ -935,7 +935,7 @@ class ProjectTest extends TestCase
     public function testBranchedDataProjectTree(ProjectModel $projectModel, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var Project $domainObject */
-        $domainObject = $this->translator->translateToDomainModel($projectModel);
+        $domainObject = self::getTranslator()->translateToDomainModel($projectModel);
         $this->assertEquals($id, $domainObject->getId());
 
         // How far up to root are we?
@@ -966,7 +966,7 @@ class ProjectTest extends TestCase
     public function testLinearDomainProjectTree(Project $projectObject, int $id, int $upExpected, int $downExpected)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($projectObject);
+        $projectModel = self::getTranslator()->translateToDataModel($projectObject);
         $this->assertEquals($id, $projectModel->getAssessmentModel()->getId());
 
         $upActual       = $downActual = 0;
@@ -994,7 +994,7 @@ class ProjectTest extends TestCase
      */
     public function testDomainProjectTreeTouchingMaxDepth()
     {
-        $this->translator->setMaxProjectLevels(2);
+        self::getTranslator()->setMaxProjectLevels(2);
 
         $p1 = (new Project())->setId(1)
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -1003,7 +1003,7 @@ class ProjectTest extends TestCase
         $p1->getAssessables()[2] = $q2;
         $q2->setContext($p1);
 
-        $this->assertInstanceOf(ProjectModel::class, $this->translator->translateToDataModel($p1));
+        $this->assertInstanceOf(ProjectModel::class, self::getTranslator()->translateToDataModel($p1));
     }
 
 
@@ -1028,7 +1028,7 @@ class ProjectTest extends TestCase
         $p2->getAssessables()[1] = $p1;
         $p1->setContext($p2);
 
-        $this->translator->translateToDataModel($p1);
+        self::getTranslator()->translateToDataModel($p1);
     }
 
 
@@ -1040,7 +1040,7 @@ class ProjectTest extends TestCase
     public function testDomainProjectTreeExceedingMaxDepth()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->translator->setMaxProjectLevels(1);
+        self::getTranslator()->setMaxProjectLevels(1);
 
         $p1 = (new Project())->setId(1)
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -1049,7 +1049,7 @@ class ProjectTest extends TestCase
         $p1->getAssessables()[2] = $q2;
         $q2->setContext($p1);
 
-        $this->translator->translateToDataModel($p1);
+        self::getTranslator()->translateToDataModel($p1);
     }
 
 
@@ -1061,7 +1061,7 @@ class ProjectTest extends TestCase
     public function testDomainProjectTreeDisallowsBottomLevelProject()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->translator->setMaxProjectLevels(2);
+        self::getTranslator()->setMaxProjectLevels(2);
 
         $p1 = (new Project())->setId(1)
                              ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
@@ -1071,7 +1071,7 @@ class ProjectTest extends TestCase
         $p1->getAssessables()[2] = $p2;
         $p2->setContext($p1);
 
-        $this->translator->translateToDataModel($p1);
+        self::getTranslator()->translateToDataModel($p1);
     }
 
 
@@ -1103,7 +1103,7 @@ class ProjectTest extends TestCase
         $q4->setContext($p3);
 
         /** @var ProjectModel $p1DataModel */
-        $p1DataModel = $this->translator->translateToDataModel($p1);
+        $p1DataModel = self::getTranslator()->translateToDataModel($p1);
 
         /** @var ProjectModel $p2DataModel */
         $p2DataModel = $p1DataModel->getAssessments()[2]->getProject();
@@ -1140,7 +1140,7 @@ class ProjectTest extends TestCase
     public function testBranchedDomainProjectTree(Project $projectObject, int $id, int $up, int $treeSize, int $descendants)
     {
         /** @var ProjectModel $projectModel */
-        $projectModel = $this->translator->translateToDataModel($projectObject);
+        $projectModel = self::getTranslator()->translateToDataModel($projectObject);
         $this->assertEquals($id, $projectModel->getAssessmentModel()->getId());
 
         // How far up to root are we?

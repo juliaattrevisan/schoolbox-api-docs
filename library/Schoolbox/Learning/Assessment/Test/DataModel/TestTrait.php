@@ -22,61 +22,89 @@ trait TestTrait
     /**
      * @var Translator
      */
-    protected $translator;
+    protected static $translator;
 
     /**
      * @var User
      */
-    protected $teacher1;
+    protected static $teacher1;
 
     /**
      * @var User
      */
-    protected $teacher2;
+    protected static $teacher2;
 
 
     /**
      * @return Assessment\Mapper
      */
-    protected function getAssessmentMapper(): Assessment\Mapper
+    protected static function getAssessmentMapper(): Assessment\Mapper
     {
         return Assessment\Mapper::getInstance();
     }
 
     /**
-     * Set up
+     * Clear translator and teacher users between tests: otherwise, translations
+     * stored within the translator will contaminate future tests.
+     *
+     * @return void
      */
     protected function setUp(): void
     {
-        $this->translator = new Translator(
-            new MarkSchemeFactory(),
-            $this->getAssessmentMapper(),
-            10
-        );
-        $this->translator
-            ->addSubTranslator(new Translator\Task())
-            ->addSubTranslator(new Translator\DueWork())
-            ->addSubTranslator(new Translator\Quiz())
-            ->addSubTranslator(new Translator\Lti())
-            ->addSubTranslator(new Translator\Project($this->translator))
-        ;
+        self::$translator = null;
+        self::$teacher1 = null;
+        self::$teacher2 = null;
+    }
 
+    protected static function getTranslator(): Translator
+    {
+        if (!isset(self::$translator)) {
+            self::$translator = new Translator(
+                new MarkSchemeFactory(),
+                self::getAssessmentMapper(),
+                10
+            );
+            self::$translator
+                ->addSubTranslator(new Translator\Task())
+                ->addSubTranslator(new Translator\DueWork())
+                ->addSubTranslator(new Translator\Quiz())
+                ->addSubTranslator(new Translator\Lti())
+                ->addSubTranslator(new Translator\Project(self::$translator))
+            ;
+        }
+        return self::$translator;
+    }
+
+    /**
+     * @return User
+     */
+    protected static function getTeacher1(): User
+    {
         // Test users
-        $this->teacher1 = (new User())
+        self::$teacher1 ??= (new User())
             ->setId(3)
             ->setExternalId(8)
             ->setTitle('Ms')
             ->setFirstname('Celia')
             ->setLastname('Glenn')
         ;
+        return self::$teacher1;
+    }
 
-        $this->teacher2 = (new User())
+    /**
+     * @return User
+     */
+    protected static function getTeacher2(): User
+    {
+        // Test users
+        self::$teacher2 ??= (new User())
             ->setId(151)
             ->setExternalId(165)
             ->setTitle('Mr')
             ->setFirstname('Zane')
             ->setLastname('Smith')
         ;
+        return self::$teacher2;
     }
 
     /**

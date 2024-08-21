@@ -45,7 +45,7 @@ class TranslatorTest extends TestCase
             ->setId(32)
             ->setSequence(3)
             ->setContext((new Folder())->setId(1))
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(null)
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -57,7 +57,7 @@ class TranslatorTest extends TestCase
             ->setDescription('Blaargh ничего')
             ->setWeight(1000);
 
-        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
+        $assessmentModel = self::getTranslator()->translateToDataModel($assessment)->getAssessmentModel();
 
         $this->assertEquals(32, $assessmentModel->getId());
         $this->assertEquals(3, $assessmentModel->getSequence());
@@ -98,7 +98,7 @@ class TranslatorTest extends TestCase
             );
 
         /** @var IAssessable $assessment */
-        $assessment = $this->translator->translateToDomainModel($dataModel);
+        $assessment = self::getTranslator()->translateToDomainModel($dataModel);
 
         $this->assertEquals(401, $assessment->getId());
         $this->assertEquals('Some assessment\'s title', $assessment->getTitle());
@@ -122,7 +122,7 @@ class TranslatorTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
         $dataModel = (new TaskModel())->setId(15);
-        $this->translator->translateToDomainModel($dataModel);
+        self::getTranslator()->translateToDomainModel($dataModel);
     }
 
     /**
@@ -130,14 +130,14 @@ class TranslatorTest extends TestCase
      *
      * @return array
      */
-    public function getTranslateAssessmentContextToDataModelData()
+    public static function getTranslateAssessmentContextToDataModelData()
     {
         return [
             [
                 (new Task())
                     ->setContext((new Folder())->setId(1))
                     ->setId(1)
-                    ->setCreator($this->teacher1),
+                    ->setCreator(self::getTeacher1()),
                 Folder::class,
                 1
             ],
@@ -145,7 +145,7 @@ class TranslatorTest extends TestCase
                 (new Task())
                     ->setContext((new UnitSpecification())->setId(3))
                     ->setId(1)
-                    ->setCreator($this->teacher1),
+                    ->setCreator(self::getTeacher1()),
                 UnitSpecification::class,
                 3
             ],
@@ -153,7 +153,7 @@ class TranslatorTest extends TestCase
                 (new Task())
                     ->setContext((new UnitImplementation())->setId(6))
                     ->setId(1)
-                    ->setCreator($this->teacher1),
+                    ->setCreator(self::getTeacher1()),
                 UnitImplementation::class,
                 6
             ],
@@ -171,7 +171,7 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateAssessmentContextToDataModelData')]
     public function testTranslateAssessmentContextToDataModel(IAssessable $assessment, $contextClass, $contextId)
     {
-        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
+        $assessmentModel = self::getTranslator()->translateToDataModel($assessment)->getAssessmentModel();
         $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
         $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
     }
@@ -232,7 +232,7 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getTranslateAssessmentContextToDomainModelData')]
     public function testTranslateAssessmentContextToDomainModel(IAssessableDataModel $assessmentModel, $contextClass, $contextId)
     {
-        $assessmentModel = $this->translator->translateToDomainModel($assessmentModel);
+        $assessmentModel = self::getTranslator()->translateToDomainModel($assessmentModel);
         $this->assertInstanceOf($contextClass, $assessmentModel->getContext());
         $this->assertEquals($contextId, $assessmentModel->getContext()->getId());
     }
@@ -359,7 +359,7 @@ class TranslatorTest extends TestCase
         $specificationContextClass,
         $specificationContextId
     ) {
-        $assessment = $this->translator->translateToDomainModel($assessmentModel);
+        $assessment = self::getTranslator()->translateToDomainModel($assessmentModel);
 
         // Assert assessment
         $this->assertInstanceOf($class, $assessment);
@@ -385,12 +385,12 @@ class TranslatorTest extends TestCase
                 (new Task())
                     ->setId(300)
                     ->setContext((new UnitImplementation())->setId(12345))
-                    ->setCreator($this->teacher1)
+                    ->setCreator(self::getTeacher1())
                     ->setSpecificationAssessment(
                         (new Task())
                             ->setId(200)
                             ->setContext((new UnitSpecification())->setId(54321))
-                            ->setCreator($this->teacher1)
+                            ->setCreator(self::getTeacher1())
                     ),
                 300,
                 TaskModel::class,
@@ -404,12 +404,12 @@ class TranslatorTest extends TestCase
                 (new Task())
                     ->setId(33)
                     ->setContext((new UnitImplementation())->setId(12345))
-                    ->setCreator($this->teacher1)
+                    ->setCreator(self::getTeacher1())
                     ->setSpecificationAssessment(
                         (new Quiz())
                             ->setId(22)
                             ->setContext((new UnitSpecification())->setId(6666))
-                            ->setCreator($this->teacher1)
+                            ->setCreator(self::getTeacher1())
                     ),
                 33,
                 QuizModel::class,
@@ -423,12 +423,12 @@ class TranslatorTest extends TestCase
                 (new Task())
                     ->setId(301)
                     ->setContext((new Folder())->setId(12345))
-                    ->setCreator($this->teacher1)
+                    ->setCreator(self::getTeacher1())
                     ->setSpecificationAssessment(
                         (new Task())
                             ->setId(201)
                             ->setContext((new Folder())->setId(54321))
-                            ->setCreator($this->teacher1)
+                            ->setCreator(self::getTeacher1())
                     ),
                 301,
                 TaskModel::class,
@@ -459,7 +459,7 @@ class TranslatorTest extends TestCase
         $specificationContextClass,
         $specificationContextId
     ) {
-        $assessmentModel = $this->translator->translateToDataModel($assessment)->getAssessmentModel();
+        $assessmentModel = self::getTranslator()->translateToDataModel($assessment)->getAssessmentModel();
 
         // Assert assessment
         $this->assertInstanceOf(AssessmentModel::class, $assessmentModel);
@@ -486,8 +486,8 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDomainObjects')]
     public function testInstanceUniquenessPreservationDomain(IAssessable $domainObject)
     {
-        $dataModel1 = $this->translator->translateToDataModel($domainObject);
-        $dataModel2 = $this->translator->translateToDataModel($domainObject);
+        $dataModel1 = self::getTranslator()->translateToDataModel($domainObject);
+        $dataModel2 = self::getTranslator()->translateToDataModel($domainObject);
         $this->assertSame($dataModel1, $dataModel2);
     }
 
@@ -501,8 +501,8 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDataModels')]
     public function testInstanceUniquenessPreservationData(IAssessableDataModel $dataModel)
     {
-        $domainObject1 = $this->translator->translateToDomainModel($dataModel);
-        $domainObject2 = $this->translator->translateToDomainModel($dataModel);
+        $domainObject1 = self::getTranslator()->translateToDomainModel($dataModel);
+        $domainObject2 = self::getTranslator()->translateToDomainModel($dataModel);
         $this->assertSame($domainObject1, $domainObject2);
     }
 
@@ -516,8 +516,8 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDomainObjects')]
     public function testInstanceIdentityDomainToDataToDomain(IAssessable $domainObject)
     {
-        $dataModel       = $this->translator->translateToDataModel($domainObject);
-        $twiceTranslated = $this->translator->translateToDomainModel($dataModel);
+        $dataModel       = self::getTranslator()->translateToDataModel($domainObject);
+        $twiceTranslated = self::getTranslator()->translateToDomainModel($dataModel);
 
         $this->assertSame($domainObject, $twiceTranslated);
     }
@@ -532,8 +532,8 @@ class TranslatorTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDataModels')]
     public function testInstanceIdentityDomainToDataToData(IAssessableDataModel $dataModel)
     {
-        $domainObject    = $this->translator->translateToDomainModel($dataModel);
-        $twiceTranslated = $this->translator->translateToDataModel($domainObject);
+        $domainObject    = self::getTranslator()->translateToDomainModel($dataModel);
+        $twiceTranslated = self::getTranslator()->translateToDataModel($domainObject);
 
         $this->assertSame($dataModel, $twiceTranslated);
     }
@@ -553,12 +553,12 @@ class TranslatorTest extends TestCase
 
         // Set title to original and test
         $domainObject->setTitle($titleOriginal);
-        $dataModel       = $this->translator->translateToDataModel($domainObject);
+        $dataModel       = self::getTranslator()->translateToDataModel($domainObject);
         $this->assertEquals($titleOriginal, $dataModel->getAssessmentModel()->getTitle());
 
         // Update title, re-translate, and re-test
         $domainObject->setTitle($titleUpdated);
-        $dataModel       = $this->translator->translateToDataModel($domainObject);
+        $dataModel       = self::getTranslator()->translateToDataModel($domainObject);
         $this->assertEquals($titleUpdated, $dataModel->getAssessmentModel()->getTitle());
     }
 
@@ -577,12 +577,12 @@ class TranslatorTest extends TestCase
 
         // Set title to original and test
         $dataModel->getAssessmentModel()->setTitle($titleOriginal);
-        $domainObject       = $this->translator->translateToDomainModel($dataModel);
+        $domainObject       = self::getTranslator()->translateToDomainModel($dataModel);
         $this->assertEquals($titleOriginal, $domainObject->getTitle());
 
         // Update title, re-translate, and re-test
         $dataModel->getAssessmentModel()->setTitle($titleUpdated);
-        $domainObject       = $this->translator->translateToDomainModel($dataModel);
+        $domainObject       = self::getTranslator()->translateToDomainModel($dataModel);
         $this->assertEquals($titleUpdated, $domainObject->getTitle());
     }
 
@@ -603,12 +603,12 @@ class TranslatorTest extends TestCase
         $projectObject = (new Project())->setCreator($userMapper->createModel($ownerOriginal))
                                         ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         /** @var ProjectModel $projectModel */
-        $projectModel       = $this->translator->translateToDataModel($projectObject);
+        $projectModel       = self::getTranslator()->translateToDataModel($projectObject);
         $this->assertEquals($ownerOriginal, $projectModel->getOwner()->getId());
 
         // Update owner, re-translate, and re-test
         $projectObject->getCreator()->setId($ownerUpdated);
-        $projectModel       = $this->translator->translateToDataModel($projectObject);
+        $projectModel       = self::getTranslator()->translateToDataModel($projectObject);
         $this->assertEquals($ownerUpdated, $projectModel->getOwner()->getId());
     }
 
