@@ -19,7 +19,6 @@ use Schoolbox\External\Normalise\TupleStack;
  */
 class TupleStackTest extends TestCase
 {
-
     /**
      *
      * @param array $stack

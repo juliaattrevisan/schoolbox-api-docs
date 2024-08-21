@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class HumanReadableTest extends TestCase
 {
-
     /**
      * The second arg is returned as a closure so the ADF can be instantiated immediately prior to comparison
      *

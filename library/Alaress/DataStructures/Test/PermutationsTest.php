@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\DataStructures\Permutations::class)]
 class PermutationsTest extends TestCase
 {
-
     /**
      * Test we generate the expected number of permutations
      *

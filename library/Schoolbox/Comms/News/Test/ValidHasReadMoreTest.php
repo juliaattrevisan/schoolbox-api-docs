@@ -21,7 +21,6 @@ use Schoolbox\Comms\News\ValidHasReadMore;
  */
 class ValidHasReadMoreTest extends TestCase
 {
-
     /**
      * @param Model  $article
      * @param string $readMore

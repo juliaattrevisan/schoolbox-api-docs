@@ -14,7 +14,6 @@ use React\EventLoop\TimerInterface;
 
 abstract class AbstractTransaction implements ITransaction
 {
-
     /** @var LoopInterface */
     private $loop;
 

@@ -25,7 +25,6 @@ use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
  */
 class ValidEventPhotosAvailableTest extends TestCase
 {
-
     /**
      * @param null|string $apiKey
      * @param bool        $featureFlag

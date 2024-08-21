@@ -19,7 +19,6 @@ use stdClass;
 
 class Client
 {
-
     /** @var Predis\Async\Client */
     private $client;
 

@@ -53,7 +53,7 @@ class ColorTest extends TestCase
         );
     }
 
-    
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorFailureData')]
     public function testAssertColorFailure($value)
     {
@@ -87,7 +87,7 @@ class ColorTest extends TestCase
         );
     }
 
-    
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaFailureData')]
     public function testAssertAlphaFailure($value)
     {

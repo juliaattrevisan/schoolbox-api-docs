@@ -15,7 +15,6 @@ use Schoolbox\Column\Base;
 
 class BaseTest extends TestCase
 {
-
     /**
      * @var Base
      */

@@ -18,7 +18,6 @@ use InvalidArgumentException;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\MarkScheme\LetterGrade::class)]
 class LetterGradeTest extends TestCase
 {
-
     public function testUnknownCaption()
     {
         $this->expectException(InvalidArgumentException::class);

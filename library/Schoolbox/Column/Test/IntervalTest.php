@@ -16,7 +16,6 @@ use Alaress\Date\Interval as IntervalObject;
 
 class IntervalTest extends TestCase
 {
-
     /**
      * @var Interval
      */

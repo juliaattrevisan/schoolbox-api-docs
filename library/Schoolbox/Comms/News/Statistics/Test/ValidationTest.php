@@ -15,7 +15,6 @@ use Schoolbox\Comms\News\Statistics;
 
 class ValidationTest extends TestCase
 {
-
     /**
      * @param null|string $referrer
      * @param bool        $expected

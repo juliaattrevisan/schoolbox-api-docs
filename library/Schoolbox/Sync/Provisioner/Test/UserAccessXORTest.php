@@ -20,7 +20,6 @@ use Schoolbox\Sync\Provisioner\UserAccessXOR;
 
 class UserAccessXORTest extends TestCase
 {
-
     /**
      * $array1 and $array2 contain the same set of tuples
      *

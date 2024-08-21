@@ -22,7 +22,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\EmployeeExternalId;
  */
 class EmployeeExternalIdTest extends TestCase
 {
-
     /**
      * Data provider for testValidEncodeDecode
      *

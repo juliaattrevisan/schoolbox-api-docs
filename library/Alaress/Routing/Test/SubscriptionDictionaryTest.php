@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionDictionaryTest extends TestCase
 {
-
     /**
      * @return array
      */

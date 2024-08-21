@@ -28,7 +28,6 @@ use Schoolbox\User;
 
 class TestSpecificationFramework extends TestCase
 {
-
     /**
      * @param ISpecification $candidate
      * @throws \PHPUnit\Framework\AssertionFailedError

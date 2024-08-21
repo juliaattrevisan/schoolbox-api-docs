@@ -17,7 +17,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
 #[\PHPUnit\Framework\Attributes\CoversClass(\External\Tass\Api\TokenCodec::class)]
 class TokenCodecTest extends TestCase
 {
-
     // ======================= Tests =========================== //
     /**
      * @param string $invalidApiKey

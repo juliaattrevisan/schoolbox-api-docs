@@ -16,7 +16,6 @@ use Schoolbox\Sync\Iterator\Guardian as GuardianIterator;
 
 class SyncTest extends TestCase
 {
-
     /**
      * @param Iterator $iterator
      * @param int[]    $ids

@@ -3163,5 +3163,4 @@ class AssessableTest extends TestCase
         self::$linker ??= new ParticipantLinker();
         return self::$linker;
     }
-
 }

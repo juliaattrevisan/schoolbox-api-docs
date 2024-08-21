@@ -16,7 +16,6 @@ use Schoolbox\Mapper as Mapper;
 
 class FactoryTest extends BaseTestCase
 {
-
     /**
      * @var Factory
      */

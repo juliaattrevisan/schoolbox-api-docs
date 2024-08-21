@@ -23,7 +23,6 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec\DSN;
  */
 class DSNTest extends TestCase
 {
-
     /**
      * Data provider for testValidDSNDecode
      *

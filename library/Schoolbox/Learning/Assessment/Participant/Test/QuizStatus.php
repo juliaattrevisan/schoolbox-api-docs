@@ -24,7 +24,6 @@ use Schoolbox\Learning\Assessment\Participant;
  */
 class QuizStatus extends TestCase
 {
-
     /**
      * @param Participant $participant
      * @param bool        $isResponseRequired

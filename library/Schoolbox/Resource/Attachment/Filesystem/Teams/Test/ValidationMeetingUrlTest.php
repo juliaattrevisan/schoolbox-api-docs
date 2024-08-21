@@ -26,7 +26,6 @@ use Schoolbox\Resource\Attachment\Filesystem\Teams\ValidTeamsMeetingUrl;
  */
 class ValidationMeetingUrlTest extends TestCase
 {
-
     /**
      * @param mixed $input
      * @param int   $expected

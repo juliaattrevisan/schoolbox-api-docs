@@ -15,7 +15,6 @@ use Schoolbox\Test\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-
     /**
      * @var IColumnType
      */

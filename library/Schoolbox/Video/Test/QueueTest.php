@@ -17,7 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 class QueueTest extends TestCase
 {
-
     /**
      * Tests the thumbnail cover function to ensure that the video is resized to at least 64 on one of the aspects
      *

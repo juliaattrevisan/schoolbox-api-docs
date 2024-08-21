@@ -22,7 +22,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\DSN;
  */
 class DSNTest extends TestCase
 {
-
     /**
      * Data provider for testValidDSNDecode
      *

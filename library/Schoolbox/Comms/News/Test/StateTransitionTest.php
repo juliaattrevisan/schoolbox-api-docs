@@ -24,7 +24,6 @@ use PHPUnit\Framework\AssertionFailedError;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\Model::class)]
 class StateTransitionTest extends TestCase
 {
-
     /**
      * Test we can transition an article through valid transitions
      *

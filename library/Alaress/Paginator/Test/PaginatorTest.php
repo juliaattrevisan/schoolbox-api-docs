@@ -16,7 +16,6 @@ use OutOfRangeException;
 
 class PaginatorTest extends TestCase
 {
-
     /**
      * Simple factory for a test Paginator object.
      *

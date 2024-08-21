@@ -22,7 +22,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code as CodeCodec;
  */
 class CodeTest extends TestCase
 {
-
     /**
      * Data provider for testValidCodeEncode
      *

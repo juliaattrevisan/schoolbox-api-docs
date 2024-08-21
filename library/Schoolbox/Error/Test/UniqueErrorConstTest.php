@@ -16,7 +16,6 @@ use Schoolbox\Error;
 
 class UniqueErrorConstTest extends TestCase
 {
-
     /**
      * Ensure that all errorId constant values are unique
      *

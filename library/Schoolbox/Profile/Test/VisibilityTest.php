@@ -22,7 +22,6 @@ use External_UserInterface;
  */
 class VisibilityTest extends TestCase
 {
-
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -798,7 +797,6 @@ class VisibilityTest extends TestCase
     {
         return new Class () implements IConfigLoader
         {
-
             /** @var bool */
             private $reportStaffAccess;
             /** @var bool */

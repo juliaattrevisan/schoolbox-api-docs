@@ -19,7 +19,6 @@ use stdClass;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\DataStructures\ObjectTree::class)]
 class ObjectTreeTest extends Framework\TestCase
 {
-
     /**
      * Tests basic build of a linear tree
      *

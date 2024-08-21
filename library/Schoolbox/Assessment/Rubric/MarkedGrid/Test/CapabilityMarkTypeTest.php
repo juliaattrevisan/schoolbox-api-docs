@@ -35,7 +35,6 @@ use Schoolbox\Learning\MarkScheme\Factory;
  */
 class CapabilityMarkTypeTest extends TestCase
 {
-
     /**
      * @param MarkType                    $dueWorkMarkType
      * @param MarkType                    $capabilityMarkType

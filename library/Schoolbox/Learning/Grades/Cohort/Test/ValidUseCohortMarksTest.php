@@ -25,7 +25,6 @@ use Schoolbox\YearLevel;
  */
 class ValidUseCohortMarksTest extends TestCase
 {
-
     /**
      * Test valid enabling of LMS Cohort Comparison
      *

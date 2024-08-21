@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
 
 class UserRulesetTest extends TestCase
 {
-
     /** @var Sync\Grammar\UserRuleset */
     protected $ruleset;
 

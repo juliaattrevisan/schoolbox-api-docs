@@ -24,7 +24,6 @@ use Scrub;
  */
 class FilterCodecTest extends TestCase
 {
-
     /**
      * @param string|null $input
      * @param string $expected

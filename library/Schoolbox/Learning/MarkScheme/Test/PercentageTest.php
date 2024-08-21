@@ -16,7 +16,6 @@ use RangeException;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\MarkScheme\Percentage::class)]
 class PercentageTest extends TestCase
 {
-
     /**
      * @param float  $normalised
      * @param string $expected

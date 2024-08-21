@@ -24,7 +24,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 
 class Module extends \Alaress\Module\Module
 {
-
     protected $basename = 'courseMarkbook';
 
 

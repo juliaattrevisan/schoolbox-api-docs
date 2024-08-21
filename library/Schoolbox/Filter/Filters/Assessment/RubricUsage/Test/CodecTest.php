@@ -22,7 +22,6 @@ use UnexpectedValueException;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec::class)]
 class CodecTest extends TestCase
 {
-
     /** @var Codec */
     private static $codec;
 

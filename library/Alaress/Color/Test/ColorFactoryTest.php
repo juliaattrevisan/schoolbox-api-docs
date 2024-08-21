@@ -110,7 +110,7 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidFormatData')]
     public function testInvalidFormat($colorString)
     {

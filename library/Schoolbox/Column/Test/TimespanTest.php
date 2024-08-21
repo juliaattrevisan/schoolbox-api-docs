@@ -15,7 +15,6 @@ use DateInterval;
 
 class TimespanTest extends TestCase
 {
-
     /**
      * @var Timespan
      */

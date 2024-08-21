@@ -26,7 +26,6 @@ use Schoolbox\Role;
  */
 class ValidStudentPhotosAvailableTest extends TestCase
 {
-
     /**
      * @param null|string $apiKey
      * @param bool $featureFlag

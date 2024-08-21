@@ -14,7 +14,6 @@ use Schoolbox\Column\Integer as IntegerColumn;
 
 class IntegerTest extends TestCase
 {
-
     /**
      * @var IntegerColumn
      */

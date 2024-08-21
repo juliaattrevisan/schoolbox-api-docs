@@ -14,7 +14,6 @@ use Schoolbox\Column\Decimal;
 
 class DecimalTest extends TestCase
 {
-
     /**
      * @var Decimal
      */

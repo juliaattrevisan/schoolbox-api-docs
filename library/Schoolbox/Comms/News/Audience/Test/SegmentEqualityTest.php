@@ -24,7 +24,6 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\Audience\Model::class)]
 class SegmentEqualityTest extends TestCase
 {
-
     // ============================ Tests ============================
 
     /**

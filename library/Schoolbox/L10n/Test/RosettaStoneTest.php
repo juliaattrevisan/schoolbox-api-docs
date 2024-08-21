@@ -131,7 +131,7 @@ class RosettaStoneTest extends TestCase
         $this->assertEquals($expected, $this->stone->translate($term, $plural, $capital));
     }
 
-    
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateUnknownTermData')]
     public function testTranslateUnknownTerm($term)
     {
@@ -145,7 +145,7 @@ class RosettaStoneTest extends TestCase
         $this->assertEquals($expected, $this->stone->indefiniteArticle($term, $plural));
     }
 
-    
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateUnknownTermData')]
     public function testTranslateIndefiniteArticleUnknownTerm($term)
     {

@@ -16,7 +16,6 @@ use Schoolbox\Column\Binary;
 
 class BinaryTest extends TestCase
 {
-
     /**
      * @var Binary
      */

@@ -35,7 +35,6 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
  */
 class FirstMeaningfulValueTest extends TestCase
 {
-
     /**
      * @param array  $input
      * @param string $expected

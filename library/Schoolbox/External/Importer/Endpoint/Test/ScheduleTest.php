@@ -24,7 +24,6 @@ use SebastianBergmann\RecursionContext;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\External\Importer\Endpoint\ValidScheduleExecution::class)]
 class ScheduleTest extends TestCase
 {
-
     /**
      *
      * @param string $frequency

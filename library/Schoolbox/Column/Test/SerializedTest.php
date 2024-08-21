@@ -14,7 +14,6 @@ use Schoolbox\Column\Serialized;
 
 class SerializedTest extends TestCase
 {
-
     /**
      * @var Serialized
      */

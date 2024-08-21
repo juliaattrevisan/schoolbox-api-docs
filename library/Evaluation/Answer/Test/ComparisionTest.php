@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class ComparisionTest extends TestCase
 {
-
     /**
      * @param string $a
      * @param string $b
