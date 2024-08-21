@@ -76,11 +76,9 @@ class ValidationTest extends TestCase
         $mockConfig
             ->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnValueMap([
-                    ['schooldata_import_data_source', \Schoolbox\External\Importer\Endpoint\Factory::TASS_API,],
-                ])
-            );
+            ->willReturnMap([
+                ['schooldata_import_data_source', \Schoolbox\External\Importer\Endpoint\Factory::TASS_API,],
+            ]);
 
         // Stub external timetable, don't allow it to use it ist own constractor
         $externalTimetable = $this->getMockBuilder(External_Timetable::Class)
