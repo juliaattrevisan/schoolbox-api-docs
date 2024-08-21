@@ -14,6 +14,7 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use BadMethodCallException;
+use Closure;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -63,19 +64,23 @@ class MockConnector implements IConnector
 
     /**
      * Resets this item's mock statement.
+     * @noinspection PhpUndefinedMethodInspection: `$testCaseGetMockBuilder`
+     *               callable is bound to `$this->testCase`, not `$this`
      */
     public function resetStatement(): void
     {
-        $this->mockStatement = $this->testCase->getMockBuilder(PDOStatement::class)->getMock();
+        // getMockBuilder is protected and final: how does that make sense!?
+        // Fake it with Closure::bind
+        $testCaseGetMockBuilder = Closure::bind(
+            (fn($class) => $this->getMockBuilder($class))(...),
+            $this->testCase,
+            $this->testCase,
+        );
 
-        // Under 8.0 the query string is a read-only parameter, and _cannot_ be
-        // initialized: however, the place which reads it assumes it's null.
-        // Under 8.2 it doesn't seem to be read-only, but it can and _must_ be
-        // initialized before it is read.
-        // TODO remove when 8.2 is the only version for which CI jobs run
-        if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
-            $this->mockStatement->queryString = '';
-        }
+        $this->mockStatement = $testCaseGetMockBuilder(PDOStatement::class)->getMock();
+
+        // The query string must be initialized before it is read
+        $this->mockStatement->queryString = '';
     }
 
     /**
@@ -116,34 +121,41 @@ class MockConnector implements IConnector
      * Internal method for setting a result set.
      *
      * @param array $result
+     * @noinspection PhpUndefinedMethodInspection: `$testCaseAny` callable is
+     *               bound to `$this->testCase`, not `$this`
      */
     private function setResultSet(array $result): void
     {
         $this->resultSet = $result;
         reset($this->resultSet);
 
+        $testCaseAny = Closure::bind(
+            (fn() => $this->any())(...),
+            $this->testCase,
+            $this->testCase,
+        );
         $this->mockStatement
-            ->expects($this->testCase->any())
+            ->expects($testCaseAny())
             ->method('fetchAll')
-            ->will($this->testCase->returnValue($this->resultSet));
+            ->willReturn($this->resultSet);
 
         $this->mockStatement
-            ->expects($this->testCase->any())
+            ->expects($testCaseAny())
             ->method('fetch')
-            ->will(
-                $this->testCase->returnCallback(function () {
+            ->willReturnCallback(
+                function () {
                     if ($val = current($this->resultSet)) {
                         next($this->resultSet);
                         return $val;
                     }
                     return null;
-                })
+                }
             );
 
         $this->mockStatement
-            ->expects($this->testCase->any())
+            ->expects($testCaseAny())
             ->method('execute')
-            ->will($this->testCase->returnValue(true));
+            ->willReturn(true);
     }
 
     /**
