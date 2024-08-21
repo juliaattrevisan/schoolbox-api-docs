@@ -262,23 +262,46 @@ class Importer
 
         /* Check that the first node is <quiz>
          */
+        if (0 === \count($xml->xpath('//quiz'))) {
+            return false;
+        }
 
         /* Check that the <availability>assess</availability> node exists
          */
+        if (0 === \count($xml->xpath('//quiz/availability[text()="assess"]'))) {
+            return false;
+        }
 
         /* Look for the existence of publish, open, due, close dates
          */
+        if (0 === \count($xml->xpath('//quiz/publishdate'))) {
+            return false;
+        }
+
+        if (0 === \count($xml->xpath('//quiz/opendate'))) {
+            return false;
+        }
+
+        if (0 === \count($xml->xpath('//quiz/duedate'))) {
+            return false;
+        }
+
+        if (0 === \count($xml->xpath('//quiz/closedate'))) {
+            return false;
+        }
 
         /* Look for Mark Visibility
          */
+        if (0 === \count($xml->xpath('//quiz/markvisibility'))) {
+            return false;
+        }
 
-
-        new \Alaress_Probe($xml->current());
+        new \Alaress_Probe($xml->xpath('//quiz/markvisibility'));
 
 //        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
 //            throw new \DomainException('xml file did not contain a legacy quiz');
 //        }
-
+        die();
         return false;
     }
 
