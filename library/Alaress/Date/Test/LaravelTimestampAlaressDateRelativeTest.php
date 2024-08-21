@@ -15,7 +15,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 12:12:00'));
         $expected = '10 seconds before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 12:12:10'));
 
         $this->assertEquals($expected, $result);
@@ -26,7 +26,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 12:12:01'));
         $expected = '54 seconds before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 12:12:55'));
 
         $this->assertEquals($expected, $result);
@@ -37,7 +37,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 12:12:01'));
         $expected = '1 minute before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 12:13:01'));
 
         $this->assertEquals($expected, $result);
@@ -48,7 +48,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 12:12:01'));
         $expected = '2 minutes before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 12:14:01'));
 
         $this->assertEquals($expected, $result);
@@ -59,7 +59,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 13:12:01'));
         $expected = '1 hour before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 14:12:01'));
 
         $this->assertEquals($expected, $result);
@@ -70,7 +70,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-31 13:12:01'));
         $expected = '5 hours before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 18:12:01'));
 
         $this->assertEquals($expected, $result);
@@ -82,7 +82,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-30 13:12:01'));
         $expected = 'Yesterday';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 13:12:01'));
 
         $this->assertEquals($expected, $result);
@@ -93,7 +93,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-26 13:12:01'));
         $expected = '5 days before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 13:12:01'));
 
         $this->assertEquals($expected, $result);
@@ -104,7 +104,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2011-08-08 05:00:14'));
         $expected = '3 weeks before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 17:40:11'));
 
         $this->assertEquals($expected, $result);
@@ -120,7 +120,7 @@ class LaravelTimestampAlaressDateRelativeTest extends TestCase
         $input = date('U', strtotime('2001-01-03 02:02:12'));
         $expected = '10 years before';
 
-        $relativeDate = $this->buildDateObject($input, 'U');
+        $relativeDate = self::buildDateObject($input, 'U');
         $result = $relativeDate->getRelativeTime(new DateTime('2011-08-31 17:40:11'));
 
         $this->assertEquals($expected, $result);

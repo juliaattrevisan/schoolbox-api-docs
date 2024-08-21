@@ -25,7 +25,7 @@ trait MockDateObject
      *
      * @return Alaress_Date_Format
      */
-    protected function buildDateObject(
+    protected static function buildDateObject(
         $dateTime = null,
         $dateFormat = null,
         DateTimeZone $timezone = null,

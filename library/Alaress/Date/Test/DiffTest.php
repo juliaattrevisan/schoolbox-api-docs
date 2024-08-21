@@ -24,14 +24,14 @@ class DiffTest extends TestCase
         return [
             [
                 // 1 day - 1 second: 86399
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 86399,
             ],
             [
                 // 1 day - 86400
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 86400,
             ],
         ];
@@ -55,14 +55,14 @@ class DiffTest extends TestCase
         return [
             [
                 // 1 day - 1 second: 1439
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 1439,
             ],
             [
                 // 1 day - 24
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 1440,
             ],
         ];
@@ -86,14 +86,14 @@ class DiffTest extends TestCase
         return [
             [
                 // 1 day - 1 second: 23
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 23,
             ],
             [
                 // 1 day - 24
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 24,
             ],
         ];
@@ -117,24 +117,24 @@ class DiffTest extends TestCase
         return [
             [
                 // 1 day - 1 second: 0
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
                 // 1 day
-                $this->buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 1,
             ],
             //            [
             //                // Different timezones, how do you handle that?
-            //                $this->buildDateObject(
+            //                self::buildDateObject(
             //                    '2015-03-25 12:34:56',
             //                    Alaress_Date_Format::DATABASE_FORMAT,
             //                    new DateTimeZone('UTC')
             //                ),
-            //                $this->buildDateObject(
+            //                self::buildDateObject(
             //                    '2015-03-25 12:34:56',
             //                    Alaress_Date_Format::DATABASE_FORMAT,
             //                    new DateTimeZone('Australia/Queensland')
@@ -163,14 +163,14 @@ class DiffTest extends TestCase
             [
                 // 7 days - 1 second: 5 weekdays, apparently
                 // I think it should be 4 but whatever.
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 5,
             ],
             [
                 // 7 days: 5 weekdays
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 5,
             ],
         ];
@@ -196,14 +196,14 @@ class DiffTest extends TestCase
                 // 7 days - 1 second: 2 weekend days, apparently
                 // I think it should be 1 because this doesn't span 2 whole weekend days,
                 // but whatever.
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 2,
             ],
             [
                 // 7 days: 2 weekend days
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 2,
             ],
         ];
@@ -227,14 +227,14 @@ class DiffTest extends TestCase
         return [
             [
                 // 7 days - 1 second: 0 weeks
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-29 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
                 // 7 days: 1 week
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-30 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 1,
             ],
         ];
@@ -259,12 +259,12 @@ class DiffTest extends TestCase
             [
                 // 1 month - 1 second: 1 month, apparently
                 // I think it should be 0 but i'm just testing the passthru
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-22 12:34:56',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
                 ),
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-04-22 12:34:55',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
@@ -273,12 +273,12 @@ class DiffTest extends TestCase
             ],
             [
                 // 1 month
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-23 12:34:56',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
                 ),
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-04-23 12:34:56',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
@@ -307,14 +307,14 @@ class DiffTest extends TestCase
             [
                 // 1 year - 1 second: 0 years
                 // I think this is right but inconsistent with getDiffInMonths, but w/e
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2016-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2016-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
                 // 1 year
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2016-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2016-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 1,
             ],
         ];
@@ -337,23 +337,23 @@ class DiffTest extends TestCase
     {
         return [
             [
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 -1,
             ],
             [
                 // Date 2's date is greater, but date 1 is greater because of timezone.
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-21 23:59:59',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
                 ),
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-22 00:00:00',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('Australia/Queensland')
@@ -380,24 +380,24 @@ class DiffTest extends TestCase
     {
         return [
             [
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-23 12:34:52', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:52', Alaress_Date_Format::DATABASE_FORMAT),
                 -1,
             ],
             [
                 // Date 2's date is greater, but date 1 is greater because of timezone.
                 // compareDateOnly ignores timezone completely, so date 1 < date 2.
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-21 23:59:59',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('UTC')
                 ),
-                $this->buildDateObject(
+                self::buildDateObject(
                     '2015-03-22 00:00:00',
                     Alaress_Date_Format::DATABASE_FORMAT,
                     new DateTimeZone('Australia/Queensland')
@@ -425,13 +425,13 @@ class DiffTest extends TestCase
     {
         return [
             [
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-23 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-23 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 0,
             ],
             [
-                $this->buildDateObject('2014-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2014-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 -1,
             ],
         ];

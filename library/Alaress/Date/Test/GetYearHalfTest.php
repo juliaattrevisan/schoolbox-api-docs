@@ -24,10 +24,10 @@ class GetYearHalfTest extends TestCase
     public function getTestYearHalfData()
     {
         return [
-            [$this->buildDateObject('2015-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 1],
-            [$this->buildDateObject('2015-06-30 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 1],
-            [$this->buildDateObject('2015-07-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 2],
-            [$this->buildDateObject('2015-12-31 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 2],
+            [self::buildDateObject('2015-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 1],
+            [self::buildDateObject('2015-06-30 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 1],
+            [self::buildDateObject('2015-07-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 2],
+            [self::buildDateObject('2015-12-31 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 2],
         ];
     }
 

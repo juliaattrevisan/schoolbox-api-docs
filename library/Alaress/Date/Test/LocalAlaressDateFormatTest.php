@@ -20,7 +20,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '02/08/2011 8:15 am';
         $expected = '2011-08-02 08:15:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y h:i a');
+        $date = self::buildDateObject($input, 'd/m/Y h:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -37,7 +37,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '23/08/2011 8:15 pm';
         $expected = '2011-08-23 20:15:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y h:i a');
+        $date = self::buildDateObject($input, 'd/m/Y h:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -54,7 +54,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '23/08/2011';
         $expected = '2011-08-23 00:00:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y|');
+        $date = self::buildDateObject($input, 'd/m/Y|');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -71,7 +71,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '23/08/2011 12:00 pm';
         $expected = '2011-08-23 12:00:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y h:i a');
+        $date = self::buildDateObject($input, 'd/m/Y h:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -88,7 +88,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '23/08/2011 12:00 Am';
         $expected = '2011-08-23 00:00:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y H:i a');
+        $date = self::buildDateObject($input, 'd/m/Y H:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -105,7 +105,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '23-08-2011 12:00 Am';
         $expected = '2011-08-23 00:00:00';
 
-        $date = $this->buildDateObject($input, 'd-m-Y h:i a');
+        $date = self::buildDateObject($input, 'd-m-Y h:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -116,7 +116,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = date('U', strtotime('2011-08-31 19:21:00'));
         $expected = '2011-08-31 19:21:00';
 
-        $date = $this->buildDateObject($input, 'U');
+        $date = self::buildDateObject($input, 'U');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -127,7 +127,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = date('U', strtotime('2011-08-31 19:21:00'));
         $expected = '7:21pm';
 
-        $date = $this->buildDateObject($input, 'U');
+        $date = self::buildDateObject($input, 'U');
         $result = $date->getTimeOnly();
 
         $this->assertEquals($expected, $result);
@@ -138,7 +138,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = date('U', strtotime('2011-08-31 19:21:00'));
         $expected = '19:21:00';
 
-        $date = $this->buildDateObject($input, 'U');
+        $date = self::buildDateObject($input, 'U');
         $result = $date->getDatabaseTime();
 
         $this->assertEquals($expected, $result);
@@ -149,7 +149,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '1/9/2011 12:14 pm';
         $expected = '2011-09-01 12:14:00';
 
-        $date = $this->buildDateObject($input, 'd/m/Y h:i a');
+        $date = self::buildDateObject($input, 'd/m/Y h:i a');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);
@@ -160,7 +160,7 @@ class LocalAlaressDateFormatTest extends TestCase
         $input = '2011-07-01 20:51:00';
         $expected = '2011-07-01 20:51:00';
 
-        $date = $this->buildDateObject($input, 'Y-m-d H:i:s');
+        $date = self::buildDateObject($input, 'Y-m-d H:i:s');
         $result = $date->getDatabase();
 
         $this->assertEquals($expected, $result);

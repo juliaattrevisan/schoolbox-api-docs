@@ -40,7 +40,7 @@ class ConstructionTest extends TestCase
     {
         $date = Alaress_Date_Format::now();
         $date->setLocale(new Alaress_Date_Locale_Static());
-        $copiedDate = $this->buildDateObject($date);
+        $copiedDate = self::buildDateObject($date);
 
         $this->assertEquals($copiedDate->getDatabase(), $date->getDatabase());
     }
@@ -48,13 +48,13 @@ class ConstructionTest extends TestCase
     public function testInvalidCreate()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->buildDateObject('2015-03-25');
+        self::buildDateObject('2015-03-25');
     }
 
     public function testCreateFromDateTime()
     {
         $date = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
-        $copiedDate = $this->buildDateObject($date);
+        $copiedDate = self::buildDateObject($date);
         $this->assertEquals($copiedDate->getDatabase(), $date->format(Alaress_Date_Format::DATABASE_FORMAT));
     }
 
@@ -63,7 +63,7 @@ class ConstructionTest extends TestCase
         $date = Alaress_Date_Format::now();
         $date->setLocale(new Alaress_Date_Locale_Static());
         $date->setTimezone(new DateTimeZone('UTC'));
-        $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
+        $copiedDate = self::buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
         $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getUnixTimeStamp());
         $this->assertEquals('UTC', $date->getTimezone()->getName());
         $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
@@ -72,7 +72,7 @@ class ConstructionTest extends TestCase
     public function testCreateFromDateTimeWithTimezone()
     {
         $date = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME'], new DateTimeZone('UTC'));
-        $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
+        $copiedDate = self::buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
         $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getTimestamp());
         $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
     }
@@ -116,7 +116,7 @@ class ConstructionTest extends TestCase
      */
     public function testMultipleDateFormatsFirstMatches()
     {
-        $date = $this->buildDateObject('25/03/2015', ['d/m/Y', 'Y-m-d']);
+        $date = self::buildDateObject('25/03/2015', ['d/m/Y', 'Y-m-d']);
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 
@@ -125,7 +125,7 @@ class ConstructionTest extends TestCase
      */
     public function testMultipleDateFormatsLastMatches()
     {
-        $date = $this->buildDateObject('2015-03-25', ['d/m/Y', 'Y-m-d']);
+        $date = self::buildDateObject('2015-03-25', ['d/m/Y', 'Y-m-d']);
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 
@@ -137,7 +137,7 @@ class ConstructionTest extends TestCase
     public function testMultipleDateFormatsNoneMatches()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->buildDateObject('2015-03-25', ['d/m/Y', 'Ymd']);
+        self::buildDateObject('2015-03-25', ['d/m/Y', 'Ymd']);
     }
 
     /**
@@ -145,7 +145,7 @@ class ConstructionTest extends TestCase
      */
     public function testTrimDateTime()
     {
-        $date = $this->buildDateObject(' 2015-03-25 ', 'Y-m-d');
+        $date = self::buildDateObject(' 2015-03-25 ', 'Y-m-d');
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 
@@ -154,7 +154,7 @@ class ConstructionTest extends TestCase
      */
     public function testTrimDateFormat()
     {
-        $date = $this->buildDateObject('2015-03-25', ' Y-m-d ');
+        $date = self::buildDateObject('2015-03-25', ' Y-m-d ');
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 
@@ -163,7 +163,7 @@ class ConstructionTest extends TestCase
      */
     public function testTrimMultipleDateFormats()
     {
-        $date = $this->buildDateObject('25/03/2015', [' d/m/Y ', ' Y-m-d ']);
+        $date = self::buildDateObject('25/03/2015', [' d/m/Y ', ' Y-m-d ']);
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 }

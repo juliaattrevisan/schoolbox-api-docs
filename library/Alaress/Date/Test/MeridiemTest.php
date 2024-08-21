@@ -61,7 +61,7 @@ class MeridiemTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getSet12HourData')]
     public function testSet12Hour($hour, $meridiem, $expectedHour)
     {
-        $date = $this->buildDateObject();
+        $date = self::buildDateObject();
         $date->set12Hour($hour, $meridiem);
         $this->assertEquals($expectedHour, $date->get24Hour());
     }
@@ -93,7 +93,7 @@ class MeridiemTest extends TestCase
     public function testSetInvalid12Hour($hour, $meridiem)
     {
         $this->expectException(InvalidArgumentException::class);
-        $date = $this->buildDateObject();
+        $date = self::buildDateObject();
         $date->set12Hour($hour, $meridiem);
     }
 
@@ -104,23 +104,23 @@ class MeridiemTest extends TestCase
     {
         return [
             // No leading zeros (default)
-            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
-            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
-            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
-            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
+            [self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [self::buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [self::buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
+            [self::buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
+            [self::buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [self::buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [self::buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
+            [self::buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
             // Leading zeros
-            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
-            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
-            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
-            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
-            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
-            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
-            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
-            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
+            [self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [self::buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [self::buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
+            [self::buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
+            [self::buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [self::buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [self::buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
+            [self::buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
         ];
     }
 
@@ -161,7 +161,7 @@ class MeridiemTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getSet12HourTimeData')]
     public function testSet12HourTime($hour, $minute, $second, $meridiem, $expectedTime)
     {
-        $date = $this->buildDateObject();
+        $date = self::buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
         $this->assertEquals($expectedTime, $date->getUsingFormat('H:i:s'));
     }
@@ -195,7 +195,7 @@ class MeridiemTest extends TestCase
     public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
     {
         $this->expectException(InvalidArgumentException::class);
-        $date = $this->buildDateObject();
+        $date = self::buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
     }
 
@@ -205,12 +205,12 @@ class MeridiemTest extends TestCase
     public function getIsAmData()
     {
         return [
-            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), true],
-            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), true],
-            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), true],
-            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), false],
-            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), false],
-            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), false],
+            [self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [self::buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [self::buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [self::buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), false],
+            [self::buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), false],
+            [self::buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), false],
         ];
     }
 
@@ -265,6 +265,6 @@ class MeridiemTest extends TestCase
     public function testInvalidIsMeridiem()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->assertTrue($this->buildDateObject()->isMeridiem('cm'));
+        $this->assertTrue(self::buildDateObject()->isMeridiem('cm'));
     }
 }

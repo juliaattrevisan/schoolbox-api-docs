@@ -22,7 +22,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '';
-        $date = $this->buildDateObject($input, 'Y-m-d H:i:s');
+        $date = self::buildDateObject($input, 'Y-m-d H:i:s');
         $this->assertFalse($date->isValid());
     }
 
@@ -38,7 +38,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = 'gronk de la guber';
-        $date = $this->buildDateObject($input, 'Y-m-d H:i:s');
+        $date = self::buildDateObject($input, 'Y-m-d H:i:s');
         $this->assertFalse($date->isValid());
     }
 
@@ -51,7 +51,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     public function testInvalidDate1()
     {
         $input = '43/67/2011';
-        $date = @$this->buildDateObject($input, 'd/m/Y');
+        $date = @self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -64,7 +64,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     public function testInvalidDate2()
     {
         $input = '97/27/1011';
-        $date = @$this->buildDateObject($input, 'd/m/Y');
+        $date = @self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -82,7 +82,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '4333/6735/34508';
-        $date = $this->buildDateObject($input, 'd/m/Y');
+        $date = self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -98,7 +98,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '234/82354';
-        $date = $this->buildDateObject($input, 'd/m/Y');
+        $date = self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -114,7 +114,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '12/02';
-        $date = $this->buildDateObject($input, 'd/m/Y');
+        $date = self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -130,7 +130,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '02-02';
-        $date = $this->buildDateObject($input, 'd/m/Y');
+        $date = self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 
@@ -146,7 +146,7 @@ class InvalidAlaressDateFormatTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $input = '02-2001';
-        $date = $this->buildDateObject($input, 'd/m/Y');
+        $date = self::buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
     }
 }

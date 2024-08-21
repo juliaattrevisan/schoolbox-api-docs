@@ -20,21 +20,21 @@ class ModifyTest extends TestCase
 
     public function testModify()
     {
-        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date = self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
         $date->modify('+1 year');
         $this->assertEquals('2016-03-25 00:00:00', $date->getDatabase());
     }
 
     public function testPrevious()
     {
-        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date = self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
         $date->previous(Alaress_Date_Format::MONDAY);
         $this->assertEquals('2015-03-23 00:00:00', $date->getDatabase());
     }
 
     public function testNext()
     {
-        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date = self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
         $date->next(Alaress_Date_Format::MONDAY);
         $this->assertEquals('2015-03-30 00:00:00', $date->getDatabase());
     }
