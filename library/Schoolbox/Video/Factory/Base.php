@@ -112,8 +112,9 @@ abstract class Base
      * Permission check prior to instantiation
      *
      * @param AbstractFile $file
+     * @param bool $isMyFile
      */
-    abstract protected function permissionCheck(AbstractFile $file);
+    abstract protected function permissionCheck(AbstractFile $file, bool $isMyFile = false);
 
 
     /**

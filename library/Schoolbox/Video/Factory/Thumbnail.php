@@ -25,7 +25,7 @@ class Thumbnail extends Base
      * @return void
      * @throws \Exception
      */
-    protected function permissionCheck(AbstractFile $file): void
+    protected function permissionCheck(AbstractFile $file, bool $isMyFile = false): void
     {
         if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
             \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
