@@ -146,7 +146,7 @@ class CompletionTest extends TestCase
     /**
      * @return int[][]
      */
-    public function provider_normalised_valid(): array
+    public static function provider_normalised_valid(): array
     {
         return [
             [0],
@@ -162,7 +162,7 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function provider_normalised_invalid(): array
+    public static function provider_normalised_invalid(): array
     {
         return [
             [null],
@@ -178,15 +178,15 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function provider_normalised(): array
+    public static function provider_normalised(): array
     {
-        return array_merge($this->provider_normalised_valid(), $this->provider_normalised_invalid());
+        return array_merge(self::provider_normalised_valid(), self::provider_normalised_invalid());
     }
 
     /**
      * @return string[][]
      */
-    public function provider_humanReadable_valid(): array
+    public static function provider_humanReadable_valid(): array
     {
         return [
             [Completion::HUMAN_READABLE_INCOMPLETE],
@@ -198,7 +198,7 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function provider_humanReadable_invalid(): array
+    public static function provider_humanReadable_invalid(): array
     {
         return [
             [null],
@@ -211,9 +211,9 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function provider_humanReadable_noResponse(): array
+    public static function provider_humanReadable_noResponse(): array
     {
-        return array_merge($this->provider_humanReadable_valid(), $this->provider_humanReadable_invalid());
+        return array_merge(self::provider_humanReadable_valid(), self::provider_humanReadable_invalid());
     }
 
 
@@ -221,15 +221,15 @@ class CompletionTest extends TestCase
      * @return array
      * @throws \InvalidArgumentException
      */
-    public function provider_humanReadable_withResponse(): array
+    public static function provider_humanReadable_withResponse(): array
     {
-        $humanReadableValues = array_merge($this->provider_humanReadable_valid(), $this->provider_humanReadable_invalid());
+        $humanReadableValues = array_merge(self::provider_humanReadable_valid(), self::provider_humanReadable_invalid());
         $responses = [
             null,
-            $this->getSelfAssessedResponseMarkedAsIncomplete(),
-            $this->getSelfAssessedResponseMarkedAsComplete(),
-            $this->getTeacherAssessedResponseMarkedAsIncomplete(),
-            $this->getTeacherAssessedResponseMarkedAsComplete(),
+            self::getSelfAssessedResponseMarkedAsIncomplete(),
+            self::getSelfAssessedResponseMarkedAsComplete(),
+            self::getTeacherAssessedResponseMarkedAsIncomplete(),
+            self::getTeacherAssessedResponseMarkedAsComplete(),
         ];
 
         $data = [];
@@ -248,7 +248,7 @@ class CompletionTest extends TestCase
     /**
      * @return TaskResponse
      */
-    private function getSelfAssessedResponseMarkedAsIncomplete(): TaskResponse
+    private static function getSelfAssessedResponseMarkedAsIncomplete(): TaskResponse
     {
         $student = (new User())->setId(1);
 
@@ -262,7 +262,7 @@ class CompletionTest extends TestCase
     /**
      * @return TaskResponse
      */
-    private function getSelfAssessedResponseMarkedAsComplete(): TaskResponse
+    private static function getSelfAssessedResponseMarkedAsComplete(): TaskResponse
     {
         $student = (new User())->setId(1);
 
@@ -278,7 +278,7 @@ class CompletionTest extends TestCase
      * @return TaskResponse
      * @throws \InvalidArgumentException
      */
-    private function getTeacherAssessedResponseMarkedAsIncomplete(): TaskResponse
+    private static function getTeacherAssessedResponseMarkedAsIncomplete(): TaskResponse
     {
         $student = (new User())->setId(1);
         $teacher = (new User())->setId(2);
@@ -302,8 +302,8 @@ class CompletionTest extends TestCase
      * @return TaskResponse
      * @throws \InvalidArgumentException
      */
-    private function getTeacherAssessedResponseMarkedAsComplete(): TaskResponse
+    private static function getTeacherAssessedResponseMarkedAsComplete(): TaskResponse
     {
-        return $this->getTeacherAssessedResponseMarkedAsIncomplete()->setMarkedComplete(true);
+        return self::getTeacherAssessedResponseMarkedAsIncomplete()->setMarkedComplete(true);
     }
 }
