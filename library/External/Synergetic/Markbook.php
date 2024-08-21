@@ -634,7 +634,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                          implode(',', $markbookFolderCodes));
         }
 
-        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
+        $hasMarkOrComment = (null !== $mark) || ('' !== trim((string)$comment)) || ('' !== trim((string)$markText));
 
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
