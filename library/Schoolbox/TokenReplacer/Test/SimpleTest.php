@@ -25,7 +25,6 @@ use Schoolbox\TokenReplacer\Simple;
  */
 class SimpleTest extends TestCase
 {
-
     /**
      * Test the token detection mechanism
      *
@@ -53,57 +52,57 @@ class SimpleTest extends TestCase
     {
         return [
             'No Tokens' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 []
             ],
 
             'One token, start' => [
-                "[firstname]. a list of the cargo carried by a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[firstname]. a list of the cargo carried by a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 ['[firstname]']
             ],
 
             'One token, middle' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 ['[firstname]']
             ],
 
             'One token, end' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and blah at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and blah at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.[firstname]",
                 ['[firstname]']
             ],
 
             'Multiple tokens' => [
-                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a [token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a [token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [token2] carried on an airplane.[lastname]",
                 ['[token1]', '[token4]', '[firstname]', '[token3]', '[token2]', '[lastname]']
             ],
 
             'Multiple tokens duplicated' => [
-                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
-                various agents and [firstname] at the ports of [token4]. a [token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of
+                various agents and [firstname] at the ports of [token4]. a [token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname] carried on an airplane.[firstname]",
                 ['[token1]', '[token4]', '[firstname]', '[token3]']
             ],
 
             'Multiple tokens duplicated, misc characters' => [
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]",
                 ['[tok@#%*(&en1]', '[__918]', '[[[[fox]', '[.cat]', '[   token3]', '[firstname   ]', '[firstname]']
             ],
@@ -136,63 +135,63 @@ class SimpleTest extends TestCase
     {
         return [
             'Replacement: No Tokens' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane."
             ],
 
             'Replacement: One token, start' => [
-                "[firstname]. a list of the cargo carried by a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[firstname]. a list of the cargo carried by a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
                     '[firstname]' => 'John'
                 ],
-                "John. a list of the cargo carried by a ship, made for the use of 
-                various agents and John at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "John. a list of the cargo carried by a ship, made for the use of
+                various agents and John at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane."
             ],
 
             'Replacement: One token, middle' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
                     '[firstname]' => 'John'
                 ],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and John at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and John at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane."
             ],
 
             'Replacement: One token, end' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and blah at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and blah at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.[firstname]",
                 [
                     '[firstname]' => 'John'
                 ],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and blah at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and blah at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.John",
             ],
 
             'Replacement: Multiple tokens' => [
-                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
-                various agents and [firstname] at the ports of destination. a [token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of
+                various agents and [firstname] at the ports of destination. a [token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [token2] carried on an airplane.[lastname]",
                 [
                     '[token1]' => 'Robert',
@@ -202,16 +201,16 @@ class SimpleTest extends TestCase
                     '[token2]' => 'Explorer reporting!',
                     '[lastname]' => 'cat'
                 ],
-                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of 
-                various agents and my life for Aiur at the ports of destination. a You need to build additional pylons or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of
+                various agents and my life for Aiur at the ports of destination. a You need to build additional pylons or
+                invoice of goods transported by truck or train. a list of the cargo
                 or Explorer reporting! carried on an airplane.cat"
             ],
 
             'Replacement: Multiple tokens duplicated' => [
-                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
-                various agents and [firstname] at the ports of [token4]. a [token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of
+                various agents and [firstname] at the ports of [token4]. a [token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname] carried on an airplane.[firstname]",
                 [
                     '[token1]' => 'Robert',
@@ -219,16 +218,16 @@ class SimpleTest extends TestCase
                     '[firstname]' => 'my life for Aiur',
                     '[token3]' => 'You need to build additional pylons',
                 ],
-                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of 
-                various agents and my life for Aiur at the ports of En taro Adun. a You need to build additional pylons or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of
+                various agents and my life for Aiur at the ports of En taro Adun. a You need to build additional pylons or
+                invoice of goods transported by truck or train. a list of the cargo
                 or my life for Aiur carried on an airplane.my life for Aiur",
             ],
 
             'Replacement: Multiple tokens duplicated, misc characters' => [
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]",
                 [
                     '[tok@#%*(&en1]' => 'Liara',
@@ -239,44 +238,44 @@ class SimpleTest extends TestCase
                     '[firstname   ]' => 'Tali',
                     '[firstname]' => 'someone else might have gotten it wrong'
                 ],
-                "Liara. a list of the cargo carried Shepard a ship, made for the use of 
-                various agents and Wrex at the ports of Grunt. a Garrus or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "Liara. a list of the cargo carried Shepard a ship, made for the use of
+                various agents and Wrex at the ports of Grunt. a Garrus or
+                invoice of goods transported by truck or train. a list of the cargo
                 or Tali carried on an airplane.someone else might have gotten it wrong",
             ],
 
             /* More esoteric cases
              */
             'Replacement: More tokens than replacements 1' => [
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]",
                 [],
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]"
             ],
 
             'Replacement: More tokens than replacements 2' => [
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]",
                 [
                     '[firstname]' => 'someone else might have gotten it wrong'
                 ],
-                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
-                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
+                invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.someone else might have gotten it wrong"
             ],
 
             'Replacement: More replacements than tokens 1' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
                     '[tok@#%*(&en1]' => 'Liara',
@@ -287,16 +286,16 @@ class SimpleTest extends TestCase
                     '[firstname   ]' => 'Tali',
                     '[firstname]' => 'someone else might have gotten it wrong'
                 ],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the ports of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the ports of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
             ],
 
             'Replacement: More replacements than tokens 2' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the [__918] of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the [__918] of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
                     '[tok@#%*(&en1]' => 'Liara',
@@ -307,27 +306,76 @@ class SimpleTest extends TestCase
                     '[firstname   ]' => 'Tali',
                     '[firstname]' => 'someone else might have gotten it wrong'
                 ],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the Shepard of destination. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the Shepard of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
             ],
 
             /* HTML shenanigans
              */
             'HTML 1' => [
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the [firstname] [lastname]. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the [firstname] [lastname]. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
                     '[firstname]' => '<strong>Bro</strong>',
                     '[lastname]' => '<em>what is this</em>'
                 ],
-                "noun. a list of the cargo carried by a ship, made for the use of 
-                various agents and officials at the &lt;strong&gt;Bro&lt;/strong&gt; &lt;em&gt;what is this&lt;/em&gt;. a list or 
-                invoice of goods transported by truck or train. a list of the cargo 
+                "noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the &lt;strong&gt;Bro&lt;/strong&gt; &lt;em&gt;what is this&lt;/em&gt;. a list or
+                invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
+            ],
+            'HTML 2' => [
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the port of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p>",
+                [],
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
+<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the port of destination. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p></body></html>
+"
+            ],
+            'HTML 3: With mention highlight' => [
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <span class=\"mention\" data-mention=\"[firstname]\">[firstname]</span>
+                <span class=\"mention\" data-mention=\"[lastname]\">[lastname]</span>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p>",
+                [
+                    '[firstname]' => 'Brother',
+                    '[lastname]' => 'what is this'
+                ],
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
+<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <span data-mention=\"Brother\">Brother</span>
+                <span data-mention=\"what is this\">what is this</span>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p></body></html>
+"
+            ],
+            'HTML 4: Mention highlight without span' => [
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <em class=\"mention\" data-mention=\"[firstname]\">[firstname]</em>
+                <em class=\"mention\" data-mention=\"[lastname]\">[lastname]</em>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p>",
+                [
+                    '[firstname]' => 'Brother',
+                    '[lastname]' => 'what is this'
+                ],
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
+<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <em class=\"mention\" data-mention=\"Brother\">Brother</em>
+                <em class=\"mention\" data-mention=\"what is this\">what is this</em>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p></body></html>
+"
             ],
         ];
     }
