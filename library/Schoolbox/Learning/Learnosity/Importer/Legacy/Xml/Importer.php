@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Alaress\Database\Connector\IConnector;
 use Assess\Import\Parser\IParser;
+use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -122,11 +123,16 @@ class Importer
          */
         $xml = $this->prepareXml($data);
 
+        /* Ensure that it's actually one of ours
+         */
+        $this->validate($xml);
+        die();
+
         /* Only accept Quiz xmls; reject Surveys
          */
-        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
-            throw new \DomainException('xml file did not contain a legacy quiz');
-        }
+//        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
+//            throw new \DomainException('xml file did not contain a legacy quiz');
+//        }
 
         /* Set up a parser to traverse the xml
          */
@@ -227,6 +233,40 @@ class Importer
         libxml_use_internal_errors($use_errors);
 
         return $result;
+    }
+
+
+    /**
+     * People have been trying to import invalid xmls (random quiz xmls from other software)
+     * but we don't (and have never) supported that ability. We can only import our own quiz xml.
+     *
+     * This validate() method inspects the first node, ensures that it's <quiz>, as this is a
+     * signature of our own xmls. This node contains all the quiz info.
+     *
+     * We can also check for the four dates and other schoolbox-specific fields to help increase
+     * detection of invalid xmls. This won't stop someone who is determined to force their xml
+     * but it should help weed out The Casuals who are doing this accidentally.
+     *
+     * @param SimpleXMLElement $xml
+     * @return bool
+     * @throws DebugBarException
+     */
+    private function validate(SimpleXMLElement $xml): bool
+    {
+        $xml->xpath('availability');
+
+        /* Required to use ->current(), as per php.net
+         * https://www.php.net/manual/en/simplexmlelement.current.php
+         */
+        $xml->rewind();
+
+        new \Alaress_Probe($xml->current());
+
+//        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
+//            throw new \DomainException('xml file did not contain a legacy quiz');
+//        }
+
+        return false;
     }
 
 
