@@ -28,49 +28,45 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 class AccessTest extends TestCase
 {
     /** @var Role[] */
-    private $roles;
+    private static $roles;
 
     /**
-     * @var array<User|MockObject>
+     * @var array<User>
      */
-    private $users;
+    private static $users;
 
     /** @var Event[] */
-    private $events;
+    private static $events;
 
     /** @var UserAccess[] */
-    private $userAccess;
+    private static $userAccess;
 
     /**
      * @param string $key
      * @return mixed|Role
      */
-    private function getRole($key)
+    private static function getRole($key)
     {
-        if (empty($this->roles)) {
-            $this->roles = [
+        if (empty(self::$roles)) {
+            self::$roles = [
                 'staff' => (new Role())->setType(Role::STAFF),
                 'parent' => (new Role())->setType(Role::PARENT),
                 'student' => (new Role())->setType(Role::STUDENT),
             ];
         }
 
-        return $this->roles[$key];
+        return self::$roles[$key];
     }
 
     /**
      * @param string $key
      * @return User|MockObject
      */
-    private function getUser($key)
+    private static function getUser($key)
     {
-        if (empty($this->users)) {
-            $newUser = function ($id, array $overload = null) {
-                // Set an empty access list by default on every user, this is to avoid hitting the database on
-                // User::getAccessList() when access list is not set
-
-                /** @var User|MockObject $mockUser */
-                $mockUser = $this->getMockBuilder(User::class)->onlyMethods($overload ?? [])->getMock();
+        if (empty(self::$users)) {
+            $newUser = function ($id) {
+                $mockUser = new User();
                 $mockUser->setId($id);
                 $mockUser->setAccessList(new GenericCollection(UserAccess::class));
                 $mockUser->setChildren(new GenericCollection(User::class));
@@ -78,12 +74,12 @@ class AccessTest extends TestCase
                 return $mockUser;
             };
 
-            $this->users = [
+            self::$users = [
                 'super'                 => $newUser(1)->setSuperuser(true),
-                'staff'                 => $newUser(2)->setRole($this->getRole('staff')),
-                'staffAlt'              => $newUser(3)->setRole($this->getRole('staff')),
-                'parent'                => $newUser(4)->setRole($this->getRole('parent')),
-                'student'               => $newUser(5)->setRole($this->getRole('student')),
+                'staff'                 => $newUser(2)->setRole(self::getRole('staff')),
+                'staffAlt'              => $newUser(3)->setRole(self::getRole('staff')),
+                'parent'                => $newUser(4)->setRole(self::getRole('parent')),
+                'student'               => $newUser(5)->setRole(self::getRole('student')),
 
                 'campusModerate'        => $newUser(6),
                 'campusWrite'           => $newUser(7),
@@ -96,35 +92,30 @@ class AccessTest extends TestCase
                 'groupRead'             => $newUser(13),
                 'groupNone'             => $newUser(14),
 
-                'parent2'               => $newUser(15)->setRole($this->getRole('parent')),
-                'student2'              => $newUser(16)->setRole($this->getRole('student')),
-                'parentWithStudent'     => $newUser(17)->setRole($this->getRole('parent')),
-                'studentWithParent'     => $newUser(18, ['getParents'])
-                                                ->setRole($this->getRole('student')),
+                'parent2'               => $newUser(15)->setRole(self::getRole('parent')),
+                'student2'              => $newUser(16)->setRole(self::getRole('student')),
+                'parentWithStudent'     => $newUser(17)->setRole(self::getRole('parent')),
+                'studentWithParent'     => $newUser(18)->setRole(self::getRole('student')),
             ];
 
             // Create a mock returns for users
 
-            // Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
-            /** @var User|MockObject $studentWithParents */
-            $studentWithParents = $this->users['studentWithParent'];
-            $studentWithParents->method('getParents')->willReturnCallback(function () {
-                $collection = new Collection();
-                return $collection->add($this->users['parentWithStudent']);
-            });
-            $this->users['studentWithParent'] = $studentWithParents;
+            // Mock returns for studentWithParent, who is a child of self::$users['parentWithStudent']
+            $studentWithParents = self::$users['studentWithParent'];
+            $studentWithParents->setParents(new GenericCollection(User::class, [self::$users['parentWithStudent']]));
+            self::$users['studentWithParent'] = $studentWithParents;
         }
 
-        return $this->users[$key];
+        return self::$users[$key];
     }
 
     /**
      * @param string $key
      * @return mixed|Event
      */
-    private function getEvent($key)
+    private static function getEvent($key)
     {
-        if (empty($this->events)) {
+        if (empty(self::$events)) {
             $folderCollection = new Collection([
                 (new Folder())->setId(1)
             ]);
@@ -133,7 +124,7 @@ class AccessTest extends TestCase
                 (new Campus())->setId(1)
             ]);
 
-            $this->events = [
+            self::$events = [
                 'personal' => (new Event())
                     ->setId(1)
                     ->setAccess(Event::ACCESS_PERSONAL),
@@ -150,55 +141,53 @@ class AccessTest extends TestCase
             ];
         }
 
-        return $this->events[$key];
+        return self::$events[$key];
     }
 
     /**
      * @param string $key
      * @return mixed|UserAccess
      */
-    private function getUserAccess($key)
+    private static function getUserAccess($key)
     {
-        if (empty($this->userAccess)) {
-            $this->userAccess = [
-                'campusModerate' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_CALENDAR)
-                    ->setAccessLevel(UserAccess::ACCESS_FULL)
-                    ->setServiceIdentifier(1),
+        self::$userAccess ??= [
+            'campusModerate' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_CALENDAR)
+                ->setAccessLevel(UserAccess::ACCESS_FULL)
+                ->setServiceIdentifier(1),
 
-                'campusWrite' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_CALENDAR)
-                    ->setAccessLevel(UserAccess::ACCESS_WRITE)
-                    ->setServiceIdentifier(1),
+            'campusWrite' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_CALENDAR)
+                ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                ->setServiceIdentifier(1),
 
-                'campusRead' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_CALENDAR)
-                    ->setAccessLevel(UserAccess::ACCESS_READ)
-                    ->setServiceIdentifier(1),
+            'campusRead' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_CALENDAR)
+                ->setAccessLevel(UserAccess::ACCESS_READ)
+                ->setServiceIdentifier(1),
 
-                'groupReadSuper' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setAccessLevel(UserAccess::ACCESS_READ)
-                    ->setServiceIdentifier(1),
+            'groupReadSuper' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_READ)
+                ->setServiceIdentifier(1),
 
-                'groupAdmin' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setAccessLevel(UserAccess::ACCESS_FULL)
-                    ->setServiceIdentifier(1),
+            'groupAdmin' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_FULL)
+                ->setServiceIdentifier(1),
 
-                'groupWrite' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setAccessLevel(UserAccess::ACCESS_WRITE)
-                    ->setServiceIdentifier(1),
+            'groupWrite' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                ->setServiceIdentifier(1),
 
-                'groupRead' => (new UserAccess())
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setAccessLevel(UserAccess::ACCESS_READ)
-                    ->setServiceIdentifier(1),
-            ];
-        }
+            'groupRead' => (new UserAccess())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_READ)
+                ->setServiceIdentifier(1),
+        ];
 
-        return $this->userAccess[$key];
+        return self::$userAccess[$key];
     }
 
     /**
@@ -206,11 +195,11 @@ class AccessTest extends TestCase
      *
      * @param string[] $keys
      */
-    private function configureUserAccess($keys)
+    private static function configureUserAccess($keys)
     {
         foreach ($keys as $key) {
-            $user = $this->getUser($key);
-            $access = $this->getUserAccess($key);
+            $user = self::getUser($key);
+            $access = self::getUserAccess($key);
 
             $user->setAccessList(new GenericCollection(UserAccess::class, [$access]));
             $access->setUser($user);
@@ -255,7 +244,7 @@ class AccessTest extends TestCase
      * @param int[] $campuses
      * @return array
      */
-    private function generateTest(
+    private static function generateTest(
         $result,
         $effectorKey,
         $accessLevel,
@@ -266,10 +255,10 @@ class AccessTest extends TestCase
     ) {
         return [
             $result,
-            $this->getUser($effectorKey),
+            self::getUser($effectorKey),
             $accessLevel,
-            $this->getUser($authorKey),
-            $this->getUser($ownerKey),
+            self::getUser($authorKey),
+            self::getUser($ownerKey),
             $groups,
             $campuses
         ];
@@ -285,13 +274,13 @@ class AccessTest extends TestCase
      * @param string $ownerKey
      * @return array
      */
-    private function generateTestExisting($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
+    private static function generateTestExisting($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
     {
-        $event = clone $this->getEvent($eventKey);
-        $event->setOwner($this->getUser($ownerKey))
-                ->setAuthor($this->getUser($authorKey));
+        $event = clone self::getEvent($eventKey);
+        $event->setOwner(self::getUser($ownerKey))
+                ->setAuthor(self::getUser($authorKey));
 
-        return [$result, $this->getUser($effectorKey), $event];
+        return [$result, self::getUser($effectorKey), $event];
     }
 
     /**
@@ -300,10 +289,10 @@ class AccessTest extends TestCase
      *
      * @return array
      */
-    public function dataCheckDestination()
+    public static function dataCheckDestination()
     {
         // Set access on users
-        $this->configureUserAccess([
+        self::configureUserAccess([
             'campusModerate',
             'campusWrite',
             'campusRead',
@@ -320,37 +309,37 @@ class AccessTest extends TestCase
             // --------------------------------------------------------------------------
 
             // Staff can create an event for themselves
-            'StaffPersonal' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staff'),
+            'StaffPersonal' => self::generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staff'),
 
             // Parent can create an event for themselves
-            'ParentPersonal' => $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent'),
+            'ParentPersonal' => self::generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent'),
 
             // Student can create an event for themselves
-            'StudentPersonal' => $this->generateTest(true, 'student', Event::ACCESS_PERSONAL, 'student', 'student'),
+            'StudentPersonal' => self::generateTest(true, 'student', Event::ACCESS_PERSONAL, 'student', 'student'),
 
             // Super can create an event for staff member
-            'SuperForStaff' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'staff'),
+            'SuperForStaff' => self::generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'staff'),
 
             // Super can create an event for a parent
-            'SuperForParent' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'parent'),
+            'SuperForParent' => self::generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'parent'),
 
             // Super can create an event for a student
-            'SuperForStudent' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'student'),
+            'SuperForStudent' => self::generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'student'),
 
             // Staff can create an event for another staff member
-            'StaffForStaff' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staffAlt'),
+            'StaffForStaff' => self::generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staffAlt'),
 
             // Staff can create event for any parent
-            'StaffForParent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'parent'),
+            'StaffForParent' => self::generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'parent'),
 
             // Staff can create event for any student
-            'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
+            'StaffForStudent' => self::generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
             // Staff can edit own event made by super user
-            'StaffEditSuper' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
+            'StaffEditSuper' => self::generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
 
             // Parent can create event for their child
-            'ParentForChild' => $this->generateTest(
+            'ParentForChild' => self::generateTest(
                 true,
                 'parentWithStudent',
                 Event::ACCESS_PERSONAL,
@@ -359,16 +348,16 @@ class AccessTest extends TestCase
             ),
 
             // Staff cannot edit other staff members event
-            'StaffEditStaff2' => $this->generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
+            'StaffEditStaff2' => self::generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
 
             // Parent cannot create an event for a staff member
-            'ParentForStaff' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
+            'ParentForStaff' => self::generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
 
             // Parent cannot create an event for another parent
-            'ParentForParent' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
+            'ParentForParent' => self::generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
 
             // Parent cannot create an event for a student that isn't theirs
-            'ParentForOtherChild' => $this->generateTest(
+            'ParentForOtherChild' => self::generateTest(
                 false,
                 'parent',
                 Event::ACCESS_PERSONAL,
@@ -377,29 +366,29 @@ class AccessTest extends TestCase
             ),
 
             // Student cannot create event for a staff member
-            'StudentForStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
+            'StudentForStaff' => self::generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
 
             // Student cannot create event for a parent
-            'StudentForParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'parent'),
+            'StudentForParent' => self::generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'parent'),
 
             // Student cannot create event for another student
-            'StudentForStudent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
+            'StudentForStudent' => self::generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
 
             // Student cannot edit own event made by staff
-            'StudentEditStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'staff', 'student'),
+            'StudentEditStaff' => self::generateTest(false, 'student', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
             // Student cannot edit own event made by parent
-            'StudentEditParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'parent', 'student'),
+            'StudentEditParent' => self::generateTest(false, 'student', Event::ACCESS_PERSONAL, 'parent', 'student'),
 
             // --------------------------------------------------------------------------
             // Campus level events
             // --------------------------------------------------------------------------
 
             // Super with no campus permission can create
-            'SuperCampus' => $this->generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]),
+            'SuperCampus' => self::generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]),
 
             // User with moderate access can create
-            'ModerateCampus' => $this->generateTest(
+            'ModerateCampus' => self::generateTest(
                 true,
                 'campusModerate',
                 Event::ACCESS_CAMPUS,
@@ -410,7 +399,7 @@ class AccessTest extends TestCase
             ),
 
             // User with write access can create
-            'WriteCampus' => $this->generateTest(
+            'WriteCampus' => self::generateTest(
                 true,
                 'campusWrite',
                 Event::ACCESS_CAMPUS,
@@ -421,7 +410,7 @@ class AccessTest extends TestCase
             ),
 
             // User with read access cannot create
-            'ReadCampus' => $this->generateTest(
+            'ReadCampus' => self::generateTest(
                 false,
                 'campusRead',
                 Event::ACCESS_CAMPUS,
@@ -432,7 +421,7 @@ class AccessTest extends TestCase
             ),
 
             // User with no access cannot create
-            'NoCampus' => $this->generateTest(
+            'NoCampus' => self::generateTest(
                 false,
                 'campusNone',
                 Event::ACCESS_CAMPUS,
@@ -448,10 +437,10 @@ class AccessTest extends TestCase
             // --------------------------------------------------------------------------
 
             // Super with no permissions to group can create
-            'SuperGroup' => $this->generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]),
+            'SuperGroup' => self::generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]),
 
             // Super with read access to group can create
-            'SuperReadGroup' => $this->generateTest(
+            'SuperReadGroup' => self::generateTest(
                 true,
                 'groupReadSuper',
                 Event::ACCESS_GROUP,
@@ -461,7 +450,7 @@ class AccessTest extends TestCase
             ),
 
             // User with admin access to group can create
-            'AdminGroup' => $this->generateTest(
+            'AdminGroup' => self::generateTest(
                 true,
                 'groupAdmin',
                 Event::ACCESS_GROUP,
@@ -471,7 +460,7 @@ class AccessTest extends TestCase
             ),
 
             // User with write access to group can create
-            'WriteGroup' => $this->generateTest(
+            'WriteGroup' => self::generateTest(
                 true,
                 'groupWrite',
                 Event::ACCESS_GROUP,
@@ -481,10 +470,10 @@ class AccessTest extends TestCase
             ),
 
             // User with read access to group cannot create
-            'ReadGroup' => $this->generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]),
+            'ReadGroup' => self::generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]),
 
             // User with no access to group cannot create
-            'NoGroup' => $this->generateTest(false, 'groupNone', Event::ACCESS_GROUP, 'groupNone', 'groupNone', [1]),
+            'NoGroup' => self::generateTest(false, 'groupNone', Event::ACCESS_GROUP, 'groupNone', 'groupNone', [1]),
 
         ];
     }
@@ -497,10 +486,10 @@ class AccessTest extends TestCase
      *
      * @return array
      */
-    public function dataCheckExisting()
+    public static function dataCheckExisting()
     {
         // Set access on users
-        $this->configureUserAccess([
+        self::configureUserAccess([
             'campusModerate',
             'campusRead',
             'groupWrite',
@@ -514,10 +503,10 @@ class AccessTest extends TestCase
             // --------------------------------------------------------------------------
 
             // Staff can modify event for themselves
-            'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
+            'ExistingPersonal' => self::generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
 
             // Student cannot modify event for a staff member
-            'ExistingPersonalStudentToStaff' => $this->generateTestExisting(
+            'ExistingPersonalStudentToStaff' => self::generateTestExisting(
                 false,
                 'student',
                 'personal',
@@ -530,10 +519,10 @@ class AccessTest extends TestCase
             // --------------------------------------------------------------------------
 
             // Moderator can modify campus level event not authored or owned by themselves
-            'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
+            'ExistingCampus' => self::generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
 
             // Read access cannot modify campus level event, even if they authored & own
-            'ExistingCampusRead' => $this->generateTestExisting(
+            'ExistingCampusRead' => self::generateTestExisting(
                 false,
                 'campusRead',
                 'campus',
@@ -546,10 +535,10 @@ class AccessTest extends TestCase
             // --------------------------------------------------------------------------
 
             // Write access can modify event not authored or owned by themselves
-            'ExistingGroup' => $this->generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
+            'ExistingGroup' => self::generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
 
             // Read access cannot modify group level event, even if they authored & own
-            'ExistingGroupRead' => $this->generateTestExisting(false, 'groupRead', 'group', 'groupRead', 'groupRead'),
+            'ExistingGroupRead' => self::generateTestExisting(false, 'groupRead', 'group', 'groupRead', 'groupRead'),
 
         ];
     }

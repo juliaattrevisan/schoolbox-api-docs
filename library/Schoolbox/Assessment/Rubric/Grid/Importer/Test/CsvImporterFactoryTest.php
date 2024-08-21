@@ -24,7 +24,7 @@ class CsvImporterFactoryTest extends TestCase
     /**
      * @return iterable
      */
-    public function getTestBuildData(): iterable
+    public static function getTestBuildData(): iterable
     {
         $test1 = <<<TEST
 ,,,,,,
@@ -93,7 +93,7 @@ TEST;
             ],
         ];
         yield 'empty descriptors' => [
-            $this->buildStream($test1),
+            self::buildStream($test1),
             5,
             new DueWorkModel(),
             $emptyDescriptorTestLevels,
@@ -147,7 +147,7 @@ TEST;
         $markPerCapOffTestCapabilities                = $standardTestCapabilities;
         $markPerCapOffTestCapabilities[0]['maxValue'] = null;
         yield 'mark-per-cap off, mark range on' => [
-            $this->buildStream($test2),
+            self::buildStream($test2),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -166,7 +166,7 @@ TEST;
 ,,15,10,5,1,0
 TEST;
         yield 'mark-per-cap percent' => [
-            $this->buildStream($test3),
+            self::buildStream($test3),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -185,7 +185,7 @@ TEST;
 ,,15,10,5,1,0
 TEST;
         yield 'mark-per-cap letter:1' => [
-            $this->buildStream($test4),
+            self::buildStream($test4),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -204,7 +204,7 @@ TEST;
 ,,15,10,5,1,0
 TEST;
         yield 'mark-per-cap letter:1 with spaces' => [
-            $this->buildStream($test5),
+            self::buildStream($test5),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -223,7 +223,7 @@ TEST;
 ,,15,10,5,1,0
 TEST;
         yield 'mark-per-cap letter with empty grade group' => [
-            $this->buildStream($test6),
+            self::buildStream($test6),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -242,7 +242,7 @@ TEST;
 ,,15,10,5,1,0
 TEST;
         yield 'mark-per-cap letter with null grade group' => [
-            $this->buildStream($test7),
+            self::buildStream($test7),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -264,7 +264,7 @@ TEST;
 TEST;
 
         yield 'mark-per-cap legacy on: null mark type => assume percent' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            self::buildStream($legacyTestMarkPerCapabilityOn),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -275,7 +275,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy on: mark type none => cap mark type total' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            self::buildStream($legacyTestMarkPerCapabilityOn),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
@@ -288,7 +288,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy on: mark type percent' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            self::buildStream($legacyTestMarkPerCapabilityOn),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
@@ -301,7 +301,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy on: mark type total' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            self::buildStream($legacyTestMarkPerCapabilityOn),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
@@ -314,7 +314,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy on: mark type letter + grade group' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOn),
+            self::buildStream($legacyTestMarkPerCapabilityOn),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
@@ -338,7 +338,7 @@ TEST;
 TEST;
 
         yield 'mark-per-cap legacy off: null mark type => assume none' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            self::buildStream($legacyTestMarkPerCapabilityOff),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -349,7 +349,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy off: mark type none' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            self::buildStream($legacyTestMarkPerCapabilityOff),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_NONE))
@@ -362,7 +362,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy off: mark type percent' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            self::buildStream($legacyTestMarkPerCapabilityOff),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_PERCENT))
@@ -375,7 +375,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy off: mark type total' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            self::buildStream($legacyTestMarkPerCapabilityOff),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_TOTAL))
@@ -388,7 +388,7 @@ TEST;
         ];
 
         yield 'mark-per-cap legacy off: mark type letter + grade group' => [
-            $this->buildStream($legacyTestMarkPerCapabilityOff),
+            self::buildStream($legacyTestMarkPerCapabilityOff),
             $standardTestLevelCount,
             (new DueWorkModel())
                 ->setMarkType((new MarkType())->setSlug(MarkType::SLUG_LETTER))
@@ -412,7 +412,7 @@ TEST;
 TEST;
 
         yield 'no levels provided' => [
-            $this->buildStream($noLevelsTest),
+            self::buildStream($noLevelsTest),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -433,7 +433,7 @@ TEST;
 TEST;
 
         yield 'too many levels provided' => [
-            $this->buildStream($tooManyLevelsTest),
+            self::buildStream($tooManyLevelsTest),
             $standardTestLevelCount,
             new DueWorkModel(),
             $standardTestLevels,
@@ -483,7 +483,7 @@ TEST;
      * @param string $content
      * @return resource
      */
-    private function buildStream(string $content)
+    private static function buildStream(string $content)
     {
         $stream = fopen('php://memory', 'rb+');
         fwrite($stream, $content);
