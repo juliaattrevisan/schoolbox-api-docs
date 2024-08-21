@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Image\Transformation\Test;
 
 use Alaress\Image\Transformation\Icon;
+use Alaress\Image\Transformation\ITransformFactory;
 use Alaress\Image\Transformation\MyImage;
 use Alaress\Image\Transformation\Portrait;
 use Alaress\Image\Transformation\Storage;
@@ -24,8 +25,8 @@ use Schoolbox\Realtime\Message\NSMapper;
  * 2. System does not incorrectly match a cache key to the wrong Transformation
  *
  * @codeCoverageIgnore
- * @covers ITransformFactory::recognisesCacheKey
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(ITransformFactory::class)]
 class RecogniseCacheKeyTest extends TestCase
 {
     /**
