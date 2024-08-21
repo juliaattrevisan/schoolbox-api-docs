@@ -25,12 +25,12 @@ class ExpiryHelperTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestDetermineExpiryData(): iterable
+    public static function getTestDetermineExpiryData(): iterable
     {
         $awardedAt = Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00');
         yield 'goal never expires' => [
             null,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -39,7 +39,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement never expires' => [
             null,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -50,7 +50,7 @@ class ExpiryHelperTest extends TestCase
         $dayExpiry = Alaress_Date_Format::newDatabaseDate('2021-01-02 00:00:00');
         yield 'goal expires in 1 day' => [
             $dayExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_DAY,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -59,7 +59,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 1 day' => [
             $dayExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_DAY,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -70,7 +70,7 @@ class ExpiryHelperTest extends TestCase
         $weekExpiry = Alaress_Date_Format::newDatabaseDate('2021-01-08 00:00:00');
         yield 'goal expires in 1 week' => [
             $weekExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_WEEK,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -79,7 +79,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 1 week' => [
             $weekExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_WEEK,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -90,7 +90,7 @@ class ExpiryHelperTest extends TestCase
         $fortnightExpiry = Alaress_Date_Format::newDatabaseDate('2021-01-15 00:00:00');
         yield 'goal expires in 1 fortnight' => [
             $fortnightExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_FORTNIGHT,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -99,7 +99,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 1 fortnight' => [
             $fortnightExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_FORTNIGHT,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -111,7 +111,7 @@ class ExpiryHelperTest extends TestCase
         $monthExpiry = Alaress_Date_Format::newDatabaseDate('2021-02-01 00:00:00');
         yield 'goal expires in 1 month' => [
             $monthExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_MONTH,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -120,7 +120,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 1 month' => [
             $monthExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_MONTH,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -133,7 +133,7 @@ class ExpiryHelperTest extends TestCase
         $quarterYearExpiry = Alaress_Date_Format::newDatabaseDate('2021-04-03 00:00:00');
         yield 'goal expires in 3 months' => [
             $quarterYearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_QUARTER_YEAR,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -142,7 +142,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 3 months' => [
             $quarterYearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_QUARTER_YEAR,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -156,7 +156,7 @@ class ExpiryHelperTest extends TestCase
         $halfYearExpiry = Alaress_Date_Format::newDatabaseDate('2021-07-03 00:00:00');
         yield 'goal expires in 6 months' => [
             $halfYearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_HALF_YEAR,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -165,7 +165,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 6 months' => [
             $halfYearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_HALF_YEAR,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -176,7 +176,7 @@ class ExpiryHelperTest extends TestCase
         $yearExpiry = Alaress_Date_Format::newDatabaseDate('2022-01-01 00:00:00');
         yield 'goal expires in 1 year' => [
             $yearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Model::EXPIRY_YEAR,
                 Badge\Award\Model::AWARD_STATUS_GOAL,
@@ -185,7 +185,7 @@ class ExpiryHelperTest extends TestCase
         ];
         yield 'achievement expires in 1 year' => [
             $yearExpiry,
-            $this->generateBadgeAward(
+            self::generateBadgeAward(
                 Badge\Model::EXPIRY_YEAR,
                 Badge\Model::EXPIRY_NEVER,
                 Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT,
@@ -277,7 +277,7 @@ class ExpiryHelperTest extends TestCase
      * @param Alaress_Date_Format $awardedAt
      * @return Badge\Award\Model
      */
-    private function generateBadgeAward(
+    private static function generateBadgeAward(
         ?int $achievementExpiry,
         ?int $goalExpiry,
         string $awardStatus,
