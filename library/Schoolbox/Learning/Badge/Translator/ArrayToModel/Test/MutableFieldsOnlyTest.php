@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Badge\Category\Model as Category;
@@ -18,6 +19,7 @@ use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
@@ -33,7 +35,7 @@ class MutableFieldsOnlyTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeCreateData(): iterable
+    public static function getTestInvokeCreateData(): iterable
     {
         yield 'empty' => [[], new Model()];
 
@@ -87,23 +89,16 @@ class MutableFieldsOnlyTest extends TestCase
         ];
 
         // Storage file upload: require a mock here
-        $storage       = (new Storage())
+        $storage = (new Storage())
             ->setHash('1234567890123456789012345678901234567890')
             ->setBasename('test.gif');
-        $collectorMock = $this->createMock(Collector::class);
-        $collectorMock->method('getFirst')->willReturn($storage);
-
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $collectorFactoryMock->method('build')->willReturn($collectorMock);
 
         yield 'image as file upload' => [
             [
                 'image' => 'file:1234567890123456789012345678901234567890:test.gif',
             ],
-            (new Model())
-                ->setImage($storage),
-            new MutableFieldsOnly($collectorFactoryMock),
+            (new Model())->setImage($storage),
+            $storage,
         ];
 
         yield 'achievement expiry' => [
@@ -129,7 +124,7 @@ class MutableFieldsOnlyTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeUpdateData(): iterable
+    public static function getTestInvokeUpdateData(): iterable
     {
         $oldDate   = '2020-01-01T00:00:00+00:00';
         $newDate   = '2020-02-01T00:00:00+00:00';
@@ -310,32 +305,27 @@ class MutableFieldsOnlyTest extends TestCase
         // Image set from upload and storage hash
         // Image is not nullable
         // (covered in `testInvokeUpdateInvalidValues)
-        $storage       = (new Storage())
+        $storage1 = (new Storage())
             ->setHash('9876543210987654321098765432109876543210')
             ->setBasename('test.png');
-        $collectorMock = $this->createMock(Collector::class);
-        $collectorMock->method('getFirst')->willReturn($storage);
-
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $collectorFactoryMock->method('build')->willReturn($collectorMock);
 
         yield 'update image from upload' => [
             [
                 'image' => 'file:9876543210987654321098765432109876543210:test.png',
             ],
             (clone $baseModel),
-            (clone $baseModel)->setImage($storage),
-            new MutableFieldsOnly($collectorFactoryMock),
+            (clone $baseModel)->setImage($storage1),
+            $storage1,
         ];
 
+        $storage2 = (new Storage())->setHash('12345');
         yield 'update image from hash' => [
             [
                 'image' => ['hash' => '12345'],
             ],
             (clone $baseModel),
-            (clone $baseModel)->setImage((new Storage())->setHash('12345')),
-            new MutableFieldsOnly($collectorFactoryMock),
+            (clone $baseModel)->setImage($storage2),
+            $storage2,
         ];
     }
 
@@ -351,9 +341,9 @@ class MutableFieldsOnlyTest extends TestCase
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
-    public function testInvokeCreate(array $input, Model $expected, MutableFieldsOnly $converter = null): void
+    public function testInvokeCreate(array $input, Model $expected, ?Istorage $storage = null): void
     {
-        $converter = $this->createConverterIfNull($converter);
+        $converter = $this->createConverter($storage);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input));
@@ -376,9 +366,9 @@ class MutableFieldsOnlyTest extends TestCase
         array $input,
         Model $existing,
         Model $expected,
-        MutableFieldsOnly $converter = null
+        ?Istorage $storage = null
     ): void {
-        $converter = $this->createConverterIfNull($converter);
+        $converter = $this->createConverter($storage);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
@@ -391,16 +381,24 @@ class MutableFieldsOnlyTest extends TestCase
      * If it's null, it creates a converter which contains a mock of the storage
      * object collector factory.
      *
-     * @param MutableFieldsOnly|null $converter
+     * @param IStorage|null $storage
      * @return MutableFieldsOnly
+     * @throws Exception
      */
-    private function createConverterIfNull(?MutableFieldsOnly $converter = null): MutableFieldsOnly
+    private function createConverter(?IStorage $storage = null): MutableFieldsOnly
     {
-        if (!$converter) {
+        if ($storage) {
+            $collectorMock = $this->createMock(Collector::class);
+            $collectorMock->method('getFirst')->willReturn($storage);
+
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            = new MutableFieldsOnly($collectorFactoryMock);
+            $collectorFactoryMock->method('build')->willReturn($collectorMock);
+            return new MutableFieldsOnly($collectorFactoryMock);
         }
-        return $converter;
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        return new MutableFieldsOnly($collectorFactoryMock);
     }
 }

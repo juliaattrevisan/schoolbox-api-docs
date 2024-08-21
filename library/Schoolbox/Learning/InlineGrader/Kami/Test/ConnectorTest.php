@@ -720,31 +720,31 @@ class ConnectorTest extends TestCase
     }
 
 
-    public function providerGetDocument(): array
+    public static function providerGetDocument(): array
     {
-        return $this->providerDocument(200);
+        return self::providerDocument(200);
     }
 
 
-    public function providerGetDocumentBadResponse(): array
+    public static function providerGetDocumentBadResponse(): array
     {
-        return $this->providerBadResponse(200);
+        return self::providerBadResponse(200);
     }
 
 
-    public function providerUpload(): array
+    public static function providerUpload(): array
     {
-        return $this->providerDocument(201);
+        return self::providerDocument(201);
     }
 
 
-    public function providerUploadBadResponse(): array
+    public static function providerUploadBadResponse(): array
     {
-        return $this->providerBadResponse(201);
+        return self::providerBadResponse(201);
     }
 
 
-    private function providerDocument(int $statusCode): array
+    private static function providerDocument(int $statusCode): array
     {
         return [
             // An ordinary document
@@ -817,7 +817,7 @@ class ConnectorTest extends TestCase
     }
 
 
-    private function providerBadResponse(int $validStatusCode): array
+    private static function providerBadResponse(int $validStatusCode): array
     {
         return [
             'Bad Response Code' => [
