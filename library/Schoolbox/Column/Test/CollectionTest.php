@@ -25,17 +25,17 @@ class CollectionTest extends TestCase
     protected $object;
 
     /**
-     * @var TestMapper
+     * @var TestMapper|null
      */
-    private static TestMapper $testMapper;
+    private static ?TestMapper $testMapper = null;
 
     /**
-     * @inheritdoc
+     * Get the test mapper
      */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public static function getTestMapper(): TestMapper
     {
-        parent::__construct($name, $data, $dataName);
-        self::$testMapper = new TestMapper();
+        self::$testMapper ??= new TestMapper();
+        return self::$testMapper;
     }
 
     /**
@@ -59,14 +59,14 @@ class CollectionTest extends TestCase
         self::assertInstanceOf(ICollection::class, $actual);
         self::assertSameSize($expected_output, $actual);
 
-        $identifier = self::$testMapper->getIdentifierProperty();
+        $identifier = self::getTestMapper()->getIdentifierProperty();
         foreach ($expected_output as $i => $expectedItem) {
             $actualItem = $actual[$i];
             self::assertInstanceOf(TestModel::class, $expectedItem);
             self::assertInstanceOf(TestModel::class, $actualItem);
             self::assertSame(
-                self::$testMapper->getModelProperty($actualItem, $identifier),
-                self::$testMapper->getModelProperty($expectedItem, $identifier),
+                self::getTestMapper()->getModelProperty($actualItem, $identifier),
+                self::getTestMapper()->getModelProperty($expectedItem, $identifier),
             );
         }
     }
@@ -125,29 +125,29 @@ class CollectionTest extends TestCase
         return [
             'null'          => [
                 null,
-                self::$testMapper->createCollection(),
+                self::getTestMapper()->createCollection(),
             ],
             'none'          => [
                 [],
-                self::$testMapper->createCollection(),
+                self::getTestMapper()->createCollection(),
             ],
             'one'           => [
                 [1],
-                self::$testMapper->createCollection([
-                    self::$testMapper->createModel()->setId(1),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
                 ]),
             ],
             'two'           => [
                 [1, 3],
-                self::$testMapper->createCollection([
-                    self::$testMapper->createModel()->setId(1),
-                    self::$testMapper->createModel()->setId(3),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
             ],
             'array of null' => [
                 [null],
-                self::$testMapper->createCollection([
-                    self::$testMapper->createModel(),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel(),
                 ]),
             ],
         ];
@@ -175,24 +175,24 @@ class CollectionTest extends TestCase
         return [
             'null'                  => [null, null],
             'empty array'           => [[], []],
-            'empty collection'      => [self::$testMapper->createCollection(), []],
+            'empty collection'      => [self::getTestMapper()->createCollection(), []],
             'collection of null'    => [new \Schoolbox\Collection([null]), [null]],
             'collection of IDs'     => [
                 new \Schoolbox\Collection([1, 2]),
                 [1, 2],
             ],
             'collection of objects' => [
-                self::$testMapper->createCollection([
-                    self::$testMapper->createModel()->setId(1),
-                    self::$testMapper->createModel()->setId(3),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
                 [1, 3],
             ],
             'mixed collection'      => [
                 new \Schoolbox\Collection([
-                    self::$testMapper->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(1),
                     2,
-                    self::$testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
                 [1, 2, 3],
             ],
@@ -203,16 +203,16 @@ class CollectionTest extends TestCase
             ],
             'array of objects'      => [
                 [
-                    self::$testMapper->createModel()->setId(1),
-                    self::$testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ],
                 [1, 3],
             ],
             'mixed array'           => [
                 [
-                    self::$testMapper->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(1),
                     2,
-                    self::$testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(3),
                 ],
                 [1, 2, 3],
             ],
@@ -225,7 +225,7 @@ class CollectionTest extends TestCase
     public static function getTestDehydrateTypeErrorCases(): iterable
     {
         return [
-            'no mapper' => [self::$testMapper->createCollection(), null],
+            'no mapper' => [self::getTestMapper()->createCollection(), null],
             'string'    => ['string', self::$testMapper],
         ];
     }

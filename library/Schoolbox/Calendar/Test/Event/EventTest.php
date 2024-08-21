@@ -70,7 +70,7 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    private function getTestLevelEvents(): array
+    private static function getTestLevelEvents(): array
     {
         return [
             Event::ACCESS_PERSONAL => (new Event())->setAccess(Event::ACCESS_PERSONAL),
@@ -85,9 +85,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsPersonalLevelData(): array
+    public static function getTestIsPersonalLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], true],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], false],
@@ -101,9 +101,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsGroupLevelData(): array
+    public static function getTestIsGroupLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], false],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], true],
@@ -117,9 +117,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsCampusLevelData(): array
+    public static function getTestIsCampusLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], false],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], false],
