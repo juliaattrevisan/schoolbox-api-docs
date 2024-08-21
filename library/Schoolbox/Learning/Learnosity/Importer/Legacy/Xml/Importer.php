@@ -11,9 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Alaress\Database\Connector\IConnector;
 use Assess\Import\Parser\IParser;
-use DebugBar\DebugBarException;
 use LearnositySdk\Exceptions\ValidationException;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -276,7 +274,7 @@ class Importer
              * Some people have tried to put a survey in here, but that won't work
              * for obvious reasons: usually this is a user accident
              */
-            '//quiz/availability[text()="assess"]',
+            '//quiz/availability[text()="' . self::QUIZ_AVAILABILITY . '"]',
             '//quiz/markvisibility',
             /* We could have checked for <section> but maybe some people have used
              * xml files to set up the aforementioned misc fields and let teachers
