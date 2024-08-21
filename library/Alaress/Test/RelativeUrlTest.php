@@ -122,7 +122,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isUrl')]
     public function testIsUrl($url)
     {
-        $siteHost = $this->getLocalSiteHost();
+        $siteHost = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $siteHost);
         $this->assertTrue($urlFormatter->isUrl(), "Failed asserting that '$url' is a Url");
     }
@@ -133,7 +133,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl')]
     public function testIsNotUrl($url)
     {
-        $siteHost = $this->getLocalSiteHost();
+        $siteHost = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $siteHost);
         $this->assertFalse($urlFormatter->isUrl(), "Failed asserting that '$url' is not a Url");
     }
@@ -146,7 +146,7 @@ class RelativeUrlTest extends TestCase
     public function testCanNotGetHostname($url)
     {
         $expected = false;
-        $siteHost = $this->getLocalSiteHost();
+        $siteHost = self::getLocalSiteHost();
 
         $urlFormatter = new Url($url, $siteHost);
         $actual = $urlFormatter->getHostname();
@@ -162,7 +162,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_parsableHostnames')]
     public function testCanGetHostname($url, $expected)
     {
-        $urlFormatter = new Url($url, $this->getLocalSiteHost());
+        $urlFormatter = new Url($url, self::getLocalSiteHost());
         $actual = $urlFormatter->getHostname();
         $message = "Failed asserting equality. Input: '$url', Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
@@ -220,7 +220,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_getSlugMapping')]
     public function testGetSlug($url, $expected)
     {
-        $urlFormatter = new Url($url, $this->getLocalSiteHost());
+        $urlFormatter = new Url($url, self::getLocalSiteHost());
         $actual = $urlFormatter->getSlug();
         $message = "Failed asserting equality. Input: '$url', Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($actual, $expected, $message);
@@ -233,7 +233,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative')]
     public function testNoProtocolUrl($url)
     {
-        $urlFormatter = new Url($url, $this->getLocalSiteHost());
+        $urlFormatter = new Url($url, self::getLocalSiteHost());
         $this->assertFalse($urlFormatter->isUrl(), "Failed to fail isURL() before prepending scheme: '$url'");
 
         // With protocol
@@ -249,7 +249,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_IsLocalSite_IsLocalServer_IsRelative($url)
     {
-        $site = $this->getLocalSiteHost();
+        $site = self::getLocalSiteHost();
         $_SERVER['HTTP_HOST'] = $site;
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
@@ -261,7 +261,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_IsLocalSite_IsLocalServer_NotRelative($url)
     {
-        $site = $this->getLocalSiteHost();
+        $site = self::getLocalSiteHost();
         $_SERVER['HTTP_HOST'] = $site;
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
@@ -273,8 +273,8 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_IsLocalSite_NotLocalServer_IsRelative($url)
     {
-        $site = $this->getLocalSiteHost();
-        $_SERVER['HTTP_HOST'] = $this->getNotLocalSiteHost();
+        $site = self::getLocalSiteHost();
+        $_SERVER['HTTP_HOST'] = self::getNotLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
     }
@@ -285,8 +285,8 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_IsLocalSite_NotLocalServer_NotRelative($url)
     {
-        $site = $this->getLocalSiteHost();
-        $_SERVER['HTTP_HOST'] = $this->getNotLocalSiteHost();
+        $site = self::getLocalSiteHost();
+        $_SERVER['HTTP_HOST'] = self::getNotLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
     }
@@ -297,8 +297,8 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_NotLocalSite_IsLocalServer_IsRelative($url)
     {
-        $site = $this->getNotLocalSiteHost();
-        $_SERVER['HTTP_HOST'] = $this->getLocalSiteHost();
+        $site = self::getNotLocalSiteHost();
+        $_SERVER['HTTP_HOST'] = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
     }
@@ -309,8 +309,8 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_notUrl_notRelative_isLocal')]
     public function test_NotLocalSite_IsLocalServer_NotRelative($url)
     {
-        $site = $this->getNotLocalSiteHost();
-        $_SERVER['HTTP_HOST'] = $this->getLocalSiteHost();
+        $site = self::getNotLocalSiteHost();
+        $_SERVER['HTTP_HOST'] = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
     }
@@ -321,7 +321,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable_isRelative')]
     public function test_NotLocalSite_NotLocalServer_IsRelative($url)
     {
-        $site = $this->getNotLocalSiteHost();
+        $site = self::getNotLocalSiteHost();
         $_SERVER['HTTP_HOST'] = $site;
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isLocalUrl(), "Failed asserting that '$url' is a local Url");
@@ -347,7 +347,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isFtpUrl')]
     public function testIsFtpUrl($url)
     {
-        $site = $this->getLocalSiteHost();
+        $site = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $this->assertTrue($urlFormatter->isFtpUrl(), "Failed asserting that '$url is a FTP Url");
     }
@@ -372,7 +372,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_relativeUrlMapping')]
     public function testGetRelativeUrl($url, $expected)
     {
-        $site = $this->getLocalSiteHost();
+        $site = self::getLocalSiteHost();
         $urlFormatter = new Url($url, $site);
         $actual = $urlFormatter->getRelativeURL();
         $msg = "Failed asserting equality. Input: '$url', Expected: '$expected', Actual: '$actual'";
@@ -387,7 +387,7 @@ class RelativeUrlTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_isParsable')]
     public function testRedirectUrl($url)
     {
-        $site = $this->getLocalSiteHost();
+        $site = self::getLocalSiteHost();
 
         $expected = '/redir.php?url=' . urlencode(base64_encode(trim($url)));
         $urlFormatter = new Url($url, $site);
@@ -399,48 +399,48 @@ class RelativeUrlTest extends TestCase
 
     // ================ Data Providers ======================
 
-    public function provider_isLocal()
+    public static function provider_isLocal()
     {
         return array_merge(
-            $this->provider_isParsable_isRelative(),
-            $this->provider_isParsable_isLocal_notRelative()
+            self::provider_isParsable_isRelative(),
+            self::provider_isParsable_isLocal_notRelative()
         );
     }
 
-    public function provider_isParsable_isLocal_notRelative()
+    public static function provider_isParsable_isLocal_notRelative()
     {
         return array_merge(
-            $this->provider_isUrl_isLocal(),
-            $this->provider_isParsable_notUrl_notRelative_isLocal()
+            self::provider_isUrl_isLocal(),
+            self::provider_isParsable_notUrl_notRelative_isLocal()
         );
     }
 
-    public function provider_isParsable_isLocal_isRelative()
+    public static function provider_isParsable_isLocal_isRelative()
     {
-        return $this->provider_isParsable_isRelative();
+        return self::provider_isParsable_isRelative();
     }
 
-    public function provider_isParsable_notLocal_notRelative()
+    public static function provider_isParsable_notLocal_notRelative()
     {
         return array_merge(
-            $this->provider_isUrl_notLocal(),
-            $this->provider_isParsable_notUrl_notRelative_notLocal()
+            self::provider_isUrl_notLocal(),
+            self::provider_isParsable_notUrl_notRelative_notLocal()
         );
     }
 
-    public function provider_isParsable_notRelative()
+    public static function provider_isParsable_notRelative()
     {
         return array_merge(
-            $this->provider_isParsable_isUrl(),
-            $this->provider_isParsable_notUrl_notRelative()
+            self::provider_isParsable_isUrl(),
+            self::provider_isParsable_notUrl_notRelative()
         );
     }
 
-    public function provider_isFtpUrl()
+    public static function provider_isFtpUrl()
     {
         return array_merge(
-            $this->provider_isParsable_isUrl_isLocal_isFtp(),
-            $this->provider_isParsable_isUrl_notLocal_isFtp()
+            self::provider_isParsable_isUrl_isLocal_isFtp(),
+            self::provider_isParsable_isUrl_notLocal_isFtp()
         );
     }
 
@@ -454,10 +454,10 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_normaliseNonLocalUrls()
+    public static function provider_normaliseNonLocalUrls()
     {
-        $localSiteHost = $this->getLocalSiteHost();
-        $otherSiteHost = $this->getNotLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
+        $otherSiteHost = self::getNotLocalSiteHost();
         return [
             ["$otherSiteHost", $localSiteHost, "http://$otherSiteHost"],
             ["$otherSiteHost/", $localSiteHost, "http://$otherSiteHost/"],
@@ -472,9 +472,9 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_normaliseLocalUrls()
+    public static function provider_normaliseLocalUrls()
     {
-        $localSiteHost = $this->getLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
         return [
             ['         ', $localSiteHost, ''],
             ['', $localSiteHost, ''],
@@ -539,20 +539,20 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_validUrlType()
+    public static function provider_validUrlType()
     {
         return array_merge(
-            $this->provider_notParsable(),
-            $this->provider_isParsable()
+            self::provider_notParsable(),
+            self::provider_isParsable()
         );
     }
 
-    public function provider_isParsable()
+    public static function provider_isParsable()
     {
         return array_merge(
-            $this->provider_isParsable_isRelative(),
-            $this->provider_isParsable_isUrl(),
-            $this->provider_isParsable_notUrl_notRelative()
+            self::provider_isParsable_isRelative(),
+            self::provider_isParsable_isUrl(),
+            self::provider_isParsable_notUrl_notRelative()
         );
     }
 
@@ -629,9 +629,9 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isParsable_isUrl_isLocal_isFtp()
+    public static function provider_isParsable_isUrl_isLocal_isFtp()
     {
-        $sitehost = $this->getLocalSiteHost();
+        $sitehost = self::getLocalSiteHost();
         return [
             ["ftp://$sitehost"],
             ["ftp://$sitehost/"],
@@ -655,9 +655,9 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isUrl_isLocal_notFtp()
+    public static function provider_isUrl_isLocal_notFtp()
     {
-        $sitehost = $this->getLocalSiteHost();
+        $sitehost = self::getLocalSiteHost();
         return [
             ["http://$sitehost"],
             ["http://$sitehost/"],
@@ -681,10 +681,10 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isParsable_isUrl_notLocal_isFtp()
+    public static function provider_isParsable_isUrl_notLocal_isFtp()
     {
-        $localSiteHost = $this->getLocalSiteHost();
-        $nonLocalSiteHost = $this->getNotLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
+        $nonLocalSiteHost = self::getNotLocalSiteHost();
         return [
             ["ftp://www.$localSiteHost"],
             ["ftp://$localSiteHost.com"],
@@ -712,10 +712,10 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isUrl_notLocal_notFtp()
+    public static function provider_isUrl_notLocal_notFtp()
     {
-        $localSiteHost = $this->getLocalSiteHost();
-        $nonLocalSiteHost = $this->getNotLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
+        $nonLocalSiteHost = self::getNotLocalSiteHost();
         return [
             ["http://$localSiteHost.au"],
             ["http://www.$localSiteHost"],
@@ -738,9 +738,9 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isParsable_notUrl_notRelative_isLocal()
+    public static function provider_isParsable_notUrl_notRelative_isLocal()
     {
-        $localSiteHost = $this->getLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
         return [
             ["$localSiteHost"],
             ["$localSiteHost:8080/"],
@@ -769,10 +769,10 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    public function provider_isParsable_notUrl_notRelative_notLocal()
+    public static function provider_isParsable_notUrl_notRelative_notLocal()
     {
-        $localSiteHost = $this->getLocalSiteHost();
-        $nonLocalSiteHost = $this->getNotLocalSiteHost();
+        $localSiteHost = self::getLocalSiteHost();
+        $nonLocalSiteHost = self::getNotLocalSiteHost();
         return [
             ['ftp'],
             ['ftp.example.com'],
@@ -819,68 +819,68 @@ class RelativeUrlTest extends TestCase
 
     // Aggregate Data Providers
 
-    public function provider_isParsable_notUrl_notRelative()
+    public static function provider_isParsable_notUrl_notRelative()
     {
         return array_merge(
-            $this->provider_isParsable_notUrl_notRelative_isLocal(),
-            $this->provider_isParsable_notUrl_notRelative_notLocal()
+            self::provider_isParsable_notUrl_notRelative_isLocal(),
+            self::provider_isParsable_notUrl_notRelative_notLocal()
         );
     }
 
 
-    public function provider_isParsable_isUrl()
+    public static function provider_isParsable_isUrl()
     {
         return array_merge(
-            $this->provider_isUrl_isLocal(),
-            $this->provider_isUrl_notLocal()
+            self::provider_isUrl_isLocal(),
+            self::provider_isUrl_notLocal()
         );
     }
 
 
-    public function provider_isUrl_notLocal()
+    public static function provider_isUrl_notLocal()
     {
         return array_merge(
-            $this->provider_isParsable_isUrl_notLocal_isFtp(),
-            $this->provider_isUrl_notLocal_notFtp()
+            self::provider_isParsable_isUrl_notLocal_isFtp(),
+            self::provider_isUrl_notLocal_notFtp()
         );
     }
 
-    public function provider_isUrl_isLocal()
+    public static function provider_isUrl_isLocal()
     {
         return array_merge(
-            $this->provider_isParsable_isUrl_isLocal_isFtp(),
-            $this->provider_isUrl_isLocal_notFtp()
+            self::provider_isParsable_isUrl_isLocal_isFtp(),
+            self::provider_isUrl_isLocal_notFtp()
         );
     }
 
-    public function provider_isParsable_notFtpUrl()
+    public static function provider_isParsable_notFtpUrl()
     {
         return array_merge(
-            $this->provider_isParsable_isRelative(),
-            $this->provider_isUrl_isLocal_notFtp(),
-            $this->provider_isUrl_notLocal_notFtp(),
-            $this->provider_isParsable_notUrl_notRelative_isLocal(),
-            $this->provider_isParsable_notUrl_notRelative_notLocal()
+            self::provider_isParsable_isRelative(),
+            self::provider_isUrl_isLocal_notFtp(),
+            self::provider_isUrl_notLocal_notFtp(),
+            self::provider_isParsable_notUrl_notRelative_isLocal(),
+            self::provider_isParsable_notUrl_notRelative_notLocal()
         );
     }
 
-    public function provider_isParsable_notUrl()
+    public static function provider_isParsable_notUrl()
     {
         return array_merge(
-            $this->provider_isParsable_isRelative(),
-            $this->provider_isParsable_notUrl_notRelative()
+            self::provider_isParsable_isRelative(),
+            self::provider_isParsable_notUrl_notRelative()
         );
     }
 
-    public function provider_cannotParseHostname()
+    public static function provider_cannotParseHostname()
     {
         return array_merge(
-            $this->provider_isMalformedHostname(),
-            $this->provider_isParsable_isRelative()
+            self::provider_isMalformedHostname(),
+            self::provider_isParsable_isRelative()
         );
     }
 
-    public function provider_isMalformedHostname()
+    public static function provider_isMalformedHostname()
     {
         return [
             ['protocol://www.example.com.'],
@@ -917,12 +917,12 @@ class RelativeUrlTest extends TestCase
         ];
     }
 
-    private function getLocalSiteHost()
+    private static function getLocalSiteHost()
     {
         return 'sbvagrant.alaress.com.au';
     }
 
-    private function getNotLocalSiteHost()
+    private static function getNotLocalSiteHost()
     {
         return 'some.non.local.site';
     }

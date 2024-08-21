@@ -24,7 +24,7 @@ class PaginatorTest extends TestCase
      * @param  int $total
      * @return Paginator
      */
-    protected function buildPaginator($pageSize, $total)
+    protected static function buildPaginator($pageSize, $total)
     {
         $paginator = new Paginator();
         $paginator->setPageSize($pageSize)->setTotal($total);
@@ -34,30 +34,30 @@ class PaginatorTest extends TestCase
     /**
      * @return array
      */
-    public function getTestPageCountData()
+    public static function getTestPageCountData()
     {
         return array(
-            array($this->buildPaginator(1, 0),  0),
-            array($this->buildPaginator(1, 9),  9),
+            array(self::buildPaginator(1, 0),  0),
+            array(self::buildPaginator(1, 9),  9),
 
-            array($this->buildPaginator(10, 9),  1),
-            array($this->buildPaginator(10, 10), 1),
-            array($this->buildPaginator(10, 11), 2),
+            array(self::buildPaginator(10, 9),  1),
+            array(self::buildPaginator(10, 10), 1),
+            array(self::buildPaginator(10, 11), 2),
 
-            array($this->buildPaginator(10, 19), 2),
-            array($this->buildPaginator(10, 20), 2),
-            array($this->buildPaginator(10, 21), 3),
+            array(self::buildPaginator(10, 19), 2),
+            array(self::buildPaginator(10, 20), 2),
+            array(self::buildPaginator(10, 21), 3),
 
-            array($this->buildPaginator(10, 59), 6),
-            array($this->buildPaginator(10, 60), 6),
-            array($this->buildPaginator(10, 61), 7),
+            array(self::buildPaginator(10, 59), 6),
+            array(self::buildPaginator(10, 60), 6),
+            array(self::buildPaginator(10, 61), 7),
 
-            array($this->buildPaginator(50, 19), 1),
-            array($this->buildPaginator(50, 20), 1),
-            array($this->buildPaginator(50, 21), 1),
-            array($this->buildPaginator(50, 49), 1),
-            array($this->buildPaginator(50, 50), 1),
-            array($this->buildPaginator(50, 51), 2),
+            array(self::buildPaginator(50, 19), 1),
+            array(self::buildPaginator(50, 20), 1),
+            array(self::buildPaginator(50, 21), 1),
+            array(self::buildPaginator(50, 49), 1),
+            array(self::buildPaginator(50, 50), 1),
+            array(self::buildPaginator(50, 51), 2),
         );
     }
 
@@ -73,34 +73,34 @@ class PaginatorTest extends TestCase
     /**
      * @return array
      */
-    public function getTestItemsOnPageData()
+    public static function getTestItemsOnPageData()
     {
         return array(
-            array($this->buildPaginator(1, 9),  1, 0, 1, 1),
-            array($this->buildPaginator(1, 9),  2, 1, 2, 2),
-            array($this->buildPaginator(1, 9),  8, 7, 8, 8),
-            array($this->buildPaginator(1, 9),  9, 8, 9, 9),
+            array(self::buildPaginator(1, 9),  1, 0, 1, 1),
+            array(self::buildPaginator(1, 9),  2, 1, 2, 2),
+            array(self::buildPaginator(1, 9),  8, 7, 8, 8),
+            array(self::buildPaginator(1, 9),  9, 8, 9, 9),
 
-            array($this->buildPaginator(10, 9),  1, 0,  1, 9),
-            array($this->buildPaginator(10, 10), 1, 0,  1, 10),
-            array($this->buildPaginator(10, 11), 1, 0,  1, 10),
-            array($this->buildPaginator(10, 11), 2, 10, 11, 11),
+            array(self::buildPaginator(10, 9),  1, 0,  1, 9),
+            array(self::buildPaginator(10, 10), 1, 0,  1, 10),
+            array(self::buildPaginator(10, 11), 1, 0,  1, 10),
+            array(self::buildPaginator(10, 11), 2, 10, 11, 11),
 
-            array($this->buildPaginator(10, 19), 1, 0,  1,  10),
-            array($this->buildPaginator(10, 19), 2, 10, 11, 19),
-            array($this->buildPaginator(10, 20), 1, 0,  1,  10),
-            array($this->buildPaginator(10, 20), 2, 10, 11, 20),
-            array($this->buildPaginator(10, 21), 1, 0,  1,  10),
-            array($this->buildPaginator(10, 21), 2, 10, 11, 20),
-            array($this->buildPaginator(10, 21), 3, 20, 21, 21),
+            array(self::buildPaginator(10, 19), 1, 0,  1,  10),
+            array(self::buildPaginator(10, 19), 2, 10, 11, 19),
+            array(self::buildPaginator(10, 20), 1, 0,  1,  10),
+            array(self::buildPaginator(10, 20), 2, 10, 11, 20),
+            array(self::buildPaginator(10, 21), 1, 0,  1,  10),
+            array(self::buildPaginator(10, 21), 2, 10, 11, 20),
+            array(self::buildPaginator(10, 21), 3, 20, 21, 21),
 
-            array($this->buildPaginator(50, 19), 1, 0,  1,  19),
-            array($this->buildPaginator(50, 20), 1, 0,  1,  20),
-            array($this->buildPaginator(50, 21), 1, 0,  1,  21),
-            array($this->buildPaginator(50, 49), 1, 0,  1,  49),
-            array($this->buildPaginator(50, 50), 1, 0,  1,  50),
-            array($this->buildPaginator(50, 51), 1, 0,  1,  50),
-            array($this->buildPaginator(50, 51), 2, 50, 51, 51),
+            array(self::buildPaginator(50, 19), 1, 0,  1,  19),
+            array(self::buildPaginator(50, 20), 1, 0,  1,  20),
+            array(self::buildPaginator(50, 21), 1, 0,  1,  21),
+            array(self::buildPaginator(50, 49), 1, 0,  1,  49),
+            array(self::buildPaginator(50, 50), 1, 0,  1,  50),
+            array(self::buildPaginator(50, 51), 1, 0,  1,  50),
+            array(self::buildPaginator(50, 51), 2, 50, 51, 51),
         );
     }
 
@@ -128,7 +128,7 @@ class PaginatorTest extends TestCase
     public function testZeroPagesize()
     {
         $this->expectException(OutOfRangeException::class);
-        $this->buildPaginator(0, 0);
+        self::buildPaginator(0, 0);
     }
 
     /**
@@ -139,7 +139,7 @@ class PaginatorTest extends TestCase
     public function testNegativePagesize()
     {
         $this->expectException(OutOfRangeException::class);
-        $this->buildPaginator(-1, 0);
+        self::buildPaginator(-1, 0);
     }
 
     /**
@@ -150,7 +150,7 @@ class PaginatorTest extends TestCase
     public function testZeroTotalOffset()
     {
         $this->expectException(OutOfRangeException::class);
-        $paginator = $this->buildPaginator(10, 0);
+        $paginator = self::buildPaginator(10, 0);
         $paginator->getOffset(1);
     }
 
@@ -162,7 +162,7 @@ class PaginatorTest extends TestCase
     public function testZeroTotalFirstOnPage()
     {
         $this->expectException(OutOfRangeException::class);
-        $paginator = $this->buildPaginator(10, 0);
+        $paginator = self::buildPaginator(10, 0);
         $paginator->getFirstOnPage(1);
     }
 
@@ -174,7 +174,7 @@ class PaginatorTest extends TestCase
     public function testZeroTotalLastOnPage()
     {
         $this->expectException(OutOfRangeException::class);
-        $paginator = $this->buildPaginator(10, 0);
+        $paginator = self::buildPaginator(10, 0);
         $paginator->getLastOnPage(1);
     }
 
@@ -186,27 +186,27 @@ class PaginatorTest extends TestCase
     public function testNegativeTotal()
     {
         $this->expectException(OutOfRangeException::class);
-        $this->buildPaginator(10, -1);
+        self::buildPaginator(10, -1);
     }
 
 
     /**
      * @return array
      */
-    public function getTestPageNumberLowerBoundData()
+    public static function getTestPageNumberLowerBoundData()
     {
         return array(
-            array($this->buildPaginator(1, 0),  -1),
+            array(self::buildPaginator(1, 0),  -1),
 
-            array($this->buildPaginator(1, 9),   0),
-            array($this->buildPaginator(1, 9),  -1),
+            array(self::buildPaginator(1, 9),   0),
+            array(self::buildPaginator(1, 9),  -1),
 
-            array($this->buildPaginator(10, 9),   0),
-            array($this->buildPaginator(10, 9),  -1),
-            array($this->buildPaginator(10, 10),  0),
-            array($this->buildPaginator(10, 10), -1),
-            array($this->buildPaginator(10, 11),  0),
-            array($this->buildPaginator(10, 11), -1),
+            array(self::buildPaginator(10, 9),   0),
+            array(self::buildPaginator(10, 9),  -1),
+            array(self::buildPaginator(10, 10),  0),
+            array(self::buildPaginator(10, 10), -1),
+            array(self::buildPaginator(10, 11),  0),
+            array(self::buildPaginator(10, 11), -1),
         );
     }
 
@@ -226,19 +226,19 @@ class PaginatorTest extends TestCase
     /**
      * @return array
      */
-    public function getTestPageNumberUpperBoundData()
+    public static function getTestPageNumberUpperBoundData()
     {
         return array(
-            array($this->buildPaginator(1, 0),  1),
+            array(self::buildPaginator(1, 0),  1),
 
-            array($this->buildPaginator(1, 9),  10),
+            array(self::buildPaginator(1, 9),  10),
 
-            array($this->buildPaginator(10, 9),  2),
-            array($this->buildPaginator(10, 9),  4),
-            array($this->buildPaginator(10, 10), 2),
-            array($this->buildPaginator(10, 10), 5),
-            array($this->buildPaginator(10, 11), 3),
-            array($this->buildPaginator(10, 11), 5),
+            array(self::buildPaginator(10, 9),  2),
+            array(self::buildPaginator(10, 9),  4),
+            array(self::buildPaginator(10, 10), 2),
+            array(self::buildPaginator(10, 10), 5),
+            array(self::buildPaginator(10, 11), 3),
+            array(self::buildPaginator(10, 11), 5),
         );
     }
 
