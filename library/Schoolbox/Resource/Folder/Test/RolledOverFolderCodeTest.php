@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder;
 /**
  * @codeCoverageIgnore
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Model::getRolledOverCodes)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Model::class)]
 class RolledOverFolderCodeTest extends TestCase
 {
     /**

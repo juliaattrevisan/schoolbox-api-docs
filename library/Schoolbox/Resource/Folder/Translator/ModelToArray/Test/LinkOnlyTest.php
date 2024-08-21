@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly::__invoke)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly::class)]
 class LinkOnlyTest extends TestCase
 {
     /**

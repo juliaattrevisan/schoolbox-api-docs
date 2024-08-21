@@ -19,7 +19,7 @@ use Schoolbox\Resource\Textbox\Model;
 use Schoolbox\Resource\Textbox\Translator\ModelToArray;
 use Schoolbox\User;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Textbox\Translator\ModelToArray::__invoke)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Textbox\Translator\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
