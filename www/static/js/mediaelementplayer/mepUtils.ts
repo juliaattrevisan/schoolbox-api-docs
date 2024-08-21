@@ -31,6 +31,16 @@ export function getConfigForVideo(overrideValueByKey?: object) {
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
          */
         success(media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
+            /**
+             * somewhere between mediaelement.js 4.2.7 and 7 the media element changed from <mediaelementwrapper> to a <div>
+             * which would cause videos to bleed out of their containers again. This code ensures that the media element is
+             * always 100% width and height of its container.
+             */
+            if (media !== null) {
+                media.style.width = "100%";
+                media.style.height = "100%";
+            }
+
             if (instance.node.nodeName.toLowerCase() === "audio") {
                 // The below code to fix aspect ratio need not be run when the instance is an audio player.
                 return;
@@ -70,7 +80,7 @@ export function getConfigForVideo(overrideValueByKey?: object) {
             }
 
             const replacementContainer: HTMLElement | null = container.closest(
-                "[data-schoolboxmedia-replacement-container]"
+                "[data-schoolboxmedia-replacement-container]",
             );
 
             /**
