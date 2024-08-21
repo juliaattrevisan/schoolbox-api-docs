@@ -260,6 +260,19 @@ class Importer
          */
         $xml->rewind();
 
+        /* Check that the first node is <quiz>
+         */
+
+        /* Check that the <availability>assess</availability> node exists
+         */
+
+        /* Look for the existence of publish, open, due, close dates
+         */
+
+        /* Look for Mark Visibility
+         */
+
+
         new \Alaress_Probe($xml->current());
 
 //        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
