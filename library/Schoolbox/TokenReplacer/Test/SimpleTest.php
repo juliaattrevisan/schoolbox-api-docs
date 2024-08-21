@@ -353,8 +353,8 @@ class SimpleTest extends TestCase
                 ],
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
-                various agents and officials at the <span data-mention=\"Brother\">Brother</span>
-                <span data-mention=\"what is this\">what is this</span>. a list or
+                various agents and officials at the Brother
+                what is this. a list or
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.</p></body></html>
 "
@@ -373,6 +373,21 @@ class SimpleTest extends TestCase
 <html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the <em class=\"mention\" data-mention=\"Brother\">Brother</em>
                 <em class=\"mention\" data-mention=\"what is this\">what is this</em>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p></body></html>
+"
+            ],
+            'HTML 5' => [
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <span class=\"mention\">[firstname]</span>. a list or
+                invoice of goods transported by truck or train. a list of the cargo
+                or passengers carried on an airplane.</p>",
+                [
+                    '[firstname]' => 'Brother',
+                ],
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
+<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the Brother. a list or
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.</p></body></html>
 "
