@@ -13,10 +13,9 @@ use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use DateTimeImmutable;
 use DateTimeInterface;
+use GuzzleHttp\Psr7\HttpFactory;
 use Schoolbox\Url\Uri;
-use Gotenberg\Modules\Chromium;
 use Gotenberg\Stream;
-use Http\Factory\Guzzle\StreamFactory;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Gotenberg\Client;
@@ -531,7 +530,7 @@ class CommandLineTool extends App
             ->html(
                 new Stream(
                     $filename,
-                    (new StreamFactory())->createStream(Scrub::htmlAbsoluteUri($input, $this->baseUri))
+                    (new HttpFactory())->createStream(Scrub::htmlAbsoluteUri($input, $this->baseUri))
                 )
             );
         $response  = $gotenberg->send($request);

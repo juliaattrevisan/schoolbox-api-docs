@@ -162,7 +162,9 @@ class Queue extends ResourceVideo
         if (isset($matches[1])) {
             $hours = $minutes = $seconds = 0;
             sscanf($matches[1], "%d:%d:%d", $hours, $minutes, $seconds);
-            $duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
+            $duration = isset($seconds)
+                ? ((int)($hours * 3600) + (int)($minutes * 60) + $seconds)
+                : ((int)($hours * 60) + $minutes);
             $this->setDuration($duration);
         }
     }

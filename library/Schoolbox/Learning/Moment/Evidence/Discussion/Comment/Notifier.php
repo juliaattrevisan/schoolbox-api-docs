@@ -68,9 +68,9 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct(IConfigLoader $configLoader)
+    public function __construct(IConfigLoader $configLoader, array $dependencies = [])
     {
-        parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
+        parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()] + $dependencies);
     }
 
     /**

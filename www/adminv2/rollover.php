@@ -44,7 +44,7 @@ $this->setVar(
     'JS_NODE_TYPE_ICON_MAP',
     $responseFactory->buildUnthemedHtml(
         '@resourceBrowser/jsNodeIconMap.twig',
-        [DebugTwig::DEBUG_WRAP => false],
+        [],
         $_SESSION['user'],
     )->getBody()->getContents()
 );

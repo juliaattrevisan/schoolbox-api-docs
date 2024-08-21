@@ -45,8 +45,11 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
                     return $last;
                 }
             );
+            return $result;
         }
-        return $result;
+        throw new UnexpectedValueException(
+            sprintf('Cached result is somehow not an array: received %s', gettype($result)),
+        );
     }
 
     /**

@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace Alaress\Sentry;
 
 use Sentry\Breadcrumb;
+use Sentry\CheckInStatus;
 use Sentry\ClientInterface;
 use Sentry\Event;
 use Sentry\EventHint;
 use Sentry\EventId;
 use Sentry\Integration\IntegrationInterface;
+use Sentry\MonitorConfig;
 use Sentry\Severity;
 use Sentry\State\HubInterface;
 use Sentry\State\Scope;
@@ -89,7 +91,7 @@ class NullHub implements HubInterface
     /**
      * @inheritDoc
      */
-    public function captureMessage(string $message, ?Severity $level = null): ?EventId
+    public function captureMessage(string $message, ?Severity $level = null, ?EventHint $hint = null): ?EventId
     {
         return null;
     }
@@ -97,7 +99,7 @@ class NullHub implements HubInterface
     /**
      * @inheritDoc
      */
-    public function captureException(\Throwable $exception): ?EventId
+    public function captureException(\Throwable $exception, ?EventHint $hint = null): ?EventId
     {
         return null;
     }
@@ -113,7 +115,7 @@ class NullHub implements HubInterface
     /**
      * @inheritDoc
      */
-    public function captureLastError(): ?EventId
+    public function captureLastError(?EventHint $hint = null): ?EventId
     {
         return null;
     }
@@ -137,7 +139,7 @@ class NullHub implements HubInterface
     /**
      * @inheritDoc
      */
-    public function startTransaction(TransactionContext $context): Transaction
+    public function startTransaction(TransactionContext $context, array $customSamplingContext = []): Transaction
     {
         return new Transaction($context, $this);
     }
@@ -164,5 +166,18 @@ class NullHub implements HubInterface
     public function setSpan(?Span $span): HubInterface
     {
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function captureCheckIn(
+        string $slug,
+        CheckInStatus $status,
+        $duration = null,
+        ?MonitorConfig $monitorConfig = null,
+        ?string $checkInId = null,
+    ): ?string {
+        return $checkInId;
     }
 }

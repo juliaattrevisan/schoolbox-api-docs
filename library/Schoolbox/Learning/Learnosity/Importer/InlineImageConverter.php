@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer;
 
+use DOMElement;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Storage\Mapper;
 
@@ -93,6 +94,9 @@ class InlineImageConverter
         $nodes     = $xpath->query('//*[@src]');
         $hasInline = false;
         foreach ($nodes as $node) {
+            if (!$node instanceof DomElement) {
+                continue;
+            }
             /* The src tag, a mega-huge base64 string
              */
             $src = $node->getAttribute('src');

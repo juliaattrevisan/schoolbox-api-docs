@@ -108,7 +108,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param IConfigLoader $configLoader
      * @param Mapper[]      $dependencies
      */
-    public function __construct(IConfigLoader $configLoader, $dependencies = array())
+    public function __construct(IConfigLoader $configLoader, array $dependencies = [])
     {
         $this->conf = $configLoader;
         $this->loadDependencies($dependencies);
