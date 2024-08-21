@@ -46,7 +46,7 @@ class MapperTest extends TestCase
      *
      * @return array
      */
-    public function getHydrateData()
+    public static function getHydrateData()
     {
         return [
             //
@@ -121,7 +121,7 @@ class MapperTest extends TestCase
                     'file'       => 'Awesome',
                 ],
                 null,
-                [$this, 'callbackForTest'],
+                [self::class, 'callbackForTest'],
             ],
             //
             // Hydrate with invalid callback - nothing changes
@@ -169,7 +169,7 @@ class MapperTest extends TestCase
      *
      * @return mixed
      */
-    public function callbackForTest($mapper, $model, $row)
+    public static function callbackForTest($mapper, $model, $row)
     {
         $model->setId(999);
         return $model;

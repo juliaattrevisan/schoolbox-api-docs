@@ -159,7 +159,7 @@ class VersionTest extends TestCase
      * @param bool|null $expected
      * @param array     $config
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCloudHostedData(): iterable')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCloudHostedData')]
     public function testIsCloudHosted(?bool $expected, array $config): void
     {
         $factoryVersion = new Version(new ArrayLoader($config));
@@ -171,7 +171,7 @@ class VersionTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsCloudHostedData(): iterable
+    public static function getTestIsCloudHostedData(): iterable
     {
         yield 'match cloud hosted is true' => [
             true,

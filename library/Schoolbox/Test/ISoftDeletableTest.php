@@ -38,11 +38,11 @@ class ISoftDeletableTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerMappers')]
     public function testMapperAndModelConsistency(IMapper $mapper, ReflectionClass $reflection, string $className): void
     {
-        $model              = $mapper->createModel();
-        $reflectionMethod = $reflection->getMethod('isSoftDeletable');
-        $isModelSoftDeletable       = $model instanceof ISoftDeletable;
-        $isMapperSoftDeleteColumn   = (bool)$reflectionMethod->invoke($mapper);
-        $message               = "'{$className}' model is" . ($isModelSoftDeletable ? '' : ' not') .
+        $model                    = $mapper->createModel();
+        $reflectionMethod         = $reflection->getMethod('isSoftDeletable');
+        $isModelSoftDeletable     = $model instanceof ISoftDeletable;
+        $isMapperSoftDeleteColumn = (bool)$reflectionMethod->invoke($mapper);
+        $message                  = "'{$className}' model is" . ($isModelSoftDeletable ? '' : ' not') .
             ' soft-deletable but mapper is ' . ($isMapperSoftDeleteColumn ? '' : 'not ') . 'soft-deletable';
         $this->assertEquals($isModelSoftDeletable, $isMapperSoftDeleteColumn, $message);
     }
@@ -53,14 +53,14 @@ class ISoftDeletableTest extends TestCase
      *
      * @return array
      */
-    public function providerMappers(): array
+    public static function providerMappers(): array
     {
-        $this->loadAllMapperClasses();
+        self::loadAllMapperClasses();
         $mappers = [];
 
         foreach (get_declared_classes() as $className) {
             // Is the class not a mapper?
-            if (!$this->isValidMapperClass($className)) {
+            if (!self::isValidMapperClass($className)) {
                 continue;
             }
             $reflection = new ReflectionClass($className);
@@ -95,7 +95,7 @@ class ISoftDeletableTest extends TestCase
      * @param string $className
      * @return bool
      */
-    private function isValidMapperClass(string $className): bool
+    private static function isValidMapperClass(string $className): bool
     {
         // Because they're not real mappers
         $exclusions = [
@@ -130,7 +130,7 @@ class ISoftDeletableTest extends TestCase
      * @param string $className The name of the relevant class
      * @return string The path to the file containing the class or false
      */
-    private function getClassFile($className): string
+    private static function getClassFile($className): string
     {
         $classSegments = preg_split('/[_\\\\]/', $className);
         return __DIR__ . '/../../../library/' . implode('/', $classSegments) . '.php';
@@ -140,7 +140,7 @@ class ISoftDeletableTest extends TestCase
     /**
      * Load all mapper classes using require_once to avoid including twice
      */
-    private function loadAllMapperClasses(): void
+    private static function loadAllMapperClasses(): void
     {
         // Attempt to load and therefore parse every single PHP class in /library
         foreach (
@@ -163,7 +163,7 @@ class ISoftDeletableTest extends TestCase
                 foreach ($candidates as $candidate) {
                     try {
                         /** @noinspection PhpIncludeInspection */
-                        require_once $this->getClassFile($candidate);
+                        require_once self::getClassFile($candidate);
                     } catch (\Throwable $e) {
                         break;
                     }

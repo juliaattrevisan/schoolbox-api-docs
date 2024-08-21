@@ -96,12 +96,11 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_uses(): array
+    public static function providerColumnToPropertyMapping_uses(): array
     {
         $data = [];
 
-        $mapper1 = new class extends Mapper
-        {
+        $mapper1 = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -110,8 +109,7 @@ class MappingCollectionTest extends TestCase
         };
         $data[]  = [$mapper1, 'a_column'];
 
-        $mapper2 = new class extends Mapper
-        {
+        $mapper2 = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -120,8 +118,7 @@ class MappingCollectionTest extends TestCase
         };
         $data[]  = [$mapper2, 'a_column'];
 
-        $mapper3 = new class extends Mapper
-        {
+        $mapper3 = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -137,10 +134,9 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_joins(): array
+    public static function providerColumnToPropertyMapping_joins(): array
     {
-        $mapper = new class extends Mapper
-        {
+        $mapper = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -157,10 +153,9 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_joinsReverseSingle(): array
+    public static function providerColumnToPropertyMapping_joinsReverseSingle(): array
     {
-        $mapper = new class extends Mapper
-        {
+        $mapper = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -178,10 +173,9 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_joinsReverseMulti(): array
+    public static function providerColumnToPropertyMapping_joinsReverseMulti(): array
     {
-        $mapper = new class extends Mapper
-        {
+        $mapper = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -199,10 +193,9 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_joinsVia(): array
+    public static function providerColumnToPropertyMapping_joinsVia(): array
     {
-        $mapper = new class extends Mapper
-        {
+        $mapper = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -220,12 +213,11 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public function providerColumnToPropertyMapping_recursive(): array
+    public static function providerColumnToPropertyMapping_recursive(): array
     {
         // t1.id <= t2.t1_id <= t3.t2_t1_id
 
-        $mapper1 = new class extends Mapper
-        {
+        $mapper1 = new class extends Mapper {
 
             protected function mapping(): void
             {
@@ -233,8 +225,7 @@ class MappingCollectionTest extends TestCase
             }
         };
 
-        $mapper2 = new class ($mapper1) extends Mapper
-        {
+        $mapper2 = new class ($mapper1) extends Mapper {
 
             private $mapper1;
 
@@ -252,8 +243,7 @@ class MappingCollectionTest extends TestCase
             }
         };
 
-        $mapper3 = new class ($mapper2) extends Mapper
-        {
+        $mapper3 = new class ($mapper2) extends Mapper {
 
             private $mapper2;
 
