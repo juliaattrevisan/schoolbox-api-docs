@@ -8,9 +8,13 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\AbstractFile;
+use Schoolbox\Resource\File\Model;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
@@ -69,6 +73,10 @@ abstract class Base
      *
      * @return ResourceVideo
      * @throws MapperException
+     * @throws Deleted
+     * @throws NotFound
+     * @throws \PDOException
+     * @throws DefinitionException
      */
     public function produce()
     {
@@ -103,9 +111,9 @@ abstract class Base
     /**
      * Permission check prior to instantiation
      *
-     * @param IFile $file
+     * @param AbstractFile $file
      */
-    abstract protected function permissionCheck(IFile $file);
+    abstract protected function permissionCheck(AbstractFile $file);
 
 
     /**

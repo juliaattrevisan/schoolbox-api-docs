@@ -13,7 +13,7 @@ use Schoolbox\Config\Loader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\AbstractFile;
 
 /**
  * Class Video
@@ -25,7 +25,7 @@ class Video extends Base
     /**
      * Check perms
      *
-     * @param IFile $file
+     * @param AbstractFile $file
      * @param bool $isMyFile
      * @return void
      * @throws Exception
@@ -34,7 +34,7 @@ class Video extends Base
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    protected function permissionCheck(IFile $file, bool $isMyFile = false): void
+    protected function permissionCheck(AbstractFile $file, bool $isMyFile = false): void
     {
         /* We're not in Aura, sorry
          */
