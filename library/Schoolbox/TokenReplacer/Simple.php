@@ -130,13 +130,9 @@ class Simple
         foreach ($nodes as $node) {
             $class = $node->getAttribute($targetAttributeProp);
             if (str_contains($class, $targetAttributeValue)) {
-                //Replace attribute by removing the target value
-                $newClass = trim(str_replace($targetAttributeValue, '', $class));
-                if ($newClass) {
-                    $node->setAttribute($targetAttributeProp, $newClass);
-                } else {
-                    $node->removeAttribute($targetAttributeProp);
-                }
+                //Replace element with plain text
+                $replace = $dom->createTextNode($node->nodeValue);
+                $node->parentNode->replaceChild($replace, $node);
             }
         }
         $body = $dom->saveHTML();
