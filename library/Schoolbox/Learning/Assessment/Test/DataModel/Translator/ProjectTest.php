@@ -319,7 +319,7 @@ class ProjectTest extends TestCase
         $subDueWork = (new DueWorkModel())
             ->setOwner($this->teacher2)
             ->setAssessmentModel((new AssessmentModel())->setId(3))
-            ->setMarkType($this->buildMarkType())
+            ->setMarkType(self::buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
         $projectModel->setAssessments(new GenericCollection(AssessmentModel::class));
@@ -408,7 +408,7 @@ class ProjectTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateSummatorToDomainModelData()
+    public static function getTestTranslateSummatorToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setId(1)
@@ -418,7 +418,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 WeightedAverage::class,
             ],
@@ -426,7 +426,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Average::class,
             ],
@@ -434,7 +434,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Minimum::class,
             ],
@@ -442,7 +442,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MAXIMUM)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Maximum::class,
             ],
@@ -472,7 +472,7 @@ class ProjectTest extends TestCase
     /**
      * Data provider for different project mark scheme settings.
      */
-    public function getTestTranslateMarkSchemeToDomainModelData()
+    public static function getTestTranslateMarkSchemeToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setId(1)
@@ -482,7 +482,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setGradeGroup((new GradeGroup()))
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 None::class,
@@ -492,7 +492,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setGradeGroup((new GradeGroup()))
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Percentage::class,
@@ -502,7 +502,7 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
                     ->setGradeGroup((new GradeGroup())->setId(1)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
@@ -607,12 +607,12 @@ class ProjectTest extends TestCase
                             ->setSubObject(
                                 (new DueWorkModel())
                                     ->setId(3)
-                                    ->setMarkType($this->buildMarkType())
+                                    ->setMarkType(self::buildMarkType())
                                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
                             )
                     )
             )
-            ->setMarkType($this->buildMarkType())
+            ->setMarkType(self::buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL);
 
         $projectModel->setAssessments(new GenericCollection(AssessmentModel::class));

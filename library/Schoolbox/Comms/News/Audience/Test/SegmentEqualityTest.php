@@ -87,10 +87,10 @@ class SegmentEqualityTest extends TestCase
     /**
      * @return array
      */
-    public function providerEqualSimple(): array
+    public static function providerEqualSimple(): array
     {
-        $left  = $this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
-        $right = $this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
+        $left  = self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
+        $right = self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
 
         return [
             // Audience\Model $left, Audience\Model $right, bool $expected
@@ -107,13 +107,13 @@ class SegmentEqualityTest extends TestCase
      * @return array
      * @throws DomainException
      */
-    public function providerEqualSimpleVsComposite(): array
+    public static function providerEqualSimpleVsComposite(): array
     {
-        $simple = $this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
+        $simple = self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
 
-        $child1 = $this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
+        $child1 = self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF);
 
-        $composite1 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $composite1 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
 
         $composite2 = clone $composite1;
         $composite2->getChildren()->add($child1);
@@ -136,67 +136,67 @@ class SegmentEqualityTest extends TestCase
      * @return array
      * @throws DomainException
      */
-    public function providerEqualComposite(): array
+    public static function providerEqualComposite(): array
     {
         $data = [];
 
         // Both empty composites
-        $left1  = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
-        $right1 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left1  = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $right1 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $data[] = [$left1, $right1, true];
 
         // Both with two children, same order
-        $left2 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left2 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $left2->getChildren()
-              ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-              ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
-        $right2 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+              ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+              ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+        $right2 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $right2->getChildren()
-               ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+               ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
         $data[] = [$left2, $right2, true];
 
         // Both with two children, reversed order
-        $left3 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left3 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $left3->getChildren()
-              ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-              ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
-        $right3 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+              ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+              ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+        $right3 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $right3->getChildren()
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-               ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+               ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
         $data[] = [$left3, $right3, true];
 
         // First has duplicate children
-        $left4 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left4 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $left4->getChildren()
-              ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-              ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
-        $right4 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+              ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+              ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+        $right4 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $right4->getChildren()
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-               ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+               ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
         $data[] = [$left4, $right4, false];
 
         // Second has duplicate children
-        $left5 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left5 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $left5->getChildren()
-              ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-              ->add($this->createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
-        $right5 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+              ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+              ->add(self::createSimple(Strategy\Folder::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+        $right5 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $right5->getChildren()
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
         $data[] = [$left5, $right5, false];
 
         // First has 1 child, second has 2
-        $left6 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+        $left6 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $left6->getChildren()
-              ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
-        $right6 = $this->createComposite(Audience\Model::RELATIONSHIP_SELF);
+              ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+        $right6 = self::createComposite(Audience\Model::RELATIONSHIP_SELF);
         $right6->getChildren()
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
-               ->add($this->createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF))
+               ->add(self::createSimple(Strategy\Role::getEntityType(), '10', Audience\Model::RELATIONSHIP_SELF));
         $data[] = [$left6, $right6, false];
 
         return $data;
@@ -213,7 +213,7 @@ class SegmentEqualityTest extends TestCase
      * @param string      $relationship
      * @return Audience\Model
      */
-    private function createSimple(string $entityType, ?string $entityValue, string $relationship): Audience\Model
+    private static function createSimple(string $entityType, ?string $entityValue, string $relationship): Audience\Model
     {
         return (new Audience\Model())
             ->setEntityType($entityType)
@@ -229,7 +229,7 @@ class SegmentEqualityTest extends TestCase
      * @return Audience\Model
      * @throws DomainException
      */
-    private function createComposite(string $relationship): Audience\Model
+    private static function createComposite(string $relationship): Audience\Model
     {
         return (new Audience\Model())
             ->setEntityType(Strategy\Composite::getEntityType())

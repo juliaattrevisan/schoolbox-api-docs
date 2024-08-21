@@ -237,7 +237,7 @@ class StateTransitionTest extends TestCase
     public function testInvalidTransitionSubmitExpired(Model $article): void
     {
         $article->submit();
-        $article->approve($this->getModerator());
+        $article->approve(self::getModerator());
         $article->archive();
         $this->expectException(InvalidTransitionException::class);
         $article->submit();
@@ -397,7 +397,7 @@ class StateTransitionTest extends TestCase
         $this->assertFalse($article->canBeArchived());
 
         // Rejected
-        $article->reject($this->getModerator());
+        $article->reject(self::getModerator());
         $this->assertTrue($article->canBeSubmitted());
         $this->assertTrue($article->canBeUnSubmitted());
         $this->assertTrue($article->canBeApproved());
@@ -413,7 +413,7 @@ class StateTransitionTest extends TestCase
         $this->assertFalse($article->canBeArchived());
 
         // Awaiting publication
-        $article->approve($this->getModerator());
+        $article->approve(self::getModerator());
         $this->assertFalse($article->canBeSubmitted());
         $this->assertTrue($article->canBeUnSubmitted());
         $this->assertFalse($article->canBeApproved());
@@ -446,14 +446,14 @@ class StateTransitionTest extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function providerStubArticleAndModerator(): array
+    public static function providerStubArticleAndModerator(): array
     {
         // Created now, publish in 7 days, expire in 14 days
         $article = (new Model())
             ->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'))
             ->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
 
-        $moderator = $this->getModerator();
+        $moderator = self::getModerator();
 
         return [
             [$article, $moderator],
@@ -467,7 +467,7 @@ class StateTransitionTest extends TestCase
      *
      * @return User
      */
-    private function getModerator(): User
+    private static function getModerator(): User
     {
         return (new User())->setId(151);
     }

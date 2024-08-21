@@ -129,10 +129,10 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeInvalidCapability(): array
+    public static function providerEncodeInvalidCapability(): array
     {
         $data = [];
-        foreach ($this->invalidCapabilities() as $capability) {
+        foreach (self::invalidCapabilities() as $capability) {
             $data[] = [$capability];
         }
         return $data;
@@ -151,14 +151,14 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeInvalidIndicator(): array
+    public static function providerEncodeInvalidIndicator(): array
     {
         $data = [];
 
         // Valid Cap + Invalid Ind
-        foreach ($this->validCapabilities() as $validCapability) {
+        foreach (self::validCapabilities() as $validCapability) {
             $capability = clone $validCapability;
-            foreach ($this->invalidIndicators() as $invalidIndicator) {
+            foreach (self::invalidIndicators() as $invalidIndicator) {
                 $indicator = clone $invalidIndicator;
                 $indicator->setCapability($capability);
                 $data[] = [$indicator];
@@ -166,9 +166,9 @@ class CodecTest extends TestCase
         }
 
         // Invalid Cap + Valid Ind
-        foreach ($this->invalidCapabilities() as $invalidCapability) {
+        foreach (self::invalidCapabilities() as $invalidCapability) {
             $capability = clone $invalidCapability;
-            foreach ($this->validIndicators() as $validIndicator) {
+            foreach (self::validIndicators() as $validIndicator) {
                 $indicator = clone $validIndicator;
                 $indicator->setCapability($capability);
                 $data[] = [$indicator];
@@ -245,7 +245,7 @@ class CodecTest extends TestCase
     /**
      * @return CapabilityModel[]
      */
-    private function invalidCapabilities(): array
+    private static function invalidCapabilities(): array
     {
         return [
             new CapabilityModel(),
@@ -257,7 +257,7 @@ class CodecTest extends TestCase
     /**
      * @return CapabilityModel[]
      */
-    private function validCapabilities(): array
+    private static function validCapabilities(): array
     {
         return [
             (new CapabilityModel())->setId(1),
@@ -270,7 +270,7 @@ class CodecTest extends TestCase
     /**
      * @return IndicatorModel[]
      */
-    private function invalidIndicators(): array
+    private static function invalidIndicators(): array
     {
         return [
             new IndicatorModel(),
@@ -282,7 +282,7 @@ class CodecTest extends TestCase
     /**
      * @return IndicatorModel[]
      */
-    private function validIndicators(): array
+    private static function validIndicators(): array
     {
         return [
             (new IndicatorModel())->setId(1),

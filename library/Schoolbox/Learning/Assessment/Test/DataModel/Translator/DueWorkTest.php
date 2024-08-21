@@ -360,7 +360,7 @@ class DueWorkTest extends TestCase
                 ->add($file1)
                 ->add($file2)
                 ->add($file3))
-            ->setMarkType($this->buildMarkType())
+            ->setMarkType(self::buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
         ;
 
@@ -435,7 +435,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateResponseAcceptanceToDomainModelData()
+    public static function getTestTranslateResponseAcceptanceToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setAssessmentContext((new Folder())->setId(1));
@@ -445,7 +445,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 true,
@@ -455,7 +455,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 false,
@@ -465,7 +465,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
@@ -475,7 +475,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
@@ -509,7 +509,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different project mark scheme settings.
      */
-    public function getTestTranslateMarkSchemeToDomainModelData()
+    public static function getTestTranslateMarkSchemeToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setAssessmentContext((new Folder())->setId(1));
@@ -517,7 +517,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 None::class,
                 null,
@@ -526,7 +526,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 Percentage::class,
                 null,
@@ -535,7 +535,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))
@@ -547,7 +547,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15)
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 TotalMarkFractional::class,

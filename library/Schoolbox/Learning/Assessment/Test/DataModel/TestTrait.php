@@ -85,7 +85,7 @@ trait TestTrait
      * @param int $markTypeId
      * @return DueWorkModel\MarkType
      */
-    protected function buildMarkType($markTypeId = DueWorkModel\MarkType::TYPE_NONE): DueWorkModel\MarkType
+    protected static function buildMarkType($markTypeId = DueWorkModel\MarkType::TYPE_NONE): DueWorkModel\MarkType
     {
         return (new DueWorkModel\MarkType())->setId($markTypeId);
     }
