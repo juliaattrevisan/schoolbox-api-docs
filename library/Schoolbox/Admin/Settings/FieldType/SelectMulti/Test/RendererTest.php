@@ -14,12 +14,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\FieldType;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use SebastianBergmann\RecursionContext;
 
 /**
  * @codeCoverageIgnore
@@ -27,7 +25,6 @@ use SebastianBergmann\RecursionContext;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer::class)]
 class RendererTest extends TestCase
 {
-
     // Tests
     /**
      * Test the renderer provides expected data structure for the twig template
@@ -35,7 +32,6 @@ class RendererTest extends TestCase
      * @param Config $config
      * @throws PHPUnitFramework\Exception
      * @throws FieldTypeMismatchException
-     * @throws RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerConfig')]
     public function testTemplateData(Config $config): void
@@ -73,17 +69,16 @@ class RendererTest extends TestCase
      *
      * An invalid value is one that doesn't match one of the available options
      *
-     * @param FieldType\SelectMulti\Renderer $renderer
-     * @param Config                         $config
-     * @param string|null                    $value
-     * @param string|null                    $expected
+     * @param Config      $config
+     * @param string|null $value
+     * @param string|null $expected
      * @throws FieldTypeMismatchException
      * @throws PHPUnitFramework\ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerTransformValue')]
-    public function testTransformValue(FieldType\SelectMulti\Renderer $renderer, Config $config, ?string $value, ?string $expected): void
+    public function testTransformValue(Config $config, ?string $value, ?string $expected): void
     {
+        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_MULTI);
         $config->setValue($value);
         self::assertSame($expected, $renderer->getTemplateAndData($config)['data']['value']);
     }
@@ -95,10 +90,10 @@ class RendererTest extends TestCase
     /**
      * @return array
      */
-    public function providerConfig(): array
+    public static function providerConfig(): array
     {
         return [
-            'normal config' => [$this->buildConfig()],
+            'normal config' => [self::buildConfig()],
         ];
     }
 
@@ -106,12 +101,12 @@ class RendererTest extends TestCase
     /**
      * @return array
      */
-    public function providerConfigAndInvalidFieldId(): array
+    public static function providerConfigAndInvalidFieldId(): array
     {
         return [
-            'boolean'      => [$this->buildConfig(), ConfigMapper::FIELD_BOOLEAN],
-            'selectKey'    => [$this->buildConfig(), ConfigMapper::FIELD_SELECT_KEY],
-            'selectLookup' => [$this->buildConfig(), ConfigMapper::FIELD_SELECT_LOOKUP],
+            'boolean'      => [self::buildConfig(), ConfigMapper::FIELD_BOOLEAN],
+            'selectKey'    => [self::buildConfig(), ConfigMapper::FIELD_SELECT_KEY],
+            'selectLookup' => [self::buildConfig(), ConfigMapper::FIELD_SELECT_LOOKUP],
         ];
     }
 
@@ -119,19 +114,18 @@ class RendererTest extends TestCase
     /**
      * @return array
      */
-    public function providerTransformValue(): array
+    public static function providerTransformValue(): array
     {
-        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_MULTI);
-        $config   = $this->buildConfig();
+        $config = self::buildConfig();
 
         // FieldType\SelectMulti\Renderer $renderer, Config $config, ?string $value, ?string $expected
         return [
-            "null"           => [$renderer, $config, null, ''],
-            "empty ''"       => [$renderer, $config, '', ''],
-            "valid single"   => [$renderer, $config, '00', '00'],
-            "valid multi"    => [$renderer, $config, '00,01', '00,01'],
-            "invalid single" => [$renderer, $config, '2', ''],
-            "invalid multi"  => [$renderer, $config, '00,2', '00'],
+            "null"           => [$config, null, ''],
+            "empty ''"       => [$config, '', ''],
+            "valid single"   => [$config, '00', '00'],
+            "valid multi"    => [$config, '00,01', '00,01'],
+            "invalid single" => [$config, '2', ''],
+            "invalid multi"  => [$config, '00,2', '00'],
 
         ];
     }
@@ -156,7 +150,7 @@ class RendererTest extends TestCase
      *
      * @return Config
      */
-    protected function buildConfig(): Config
+    protected static function buildConfig(): Config
     {
         return (new Config())
             ->setId(236)
