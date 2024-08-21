@@ -209,7 +209,7 @@ class ValidCodesSpecTest extends TestCase
     {
         /** @var Folder\Code\Mapper|MockObject $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
-        $mockDatabase     = $this->createMock(MockConnector::class);
+        $mockDatabase     = new MockConnector($this);
 
         $folderCodeMapper
             ->method('getPredicateBuilder')
