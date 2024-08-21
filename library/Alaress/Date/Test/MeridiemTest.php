@@ -100,7 +100,7 @@ class MeridiemTest extends TestCase
     /**
      * Data sets for testGet12HourTime
      */
-    public function getGet12HourTimeData()
+    public static function getGet12HourTimeData()
     {
         return [
             // No leading zeros (default)
@@ -202,7 +202,7 @@ class MeridiemTest extends TestCase
     /**
      * Data sets for testIsAm and testIsPm
      */
-    public function getIsAmData()
+    public static function getIsAmData()
     {
         return [
             [self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), true],

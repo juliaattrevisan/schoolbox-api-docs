@@ -21,7 +21,7 @@ class GetYearHalfTest extends TestCase
     /**
      * Data sets for testGetYearHalf
      */
-    public function getTestYearHalfData()
+    public static function getTestYearHalfData()
     {
         return [
             [self::buildDateObject('2015-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 1],

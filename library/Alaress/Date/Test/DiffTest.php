@@ -19,7 +19,7 @@ class DiffTest extends TestCase
 {
     use MockDateObject;
 
-    public function getDiffInSecondsData()
+    public static function getDiffInSecondsData()
     {
         return [
             [
@@ -50,7 +50,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInSeconds($a, false));
     }
 
-    public function getDiffInMinutesData()
+    public static function getDiffInMinutesData()
     {
         return [
             [
@@ -81,7 +81,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInMinutes($a, false));
     }
 
-    public function getDiffInHoursData()
+    public static function getDiffInHoursData()
     {
         return [
             [
@@ -112,7 +112,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInHours($a, false));
     }
 
-    public function getDiffInDaysData()
+    public static function getDiffInDaysData()
     {
         return [
             [
@@ -157,7 +157,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInDays($a, false));
     }
 
-    public function getDiffInWeekdaysData()
+    public static function getDiffInWeekdaysData()
     {
         return [
             [
@@ -189,7 +189,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInWeekdays($a, false));
     }
 
-    public function getDiffInWeekendDaysData()
+    public static function getDiffInWeekendDaysData()
     {
         return [
             [
@@ -222,7 +222,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInWeekendDays($a, false));
     }
 
-    public function getDiffInWeeksData()
+    public static function getDiffInWeeksData()
     {
         return [
             [
@@ -253,7 +253,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInWeeks($a, false));
     }
 
-    public function getDiffInMonthsData()
+    public static function getDiffInMonthsData()
     {
         return [
             [
@@ -301,7 +301,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInMonths($a, false));
     }
 
-    public function getDiffInYearsData()
+    public static function getDiffInYearsData()
     {
         return [
             [
@@ -333,7 +333,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->diffInYears($a, false));
     }
 
-    public function getCompareData()
+    public static function getCompareData()
     {
         return [
             [
@@ -376,7 +376,7 @@ class DiffTest extends TestCase
         $this->assertEquals($expected * -1, $b->compare($a));
     }
 
-    public function getCompareDateOnlyData()
+    public static function getCompareDateOnlyData()
     {
         return [
             [
@@ -421,7 +421,7 @@ class DiffTest extends TestCase
     }
 
 
-    public function getCompareYearOnlyData()
+    public static function getCompareYearOnlyData()
     {
         return [
             [

@@ -19,7 +19,7 @@ class IsATypeOfDateTest extends TestCase
 {
     use MockDateObject;
 
-    public function getIsWeekdayData()
+    public static function getIsWeekdayData()
     {
         return [
             [self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
@@ -39,7 +39,7 @@ class IsATypeOfDateTest extends TestCase
         $this->assertNotEquals($isWeekday, $date->isWeekend());
     }
 
-    public function getIsLeapYearData()
+    public static function getIsLeapYearData()
     {
         return [
             // Leap years: every 4 years
@@ -64,7 +64,7 @@ class IsATypeOfDateTest extends TestCase
     }
 
 
-    public function getBetweenData()
+    public static function getBetweenData()
     {
         return [
             [
