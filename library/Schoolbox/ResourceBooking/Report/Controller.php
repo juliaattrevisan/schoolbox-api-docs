@@ -110,7 +110,7 @@ class Controller extends Base
         $allCategories = array_keys($categoryList);
 
         // Filter out non-existent categories from $selectedCategories
-        $selectedCategories = $this->requestQuery->get('category', []);
+        $selectedCategories = (array)($this->requestQuery->get('category', []));
         if (!empty($selectedCategories)) {
             $selectedCategories = array_intersect($selectedCategories, $allCategories);
         } else {
