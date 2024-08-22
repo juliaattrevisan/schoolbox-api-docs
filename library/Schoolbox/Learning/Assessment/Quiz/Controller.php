@@ -42,7 +42,6 @@ use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -416,21 +415,6 @@ class Controller extends Assessment\Controller
         $plan['finish']      = $participant ? $participant->getDueDate() : $assessment->getDueAt();
         $plan['close']       = $participant ? $participant->getCloseDate() : $assessment->getCloseAt();
 
-        // Note on need for consistency when dealing with permissions
-        // ----------------------------------------------------------
-        // It is important that the permission checks that determine whether the 'start quiz' button is displayed (in this
-        // function) are the same as those used on the quiz page itself (Learnosity/Controller->getAttempt()).  Otherwise,
-        // either an enabled 'start quiz' button will lead to a permission error on the quiz page, or directly accessing
-        // the quiz page will enable users to bypass permission checks that prevent the 'start quiz' button from displaying.
-        // See Learnosity/Controller->getAttempt() (where the same permission checks are used).
-        // TODO this should eventually be route permission based
-        // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $actionValidator = new ActionValidator($now, $this->getAccess());
-        $canAttempt = (
-            $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
-            $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader())
-        );
-
         /**
          * record view
          */
@@ -463,7 +447,15 @@ class Controller extends Assessment\Controller
             /* What is this andyland stuff?
              */
             // User may only attempt quiz from here if viewing own summary
-            'canAttempt' => $canAttempt,
+            /* Also see if $student can load the learnosity getAttempt() screen
+             * If they can, then they can attempt it; provide the button
+             */
+            'canAttempt' => (bool)$this->getRouteIfAuthorized('learnosity.getAttempt', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId(),
+                'student' => $student,
+                'studentId' => $student->getId(),
+            ]),
             /* External Url for third party apps which might have generated this assessment
              */
             'externalRedirectUrl' => $externalRedirectUrl,
