@@ -87,7 +87,7 @@ class ServiceManager implements IServiceManager
         //Check to see if TASS Orbit is set up as a delivery provider
         //Only parents should receive the notifications through TASS Orbit
         $tassProvider = $isRecipientParent ?
-            (new ServiceMapper())->countByColumn('provider', Registry::PROVIDER_TASS_ORBIT) :
+            (ServiceMapper::getInstance())->countByColumn('provider', Registry::PROVIDER_TASS_ORBIT) :
             0;
 
         //User didn't registered anything and TASS is not set up
@@ -352,7 +352,7 @@ class ServiceManager implements IServiceManager
         //If the TASS Orbit is set up as delivery provider, append it to the list of registry
         try {
             $tassOrbitService =
-                (new ServiceMapper())
+                (ServiceMapper::getInstance())
                     ->findOneByColumn(
                         'provider',
                         Registry::PROVIDER_TASS_ORBIT
