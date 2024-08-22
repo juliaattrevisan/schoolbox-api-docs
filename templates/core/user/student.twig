@@ -98,13 +98,13 @@
     <div class="list-item">
         <div class="small-12 column">
             {% block profileHeading %}
-                <h1>{{ user.formatName }}</h1>
+                <h1 data-test="user-profile-name">{{ user.formatName }}</h1>
             {% endblock %}
         </div>
     </div>
     <nav>
         {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
+            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify"></a>
         {% endif %}
     </nav>
 </div>
