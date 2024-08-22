@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Apple;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Async\Notification\Instance\Instance;
 use Apple\ApnPush\Certificate\Certificate;
 use Apple\ApnPush\Exception\CertificateFileNotFoundException;
 use Apple\ApnPush\Model\Alert;
@@ -102,7 +103,7 @@ class ApnService extends AbstractService
     /**
      * @inheritdoc
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?\Alaress\Async\Notification\Notification $notification = null, ?User $recipient = null): bool
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null): bool
     {
         // Try to set up the protocol
         try {

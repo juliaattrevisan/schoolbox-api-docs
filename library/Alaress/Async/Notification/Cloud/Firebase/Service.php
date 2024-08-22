@@ -11,6 +11,7 @@ namespace Alaress\Async\Notification\Cloud\Firebase;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
 use Alaress\Async\Notification\Cloud\RateLimitException;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Kreait\Firebase;
 use Monolog\Logger;
@@ -50,15 +51,12 @@ class Service extends AbstractService
 
 
     /**
-     * @param array      $tokens
-     * @param int        $id
-     * @param string     $title
-     * @param int        $unreadCount
-     * @param null|Notification $notification
      * @inheritDoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null): bool
     {
+        $notification = new Notification([ $instance ]);
+
         // Create messaging client
         $this->messagingClient ??= (new Firebase\Factory())
             ->withServiceAccount($this->privateKey)

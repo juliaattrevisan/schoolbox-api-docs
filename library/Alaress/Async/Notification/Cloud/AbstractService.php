@@ -99,7 +99,7 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title, $unreadCount, $n, $recipient);
+        return $this->propagate($tokens, $id, $title, $unreadCount, $instance, $recipient);
     }
 
 
@@ -139,8 +139,9 @@ abstract class AbstractService implements ServiceInterface
      * @param int               $id
      * @param string            $title
      * @param int               $unreadCount
-     * @param Notification|null $notification
+     * @param Instance|null     $instance
+     * @param User|null         $recipient
      * @return bool
      */
-    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null, ?User $recipient = null);
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null);
 }
