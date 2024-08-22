@@ -12,6 +12,8 @@
             "@schoolboxBadge/*": ["library/Schoolbox/Learning/Badge/*"],
             "@schoolboxAssessment/*": ["library/Schoolbox/Assessment/*"],
             "@schoolboxLearnosity/*": ["library/Schoolbox/Learning/Learnosity/templates/*"],
+            "@schoolboxCalendarEvent/*": ["library/Schoolbox/Calendar/Event/templates/vue/*"],
+            "@schoolboxLibrary/*": ["library/Schoolbox/*"],
             "@schoolboxVue/*": ["vue/*"],
             "@schoolboxTest/*": ["test/*"],
             "@js/*": ["www/static/js/*"],

@@ -1,21 +1,20 @@
 <script>
-import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
-import CreateEventModal from "./create-event-modal";
-import ExportModal from "./export-modal";
-import FilterModal from "./filter-modal";
-import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
-import qs from "qs";
+import { getFormData, getSearchString } from "@js/util/queryUtils";
+import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
+import CreateEventModal from "./create-event-modal.vue";
+import ExportModal from "./export-modal.vue";
+import FilterModal from "./filter-modal.vue";
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = "/calendar/changeState";
@@ -320,7 +319,7 @@ export default {
                 "/timetable/calendar/" +
                     (newUrlDate === null ? this.getCurrentValueOfUrlDate() : newUrlDate) + // Format DD-MM-YYYY (FORMAT_FORM_DATE).
                     "/" +
-                    this.selectedOption.userId
+                    this.selectedOption.userId,
             );
         },
 
@@ -362,30 +361,30 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(URL_EVENT_SOURCE, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: this.config.userId,
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                userId: this.config.userId,
 
-                        /* This param lets you load the specific set of subscriptions
-                         * relevant to the Timetable Calendar
-                         */
-                        timetableCalendar: true,
-                    },
-                })
+                /* This param lets you load the specific set of subscriptions
+                 * relevant to the Timetable Calendar
+                 */
+                timetableCalendar: true,
+            };
+            fetch(`${URL_EVENT_SOURCE}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     callback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
 
-                    let slots = this.findSlotBoundaries(response.data);
+                    let slots = this.findSlotBoundaries(response);
 
                     this.calendarApi.setOption("slotMinTime", slots.slotMinTime);
                     this.calendarApi.setOption("slotMaxTime", slots.slotMaxTime);
@@ -636,12 +635,15 @@ export default {
             }
 
             // @TODO this needs to consider events in series
-            axios.post(
-                ENDPOINTS.generateUrlFromConst(
+            fetch(
+                `${ENDPOINTS.generateUrlFromConst(
                     ENDPOINTS.URL_EVENT_MOVE,
-                    String(event?.extendedProps?.data?.meta?.eventId)
-                ),
-                qs.stringify(data)
+                    String(event?.extendedProps?.data?.meta?.eventId),
+                )}?${getSearchString(data)}`,
+                {
+                    method: "POST",
+                    body: getFormData(data),
+                },
             );
         },
 
@@ -694,7 +696,10 @@ export default {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
             try {
-                await axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters }));
+                await fetch(URL_EVENT_FILTER, {
+                    method: "POST",
+                    body: getFormData({ filters: this.config.selectedFilters }),
+                });
                 this.calendarApi.refetchEvents();
             } catch (error) {
                 console.warn(error);
@@ -729,7 +734,7 @@ export default {
                     "value",
                     this.listViewDateRange.start
                         ? this.listViewDateRange.start
-                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // End date field
@@ -741,7 +746,7 @@ export default {
                     "value",
                     this.listViewDateRange.end
                         ? this.listViewDateRange.end
-                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // Update button
@@ -777,12 +782,12 @@ export default {
                         const startDateValue = dayjs(
                             document.querySelector("#start_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
                         const endDateValue = dayjs(
                             document.querySelector("#end_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
@@ -792,7 +797,7 @@ export default {
                             this.duration.days =
                                 this.fullCalendarHelper_dateDiff(
                                     startDateValue.format("YYYY-MM-DD"),
-                                    endDateValue.format("YYYY-MM-DD")
+                                    endDateValue.format("YYYY-MM-DD"),
                                 ) + 1;
                             this.calendarApi.gotoDate(startDateValue.format("YYYY-MM-DD"));
                         }
@@ -842,7 +847,7 @@ export default {
             window.history.replaceState(
                 this.getPageStateForUrlHistory(),
                 "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId,
             );
         },
 
@@ -924,7 +929,8 @@ export default {
         <div class="small-12 columns">
             <h1>
                 Timetable for
-                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span><template v-if="selectedOption?.yearLevel?.length">,</template>
+                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span
+                ><template v-if="selectedOption?.yearLevel?.length">,</template>
                 <span data-heading-user-year>{{ selectedOption === null ? "" : selectedOption.yearLevel }}</span>
             </h1>
         </div>
