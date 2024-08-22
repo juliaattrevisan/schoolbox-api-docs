@@ -64,9 +64,11 @@ class Controller extends Base
 
     /**
      * Users are prompted to do something after this many seconds of inactivity
-     *
+     * It is an offset from config.session_length whose default is usually 3600
+     * (means that if you are idle for 3600-60 = 3540 seconds, you get alerted...
+     * 60 more seconds of idle time means your schoolbox session will log you out)
      */
-    private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT = 300;
+    private const LEARNOSITY_ATTEMPT_IDLE_TIMEOUT_OFFSET = 60;
 
 
     /**
@@ -501,7 +503,7 @@ class Controller extends Base
             "config" => [
                 "configuration" => [
                     "idle_timeout" => [
-                        "interval" => self::LEARNOSITY_ATTEMPT_IDLE_TIMEOUT
+                        "interval" => max((int)$this->getConfigLoader()->get('session_length') - self::LEARNOSITY_ATTEMPT_IDLE_TIMEOUT_OFFSET, 0)
                     ],
                     'onsubmit_redirect_url' => false,
                     /* You were idle too long. Go back to the intro if Learnosity
