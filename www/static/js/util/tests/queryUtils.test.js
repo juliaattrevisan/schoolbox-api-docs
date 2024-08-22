@@ -6,10 +6,12 @@ describe("getKeyValuePairs()", () => {
             getKeyValuePairs({
                 query: "test",
                 id: 1,
+                isActive: true,
             }),
         ).toStrictEqual({
             query: "test",
             id: "1",
+            isActive: "true",
         });
     });
     test("converts nested object", () => {
@@ -64,8 +66,9 @@ describe("getSearchString()", () => {
             getSearchString({
                 query: "test",
                 id: 1,
+                isActive: true,
             }),
-        ).toBe("query=test&id=1");
+        ).toBe("query=test&id=1&isActive=true");
     });
     test("converts nested object", () => {
         expect(

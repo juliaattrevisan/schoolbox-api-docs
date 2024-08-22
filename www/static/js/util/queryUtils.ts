@@ -32,6 +32,9 @@ export function getKeyValuePairs(obj: NestedObject) {
                 } else if (typeof value === "number") {
                     // If the value is a number, convert it to a string and add it to the result
                     result[newKeyPath] = (value as number).toString();
+                } else if (typeof value === "boolean") {
+                    // If the value is a boolean, convert it to a string and add it to the result
+                    result[newKeyPath] = (value as boolean).toString();
                 } else if (Array.isArray(value)) {
                     // If the value is an array, loop through the array and add an entry for each element
                     value.forEach((element, index) => {
@@ -45,6 +48,9 @@ export function getKeyValuePairs(obj: NestedObject) {
                         } else if (typeof element === "number") {
                             // If the element is a number, convert it to a string and add it to the result
                             result[arrayKeyPath] = (element as number).toString();
+                        } else if (typeof value === "boolean") {
+                            // If the value is a boolean, convert it to a string and add it to the result
+                            result[newKeyPath] = (element as boolean).toString();
                         } else if (element === null) {
                             // If the element is null, add an empty string to the result
                             result[arrayKeyPath] = "";
