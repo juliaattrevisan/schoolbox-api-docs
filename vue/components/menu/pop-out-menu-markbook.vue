@@ -157,33 +157,40 @@ const viewStatusText = window.Vue.computed(() => {
 });
 
 /**
- * Exclude route.
- * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
+ *  Fetches an array from the dataEndpoint, which should return a
+ *  an array of items corresponding to recent activity events.
  */
-function excludeCheck() {
-    // does the user have work?
-    if (hasSubmissions.value || hasFeedback.value) {
-        // has some kind of activity.. prompt for exclusion
-        excludeModalEl.value.open();
-    } else {
-        // no work or feedback
-        onMenuItemSelected(routes.value.excludeRoute, "exclude");
+async function getActivity() {
+    try {
+        isLoading.value = true;
+        const response = await fetch(routes.value.dataEndpoint, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        if (response.ok) {
+            const activityItemsResponse = (await response.json()) as ActivityItem[];
+            activityItems.value = activityItemsResponse;
+            hasLoadError.value = false;
+        } else {
+            hasLoadError.value = true;
+        }
+    } catch (error) {
+        hasLoadError.value = true;
+    } finally {
+        isLoading.value = false;
     }
 }
 
 /**
- * actually exclude the student from the assessment
+ * Close the pop out
  */
-function exclude() {
-    closeExclude();
-    onMenuItemSelected(routes.value.excludeRoute, "exclude");
-}
-
-/**
- * close the exclude modal function
- */
-function closeExclude() {
-    excludeModalEl.value.close();
+function closePopOut() {
+    isSelected.value = false;
+    // Clear out any selected states.
+    referenceElement.value?.classList.remove("is-selected");
+    referenceElement.value = null;
 }
 
 /**
@@ -213,8 +220,104 @@ function reloadMarkbook() {
 }
 
 /**
+ * UI toggle student to exclusion display
+ * are change from excluded included and visa-versa
+ */
+function toggleExclusion() {
+    // invert the excluded option that is currently the only post system
+    isExcluded.value = !isExcluded.value;
+    // update the data location in html, so if you click back in it doesn't break...
+    const element = referenceElement.value;
+    if (element) {
+        element.classList.toggle("excluded");
+        const currentValue = element.getAttribute("data-is-excluded");
+        const newValue = currentValue === "true" ? "false" : "true";
+        element.setAttribute("data-is-excluded", newValue);
+    }
+}
+
+/**
+ * Navigate to a new page
+ * @param { string } target - The URL we want to navigate to.
+ * @param { string } action - Should we redirect, or do a specific action? (exclude,publish)
+ */
+async function onMenuItemSelected(target: string, action: string | null = null) {
+    // No specific action, just redirect
+    if (action === null) {
+        // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
+        const returnUrl = `?returnUrl=${btoa(window.location.pathname)}`;
+        window.location.href = target + returnUrl;
+        return;
+    }
+
+    // Not as basic redirect, js fetch things...
+    try {
+        isLoading.value = true;
+        const response = await fetch(target, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        if (response.ok) {
+            hasLoadError.value = false;
+
+            // if action is exclude then toggle the exclusion UI
+            if (action === "exclude") {
+                toggleExclusion();
+            }
+
+            // If including student reload the activity list
+            if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
+                await getActivity();
+            } else {
+                activityItems.value = [];
+            }
+        } else {
+            hasLoadError.value = true;
+        }
+    } catch (error) {
+        hasLoadError.value = true;
+    } finally {
+        isLoading.value = false;
+        // trigger a markbook reload
+        reloadMarkbook();
+    }
+}
+
+/**
+ * Exclude route.
+ * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
+ */
+async function excludeCheck() {
+    // does the user have work?
+    if (hasSubmissions.value || hasFeedback.value) {
+        // has some kind of activity.. prompt for exclusion
+        excludeModalEl.value.open();
+    } else {
+        // no work or feedback
+        await onMenuItemSelected(routes.value.excludeRoute, "exclude");
+    }
+}
+
+/**
+ * close the exclude modal function
+ */
+function closeExclude() {
+    excludeModalEl.value.close();
+}
+
+/**
+ * actually exclude the student from the assessment
+ */
+async function exclude() {
+    closeExclude();
+    await onMenuItemSelected(routes.value.excludeRoute, "exclude");
+}
+
+/**
  * Get the latest routes to display within the popout
- *
  * @param { Routes } newRoutes - the routes linked to the selection
  * @returns { Routes } - the updated routes
  */
@@ -231,35 +334,7 @@ function updateRoutes(newRoutes: Routes) {
 }
 
 /**
- *  Fetches an array from the dataEndpoint, which should return a
- *  an array of items corresponding to recent activity events.
- */
-async function getActivity() {
-    try {
-        isLoading.value = true;
-        const response = await fetch(routes.value.dataEndpoint, {
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        });
-        if (response.ok) {
-            const activityItemsResponse = (await response.json()) as ActivityItem[];
-            activityItems.value = activityItemsResponse;
-            hasLoadError.value = false;
-        } else {
-            hasLoadError.value = true;
-        }
-    } catch (error) {
-        hasLoadError.value = true;
-    } finally {
-        isLoading.value = false;
-    }
-}
-
-/**
  * A linked button has been selected so populate the pop out
- *
  * @param { CustomEvent } event - the event fired from the mark book
  */
 async function onPopOutSelected(event: CustomEvent) {
@@ -286,7 +361,6 @@ async function onPopOutSelected(event: CustomEvent) {
 /**
  * to be able to close the search results
  * when selection outside is made
- *
  * @param { event } event - the mouse event
  */
 function onMouseClick(event: Event) {
@@ -306,16 +380,6 @@ function onMouseClick(event: Event) {
 }
 
 /**
- * Close the pop out
- */
-function closePopOut() {
-    isSelected.value = false;
-    // Clear out any selected states.
-    referenceElement.value?.classList.remove("is-selected");
-    referenceElement.value = null;
-}
-
-/**
  * Listen for selections to display the pop out as well as
  * any mouse clicks so we can close the pop out when suitable
  */
@@ -324,7 +388,7 @@ window.Vue.onMounted(() => {
      * Start listening for selection events
      * Currenty dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
      */
-    document.addEventListener("pop-out-menu-markbook__selected", (event) => onPopOutSelected(event));
+    document.addEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
     document.addEventListener("click", onMouseClick);
 });
 
@@ -332,13 +396,12 @@ window.Vue.onMounted(() => {
  * Remove the added listeners
  */
 window.Vue.onUnmounted(() => {
-    document.removeEventListener("pop-out-menu-markbook__selected", onPopOutSelected);
+    document.removeEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
     document.removeEventListener("click", onMouseClick);
 });
 
 /**
  * Translate types into more human-readable "action" format.
- *
  * @param { object } item - the item to check the action on
  * @returns { string } - the string to return
  */
@@ -370,74 +433,6 @@ function getAction(item: ActivityItem): string {
 function onToggleSelected() {
     isExpanded.value = !isExpanded.value;
 }
-
-/**
- * UI toggle student to exclusion display
- * are change from excluded included and visa-versa
- */
-function toggleExclusion() {
-    // invert the excluded option that is currently the only post system
-    isExcluded.value = !isExcluded.value;
-    // update the data location in html, so if you click back in it doesn't break...
-    const element = referenceElement.value;
-    if (element) {
-        element.classList.toggle("excluded");
-        const currentValue = element.getAttribute("data-is-excluded");
-        const newValue = currentValue === "true" ? "false" : "true";
-        element.setAttribute("data-is-excluded", newValue);
-    }
-}
-
-/**
- * Navigate to a new page
- *
- * @param { string } target - The URL we want to navigate to.
- * @param { string } action - Should we redirect, or do a specific action? (exclude,publish)
- */
-async function onMenuItemSelected(target: string, action: string | null = null) {
-    // No specific action, just redirect
-    if (null === action) {
-        // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
-        let returnUrl = "?returnUrl=" + btoa(window.location.pathname);
-        window.location.href = target + returnUrl;
-        return;
-    }
-
-    // Not as basic redirect, js fetch things...
-    try {
-        isLoading.value = true;
-        const response = await fetch(target, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        });
-        if (response.ok) {
-            hasLoadError.value = false;
-
-            //if action is exclude then toggle the exclusion UI
-            if ("exclude" === action) {
-                toggleExclusion();
-            }
-
-            // If including student reload the activity list
-            if (assessmentType.value === ACTIVITY_TYPE_DUE_WORK) {
-                await getActivity();
-            } else {
-                activityItems.value = [];
-            }
-        } else {
-            hasLoadError.value = true;
-        }
-    } catch (error) {
-        hasLoadError.value = true;
-    } finally {
-        isLoading.value = false;
-        //trigger a markbook reload
-        reloadMarkbook();
-    }
-}
 </script>
 
 <template>
@@ -462,7 +457,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
         <div v-else-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-else class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
+        <div v-else ref="markbookElement" class="c-pop-out-menu" :class="{ 'is-expanded': isExpanded }">
             <div class="s-collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
@@ -540,12 +535,12 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
             <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
             <ul class="flex-list buttons">
                 <li>
-                    <button @click.prevent="exclude()" class="button submit" id="excludeStudent-exclude-button">
+                    <button id="excludeStudent-exclude-button" class="button submit" @click.prevent="exclude()">
                         Yes
                     </button>
                 </li>
                 <li>
-                    <button @click.prevent="closeExclude()" class="button" id="excludeStudent-cancel-button">
+                    <button id="excludeStudent-cancel-button" class="button" @click.prevent="closeExclude()">
                         Cancel
                     </button>
                 </li>
