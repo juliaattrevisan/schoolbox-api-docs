@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 use Alaress\Database\Connector\IConnector;
 use Assess\Import\Parser\IParser;
 use LearnositySdk\Exceptions\ValidationException;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -122,10 +121,10 @@ class Importer
          */
         $xml = $this->prepareXml($data);
 
-        /* Only accept Quiz xmls; reject Surveys
+        /* Ensure that it's actually one of ours
          */
-        if (self::QUIZ_AVAILABILITY !== trim((string)$xml->xpath('availability')[0])) {
-            throw new \DomainException('xml file did not contain a legacy quiz');
+        if (!$this->validate($xml)) {
+            throw new \DomainException('xml file did not contain a legacy schoolbox quiz.');
         }
 
         /* Set up a parser to traverse the xml
@@ -227,6 +226,72 @@ class Importer
         libxml_use_internal_errors($use_errors);
 
         return $result;
+    }
+
+
+    /**
+     * People have been trying to import invalid xmls (random quiz xmls from other software)
+     * but we don't (and have never) supported that ability. We can only import our own quiz xml.
+     *
+     * This validate() method inspects the first node, ensures that it's <quiz>, as this is a
+     * signature of our own xmls. This node contains all the quiz info.
+     *
+     * We can also check for the four dates and other schoolbox-specific fields to help increase
+     * detection of invalid xmls. This won't stop someone who is determined to force their xml
+     * but it should help weed out The Casuals who are doing this accidentally.
+     *
+     * @param SimpleXMLElement $xml
+     * @return bool
+     */
+    private function validate(SimpleXMLElement $xml): bool
+    {
+        $xml->xpath('availability');
+
+        /* Required to use ->current(), as per php.net
+         * https://www.php.net/manual/en/simplexmlelement.current.php
+         */
+        $xml->rewind();
+
+        $signatureNodes = [
+            /* Check that the first node is <quiz>
+             */
+            '//quiz',
+            /* Check these misc fields existed
+             */
+            '//quiz/version',
+            '//quiz/title',
+            '//quiz/description',
+            '//quiz/completionmessage',
+            '//quiz/publishdate',
+            '//quiz/opendate',
+            '//quiz/duedate',
+            '//quiz/closedate',
+            '//quiz/weight',
+            '//quiz/duration',
+            '//quiz/maxattempts',
+            /* Check that the <availability>assess</availability> node exists
+             * Some people have tried to put a survey in here, but that won't work
+             * for obvious reasons: usually this is a user accident
+             */
+            '//quiz/availability[text()="' . self::QUIZ_AVAILABILITY . '"]',
+            '//quiz/markvisibility',
+            /* We could have checked for <section> but maybe some people have used
+             * xml files to set up the aforementioned misc fields and let teachers
+             * supply their own content, so I'm a bit reluctant
+             *
+             * '//quiz/section',
+             */
+        ];
+
+        foreach ($signatureNodes as $node) {
+            if (0 === \count($xml->xpath($node))) {
+                return false;
+            }
+        }
+
+        /* Welp...I guess it passed the checks we set up
+         */
+        return true;
     }
 
 
