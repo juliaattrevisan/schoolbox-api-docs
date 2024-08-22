@@ -260,7 +260,6 @@ class Importer
              */
             '//quiz/version',
             '//quiz/title',
-            '//quiz/worktype',
             '//quiz/description',
             '//quiz/completionmessage',
             '//quiz/publishdate',
