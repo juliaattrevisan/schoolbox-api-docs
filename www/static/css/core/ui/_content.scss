@@ -458,7 +458,7 @@ span.loader {
     right: 0;
     top: 0;
     position: fixed;
-    z-index: var(--sbx-depth-fullscreen);
+    z-index: var(--sbx-depth-modal);
 
     .loader {
         position: absolute;

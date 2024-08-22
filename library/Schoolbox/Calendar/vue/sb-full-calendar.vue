@@ -10,6 +10,7 @@ import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-mod
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import CreateEventModal from "./create-event-modal.vue";
 import ExportModal from "./export-modal.vue";
@@ -236,12 +237,13 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
+            activate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                 userId: this.config.userId,
             };
-            fetch(`${URL_EVENT_SOURCE}?${getSearchString(params)}`, {
+            fetch(`${URL_EVENT_SOURCE}d?${getSearchString(params)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
@@ -253,8 +255,12 @@ export default {
                             return "start" in v;
                         }),
                     );
+                    timeout({ text: "Events retrieved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**
@@ -571,6 +577,7 @@ export default {
         async updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
+            activate("Updating events...");
             try {
                 await fetch(URL_EVENT_FILTER, {
                     method: "POST",
@@ -579,6 +586,7 @@ export default {
                 this.calendarApi.refetchEvents();
             } catch (error) {
                 console.warn(error);
+                timeout({ text: "Event filters could not be updated", isSuccess: false });
             }
         },
 
