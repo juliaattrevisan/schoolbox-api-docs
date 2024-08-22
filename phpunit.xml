@@ -12,9 +12,9 @@
 >
   <testsuites>
     <testsuite name="default">
-      <directory suffix="Test.php">library/Proxy/</directory>
-      <directory suffix="Test.php">library/Alaress/</directory>
-      <directory suffix="Test.php">library/Schoolbox/</directory>
+      <directory suffix=".php">library/Proxy/</directory>
+      <directory suffix=".php">library/Alaress/</directory>
+      <directory suffix=".php">library/Schoolbox/</directory>
       <exclude>library/Alaress/Database/Test</exclude>
       <exclude>library/Schoolbox/Database/Test</exclude>
       <exclude>library/Schoolbox/Profile/Test/Generator.php</exclude>
