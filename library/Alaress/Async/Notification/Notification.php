@@ -20,9 +20,6 @@ class Notification
     /** @var string */
     protected $hash;
 
-    /** @var string */
-    protected $baseParamHash;
-
     /** @var Instance[] */
     protected $instances;
 
@@ -109,9 +106,6 @@ class Notification
 
         // store instance
         $this->instances[$paramHash] = $instance;
-
-        // we need a hash that's more relatively unique
-        $this->baseParamHash = $instance->getBaseHash() . $paramHash;
 
         // take timestamp if it's more recent than the one we have already
         if ($instance->getTime() > $this->timestamp) {
@@ -275,14 +269,5 @@ class Notification
                 $this->instances
             )
         );
-    }
-
-    /**
-     * Return hash with combination of base and params for more uniqueness
-     * @return string
-     */
-    public function getBaseParamHash(): string
-    {
-        return $this->baseParamHash;
     }
 }
