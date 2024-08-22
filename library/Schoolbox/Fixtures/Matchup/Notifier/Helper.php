@@ -197,7 +197,7 @@ class Helper
             $teamUser = $teamPlayer->getUser();
             if ($teamUser instanceof User) {
                 $bob->setParam('child', new UserParam($teamUser));
-                $bob->putMatchMeta('studentExternalId', $teamPlayer->getUser()->getExternalId());
+                $bob->setStudentExternalIdMeta($teamPlayer->getUser()->getExternalId());
                 $envelope->targetToParent($teamUser, $bob->build());
             }
         }

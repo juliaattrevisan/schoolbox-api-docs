@@ -168,7 +168,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob = $this
             ->notifyRemovedFromTeam($effector, $teamPlayer, $team, $title, $params)
-            ->putMeta('studentExternalId', $teamPlayer->getUser()->getExternalId())
+            ->setStudentExternalIdMeta($teamPlayer->getUser()->getExternalId())
             ->build();
 
         $envelope = new Envelope();

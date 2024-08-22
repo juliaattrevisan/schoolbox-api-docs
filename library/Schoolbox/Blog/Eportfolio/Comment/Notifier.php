@@ -470,7 +470,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setParams(array_merge($ownerParam, ['effector' => $effectorParam]));
             //Only add the student external id for the parent notification
             if ($ownerParam['student'] instanceof ChildParam) {
-                $bob->putMeta('studentExternalId', $owner->getExternalId());
+                $bob->setStudentExternalIdMeta($owner->getExternalId());
             }
             $envelope->targetToUser($target->getId(), $bob->build());
         }

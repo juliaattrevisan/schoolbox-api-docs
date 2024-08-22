@@ -1393,7 +1393,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return $bob
             ->setParam('assessment', new Param($assessment->getTitle(), $href))
             ->setParam('child', new ChildParam($participant->getUser()))
-            ->putMeta('studentExternalId', $participant->getUser()->getExternalId())
+            ->setStudentExternalIdMeta($participant->getUser()->getExternalId())
             ->setHref($href);
     }
 

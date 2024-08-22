@@ -53,13 +53,12 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * @param string $metaName
-     * @param string $metaValue
+     * @param string $studentExternalId
      * @return self
      */
-    public function putMatchMeta(string $metaName, string $metaValue)
+    public function setStudentExternalIdMeta($studentExternalId)
     {
-        $this->internalBuilder->putMeta($metaName, $metaValue);
+        $this->internalBuilder->setStudentExternalIdMeta($studentExternalId);
         return $this;
     }
 

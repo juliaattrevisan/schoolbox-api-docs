@@ -167,7 +167,7 @@ class Notifier extends AbstractModuleNotifier
                 ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
                 ->putMeta('type', $method) // to provide different key for $instance->getBaseHash() . $instance->getParamHash()
                 ->addTopic(sprintf("pastoral.%s.%s", $pastoral->getId(), $method))
-                ->putMeta('studentExternalId', $pastoral->getStudent()->getExternalId());
+                ->setStudentExternalIdMeta($pastoral->getStudent()->getExternalId());
 
         $message = $builder->build();
 
@@ -329,7 +329,7 @@ class Notifier extends AbstractModuleNotifier
                     ->setSeverity(Logger::ERROR)
                     ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
                     ->addTopic(sprintf("pastoral.%s.%s.%s", $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT))
-                    ->putMeta('studentExternalId', $pastoral->getStudent()->getExternalId());
+                    ->setStudentExternalIdMeta($pastoral->getStudent()->getExternalId());
 
             $message     = $builder->build();
             $targetUsers = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))
