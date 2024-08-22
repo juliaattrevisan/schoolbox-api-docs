@@ -243,7 +243,7 @@ export default {
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                 userId: this.config.userId,
             };
-            fetch(`${URL_EVENT_SOURCE}d?${getSearchString(params)}`, {
+            fetch(`${URL_EVENT_SOURCE}?${getSearchString(params)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
