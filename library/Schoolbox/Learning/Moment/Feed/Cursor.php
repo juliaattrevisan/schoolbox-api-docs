@@ -240,23 +240,24 @@ class Cursor implements ICursor
         if ($encodedCursor !== null) {
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
-
-            // The usual cursor where part:
-            // fetch items from before the last item's date, as well as ones
-            // which match the last item's date and whose other fields are less
-            // than the current field
-            $wherePart = (
-                'WHERE
-                 (date < :date1) OR
-                 (date = :date2 AND discriminator > :discriminator2) OR
-                 (date = :date3 AND discriminator = :discriminator3 AND id < :id3)'
-            );
-            $params['date1']          = $cursor['date'];
-            $params['date2']          = $cursor['date'];
-            $params['date3']          = $cursor['date'];
-            $params['discriminator2'] = $cursor['discriminator'];
-            $params['discriminator3'] = $cursor['discriminator'];
-            $params['id3']            = $cursor['id'];
+            if (isset($cursor['date']) && isset($cursor['id']) && isset($cursor['discriminator'])) {
+                // The usual cursor where part:
+                // fetch items from before the last item's date, as well as ones
+                // which match the last item's date and whose other fields are less
+                // than the current field
+                $wherePart                = (
+                    'WHERE
+                     (date < :date1) OR
+                     (date = :date2 AND discriminator > :discriminator2) OR
+                     (date = :date3 AND discriminator = :discriminator3 AND id < :id3)'
+                );
+                $params['date1']          = $cursor['date'];
+                $params['date2']          = $cursor['date'];
+                $params['date3']          = $cursor['date'];
+                $params['discriminator2'] = $cursor['discriminator'];
+                $params['discriminator3'] = $cursor['discriminator'];
+                $params['id3']            = $cursor['id'];
+            }
         }
 
         $query = (
@@ -523,7 +524,7 @@ class Cursor implements ICursor
             $query .= ("
                 assess_attempt.attempt_id      AS id,
                 :discriminatorQuizFeedback AS discriminator,
-                assess_attempt.reviewed_at AS date 
+                assess_attempt.reviewed_at AS date
             ");
 
             $params['discriminatorQuizFeedback'] = self::DISCRIMINATOR_QUIZ_FEEDBACK;
