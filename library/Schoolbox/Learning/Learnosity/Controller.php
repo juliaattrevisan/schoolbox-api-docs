@@ -39,13 +39,11 @@ use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\TokenReplacer;
@@ -446,11 +444,16 @@ class Controller extends Base
         // See library/Schoolbox/Learning/Assessment/Quiz/Controller.php (where the same permission checks are used).
         $now = Alaress_Date_Format::now();
         $this->quizMapper->closeExpiredAttempts($assessment, $quiz, $now); // Close any expired attempts before checking for in-progress.
-        $actionValidator = new ActionValidator($now, Access::getInstance());
-        $canAttempt = (
-            $this->getUser()->getId() === $student->getId() && // A user may not attempt a quiz on behalf of another user.
-            $actionValidator->canAttemptQuiz($this->getUser(), $assessment, $this->getConfigLoader())
-        );
+
+        /* Also see if $student can load the learnosity getAttempt() screen
+         * If they can, then they can attempt it; provide the button
+         */
+        $canAttempt = (bool)$this->getRouteIfAuthorized('learnosity.getAttempt', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $student,
+            'studentId' => $student->getId(),
+        ]);
 
         if (!$canAttempt) {
             /* Redirect back to summary screen
