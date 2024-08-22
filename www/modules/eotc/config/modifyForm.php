@@ -50,25 +50,14 @@ if ($sessionUser->isSuperuser()) {
     $mandatoryStudents = $allConfigs->getBy('name', 'student_attendees_required');
     $mandatoryStudents->setValue((int)$_POST['studentAttendeesRequired']);
 
-    // Split file type string into an array
+    /* Synergetic Filetypes are comma-separated in EOT Config
+     * Explode this csv and forcibly uppercase everything
+     */
+    $arrayFileTypes = explode(',', $_POST['externalFiletypeBlacklist']);
 
-    $arrayFileTypes = explode(",", $_POST['externalFiletypeBlacklist']);
-
-    // Iterate each item to find syntactically valid Synergetic FileTypes (single alpha character, uppercase)
-
-    $validFileTypes = [];
-
-    foreach ($arrayFileTypes as $fileType) {
-        // Trim and convert to uppercase
-
-        $fileType = strtoupper(trim($fileType));
-
-        // Make sure it is a single alpha character, otherwise ignore it
-
-        if (strlen($fileType) == 1 && ctype_alpha($fileType)) {
-            $validFileTypes[] = $fileType;
-        }
-    }
+    $validFileTypes = array_map(static function ($elem) {
+        return strtoupper(trim($elem));
+    }, $arrayFileTypes);
 
     // Sort it alphabetically
 
