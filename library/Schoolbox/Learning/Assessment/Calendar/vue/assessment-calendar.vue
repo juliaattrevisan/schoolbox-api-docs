@@ -259,7 +259,7 @@ export default {
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                 filters: this.selectedFilters,
             };
-            fetch(`${URL_EVENT_SOURCE}/${window.fullCalendarConfig.userId}?${getSearchString(ajaxParams)}`, {
+            fetch(`${URL_ASSESSMENT_EVENT_SOURCE}?${getSearchString(ajaxParams)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
