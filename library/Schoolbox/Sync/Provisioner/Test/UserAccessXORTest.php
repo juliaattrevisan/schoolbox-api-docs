@@ -27,7 +27,6 @@ class UserAccessXORTest extends TestCase
      * @param array $array2
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_same')]
     public function testSame(array $array1, array $array2, int $expected)
@@ -150,7 +149,6 @@ class UserAccessXORTest extends TestCase
      * @param array $array2
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_different')]
     public function testDifferent(array $array1, array $array2, int $expected)

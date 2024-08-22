@@ -33,7 +33,6 @@ class ValidStudentPhotosAvailableTest extends TestCase
      * @param \Schoolbox\User  $viewee
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_validStudentPhotosAvailable')]
     public function testValidStudentPhotosAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)

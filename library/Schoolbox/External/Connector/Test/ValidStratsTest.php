@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\ValidStrats;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * Class ValidStratsTest
@@ -27,7 +26,6 @@ class ValidStratsTest extends TestCase
      * @param string $cliArgs
      * @param array  $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidWatchlistValue')]
     public function testValidStrats(string $cliArgs, array $expected)
@@ -128,7 +126,6 @@ I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f,
      * @param string $cliArgs
      * @param bool   $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStratEnabled')]
     public function testStratEnabled(string $method, string $cliArgs, bool $expected)

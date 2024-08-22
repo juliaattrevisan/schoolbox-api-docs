@@ -26,7 +26,6 @@ class FolderCodecTest extends TestCase
      * @param string|null $expected
      * @throws \DebugBar\DebugBarException
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFolderCode')]
     public function testValidEFolderCode(int $currentYear, string $canvasCourseCode, ?string $expected)

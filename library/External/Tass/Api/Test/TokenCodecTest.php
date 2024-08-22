@@ -14,7 +14,7 @@ use PHPUnit;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\External\Tass\Api\TokenCodec::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(Token::class)]
 class TokenCodecTest extends TestCase
 {
     // ======================= Tests =========================== //
@@ -60,9 +60,9 @@ class TokenCodecTest extends TestCase
     }
 
 
-    public function providerReversibility(): array
+    public static function providerReversibility(): array
     {
-        $tokenCodec = $this->getTokenCodec();
+        $tokenCodec = self::getTokenCodec();
 
         return [
             [$tokenCodec, []],
@@ -77,7 +77,7 @@ class TokenCodecTest extends TestCase
 
     // ===================== Helpers =========================== //
 
-    private function getTokenCodec(): Token
+    private static function getTokenCodec(): Token
     {
         return new Token('SSBhbSB0b2tlbg==');
     }

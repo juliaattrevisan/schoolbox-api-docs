@@ -80,7 +80,6 @@ class DSNTest extends TestCase
      * @param string $expected
      * @throws DomainException
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecodeEncode')]
     public function testValidDSNDecodeEncode(string $dsn, string $expected): void

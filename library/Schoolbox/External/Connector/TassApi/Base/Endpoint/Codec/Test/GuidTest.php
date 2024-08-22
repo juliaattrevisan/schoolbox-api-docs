@@ -15,7 +15,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Guid as GuidCodec;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * Class GuidTest
@@ -76,7 +75,6 @@ class GuidTest extends TestCase
      * @param string $classCode
      * @param string $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidGuidEncode')]
     public function testValidGuidEncode(string $startAt, string $ttid, string $day, string $periodCode, string $classCode, string $expected): void
@@ -134,7 +132,6 @@ class GuidTest extends TestCase
      * @param array  $input
      * @param array $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidGuidEncodeDecode')]
     public function testValidGuidEncodeDecode(array $input, array $expected): void

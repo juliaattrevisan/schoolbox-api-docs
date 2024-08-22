@@ -32,7 +32,6 @@ class ValidUseCohortMarksTest extends TestCase
      * @param Folder\Model $folder
      * @param bool         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_validLMSCohortComparison')]
     public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, bool $expected): void

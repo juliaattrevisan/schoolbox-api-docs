@@ -32,7 +32,6 @@ class SimpleTest extends TestCase
      * @param string $input
      * @param array  $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerBodyManifest')]
     public function testSimpleManifest(string $input, array $expected): void
@@ -116,7 +115,6 @@ class SimpleTest extends TestCase
      * @param array  $replacements
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerBody')]
     public function testSimple(string $input, array $replacements, string $expected): void

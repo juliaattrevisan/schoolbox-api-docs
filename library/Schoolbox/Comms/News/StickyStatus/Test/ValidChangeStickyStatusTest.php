@@ -19,9 +19,10 @@ use Schoolbox\User;
 class ValidChangeStickyStatusTest extends TestCase
 {
     /**
-     * @param ValidChangeStickyStatus $validChangeStickyStatus
-     * @param User                    $user
-     * @param bool                    $expected
+     * @param bool $isNewsModerator
+     * @param bool $configStickyStatus
+     * @param User $user
+     * @param bool $expected
      * @return void
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]

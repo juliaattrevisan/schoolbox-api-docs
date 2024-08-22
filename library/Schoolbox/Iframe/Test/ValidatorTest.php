@@ -18,7 +18,6 @@ namespace Schoolbox\Iframe\Test;
 use Schoolbox\Iframe\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 class ValidatorTest extends TestCase
 {
@@ -27,7 +26,6 @@ class ValidatorTest extends TestCase
      * @param $url
      * @param int $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidExample')]
     public function testValidExample($safeSources, $url, $expected)

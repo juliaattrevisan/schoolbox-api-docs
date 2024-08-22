@@ -28,7 +28,6 @@ class FilterCodecTest extends TestCase
      * @param string|null $input
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFilterCodecEncodeDecode')]
     public function testFilterCodecEncodeDecode(?string $input, string $expected)
@@ -61,7 +60,6 @@ class FilterCodecTest extends TestCase
      * @param string|null $input
      * @param array $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFilterCodecDecode')]
     public function testFilterCodecDecode(?string $input, array $expected)

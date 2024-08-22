@@ -31,7 +31,6 @@ class ValidActiveEnrolmentTest extends TestCase
      * @param string $to
      * @param bool   $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidActiveEnrolment')]
     public function testValidActiveEnrolment(string $now, string $from, string $to, bool $expected)

@@ -27,7 +27,6 @@ class SebCheckTest extends TestCase
      * @param string $configKey
      * @param bool   $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSebCheck')]
     public function testValidSebCheck(

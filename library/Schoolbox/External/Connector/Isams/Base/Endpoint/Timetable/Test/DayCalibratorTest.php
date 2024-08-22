@@ -158,7 +158,6 @@ class DayCalibratorTest extends TestCase
      * @param int    $isamsDay
      * @param int    $schoolboxDay
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDayCalibrator')]
     public function testValidDayCalibrator(string $xml, int $isamsDay, int $schoolboxDay): void

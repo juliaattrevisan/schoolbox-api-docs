@@ -42,24 +42,8 @@ use Schoolbox\Resource\Folder;
  */
 class VisibilityTests extends TestCase
 {
-    /** @var Visibility */
-    private $visibility;
-
     /** @var string */
-    private $nowDatabase = '2010-01-10 00:00:00';    // To ensure test repeatability, freeze time
-
-
-    /**
-     * @inheritdoc
-     * @throws PHPUnit\Framework\Exception
-     * @throws PHPUnit\Framework\MockObject\RuntimeException
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-        $this->visibility = new Visibility($this->getMockAccess());
-    }
-
+    private const NOW_DATABASE = '2010-01-10 00:00:00';    // To ensure test repeatability, freeze time
 
     /**
      * @param bool                $isParticipant
@@ -97,7 +81,8 @@ class VisibilityTests extends TestCase
         // Apply workType
         $assessable->setWorkType($workType);
 
-        $this->assertEquals($expected, $this->visibility->isVisibleToUser($assessable, $user, $showClosed, $now));
+        $visibility = new Visibility($this->getMockAccess());
+        $this->assertEquals($expected, $visibility->isVisibleToUser($assessable, $user, $showClosed, $now));
     }
 
 
@@ -105,17 +90,17 @@ class VisibilityTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function providerIsVisible(): array
+    public static function providerIsVisible(): array
     {
         // Is participant
         $isParticipant  = true;
         $notParticipant = false;
 
         // isStaff dimensions
-        [$studentRole, $staffRole] = $this->buildRoles();
+        [$studentRole, $staffRole] = self::buildRoles();
 
         // isInstructor dimension
-        [$nonInstructor, $isInstructor] = $this->buildUsers();
+        [$nonInstructor, $isInstructor] = self::buildUsers();
 
         // workType dimension
         $workTypeNone   = null;
@@ -123,8 +108,8 @@ class VisibilityTests extends TestCase
         $workTypeSivo   = (new WorkType\Model())->setStaffOrInstructorVisibleOnly(true);
 
         // Assessment temporal state
-        $now = new Alaress_Date_Format($this->nowDatabase, Alaress_Date_Format::DATABASE_FORMAT);
-        [$unpublished, $upcoming, $open, $overdue, $closed] = $this->buildAssessments($now);
+        $now = new Alaress_Date_Format(self::NOW_DATABASE, Alaress_Date_Format::DATABASE_FORMAT);
+        [$unpublished, $upcoming, $open, $overdue, $closed] = self::buildAssessments($now);
 
         // Show closed flag
         $showClosed = true;
@@ -452,7 +437,7 @@ class VisibilityTests extends TestCase
      *
      * @return Role[]
      */
-    private function buildRoles(): array
+    private static function buildRoles(): array
     {
         return [
             (new Role())->setType(Role::STUDENT),
@@ -467,7 +452,7 @@ class VisibilityTests extends TestCase
      * @return User[]
      * @see $this->getMockAccess()
      */
-    private function buildUsers(): array
+    private static function buildUsers(): array
     {
         return [
             (new User())->setId(1)->setFirstname('Andy - non-instructor'),
@@ -482,7 +467,7 @@ class VisibilityTests extends TestCase
      * @param Alaress_Date_Format $now
      * @return IAssessable[]
      */
-    private function buildAssessments(Alaress_Date_Format $now): array
+    private static function buildAssessments(Alaress_Date_Format $now): array
     {
 
         $folderContext = (new Folder\Model())->setId(1);
@@ -544,12 +529,12 @@ class VisibilityTests extends TestCase
     /**
      * Builds a mock of the Access dependency
      *
-     * @return MockObject
+     * @return Access|MockObject
      * @throws PHPUnit\Framework\Exception
      * @throws RuntimeException
-     * @see $this->buildUsers()
+     * @see self::buildUsers()
      */
-    private function getMockAccess(): MockObject
+    private function getMockAccess(): Access|MockObject
     {
         /** @var Access|MockObject $mockAccess */
         $mockAccess = $this->createMock(Access::class);

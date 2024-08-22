@@ -29,7 +29,6 @@ class ValidFileTest extends TestCase
      * @param SubmissionFile $file
      * @param bool           $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidExample')]
     public function testValidExample(SubmissionFile $file, bool $expected): void

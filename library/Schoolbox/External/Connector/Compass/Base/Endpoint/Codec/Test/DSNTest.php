@@ -46,7 +46,6 @@ class DSNTest extends TestCase
      * @param string $dsn
      * @param array  $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecode')]
     public function testValidDSNDecode(string $dsn, $expected): void
@@ -79,7 +78,6 @@ class DSNTest extends TestCase
      * @param string $dsn
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDSNDecodeEncode')]
     public function testValidDSNDecodeEncode(string $dsn, string $expected): void

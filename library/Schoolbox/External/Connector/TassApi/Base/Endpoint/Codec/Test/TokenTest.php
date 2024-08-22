@@ -34,7 +34,6 @@ class TokenTest extends TestCase
      * @param string $encrypted
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerTokenGeneration')]
     public function testTokenGeneration(string $tassProductToken, array $data, string $encrypted)
@@ -55,7 +54,6 @@ class TokenTest extends TestCase
      * @param string $encrypted
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerTokenGeneration')]
     public function testTokenUnpack(string $tassProductToken, array $data, string $encrypted)
