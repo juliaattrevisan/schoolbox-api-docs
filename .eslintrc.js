@@ -63,6 +63,13 @@ module.exports = {
                 devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
             },
         ],
+        // Allow console.warn and console.error, but disallow other console methods
+        "no-console": [
+            "error",
+            {
+                allow: ["warn", "error"],
+            },
+        ],
     },
     settings: {
         "import/parsers": {
