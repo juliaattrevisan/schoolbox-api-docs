@@ -95,6 +95,14 @@
         .default-login-toggle {
             opacity: 0.5;
         }
+
+        /* Center login content vertically*/
+        #content{
+            align-items: center;
+            display:flex;
+            max-width: 360px;
+            min-height: 100vh;
+        }
     </style>
 {% endautoescape %}
 
@@ -276,10 +284,6 @@
         l = $('#login');
 
         fy = $('#footer').height();
-
-        $(window).on('load resize', function () {
-            l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
-        });
 
         // Validation of terms and conditions
         l.alaressValidate({
