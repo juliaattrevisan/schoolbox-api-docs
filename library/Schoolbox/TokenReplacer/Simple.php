@@ -128,11 +128,13 @@ class Simple
         $nodes = $xpath->query("//span[@$targetAttributeProp]");
 
         foreach ($nodes as $node) {
-            $class = $node->getAttribute($targetAttributeProp);
-            if (str_contains($class, $targetAttributeValue)) {
-                //Replace element with plain text
-                $replace = $dom->createTextNode($node->nodeValue);
-                $node->parentNode->replaceChild($replace, $node);
+            if ($node instanceof \DOMElement) {
+                $class = $node->getAttribute($targetAttributeProp);
+                if (str_contains($class, $targetAttributeValue)) {
+                    //Replace element with plain text
+                    $replace = $dom->createTextNode($node->nodeValue);
+                    $node->parentNode->replaceChild($replace, $node);
+                }
             }
         }
         $body = $dom->saveHTML();
