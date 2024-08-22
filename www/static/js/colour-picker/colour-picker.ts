@@ -19,7 +19,9 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
     const eventDetail = (e as ColourPickerInitialiseEvent).detail;
     const colorisOptions: Coloris.ColorisOptions = Object.assign(colorPickerDefaults, eventDetail);
 
-    const targetEl = document.querySelector(colorisOptions.el);
+    const targetEl =
+        typeof colorisOptions.el === "string" ? document.querySelector(colorisOptions.el) : colorisOptions.el;
+
     if (!(targetEl instanceof HTMLInputElement)) {
         throw new Error(`colourPickerInitialise: target element ${colorisOptions.el} is not an input element`);
     }
