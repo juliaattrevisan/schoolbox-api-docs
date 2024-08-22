@@ -50,5 +50,7 @@ jobs:
 
     - name: Typecheck
       run: npm run typecheck
-    - name: Test Code Linting
-      run: npm run lint
+
+    # No linting yet, will be added in a different PR (SA-18139)
+    # - name: Test Code Linting
+    #   run: npm run lint
