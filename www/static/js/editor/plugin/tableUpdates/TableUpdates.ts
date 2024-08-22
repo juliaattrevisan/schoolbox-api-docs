@@ -44,6 +44,7 @@ export default class TableUpdates extends Plugin {
                 key: this.isCK5Attribute,
             },
             view: {
+                // @ts-expect-error -- This does match one of the types, but it doesn't quite seem to be able to infer that at the moment...
                 name: "table",
                 key: this.isCK5Attribute,
             },
@@ -56,6 +57,7 @@ export default class TableUpdates extends Plugin {
             model: {
                 name: "table",
                 key: this.isCK5Attribute,
+                value: undefined,
             },
         });
     }
@@ -79,20 +81,20 @@ export default class TableUpdates extends Plugin {
                     const viewTable = viewElement.is("element", "table")
                         ? viewElement
                         : Array.from(viewElement.getChildren()).find((viewChild) => viewChild.is("element", "table"));
-                    if (modelTable.hasAttribute(this.isCK5Attribute)) {
-                        viewWriter.addClass("sb-ck-table", viewTable);
+                    if (modelTable.hasAttribute(this.isCK5Attribute) && viewTable !== undefined) {
+                        viewWriter.addClass("sb-ck-table", viewTable as ViewElement);
                     }
                 },
-                { priority: "low" }
+                { priority: "low" },
             );
         });
     }
 
     /**
      * Get the currently selected table
-     * @returns { ModelElement } The currently selected table
+     * @returns { Element | null | undefined } The currently selected table
      */
-    getSelectedTable() {
+    getSelectedTable(): Element | null | undefined {
         const { selection } = this.editor.model.document;
         const table = selection.getFirstPosition()?.findAncestor("table");
         return table;
@@ -121,7 +123,9 @@ export default class TableUpdates extends Plugin {
             });
             this.editor.model.change((writer) => {
                 // add the isCK5Attribute attribute to the table so we can add .sb-ck-table to the table in the downcast
-                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
+                const selectedTable = this.getSelectedTable();
+                if (!selectedTable) return;
+                writer.setAttribute(this.isCK5Attribute, "true", selectedTable);
             });
             this.setCellBorders();
         });
@@ -132,12 +136,14 @@ export default class TableUpdates extends Plugin {
             "insertTableRowBelow",
         ];
         insertColumnAndRowCommands.forEach((command) => {
-            this.editor.commands.get(command).on("execute", () => {
+            this.editor.commands.get(command)!.on("execute", () => {
                 const cells = this.getCellElements();
                 // only add default styles if all cells have not been set to border style none
                 const hasBorderStyles = cells.some(
                     (cell) =>
-                        cell._attrs.has("tableCellBorderStyle") && cell._attrs.get("tableCellBorderStyle") !== "none"
+                        // @ts-expect-error -- accessing a private property is intentional here, for now...
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                        cell._attrs.has("tableCellBorderStyle") && cell._attrs.get("tableCellBorderStyle") !== "none",
                 );
                 if (hasBorderStyles) {
                     this.setCellBorders();
@@ -152,11 +158,15 @@ export default class TableUpdates extends Plugin {
      * @returns {Array} An array of all the cell elements in the table
      */
     getCellElements() {
-        const cellElements = Array.from(this.getSelectedTable().getChildren())
-            .filter((row) => row.name === "tableRow")
-            .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
+        const selectedTable = this.getSelectedTable();
+        if (!selectedTable) return [];
+        const cellElements = Array.from(selectedTable.getChildren())
+            .filter((row) => (row as Element).name === "tableRow")
+            .map((row) =>
+                Array.from((row as Element).getChildren()).filter((cell) => (cell as Element).name === "tableCell"),
+            )
             .flat();
-        return cellElements;
+        return cellElements as Element[];
     }
 
     /**
@@ -167,6 +177,8 @@ export default class TableUpdates extends Plugin {
      */
     setCellBorders() {
         const cells = this.getCellElements();
+        // @ts-expect-error -- accessing a private property is intentional here, for now...
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         const filteredCells = cells.filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // to update only newly inserted cells
         this.editor.model.change((writer) => {
             filteredCells.forEach((cell) => {
@@ -185,7 +197,9 @@ export default class TableUpdates extends Plugin {
         const tableAlignmentCommand = this.editor.commands.get("tableAlignment") as TableAlignmentCommand;
         tableAlignmentCommand.on("execute", () => {
             this.editor.model.change((writer) => {
-                writer.setAttribute(this.isCK5Attribute, "true", this.getSelectedTable());
+                const selectedTable = this.getSelectedTable();
+                if (!selectedTable) return;
+                writer.setAttribute(this.isCK5Attribute, "true", selectedTable);
             });
         });
     }

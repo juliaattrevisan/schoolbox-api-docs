@@ -9,7 +9,7 @@ import type { lightGallery } from "lightgallery";
 import type { LightGallery } from "lightgallery/lightgallery";
 import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
 import type { DefineComponent } from "vue";
-import type { Editor } from "@js/editor/types/editorTypes";
+import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { pwaConfig } from "@js/global/pwaConfig";
@@ -36,7 +36,7 @@ declare global {
                 constant: string[];
                 swatches: string[];
             };
-            editors: { [key: string]: Editor };
+            editors: Partial<Record<string, SbxEditor>>;
             hasEditorAI: true | undefined; // to display the AI features within the editor
             openAIModel: string | undefined; // chosen open AI model to use
             lightGallery: typeof lightGallery;

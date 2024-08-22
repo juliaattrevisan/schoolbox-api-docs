@@ -47,6 +47,7 @@ export default class ResourceEditing extends Plugin {
                     key: attribute,
                 },
                 view: {
+                    // @ts-expect-error -- This does match one of the types, but it doesn't quite seem to be able to infer that at the moment...
                     name: "img",
                     key: attribute,
                 },
@@ -59,6 +60,7 @@ export default class ResourceEditing extends Plugin {
                 model: {
                     name: "imageInline",
                     key: attribute,
+                    value: undefined,
                 },
             });
         });
@@ -88,7 +90,7 @@ export default class ResourceEditing extends Plugin {
                             "data-schoolboxresource-width": parseFloat(width),
                             "data-schoolboxresource-height": parseFloat(width) * (9 / 16),
                         },
-                        imageElement
+                        imageElement,
                     );
                 });
             }

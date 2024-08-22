@@ -29,7 +29,7 @@ export function getTableSettings(): { table: TableConfig } {
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - updated sourceElement content as HTML
  */
-export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
+export function addFullWidthStyle(sourceElementHTML: HTMLElement): HTMLElement {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
         if (!table.style.width.includes("px")) {
@@ -45,7 +45,7 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } -
  */
-export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
+export function addAlignLeftStyle(sourceElementHTML: HTMLElement): HTMLElement {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
         if (table.align === "" && table.parentElement && !table.parentElement.hasAttribute("data-is-ckeditor5-table")) {

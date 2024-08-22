@@ -5,7 +5,7 @@
 
 import type { ToolbarConfig, ToolbarConfigItem } from "@ckeditor/ckeditor5-core";
 import { EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Display the AI toolbar options based on the existence of an sbProp
@@ -21,10 +21,10 @@ function getToolbarAI(): string[] {
 
 /**
  * Display the toolbar options based on config
- * @param { EditorConfig } config - the config to use when creating the editor
+ * @param { SbxEditorConfig } config - the config to use when creating the editor
  * @returns { ToolbarConfig } - the toolbar display
  */
-export function getToolbar(config: EditorConfig): ToolbarConfig {
+export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     // what displays in the default toolbar in order, are either single buttons or groups via objects
     let items: ToolbarConfigItem[] = [];
 

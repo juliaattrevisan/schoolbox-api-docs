@@ -36,21 +36,17 @@ import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { getAISettings } from "@js/editor/settings/aiSettings";
-import { EditorConfig as SbxEditorConfig } from "@js/editor/types/editorTypes";
+import { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
-interface EditorConfigWithSbx extends EditorConfig {
-    sbConfig: SbxEditorConfig;
-}
-
 /**
  * Return the default configuration
  * @param { SbxEditorConfig } config - the default config
- * @returns { EditorConfigWithSbx } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
+ * @returns { EditorConfig & { sbConfig: SbxEditorConfig } } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getConfig(config: SbxEditorConfig): EditorConfigWithSbx {
+export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: SbxEditorConfig } {
     return {
         plugins: [
             // list all the plugins we'll use in the default editor

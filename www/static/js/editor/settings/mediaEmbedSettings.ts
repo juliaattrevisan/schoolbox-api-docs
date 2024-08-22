@@ -21,7 +21,7 @@ export function getMediaEmbedSettings(): { mediaEmbed: MediaEmbedConfig } {
                 {
                     name: "iframely previews", // hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
                     url: /.+/, // Match all URLs or just the ones you need
-                    html: (match: string) => {
+                    html: (match) => {
                         const url = match[0];
                         const iframeUrl = `${IFRAME_SRC}?app=1&key=${window.sbProps.iframelyLicenseKey}&url=${encodeURIComponent(url)}`;
                         // alternatively, use &key= instead of &api_key with the MD5 hash of your api_key

@@ -11,7 +11,7 @@ import type { ImageUploadCompleteEvent } from "@ckeditor/ckeditor5-image/src/ima
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { SbxEditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
 import type { ViewDocumentClipboardInputEvent } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
 import { createImageTypeRegExp } from "@ckeditor/ckeditor5-image/src/imageupload/utils";
@@ -27,7 +27,7 @@ export default class ResourceEditing extends Plugin {
      * When files are added, upload them and add them to the editor
      */
     init() {
-        const config = this.editor.config.get("sbConfig") as EditorConfig;
+        const config = this.editor.config.get("sbConfig") as SbxEditorConfig;
         // prevent adding resources if the toolbar is set to simple
         if (config.toolbar === EditorToolbar.SIMPLE) {
             return;

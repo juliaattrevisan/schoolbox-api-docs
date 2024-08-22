@@ -4,7 +4,7 @@
 
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import type { Element } from "@ckeditor/ckeditor5-engine";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { getWithoutExtension } from "@js/util/fileUtils";
 
 export interface AsyncUploadResponseError {
@@ -46,10 +46,10 @@ export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponse
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that
  * @param { string } url - the url to reformat
- * @param { EditorConfig } config - the CKEditor instance config
+ * @param { SbxEditorConfig } config - the CKEditor instance config
  * @returns { URL|string } - the url with the baseHref conditionally added
  */
-export function getURL(url: string, config: EditorConfig) {
+export function getURL(url: string, config: SbxEditorConfig): URL | string {
     // If we are requesting a baseHref to exist, we should be using it...
     if (config.baseHref) {
         return new URL(url, config.baseHref);
@@ -109,20 +109,27 @@ export type Resource = {
 /**
  * Get the image src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the image src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL|string } - the image src
  */
-function getImageSrc(resource: Resource, config: EditorConfig) {
+function getImageSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     return getURL(`/storage/image.php?hash=${resource.hash}`, config);
 }
 
 /**
  * Get the image attributes
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the image attributes
  */
-function getImageAttributes(resource: Resource, config: EditorConfig) {
+function getImageAttributes(
+    resource: Resource,
+    config: SbxEditorConfig,
+): {
+    src: URL | string;
+    alt: string;
+    linkHref: URL | string;
+} {
     return {
         src: getImageSrc(resource, config),
         alt: resource.name,
@@ -133,10 +140,10 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the video src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the video src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the video src
  */
-function getVideoSrc(resource: Resource, config: EditorConfig) {
+function getVideoSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     const resourceId = resource.id ? resource.id : resource.hash;
     return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, config);
 }
@@ -144,10 +151,10 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
 /**
  * Get the video thumbnail src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the video thumbnail src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the video thumbnail src
  */
-function getVideoThumb(resource: Resource, config: EditorConfig) {
+function getVideoThumb(resource: Resource, config: SbxEditorConfig): URL | string {
     const resourceId = resource.id ? resource.id : resource.hash;
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
     return getURL(`/cms/videoThumb.php?size=poster_letterbox&id=${resourceId}&type=${filesystemWithReplaces}`, config);
@@ -157,10 +164,10 @@ function getVideoThumb(resource: Resource, config: EditorConfig) {
  * Get the video attributes, with the src as a thumbnail of the loaded video or the
  * "video processing" image if the video is not yet ready
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the image attributes
  */
-function getVideoAttributes(resource: Resource, config: EditorConfig) {
+function getVideoAttributes(resource: Resource, config: SbxEditorConfig) {
     const thumbnail = getVideoThumb(resource, config);
     return {
         src: thumbnail,
@@ -179,20 +186,20 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the audio src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the audio src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the audio src
  */
-function getAudioSrc(resource: Resource, config: EditorConfig) {
+function getAudioSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     const resourceId = resource.id ? resource.id : resource.hash;
     return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, config);
 }
 
 /**
  * Get the audio thumbnail src, which is just a generic speaker
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the audio thumbnail src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the audio thumbnail src
  */
-function getAudioThumb(config: EditorConfig) {
+function getAudioThumb(config: SbxEditorConfig): URL | string {
     return getURL(
         `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
         config,
@@ -202,10 +209,10 @@ function getAudioThumb(config: EditorConfig) {
 /**
  * Get the audio attributes, with the src just being of a speaker
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the audio attributes
  */
-function getAudioAttributes(resource: Resource, config: EditorConfig) {
+function getAudioAttributes(resource: Resource, config: SbxEditorConfig) {
     const thumbnail = getAudioThumb(config);
     return {
         src: thumbnail,
@@ -223,10 +230,10 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the document attributes
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the document attributes
  */
-function getDocumentAttributes(resource: Resource, config: EditorConfig) {
+function getDocumentAttributes(resource: Resource, config: SbxEditorConfig) {
     return {
         src: getURL(`/ajax/mime/${resource.mime}`, config),
         alt: resource.name,
@@ -239,10 +246,10 @@ function getDocumentAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the other attributes, which is a file type for "other" files...
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the document attributes
  */
-function getOtherAttributes(resource: Resource, config: EditorConfig) {
+function getOtherAttributes(resource: Resource, config: SbxEditorConfig) {
     return {
         src: getURL(`/ajax/mime/${resource.mime}`, config),
         alt: resource.name,
@@ -255,50 +262,50 @@ function getOtherAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the folder src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the folder src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the folder src
  */
-function getFolderSrc(resource: Resource, config: EditorConfig) {
+function getFolderSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     return getURL(`/homepage/${resource.id as string}`, config);
 }
 
 /**
  * Get the storage src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the storage src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the storage src
  */
-function getStorageSrc(resource: Resource, config: EditorConfig) {
+function getStorageSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     return getURL(`/storage/fetch.php?hash=${resource.hash}`, config);
 }
 
 /**
  * Get the web dav src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the web dav src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the web dav src
  */
-function getWebDavSrc(resource: Resource, config: EditorConfig) {
+function getWebDavSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     return getURL(`/cms/sendNetworkFile.php?id=${resource.hash}`, config);
 }
 
 /**
  * Get the file src
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { string } - the file src
+ * @param { SbxEditorConfig } config - the editor config
+ * @returns { URL | string } - the file src
  */
-function getFileSrc(resource: Resource, config: EditorConfig) {
+function getFileSrc(resource: Resource, config: SbxEditorConfig): URL | string {
     return getURL(`/send.php?id=${resource.hash}`, config);
 }
 
 /**
  * Get the resource attributes
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the resource attributes
  */
-export function getAttributes(resource: Resource, config: EditorConfig) {
+export function getAttributes(resource: Resource, config: SbxEditorConfig) {
     if (resource.type === ResourceType.IMAGE) {
         return getImageAttributes(resource, config);
     }
@@ -320,10 +327,10 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
 /**
  * Get the resource attributes
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
+ * @param { SbxEditorConfig } config - the editor config
  * @returns { object } - the resource attributes
  */
-export function getSrc(resource: Resource, config: EditorConfig) {
+export function getSrc(resource: Resource, config: SbxEditorConfig) {
     if (resource.type === ResourceType.IMAGE) {
         return getImageSrc(resource, config);
     }
@@ -371,7 +378,7 @@ export function getSrc(resource: Resource, config: EditorConfig) {
  * @param { Resource } resource - the resource
  */
 export function addResource(editor: Editor, resource: Resource) {
-    const config = editor.config.get("sbConfig") as EditorConfig;
+    const config = editor.config.get("sbConfig") as SbxEditorConfig;
     const imageUtils = editor.plugins.get("ImageUtils");
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(

@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import McViewNode from "../mc-view-node";
+import McViewNode from "../mc-view-node.vue";
 import { createTestingPinia } from "@pinia/testing";
 import { useViewNodesStore } from "../store/mcViewNodesStore";
 

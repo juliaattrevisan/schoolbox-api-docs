@@ -9,6 +9,10 @@
  *  - In requires() change "ImageBlockEditing" to "ImageInlineEditing" (as we don't use ImageBlock)
  */
 
+// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
+
 /**
  * @license Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
@@ -90,7 +94,7 @@ export default class LinkImageUI extends Plugin {
 
         editor.ui.componentFactory.add("linkImage", (locale) => {
             const button = new ButtonView(locale);
-            const plugin = editor.plugins.get("LinkUI");
+            const plugin = editor.plugins.get("LinkUI") as LinkUI;
             const linkCommand = editor.commands.get("link")!;
 
             button.set({

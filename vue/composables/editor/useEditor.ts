@@ -6,13 +6,13 @@
 import type { Ref } from "vue";
 import { EditorEvent, type EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import { injectScript } from "@js/util/domUtils";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { PartialSbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Initialise the composable
  * @param { string | Ref<string> } $currentValue - the initial string value to input into the ckeditor, or a ref to the value
  * @param { string | HTMLElement } ckeditorSelector - the selector to target the CKEditor, or the element itself
- * @param { EditorConfig } editorConfig - the config to use when creating the editor
+ * @param { PartialSbxEditorConfig } editorConfig - the config to use when creating the editor
  * @param { boolean } isMounted - whether or not we are already mounted, and to skip the onMounted hook
  * @param { Function } callback - a callback to run after the editor is created including EditorCreatedEventInfo
  * @returns { Ref<string> } - the current value of the editor input as a ref
@@ -20,7 +20,7 @@ import type { EditorConfig } from "@js/editor/types/editorTypes";
 export function useEditor(
     $currentValue: string | Ref<string>,
     ckeditorSelector: string | HTMLElement,
-    editorConfig: EditorConfig,
+    editorConfig: PartialSbxEditorConfig,
     isMounted: boolean = false,
     callback?: (event: EditorCreatedEventInfo) => void,
 ): Ref<string> {

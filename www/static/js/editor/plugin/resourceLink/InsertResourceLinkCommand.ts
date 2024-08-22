@@ -5,7 +5,7 @@
 import { Command, type Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import LinkUI from "@js/editor/plugin/link/LinkUI";
 
 export default class InsertResourceLinkCommand extends Command {
@@ -13,7 +13,9 @@ export default class InsertResourceLinkCommand extends Command {
      * Whether the button is on or off
      */
     public declare isOn: boolean;
-    messageBinding; // as .bind() returns a new function object, we need to store it in a variable
+
+    // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
+    messageBinding;
 
     /**
      * To open the Resource modal and insert the selected resource into the editor
@@ -54,18 +56,22 @@ export default class InsertResourceLinkCommand extends Command {
         /**
          * Fire of the jQuery plugin to display the resource modal
          */
+        // @ts-expect-error -- This is a custom jQuery plugin, so it won't be found in the types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
-            fileBrowserCategoryId: (this.editor.config.get("sbConfig") as EditorConfig).fileBrowserCategoryId,
+            fileBrowserCategoryId: (this.editor.config.get("sbConfig") as SbxEditorConfig).fileBrowserCategoryId,
             onBeforeOpen: () => {
                 this.set("isOn", true);
                 this.messageBinding = this.onResourceReturned.bind(this);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Intentional use to ensure binding of .this from jquery.modal.js
                 window.addEventListener("message", this.messageBinding);
             },
             onModalClosed: () => {
                 // Once the modal is completely closed, the LinkUI can be closed again
                 this.set("isOn", false);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Intentional use to ensure binding of .this from jquery.modal.js
                 window.removeEventListener("message", this.messageBinding);
             },
         });
@@ -75,6 +81,8 @@ export default class InsertResourceLinkCommand extends Command {
      * to close the resource modal and allow the LinkUI to be also closed again
      */
     closeModal() {
+        // @ts-expect-error -- jquery plugin
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         $("#file-picker").foundation("reveal", "close");
         this.set("isOn", false);
     }
@@ -85,8 +93,10 @@ export default class InsertResourceLinkCommand extends Command {
      */
     updateLink(value: string) {
         const linkUI = this.editor.plugins.get("LinkUI") as LinkUI;
-        linkUI.formView.urlInputView.fieldView.focus();
-        linkUI.formView.urlInputView.fieldView.value = value;
+        const { formView } = linkUI;
+        if (formView === null) return;
+        formView.urlInputView.fieldView.focus();
+        formView.urlInputView.fieldView.value = value;
     }
 
     /**
@@ -102,7 +112,7 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.get("sbConfig") as EditorConfig) as string;
+            const src = getSrc(resource, this.editor.config.get("sbConfig") as SbxEditorConfig) as string;
             this.updateLink(src);
         } catch (error) {
             console.error(error);
@@ -115,10 +125,12 @@ export default class InsertResourceLinkCommand extends Command {
      * @param { MessageEvent } event - the event
      */
     onResourceReturned(event: MessageEvent) {
+        // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         let message;
         try {
             message = JSON.parse(event.data);
-        } catch (error: SyntaxError) {
+        } catch (error) {
             message = event.data;
         }
         if (message.data !== undefined) {
@@ -129,7 +141,7 @@ export default class InsertResourceLinkCommand extends Command {
                     status = message.data[0].status;
                 }
                 if (status === "success") {
-                    this.getResourceInfo(message.data[0].hash as string);
+                    void this.getResourceInfo(message.data[0].hash as string);
                 } else {
                     // Unknown status: assume error and do nothing, as the modal already shows the error
                 }
@@ -144,5 +156,6 @@ export default class InsertResourceLinkCommand extends Command {
         } else {
             // Connecting to your Google Drive (event is fired when the drive is first accessed)
         }
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
     }
 }

@@ -3,11 +3,13 @@
  */
 
 import { Command } from "@ckeditor/ckeditor5-core";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { addResource } from "./resourceUtils";
 import type { Resource } from "./resourceUtils";
 
 export default class InsertResourceCommand extends Command {
-    messageBinding; // as .bind() returns a new function object, we need to store it in a variable
+    // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
+    messageBinding;
 
     value: boolean = false; // has no value (its just a button), so always false to show as de-selected
 
@@ -43,18 +45,22 @@ export default class InsertResourceCommand extends Command {
         /**
          * Fire off the jQuery plugin to display the resource modal
          */
+        // @ts-expect-error -- This is a custom jQuery plugin, so it won't be found in the types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         $.fn.schoolboxResource({
             allowedFilesystems: "files",
             allowedFiles: "*/*",
             allowMulti: true,
             useFolder: false,
             defaultFolderSelector,
-            fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
+            fileBrowserCategoryId: (this.editor.config.get("sbConfig") as SbxEditorConfig).fileBrowserCategoryId,
             onBeforeOpen: () => {
                 this.messageBinding = this.onResourceReturned.bind(this);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Intentional use to ensure binding of .this from jquery.modal.js
                 window.addEventListener("message", this.messageBinding);
             },
             onModalClosed: () => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Intentional use to ensure binding of .this from jquery.modal.js
                 window.removeEventListener("message", this.messageBinding);
             },
         });
@@ -82,6 +88,8 @@ export default class InsertResourceCommand extends Command {
             console.warn(error);
         }
         // to close the resource modal
+        // @ts-expect-error -- jquery plugin
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         $("#file-picker").foundation("reveal", "close");
     }
 
@@ -90,18 +98,22 @@ export default class InsertResourceCommand extends Command {
      * @param { MessageEvent } event - the event
      */
     onResourceReturned(event: MessageEvent) {
+        // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         let message;
         try {
             message = JSON.parse(event.data);
-        } catch (error: SyntaxError) {
+        } catch (error) {
             message = event.data;
         }
         if (message.data !== undefined) {
             if (0 in message.data) {
+                // @ts-expect-error -- disable typechecking for this, as it's integrating with jquery.modal.js and untyped
                 // for each resource returned, get the resource info and insert it into the editor
                 const resources = message.data.filter((resource) => resource.hash !== undefined);
+                // @ts-expect-error -- disable typechecking for this, as it's integrating with jquery.modal.js and untyped
                 resources.forEach((resource) => {
-                    this.getResourceInfo(resource.hash as string);
+                    void this.getResourceInfo(resource.hash as string);
                 });
             } else {
                 // The file was rejected, probably cause it was the wrong mimetype.
@@ -110,5 +122,6 @@ export default class InsertResourceCommand extends Command {
         } else {
             // Connecting to your Google Drive (event is fired when the drive is first accessed)
         }
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
     }
 }

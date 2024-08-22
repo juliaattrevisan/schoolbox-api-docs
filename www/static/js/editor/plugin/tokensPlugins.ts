@@ -4,14 +4,14 @@
 
 import { Mention } from "@ckeditor/ckeditor5-mention";
 
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * If tokens are enabled, return the tokens settings
- * @param { EditorConfig } config - the config to use when creating the editor
+ * @param { SbxEditorConfig } config - the config to use when creating the editor
  * @returns { object } - the tokens settings
  */
-export function getTokensPlugins(config: EditorConfig) {
+export function getTokensPlugins(config: SbxEditorConfig) {
     if (config.hasTokens) {
         return [Mention];
     }

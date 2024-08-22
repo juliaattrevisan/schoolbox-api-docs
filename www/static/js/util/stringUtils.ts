@@ -4,7 +4,6 @@
 
 /**
  * shorten a string if it's over the max length
- *
  * @param {string} string - the string to shorten
  * @param {number} maxLength - the max length the string should be shortened to
  * @returns {string} shortened string
@@ -15,7 +14,6 @@ export function shortenLength(string: string, maxLength: number): string {
 
 /**
  * capitalize the first letter of a string
- *
  * @param {string} string - the string to capitalize
  * @returns {string} string with first letter capitalized
  */
@@ -33,7 +31,6 @@ export type StringSection = {
 
 /**
  * Replaces a section of a string with a replacement string and returns the updated string
- *
  * @param { number } startIndex - the start index of the section to replace
  * @param { number } endIndex - the end index of the section to replace
  * @param { string } inputString - the string to replace the section in
@@ -44,7 +41,7 @@ export function replaceStringSection(
     startIndex: number,
     endIndex: number,
     inputString: string,
-    replacementString: string
+    replacementString: string,
 ): string {
     const replacedString =
         inputString.substring(0, startIndex) + replacementString + inputString.substring(endIndex + 1);
@@ -53,7 +50,6 @@ export function replaceStringSection(
 
 /**
  * Replaces all the sections of a string with a replacement string and returns the updated string
- *
  * @param { StringSection[] } sectionsToReplace - the sections to replace
  * @param { string } inputString - the string to replace sections in
  * @param { string } replacementString - the string to replace the sections with
@@ -62,7 +58,7 @@ export function replaceStringSection(
 export function replaceAllStringSections(
     sectionsToReplace: StringSection[],
     inputString: string,
-    replacementString: string
+    replacementString: string,
 ): string {
     let newString = inputString;
     let stringAtSection = "";
@@ -76,7 +72,7 @@ export function replaceAllStringSections(
                 section.startIndex + index * (replacementString.length - stringAtSection.length),
                 section.endIndex + index * (replacementString.length - stringAtSection.length),
                 newString,
-                replacementString
+                replacementString,
             );
         }
     });
