@@ -327,19 +327,19 @@ const searchButtonText = window.Vue.computed(() => {
                         <div class="c-img c-img--s l-flex__item--0-shrink">
                             <div class="c-img__wrapper">
                                 <img v-if="result.image" :src="result.image" :alt="`photo of ${result.title}`" />
-                                <div v-else :class="`icon icon-${result.icon as string}`"></div>
+                                <div v-else :class="`icon icon-${result.icon}`"></div>
                             </div>
                         </div>
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
                             <h3>
                                 {{ result.title }}
                             </h3>
-                            <span v-if="result.meta && result.meta.length > 0" class="meta">
-                                <template v-for="(context, index) in result.meta as MetaContext[]" :key="context.id">
-                                    <a :href="context.url">{{ context.name }}</a
-                                    ><template v-if="index < result.meta.length - 1"> > </template>
-                                </template></span
-                            >
+                            <span v-if="typeof result.meta !== 'string' && result.meta.length > 0" class="meta">
+                                <template v-for="(context, index) in result.meta" :key="context.name">
+                                    <a :href="context.url">{{ context.name }}</a>
+                                    <template v-if="index < result.meta.length - 1"> > </template>
+                                </template>
+                            </span>
                         </div>
                     </div>
                 </a>

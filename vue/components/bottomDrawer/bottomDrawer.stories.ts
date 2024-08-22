@@ -25,18 +25,18 @@ const meta: Meta<typeof BottomDrawer> = {
         setup() {
             return { args };
         },
-        template: `
-            <bottom-drawer v-bind="args">
-                ${args.default}
-            </bottom-drawer>
-        `,
+        // @ts-expect-error -- For now, args.default doesn't match Meta<typeof BottomDrawer>, but we want to show it as a slot
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        template: `<bottom-drawer v-bind="args">${args.default}</bottom-drawer>`,
     }),
     argTypes: {
+        // @ts-expect-error -- For now, args.default doesn't match Meta<typeof BottomDrawer>, but we want to show it as a slot
         default: {
             control: "text",
         },
     },
     args: {
+        // @ts-expect-error -- For now, args.default doesn't match Meta<typeof BottomDrawer>, but we want to show it as a slot
         default: "Any content can go here.",
         showDrawer: true,
         isAlwaysAnchored: true,

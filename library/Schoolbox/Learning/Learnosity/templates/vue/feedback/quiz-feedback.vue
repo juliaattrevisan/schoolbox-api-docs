@@ -8,6 +8,7 @@ import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/
 import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
+import type { LearnosityReportInitOptions } from "@schoolboxLearnosity/vue/learnosityReportTypes";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 import { loadReport } from "./util/loadReport";
@@ -16,7 +17,7 @@ import QfFinaliseReview from "./qf-finalise-review.vue";
 
 interface Props {
     student: Student; // the student who has attempted the quiz
-    reportInitOptions: object; // the report payloads to load from the Learnosity Reports API
+    reportInitOptions: LearnosityReportInitOptions; // the report payloads to load from the Learnosity Reports API
     itemResponses: StudentItemQuestionResponse[]; // all the item responses for the quiz, which can include multiple questions within the same item
     attemptResponse: StudentAttemptResponse; // StudentAttemptResponse all the overall attempt comments for the quiz
     isReadOnly: boolean; // whether is in feedback mode, where the teacher can provide feedback to the student

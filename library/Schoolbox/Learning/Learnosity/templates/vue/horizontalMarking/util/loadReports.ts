@@ -4,6 +4,7 @@
 
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
 import { addTargetsToMarks, disableTextAreas } from "@schoolboxLearnosity/js/util/domUtils";
+import type { LearnosityReportInitOptions } from "@schoolboxLearnosity/vue/learnosityReportTypes";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
 
@@ -14,9 +15,9 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 export function loadReports(reportPayloads: string[]) {
     let reportsLoaded = 0;
     for (let i = 0; i < reportPayloads.length; i += 1) {
-        const initOptions = JSON.parse(reportPayloads[i]);
+        const initOptions = JSON.parse(reportPayloads[i]) as LearnosityReportInitOptions;
         // To link the report to the student
-        const reportId = initOptions.request.reports[0].id as string;
+        const reportId = initOptions.request.reports[0].id;
         /**
          * Every report gets its own callback; this is because the readyListeners()
          * don't have any idea which report they are in, which means we can't tell
@@ -26,10 +27,15 @@ export function loadReports(reportPayloads: string[]) {
         const reportCallback = {
             // eslint-disable-next-line @typescript-eslint/no-loop-func
             readyListener: () => {
-                const attemptReport = reportsApp.getReport(reportId);
+                // @ts-expect-error -- reportsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define
+                const attemptReport = (reportsApp as unknown).getReport(reportId);
                 // itemsApi only spawns if you used session-detail-by-item
-                attemptReport.on("ready:itemsApi", (itemsApp) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                attemptReport.on("ready:itemsApi", (itemsApp: unknown) => {
                     // Load the items for the student
+                    // @ts-expect-error -- itemsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     itemsApp.getItems(($items: object) => {
                         reportsLoaded += 1;
                         const items: StudentItem[] = [];
@@ -48,7 +54,10 @@ export function loadReports(reportPayloads: string[]) {
                 });
             },
         };
+
         // Initialise reports for each attempt
-        let reportsApp = LearnosityReports.init(initOptions, reportCallback);
+        // @ts-expect-error -- LearnosityReports is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        let reportsApp = (LearnosityReports as unknown).init(initOptions, reportCallback);
     }
 }

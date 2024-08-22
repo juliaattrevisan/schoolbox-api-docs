@@ -18,6 +18,7 @@ import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
+import type { PopOutMenuMarkbookSelectedEvent, PopOutMenuMarkbookRoutes } from "./popOutMenuMarkbookEvent";
 
 /**
  * an activity linked to the selected mark book item
@@ -36,20 +37,6 @@ type ActivityItem = {
     submitted?: boolean;
     submittedOnTime?: boolean;
     published?: boolean;
-};
-
-/**
- * the routes to load the activity data, as well as links to further actions
- * like 'Update feedback' or 'Exclude Student'
- */
-type Routes = {
-    dataEndpoint: string;
-    updateRoute: string;
-    reviewRoute: string;
-    publishRoute: string;
-    excludeRoute: string;
-    includeRoute: string;
-    historyRoute: string;
 };
 
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
@@ -78,7 +65,7 @@ const isExcluded = window.Vue.ref(false);
 const isParticipant = window.Vue.ref(false);
 const isActivityEmpty = window.Vue.computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
-const routes: Ref<Routes> = window.Vue.ref({
+const routes: Ref<PopOutMenuMarkbookRoutes> = window.Vue.ref({
     dataEndpoint: "",
     updateRoute: "",
     reviewRoute: "",
@@ -90,7 +77,7 @@ const routes: Ref<Routes> = window.Vue.ref({
 const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
 
 // Exclude confirm, popout
-const excludeModalEl = window.Vue.ref(null);
+const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 /**
  * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
@@ -208,14 +195,14 @@ function reloadMarkbook() {
     closePopOut();
 
     // reload the markbook
-    document.getElementById("submit_button").click();
+    document.getElementById("submit_button")?.click();
 
     /**
      * disable the markbook popout
      */
     const elements = document.querySelectorAll("[data-pop-out-menu]");
     elements.forEach((cell) => {
-        delete cell.dataset.popOutMenu;
+        delete (cell as HTMLElement).dataset.popOutMenu;
     });
 }
 
@@ -294,7 +281,7 @@ async function excludeCheck() {
     // does the user have work?
     if (hasSubmissions.value || hasFeedback.value) {
         // has some kind of activity.. prompt for exclusion
-        excludeModalEl.value.open();
+        if (excludeModalEl.value) excludeModalEl.value.open();
     } else {
         // no work or feedback
         await onMenuItemSelected(routes.value.excludeRoute, "exclude");
@@ -305,6 +292,7 @@ async function excludeCheck() {
  * close the exclude modal function
  */
 function closeExclude() {
+    if (excludeModalEl.value === null) return;
     excludeModalEl.value.close();
 }
 
@@ -317,30 +305,13 @@ async function exclude() {
 }
 
 /**
- * Get the latest routes to display within the popout
- * @param { Routes } newRoutes - the routes linked to the selection
- * @returns { Routes } - the updated routes
- */
-function updateRoutes(newRoutes: Routes) {
-    return {
-        dataEndpoint: newRoutes.dataEndpoint,
-        updateRoute: newRoutes.updateRoute,
-        reviewRoute: newRoutes.reviewRoute,
-        publishRoute: newRoutes.publishRoute,
-        excludeRoute: newRoutes.excludeRoute,
-        includeRoute: newRoutes.includeRoute,
-        historyRoute: newRoutes.historyRoute,
-    };
-}
-
-/**
  * A linked button has been selected so populate the pop out
- * @param { CustomEvent } event - the event fired from the mark book
+ * @param { CustomEvent<PopOutMenuMarkbookSelectedEvent> } event - the event fired from the mark book
  */
-async function onPopOutSelected(event: CustomEvent) {
+async function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>) {
     // Make sure we're not reloading a menu we already have open.
     if (referenceElement.value !== event.detail.target) {
-        routes.value = updateRoutes(event.detail.routes as Routes);
+        routes.value = event.detail.routes;
         isSelected.value = true;
         isExpanded.value = false;
         isExcluded.value = event.detail.isExcluded;
@@ -363,15 +334,21 @@ async function onPopOutSelected(event: CustomEvent) {
  * when selection outside is made
  * @param { event } event - the mouse event
  */
-function onMouseClick(event: Event) {
+function onMouseClick(event: MouseEvent) {
+    const eventTarget = event.target;
+    const currentExcludeModalEl = excludeModalEl.value;
+
     if (
         showPopOut.value &&
         markbookElement.value !== null &&
-        !markbookElement.value.contains(event.target) &&
-        referenceElement.value !== event.target
+        currentExcludeModalEl !== null &&
+        eventTarget instanceof Node &&
+        !markbookElement.value.contains(eventTarget) &&
+        referenceElement.value !== eventTarget
     ) {
         // Prevent the pop out from closing if the exclude modal is open and the click is within the modal.
-        if (excludeModalEl.value !== null && excludeModalEl.value.modal[0].contains(event.target)) {
+        const modalElement = (currentExcludeModalEl.modal[0] as HTMLElement) || undefined;
+        if (modalElement !== undefined && modalElement.contains(eventTarget)) {
             return;
         }
 
