@@ -585,8 +585,8 @@ export default {
                 });
                 this.calendarApi.refetchEvents();
             } catch (error) {
-                console.warn(error);
                 timeout({ text: "Event filters could not be updated", isSuccess: false });
+                console.error(error);
             }
         },
 
