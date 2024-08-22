@@ -100,6 +100,5 @@ export function getFormData(obj: NestedObject) {
         formData.append(key, value);
     });
     // then return the searchParams object as a string
-    console.warn("formData", formData.values());
     return formData;
 }
