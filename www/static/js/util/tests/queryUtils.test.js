@@ -73,6 +73,17 @@ describe("getSearchString()", () => {
     test("converts array", () => {
         expect(getSearchString(numberArray)).toBe("userIds%5B0%5D=13&userIds%5B1%5D=14");
     });
+    test("converts empty object", () => {
+        expect(getSearchString({})).toBe("");
+    });
+    test("encodes html tags", () => {
+        expect(getSearchString({ query: "<script>alert('hi')</script>" })).toBe(
+            "query=%3Cscript%3Ealert%28%27hi%27%29%3C%2Fscript%3E",
+        );
+    });
+    test("overwrites existing params", () => {
+        expect(getSearchString({ query: "test", query: "new" })).toBe("query=new");
+    });
 });
 
 describe("getFormData()", () => {
