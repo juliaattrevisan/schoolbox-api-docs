@@ -10,6 +10,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import ViewGroupedEventsModal from "./view-grouped-events-modal.vue";
 
 // Various URLs this calendar can make use of
@@ -252,7 +253,7 @@ export default {
                 successCallback([]);
                 return;
             }
-
+            activate("Retrieving calendar events...");
             // AJAX params: the same for all requests
             const ajaxParams = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -266,6 +267,7 @@ export default {
             })
                 .then((response) => response.json())
                 .then((response) => {
+                    timeout({ text: "Events retrieved successfully" });
                     // Assign event grouping and resourceIds into every event
                     response = response.map((element) => {
                         element.resourceId = this.buildResourceIdFromEvent(element);
@@ -295,8 +297,11 @@ export default {
 
                     // Filter out events which don't start
                     successCallback(response.filter((v) => "start" in v));
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         groupedEvents(fetchInfo, successCallback) {
@@ -307,7 +312,6 @@ export default {
                 successCallback([]);
                 return;
             }
-
             // AJAX params: the same for all requests
             const ajaxParams = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -315,7 +319,6 @@ export default {
                 filters: this.selectedFilters,
                 inContext: this.inContext,
             };
-
             fetch(`${URL_ASSESSMENT_GROUPED_EVENT_SOURCE}?${getSearchString(ajaxParams)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
@@ -350,6 +353,9 @@ export default {
 
                     // Filter out events which don't start
                     successCallback(response.filter((v) => "start" in v));
+                })
+                .catch((error) => {
+                    console.error(error);
                 });
         },
 
