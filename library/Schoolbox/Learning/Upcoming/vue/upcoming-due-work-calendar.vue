@@ -11,6 +11,7 @@ import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-mod
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 
 // Various URLs that FullCalendar may make use of.
 const URL_EVENT_SOURCE = "/learning/due/events";
@@ -183,6 +184,7 @@ export default {
                 successCallback([]);
                 return;
             }
+            activate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                 end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
@@ -200,8 +202,12 @@ export default {
                             return "start" in v;
                         }),
                     );
+                    timeout({ text: "Events retrieved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**
