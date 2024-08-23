@@ -28,7 +28,7 @@
                     </div>
                     <div class="columns medium-12 large-5">
                         {% set dummyDate = {local: ''} %}
-                        {% if acceptingResponses %}
+                        {% if acceptingResponses is defined and acceptingResponses %}
                             {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
                             {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
                             {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
