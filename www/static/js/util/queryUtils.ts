@@ -7,7 +7,32 @@ type NestedObject = {
 };
 
 /**
- * Takes an object and converts it to a collection of key-value pairs, with object depth represented by array bracket notation
+ * Checks if a value is a nested object
+ * @param {unknown} value - The value to be checked
+ * @returns {boolean} - Whether the value is a nested object
+ */
+function isValueNestedObject(value: unknown): value is NestedObject {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Takes a value and converts it to a string
+ * @param {unknown} value - The value to be converted to a string
+ * @returns {string} - The value as a string
+ */
+function setValue(value: unknown) {
+    if (typeof value === "string") {
+        return value;
+    }
+    if (typeof value === "number" || typeof value === "boolean") {
+        return value.toString();
+    }
+    return "";
+}
+
+/**
+ * Takes an object and converts it to a collection of key-value pairs,
+ * with object depth represented by array bracket notation
  * @param {NestedObject} obj - The object to be converted to key-value pairs
  * @returns {Record<string, string>} - The key-value pairs
  */
@@ -23,42 +48,23 @@ export function getKeyValuePairs(obj: NestedObject) {
             if (Object.prototype.hasOwnProperty.call(curr, key)) {
                 const newKeyPath = keyPath ? `${keyPath}[${key}]` : key;
                 const value = curr[key];
-                if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+                if (isValueNestedObject(value)) {
                     // Recursively call the function for nested objects
                     recurse(value, newKeyPath);
-                } else if (typeof value === "string") {
-                    // If the value is a string, add it to the result
-                    result[newKeyPath] = value;
-                } else if (typeof value === "number") {
-                    // If the value is a number, convert it to a string and add it to the result
-                    result[newKeyPath] = (value as number).toString();
-                } else if (typeof value === "boolean") {
-                    // If the value is a boolean, convert it to a string and add it to the result
-                    result[newKeyPath] = (value as boolean).toString();
                 } else if (Array.isArray(value)) {
-                    // If the value is an array, loop through the array and add an entry for each element
-                    value.forEach((element, index) => {
+                    // If the value is an array, loop through the array and add an entry for each valueWithin
+                    value.forEach((valueWithin: unknown, index) => {
                         const arrayKeyPath = `${newKeyPath}[${index}]`;
-                        if (typeof element === "object" && element !== null) {
+                        // result[arrayKeyPath] = setValue(valueWithin);
+                        if (isValueNestedObject(valueWithin)) {
                             // Recursively call the function for nested objects
-                            recurse(element, arrayKeyPath);
-                        } else if (typeof element === "string") {
-                            // If the element is a string, add it to the result
-                            result[arrayKeyPath] = element;
-                        } else if (typeof element === "number") {
-                            // If the element is a number, convert it to a string and add it to the result
-                            result[arrayKeyPath] = (element as number).toString();
-                        } else if (typeof value === "boolean") {
-                            // If the value is a boolean, convert it to a string and add it to the result
-                            result[newKeyPath] = (element as boolean).toString();
-                        } else if (element === null) {
-                            // If the element is null, add an empty string to the result
-                            result[arrayKeyPath] = "";
+                            recurse(valueWithin, arrayKeyPath);
+                        } else {
+                            result[arrayKeyPath] = setValue(valueWithin);
                         }
                     });
-                } else if (value === null) {
-                    // If the value is null, add an empty string to the result
-                    result[newKeyPath] = "";
+                } else {
+                    result[newKeyPath] = setValue(value);
                 }
             }
         });
