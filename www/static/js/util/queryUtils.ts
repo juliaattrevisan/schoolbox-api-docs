@@ -55,7 +55,6 @@ export function getKeyValuePairs(obj: NestedObject) {
                     // If the value is an array, loop through the array and add an entry for each valueWithin
                     value.forEach((valueWithin: unknown, index) => {
                         const arrayKeyPath = `${newKeyPath}[${index}]`;
-                        // result[arrayKeyPath] = setValue(valueWithin);
                         if (isValueNestedObject(valueWithin)) {
                             // Recursively call the function for nested objects
                             recurse(valueWithin, arrayKeyPath);
