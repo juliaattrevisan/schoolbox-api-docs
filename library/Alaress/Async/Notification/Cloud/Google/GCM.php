@@ -79,10 +79,10 @@ class GCM extends AbstractService
 
     /**
      * @inheritdoc
-     *@throws OverflowException if the max payload size (4KB) is exceeded
+     * @throws OverflowException if the max payload size (4KB) is exceeded
      * @throws RuntimeException if your API key is bad
      */
-    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null): bool
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null)
     {
         $data = [
             'id'           => $id,
