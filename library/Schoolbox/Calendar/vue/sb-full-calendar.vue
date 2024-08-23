@@ -534,7 +534,7 @@ export default {
                     timeout({ text: "Event moved successfully" });
                 })
                 .catch((error) => {
-                    timeout({ text: "Events could not be moved", isSuccess: false });
+                    timeout({ text: "Event could not be moved", isSuccess: false });
                     console.error(error);
                 });
         },
