@@ -119,7 +119,7 @@ export default class AcceptanceTester extends BaseTester {
         const tourButtons = this.page.locator("div.introjs-tooltipbuttons a");
         const tourButtonCount = await tourButtons.count();
         if (tourButtonCount > 0) {
-            await tourButtons.getByText("Finish").click();
+            await tourButtons.getByText("x").click();
         }
     }
 

@@ -285,7 +285,7 @@ class AcceptanceTester extends Actor
     {
         try {
             $this->seeElement('div.introjs-tooltipbuttons a');
-            $this->click('Finish');
+            $this->click('a.introjs-button introjs-skipbutton');
         } catch (Exception $e) {
         }
     }
