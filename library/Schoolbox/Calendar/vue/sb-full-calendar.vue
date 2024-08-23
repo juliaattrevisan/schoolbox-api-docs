@@ -323,6 +323,8 @@ export default {
             fetch(URL_STATE_CHANGE, {
                 method: "POST",
                 body: getFormData({ calendarView: info.view.type }),
+            }).catch((error) => {
+                console.error(error);
             });
         },
 
@@ -517,16 +519,24 @@ export default {
             }
 
             // @TODO this needs to consider events in series
+            activate("Moving event...");
             fetch(
-                `${ENDPOINTS.generateUrlFromConst(
+                ENDPOINTS.generateUrlFromConst(
                     ENDPOINTS.URL_EVENT_MOVE,
                     String(event?.extendedProps?.data?.meta?.eventId),
-                )}?${getSearchString(data)}`,
+                ),
                 {
                     method: "POST",
                     body: getFormData(data),
                 },
-            );
+            )
+                .then(() => {
+                    timeout({ text: "Event moved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be moved", isSuccess: false });
+                    console.error(error);
+                });
         },
 
         /**
