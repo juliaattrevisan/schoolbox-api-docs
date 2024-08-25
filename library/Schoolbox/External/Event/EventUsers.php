@@ -22,50 +22,17 @@ use Schoolbox\User;
 class EventUsers
 {
     /**
-     * @var Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusMapper;
-
-
-    /**
-     * @var Roletype\Mapper
-     */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Code\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
-
-
-    /**
-     * @param \Schoolbox\External\Event\Mapper         $eventMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
-     * @param Roletype\Mapper                          $roletypeMapper
+     * @param Mapper $eventMapper
+     * @param Campus\Mapper $campusMapper
+     * @param Roletype\Mapper $roletypeMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
-        $this->eventMapper = $eventMapper;
-        $this->campusMapper = $campusMapper;
-        $this->roletypeMapper = $roletypeMapper;
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache();
-        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance()->disableCache();
     }
 
 
@@ -133,11 +100,6 @@ class EventUsers
         $roleWhere = implode(' AND ', $rolePb->getWhere());
         $roleParams = $rolePb->getParams();
 
-        /* I can't join to a folder via a code (code doesn't have an identifier property)
-         */
-        $folderColumnString = $this->folderMapper->getColumnString('f');
-        $folderCodeColumnString = $this->folderCodeMapper->getColumnString('fc');
-
         /* Perhaps controversial:
          * In order for you to be involved in an event, you have to be in
          * both the campus and the roletype
@@ -147,33 +109,24 @@ class EventUsers
          */
         $query = "
             SELECT DISTINCT
-                {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString},
-                {$folderCodeColumnString}
+                {$this->eventMapper->getColumnString('se')}
             FROM {$this->eventMapper->getTable()} se
-            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
-            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id
-            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
-            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
-            WHERE {$campusWhere} AND {$roleWhere}
-            AND se.classification = :classification
+            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id AND {$campusWhere}
+            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id AND {$roleWhere}
+            WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
 
             UNION
 
             SELECT DISTINCT
-                {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString},
-                {$folderCodeColumnString}
+                {$this->eventMapper->getColumnString('se')}
             FROM {$this->eventMapper->getTable()} se
             INNER JOIN sis_event_user seu ON se.id = seu.event_id
-            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
-            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
-            WHERE se.classification = :classification
-            AND se.start_at >= :startDatetime
-            AND se.finish_at <= :finishDatetime
-            AND seu.external_id = :externalId
+                AND se.classification = :classification
+                AND se.start_at >= :startDatetime
+                AND se.finish_at <= :finishDatetime
+                AND seu.external_id = :externalId
         ";
 
         $params = array_merge([
@@ -210,24 +163,59 @@ class EventUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute($params);
 
+        /* Process folder codes separately; the megaquery kept timing out, so we
+         * can bolt these on after the fact. It changes nothing in the query itself;
+         * just what we ultimately produce in $stack for frontend
+         */
+        $tempFolderCodes = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $event = $this->eventMapper->hydrate($row, 'se');
 
-            /* If a folder code x folder join can be found, shove it in
+            /* Only care about valid hydrations
              */
-            if ($row['f.id']) {
-                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
-                $folder = $this->folderMapper->hydrate($row, 'f');
+            if ($event instanceof \Schoolbox\External\Event\Model) {
+                $stack->add($event);
 
-                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
-                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
+                /* Remember this folder code: we need to hydrate their instances separately
+                 */
+                $code = trim((string)$row['se.code']);
 
-                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
-
-                $event->setFolder($folder);
+                $tempFolderCodes[$code] = $code;
             }
+        }
 
-            $stack->add($event);
+        /* Ignore useless folder codes
+         *
+         * Filter out all the empty strings, null values
+         * Use a custom callback so 0 is a valid outcome
+         */
+        $tempFolderCodes = array_filter($tempFolderCodes, static function ($val) {
+            return '' !== $val;
+        });
+
+        /* Fetch folder instances by their codes
+         */
+        $folders = $this->folderMapper->findAllByCode(array_keys($tempFolderCodes));
+
+        /* Index each folder by their code(s)
+         */
+        $folderLookup = [];
+
+        foreach ($folders as $folder) {
+            foreach ($folder->getCodes() as $code) {
+                $folderLookup[$code] = $folder;
+            }
+        }
+
+        /* Assign folder instances quickly via lookup
+         */
+        foreach ($stack as $event) {
+            $code = trim((string)$event->getCode());
+
+            if ('' !== $code) {
+                $event->setFolder($folderLookup[$code] ?? null);
+            }
         }
 
         return $stack;

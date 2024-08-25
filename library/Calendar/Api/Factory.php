@@ -177,7 +177,14 @@ class Calendar_Api_Factory
                 \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                /* This cache disabling was added in SA-14825 by @armatronic
+                 * I *think* it was important when we had a detached process to deal with
+                 * user-initiated syncs that were playing up and dying - we could potentially
+                 * remove these disableCache() calls since user-initiated syncs are now
+                 * processed in a cli environment
+                 */
+                \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache()
             ));
         }
 
@@ -376,7 +383,8 @@ class Calendar_Api_Factory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache()
                 );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");

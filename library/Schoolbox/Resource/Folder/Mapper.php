@@ -1104,7 +1104,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      */
     public function findByCode(string $classCodeCsv): Model
     {
-        $folders = $this->findAllByCode($classCodeCsv);
+        $folders = $this->findAllByCode(explode(',', $classCodeCsv));
 
         // The set of $code returned exactly one folder (determinate)
         // return this folder because we're sure
@@ -1135,14 +1135,13 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Does not match soft-deleted folder codes
      * Does not return soft-deleted folders or folder codes
      *
-     * @param string $classCodeCsv Comma-separated list of class codes, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
+     * @param array $classCodes array of class codes, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
      * @return GenericCollection|Model[]
      * @throws Predicate\InvalidColumnException
      * @throws PDOException
      */
-    private function findAllByCode(string $classCodeCsv): GenericCollection
+    public function findAllByCode(array $classCodes): GenericCollection
     {
-        $classCodes = explode(',', $classCodeCsv);
         if (!count($classCodes)) {
             return $this->createCollection();
         }
