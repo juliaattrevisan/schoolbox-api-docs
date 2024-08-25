@@ -20,7 +20,9 @@ const duration = window.Vue.ref(1.5);
  */
 function appendToNotifications() {
     const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
-    toggle.appendChild(notificationEl.value as HTMLDivElement);
+    if (toggle) {
+        toggle.appendChild(notificationEl.value as HTMLDivElement);
+    }
 }
 
 /**
@@ -111,4 +113,3 @@ window.Vue.onMounted(() => {
     }
 }
 </style>
-./birthdayNotificationStars ./bsNotificationStars
