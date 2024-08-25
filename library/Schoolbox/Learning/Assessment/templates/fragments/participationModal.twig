@@ -3,7 +3,9 @@
 {#
  # Modal for creating/modifying a custom learning plan on an assessment.
  # This is split out into a separate file in order to include this outside of the main form (this contains a form).
- #}
+ #
+ # @param bool      $acceptingResponses     a boolean is this assessment something students will attempt
+#}
 <div data-reveal id="participant-customise-modal" class="reveal-modal">
     <h2 data-plan-header>{# Filled with JS on modal open #}</h2>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -28,7 +30,7 @@
                     </div>
                     <div class="columns medium-12 large-5">
                         {% set dummyDate = {local: ''} %}
-                        {% if acceptingResponses %}
+                        {% if acceptingResponses is defined and acceptingResponses %}
                             {{ dateForm.dateField('Publish', 'planPublish', dummyDate, ''                , '#planOpenDate' ) }}
                             {{ dateForm.dateField('Open'   , 'planOpen'   , dummyDate, '#planPublishDate', '#planDueDate'  ) }}
                             {{ dateForm.dateField('Due'    , 'planDue'    , dummyDate, '#planOpenDate'   , '#planCloseDate') }}
