@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import DataTable from "@schoolboxVue/components/dataTable/data-table.vue";
 import { data } from "./dataTableMockData";
 
@@ -8,12 +8,10 @@ import { data } from "./dataTableMockData";
  */
 const endpoint = "/mock-data";
 const mswHandlers = [
-    rest.get(endpoint, (req, res, ctx) => {
-        return res(
-            // we grab an endpoint and then modify the data before it's returned
-            ctx.delay(2000),
-            ctx.json(data)
-        );
+    http.get(endpoint, () => {
+        return HttpResponse.json({
+            ...data,
+        });
     }),
 ];
 
@@ -144,16 +142,16 @@ export const Default: Story = {
 /**
  * What's displayed when there's an error loading the data
  */
-export const Error: Story = {
-    ...Default,
-    parameters: {
-        msw: {
-            handlers: [
-                rest.get(endpoint, (req, res, ctx) => {
-                    return res(ctx.delay(2000), ctx.status(500));
-                }),
-                ...mswHandlers,
-            ],
-        },
-    },
-};
+// export const Error: Story = {
+//     ...Default,
+//     parameters: {
+//         msw: {
+//             handlers: [
+//                 rest.get(endpoint, (req, res, ctx) => {
+//                     return res(ctx.delay(2000), ctx.status(500));
+//                 }),
+//                 ...mswHandlers,
+//             ],
+//         },
+//     },
+// };

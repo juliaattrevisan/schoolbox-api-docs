@@ -12,7 +12,7 @@ import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scss"; // add in any other styles we want to use in storybook only
 import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
-import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
+import { initialize, mswLoader } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
@@ -35,11 +35,9 @@ initialize({
     onUnhandledRequest: "bypass", // If you want MSW to bypass unhandled requests and not do anything
 });
 
-export const decorators = [mswDecorator]; // Provide the MSW addon decorator globally, so any story can use
-
 setup((app) => {
-    app.use(ClientTable); //so can use v-tables-3-select-rows in stories
-    app.use(createPinia()); //so can use pinia in stories
+    app.use(ClientTable); // so can use v-tables-3-select-rows in stories
+    app.use(createPinia()); // so can use pinia in stories
 });
 
 /**
@@ -56,6 +54,8 @@ export function register() {
     window.customElements.define("sbx-free-style", SbxFreeStyleCE);
 }
 register();
+
+export const loaders = [mswLoader]; // so we can load mock data into stories
 
 export const parameters = {
     backgrounds: {
