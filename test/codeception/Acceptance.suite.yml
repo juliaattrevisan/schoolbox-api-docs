@@ -15,7 +15,7 @@ modules:
             port: 9515
             window_size: false
             capabilities:
-              chromeOptions:
+              goog:chromeOptions:
                 args: ["--headless", "--disable-gpu", "--window-size=1920x9999", "disable-dev-shm-usage", "--ignore-certificate-errors", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
                 binary: "/usr/bin/chromium-browser"
               acceptInsecureCerts: true
