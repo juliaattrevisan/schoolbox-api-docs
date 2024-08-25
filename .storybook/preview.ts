@@ -13,7 +13,7 @@ import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scs
 import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
 import { initialize, mswLoader } from "msw-storybook-addon"; //to be able to load mock data into stories
-import { Preview, setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
+import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
 import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue"; // as Vue is now stored globally, provide reference to these functions so storybook can still run without browser context
@@ -55,7 +55,7 @@ export function register() {
 }
 register();
 
-const preview: Preview = {
+const preview = {
     loaders: [mswLoader], // so we can load mock data into stories
     parameters: {
         backgrounds: {
@@ -74,7 +74,7 @@ const preview: Preview = {
             theme: themes.dark,
             page: DocumentationTemplate, // use our own custom documentation template
         },
-        layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
+        layout: "fullscreen", // allow the component to expand to the full width and height of the Canvas
         options: {
             storySort: {
                 // Sort stories alphabetically, but with Introduction related docs first
