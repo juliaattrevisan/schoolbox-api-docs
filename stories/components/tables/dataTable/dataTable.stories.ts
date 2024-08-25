@@ -9,9 +9,7 @@ import { data } from "./dataTableMockData";
 const endpoint = "/mock-data";
 const mswHandlers = [
     http.get(endpoint, () => {
-        return HttpResponse.json({
-            ...data,
-        });
+        return HttpResponse.json(data);
     }),
 ];
 
@@ -142,16 +140,16 @@ export const Default: Story = {
 /**
  * What's displayed when there's an error loading the data
  */
-// export const Error: Story = {
-//     ...Default,
-//     parameters: {
-//         msw: {
-//             handlers: [
-//                 rest.get(endpoint, (req, res, ctx) => {
-//                     return res(ctx.delay(2000), ctx.status(500));
-//                 }),
-//                 ...mswHandlers,
-//             ],
-//         },
-//     },
-// };
+export const Error: Story = {
+    ...Default,
+    parameters: {
+        msw: {
+            handlers: [
+                http.get(endpoint, () => {
+                    return new HttpResponse(null, { status: 401 });
+                }),
+                ...mswHandlers,
+            ],
+        },
+    },
+};
