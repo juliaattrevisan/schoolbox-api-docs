@@ -262,7 +262,7 @@ class CSV extends AbstractCSV
                      * Somewhat confusingly, these are made as Responses from the student
                      */
                     if ($assessment->getIsSelfAssessable()) {
-                        /** @var \Schoolbox\Assessment\Course\Task\Model $response */
+                        /** @var \Schoolbox\Assessment\Course\Task\Completion|null $response */
                         $response = $participant->findMostRecentSubmittedResponse();
 
                         if ($response) {
