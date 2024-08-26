@@ -17,8 +17,8 @@
  */
 @mixin form-input-focus {
     background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
-    border-color: var(--color-form-elements);
-    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--color-focus-form-elements);
+    border-color: var(--sbx-color-accent);
+    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--sbx-color-accent);
     outline-offset: calc(var(--size-form-el-border-width) + 1px);
 }
 
@@ -54,7 +54,7 @@
  */
 input[type="color"] {
     background-color: var(--color-foreground-primary);
-    border-color: var(--color-form-elements);
+    border-color: var(--sbx-color-accent);
     border-radius: var(--roundness-form-elements);
 }
 
@@ -72,13 +72,13 @@ hr {
 .c-input-range {
     &__input::-webkit-slider-runnable-track {
         background-color: var(--color-foreground-primary);
-        border: var(--size-form-element-border-width) solid var(--color-form-elements);
+        border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     }
     &__input::-webkit-slider-thumb {
-        background-color: var(--color-form-elements);
+        background-color: var(--sbx-color-accent);
     }
     &__input:focus-visible::-webkit-slider-thumb {
-        outline: 3px solid var(--color-focus-form-elements);
+        outline: 3px solid var(--sbx-color-accent);
     }
 }
 

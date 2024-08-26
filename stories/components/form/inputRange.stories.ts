@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
+ * ![draft](/draft.png)
+ *
  * **Styles**: `www/static/css/core/ui/forms/_input-range.scss`
  *
  * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range)
@@ -36,10 +38,10 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element c-input-range">
-                <label class="c-label" for="column-width">Column Width</label>
-                <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
-            </div>
+<div class="c-form-element c-input-range">
+    <label class="c-label" for="column-width">Column Width</label>
+    <input class="c-input-range__input" type="range" id="column-width" name="column-width" min="3" max="9" step="1" value="7" />
+</div>
         `,
     }),
 };

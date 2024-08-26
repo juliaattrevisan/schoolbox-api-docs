@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
+ * ![draft](/draft.png)
+ *
  * **Styles**: `www/static/css/core/layout/_island.scss`
  *
  * Currently our main content areas

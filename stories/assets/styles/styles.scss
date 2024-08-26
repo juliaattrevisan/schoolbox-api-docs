@@ -9,27 +9,66 @@
  * New suggested custom properties
  */
 :root {
-    --roundness-islands: 0px;
-    --roundness-images: 0px;
-    --roundness-cards: var(--spacing-m);
-    --roundness-form-elements: 0px;
-    --roundness-buttons: 0px;
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-4
+    --sbx-color-background: #e5eff7;
+    --sbx-color-foreground-primary: #ffffff;
+    --sbx-color-foreground-secondary: #f4f2f2;
+    --sbx-color-text-primary: #000000;
+    --sbx-color-text-secondary: #525252;
+    --sbx-color-alert: #fa4a47;
+    --sbx-color-success: #4fa74f;
+    --sbx-color-warning: #ff7d00;
+    --sbx-color-highlight: #ffd100;
+    --sbx-color-accent: #4c94c8;
+    --sbx-color-accent-text: #ffffff;
+    --sbx-color-loading: #ebeaea;
 
-    --color-background: #e5eff7;
-    --color-foreground-primary: #ffffff;
-    --color-foreground-secondary: #f4f2f2;
-    --color-text-primary: #000000;
-    --color-text-secondary: #525252;
-    --color-form-elements: #4c94c8;
-    --color-focus-form-elements: #4c94c8;
-    --color-focus-buttons: #4c94c8;
-    --color-loading: #ebeaea;
-    --color-alert: #d8201d;
-    --color-success: #298129;
-    --color-warning: #ff7d00;
-    --color-buttons: #0066b0;
-    --color-buttons-hover: #1e82c9;
-    --color-buttons-text: #ffffff;
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-8
+    --sbx-border-radius-none: 0px;
+    --sbx-border-radius-small: 0.25rem;
+    --sbx-border-radius-normal: 0.5rem;
+    --sbx-border-radius-full: 50%;
+
+    --sbx-border-width-normal: 1px;
+    --sbx-border-width-thick: 2px;
+    --sbx-border-width-thicker: 0.5rem;
+
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=44-253
+    --sbx-shadow-s: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sbx-shadow-m: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --sbx-shadow-l: 0.5rem (8px);
+
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-10
+    --sbx-font-size-xs: 0.6875rem;
+    --sbx-font-size-s: 0.75rem;
+    --sbx-font-size-m: 1rem;
+    --sbx-font-size-l: 1.5rem;
+    --sbx-font-size-xl: 2.25rem;
+
+    --sbx-font-weight-normal: 400;
+    --sbx-font-weight-active: 500;
+    --sbx-font-weight-heading: 600;
+    --sbx-font-weight-strong: 700;
+
+    --sbx-line-height-tight: 1.2;
+    --sbx-line-height-normal: 1.5;
+    --sbx-line-height-large: 1.8;
+
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-9
+    --sbx-size-xs: 0.25rem;
+    --sbx-size-s: 0.5rem;
+    --sbx-size-m: 1rem;
+    --sbx-size-l: 1.5rem;
+    --sbx-size-xl: 2rem;
+
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-11
+    --sbx-animation-duration-fast: 50ms;
+    --sbx-animation-duration-normal: 200ms;
+    --sbx-animation-duration-slow: 400ms;
+
+    --sbx-animation-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --sbx-animation-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --sbx-animation-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /**
@@ -42,6 +81,7 @@ body {
 }
 
 @import "docs";
+@import "../../../www/static/css/core/ui/button/c-button";
 @import "form";
 @import "../../../www/static/css/core/layout/island";
 @import "card";

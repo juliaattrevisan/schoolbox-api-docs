@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import StorybookSlot from "../../../vue/components/storybook-slot.vue";
+import StorybookSlot from "../../vue/components/storybook-slot.vue";
 
 /**
  * Below is a list of all icons, which can be referenced by their name and used within the `<sbx-icon>` [component](?path=/docs/components-icon--docs).
@@ -15,7 +15,7 @@ const meta: Meta<typeof StorybookSlot> = {
             `,
         }),
     ],
-    title: "Getting Started/Design Tokens/Icons",
+    title: "Icons/Icons",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;

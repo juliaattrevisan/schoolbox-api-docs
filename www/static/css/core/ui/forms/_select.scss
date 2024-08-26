@@ -5,7 +5,7 @@
 .c-select {
     align-items: center;
     background-color: var(--color-foreground-primary);
-    border: var(--size-form-element-border-width) solid var(--color-form-elements);
+    border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     border-radius: var(--roundness-form-elements);
     cursor: pointer;
     display: grid; // to allow for the pseudo-element ::after to be positioned correctly
@@ -39,7 +39,7 @@
     }
     &::after {
         // Custom arrow
-        background-color: var(--color-form-elements);
+        background-color: var(--sbx-color-accent);
         clip-path: polygon(100% 0%, 0 0%, 50% 100%);
         content: "";
         height: 0.5em;

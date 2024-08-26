@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import DataTable from "@schoolboxVue/components/dataTable/data-table.vue";
 import { data } from "./dataTableMockData";
 
@@ -8,12 +8,8 @@ import { data } from "./dataTableMockData";
  */
 const endpoint = "/mock-data";
 const mswHandlers = [
-    rest.get(endpoint, (req, res, ctx) => {
-        return res(
-            // we grab an endpoint and then modify the data before it's returned
-            ctx.delay(2000),
-            ctx.json(data)
-        );
+    http.get(endpoint, () => {
+        return HttpResponse.json(data);
     }),
 ];
 
@@ -149,8 +145,8 @@ export const Error: Story = {
     parameters: {
         msw: {
             handlers: [
-                rest.get(endpoint, (req, res, ctx) => {
-                    return res(ctx.delay(2000), ctx.status(500));
+                http.get(endpoint, () => {
+                    return new HttpResponse(null, { status: 401 });
                 }),
                 ...mswHandlers,
             ],

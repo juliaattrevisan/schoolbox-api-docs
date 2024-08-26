@@ -9,6 +9,7 @@ module.exports = {
         "@storybook/addon-storysource",
         "@storybook/addon-mdx-gfm",
         "@storybook/addon-webpack5-compiler-swc",
+        "@storybook/addon-designs",
     ],
     features: {
         postcss: false,
@@ -43,7 +44,5 @@ module.exports = {
         // Return the altered config
         return config;
     },
-    docs: {
-        autodocs: true,
-    },
+    docs: {},
 };

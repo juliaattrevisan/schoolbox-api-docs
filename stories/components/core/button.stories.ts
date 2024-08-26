@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
+ * ![draft](/draft.png)
+ *
  * **Styles**: `www/static/css/core/ui/button/_c-button.scss`
  *
  * [mdn](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button)
@@ -28,6 +30,12 @@ export const Default: Story = {
             <button class="c-button" type="button">Button</button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-6",
+        },
+    },
 };
 
 /**
@@ -51,6 +59,12 @@ export const LinkButton: Story = {
             <a href="javascript:;" class="c-button">Button</a>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-6",
+        },
+    },
 };
 
 /**
@@ -59,12 +73,18 @@ export const LinkButton: Story = {
 export const WithIcon: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button">
-                <sbx-icon name="advanced-list"></sbx-icon>
-                <span>Button</span>
-            </button>
+<button type="button" class="c-button">
+    <sbx-icon name="add"></sbx-icon>
+    <span>Button</span>
+</button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-29",
+        },
+    },
 };
 
 /**
@@ -73,9 +93,9 @@ export const WithIcon: Story = {
 export const FullWidth: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button l-width-100">
-                <span>Button</span>
-            </button>
+<button type="button" class="c-button l-width-100">
+    <span>Button</span>
+</button>
         `,
     }),
 };
@@ -86,26 +106,17 @@ export const FullWidth: Story = {
 export const Secondary: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--secondary">
-                <sbx-icon name="approve"></sbx-icon>
-                <span>Button</span>
-            </button>
+<button type="button" class="c-button c-button--secondary">
+    <span>Button</span>
+</button>
         `,
     }),
-};
-
-/**
- *
- */
-export const Tertiary: Story = {
-    render: () => ({
-        template: `
-            <button type="button" class="c-button c-button--tertiary">
-                <sbx-icon name="approve"></sbx-icon>
-                <span>Button</span>
-            </button>
-        `,
-    }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-49",
+        },
+    },
 };
 
 /**
@@ -114,12 +125,17 @@ export const Tertiary: Story = {
 export const Success: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--success">
-                <sbx-icon name="approve"></sbx-icon>
-                <span>Save</span>
-            </button>
+<button type="button" class="c-button c-button--success">
+    <span>Button</span>
+</button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-89",
+        },
+    },
 };
 
 /**
@@ -128,12 +144,17 @@ export const Success: Story = {
 export const Alert: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--alert">
-                <sbx-icon name="delete"></sbx-icon>
-                <span>Delete</span>
-            </button>
+<button type="button" class="c-button c-button--alert">
+    <span>Button</span>
+</button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-69",
+        },
+    },
 };
 
 /**
@@ -143,9 +164,9 @@ export const Alert: Story = {
 export const IconOnly: Story = {
     render: () => ({
         template: `
-            <button type="button" class="c-button c-button--secondary c-button--icon-only" title="Add to favourties" aria-label="Add to favourites">
-                <sbx-icon name="favourite"></sbx-icon>
-            </button>
+<button type="button" class="c-button c-button--secondary c-button--icon-only" title="Add to favourites" aria-label="Add to favourites">
+    <sbx-icon name="favourite"></sbx-icon>
+</button>
         `,
     }),
 };
@@ -153,11 +174,11 @@ export const IconOnly: Story = {
 export const ButtonGroup: Story = {
     render: () => ({
         template: `
-            <div class="l-flex-row l-gap-s">
-                <button class="c-button" type="button">Button 1</button>
-                <button class="c-button" type="button">Button 2</button>
-                <button class="c-button" type="button">Button 3</button>
-            </div>
+<div class="l-flex-row l-gap-s">
+    <button class="c-button" type="button">Button 1</button>
+    <button class="c-button" type="button">Button 2</button>
+    <button class="c-button" type="button">Button 3</button>
+</div>
         `,
     }),
 };
@@ -165,12 +186,12 @@ export const ButtonGroup: Story = {
 export const SecondaryButtonGroup: Story = {
     render: () => ({
         template: `
-            <div class="l-flex-row l-gap-s">
-                <button class="c-button c-button--secondary" type="button">Button 1</button>
-                <button class="c-button c-button--secondary" type="button">Button 2</button>
-                <button class="c-button c-button--secondary" type="button">Button 3</button>
-                <button class="c-button c-button--secondary" type="button">Button 4</button>
-            </div>
+<div class="l-flex-row l-gap-s">
+    <button class="c-button c-button--secondary" type="button">Button 1</button>
+    <button class="c-button c-button--secondary" type="button">Button 2</button>
+    <button class="c-button c-button--secondary" type="button">Button 3</button>
+    <button class="c-button c-button--secondary" type="button">Button 4</button>
+</div>
         `,
     }),
 };
@@ -183,10 +204,10 @@ export const SecondaryButtonGroup: Story = {
 export const ButtonGroupStretch: Story = {
     render: () => ({
         template: `
-            <div class="l-flex-row l-gap-s">
-                <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
-                <button class="c-button l-flex__item--1" type="button">Primary Action</button>
-            </div>
+<div class="l-flex-row l-gap-s">
+    <button class="c-button c-button--secondary l-flex__item--1" type="button">Secondary Action</button>
+    <button class="c-button l-flex__item--1" type="button">Primary Action</button>
+</div>
         `,
     }),
 };

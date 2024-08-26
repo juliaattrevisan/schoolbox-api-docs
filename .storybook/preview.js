@@ -12,7 +12,8 @@ import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scss"; // add in any other styles we want to use in storybook only
 import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
-import { initialize, mswDecorator } from "msw-storybook-addon"; //to be able to load mock data into stories
+import theme from "./theme";
+import { initialize, mswLoader } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
@@ -35,11 +36,9 @@ initialize({
     onUnhandledRequest: "bypass", // If you want MSW to bypass unhandled requests and not do anything
 });
 
-export const decorators = [mswDecorator]; // Provide the MSW addon decorator globally, so any story can use
-
 setup((app) => {
-    app.use(ClientTable); //so can use v-tables-3-select-rows in stories
-    app.use(createPinia()); //so can use pinia in stories
+    app.use(ClientTable); // so can use v-tables-3-select-rows in stories
+    app.use(createPinia()); // so can use pinia in stories
 });
 
 /**
@@ -57,35 +56,51 @@ export function register() {
 }
 register();
 
-export const parameters = {
-    backgrounds: {
-        default: "demo",
-        values: [
-            {
-                name: "demo",
-                value: "var(--color-background)",
-            },
-        ],
-    },
-    chromatic: {
-        pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
-    },
-    docs: {
-        theme: themes.dark,
-        page: DocumentationTemplate, // use our own custom documentation template
-    },
-    layout: "fullscreen", //allow the component to expand to the full width and height of the Canvas
-    options: {
-        storySort: {
-            // Sort stories alphabetically, but with Introduction related docs first
-            method: "alphabetical",
-            order: [
-                "Introduction",
-                "Getting Started",
-                ["Design Systems", "CSS Principles", "Design Tokens", "Contributing"],
-                "*",
-                "Draft",
+const preview = {
+    loaders: [mswLoader], // so we can load mock data into stories
+    parameters: {
+        backgrounds: {
+            default: "demo",
+            values: [
+                {
+                    name: "demo",
+                    value: "var(--sbx-color-background)",
+                },
             ],
         },
+        chromatic: {
+            pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
+        },
+        docs: {
+            theme: theme,
+            page: DocumentationTemplate, // use our own custom documentation template
+            source: {
+                transform: (code, storyContext) => {
+                    if (code.includes("render:")) {
+                        // remove everything but the template when there's the render object in the 'view source' code
+                        // see https://storybook.js.org/docs/api/doc-blocks/doc-block-source#transform for further details
+                        return code.match(/template:\s*`([^`]*)`/s)[1].trim();
+                    }
+                    return code;
+                },
+            },
+        },
+        layout: "fullscreen", // allow the component to expand to the full width and height of the Canvas
+        options: {
+            storySort: {
+                // Sort stories alphabetically, but with Introduction related docs first
+                method: "alphabetical",
+                order: [
+                    "Introduction",
+                    "Getting Started",
+                    ["Design Systems", "CSS Principles", "Design Tokens", "Contributing"],
+                    "*",
+                    "Draft",
+                ],
+            },
+        },
     },
+    tags: ["autodocs"],
 };
+
+export default preview;
