@@ -24,9 +24,9 @@ const DEFAULT_TOKENS = [
 /**
  * If tokens are enabled, return the tokens settings
  * @param { SbxEditorConfig } config - the config to use when creating the editor
- * @returns { { mention: MentionConfig } | Record<string, never> } - the tokens settings if enabled
+ * @returns { { mention: MentionConfig } | Record<PropertyKey, never> } - the tokens settings if enabled
  */
-export function getTokensSettings(config: SbxEditorConfig): { mention: MentionConfig } | Record<string, never> {
+export function getTokensSettings(config: SbxEditorConfig): { mention: MentionConfig } | Record<PropertyKey, never> {
     if (config.hasTokens) {
         return {
             mention: {
