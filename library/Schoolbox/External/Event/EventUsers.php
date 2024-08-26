@@ -204,7 +204,7 @@ class EventUsers
 
         foreach ($folders as $folder) {
             foreach ($folder->getCodes() as $code) {
-                $folderLookup[$code] = $folder;
+                $folderLookup[$code->getCode()] = $folder;
             }
         }
 
