@@ -1,0 +1,420 @@
+import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import { Page, expect } from "@playwright/test";
+
+export default class TextboxForm {
+    private tester: AcceptanceTester;
+
+    private page: Page;
+
+    static readonly URL = "/homepage/{homepageId}/textBoxCreate/{componentId}#go-to{componentId}";
+
+    static readonly FORM = 'form[id^="textBoxForm"]';
+
+    static readonly FORM_SAVE = `${TextboxForm.FORM} input[type="submit"]`;
+
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
+        this.page = page;
+    }
+
+    async fillHeading(heading: string) {
+        // await this.page.fill("heading", heading);
+        await this.page.locator('input[name="heading"]').fill(heading);
+
+        return this;
+    }
+
+    async seeInHeading(heading: string) {
+        await expect(this.page.locator(`${TextboxForm.FORM} input[name="textBoxHeading"]`)).toHaveValue(heading);
+        return this;
+    }
+
+    async fillContent(description: string) {
+        const descriptionTextarea = this.page.getByTestId("component-textbox-4901");
+        await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
+    }
+
+    async seeInContent(content: string) {
+        const id = await this.page.locator(`${TextboxForm.FORM} textarea[name^="textBoxBody"]`).getAttribute("id");
+        await expect(this.page.locator(`#${id}`)).toHaveText(content);
+        return this;
+    }
+
+    async submit() {
+        await this.page.click('input[type=submit][value="Create Text Box"]');
+        await this.page.waitForTimeout(2000);
+        return this;
+    }
+
+    async save() {
+        await this.page
+            .locator("div.component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller")
+            .scrollIntoViewIfNeeded();
+        await this.page.locator("div.component-action section button").click();
+        return this;
+    }
+}
+
+// <?php
+// /**
+//  * @copyright Copyright 2019, Schoolbox Pty Ltd
+//  * @link      https://schoolbox.com.au/
+//  */
+
+// declare(strict_types=1);
+
+// namespace Tests\Support\Page\Homepage;
+
+// use Tests\Support\AcceptanceTester;
+// use Codeception\Util\Locator;
+// use Tests\Support\Page\Common;
+
+// /**
+//  * Class TextboxForm
+//  */
+// class TextboxForm
+// {
+//     public const URL = '/homepage/{homepageId}/textBoxCreate/{componentId}#go-to{componentId}';
+
+//     public const FORM = Common::ELEMENT_CONTENT . ' form[id^="textBoxForm"]';
+
+//     public const FORM_SAVE = self::FORM . ' input[type="submit"]';
+
+//     /**
+//      * @var AcceptanceTester
+//      */
+//     protected $tester;
+
+//     /**
+//      * Constructor
+//      *
+//      * @param AcceptanceTester $i
+//      */
+//     public function __construct(AcceptanceTester $i)
+//     {
+//         $this->tester = $i;
+//     }
+
+//     /**
+//      * Generates route for this page.
+//      *
+//      * @param int $homepageId
+//      * @param int $componentId
+//      * @return string
+//      */
+//     public function generateRoute(int $homepageId, int $componentId): string
+//     {
+//         return strtr(static::URL, ['{homepageId}' => $homepageId, '{componentId}' => $componentId]);
+//     }
+
+//     /**
+//      * @param string $heading
+//      * @return $this
+//      */
+//     public function fillHeading(string $heading): self
+//     {
+//         $this->tester->fillField("heading", $heading);
+//         return $this;
+//     }
+
+//     /**
+//      * @param string $heading
+//      * @return $this
+//      */
+//     public function seeInHeading(string $heading): self
+//     {
+//         $this->tester->seeInField(['css' => self::FORM . ' input[name="textBoxHeading"]'], $heading);
+//         return $this;
+//     }
+
+//     /**
+//      * @param string $content
+//      * @return $this
+//      */
+//     public function fillContent(string $content): self
+//     {
+//         $this->tester->executeJS('for(var i in window.sbProps.editors) { window.sbProps.editors[i].setData(\'' . $content . '\')}');
+//         return $this;
+//     }
+
+//     /**
+//      * @param string $content
+//      * @return $this
+//      */
+//     public function seeInContent(string $content): self
+//     {
+//         // Need to figure out what the id of this rich text field SHOULD be
+//         // (Find ID of field)
+//         $this->tester->seeInRichTextField(
+//             $this->tester->grabAttributeFrom(
+//                 self::FORM . ' textarea[name^="textBoxBody"]',
+//                 'id'
+//             ),
+//             $content
+//         );
+//         return $this;
+//     }
+
+//     /**
+//      * @return $this
+//      */
+//     public function submit(): self
+//     {
+//         $this->tester->click(['css' => 'input[type=submit][value=Create\ Text\ Box]']);
+//         sleep(2);
+//         return $this;
+//     }
+
+//     /**
+//      * @return $this
+//      * @throws \Exception
+//      */
+//     public function save(): self
+//     {
+//         $this->tester->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
+//         $element = Locator::contains('div.component-action section button', 'Save');
+//         $this->tester->waitForElementVisible($element, 5);
+//         $this->tester->click($element);
+//         return $this;
+//     }
+// }
+// import { Page, expect } from "@playwright/test";
+
+// export default class Homepage {
+//     private page: Page;
+
+//     static readonly URL = "/homepage/{id}";
+
+//     static readonly ELEMENT_ADD_COMPONENT_TAB = "#tabs-1";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_INFORMATION = "#tabs-sub-1";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_COLLABORATION = "#tabs-sub-2";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_LEARNING = "#tabs-sub-3";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_MULTIMEDIA = "#tabs-sub-4";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_RESOURCES = "#tabs-sub-5";
+
+//     static readonly ELEMENT_ADD_COMPONENT_SECTION_FEEDS = "#tabs-sub-6";
+
+//     static readonly ELEMENT_COMPONENT_SECTION_INFORMATION = 'a[href="#tabs-sub-1"]';
+
+//     static readonly ELEMENT_COMPONENT_SECTION_COLLABORATION = 'a[href="#tabs-sub-2"]';
+
+//     static readonly ELEMENT_COMPONENT_SECTION_LEARNING = 'a[href="#tabs-sub-3"]';
+
+//     static readonly ELEMENT_COMPONENT_SECTION_MULTIMEDIA = 'a[href="#tabs-sub-4"]';
+
+//     static readonly ELEMENT_COMPONENT_SECTION_RESOURCES = 'a[href="#tabs-sub-5"]';
+
+//     static readonly ELEMENT_COMPONENT_SECTION_FEEDS = 'a[href="#tabs-sub-6"]';
+
+//     static readonly ELEMENT_EDIT_COLUMNS_TAB = "#tabs-2";
+
+//     static readonly DATATEST_LINK_MENU = "sbx-pop-out-tab-control";
+
+//     static readonly DATATEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
+
+//     static readonly ELEMENT_COMPONENT_LAYOUT = "#component-layout";
+
+//     static readonly ELEMENT_COMPONENT_LAYOUT_TOP = `${Homepage.ELEMENT_COMPONENT_LAYOUT} div.column-top`;
+
+//     static readonly ELEMENT_COMPONENT_LAYOUT_LEFT = `${Homepage.ELEMENT_COMPONENT_LAYOUT} div.column-left`;
+
+//     static readonly ELEMENT_COMPONENT_LAYOUT_RIGHT = `${Homepage.ELEMENT_COMPONENT_LAYOUT} div.column-right`;
+
+//     static readonly ELEMENT_COMPONENT = "div.component-container";
+
+//     static readonly ELEMENT_COMPONENT_HEADING = ".component-titlebar h2";
+
+//     static readonly ELEMENT_COMPONENT_CONTENT = ".content";
+
+//     static readonly ELEMENT_COMPONENT_ACTION_BAR = ".component-action";
+
+//     static readonly ELEMENT_LOCK_TOGGLE = "#component-lock-switch";
+
+//     static readonly ELEMENT_COMPONENT_SETTINGS = "a.icon-settings.settings.edit";
+
+//     static readonly ELEMENT_REMOVE_ICON = "a.icon-close";
+
+//     static readonly ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
+
+//     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
+
+//     constructor(page: Page) {
+//         this.page = page;
+//     }
+
+//     /**
+//      * Go to a homepage for a given ID
+//      * @param { number } id - The ID of the homepage
+//      */
+//     async goto(id: number) {
+//         await this.page.goto(Homepage.generateRoute(id));
+//     }
+
+//     /**
+//      * Generates route for this page
+//      * @param { number } id - The ID of the page
+//      * @returns { string } - the URL for the page
+//      */
+//     public static generateRoute(id: number): string {
+//         return Homepage.URL.replace("{id}", id.toString());
+//     }
+
+//     /**
+//      * Adds the given component
+//      * @param { string } componentSection - The section it's in: one of the `self::ELEMENT_ADD_COMPONENT_SECTION_*` constants
+//      * @param { string } componentName - The name of the component, as seen in its link
+//      */
+//     async addComponent(componentSection: string, componentName: string) {
+//         // Open the component tab
+//         await this.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
+
+//         // Which component section is it in?
+//         await this.openTabPanel(componentSection);
+
+//         // Click to add the component
+//         const componentSectionEl = this.page.locator(componentSection);
+//         await componentSectionEl.getByText(componentName).click();
+
+//         // Wait for it to load
+//         // TODO: Check if needed
+//         // await this.tester.waitForAjaxDone();
+//     }
+
+//     /**
+//      * Create a locator for a component in a layout for a given position
+//      * @param { string } layout - The layout in which the component lives: one of the `self::ELEMENT_COMPONENT_LAYOUT_*` constants
+//      * @param { number } position - The position of the component (1-indexed)
+//      * @returns { string } - the locator for the component
+//      */
+//     public static locateComponent(layout: string, position: number): string {
+//         return `${layout} ${Homepage.ELEMENT_COMPONENT}:nth-child(${position})`;
+//     }
+
+//     /**
+//      * Verify that the component at the given position has the given heading
+//      * @param { string } heading - The heading to verify
+//      * @param { string } layout - The layout of the component
+//      * @param { number } position - The position of the component (1-indexed)
+//      */
+//     async seeInComponentHeading(heading: string, layout: string, position: number) {
+//         const componentLocator = Homepage.locateComponent(layout, position);
+//         const componentHeadingEl = this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_HEADING}`);
+//         await expect(componentHeadingEl).toHaveText(heading);
+//     }
+
+//     /**
+//      * Verify that the component at the given position contains the given content
+//      * @param { string } content - The content to verify
+//      * @param { string } layout - The layout of the component
+//      * @param { number } position - The position of the component (1-indexed)
+//      */
+//     async seeInComponentContent(content: string, layout: string, position: number) {
+//         const componentLocator = Homepage.locateComponent(layout, position);
+//         const componentContentEl = this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_CONTENT}`);
+//         await expect(componentContentEl).toHaveText(content);
+//     }
+
+//     /**
+//      * Clicks a component empty state link
+//      * @param { string } layout - The layout of the component
+//      * @param { number } position - The position of the component (1-indexed)
+//      */
+//     async clickComponentEmptyStateLink(layout: string, position: number) {
+//         const componentLocator = Homepage.locateComponent(layout, position);
+//         await this.page.locator(`${componentLocator} .empty-state a`).click();
+//     }
+
+//     /**
+//      * Clicks a component action bar button
+//      * @param { string } button - The button to click (as a queryselector)
+//      * @param { string } layout - The layout of the component
+//      * @param { number } position - The position of the component (1-indexed)
+//      */
+//     async clickComponentActionBarButton(button: string, layout: string, position: number) {
+//         const componentLocator = Homepage.locateComponent(layout, position);
+//         await this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button).click();
+//     }
+
+//     /**
+//      * Open a tab panel
+//      * @param { string } link - The link of the tab panel
+//      */
+//     async openTabPanel(link: string) {
+//         await this.page.locator(`[href="${link}"]`).click();
+//     }
+
+//     /**
+//      * Click a tab to add components
+//      * @param { string } tab - The tab to click
+//      */
+//     async clickComponentsTab(tab: string) {
+//         await this.page.click(tab);
+//     }
+
+//     /**
+//      * Check component icons
+//      * @param { string } icon - The icon to check
+//      */
+//     async checkComponentIcon(icon: string) {
+//         await expect(this.page.locator(`span.size-32.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
+//     }
+
+//     /**
+//      * Click the lock toggle
+//      */
+//     async clickLockToggle() {
+//         await this.page.click(Homepage.ELEMENT_LOCK_TOGGLE);
+//     }
+
+//     /**
+//      * Click the component settings
+//      */
+//     async clickComponentSettings() {
+//         await this.page.click(Homepage.ELEMENT_COMPONENT_SETTINGS);
+//     }
+
+//     /**
+//      * Click the component remove icon
+//      */
+//     async clickComponentRemoveIcon() {
+//         await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().click();
+//     }
+
+//     /**
+//      * Type a heading text into a component's heading field
+//      * @param {string} headingText - The text to type into the heading field.
+//      */
+//     async typeTextBoxHeading(headingText: string) {
+//         await this.page.fill(Homepage.ELEMENT_COMPONENT_EDIT_HEADING, headingText);
+//     }
+
+//     /**
+//      * Uncheck a component's checkbox
+//      * @param {number} id - The component ID.
+//      * @param {string} componentElement - The checkbox element name.
+//      */
+//     async uncheckComponentCheckbox(id: number, componentElement: string) {
+//         await this.page.uncheck(`#component${id}-${componentElement}`);
+//     }
+
+//     /**
+//      * Check a component's checkbox
+//      * @param {number} id - The component ID.
+//      * @param {string} componentElement - The checkbox element name.
+//      */
+//     async checkComponentCheckbox(id: number, componentElement: string) {
+//         await this.page.check(`#component${id}-${componentElement}`);
+//     }
+
+//     /**
+//      * Click the remove confirmation button
+//      */
+//     async clickRemoveConfirmationMessage() {
+//         await this.page.click(`text=${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}`);
+//     }
+// }
