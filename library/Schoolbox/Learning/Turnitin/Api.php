@@ -39,7 +39,7 @@ class Api
      * Request connection timeout
      * Can't connect after this amount of seconds? You died
      */
-    private const DEFAULT_CONNECT_TIMEOUT = 3;
+    private const DEFAULT_CONNECT_TIMEOUT = 5;
 
 
     /**
