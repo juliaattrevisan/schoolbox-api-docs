@@ -269,7 +269,7 @@ class CSV extends AbstractCSV
                             /* Tasks have no draft states: once you set their state, that's it
                              */
                             $suffix = '';
-                            $humanReadableMark = \Schoolbox\Assessment\Course\Task\Completion::STATUS_MAP[(int)$response->getCompletionStatus()] ?? '';
+                            $humanReadableMark = \Schoolbox\Assessment\Course\Task\Completion::STATUS_MAP[$response->getCompletionStatus()] ?? '';
                             $normalisedMark = null;
                             $comment = null;
                             $dataFound = true;
