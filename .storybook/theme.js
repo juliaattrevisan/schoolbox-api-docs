@@ -11,8 +11,8 @@ export default create({
     brandUrl: "https://schoolbox.education",
     brandImage: "/sb-logo-white.png",
     brandTarget: "_self",
-    appBg: "#140021",
-    appContentBg: "#140021",
-    appPreviewBg: "#140021",
-    barBg: "#140021",
+    appBg: "#000b1b",
+    appContentBg: "#000b1b",
+    appPreviewBg: "#000b1b",
+    barBg: "#000b1b",
 });
