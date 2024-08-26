@@ -12,6 +12,7 @@ import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scss"; // add in any other styles we want to use in storybook only
 import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
+import theme from "./theme";
 import { initialize, mswLoader } from "msw-storybook-addon"; //to be able to load mock data into stories
 import { setup } from "@storybook/vue3"; // so can add in v-tables-3-select-rows and pinia
 import { ClientTable } from "v-tables-3-select-rows";
@@ -71,7 +72,7 @@ const preview = {
             pauseAnimationAtEnd: true, // Notifies Chromatic to pause the animations when they finish at a global level.
         },
         docs: {
-            theme: themes.dark,
+            theme: theme,
             page: DocumentationTemplate, // use our own custom documentation template
             source: {
                 transform: (code, storyContext) => {
