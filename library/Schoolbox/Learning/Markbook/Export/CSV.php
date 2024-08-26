@@ -240,9 +240,39 @@ class CSV extends AbstractCSV
                 $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
                 $comment = '';
                 $dataFound = true;
+            } elseif ($assessment instanceof \Schoolbox\Learning\Assessment\Task\Model ) {
+                /* Tasks can be
+                 *    - unmarked, or
+                 *    - self-assessed (response provided by student) or
+                 *    - teacher-assessed (feedback provided by teacher)
+                 */
+                $feedback = $participant->getAuthoritativeFeedback(!$showDrafts);
+
+                if ($feedback) {
+                    /* First find out if the teacher has provided feedback
+                     */
+                    $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
+                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $normalisedMark = $feedback->getNormalisedMark();
+                    $comment = $feedback->getComment();
+                    $dataFound = true;
+                } else {
+                    /* If this task allowed self-assessment, dig into Responses.
+                     * Look for student-given feedback instead, because they might have self-assessed.
+                     * Somewhat confusingly, these are made as Responses from the student
+                     */
+                    if ($assessment->getIsSelfAssessable()) {
+                        $response = $participant->findMostRecentSubmittedResponse();
+
+                        if ($response) {
+                            new \Alaress_Probe($assessment->getTitle(), $participant->getUser()->getFullName(), $response->getId(), $response->getCompletionStatus());
+                        }
+                    }
+                }
             } else {
                 // For non-projects, all the data is in the feedback.
-                $feedback = $participant->getAuthoritativeFeedback(!$showDrafts);
+                $feedback = $participant->getAuthoritativeFeedback(false);
+
                 if ($feedback) {
                     $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
                     $humanReadableMark = $feedback->getHumanReadableMark();
@@ -280,6 +310,7 @@ class CSV extends AbstractCSV
         if ($this->hasCommentColumn($assessment)) {
             $row[] = '';
         }
+
         return $row;
     }
 }
