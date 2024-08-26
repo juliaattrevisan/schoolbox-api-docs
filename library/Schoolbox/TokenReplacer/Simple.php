@@ -42,6 +42,7 @@ class Simple
      */
     public function replace(string $body, array $replacements): string
     {
+        $body = $this->stripMentionAttribute($body);
         $sanitisedReplacements = array_map(static function ($val) {
             return \Scrub::text($val);
         }, array_values($replacements));
@@ -58,6 +59,7 @@ class Simple
      */
     public function replaceHtml(string $body, array $replacements): string
     {
+        $body = $this->stripMentionAttribute($body);
         $sanitisedReplacements = array_map(static function ($val) {
             return \Scrub::html($val);
         }, array_values($replacements));
@@ -82,5 +84,19 @@ class Simple
         /* Remove dupes and reindex
          */
         return array_values(array_unique($matches[0]));
+    }
+
+
+    /**
+     * Attempt to remove attributes from the target element
+     *
+     * @param string $content
+     * @return string
+     */
+    public function stripMentionAttribute(
+        string $content,
+    ): string {
+        $regex = '/<span class="mention" data-mention="(.*)">\1<\/span>/';
+        return preg_replace($regex, '$1', $content);
     }
 }
