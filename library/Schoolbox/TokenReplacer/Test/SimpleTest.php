@@ -328,18 +328,16 @@ class SimpleTest extends TestCase
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
             ],
-            'HTML 2' => [
+            'HTML 2: No tokens' => [
                 "<p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the port of destination. a list or
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.</p>",
                 [],
-                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
-<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the port of destination. a list or
                 invoice of goods transported by truck or train. a list of the cargo
-                or passengers carried on an airplane.</p></body></html>
-"
+                or passengers carried on an airplane.</p>"
             ],
             'HTML 3: With mention highlight' => [
                 "<p>noun. a list of the cargo carried by a ship, made for the use of
@@ -351,13 +349,11 @@ class SimpleTest extends TestCase
                     '[firstname]' => 'Brother',
                     '[lastname]' => 'what is this'
                 ],
-                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
-<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the Brother
                 what is this. a list or
                 invoice of goods transported by truck or train. a list of the cargo
-                or passengers carried on an airplane.</p></body></html>
-"
+                or passengers carried on an airplane.</p>"
             ],
             'HTML 4: Mention highlight without span' => [
                 "<p>noun. a list of the cargo carried by a ship, made for the use of
@@ -369,15 +365,13 @@ class SimpleTest extends TestCase
                     '[firstname]' => 'Brother',
                     '[lastname]' => 'what is this'
                 ],
-                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
-<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the <em class=\"mention\" data-mention=\"Brother\">Brother</em>
                 <em class=\"mention\" data-mention=\"what is this\">what is this</em>. a list or
                 invoice of goods transported by truck or train. a list of the cargo
-                or passengers carried on an airplane.</p></body></html>
-"
+                or passengers carried on an airplane.</p>"
             ],
-            'HTML 5' => [
+            'HTML 5: Incomplete mention span tag' => [
                 "<p>noun. a list of the cargo carried by a ship, made for the use of
                 various agents and officials at the <span class=\"mention\">[firstname]</span>. a list or
                 invoice of goods transported by truck or train. a list of the cargo
@@ -385,12 +379,10 @@ class SimpleTest extends TestCase
                 [
                     '[firstname]' => 'Brother',
                 ],
-                "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
-<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>noun. a list of the cargo carried by a ship, made for the use of
-                various agents and officials at the Brother. a list or
+                "<p>noun. a list of the cargo carried by a ship, made for the use of
+                various agents and officials at the <span class=\"mention\">Brother</span>. a list or
                 invoice of goods transported by truck or train. a list of the cargo
-                or passengers carried on an airplane.</p></body></html>
-"
+                or passengers carried on an airplane.</p>"
             ],
         ];
     }
