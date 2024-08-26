@@ -140,7 +140,8 @@
         "codeception/module-db": "^3.1",
         "codeception/module-cli": "^2.0",
         "codeception/module-rest": "^3.4",
-        "codeception/module-phpbrowser": "^3.0"
+        "codeception/module-phpbrowser": "^3.0",
+        "rector/rector": "^1.2"
     },
     "config": {
         "allow-plugins": {
