@@ -91,8 +91,12 @@ function onItemSelected(reference: string) {
 
 <style lang="scss" scoped>
 .select-button {
+    align-items: center;
+    align-self: start; // https://moderncss.dev/css-button-styling-guide/#gotcha-child-of-flex-columns
     background: var(--color-foreground-primary);
     border: 1px solid var(--form-border-color);
+    color: var(--color-buttons-text);
+    display: inline-flex;
     justify-content: space-between;
     padding: var(--spacing-xs) var(--spacing-m);
     text-align: left;
@@ -101,6 +105,15 @@ function onItemSelected(reference: string) {
     &:active {
         &:not([disabled]) {
             background-color: var(--form-bg-hover-color);
+        }
+    }
+    .c-icon--dropdown {
+        transform: rotate(180deg);
+    }
+    &[aria-expanded="true"] {
+        // rotate when open
+        .c-icon--dropdown {
+            transform: rotate(0deg);
         }
     }
 }
