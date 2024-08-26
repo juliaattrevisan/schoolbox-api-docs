@@ -45,7 +45,8 @@ class Service extends AbstractService
 
         try {
             if (!$recipient->getRole()->isParent()) {
-                throw new \InvalidArgumentException('User is not a parent.');
+                $this->getLog()->warning('User is not a parent.');
+                return false;
             }
 
             if (!$recipient->getExternalId()) {
