@@ -340,10 +340,10 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * @param string $studentExternalId
+     * @param string|null $studentExternalId
      * @return Builder
      */
-    public function setStudentExternalIdMeta(string $studentExternalId): self
+    public function setStudentExternalIdMeta(?string $studentExternalId): self
     {
         $this->meta[Service::PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID] = $studentExternalId;
         return $this;
