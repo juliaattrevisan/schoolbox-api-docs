@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\TokenReplacer;
 
-use RuntimeException;
-
 /**
  * Class Simple
  *
