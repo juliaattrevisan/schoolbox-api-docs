@@ -51,6 +51,7 @@ a.c-button {
     &:active {
         background-color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
         color: var(--sbx-color-accent-text); // ^foundation-fixes^ - remove the change of text colour on hover
+        filter: brightness(1.1);
     }
     &:focus {
         background-color: var(--sbx-color-accent); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
@@ -90,7 +91,6 @@ a.c-button {
         &:hover,
         &:active {
             background-color: var(--color-success);
-            filter: brightness(1.2);
         }
         &:focus {
             background-color: var(
@@ -104,7 +104,6 @@ a.c-button {
         &:hover,
         &:active {
             background-color: var(--color-alert);
-            filter: brightness(1.2);
         }
         &:focus {
             background-color: var(--color-alert); // ^foundation-fixes^ - don't lighten on focus, just reduces contrast
