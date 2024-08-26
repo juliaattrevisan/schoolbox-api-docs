@@ -1,8 +1,7 @@
-<script lang="ts">
-// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+<script>
+// Ignore this file for ESLint checks for now (SA-18139)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-// @ts-nocheck
 
 /**
  * To scroll a list of items horizontally
@@ -169,7 +168,7 @@ export default {
          *
          * @param { number } xTarget - where to move the container
          */
-        moveInnerContainer(xTarget: number) {
+        moveInnerContainer(xTarget) {
             gsap.to(this.innerContainer, {
                 x: xTarget,
                 duration: 0.5,
