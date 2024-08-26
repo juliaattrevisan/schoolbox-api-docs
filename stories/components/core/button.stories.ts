@@ -18,12 +18,6 @@ const meta: Meta<typeof StorybookSlot> = {
         }),
     ],
     title: "Draft/Button",
-    parameters: {
-        design: {
-            type: "figma",
-            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=179-2",
-        },
-    },
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -34,6 +28,12 @@ export const Default: Story = {
             <button class="c-button" type="button">Button</button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-6",
+        },
+    },
 };
 
 /**
@@ -57,6 +57,12 @@ export const LinkButton: Story = {
             <a href="javascript:;" class="c-button">Button</a>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-6",
+        },
+    },
 };
 
 /**
@@ -71,6 +77,12 @@ export const WithIcon: Story = {
 </button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-29",
+        },
+    },
 };
 
 /**
@@ -93,11 +105,16 @@ export const Secondary: Story = {
     render: () => ({
         template: `
 <button type="button" class="c-button c-button--secondary">
-    <sbx-icon name="approve"></sbx-icon>
     <span>Button</span>
 </button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-49",
+        },
+    },
 };
 
 /**
@@ -121,11 +138,16 @@ export const Success: Story = {
     render: () => ({
         template: `
 <button type="button" class="c-button c-button--success">
-    <sbx-icon name="approve"></sbx-icon>
-    <span>Save</span>
+    <span>Button</span>
 </button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-89",
+        },
+    },
 };
 
 /**
@@ -135,11 +157,16 @@ export const Alert: Story = {
     render: () => ({
         template: `
 <button type="button" class="c-button c-button--alert">
-    <sbx-icon name="delete"></sbx-icon>
-    <span>Delete</span>
+    <span>Button</span>
 </button>
         `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-69",
+        },
+    },
 };
 
 /**
@@ -149,7 +176,7 @@ export const Alert: Story = {
 export const IconOnly: Story = {
     render: () => ({
         template: `
-<button type="button" class="c-button c-button--secondary c-button--icon-only" title="Add to favourties" aria-label="Add to favourites">
+<button type="button" class="c-button c-button--secondary c-button--icon-only" title="Add to favourites" aria-label="Add to favourites">
     <sbx-icon name="favourite"></sbx-icon>
 </button>
         `,
