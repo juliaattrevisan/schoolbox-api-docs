@@ -18,6 +18,12 @@ const meta: Meta<typeof StorybookSlot> = {
         }),
     ],
     title: "Draft/Button",
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=179-2",
+        },
+    },
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
