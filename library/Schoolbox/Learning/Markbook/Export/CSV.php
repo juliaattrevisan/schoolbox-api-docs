@@ -257,7 +257,7 @@ class CSV extends AbstractCSV
                     $comment = $feedback->getComment();
                     $dataFound = true;
                 } else {
-                    /* If this task allowed self-assessment, dig into Responses.
+                    /* If this task allowed self-assessment, dig into Responses in the absence of teacher feedbacks.
                      * Look for student-given feedback instead, because they might have self-assessed.
                      * Somewhat confusingly, these are made as Responses from the student
                      */
@@ -265,7 +265,13 @@ class CSV extends AbstractCSV
                         $response = $participant->findMostRecentSubmittedResponse();
 
                         if ($response) {
-                            new \Alaress_Probe($assessment->getTitle(), $participant->getUser()->getFullName(), $response->getId(), $response->getCompletionStatus());
+                            /* Tasks have no draft states: once you set their state, that's it
+                             */
+                            $suffix = '';
+                            $humanReadableMark = \Schoolbox\Assessment\Course\Task\Completion::STATUS_MAP[(int)$response->getCompletionStatus()] ?? '';
+                            $normalisedMark = null;
+                            $comment = null;
+                            $dataFound = true;
                         }
                     }
                 }

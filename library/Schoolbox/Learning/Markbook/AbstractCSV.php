@@ -64,8 +64,8 @@ class AbstractCSV
     protected function initExport(string $filename): void
     {
         // set the output headers
-//        header('Content-type: text/csv; charset=utf-8');
-//        header("Content-Disposition: attachment; filename=\"{$filename}\"");
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"{$filename}\"");
 
         $this->fp = fopen("php://output", 'w');
     }
