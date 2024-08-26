@@ -45,7 +45,7 @@ function onItemSelected(reference: string) {
     <button
         ref="button"
         type="button"
-        class="c-button f-match-existing-button-styles select-button"
+        class="select-button"
         :title="currentLabel"
         :aria-label="currentLabel"
         aria-haspopup="menu"
