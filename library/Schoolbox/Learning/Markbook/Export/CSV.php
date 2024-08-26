@@ -278,7 +278,7 @@ class CSV extends AbstractCSV
                 }
             } else {
                 // For non-projects, all the data is in the feedback.
-                $feedback = $participant->getAuthoritativeFeedback(false);
+                $feedback = $participant->getAuthoritativeFeedback(!$showDrafts);
 
                 if ($feedback) {
                     $suffix = $feedback->isDraft() ? self::DRAFT_SUFFIX : '';
