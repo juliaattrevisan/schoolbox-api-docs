@@ -60,6 +60,15 @@
     --sbx-size-m: 1rem;
     --sbx-size-l: 1.5rem;
     --sbx-size-xl: 2rem;
+
+    // https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=8-11
+    --sbx-animation-duration-fast: 50ms;
+    --sbx-animation-duration-normal: 200ms;
+    --sbx-animation-duration-slow: 400ms;
+
+    --sbx-animation-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --sbx-animation-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --sbx-animation-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /**

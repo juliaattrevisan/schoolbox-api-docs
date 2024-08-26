@@ -24,7 +24,7 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
-    title: "Draft/Images/Images",
+    title: "Components/Images/Images",
 };
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
@@ -89,6 +89,8 @@ export const Icon: Story = {
 };
 
 /**
+ * ![draft](/draft.png)
+ *
  * _This is a work in progress_
  */
 export const Initials: Story = {

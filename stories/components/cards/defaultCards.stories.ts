@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**
+ * ![draft](/draft.png)
+ *
  * **Styles**: `stories/assets/styles/_card.scss`
  *
  * Styling rework of our card layouts, utilising flex to do a lot of the heavy lifting.
