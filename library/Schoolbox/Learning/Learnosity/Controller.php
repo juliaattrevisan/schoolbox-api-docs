@@ -823,7 +823,7 @@ class Controller extends Base
             'session_id' => [
                 $attempt->getLearnosityReference()
             ]
-        ])['data'][0]['responses'];
+        ])['data'][0]['responses'] ?? [];
 
         /* Reforge it into a generic set of tuples
          * because we need to shank it in via frontend
@@ -843,7 +843,11 @@ class Controller extends Base
 
         /* Find all the comments for this attempt
          */
-        $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+        $responseComments = [];
+
+        if (\count($scores)) {
+            $responseComments = $this->feedbackMapper->findByLearnosityReferences(array_keys($scores));
+        }
 
         return array_values(array_merge_recursive($scores, $responseComments));
     }
