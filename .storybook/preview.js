@@ -73,6 +73,16 @@ const preview = {
         docs: {
             theme: themes.dark,
             page: DocumentationTemplate, // use our own custom documentation template
+            source: {
+                transform: (code, storyContext) => {
+                    if (code.includes("render:")) {
+                        // remove everything but the template when there's the render object in the 'view source' code
+                        // see https://storybook.js.org/docs/api/doc-blocks/doc-block-source#transform for further details
+                        return code.match(/template:\s*`([^`]*)`/s)[1].trim();
+                    }
+                    return code;
+                },
+            },
         },
         layout: "fullscreen", // allow the component to expand to the full width and height of the Canvas
         options: {

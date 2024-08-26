@@ -28,9 +28,9 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const PaddingXS: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-xs">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-xs">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -41,9 +41,9 @@ export const PaddingXS: Story = {
 export const PaddingS: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-s">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-s">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -54,9 +54,9 @@ export const PaddingS: Story = {
 export const PaddingM: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -67,9 +67,9 @@ export const PaddingM: Story = {
 export const PaddingL: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-l">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-l">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -80,9 +80,9 @@ export const PaddingL: Story = {
 export const PaddingXL: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-xl">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-xl">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -95,9 +95,9 @@ export const PaddingXL: Story = {
 export const PaddingHorizontal: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--horiz">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--horiz">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -110,9 +110,9 @@ export const PaddingHorizontal: Story = {
 export const PaddingVertical: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--vert">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--vert">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -125,9 +125,9 @@ export const PaddingVertical: Story = {
 export const PaddingTop: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--top">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--top">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -140,9 +140,9 @@ export const PaddingTop: Story = {
 export const PaddingBottom: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--bottom">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--bottom">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -155,9 +155,9 @@ export const PaddingBottom: Story = {
 export const PaddingLeft: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--left">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--left">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -170,9 +170,9 @@ export const PaddingLeft: Story = {
 export const PaddingRight: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m--right">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m--right">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };
@@ -185,9 +185,9 @@ export const PaddingRight: Story = {
 export const Padding0: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-box l-pad-m l-pad--0">
-                <div class="story-demo-box__inside"></div>
-            </div>
+<div class="story-demo-box l-pad-m l-pad--0">
+    <div class="story-demo-box__inside"></div>
+</div>
         `,
     }),
 };

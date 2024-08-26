@@ -28,9 +28,9 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const MarginXS: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-xs"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-xs"></div>
+</div>
         `,
     }),
 };
@@ -41,9 +41,9 @@ export const MarginXS: Story = {
 export const MarginS: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-s"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-s"></div>
+</div>
         `,
     }),
 };
@@ -54,9 +54,9 @@ export const MarginS: Story = {
 export const MarginM: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m"></div>
+</div>
         `,
     }),
 };
@@ -67,9 +67,9 @@ export const MarginM: Story = {
 export const MarginL: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-l"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-l"></div>
+</div>
         `,
     }),
 };
@@ -81,9 +81,9 @@ export const MarginL: Story = {
 export const MarginXL: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-xl"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-xl"></div>
+</div>
         `,
     }),
 };
@@ -96,9 +96,9 @@ export const MarginXL: Story = {
 export const MarginHorizontals: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--horiz"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--horiz"></div>
+</div>
         `,
     }),
 };
@@ -111,9 +111,9 @@ export const MarginHorizontals: Story = {
 export const MarginVertical: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--vert"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--vert"></div>
+</div>
         `,
     }),
 };
@@ -126,9 +126,9 @@ export const MarginVertical: Story = {
 export const MarginTop: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--top"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--top"></div>
+</div>
         `,
     }),
 };
@@ -141,9 +141,9 @@ export const MarginTop: Story = {
 export const MarginBottom: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--bottom"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--bottom"></div>
+</div>
         `,
     }),
 };
@@ -156,9 +156,9 @@ export const MarginBottom: Story = {
 export const MarginLeft: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--left"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--left"></div>
+</div>
         `,
     }),
 };
@@ -171,9 +171,9 @@ export const MarginLeft: Story = {
 export const MarginRight: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m--right"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m--right"></div>
+</div>
         `,
     }),
 };
@@ -186,9 +186,9 @@ export const MarginRight: Story = {
 export const Margin0: Story = {
     render: () => ({
         template: `
-            <div class="story-demo-boxes l-flex-row">
-                <div class="story-demo-box l-mar-m l-mar--0"></div>
-            </div>
+<div class="story-demo-boxes l-flex-row">
+    <div class="story-demo-box l-mar-m l-mar--0"></div>
+</div>
         `,
     }),
 };

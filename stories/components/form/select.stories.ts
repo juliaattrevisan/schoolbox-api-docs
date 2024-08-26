@@ -31,16 +31,16 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <div class="c-select">
-                <select id="standard-select">
-                    <option value="Option 1">Option 1</option>
-                    <option value="Option 2">Option 2</option>
-                    <option value="Option 3">Option 3</option>
-                    <option value="Option 4">Option 4</option>
-                    <option value="Option 5">Option 5</option>
-                    <option value="Option length">Option that has too long of a value to fit</option>
-                </select>
-            </div>
+<div class="c-select">
+    <select id="standard-select">
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+</div>
             `,
     }),
 };
@@ -48,16 +48,16 @@ export const Default: Story = {
 export const Disabled: Story = {
     render: () => ({
         template: `
-            <div class="c-select c-select--disabled">
-                <select id="standard-select" disabled>
-                    <option value="Option 1">Option 1</option>
-                    <option value="Option 2">Option 2</option>
-                    <option value="Option 3">Option 3</option>
-                    <option value="Option 4">Option 4</option>
-                    <option value="Option 5">Option 5</option>
-                    <option value="Option length">Option that has too long of a value to fit</option>
-                </select>
-            </div>
+<div class="c-select c-select--disabled">
+    <select id="standard-select" disabled>
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+</div>
             `,
     }),
 };
@@ -65,16 +65,16 @@ export const Disabled: Story = {
 export const HasError: Story = {
     render: () => ({
         template: `
-            <div class="c-select c-select--error">
-                <select id="standard-select">
-                    <option value="Option 1">Option 1</option>
-                    <option value="Option 2">Option 2</option>
-                    <option value="Option 3">Option 3</option>
-                    <option value="Option 4">Option 4</option>
-                    <option value="Option 5">Option 5</option>
-                    <option value="Option length">Option that has too long of a value to fit</option>
-                </select>
-            </div>
+<div class="c-select c-select--error">
+    <select id="standard-select">
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+</div>
             `,
     }),
 };

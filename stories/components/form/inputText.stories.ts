@@ -71,13 +71,13 @@ export const HasError: Story = {
 export const WithButton: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element l-gap--0">
-                <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
-                <button class="c-button c-button--with-input l-width-100">
-                    <sbx-icon name="folder"></sbx-icon>
-                    <span>Browse Resources</span>
-                </button>
-            </div>
+<div class="c-form-element l-gap--0">
+    <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
+    <button class="c-button c-button--with-input l-width-100">
+        <sbx-icon name="folder"></sbx-icon>
+        <span>Browse Resources</span>
+    </button>
+</div>
             `,
     }),
 };
@@ -85,10 +85,10 @@ export const WithButton: Story = {
 export const WithLabel: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element">
-                <label for="input1" class="c-label">Default News Archiving Period</label>
-                <input id="input1" class="c-input-text" type="text" />
-            </div>
+<div class="c-form-element">
+    <label for="input1" class="c-label">Default News Archiving Period</label>
+    <input id="input1" class="c-input-text" type="text" />
+</div>
             `,
     }),
 };
@@ -96,11 +96,11 @@ export const WithLabel: Story = {
 export const WithHint: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element">
-                <label for="input2" class="c-label">Default News Archiving Period</label>
-                <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
-                <input id="input2" class="c-input-text" type="text" />
-            </div>
+<div class="c-form-element">
+    <label for="input2" class="c-label">Default News Archiving Period</label>
+    <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
+    <input id="input2" class="c-input-text" type="text" />
+</div>
             `,
     }),
 };
@@ -108,12 +108,12 @@ export const WithHint: Story = {
 export const WithError: Story = {
     render: () => ({
         template: `
-            <div class="c-form-element">
-                <label for="input3" class="c-label c-label--required">Default News Archiving Period</label>
-                <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
-                <input id="input3" class="c-input-text c-input-text--error" type="text" required />
-                <label id="news-title-error" class="error" for="news-title">This field is required.</label>
-            </div>
+<div class="c-form-element">
+    <label for="input3" class="c-label c-label--required">Default News Archiving Period</label>
+    <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
+    <input id="input3" class="c-input-text c-input-text--error" type="text" required />
+    <label id="news-title-error" class="error" for="news-title">This field is required.</label>
+</div>
             `,
     }),
 };
