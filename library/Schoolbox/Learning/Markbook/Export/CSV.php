@@ -240,7 +240,7 @@ class CSV extends AbstractCSV
                 $normalisedMark = $participant->getNormalisedMark(!$showDrafts);
                 $comment = '';
                 $dataFound = true;
-            } elseif ($assessment instanceof \Schoolbox\Learning\Assessment\Task\Model ) {
+            } elseif ($assessment instanceof \Schoolbox\Learning\Assessment\Task\Model) {
                 /* Tasks can be
                  *    - unmarked, or
                  *    - self-assessed (response provided by student) or
@@ -262,6 +262,7 @@ class CSV extends AbstractCSV
                      * Somewhat confusingly, these are made as Responses from the student
                      */
                     if ($assessment->getIsSelfAssessable()) {
+                        /** @var \Schoolbox\Assessment\Course\Task\Model $response */
                         $response = $participant->findMostRecentSubmittedResponse();
 
                         if ($response) {
