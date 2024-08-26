@@ -37,12 +37,12 @@ const formColors = [
     {
         label: "Primary",
         hint: "The primary colour for all form elements",
-        variable: "--color-form-elements",
+        variable: "--sbx-color-accent",
     },
     {
         label: "Focus",
         hint: "The colour used to highlight the form element is focused",
-        variable: "--color-focus-form-elements",
+        variable: "--sbx-color-accent",
     },
 ];
 
@@ -173,7 +173,7 @@ window.Vue.onMounted(() => {
                             <input id="islands-rounded" type="checkbox" class="c-toggle__input" />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                                <sbx-icon name="close" color="var(--sbx-color-accent)" />
                             </span>
                         </label>
                     </div>
@@ -240,7 +240,7 @@ window.Vue.onMounted(() => {
                             <input id="rounded-form-elements" type="checkbox" class="c-toggle__input" />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                                <sbx-icon name="close" color="var(--sbx-color-accent)" />
                             </span>
                         </label>
                     </div>
@@ -338,7 +338,7 @@ window.Vue.onMounted(() => {
                             <input id="rounded-buttons" type="checkbox" class="c-toggle__input" />
                             <span class="c-toggle__display" hidden>
                                 <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-                                <sbx-icon name="close" color="var(--color-form-elements)" />
+                                <sbx-icon name="close" color="var(--sbx-color-accent)" />
                             </span>
                         </label>
                     </div>

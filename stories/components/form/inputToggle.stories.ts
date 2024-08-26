@@ -31,7 +31,7 @@ export const Default: Story = {
     <input id="tgl1" type="checkbox" class="c-toggle__input" checked />
     <span class="c-toggle__display" hidden>
         <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--color-form-elements)" />
+        <sbx-icon name="close" color="var(--sbx-color-accent)" />
     </span>
 </label>
             `,
@@ -46,7 +46,7 @@ export const Disabled: Story = {
     <input id="tgl2" type="checkbox" class="c-toggle__input" checked disabled />
     <span class="c-toggle__display" hidden>
         <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--color-form-elements)" />
+        <sbx-icon name="close" color="var(--sbx-color-accent)" />
     </span>
 </label>
             `,
@@ -62,7 +62,7 @@ export const WithHint: Story = {
     <input id="tgl3" type="checkbox" class="c-toggle__input" checked />
     <span class="c-toggle__display" hidden>
         <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--color-form-elements)" />
+        <sbx-icon name="close" color="var(--sbx-color-accent)" />
     </span>
 </label>
             `,
@@ -76,7 +76,7 @@ export const Inline: Story = {
     <input id="tgl4" type="checkbox" class="c-toggle__input" checked />
     <span class="c-toggle__display" hidden>
         <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--color-form-elements)" />
+        <sbx-icon name="close" color="var(--sbx-color-accent)" />
     </span>
     Enable Curriculum Code Tagging
 </label>
@@ -92,7 +92,7 @@ export const RTL: Story = {
     <input id="tgl5" type="checkbox" class="c-toggle__input" checked />
     <span class="c-toggle__display" hidden>
         <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--color-form-elements)" />
+        <sbx-icon name="close" color="var(--sbx-color-accent)" />
     </span>
 </label>
             `,

@@ -15,13 +15,13 @@
         position: absolute;
         width: 100%;
         &:checked + .c-toggle__display {
-            background-color: var(--color-form-elements);
+            background-color: var(--sbx-color-accent);
         }
         &:checked + .c-toggle__display::before {
             transform: translate(100%, -50%);
         }
         &:focus + .c-toggle__display {
-            outline: 3px solid var(--color-focus-form-elements);
+            outline: 3px solid var(--sbx-color-accent);
             outline-offset: 2px;
         }
         &:focus:not(:focus-visible) + .c-toggle__display {
@@ -36,7 +36,7 @@
         --diameter: 1.5rem;
         align-items: center;
         background-color: var(--color-foreground-primary);
-        border: 1px solid var(--color-form-elements);
+        border: 1px solid var(--sbx-color-accent);
         border-radius: calc(var(--roundness-form-elements) * 2);
         box-sizing: content-box;
         display: inline-flex;
@@ -48,7 +48,7 @@
         &::before {
             // the toggle
             background-color: var(--color-foreground-primary);
-            border: 1px solid var(--color-form-elements);
+            border: 1px solid var(--sbx-color-accent);
             border-radius: 50%;
             box-sizing: border-box;
             content: "";

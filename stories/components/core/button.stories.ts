@@ -72,7 +72,7 @@ export const WithIcon: Story = {
     render: () => ({
         template: `
 <button type="button" class="c-button">
-    <sbx-icon name="advanced-list"></sbx-icon>
+    <sbx-icon name="add"></sbx-icon>
     <span>Button</span>
 </button>
         `,
@@ -115,20 +115,6 @@ export const Secondary: Story = {
             url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=222-49",
         },
     },
-};
-
-/**
- *
- */
-export const Tertiary: Story = {
-    render: () => ({
-        template: `
-<button type="button" class="c-button c-button--tertiary">
-    <sbx-icon name="approve"></sbx-icon>
-    <span>Button</span>
-</button>
-        `,
-    }),
 };
 
 /**

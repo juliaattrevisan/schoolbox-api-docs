@@ -63,7 +63,7 @@ const preview = {
             values: [
                 {
                     name: "demo",
-                    value: "var(--color-background)",
+                    value: "var(--sbx-color-background)",
                 },
             ],
         },

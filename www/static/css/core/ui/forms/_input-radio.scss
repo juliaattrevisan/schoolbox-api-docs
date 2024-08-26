@@ -5,9 +5,9 @@
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
     background-color: var(--color-foreground-primary); // For iOS < 15
-    border: var(--size-form-element-border-width) solid var(--color-form-elements);
+    border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     border-radius: 50%;
-    color: var(--color-form-elements);
+    color: var(--sbx-color-accent);
     cursor: pointer;
     display: grid;
     height: 1.875rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
@@ -24,14 +24,12 @@
             --color-foreground-primary
         ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
         color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
-        border-color: var(
-            --color-form-elements
-        ) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+        border-color: var(--sbx-color-accent) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     }
     &::before {
         background-color: CanvasText; // Windows High Contrast Mode, to ensure the tick is visible https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
         border-radius: 50%;
-        box-shadow: inset 1rem 1rem var(--color-form-elements); // using box-shadow will allow the tick to be visible when printed
+        box-shadow: inset 1rem 1rem var(--sbx-color-accent); // using box-shadow will allow the tick to be visible when printed
         content: "";
         height: 1rem;
         transform: scale(0);
