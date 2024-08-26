@@ -35,31 +35,42 @@ class Helper
 
         //If the TASS Orbit is set up as delivery provider, append it to the list of registry
         try {
-            $tassOrbitService =
+            $tassOrbitServices =
                 (ServiceMapper::getInstance())
-                    ->findOneByColumn(
+                    ->findByColumn(
                         'provider',
                         Registry::PROVIDER_TASS_ORBIT
                     );
 
             $now = \Alaress_Date_Format::now();
 
-            $tass_registry = new Registry();
-            //Mocking registry to send to notifications
-            $tass_registry
-                ->setUser($user)
-                ->setToken(uniqid('tass_orbit_' . $user->getId() . '@'))
-                ->setService($tassOrbitService)
-                ->setDeviceId(Registry::PROVIDER_TASS_ORBIT)
-                ->setCreatedAt($now)
-                ->setTouchedAt($now);
-            /**
-             * Registering to 'mobile_app_registry', TASS handles the registering on their
-             * end, and that supposedly they don't get de-registered, we will leave the
-             * cleaning-up to the cron job in 'cleanUpAbandoned'
-             */
-            $registryMapper->save($tass_registry);
-            $registryOfUser->add($tass_registry);
+            $existingRegistry = Collection::arrayColumn($registryOfUser, 'token');
+
+            foreach ($tassOrbitServices as $tassOrbitService) {
+                $newToken = 'tass_orbit_' . $user->getId() . '@' . $tassOrbitService->getAppIdentifier();
+
+                //Already registered. Skip.
+                if (in_array($newToken, $existingRegistry)) {
+                    continue;
+                }
+
+                $tass_registry = new Registry();
+                //Mocking registry to send to notifications
+                $tass_registry
+                    ->setUser($user)
+                    ->setToken($newToken)
+                    ->setService($tassOrbitService)
+                    ->setDeviceId(Registry::PROVIDER_TASS_ORBIT)
+                    ->setCreatedAt($now)
+                    ->setTouchedAt($now);
+                /**
+                 * Registering to 'mobile_app_registry', TASS handles the registering on their
+                 * end, and that supposedly they don't get de-registered, we will leave the
+                 * cleaning-up to the cron job in 'cleanUpAbandoned'
+                 */
+                $registryMapper->save($tass_registry);
+                $registryOfUser->add($tass_registry);
+            }
         } catch (Exception\NotFound $e) {
             //TASS Orbit is not set up as delivery provider. Skip.
         } catch (Exception $e) {
@@ -81,8 +92,10 @@ class Helper
         return
             //Should only attempt to check if the recipient is a parent and has external id
             ($user->getRole()->isParent() && !!$user->getExternalId()) &&
-            //Tass is already registered to user. Skip.
-            !count(
+            //If there are any new TASS delivery provider should add
+            (ServiceMapper::getInstance())
+                ->countByColumn('provider', Registry::PROVIDER_TASS_ORBIT)
+            > count(
                 array_filter(
                     Collection::arrayColumn($registryOfUser, 'service'),
                     function ($value) {
