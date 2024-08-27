@@ -1,5 +1,5 @@
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 
 /**
  * The different types of editors that can be used
@@ -17,14 +17,6 @@ export enum EditorToolbar {
     COMMENT = "comment",
     SIMPLE = "simple",
 }
-
-/**
- * A map of the different types of editors to their respective editor classes
- */
-export const editorClassMap = {
-    [EditorType.CLASSIC]: ClassicEditor,
-    [EditorType.INLINE]: InlineEditor,
-};
 
 /**
  * The config object for the editor

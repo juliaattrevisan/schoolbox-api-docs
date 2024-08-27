@@ -2,22 +2,21 @@
  * To create CKEditor instances.
  * Refer to templates/core/pantry/editor.htm for further details on how to use this script.
  */
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 import { getConfig } from "@js/editor/config/editorConfig";
-import {
+import { EditorType, EditorToolbar, allowedEditorElements } from "@js/editor/types/editorTypes";
+import type {
     SbxEditor,
     SbxEditorConfig,
-    EditorType,
-    EditorToolbar,
-    allowedEditorElements,
     SbxEditorElement,
-    editorClassMap,
     PartialSbxEditorConfig,
 } from "@js/editor/types/editorTypes";
-import {
+import { EditorEvent } from "@js/editor/event/editorEvent";
+import type {
     EditorCreatedEventInfo,
     EditorDeletedEventInfo,
     EditorDeleteEventInfo,
-    EditorEvent,
 } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
 import { modifyEditor } from "@js/editor/config/editorCreated";
@@ -63,6 +62,11 @@ function addDefaultConfig(config: PartialSbxEditorConfig): SbxEditorConfig {
  * @param { SbxEditorConfig } config - the config to use when creating the editor
  */
 async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig) {
+    const editorClassMap = {
+        [EditorType.CLASSIC]: ClassicEditor,
+        [EditorType.INLINE]: InlineEditor,
+    };
+
     const editor = await editorClassMap[config.type].create(sourceElement, getConfig(config));
     onCreated(sourceElement, editor, config);
 }
