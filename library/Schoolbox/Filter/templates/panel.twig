@@ -222,7 +222,6 @@ Usage:
          * Requests a filtered report via AJAX
          */
         function fetchReport() {
-            $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
             var href        = $submitButton.data('href'),
                 data        = $optionInputs.serializeArray(),
@@ -294,7 +293,6 @@ Usage:
             $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded', [decodedSelections]);
             $(document).foundation();
-            $toast.toastTimeout({text: 'Loaded successfully', css: 'success'});
         }
 
 

@@ -1,22 +1,14 @@
 <script>
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+import { getSearchString } from "@js/util/queryUtils";
 import ExportUrlModal from "./export-url-modal";
-import qs from "qs";
 
 export default {
     name: "export-modal",
 
     components: { ExportUrlModal, RevealModal },
 
-    props: [
-        'eventTypes',
-        'groups',
-        'campuses',
-        'translations',
-        'token',
-        'eventExportUrl',
-        'exportOptions',
-    ],
+    props: ["eventTypes", "groups", "campuses", "translations", "token", "eventExportUrl", "exportOptions"],
 
     data() {
         return {
@@ -58,7 +50,7 @@ export default {
                 this.window.location.host +
                 this.eventExportUrl +
                 "?" +
-                qs.stringify(values)
+                getSearchString(values)
             );
         },
     },

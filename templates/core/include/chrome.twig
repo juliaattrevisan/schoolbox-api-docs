@@ -175,6 +175,10 @@
     {{ scripts.header | raw }}
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
+<div id="toast-container">
+    <sbx-toast />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
 <div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
     <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
         {% set dockTitle = 'Pin side menu' %}
@@ -906,11 +910,7 @@
         <a href="#" class="exit-off-canvas"></a>
     </div>
 </div>
-<div id="toast-container">
-    <sbx-toast />
-</div>
 <script src="{{ CDN_PREFIX }}/js/bundle/headerSearch.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/bundle/sbxToast.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/firebaseInit.js?v={{ config.site_version }}"></script>
 </body>
 </html>

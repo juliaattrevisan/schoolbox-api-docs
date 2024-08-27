@@ -4,14 +4,14 @@ import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
-import axios from "axios";
-import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import { stringify } from "qs";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import ViewGroupedEventsModal from "./view-grouped-events-modal";
-import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
+import { getSearchString } from "@js/util/queryUtils";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import ViewGroupedEventsModal from "./view-grouped-events-modal.vue";
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = "/learning/assessment/calendar/events";
@@ -253,52 +253,55 @@ export default {
                 successCallback([]);
                 return;
             }
-
+            activate("Retrieving calendar events...");
             // AJAX params: the same for all requests
-            let ajaxParams = {
+            const ajaxParams = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                filters: this.selectedFilters,
+            };
+            fetch(`${URL_ASSESSMENT_EVENT_SOURCE}?${getSearchString(ajaxParams)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                params: {
-                    start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                    end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                    filters: this.selectedFilters,
-                },
-                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
-            };
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    timeout({ text: "Events retrieved successfully" });
+                    // Assign event grouping and resourceIds into every event
+                    response = response.map((element) => {
+                        element.resourceId = this.buildResourceIdFromEvent(element);
+                        return element;
+                    });
 
-            axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then((response) => {
-                // Assign event grouping and resourceIds into every event
-                response.data = response.data.map((element) => {
-                    element.resourceId = this.buildResourceIdFromEvent(element);
-                    return element;
+                    // Add new resources
+                    response.forEach((element) => {
+                        if (!this.folderResources.some((el) => el.id === element.data?.meta?.folderId)) {
+                            this.folderResources.push({
+                                id: element.resourceId,
+                                title: element.data.meta.folderName,
+                                eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
+                            });
+                        }
+                    });
+
+                    // Reload resources here too
+                    this.calendarApi.refetchResources();
+
+                    // For FullCalendar to correctly render the event colour for time-based events,
+                    // the event must have a `display` property set to `block`, rather then the default of 'auto'
+                    // This appears to relate to https://github.com/fullcalendar/fullcalendar/issues/5533
+                    response.forEach((e) => {
+                        e.display = "block";
+                    });
+
+                    // Filter out events which don't start
+                    successCallback(response.filter((v) => "start" in v));
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-
-                // Add new resources
-                response.data.forEach((element) => {
-                    if (!this.folderResources.some((el) => el.id === element.data.meta?.folderId)) {
-                        this.folderResources.push({
-                            id: element.resourceId,
-                            title: element.data.meta.folderName,
-                            eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
-                        });
-                    }
-                });
-
-                // Reload resources here too
-                this.calendarApi.refetchResources();
-
-                // For FullCalendar to correctly render the event colour for time-based events,
-                // the event must have a `display` property set to `block`, rather then the default of 'auto'
-                // This appears to relate to https://github.com/fullcalendar/fullcalendar/issues/5533
-                response.data.forEach((e) => {
-                    e.display = "block";
-                });
-
-                // Filter out events which don't start
-                successCallback(response.data.filter((v) => "start" in v));
-            });
-            // Fail callback: consider a message saying something failed
         },
 
         groupedEvents(fetchInfo, successCallback) {
@@ -309,51 +312,51 @@ export default {
                 successCallback([]);
                 return;
             }
-
             // AJAX params: the same for all requests
-            let ajaxParams = {
+            const ajaxParams = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                filters: this.selectedFilters,
+                inContext: this.inContext,
+            };
+            fetch(`${URL_ASSESSMENT_GROUPED_EVENT_SOURCE}?${getSearchString(ajaxParams)}`, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                params: {
-                    start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                    end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                    filters: this.selectedFilters,
-                    inContext: this.inContext,
-                },
-                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
-            };
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    // Assign event grouping and resourceIds into every event
+                    response = response.map((element) => {
+                        element.resourceId = this.buildResourceIdFromEvent(element);
+                        return element;
+                    });
+                    // Add new resources
+                    response.forEach((element) => {
+                        if (!this.folderResources.some((el) => el.id === element.data?.meta?.folderId)) {
+                            this.folderResources.push({
+                                id: element.resourceId,
+                                title: element.data.meta.folderName,
+                                eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
+                            });
+                        }
+                    });
+                    this.folderResources.sort((a, b) => {
+                        if (typeof a?.title === "string" && typeof b?.title === "string") {
+                            return a.title.localeCompare(b.title, "en", { numeric: true, sensitivity: "accent" });
+                        }
+                        return 0;
+                    });
 
-            axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams).then((response) => {
-                // Assign event grouping and resourceIds into every event
-                response.data = response.data.map((element) => {
-                    element.resourceId = this.buildResourceIdFromEvent(element);
-                    return element;
+                    // Reload resources here too
+                    this.calendarApi.refetchResources();
+
+                    // Filter out events which don't start
+                    successCallback(response.filter((v) => "start" in v));
+                })
+                .catch((error) => {
+                    console.error(error);
                 });
-
-                // Add new resources
-                response.data.forEach((element) => {
-                    if (!this.folderResources.some((el) => el.id === element.data.meta?.folderId)) {
-                        this.folderResources.push({
-                            id: element.resourceId,
-                            title: element.data.meta.folderName,
-                            eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
-                        });
-                    }
-                });
-                this.folderResources.sort((a, b) => {
-                    if (typeof a?.title === "string" && typeof b?.title === "string") {
-                        return a.title.localeCompare(b.title, "en", { numeric: true, sensitivity: "accent" });
-                    }
-                    return 0;
-                });
-
-                // Reload resources here too
-                this.calendarApi.refetchResources();
-
-                // Filter out events which don't start
-                successCallback(response.data.filter((v) => "start" in v));
-            });
         },
 
         /**

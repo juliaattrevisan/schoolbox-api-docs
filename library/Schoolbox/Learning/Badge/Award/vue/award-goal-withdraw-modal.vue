@@ -1,9 +1,8 @@
 <script>
-import axios from "axios";
-import BadgeImage from "./../../vue/badge-image";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import qs from "qs";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import { getFormData } from "@js/util/queryUtils";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
+import BadgeImage from "../../vue/badge-image.vue";
 
 export default {
     /**
@@ -91,33 +90,30 @@ export default {
         withdraw() {
             let self = this;
 
-            /* Access the withdraw endpoint, grab the awards for the user
-             */
-            let request = {
-                url: this.award._links.goalWithdraw,
-                data: qs.stringify({ userIds: [this.award.recipient.id] }),
-                method: "post",
-                responseType: "json",
-            };
-
             /* A toast - to your valour, my sword, and our victory together
              */
             self.toastActivate("Removing goal...");
 
-            axios
-                .request(request)
+            fetch(this.award._links.goalWithdraw, {
+                method: "POST",
+                body: getFormData({ userIds: [this.award.recipient.id] }),
+            })
                 .then((response) => {
-                    /* Send bat signal to the parent component
-                     */
-                    this.$emit("withdraw-complete");
+                    if (response.ok) {
+                        /* Send bat signal to the parent component
+                         */
+                        this.$emit("withdraw-complete");
 
-                    /* Close this modal
-                     */
-                    self.close();
+                        /* Close this modal
+                         */
+                        self.close();
 
-                    /* Pop toast
-                     */
-                    self.toastSuccess("Goal has been removed");
+                        /* Pop toast
+                         */
+                        self.toastSuccess("Goal has been removed");
+                    } else {
+                        self.toastError("Unable to remove goal; please try again.");
+                    }
                 })
                 .catch((error) => {
                     if (error.response) {

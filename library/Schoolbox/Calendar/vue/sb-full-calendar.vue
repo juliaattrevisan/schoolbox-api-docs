@@ -5,16 +5,16 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
-import CreateEventModal from "./create-event-modal";
-import ExportModal from "./export-modal";
-import FilterModal from "./filter-modal";
-import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
-import qs from "qs";
+import { getFormData, getSearchString } from "@js/util/queryUtils";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
+import CreateEventModal from "./create-event-modal.vue";
+import ExportModal from "./export-modal.vue";
+import FilterModal from "./filter-modal.vue";
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = "/calendar/changeState";
@@ -237,25 +237,30 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(URL_EVENT_SOURCE, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: this.config.userId,
-                    },
-                })
+            activate("Retrieving calendar events...");
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                userId: this.config.userId,
+            };
+            fetch(`${URL_EVENT_SOURCE}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     callback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
+                    timeout({ text: "Events retrieved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**
@@ -315,7 +320,12 @@ export default {
                 });
             }
 
-            axios.post(URL_STATE_CHANGE, qs.stringify({ calendarView: info.view.type }));
+            fetch(URL_STATE_CHANGE, {
+                method: "POST",
+                body: getFormData({ calendarView: info.view.type }),
+            }).catch((error) => {
+                console.error(error);
+            });
         },
 
         /**
@@ -509,13 +519,24 @@ export default {
             }
 
             // @TODO this needs to consider events in series
-            axios.post(
+            activate("Moving event...");
+            fetch(
                 ENDPOINTS.generateUrlFromConst(
                     ENDPOINTS.URL_EVENT_MOVE,
-                    String(event?.extendedProps?.data?.meta?.eventId)
+                    String(event?.extendedProps?.data?.meta?.eventId),
                 ),
-                qs.stringify(data)
-            );
+                {
+                    method: "POST",
+                    body: getFormData(data),
+                },
+            )
+                .then(() => {
+                    timeout({ text: "Event moved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Event could not be moved", isSuccess: false });
+                    console.error(error);
+                });
         },
 
         /**
@@ -566,11 +587,16 @@ export default {
         async updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
+            activate("Updating events...");
             try {
-                await axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters }));
+                await fetch(URL_EVENT_FILTER, {
+                    method: "POST",
+                    body: getFormData({ filters: this.config.selectedFilters }),
+                });
                 this.calendarApi.refetchEvents();
             } catch (error) {
-                console.warn(error);
+                timeout({ text: "Event filters could not be updated", isSuccess: false });
+                console.error(error);
             }
         },
 
@@ -602,7 +628,7 @@ export default {
                     "value",
                     this.listViewDateRange.start
                         ? this.listViewDateRange.start
-                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // End date field
@@ -614,7 +640,7 @@ export default {
                     "value",
                     this.listViewDateRange.end
                         ? this.listViewDateRange.end
-                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // Update button
@@ -650,12 +676,12 @@ export default {
                         const startDateValue = dayjs(
                             document.querySelector("#start_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
                         const endDateValue = dayjs(
                             document.querySelector("#end_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
@@ -665,7 +691,7 @@ export default {
                             this.duration.days =
                                 this.fullCalendarHelper_dateDiff(
                                     startDateValue.format("YYYY-MM-DD"),
-                                    endDateValue.format("YYYY-MM-DD")
+                                    endDateValue.format("YYYY-MM-DD"),
                                 ) + 1;
                             this.calendarApi.gotoDate(startDateValue.format("YYYY-MM-DD"));
                         }
@@ -683,7 +709,7 @@ export default {
             window.history.pushState(
                 "",
                 "",
-                "/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+                "/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId,
             );
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = dayjs(end || new Date())

@@ -1,21 +1,19 @@
 <script>
-import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import adaptivePlugin from "@fullcalendar/adaptive";
-import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
-import CreateEventModal from "./create-event-modal";
-import ExportModal from "./export-modal";
-import FilterModal from "./filter-modal";
-import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
-import qs from "qs";
+import { getSearchString } from "@js/util/queryUtils";
+import TimetableCalendarOptions from "@schoolboxLibrary/Calendar/vue/timetable-calendar-options.vue";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
+import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
+import ExportModal from "./export-modal.vue";
+import FilterModal from "./filter-modal.vue";
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = "/calendar/changeState";
@@ -65,7 +63,6 @@ export default {
         TimetableCalendarOptions,
         FilterModal,
         ExportModal,
-        CreateEventModal,
         ViewEventModal,
         FullCalendar,
         FlatPickr,
@@ -178,16 +175,6 @@ export default {
                 return this.fullCalendarHelper_eventTimeFormat(date);
             },
             customButtons: {
-                /* You can't export or filter events in Timetable Calendar view
-                 */
-                // customExport: {
-                //     text: 'Export',
-                //     click: this.onExportClick
-                // },
-                // customFilters: {
-                //     text: 'Filters',
-                //     click: this.onFilterClick
-                // },
                 quickSwitchButton: {
                     text: " ",
                 },
@@ -207,17 +194,10 @@ export default {
             headerToolbar: {
                 left: "quickSwitchButton,customToday,customPrev,customNext",
                 center: "title",
-                // right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
                 right: "",
             },
             buttonText: {
                 today: "Today",
-                /* Didn't need any of these extra buttons in Timetable View
-                 */
-                // month:    'Month',
-                // week:     'Week',
-                // day:      'Day',
-                // list:     'List',
             },
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView || "dayGridMonth",
@@ -232,10 +212,7 @@ export default {
             ],
             eventDidMount: this.eventRender,
             loading: this.fullCalendarHelper_onLoading,
-            dateClick: this.onDateClick,
             eventClick: this.onEventClick,
-            eventResize: this.onEventResize,
-            eventDrop: this.onEventDrop,
         };
     },
 
@@ -320,7 +297,7 @@ export default {
                 "/timetable/calendar/" +
                     (newUrlDate === null ? this.getCurrentValueOfUrlDate() : newUrlDate) + // Format DD-MM-YYYY (FORMAT_FORM_DATE).
                     "/" +
-                    this.selectedOption.userId
+                    this.selectedOption.userId,
             );
         },
 
@@ -362,36 +339,41 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(URL_EVENT_SOURCE, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: this.config.userId,
+            activate("Retrieving timetable events...");
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                userId: this.config.userId,
 
-                        /* This param lets you load the specific set of subscriptions
-                         * relevant to the Timetable Calendar
-                         */
-                        timetableCalendar: true,
-                    },
-                })
+                /* This param lets you load the specific set of subscriptions
+                 * relevant to the Timetable Calendar
+                 */
+                timetableCalendar: true,
+            };
+            fetch(`${URL_EVENT_SOURCE}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     callback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
 
-                    let slots = this.findSlotBoundaries(response.data);
+                    let slots = this.findSlotBoundaries(response);
 
                     this.calendarApi.setOption("slotMinTime", slots.slotMinTime);
                     this.calendarApi.setOption("slotMaxTime", slots.slotMaxTime);
                     this.calendarApi.setOption("allDaySlot", slots.allDaySlot);
+                    timeout({ text: "Timetable retrieved successfully" });
+                })
+                .catch((error) => {
+                    timeout({ text: "Timetable could not be retrieved", isSuccess: false });
+                    console.error(error);
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**
@@ -453,110 +435,6 @@ export default {
              * Everything always renders
              */
             return true;
-
-            // const calEvent = eventRenderInfo.event;
-            //
-            // if (!this.fullCalendarHelper_eventRender(eventRenderInfo)) {
-            //     calEvent.setProp('display', 'none');
-            //     return false;
-            // }
-            //
-            // // Extra condition for rendering events on this calendar:
-            // // All of the event's attributes must match at least one
-            // // selected filter: if it doesn't, don't render it.
-            // let eventAttributes = {};
-            // let isEventRendered = true;
-            //
-            // // Build a list of filters from the event
-            // calEvent.classNames.forEach((className) => {
-            //     let match = className.match(/^([a-z]+)(\d+)/i);
-            //     if (match) {
-            //         let attributeGroup = match[1],
-            //             id             = Number(match[2]);
-            //         if (!eventAttributes[attributeGroup]) {
-            //             eventAttributes[attributeGroup] = [];
-            //         }
-            //         eventAttributes[attributeGroup].push(id);
-            //     }
-            // });
-            //
-            // // All of the event's attributes must match at least one
-            // // selected filter.
-            // // If it doesn't, don't render it.
-            // Object.keys(eventAttributes).forEach((attributeGroup) => {
-            //     let ids                = eventAttributes[attributeGroup],
-            //         eventMatchesFilter = false;
-            //
-            //     // If all items in the attribute group are selected:
-            //     // always render an event that has one of these attributes,
-            //     // even if it doesn't match the filter.
-            //     // This allows events a user has been invited to, but are
-            //     // outside their list of groups/campuses, to display.
-            //     if (this.$refs.filter.allSelected(attributeGroup)) {
-            //         eventMatchesFilter = true;
-            //         return;
-            //     }
-            //
-            //     // Otherwise: check id against the list of selected filters.
-            //     ids.forEach((id) => {
-            //         let keyspace = [];
-            //         switch (attributeGroup) {
-            //             case 'source':
-            //                 // Sources have multiple IDs per selection:
-            //                 // this event needs to only match one of them.
-            //                 keyspace = (this.config.selectedFilters?.source || []).flat();
-            //                 break;
-            //
-            //             case 'type':
-            //                 keyspace = this.config.selectedFilters?.eventType || [];
-            //                 break;
-            //
-            //             case 'group':
-            //                 keyspace = this.config.selectedFilters?.group || [];
-            //                 break;
-            //
-            //             case 'campus':
-            //                 keyspace = this.config.selectedFilters?.campus || [];
-            //                 break;
-            //
-            //             default:
-            //                 // Ignore this one
-            //                 return;
-            //         }
-            //         if (keyspace.includes(id)) {
-            //             eventMatchesFilter = true;
-            //         }
-            //     });
-            //     if (!eventMatchesFilter) {
-            //         isEventRendered = false;
-            //     }
-            // });
-            //
-            // if (isEventRendered) {
-            //     calEvent.setProp('display', 'block');
-            // } else {
-            //     calEvent.setProp('display', 'none');
-            // }
-            //
-            // return isEventRendered;
-        },
-
-        /**
-         * Click a date on the calendar callback: opens the create event
-         * modal for the clicked date.
-         * @see https://fullcalendar.io/docs/dateClick
-         *
-         * @param dateClickInfo
-         */
-        onDateClick(dateClickInfo) {
-            let [firstEventType] = this.config.eventTypes;
-            this.$refs.createEvent.open({
-                date: dateClickInfo.date,
-                allDay: dateClickInfo.allDay,
-                title: "",
-                detail: "",
-                type: firstEventType ? firstEventType.id : null,
-            });
         },
 
         /**
@@ -573,79 +451,6 @@ export default {
         },
 
         /**
-         * Resize event callback: persist the change to the event's start
-         * and end dates.
-         * @see https://fullcalendar.io/docs/eventResize
-         *
-         * @param eventResizeInfo
-         */
-        onEventResize(eventResizeInfo) {
-            this.moveEvent(eventResizeInfo.event);
-        },
-
-        /**
-         * Drop event callback: persist the change to the event's start
-         * and end dates.
-         * @see https://fullcalendar.io/docs/eventDrop
-         *
-         * @param eventDropInfo
-         */
-        onEventDrop(eventDropInfo) {
-            // If an event is moved from all-day to a time:
-            // it won't have an end date, assume it lasts 1 hour
-            if (eventDropInfo.oldEvent.allDay && !eventDropInfo.event.allDay) {
-                eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getTime() + DEFAULT_EVENT_DURATION));
-            }
-
-            // If event is moved from a time to all-day:
-            // it won't have an end date either, assume it lasts 1 day
-            if (!eventDropInfo.oldEvent.allDay && eventDropInfo.event.allDay) {
-                eventDropInfo.event.setEnd(new Date(eventDropInfo.event.start.getDate() + DEFAULT_ALLDAY_EVENT_DAYS));
-            }
-
-            // And move the event
-            this.moveEvent(eventDropInfo.event);
-        },
-
-        /**
-         * Moves an existing event to its new start and end time.
-         *
-         * @param {Object} event
-         */
-        moveEvent(event) {
-            const data = {
-                start: dayjs(event.start).format(),
-                allDay: event.allDay,
-            };
-
-            // Account for the difference in all-day end date between FullCalendar and Schoolbox:
-            // * Schoolbox events are inclusive of the end date
-            // * FullCalendar events are exclusive
-            // This means that all-day events need their end date set back
-            // one day before being sent to Schoolbox.
-            if (event.allDay && dayjs(event.end).isValid()) {
-                data.end = dayjs(event.end)
-                    .add(dayjs.duration({ days: -1 }))
-                    .format();
-            } else if (dayjs(event.end).isValid()) {
-                //there isn't always an end date, so only add in when it's available
-                data.end = dayjs(event.end).format();
-            } else {
-                //otherwise it's assumed the start date is the same as the end date
-                data.end = dayjs(event.start).format();
-            }
-
-            // @TODO this needs to consider events in series
-            axios.post(
-                ENDPOINTS.generateUrlFromConst(
-                    ENDPOINTS.URL_EVENT_MOVE,
-                    String(event?.extendedProps?.data?.meta?.eventId)
-                ),
-                qs.stringify(data)
-            );
-        },
-
-        /**
          * Get the current url; these redirects are used after backend processing
          * so you can return to your current location afterwards
          *
@@ -654,16 +459,6 @@ export default {
          */
         returnUrl() {
             return btoa(window.location.pathname);
-        },
-
-        /**
-         * Callback for adding an event to the calendar.
-         * @see https://fullcalendar.io/docs/Calendar-addEvent
-         *
-         * @param event
-         */
-        addEvent(event) {
-            this.calendarApi.addEvent(event, EVENT_SOURCE_ID);
         },
 
         /**
@@ -681,24 +476,6 @@ export default {
          */
         reloadEvents() {
             this.calendarApi.refetchEvents();
-        },
-
-        /**
-         * Callback for when the filters have been updated: rerender events
-         * (thus hiding events which don't match the new filters) and
-         * persist the filters selected.
-         *
-         * @param selectedFilters
-         */
-        async updateSelectedFilters(selectedFilters) {
-            // The selected filters in config are read-only and passed by reference.
-            // TODO pass it by value into the filter modal, and update in this method
-            try {
-                await axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters }));
-                this.calendarApi.refetchEvents();
-            } catch (error) {
-                console.warn(error);
-            }
         },
 
         /**
@@ -729,7 +506,7 @@ export default {
                     "value",
                     this.listViewDateRange.start
                         ? this.listViewDateRange.start
-                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // End date field
@@ -741,7 +518,7 @@ export default {
                     "value",
                     this.listViewDateRange.end
                         ? this.listViewDateRange.end
-                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE)
+                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE),
                 );
 
                 // Update button
@@ -777,12 +554,12 @@ export default {
                         const startDateValue = dayjs(
                             document.querySelector("#start_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
                         const endDateValue = dayjs(
                             document.querySelector("#end_date").value,
                             FORMAT_FLATPICKR_DATE,
-                            true
+                            true,
                         );
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
@@ -792,7 +569,7 @@ export default {
                             this.duration.days =
                                 this.fullCalendarHelper_dateDiff(
                                     startDateValue.format("YYYY-MM-DD"),
-                                    endDateValue.format("YYYY-MM-DD")
+                                    endDateValue.format("YYYY-MM-DD"),
                                 ) + 1;
                             this.calendarApi.gotoDate(startDateValue.format("YYYY-MM-DD"));
                         }
@@ -842,7 +619,7 @@ export default {
             window.history.replaceState(
                 this.getPageStateForUrlHistory(),
                 "",
-                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId,
             );
         },
 
@@ -924,7 +701,8 @@ export default {
         <div class="small-12 columns">
             <h1>
                 Timetable for
-                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span><template v-if="selectedOption?.yearLevel?.length">,</template>
+                <span data-heading-user-fullname>{{ selectedOption === null ? "" : selectedOption.formattedName }}</span
+                ><template v-if="selectedOption?.yearLevel?.length">,</template>
                 <span data-heading-user-year>{{ selectedOption === null ? "" : selectedOption.yearLevel }}</span>
             </h1>
         </div>
@@ -933,21 +711,6 @@ export default {
         <div class="small-12 island">
             <section>
                 <div>
-                    <create-event-modal
-                        ref="createEvent"
-                        :user-id="config.userId"
-                        :can-invite="config.canInvite"
-                        :event-types="config.eventTypes"
-                        :event-create-url="urls.create"
-                        :event-create-form-url="urls.createForm"
-                        :event-modify-form-url="urls.modifyForm"
-                        :format-form-date="formats.formDate"
-                        :format-form-datetime="formats.formDatetime"
-                        :format-display-date="formats.displayDate"
-                        :format-display-datetime="formats.displayDatetime"
-                        @eventCreated="addEvent"
-                    />
-
                     <view-event-modal
                         ref="event"
                         :event-modify-form-url="urls.modifyForm"

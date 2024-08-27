@@ -1,9 +1,9 @@
 <script>
-import axios from "axios";
 import debounce from "lodash/debounce";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
+import { getFormData, getSearchString } from "@js/util/queryUtils";
 
 /* Vue select
  */
@@ -15,7 +15,6 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
-import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 
 /**
@@ -141,14 +140,10 @@ export default {
          * Perform async request and load results into component
          */
         search: debounce(function (loading, query, vm) {
-            axios
-                .get(this.badge._links.achievementRecipients, {
-                    params: {
-                        query: query,
-                    },
-                })
+            fetch(`${this.badge._links.achievementRecipients}?${getSearchString({ query })}`)
+                .then((response) => response.json())
                 .then(function (response) {
-                    vm.options = response.data;
+                    vm.options = response;
                     loading(false);
                 });
         }, 350),
@@ -173,29 +168,25 @@ export default {
                 userIds.push(this.selected[i].id);
             }
 
-            /* Pack it up and send it
-             */
-            let request = {
-                url: this.badge._links.achievementWithdraw,
-                data: qs.stringify({ userIds: userIds }),
-                method: "post",
-                responseType: "json",
-            };
-
             /* A toast - to your valour, my sword, and our victory together
              */
             self.toastActivate("Withdrawing achievements from " + this.selected.length + " student(s)");
-
-            axios
-                .request(request)
+            fetch(this.badge._links.achievementWithdraw, {
+                method: "POST",
+                body: getFormData({ userIds: userIds }),
+            })
                 .then(function (response) {
-                    /* Close this modal
-                     */
-                    self.close();
+                    if (response.ok) {
+                        /* Close this modal
+                         */
+                        self.close();
 
-                    /* Pop toast
-                     */
-                    self.toastSuccess("Withdraw complete");
+                        /* Pop toast
+                         */
+                        self.toastSuccess("Withdraw complete");
+                    } else {
+                        self.toastError("Unable to withdraw achievement; please try again.");
+                    }
                 })
                 .then(function () {
                     /* Clear selection after async outcome

@@ -17,10 +17,8 @@ export default {
          */
         fullCalendarHelper_onLoading(isLoading) {
             if (isLoading === true) {
-                // this.$refs.toast.activate('Loading...');
                 document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
             } else {
-                // this.$refs.toast.timeout('Done', true, 3000, 2000);
                 document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
             }
         },
