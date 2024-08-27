@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFile;
 
@@ -19,16 +21,47 @@ use Schoolbox\Resource\AbstractFile;
 class Thumbnail extends Base
 {
     /**
-     * Check perms
+     * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return void
-     * @throws \Exception
+     * @return bool
+     * @throws Exception
+     * @throws NotFound
      */
-    protected function permissionCheck(AbstractFile $file, bool $isMyFile = false): void
+    protected function permissionCheckFolder(AbstractFile $file): bool
     {
-        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-            \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+            return true;
         }
+
+        \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param AbstractFile $file
+     * @return bool
+     */
+    protected function permissionCheckOwner(AbstractFile $file): bool
+    {
+        /* Not used in this context.
+         */
+        return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param AbstractFile $file
+     * @return bool
+     */
+    protected function permissionCheckEportfolioAccess(AbstractFile $file): bool
+    {
+        /* Not used in this context.
+         */
+        return true;
     }
 }

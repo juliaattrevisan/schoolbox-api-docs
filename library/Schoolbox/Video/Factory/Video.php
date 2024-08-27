@@ -23,36 +23,36 @@ use Schoolbox\Resource\AbstractFile;
 class Video extends Base
 {
     /**
-     * Check perms
+     * @inheritDoc
      *
      * @param AbstractFile $file
-     * @param bool $isMyFile
-     * @return void
-     * @throws Exception
+     * @return bool
      * @throws NotFound
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
      */
-    protected function permissionCheck(AbstractFile $file, bool $isMyFile = false): void
+    public function permissionCheckOwner(AbstractFile $file): bool
     {
-        /* We're not in Aura, sorry
-         */
-        $currentUser = $_SESSION['user'];
-
         /* If you are the owner
          * then you can view the content
          */
-        if ($file->getOwner()->getId() === $currentUser->getId()) {
-            return;
+        if ($file->getOwner()->getId() === $this->user->getId()) {
+            return true;
         }
 
-        /* TODO Decide about staffs
+        /* Every other use case: you get kicked out
          */
-//        if ($currentUser->getRole()->isStaff()) {
-//            return;
-//        }
+        throw new NotFound('You do not have permission to view this video.');
+    }
 
+
+    /**
+     * @inheritDoc
+     *
+     * @param AbstractFile $file
+     * @return bool
+     * @throws NotFound
+     */
+    protected function permissionCheckEportfolioAccess(AbstractFile $file): bool
+    {
         /* If the eportfolio feature is globally enabled, dig a little deeper;
          * maybe this lets you see stuff. If it's disabled, skip all this costly
          * investigation entirely and keep going with other checks
@@ -72,24 +72,33 @@ class Video extends Base
              * break out of here
              */
             foreach ($files as $currentFile) {
-                if ((new \Eportfolio_Authenticator($currentUser, $file->getOwner(), $currentFile->getPageId()))->canView()) {
-                    return;
+                if ((new \Eportfolio_Authenticator($this->user, $file->getOwner(), $currentFile->getPageId()))->canView()) {
+                    return true;
                 }
             }
         }
 
-        /* If $isMyFile is true, then we need to have special treatment about myFile.parent = 0.
-         * This is inferred to be the root level node of the resource browzer which, in Access.php:443,
-         * is assumed to be accessible to everyone with READ access. This isn't correct when your
-         * file is a MyFile (it shouldn't be accessible to any old bro)
+        /* Every other use case: you get kicked out
          */
-        if (!$isMyFile) {
-            /* If the video was in a folder where you have read access,
-             * then you can view the content
-             */
-            if ($this->getAccess()->getFolderAccess($currentUser, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
-                return;
-            }
+        throw new NotFound('You do not have permission to view this video.');
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param AbstractFile $file
+     * @return bool
+     * @throws Exception
+     * @throws NotFound
+     */
+    protected function permissionCheckFolder(AbstractFile $file): bool
+    {
+        /* If the video was in a folder where you have read access,
+         * then you can view the content
+         */
+        if ($this->getAccess()->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+            return true;
         }
 
         /* Every other use case: you get kicked out

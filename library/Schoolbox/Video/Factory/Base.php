@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\AbstractFile;
-use Schoolbox\Resource\File\Model;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
@@ -55,6 +54,14 @@ abstract class Base
 
 
     /**
+     * The current session user
+     *
+     * @var \Schoolbox\User
+     */
+    protected \Schoolbox\User $user;
+
+
+    /**
      * Constructor
      *
      * @param int $id
@@ -65,6 +72,10 @@ abstract class Base
         $this->setAccess(Access::getInstance());
         $this->setType($type);
         $this->setId($id);
+
+        /* We're not in Aura, sorry
+         */
+        $this->user = $_SESSION['user'];
     }
 
 
@@ -78,7 +89,7 @@ abstract class Base
      * @throws \PDOException
      * @throws DefinitionException
      */
-    public function produce()
+    public function produce(): ResourceVideo
     {
         $videoMapper = new ResourceVideoMapper();
 
@@ -94,7 +105,7 @@ abstract class Base
                 /* TODO Check Folder Perms prior to this PR
                  *  (whatever that was - check that)
                  */
-                $this->permissionCheck($file);
+                $this->permissionCheckFolder($file);
 
                 return $videoMapper->findByStorageHash($file->getHash());
 
@@ -102,12 +113,20 @@ abstract class Base
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
 
-
-                /* TODO Check Owner Perms
-                 * TODO Eportfolio access
+                /* Check owner perms
+                 * Eportfolio access
                  */
+                $this->permissionCheckOwner($file);
+                $this->permissionCheckEportfolioAccess($file);
 
-                $this->permissionCheck($file, true);
+                /* If $file is a MyFile, then we need to have special treatment about myFile.parent = 0.
+                 * This is inferred to be the root level node of the resource browzer which, in Access.php:443,
+                 * is assumed to be accessible to everyone with READ access. This isn't correct when your
+                 * file is a MyFile (it shouldn't be accessible to any old bro)
+                 *
+                 * For this reason we skip the permissinoCheckFolder() call, which would have let anyone see
+                 * this MyFile.
+                 */
 
                 return $videoMapper->findByStorageHash($file->getHash());
         }
@@ -117,13 +136,32 @@ abstract class Base
 
 
     /**
-     * Permission check prior to instantiation
+     * Check whether the current session user is the owner of $file
+     * normally by comparing ids
      *
      * @param AbstractFile $file
-     * @param bool $isMyFile
+     * @return bool
      */
+    abstract protected function permissionCheckOwner(AbstractFile $file): bool;
 
-    abstract protected function permissionCheck(AbstractFile $file, bool $isMyFile = false);
+
+    /**
+     * Check whether the current session user has access to an eportfolio
+     * page via Eportfolio_Authenticator's existing methods
+     *
+     * @param AbstractFile $file
+     * @return bool
+     */
+    abstract protected function permissionCheckEportfolioAccess(AbstractFile $file): bool;
+
+
+    /**
+     * Check whether the current session user has read+ access to a folder
+     *
+     * @param AbstractFile $file
+     * @return bool
+     */
+    abstract protected function permissionCheckFolder(AbstractFile $file): bool;
 
 
     /**
