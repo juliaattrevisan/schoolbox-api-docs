@@ -1,22 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
-    <script type="text/javascript">
-        $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
-                event.preventDefault();
-                var element = $(this);
-                $(this).confirmDialog({
-                    text: 'Do you want to delete this item?',
-                    confirmEvent: function() {
-                        window.location.href = element.attr('href');
-                    }
-                });
-            });
-        });
-    </script>
-
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="small-12 island">
             <section>
                 <div class="dz-wrap">
@@ -88,6 +73,20 @@
                     </section>
                 </div>
                 <!-- END modify_button -->
+                <script type="text/javascript">
+                    $(function() {
+                        $('#component{COMPONENT_INSTANCE_ID}').find('[data-delete]').click(function(event) {
+                            event.preventDefault();
+                            var element = $(this);
+                            $(this).confirmDialog({
+                                text: 'Do you want to delete this item?',
+                                confirmEvent: function() {
+                                    window.location.href = element.attr('href');
+                                }
+                            });
+                        });
+                    });
+                </script>
             </section>
         </div>
     </div>

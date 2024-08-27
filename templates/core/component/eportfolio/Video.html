@@ -1,24 +1,4 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
-    <script type="text/javascript">
-        $(function() {
-            var component    = $('#component{COMPONENT_INSTANCE_ID}');
-            var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
-            var video        = videoElement.data('mediaelementplayer');
-            component.find('[data-media-id]').click(function(event) {
-                event.preventDefault();
-                var videoId = $(this).data('media-id');
-                var $target = "/cms/sendVideo.php?type=myfile&id="+videoId;
-                var $poster = "/cms/videoThumb.php?type=myfile&id="+videoId+"&size=poster";
-                // setting video plugin's poster doesn't work as expected,
-                // so set the video's poster directly
-                videoElement.attr('poster', $poster);
-                video.setSrc($target);
-                video.setPoster($poster);
-                video.load();
-            });
-        });
-    </script>
-
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
@@ -114,6 +94,24 @@
                         complete: function (file) {
                             $(file.previewElement).find('img').remove();
                         }
+                    });
+
+                    $(function() {
+                        var component    = $('#component{COMPONENT_INSTANCE_ID}');
+                        var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
+                        var video        = videoElement.data('mediaelementplayer');
+                        component.find('[data-media-id]').click(function(event) {
+                            event.preventDefault();
+                            var videoId = $(this).data('media-id');
+                            var $target = "/cms/sendVideo.php?type=myfile&id="+videoId;
+                            var $poster = "/cms/videoThumb.php?type=myfile&id="+videoId+"&size=poster";
+                            // setting video plugin's poster doesn't work as expected,
+                            // so set the video's poster directly
+                            videoElement.attr('poster', $poster);
+                            video.setSrc($target);
+                            video.setPoster($poster);
+                            video.load();
+                        });
                     });
                 </script>
                 <!-- END submit_video -->

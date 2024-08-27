@@ -1,38 +1,4 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
-    <script type="text/javascript">
-        $(function(){
-            var component    = $("#component{COMPONENT_INSTANCE_ID}");
-            var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
-            var video        = videoElement.data('mediaelementplayer');
-            component.on('click', 'a[data-videolink]', function(event) {
-                event.preventDefault();
-                var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
-                var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
-                // setting video plugin's poster doesn't work as expected,
-                // so set the video's poster directly
-                videoElement.attr('poster', $poster);
-                video.setSrc($target);
-                video.setPoster($poster);
-                video.load();
-            });
-
-            $("[video-delete]").on('click', function (event) {
-                event.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this?',
-                    confirmLabel: 'Delete',
-                    confirmEvent: function (anchor) {
-                        $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
-                            location.reload();
-                        });
-                    }
-                });
-            });
-
-        });
-    </script>
-
     {CONFIGURATION}
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
@@ -198,12 +164,42 @@
                             $(file.previewElement).find('img').remove();
                         }
                     });
+
+                    $(function(){
+                        var component    = $("#component{COMPONENT_INSTANCE_ID}");
+                        var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
+                        var video        = videoElement.data('mediaelementplayer');
+                        component.on('click', 'a[data-videolink]', function(event) {
+                            event.preventDefault();
+                            var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
+                            var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
+                            // setting video plugin's poster doesn't work as expected,
+                            // so set the video's poster directly
+                            videoElement.attr('poster', $poster);
+                            video.setSrc($target);
+                            video.setPoster($poster);
+                            video.load();
+                        });
+
+                        $("[video-delete]").on('click', function (event) {
+                            event.preventDefault();
+
+                            $(this).confirmDialog({
+                                text: 'Are you sure you want to delete this?',
+                                confirmLabel: 'Delete',
+                                confirmEvent: function (anchor) {
+                                    $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
+                                        location.reload();
+                                    });
+                                }
+                            });
+                        });
+                    });
                 </script>
                 <!-- END submit_video -->
                 <!-- END source_folder_exists -->
             </section>
             <!-- END has_video -->
-
         </div>
     </div>
 </div>
