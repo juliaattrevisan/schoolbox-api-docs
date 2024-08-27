@@ -64,9 +64,9 @@ test.describe("Textbox Tests", () => {
         const createFolder = new CreateFolder(page);
         const resources = new Resources(page);
         const manageAll = new ManageAllTextbox(page);
-        const assessmentForm = new AssessmentForm(page);
-        // const homepage = new Homepage(page);
-        const textbox = new TextboxForm(page);
+        const assessmentForm = new AssessmentForm(tester, page);
+        const homepage = new Homepage(page);
+        const textbox = new TextboxForm(tester, page);
         const folderName = "Test TextBox Homepage";
         const heading = "Test Text Box Title";
         const content = "I am textbox content";
@@ -77,18 +77,16 @@ test.describe("Textbox Tests", () => {
         await resources.clickMenuItem("home");
 
         tester.isGoingTo("Add a new component in the homepage");
-        // await homepage.addComponent("#tabs-sub-1", "Text Box");
-        // tester.isGoingTo("Enter content into the new component");
-        // await page.waitForSelector("i.icon-textbox");
-        // const layout = "top";
-        // const position = 1;
-        // await homepage.clickComponentEmptyStateLink(layout, position);
-        await expect(page.locator('a[data-reveal-id="addTextboxModal-4901"]')).toBeVisible();
-        await page.click('a[data-reveal-id="addTextboxModal-4901"]');
+        await homepage.addComponent("#tabs-sub-1", "Text Box");
+        tester.isGoingTo("Enter content into the new component");
+        await page.waitForSelector("i.icon-textbox");
+        const layout = Homepage.ELEMENT_COMPONENT_LAYOUT_TOP;
+        const position = 1;
+        await homepage.clickComponentEmptyStateLink(layout, position);
         await textbox.fillHeading(heading);
         await textbox.submit();
         await assessmentForm.setDescription(content);
-        // await textbox.fillContent(content);
+        await textbox.fillContent(content);
         await textbox.save();
 
         tester.isGoingTo("Verify what I entered is the heading and body");
