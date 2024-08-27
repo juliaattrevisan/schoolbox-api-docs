@@ -86,7 +86,6 @@
         "mediaelement": "~7.0.5",
         "pinia": "~2.2.2",
         "qrcode.vue": "~3.4.1",
-        "qs": "~6.11.2",
         "sanitize-html": "~2.13.0",
         "strtotime": "~1.0.0",
         "swiper": "~11.1.9",
