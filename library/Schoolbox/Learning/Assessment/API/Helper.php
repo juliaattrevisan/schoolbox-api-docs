@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\API;
 
+use Alaress\Web\Request\Values;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound as NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -315,7 +316,7 @@ class Helper
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight ";
-            if ((bool)$filter['weighted'] === true) {
+            if ((new Values([$filter['weighted']]))->getBool(0) === true) {
                 $where .= " != 0.00 ";
             } else {
                 $where .= " = 0.00 ";
@@ -1134,7 +1135,7 @@ class Helper
             }
             // bool
             if (isset($booleanFields[$filterName])) {
-                if (!is_bool($filterValue)) {
+                if (!is_bool((new Values([$filterValue]))->getBool(0))) {
                     throw new SchoolboxException("Filter $filterName - $filterValue must be a boolean.");
                 }
                 $found = true;
