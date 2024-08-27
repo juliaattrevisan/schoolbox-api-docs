@@ -141,9 +141,9 @@ abstract class Base
      * normally by comparing ids
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      */
-    abstract protected function permissionCheckOwner(AbstractFile $file): bool;
+    abstract protected function permissionCheckOwner(AbstractFile $file): void;
 
 
     /**
@@ -151,16 +151,16 @@ abstract class Base
      * page via Eportfolio_Authenticator's existing methods
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      */
-    abstract protected function permissionCheckEportfolioAccess(AbstractFile $file): bool;
+    abstract protected function permissionCheckEportfolioAccess(AbstractFile $file): void;
 
 
     /**
      * Check whether the current session user has read+ access to a folder
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      */
-    abstract protected function permissionCheckFolder(AbstractFile $file): bool;
+    abstract protected function permissionCheckFolder(AbstractFile $file): void;
 }

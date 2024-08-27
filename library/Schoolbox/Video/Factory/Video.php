@@ -26,16 +26,16 @@ class Video extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      * @throws NotFound
      */
-    protected function permissionCheckOwner(AbstractFile $file): bool
+    protected function permissionCheckOwner(AbstractFile $file): void
     {
         /* If you are the owner
          * then you can view the content
          */
         if ($file->getOwner()->getId() === $this->user->getId()) {
-            return true;
+            return;
         }
 
         /* Every other use case: you get kicked out
@@ -48,10 +48,10 @@ class Video extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      * @throws NotFound
      */
-    protected function permissionCheckEportfolioAccess(AbstractFile $file): bool
+    protected function permissionCheckEportfolioAccess(AbstractFile $file): void
     {
         /* If the eportfolio feature is globally enabled, dig a little deeper;
          * maybe this lets you see stuff. If it's disabled, skip all this costly
@@ -73,7 +73,7 @@ class Video extends Base
              */
             foreach ($files as $currentFile) {
                 if ((new \Eportfolio_Authenticator($this->user, $file->getOwner(), $currentFile->getPageId()))->canView()) {
-                    return true;
+                    return;
                 }
             }
         }
@@ -88,17 +88,17 @@ class Video extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      * @throws Exception
      * @throws NotFound
      */
-    protected function permissionCheckFolder(AbstractFile $file): bool
+    protected function permissionCheckFolder(AbstractFile $file): void
     {
         /* If the video was in a folder where you have read access,
          * then you can view the content
          */
         if ($this->access->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
-            return true;
+            return;
         }
 
         /* Every other use case: you get kicked out

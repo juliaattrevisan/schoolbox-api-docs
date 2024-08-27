@@ -24,21 +24,17 @@ class Thumbnail extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      * @throws Exception
      * @throws NotFound
      */
-    protected function permissionCheckFolder(AbstractFile $file): bool
+    protected function permissionCheckFolder(AbstractFile $file): void
     {
         if ($this->access->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
-            return true;
+            return;
         }
 
         \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
-
-        /* SitePage redirects you, but phpstan doesn't understand that.
-         */
-        return false;
     }
 
 
@@ -46,13 +42,12 @@ class Thumbnail extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      */
-    protected function permissionCheckOwner(AbstractFile $file): bool
+    protected function permissionCheckOwner(AbstractFile $file): void
     {
         /* Not used in this context.
          */
-        return true;
     }
 
 
@@ -60,12 +55,11 @@ class Thumbnail extends Base
      * @inheritDoc
      *
      * @param AbstractFile $file
-     * @return bool
+     * @return void
      */
-    protected function permissionCheckEportfolioAccess(AbstractFile $file): bool
+    protected function permissionCheckEportfolioAccess(AbstractFile $file): void
     {
         /* Not used in this context.
          */
-        return true;
     }
 }
