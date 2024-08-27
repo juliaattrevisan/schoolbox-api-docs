@@ -34,31 +34,31 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return array
      */
-    public function providerMapperProxy()
+    public static function providerMapperProxy()
     {
         return [
             [
-                $this->getDueWorkResponseMapperProxy(),
+                self::getDueWorkResponseMapperProxy(),
                 Assessment\DueWork\Response\Model::class,
             ],
             [
-                $this->getDueWorkFeedbackMapperProxy(),
+                self::getDueWorkFeedbackMapperProxy(),
                 Assessment\DueWork\Feedback\Model::class,
             ],
             [
-                $this->getQuizResponseMapperProxy(),
+                self::getQuizResponseMapperProxy(),
                 Assessment\Quiz\Attempt\Model::class,
             ],
             [
-                $this->getQuizFeedbackMapperProxy(),
+                self::getQuizFeedbackMapperProxy(),
                 Assessment\Quiz\Feedback\Model::class,
             ],
             [
-                $this->getTaskResponseMapperProxy(),
+                self::getTaskResponseMapperProxy(),
                 Assessment\Task\Response\Model::class,
             ],
             [
-                $this->getTaskFeedbackMapperProxy(),
+                self::getTaskFeedbackMapperProxy(),
                 Assessment\Task\Feedback\Model::class,
             ],
         ];
@@ -68,7 +68,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\DueWork\Response\MapperProxy
      */
-    private function getDueWorkResponseMapperProxy()
+    private static function getDueWorkResponseMapperProxy()
     {
         return new Assessment\DueWork\Response\MapperProxy(SubmissionMapper::getInstance());
     }
@@ -76,7 +76,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\DueWork\Feedback\MapperProxy
      */
-    private function getDueWorkFeedbackMapperProxy()
+    private static function getDueWorkFeedbackMapperProxy()
     {
         return new Assessment\DueWork\Feedback\MapperProxy(ReturnedWorkMapper::getInstance());
     }
@@ -84,7 +84,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\Quiz\Attempt\MapperProxy
      */
-    private function getQuizResponseMapperProxy()
+    private static function getQuizResponseMapperProxy()
     {
         return new Assessment\Quiz\Attempt\MapperProxy(Quiz\Attempt\Mapper::getInstance());
     }
@@ -92,7 +92,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\Quiz\Feedback\MapperProxy
      */
-    private function getQuizFeedbackMapperProxy()
+    private static function getQuizFeedbackMapperProxy()
     {
         return new Assessment\Quiz\Feedback\MapperProxy(Quiz\Attempt\Mapper::getInstance());
     }
@@ -100,7 +100,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\Task\Response\MapperProxy
      */
-    private function getTaskResponseMapperProxy()
+    private static function getTaskResponseMapperProxy()
     {
         return new Assessment\Task\Response\MapperProxy(Task\CompletionMapper::getInstance());
     }
@@ -108,7 +108,7 @@ class InteractionMapperProxy extends TestCase
     /**
      * @return Assessment\Task\Feedback\MapperProxy
      */
-    private function getTaskFeedbackMapperProxy()
+    private static function getTaskFeedbackMapperProxy()
     {
         return new Assessment\Task\Feedback\MapperProxy(Task\CompletionMapper::getInstance());
     }

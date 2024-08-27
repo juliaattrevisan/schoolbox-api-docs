@@ -323,7 +323,7 @@ class CapabilityUsage extends TestCase
      *                               (@see `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::generateGrid`)
      * @return RubricGrid\CapabilityUsage
      */
-    private function generateCapabilityUsage(array $capabilityUsage): RubricGrid\CapabilityUsage
+    private static function generateCapabilityUsage(array $capabilityUsage): RubricGrid\CapabilityUsage
     {
         $generator = new Generator();
         $testGrid  = $generator->generateGrid(
@@ -339,16 +339,16 @@ class CapabilityUsage extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsCapabilityMarkShownData(): iterable
+    public static function getTestIsCapabilityMarkShownData(): iterable
     {
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 0,
             'indicators' => [],
         ]);
         yield 'Empty capability' => [$capabilityUsage, false];
 
 
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 0,
             'indicators' => [
                 11 => [],
@@ -357,7 +357,7 @@ class CapabilityUsage extends TestCase
         yield 'Empty indicators' => [$capabilityUsage, false];
 
 
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 0,
             'indicators' => [
                 11 => [
@@ -389,7 +389,7 @@ class CapabilityUsage extends TestCase
         yield 'Indicators with no value descriptors' => [$capabilityUsage, false];
 
 
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 4,
             'indicators' => [
                 11 => [
@@ -425,14 +425,14 @@ class CapabilityUsage extends TestCase
         yield 'Indicators with valued descriptors' => [$capabilityUsage, true];
 
 
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 12,
             'indicators' => [],
         ]);
         yield 'Capability with max value' => [$capabilityUsage, true];
 
 
-        $capabilityUsage = $this->generateCapabilityUsage([
+        $capabilityUsage = self::generateCapabilityUsage([
             'maxValue'   => 0,
             'indicators' => [],
         ]);

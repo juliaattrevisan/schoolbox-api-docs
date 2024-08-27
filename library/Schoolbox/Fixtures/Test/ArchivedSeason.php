@@ -31,14 +31,14 @@ class ArchivedSeason extends TestCase
 
     public function testIsArchived()
     {
-        $season = $this->buildArchivedSeason();
+        $season = self::buildArchivedSeason();
         $this->assertTrue($season->isArchived());
     }
 
 
     public function testIsNotArchived()
     {
-        $season = $this->buildNonArchivedSeason();
+        $season = self::buildNonArchivedSeason();
         $this->assertFalse($season->isArchived());
     }
 
@@ -87,40 +87,40 @@ class ArchivedSeason extends TestCase
     /**
      * @return array
      */
-    public function providerSeasonNotFound()
+    public static function providerSeasonNotFound()
     {
         return [
             [[]],
             [
                 [
-                    'wrongNameSeason' => $this->buildArchivedSeason(),
+                    'wrongNameSeason' => self::buildArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'anotherWrongNameSeason' => $this->buildNonArchivedSeason(),
+                    'anotherWrongNameSeason' => self::buildNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'wrongNameSeason'        => $this->buildArchivedSeason(),
-                    'anotherWrongNameSeason' => $this->buildNonArchivedSeason(),
+                    'wrongNameSeason'        => self::buildArchivedSeason(),
+                    'anotherWrongNameSeason' => self::buildNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'team'     => $this->buildArchivedSeason(),
-                    'division' => $this->buildNonArchivedSeason(),
+                    'team'     => self::buildArchivedSeason(),
+                    'division' => self::buildNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'season' => $this->buildTeamInArchivedSeason(),
+                    'season' => self::buildTeamInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'context' => $this->buildTeamInArchivedSeason(),
+                    'context' => self::buildTeamInArchivedSeason(),
                 ],
             ],
         ];
@@ -130,115 +130,115 @@ class ArchivedSeason extends TestCase
     /**
      * @return array
      */
-    public function providerSeasonNotArchived()
+    public static function providerSeasonNotArchived()
     {
         return [
             [
                 [
-                    'season' => $this->buildNonArchivedSeason(),
+                    'season' => self::buildNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildNonArchivedSeason(),
+                    'entity' => self::buildNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'division' => $this->buildDivisionInNonArchivedSeason(),
+                    'division' => self::buildDivisionInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildDivisionInNonArchivedSeason(),
+                    'entity' => self::buildDivisionInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'context' => $this->buildDivisionInNonArchivedSeason(),
+                    'context' => self::buildDivisionInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'team' => $this->buildTeamInNonArchivedSeason(),
+                    'team' => self::buildTeamInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildTeamInNonArchivedSeason(),
+                    'entity' => self::buildTeamInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'season'   => $this->buildNonArchivedSeason(),
-                    'team'     => $this->buildTeamInArchivedSeason(),
-                    'division' => $this->buildDivisionInArchivedSeason(),
-                    'context'  => $this->buildDivisionInArchivedSeason(),
+                    'season'   => self::buildNonArchivedSeason(),
+                    'team'     => self::buildTeamInArchivedSeason(),
+                    'division' => self::buildDivisionInArchivedSeason(),
+                    'context'  => self::buildDivisionInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity'   => $this->buildNonArchivedSeason(),
-                    'team'     => $this->buildTeamInArchivedSeason(),
-                    'division' => $this->buildDivisionInArchivedSeason(),
-                    'context'  => $this->buildDivisionInArchivedSeason(),
+                    'entity'   => self::buildNonArchivedSeason(),
+                    'team'     => self::buildTeamInArchivedSeason(),
+                    'division' => self::buildDivisionInArchivedSeason(),
+                    'context'  => self::buildDivisionInArchivedSeason(),
                 ],
             ],
         ];
     }
 
 
-    public function providerSeasonIsArchived()
+    public static function providerSeasonIsArchived()
     {
         return [
             [
                 [
-                    'season' => $this->buildArchivedSeason(),
+                    'season' => self::buildArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildArchivedSeason(),
+                    'entity' => self::buildArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'division' => $this->buildDivisionInArchivedSeason(),
+                    'division' => self::buildDivisionInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildDivisionInArchivedSeason(),
+                    'entity' => self::buildDivisionInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'team' => $this->buildTeamInArchivedSeason(),
+                    'team' => self::buildTeamInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity' => $this->buildTeamInArchivedSeason(),
+                    'entity' => self::buildTeamInArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'season'   => $this->buildArchivedSeason(),
-                    'team'     => $this->buildTeamInNonArchivedSeason(),
-                    'division' => $this->buildDivisionInNonArchivedSeason(),
+                    'season'   => self::buildArchivedSeason(),
+                    'team'     => self::buildTeamInNonArchivedSeason(),
+                    'division' => self::buildDivisionInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'entity'   => $this->buildArchivedSeason(),
-                    'team'     => $this->buildTeamInNonArchivedSeason(),
-                    'division' => $this->buildDivisionInNonArchivedSeason(),
+                    'entity'   => self::buildArchivedSeason(),
+                    'team'     => self::buildTeamInNonArchivedSeason(),
+                    'division' => self::buildDivisionInNonArchivedSeason(),
                 ],
             ],
             [
                 [
-                    'season' => $this->buildArchivedSeason(),
-                    'entity' => $this->buildTeamInNonArchivedSeason(),
+                    'season' => self::buildArchivedSeason(),
+                    'entity' => self::buildTeamInNonArchivedSeason(),
                 ],
             ],
         ];
@@ -250,9 +250,9 @@ class ArchivedSeason extends TestCase
     /**
      * @return Team\Model
      */
-    private function buildTeamInNonArchivedSeason()
+    private static function buildTeamInNonArchivedSeason()
     {
-        $team = $this->buildTeamInArchivedSeason();
+        $team = self::buildTeamInArchivedSeason();
         $team->setName('Team in non-archived season');
         $team->getDivision()->getSeason()->setArchivedAt(null);
         return $team;
@@ -262,16 +262,16 @@ class ArchivedSeason extends TestCase
     /**
      * @return Team\Model
      */
-    private function buildTeamInArchivedSeason()
+    private static function buildTeamInArchivedSeason()
     {
         $mapper = Team\Mapper::getInstance();
-        $model  = $mapper->createModel($this->getUniqueId());
+        $model  = $mapper->createModel(self::getUniqueId());
         $model
-            ->setDivision($this->buildDivisionInArchivedSeason())
+            ->setDivision(self::buildDivisionInArchivedSeason())
             ->setName('Team in archived season')
             ->setUrl('http://www.google.com')
-            ->setCreatedAt($this->buildDate('2001-01-01'))
-            ->setUpdatedAt($this->buildDate('2001-01-01'))
+            ->setCreatedAt(self::buildDate('2001-01-01'))
+            ->setUpdatedAt(self::buildDate('2001-01-01'))
             ->setDeletedAt(null);
         return $model;
     }
@@ -280,9 +280,9 @@ class ArchivedSeason extends TestCase
     /**
      * @return Division\Model
      */
-    private function buildDivisionInNonArchivedSeason()
+    private static function buildDivisionInNonArchivedSeason()
     {
-        $division = $this->buildDivisionInArchivedSeason();
+        $division = self::buildDivisionInArchivedSeason();
         $division->setName('Division linked to non-archived season');
         $division->getSeason()->setArchivedAt(null);
         return $division;
@@ -292,17 +292,17 @@ class ArchivedSeason extends TestCase
     /**
      * @return Division\Model
      */
-    private function buildDivisionInArchivedSeason()
+    private static function buildDivisionInArchivedSeason()
     {
         $sportMapper    = Sport\Mapper::getInstance();
         $divisionMapper = Division\Mapper::getInstance();
-        $division       = $divisionMapper->createModel($this->getUniqueId());
+        $division       = $divisionMapper->createModel(self::getUniqueId());
         $division
-            ->setSport($sportMapper->createModel($this->getUniqueId()))
-            ->setSeason($this->buildArchivedSeason())
+            ->setSport($sportMapper->createModel(self::getUniqueId()))
+            ->setSeason(self::buildArchivedSeason())
             ->setName('Division linked to archived season')
-            ->setCreatedAt($this->buildDate('2001-01-01'))
-            ->setUpdatedAt($this->buildDate('2001-01-01'))
+            ->setCreatedAt(self::buildDate('2001-01-01'))
+            ->setUpdatedAt(self::buildDate('2001-01-01'))
             ->setDeletedAt(null);
         return $division;
     }
@@ -311,9 +311,9 @@ class ArchivedSeason extends TestCase
     /**
      * @return Season\Model
      */
-    private function buildNonArchivedSeason()
+    private static function buildNonArchivedSeason()
     {
-        $season = $this->buildArchivedSeason();
+        $season = self::buildArchivedSeason();
         $season->setName('Non-Archived')
                ->setArchivedAt(null);
         return $season;
@@ -323,17 +323,17 @@ class ArchivedSeason extends TestCase
     /**
      * @return Season\Model
      */
-    private function buildArchivedSeason()
+    private static function buildArchivedSeason()
     {
         $mapper = Season\Mapper::getInstance();
-        $model  = $mapper->createModel($this->getUniqueId());
+        $model  = $mapper->createModel(self::getUniqueId());
         $model
             ->setName('Archived Season')
-            ->setStart($this->buildDate('2001-01-01'))
-            ->setEnd($this->buildDate('2020-01-01'))
-            ->setArchivedAt($this->buildDate('2020-01-01'))
-            ->setCreatedAt($this->buildDate('2001-01-01'))
-            ->setUpdatedAt($this->buildDate('2001-01-01'))
+            ->setStart(self::buildDate('2001-01-01'))
+            ->setEnd(self::buildDate('2020-01-01'))
+            ->setArchivedAt(self::buildDate('2020-01-01'))
+            ->setCreatedAt(self::buildDate('2001-01-01'))
+            ->setUpdatedAt(self::buildDate('2001-01-01'))
             ->setDeletedAt(null);
         return $model;
     }
@@ -344,7 +344,7 @@ class ArchivedSeason extends TestCase
      * @param string $format
      * @return Alaress_Date_Format
      */
-    private function buildDate($dateString, $format = Alaress_Date_Format::DATABASE_DATE_FORMAT)
+    private static function buildDate($dateString, $format = Alaress_Date_Format::DATABASE_DATE_FORMAT)
     {
         return new Alaress_Date_Format($dateString, $format);
     }
@@ -353,7 +353,7 @@ class ArchivedSeason extends TestCase
     /**
      * @return int
      */
-    private function getUniqueId()
+    private static function getUniqueId()
     {
         return self::$nextId++;
     }

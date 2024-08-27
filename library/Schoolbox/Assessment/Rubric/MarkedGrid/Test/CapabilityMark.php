@@ -32,7 +32,7 @@ class CapabilityMark extends TestCase
      *
      * @return array
      */
-    private function createNullTestIndicatorUsageData(array $indicatorUsages, bool $nullDescriptors): array
+    private static function createNullTestIndicatorUsageData(array $indicatorUsages, bool $nullDescriptors): array
     {
         unset($indicatorUsages['maxValue']);
         if ($nullDescriptors) {
@@ -53,7 +53,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateScaledMarkData(): iterable
+    public static function getTestCalculateScaledMarkData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -89,8 +89,8 @@ class CapabilityMark extends TestCase
 
         // The same grid, with null values
         $nullCapabilityUsages = $capabilityUsages;
-        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
-        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $nullCapabilityUsages[1] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
         $markedGrid = $generator->generateMarkedGrid(
             $capabilities,
             $levels,
@@ -118,7 +118,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateIndicatorMarkSumData(): iterable
+    public static function getTestCalculateIndicatorMarkSumData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -154,8 +154,8 @@ class CapabilityMark extends TestCase
 
         // The same grid, with null values
         $nullCapabilityUsages = $capabilityUsages;
-        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
-        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $nullCapabilityUsages[1] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
         $markedGrid = $generator->generateMarkedGrid(
             $capabilities,
             $levels,
@@ -185,7 +185,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveNormalizedMarkData(): iterable
+    public static function getTestRetrieveNormalizedMarkData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -221,8 +221,8 @@ class CapabilityMark extends TestCase
 
         // The same grid, with null values
         $nullCapabilityUsages = $capabilityUsages;
-        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
-        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $nullCapabilityUsages[1] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = self::createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
         $markedGrid = $generator->generateMarkedGrid(
             $capabilities,
             $levels,
@@ -364,9 +364,9 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestConvertFormInputToValueData(): iterable
+    public static function getTestConvertFormInputToValueData(): iterable
     {
-        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+        $testCapabilityUsage = self::buildTestFormInputConversionCapabilityUsage();
 
         // None
         $none = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\None());
@@ -389,7 +389,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark type: total, fraction form input, no space' => [$total, '6/12', 2];
 
         // Letter grade
-        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, self::buildTestLetterGradeMarkScheme());
         yield 'Capability mark type: letter, null form input' => [$letter, null, null];
         yield 'Capability mark type: letter, valid form input' => [$letter, 'A', 3.5];
     }
@@ -416,9 +416,9 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestConvertFormInputToValueDataInvalid(): iterable
+    public static function getTestConvertFormInputToValueDataInvalid(): iterable
     {
-        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+        $testCapabilityUsage = self::buildTestFormInputConversionCapabilityUsage();
 
         // Percent
         $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
@@ -429,7 +429,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark type: total, string' => [$total, 'red'];
 
         // Letter grade
-        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, self::buildTestLetterGradeMarkScheme());
         yield 'Capability mark type: letter, string' => [$letter, 'red'];
     }
 
@@ -453,9 +453,9 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestConvertFormInputToValueDataOutOfRange(): iterable
+    public static function getTestConvertFormInputToValueDataOutOfRange(): iterable
     {
-        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+        $testCapabilityUsage = self::buildTestFormInputConversionCapabilityUsage();
 
         // Percent
         $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
@@ -488,9 +488,9 @@ class CapabilityMark extends TestCase
     /**
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableValueData(): iterable
+    public static function getConvertFormInputToHumanReadableValueData(): iterable
     {
-        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+        $testCapabilityUsage = self::buildTestFormInputConversionCapabilityUsage();
 
         // None
         $none = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\None());
@@ -513,7 +513,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark type: total, fraction form input, no space' => [$total, '6/12', '6 / 12'];
 
         // Letter grade
-        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, self::buildTestLetterGradeMarkScheme());
         yield 'Capability mark type: letter, null form input' => [$letter, null, null];
         yield 'Capability mark type: letter, valid form input' => [$letter, 'A', 'A'];
     }
@@ -540,9 +540,9 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getRetrieveHumanReadableValueAsFormInputData(): iterable
+    public static function getRetrieveHumanReadableValueAsFormInputData(): iterable
     {
-        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+        $testCapabilityUsage = self::buildTestFormInputConversionCapabilityUsage();
 
         // None
         $none = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\None());
@@ -565,7 +565,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark type: total, fraction HR value, no space' => [$total, '6/12', '6'];
 
         // Letter grade
-        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, self::buildTestLetterGradeMarkScheme());
         yield 'Capability mark type: letter, null HR value' => [$letter, null, null];
         yield 'Capability mark type: letter, valid HR value' => [$letter, 'A', 'A'];
     }
@@ -595,7 +595,7 @@ class CapabilityMark extends TestCase
      *
      * @return CapabilityUsage
      */
-    private function buildTestFormInputConversionCapabilityUsage(): CapabilityUsage
+    private static function buildTestFormInputConversionCapabilityUsage(): CapabilityUsage
     {
         $gridGenerator = new GridGenerator();
         $grid          = $gridGenerator->generateGrid(
@@ -650,7 +650,7 @@ class CapabilityMark extends TestCase
      *
      * @return MarkScheme\LetterGrade
      */
-    private function buildTestLetterGradeMarkScheme(): MarkScheme\LetterGrade
+    private static function buildTestLetterGradeMarkScheme(): MarkScheme\LetterGrade
     {
         return new MarkScheme\LetterGrade(
             (new GradeLevel\Group\Model())

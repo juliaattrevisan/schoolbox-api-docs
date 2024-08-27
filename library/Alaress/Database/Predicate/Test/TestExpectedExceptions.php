@@ -557,18 +557,18 @@ class TestExpectedExceptions extends TestCase
 
     // Data Providers
 
-    public function providerBetweenDatesInvalidColumnValidValue()
+    public static function providerBetweenDatesInvalidColumnValidValue()
     {
         $data   = [];
         $format = Alaress_Date_Format::DATABASE_DATE_FORMAT;
         $date1  = new Alaress_Date_Format('2010-01-01', $format);
         $date2  = new Alaress_Date_Format('2020-01-01', $format);
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName, null, $date1];
             $data[] = [$invalidColumnName, $date1, null];
             $data[] = [$invalidColumnName, $date1, $date2];
         }
-        foreach ($this->getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
+        foreach (self::getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
             $data[] = [$invalidSqlFunc, null, $date1];
             $data[] = [$invalidSqlFunc, $date1, null];
             $data[] = [$invalidSqlFunc, $date1, $date2];
@@ -577,10 +577,10 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerBetweenInvalidColumnValidValue()
+    public static function providerBetweenInvalidColumnValidValue()
     {
         $data = [];
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName, null, 20];
             $data[] = [$invalidColumnName, 10, null];
             $data[] = [$invalidColumnName, 10, 20];
@@ -588,7 +588,7 @@ class TestExpectedExceptions extends TestCase
             $data[] = [$invalidColumnName, '2010-01-01', null];
             $data[] = [$invalidColumnName, '2010-01-01', '2020-01-01'];
         }
-        foreach ($this->getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
+        foreach (self::getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
             $data[] = [$invalidSqlFunc, null, 20];
             $data[] = [$invalidSqlFunc, 10, null];
             $data[] = [$invalidSqlFunc, 10, 20];
@@ -600,16 +600,16 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerBetweenValidColumnInvalidValue()
+    public static function providerBetweenValidColumnInvalidValue()
     {
         $data = [];
-        foreach ($this->getValidColumnNames() as $validColumnName) {
+        foreach (self::getValidColumnNames() as $validColumnName) {
             $data[] = [$validColumnName, [], null];
             $data[] = [$validColumnName, null, []];
             $data[] = [$validColumnName, [], []];
             $data[] = [$validColumnName, '2010-01-01', []];
         }
-        foreach ($this->getSqlFuncWithValidColumnNames() as $validSqlFunc) {
+        foreach (self::getSqlFuncWithValidColumnNames() as $validSqlFunc) {
             $data[] = [$validSqlFunc, [], null];
             $data[] = [$validSqlFunc, null, []];
             $data[] = [$validSqlFunc, [], []];
@@ -619,29 +619,29 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerInvalidColumn()
+    public static function providerInvalidColumn()
     {
         $data = [];
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName];
         }
-        foreach ($this->getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
+        foreach (self::getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
             $data[] = [$invalidSqlFunc];
         }
         return $data;
     }
 
 
-    public function providerInvalidColumnValidValue()
+    public static function providerInvalidColumnValidValue()
     {
         $data = [];
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName, 10];
             $data[] = [$invalidColumnName, 10.2];
             $data[] = [$invalidColumnName, 'a string'];
             $data[] = [$invalidColumnName, '2010-01-01'];
         }
-        foreach ($this->getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
+        foreach (self::getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
             $data[] = [$invalidSqlFunc, 10];
             $data[] = [$invalidSqlFunc, 10.2];
             $data[] = [$invalidSqlFunc, 'a string'];
@@ -651,10 +651,10 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerValidColumnInvalidValueTraversable()
+    public static function providerValidColumnInvalidValueTraversable()
     {
         $data = [];
-        foreach ($this->getValidColumnNames() as $validColumnName) {
+        foreach (self::getValidColumnNames() as $validColumnName) {
             $data[] = [$validColumnName, null];
             $data[] = [$validColumnName, true];
             $data[] = [$validColumnName, false];
@@ -662,7 +662,7 @@ class TestExpectedExceptions extends TestCase
             $data[] = [$validColumnName, 'a string'];
             $data[] = [$validColumnName, '2010-01-01'];
         }
-        foreach ($this->getSqlFuncWithValidColumnNames() as $validSqlFunc) {
+        foreach (self::getSqlFuncWithValidColumnNames() as $validSqlFunc) {
             $data[] = [$validSqlFunc, null];
             $data[] = [$validSqlFunc, true];
             $data[] = [$validSqlFunc, false];
@@ -674,15 +674,15 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerInvalidColumnValidValueTraversable()
+    public static function providerInvalidColumnValidValueTraversable()
     {
         $data = [];
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName, [10]];
             $data[] = [$invalidColumnName, [10, 20]];
             $data[] = [$invalidColumnName, ['2010-01-01']];
         }
-        foreach ($this->getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
+        foreach (self::getSqlFuncWithInvalidColumnNames() as $invalidSqlFunc) {
             $data[] = [$invalidSqlFunc, [10]];
             $data[] = [$invalidSqlFunc, [10, 20]];
             $data[] = [$invalidSqlFunc, ['2010-01-01']];
@@ -691,15 +691,15 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerValidColumnInvalidValue()
+    public static function providerValidColumnInvalidValue()
     {
         $data = [];
-        foreach ($this->getValidColumnNames() as $validColumn) {
+        foreach (self::getValidColumnNames() as $validColumn) {
             $data[] = [$validColumn, null];
             $data[] = [$validColumn, []];
             $data[] = [$validColumn, [10, 20]];
         }
-        foreach ($this->getSqlFuncWithValidColumnNames() as $validSqlFunc) {
+        foreach (self::getSqlFuncWithValidColumnNames() as $validSqlFunc) {
             $data[] = [$validSqlFunc, null];
             $data[] = [$validSqlFunc, []];
             $data[] = [$validSqlFunc, [10, 20]];
@@ -708,10 +708,10 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function providerInvalidColumnNamesAndValues()
+    public static function providerInvalidColumnNamesAndValues()
     {
         $data = [];
-        foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
+        foreach (self::getInvalidColumnNames() as $invalidColumnName) {
             $data[] = [$invalidColumnName, 10];
             $data[] = [$invalidColumnName, [10, 20]];
         }
@@ -726,7 +726,7 @@ class TestExpectedExceptions extends TestCase
      *
      * @return string[]
      */
-    private function getInvalidColumnNames(): array
+    private static function getInvalidColumnNames(): array
     {
         return [
             'invalid.column.name',
@@ -740,7 +740,7 @@ class TestExpectedExceptions extends TestCase
      *
      * @return string[]
      */
-    private function getValidColumnNames(): array
+    private static function getValidColumnNames(): array
     {
         return [
             'column',
@@ -754,7 +754,7 @@ class TestExpectedExceptions extends TestCase
      *
      * @return ISqlFunc[]
      */
-    private function getSqlFuncWithInvalidColumnNames(): array
+    private static function getSqlFuncWithInvalidColumnNames(): array
     {
         return [
             new Coalesce(['invalid.column.name']),
@@ -769,7 +769,7 @@ class TestExpectedExceptions extends TestCase
      *
      * @return ISqlFunc[]
      */
-    private function getSqlFuncWithValidColumnNames(): array
+    private static function getSqlFuncWithValidColumnNames(): array
     {
         return [
             new Coalesce(['column']),

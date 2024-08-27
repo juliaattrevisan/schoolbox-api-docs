@@ -28,9 +28,9 @@ class MarkedGrid extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveMarkData(): iterable
+    public static function getTestRetrieveMarkData(): iterable
     {
-        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+        $markedGrid = self::generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
         yield 'mark-per-capability on' => [
             $markedGrid,
             [
@@ -40,7 +40,7 @@ class MarkedGrid extends TestCase
             ]
         ];
 
-        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+        $markedGrid = self::generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
         // Indicators used: 4, max mark for each indicator: 8 => max mark = 32
         yield 'mark-per-capability off' => [
             $markedGrid,
@@ -53,7 +53,7 @@ class MarkedGrid extends TestCase
 
         // If marking per capability, and all cap marks are null:
         // the grid's marks are null
-        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
+        $markedGrid = self::generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_TOTAL));
         $markedGrid->getCapabilityMarks()[1]->setValue(null);
         $markedGrid->getCapabilityMarks()[2]->setValue(null);
         yield 'mark-per-capability on, all capability marks null' => [
@@ -66,7 +66,7 @@ class MarkedGrid extends TestCase
         ];
 
         // If not marking per capability: explicitly cap marks are ignored?
-        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+        $markedGrid = self::generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
         $markedGrid->getCapabilityMarks()[1]->setValue(null);
         $markedGrid->getCapabilityMarks()[2]->setValue(null);
         yield 'mark-per-capability off, all capability marks null' => [
@@ -79,7 +79,7 @@ class MarkedGrid extends TestCase
         ];
 
         // Test clearing capability marks and setting indicator marks instead
-        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
+        $markedGrid = self::generateTestRetrieveMarkDataMarkedGrid(MarkTypeMapper::getInstance()->createModel()->setId(MarkType::TYPE_NONE));
         $markedGrid->getCapabilityMarks()[1]->setValue(null);
         $markedGrid->getCapabilityMarks()[2]->setValue(null);
 
@@ -116,7 +116,7 @@ class MarkedGrid extends TestCase
      *                                     This affects the grid's total mark.
      * @return RubricMarkedGrid\MarkedGrid
      */
-    private function generateTestRetrieveMarkDataMarkedGrid(MarkType $capabilityMarkType): RubricMarkedGrid\MarkedGrid
+    private static function generateTestRetrieveMarkDataMarkedGrid(MarkType $capabilityMarkType): RubricMarkedGrid\MarkedGrid
     {
         // TODO consider generator for this data set
 
