@@ -84,21 +84,29 @@ abstract class Base
 
         switch ($this->getType()) {
             case QueueMapper::FILE_TYPE_STORAGE:
+            case QueueMapper::FILE_TYPE_SUBMISSION:
                 return $videoMapper->findByStorageHash($this->getId());
 
             case QueueMapper::FILE_TYPE_SBFS:
                 // For SBFS we must first load file, then resolve the hash
                 $file = FileMapper::getInstance()->findById($this->getId());
+
+                /* TODO Check Folder Perms prior to this PR
+                 *  (whatever that was - check that)
+                 */
                 $this->permissionCheck($file);
 
                 return $videoMapper->findByStorageHash($file->getHash());
 
-            case QueueMapper::FILE_TYPE_SUBMISSION:
-                return $videoMapper->findByStorageHash($this->getId());
-
             case QueueMapper::FILE_TYPE_MYFILE:
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
+
+
+                /* TODO Check Owner Perms
+                 * TODO Eportfolio access
+                 */
+
                 $this->permissionCheck($file, true);
 
                 return $videoMapper->findByStorageHash($file->getHash());
@@ -114,6 +122,7 @@ abstract class Base
      * @param AbstractFile $file
      * @param bool $isMyFile
      */
+
     abstract protected function permissionCheck(AbstractFile $file, bool $isMyFile = false);
 
 
