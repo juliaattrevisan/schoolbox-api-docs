@@ -35,12 +35,12 @@
 {% endif %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', {assessment: currentInteraction.assessable, assessmentId: currentInteraction.assessable.id, participant: participant, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
-<ul class="information-list threaded {% if currentInteraction.isDraft %}draftSubmission{% endif %}">
+<ul class="information-list threaded">
     <li class="actions-small-1">
         <ul class="action-list">
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="card small-12">
+                    <div class="card small-12  {% if currentInteraction.isDraft %}draftSubmission{% endif %}">
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
