@@ -1,7 +1,7 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
 
-// See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propogate
+// See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
 interface SbxFirebaseNotificationPayload {
     notification:
         | {
