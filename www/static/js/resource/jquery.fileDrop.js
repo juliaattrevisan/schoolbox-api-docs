@@ -41,6 +41,7 @@
             sending: noop,
             complete: noop,
             queuecomplete: noop,
+            contentReloaded: noop,
 
             uploadprogress: function (file, progress, bytesSent) {
                 var el = $(file.previewElement);
@@ -212,6 +213,7 @@
                                  */
                                 if (self.options.reloadContent) {
                                     $(self.options.refreshSelector).empty().append($(data).children());
+                                    self.options.contentReloaded.apply(this, arguments);
                                 }
                             });
                         }, self.options.refreshTimeout);
@@ -317,8 +319,8 @@
                 $('<div class="dz-details" />')
                     .append($('<div class="dz-filename" />').html("<span data-dz-name></span>"))
                     .append(
-                        '<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />'
-                    )
+                        '<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />',
+                    ),
             )
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 

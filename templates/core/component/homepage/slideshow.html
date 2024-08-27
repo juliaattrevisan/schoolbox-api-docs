@@ -56,9 +56,15 @@
                                         .closest('[data-dz-container]')
                                         .find('.dz-preview').remove();
                             },
-                            success: function (file, response) {
-                                // Set a localStorage item to check when the component is reloaded
-                                localStorage.setItem("refreshComponent{COMPONENT_INSTANCE_ID}", "true");
+                            success: function (file, response) {},
+                            contentReloaded: () => {
+                                // Let masonry know we overrode the component, so it can fix the event listeners (e.g. drag or settings)
+                                document.dispatchEvent(
+                                    new CustomEvent(
+                                        "UPDATE_MASONRY__COMPONENT_UPDATED",
+                                        { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }
+                                    )
+                                );
                             }
                         });
                     </script>
@@ -229,9 +235,15 @@
                                     .closest('[data-dz-container]')
                                     .find('.dz-preview').remove();
                         },
-                        success: function (file, response) {
-                            // Set a localStorage item to check when the component is reloaded
-                            localStorage.setItem("refreshComponent{COMPONENT_INSTANCE_ID}", "true");
+                        success: function (file, response) {},
+                        contentReloaded: () => {
+                            // Let masonry know we overrode the component, so it can fix the event listeners (e.g. drag or settings)
+                            document.dispatchEvent(
+                                new CustomEvent(
+                                    "UPDATE_MASONRY__COMPONENT_UPDATED",
+                                    { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }
+                                )
+                            );
                         }
                     });
                     </script>
@@ -243,11 +255,4 @@
 
         </div>
     </div>
-    <script>
-        // This checks when the component reloaded so the component can still move moved on the page
-        if (localStorage.getItem("refreshComponent{COMPONENT_INSTANCE_ID}") === "true") {
-            localStorage.removeItem("refreshComponent{COMPONENT_INSTANCE_ID}");
-            document.dispatchEvent(new CustomEvent("UPDATE_HOMEPAGE__COMPONENT_UPDATED", { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }))
-        }
-    </script>
 </div>

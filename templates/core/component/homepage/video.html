@@ -87,6 +87,15 @@
                             },
                             complete: function (file) {
                                 $(file.previewElement).find('img').remove();
+                            },
+                            contentReloaded: () => {
+                                // Let masonry know we overrode the component, so it can fix the event listeners (e.g. drag or settings)
+                                document.dispatchEvent(
+                                    new CustomEvent(
+                                        "UPDATE_MASONRY__COMPONENT_UPDATED",
+                                        { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }
+                                    )
+                                );
                             }
                         });
                     </script>
@@ -196,6 +205,15 @@
                         },
                         complete: function (file) {
                             $(file.previewElement).find('img').remove();
+                        },
+                        contentReloaded: () => {
+                            // Let masonry know we overrode the component, so it can fix the event listeners (e.g. drag or settings)
+                            document.dispatchEvent(
+                                new CustomEvent(
+                                    "UPDATE_MASONRY__COMPONENT_UPDATED",
+                                    { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }
+                                )
+                            );
                         }
                     });
                 </script>
