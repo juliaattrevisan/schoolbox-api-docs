@@ -41,9 +41,9 @@ export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
     /**
      * Recursively converts an object to a collection of key-value pairs
      * @param {Record<string, string>} curr - The current object
-     * @param {string} keyPath - The path of the current key
+     * @param {string | undefined} [keyPath] - The path of the current key
      */
-    function recurse(curr: NestedObject, keyPath = ""): void {
+    function recurse(curr: NestedObject, keyPath?: string): void {
         Object.keys(curr).forEach((key) => {
             if (Object.prototype.hasOwnProperty.call(curr, key)) {
                 const newKeyPath = keyPath ? `${keyPath}[${key}]` : key;
@@ -93,7 +93,7 @@ export function getSearchString(obj: NestedObject): string {
 /**
  * Takes an object and converts it to a FormData
  * @param {NestedObject} obj - The object to be converted to a FormData
- * @returns {string} - the FormData object
+ * @returns {FormData} - the FormData object
  */
 export function getFormData(obj: NestedObject): FormData {
     // first convert the object to key-value pairs
