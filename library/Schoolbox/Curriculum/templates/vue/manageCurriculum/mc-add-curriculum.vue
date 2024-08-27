@@ -3,12 +3,11 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
-import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";
 
-const store = useStore();
 const addCurriculumStore = useAddCurriculumStore();
 
 /**
@@ -20,7 +19,6 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
- *
  * @returns { string }
  */
 const addButtonText = window.Vue.computed(() => {
@@ -28,12 +26,11 @@ const addButtonText = window.Vue.computed(() => {
         return "Adding...";
     }
 
-    return "Add" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+    return `Add${isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : ""}`;
 });
 
 /**
  * Only enable the button once the conditions are met
- *
  * @returns { boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
@@ -63,8 +60,8 @@ window.Vue.watch(descriptionFieldValue, (newValue: string) => {
 /**
  * submit save
  */
-function onAddSubsectionSelected() {
-    addCurriculumStore.add();
+async function onAddSubsectionSelected() {
+    await addCurriculumStore.add();
 }
 
 /**
@@ -72,13 +69,13 @@ function onAddSubsectionSelected() {
  */
 addCurriculumStore.$onAction(({ name, after, onError }) => {
     if (name === "add") {
-        store.toastEl.value.activate("Adding...");
+        toast.activate("Adding...");
         after((result) => {
-            store.toastEl.value.timeout(result.message, true, 5000);
+            toast.timeout({ text: result.message, isSuccess: true });
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.value.timeout("Unable to add Curriculum", false, 5000);
+            console.error("Unable to add Curriculum", error);
+            toast.timeout({ text: "Unable to add Curriculum", isSuccess: false });
         });
     }
 });
@@ -102,15 +99,15 @@ function onCancelSelected() {
                             <label for="name" class="required">Name</label>
                             <input
                                 id="name"
+                                v-model="addCurriculumStore.curriculum.name"
                                 maxlength="2048"
                                 required
                                 type="text"
-                                v-model="addCurriculumStore.curriculum.name"
                             />
                         </div>
                         <div class="small-12 columns">
                             <label for="code">Code</label>
-                            <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64" />
+                            <input id="code" v-model="addCurriculumStore.curriculum.code" type="text" maxlength="64" />
                         </div>
                         <div class="small-12 columns">
                             <label for="description">Description</label>
@@ -121,20 +118,20 @@ function onCancelSelected() {
                                 <li>
                                     <button
                                         :disabled="addCurriculumStore.isProcessing"
-                                        @click.prevent="onCancelSelected"
                                         class="button icon-close"
+                                        @click.prevent="onCancelSelected"
                                     >
                                         Cancel
                                     </button>
                                 </li>
                                 <li>
                                     <button
+                                        ref="addButton"
+                                        class="button icon-add submit"
+                                        data-test-add-curriculum
                                         :data-submit-button-for="ckeditorIdAttr"
                                         :disabled="isAddDisabled"
                                         @click.prevent="onAddSubsectionSelected"
-                                        class="button icon-add submit"
-                                        data-test-add-curriculum
-                                        ref="addButton"
                                     >
                                         {{ addButtonText }}
                                     </button>

@@ -1,5 +1,6 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, run the build if available and run the tests
-# Note it will only run when changes to js, ts or vue files are added to PRs  
+# It will also run a full typecheck and ensure all linting rules are followed
+# Note it will only run when changes to js, ts or vue files are added to PRs
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: Check JS
@@ -29,3 +30,27 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+
+  typecheck:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+
+    - name: Typecheck
+      run: npm run typecheck
+
+    # No linting yet, will be added in a different PR (SA-18139)
+    # - name: Test Code Linting
+    #   run: npm run lint

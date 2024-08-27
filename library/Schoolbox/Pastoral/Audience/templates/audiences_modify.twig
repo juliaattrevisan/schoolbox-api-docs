@@ -197,10 +197,9 @@
                                         flagPreview = document.getElementById('pastoralFlagPreview');
 
                                     document.dispatchEvent(
-                                        new CustomEvent("colourPickerInitialize", {
+                                        new CustomEvent("colourPickerInitialise", {
                                             detail: {
-                                                target: `#pastoralColor`,
-                                                options: {},
+                                                el: `#pastoralColor`
                                             },
                                         })
                                     );

@@ -2,6 +2,7 @@
  * Returns the tokens plugins for the editor
  */
 
+import type { PluginConstructor } from "@ckeditor/ckeditor5-core";
 import {
     Emoji,
     EmojiActivity,
@@ -16,10 +17,9 @@ import {
 
 /**
  * All the emoji plugins
- *
- * @returns { object } - the emoji plugins
+ * @returns { PluginConstructor[] } - the emoji plugins
  */
-export function getEmojiPlugins() {
+export function getEmojiPlugins(): PluginConstructor[] {
     return [
         Emoji,
         EmojiPeople,

@@ -25,7 +25,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * If there's only no Curriculum, display an empty state
-     *
      * @returns { boolean }
      */
     const hasNoCurriculum = window.Vue.computed(() => nodes.value?.children && nodes.value.children.length === 0);
@@ -33,14 +32,12 @@ export const useNodesStore = defineStore("mcNodes", () => {
     /**
      * If there's only one curriculum, we can select it
      * straight away, otherwise we allow the user to make the selection
-     *
      * @returns { boolean }
      */
     const hasSingleCurriculum = window.Vue.computed(() => nodes.value?.children && nodes.value?.children.length === 1);
 
     /**
      * Update the nodes when a change has occured, either from the initial load or adding or deleting them
-     *
      * @param { Node[] } $nodes - the updated nodes
      */
     function updateNodes($nodes: Node[]) {
@@ -54,6 +51,19 @@ export const useNodesStore = defineStore("mcNodes", () => {
             order: 0,
             parent: null,
             name: "Curricula",
+            _links: {
+                delete: "",
+                getUsage: "",
+                read: "",
+                update: "",
+            }, // TODO: ... review this, it seems like it could lead to a bug
+            _usageCounts: {
+                course: 0,
+                unit: 0,
+                assessment: 0,
+                badge: 0,
+                folder: 0,
+            },
         };
         $nodes.forEach((node) => useSelectedNodesStore().checkIfSelected(node)); // ensure isSelected is kept up to date
     }
@@ -70,19 +80,17 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * to only load the nodes that aren't already active
-     *
      * @param { Breadcrumb[] } activeBreadcrumbs - the active breadcrumbs
      * @param { Breadcrumb } newBreadcrumb - breadcrumb to add
      * @returns { boolean } whether the breadcrumb is active
      */
-    function isActiveBreadcrumb(activeBreadcrumbs: Breadcrumb[], newBreadcrumb: Breadcrumb) {
+    function isActiveBreadcrumb(activeBreadcrumbs: Breadcrumb[], newBreadcrumb: Breadcrumb): boolean {
         return !activeBreadcrumbs.some((activeBreadcrumb) => newBreadcrumb.id === activeBreadcrumb.id);
     }
 
     /**
      * load in all the children required to reach the depth of the node,
      * avoiding loading those nodes that are already loaded
-     *
      * @param { Node } node - the Node to load all children of
      */
     async function loadAllChildren(node: Node) {
@@ -108,7 +116,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * load the node, retrieving all its parents, so we can traverse directly to it
-     *
      * @param { number } id - the id of the Node to load
      */
     async function loadId(id: number) {
@@ -131,7 +138,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             }
         } catch (error) {
             hasLoadError.value = true;
-            throw new Error(error.message, error.options);
+            throw new Error((error as Error).message);
         } finally {
             isLoading.value = false;
         }
@@ -139,7 +146,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * set the top level nodes, passed through from loading
-     *
      * @param { Node[] } $nodes - the node to load
      */
     async function setTopLevel($nodes: Node[]) {
@@ -197,7 +203,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                     },
                 },
             );
-            const responseJson = await response.json();
+            const responseJson = (await response.json()) as Node | { title: string };
             if (response.ok) {
                 const newNode = responseJson as Node;
                 newNode.children?.forEach((node: Node) => useSelectedNodesStore().checkIfSelected(node));
@@ -205,7 +211,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                 useSelectedNodesStore().checkIfSelected(oldNode);
                 oldNode.children = newNode.children; // we just grab the loaded children and overwrite the old property
             } else {
-                throw new Error(responseJson.title, { ...responseJson });
+                throw new Error((responseJson as { title: string }).title);
             }
         } catch (error) {
             hasLoadError.value = true;
@@ -216,7 +222,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * A new curriculum has been added so add it to the nodes
-     *
      * @param { Node } curriculum - the new root curriculum node
      */
     function addNewCurriculum(curriculum: Node) {
@@ -226,7 +231,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * A node has been updated, so we should check if the name change would prompt a sort change
-     *
      * @param { Node } node - the node that has been updated
      */
     function nodeUpdated(node: Node) {
@@ -242,7 +246,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * Pull the node out of the list
-     *
      * @param { Node } node - the node to delete
      */
     function deleteNode(node: Node) {

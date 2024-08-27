@@ -69,14 +69,12 @@ function initColourPickers() {
         }
 
         document.dispatchEvent(
-            new CustomEvent("colourPickerInitialize", {
+            new CustomEvent("colourPickerInitialise", {
                 detail: {
-                    target: `#${colourPicker.id}`,
-                    options: {
-                        clearButton: true,
-                    },
+                    el: `#${colourPicker.id}`,
+                    clearButton: true,
                 },
-            })
+            }),
         );
 
         colourPicker.addEventListener("input", (event) => {
@@ -156,7 +154,7 @@ function updateColourPickerColours(columnCheckboxes) {
     colourPickers.forEach((colourPicker) => {
         const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
         const colourList = checkboxes.map(
-            (checkbox) => getMasonryConfig().editColumns.colours.pickers[`${checkbox.id}_${colourPicker.id}`]
+            (checkbox) => getMasonryConfig().editColumns.colours.pickers[`${checkbox.id}_${colourPicker.id}`],
         ); //for example top_head_font, left_head_font and right_head_font
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
 

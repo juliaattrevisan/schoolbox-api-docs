@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
@@ -18,9 +17,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const toastEl = window.Vue.ref<Toast | null>(null);
-
 const store = useLinkedActivitiesStore();
 
 /**
@@ -111,7 +107,8 @@ const sortedUnitsByDate = window.Vue.computed(() => {
 });
 
 window.Vue.onMounted(() => {
-    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, props.gradeGradientEnable, toastEl);
+    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, props.gradeGradientEnable);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     $("[data-collapser]").collapsable();
 });
 </script>
@@ -251,8 +248,6 @@ window.Vue.onMounted(() => {
             <linked-activities-unlink></linked-activities-unlink>
         </template>
     </sequential-reveal-modal>
-
-    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped></style>

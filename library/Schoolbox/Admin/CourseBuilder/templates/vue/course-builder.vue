@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Toast from "@schoolboxVue/components/toast.vue";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
 import { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilderTypes";
 import CourseBuilderRows from "./course-builder-rows.vue";
@@ -18,8 +17,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const toastEl = window.Vue.ref<typeof Toast>();
 
 const store = useCourseBuilderStore();
 
@@ -54,7 +51,6 @@ window.Vue.onMounted(() => {
         props.unitPermissions,
         props.courseInherit,
         props.unitInherit,
-        toastEl
     );
 });
 </script>
@@ -100,8 +96,6 @@ window.Vue.onMounted(() => {
     </form>
 
     <course-builder-delete-modal />
-
-    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped></style>

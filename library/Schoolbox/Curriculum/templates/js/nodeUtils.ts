@@ -167,7 +167,7 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
  * @param {Node} node - the node to check
  * @returns {boolean} - whether there's any usage assigned on the node
  */
-export function hasUsage(node: Node) {
+export function hasUsage(node: Node): boolean {
     if (
         node._usageCounts.course > 0 ||
         node._usageCounts.unit > 0 ||
@@ -184,7 +184,7 @@ export function hasUsage(node: Node) {
  * @param {Node} node - the node to check
  * @returns {number} - the total count
  */
-export function getTotalUsage(node: Node) {
+export function getTotalUsage(node: Node): number {
     return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.assessment + node._usageCounts.badge;
 }
 
@@ -193,7 +193,7 @@ export function getTotalUsage(node: Node) {
  * @param {ActivityTypes} type - the activity type
  * @returns {string} - the icon to return
  */
-export function getUsageIcon(type: ActivityTypes) {
+export function getUsageIcon(type: ActivityTypes): string {
     const icons = {
         [ActivityTypes.COURSE]: "icon-course-builder",
         [ActivityTypes.UNIT]: "icon-unit",
@@ -205,6 +205,7 @@ export function getUsageIcon(type: ActivityTypes) {
         [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "icon-lesson-plan",
         [ActivityTypes.LEARNING_ACTIVITY_LTI]: "icon-lti",
         [ActivityTypes.BADGE]: "icon-badge",
+        [ActivityTypes.FOLDER]: "icon-folder",
     };
     return icons[type];
 }
@@ -214,12 +215,13 @@ export function getUsageIcon(type: ActivityTypes) {
  * @param {Usage} usage - the usage
  * @returns {string} - the icon to return
  */
-export function getUsageHref(usage: Usage) {
+export function getUsageHref(usage: Usage): string {
     const icons = {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
         [ActivityTypes.LEARNING_ACTIVITY]: () => (usage.object as LearningActivityUsageObject)._links.view,
         [ActivityTypes.BADGE]: () => "#view-badge-details", // opens the badge modal
+        [ActivityTypes.FOLDER]: () => "#", // UNIMPLEMENTED
     };
     return icons[usage.discriminator] && icons[usage.discriminator]();
 }
@@ -230,7 +232,7 @@ export function getUsageHref(usage: Usage) {
  * @param {ActivityTypes} type - the activity type
  * @returns {Usage[]} - the usages of the specified type
  */
-export function getSpecificUsages(usages: Usage[], type: ActivityTypes) {
+export function getSpecificUsages(usages: Usage[], type: ActivityTypes): Usage[] {
     return usages.filter((usage) => usage.discriminator === type);
 }
 
@@ -238,7 +240,7 @@ export function getSpecificUsages(usages: Usage[], type: ActivityTypes) {
  * To return the hash of the current url as a node id
  * @returns {number} - the node id
  */
-export function getIdHash() {
+export function getIdHash(): number {
     const documentURL = document.URL;
     return Number(documentURL.substring(documentURL.indexOf("#") + 1, documentURL.length));
 }
@@ -249,7 +251,7 @@ export function getIdHash() {
  * is a valid node id
  * @returns {boolean} - whether the hash is valid
  */
-export function isValidHash() {
+export function isValidHash(): boolean {
     const documentURL = document.URL;
     const hashCount = (documentURL.match(/#/g) || []).length; // the number of # found in the url
     const idHash = getIdHash();

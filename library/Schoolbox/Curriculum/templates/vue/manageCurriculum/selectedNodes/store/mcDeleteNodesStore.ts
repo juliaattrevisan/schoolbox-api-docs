@@ -20,31 +20,26 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-     *
-     * @returns { Array } - list of fetches
+     * @returns { Promise<Response> } - list of fetch promises
      */
-    function getFetches() {
-        const fetchList = [];
+    function getFetches(): Promise<Response>[] {
         const selectedNodesStore = useSelectedNodesStore();
-        selectedNodesStore.nodes.forEach((node) => {
-            fetchList.push(
-                fetch(node._links.delete, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }),
-            );
+
+        return selectedNodesStore.nodes.map((node) => {
+            return fetch(node._links.delete, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
         });
-        return fetchList;
     }
 
     /**
      * To notify the user of success status
-     *
      * @returns { string } - the success message
      */
-    function getSuccessMessage() {
+    function getSuccessMessage(): string {
         const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
         return `${nodeSingleOrPlural} successfully deleted`;
     }
@@ -59,10 +54,10 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     /**
      * node removal has been confirmed so notify the backend
      * and then pull it out of the nodes if successful
-     *
      * @todo - more extensive error checking needs to occur
+     * @returns { Promise<string> } - the success message
      */
-    async function deleteNodes() {
+    async function deleteNodes(): Promise<string> {
         try {
             isProcessing.value = true;
             const nodeDeletions = await Promise.all(getFetches());

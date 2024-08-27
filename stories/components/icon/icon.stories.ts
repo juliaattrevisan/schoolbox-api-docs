@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
+import type SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 
 /**

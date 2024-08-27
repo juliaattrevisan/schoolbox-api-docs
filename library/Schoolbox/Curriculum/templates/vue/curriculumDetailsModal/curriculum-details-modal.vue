@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
-const selectedNode = window.Vue.ref(getEmptyNode());
-const modalEl = window.Vue.ref(null);
+const activeSelectedNodeId = window.Vue.ref<number | null>(null);
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 interface Props {
     selectedNodeId?: number; // the assigned node to display
@@ -26,8 +26,11 @@ window.Vue.watch(
     () => props.selectedNodeId,
     () => {
         if (props.selectedNodeId !== UNSET_ID) {
-            selectedNode.value = { id: props.selectedNodeId };
-            modalEl.value.open();
+            activeSelectedNodeId.value = props.selectedNodeId;
+
+            if (modalEl.value) {
+                modalEl.value.open();
+            }
         }
     },
 );
@@ -43,8 +46,11 @@ function onNodeLinkSelected(event: Event) {
     event.preventDefault();
     const { href } = event.currentTarget as HTMLAnchorElement;
     const selectedNodeId = parseInt(href.substring(href.indexOf("#") + 1, href.length), 10);
-    selectedNode.value = { id: selectedNodeId };
-    modalEl.value.open();
+    activeSelectedNodeId.value = selectedNodeId;
+
+    if (modalEl.value) {
+        modalEl.value.open();
+    }
 }
 
 /**
@@ -73,6 +79,6 @@ function onModalClosed() {
 
 <template>
     <reveal-modal ref="modalEl" @closed="onModalClosed">
-        <node-details :node="selectedNode" />
+        <node-details v-if="activeSelectedNodeId !== null" :node-id="activeSelectedNodeId" />
     </reveal-modal>
 </template>

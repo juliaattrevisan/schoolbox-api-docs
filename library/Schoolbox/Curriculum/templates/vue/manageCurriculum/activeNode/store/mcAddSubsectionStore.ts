@@ -11,7 +11,6 @@ const UNSET_ID = -1;
 
 /**
  * Pass empty fields to be added
- *
  * @returns { Partial<Node> } - a new Node to add
  */
 function getSubsection(): Partial<Node> {
@@ -24,7 +23,6 @@ function getSubsection(): Partial<Node> {
 
 /**
  * Pass through the subsection and whether the node is enabled
- *
  * @param { Partial<Node> } subsection - the new subsection data
  * @param { Node } node - the parent Node
  * @returns { string } - the data to send to the backend
@@ -46,7 +44,6 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
 
     /**
      * to display a prompt to confirm adding a node to a subsection
-     *
      * @param { Node } node - the node being added
      */
     function prompt(node: Node) {
@@ -65,8 +62,9 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
 
     /**
      * pass the new subsections details to the backend
+     * @returns { Promise<{ id: number, message: string }> } - the id of the new node and a message to display
      */
-    async function add() {
+    async function add(): Promise<{ id: number; message: string }> {
         const activeNodeStore = useActiveNodeStore();
         try {
             isProcessing.value = true;
@@ -77,7 +75,7 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
                 },
                 body: getFormData(subsection.value, activeNodeStore.node),
             });
-            const responseJson = await response.json();
+            const responseJson = (await response.json()) as Node | { title: string };
             if (response.ok) {
                 const newNode: Node = responseJson as Node;
                 id.value = newNode.id;
@@ -86,9 +84,10 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
                 cancel();
                 return { id: newNode.id, message: "Subsection successfully added" };
             }
-            throw new Error(responseJson.title, { ...responseJson });
+
+            throw new Error((responseJson as { title: string }).title);
         } catch (error) {
-            throw new Error(error.message, error.options);
+            throw new Error((error as Error).message);
         } finally {
             isProcessing.value = false;
         }

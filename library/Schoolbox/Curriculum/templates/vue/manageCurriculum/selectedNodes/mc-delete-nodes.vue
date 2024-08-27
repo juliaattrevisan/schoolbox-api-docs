@@ -3,15 +3,14 @@
  * To be able to delete a node on confirmation
  */
 
-import { useStore } from "../store/manageCurriculumStore";
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
-const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const deleteNodesStore = useDeleteNodesStore();
-const modalEl = window.Vue.ref(null);
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 /**
  * to open the modal when requested
@@ -19,15 +18,20 @@ const modalEl = window.Vue.ref(null);
 window.Vue.watch(
     () => deleteNodesStore.isOpen,
     (isOpen) => {
-        isOpen ? modalEl.value.open() : modalEl.value.close();
+        if (modalEl.value === null) return; // no modal yet...
+        if (isOpen) {
+            modalEl.value.open();
+        } else {
+            modalEl.value.close();
+        }
     },
 );
 
 /**
  * delete the node when confirmed
  */
-function onDeleteSelected() {
-    deleteNodesStore.deleteNodes();
+async function onDeleteSelected() {
+    await deleteNodesStore.deleteNodes();
 }
 
 /**
@@ -36,13 +40,14 @@ function onDeleteSelected() {
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === "deleteNodes") {
-        store.toastEl.value.activate("Deleting...");
+        toast.activate("Deleting...");
+
         after((result) => {
-            store.toastEl.value.timeout(result, true, 5000);
+            toast.timeout({ text: result, isSuccess: true });
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.value.timeout("Unable to delete outcome", false, 5000);
+            console.error("Unable to delete outcome", error);
+            toast.timeout({ text: "Unable to delete outcome", isSuccess: false });
         });
     }
 });
@@ -50,16 +55,14 @@ deleteNodesStore.$onAction(({ name, after, onError }) => {
 /**
  * To instantly notify the user that the node is being deleted
  * by updating the button text
- *
- * @returns { String }
+ * @returns { string }
  */
 const deleteButtonText = window.Vue.computed(() => (deleteNodesStore.isProcessing ? "Deleting..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
  * processing is taking place
- *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isModalDisabled = window.Vue.computed(() => deleteNodesStore.isProcessing);
 

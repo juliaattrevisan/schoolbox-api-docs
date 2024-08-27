@@ -3,10 +3,10 @@
  * to be able to update a nodes name, code and description
  */
 
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
-import { useStore } from "../store/manageCurriculumStore";
 import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
 
 const props = defineProps({
@@ -19,20 +19,17 @@ const props = defineProps({
     },
 });
 
-const store = useStore();
 const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
 /**
  * to gradually and more marginLeft to indicate node level depth
- *
  * @returns { number }
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
- *
  * @returns { string }
  */
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
@@ -41,7 +38,6 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
- *
  * @returns { string }
  */
 const updateButtonText = window.Vue.computed(() => {
@@ -49,12 +45,11 @@ const updateButtonText = window.Vue.computed(() => {
         return "Updating...";
     }
 
-    return "Update" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+    return `Update${isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : ""}`;
 });
 
 /**
  * Only enable the button once the conditions are met
- *
  * @returns { boolean }
  */
 const isUpdateDisabled = window.Vue.computed(() => {
@@ -71,7 +66,7 @@ const isUpdateDisabled = window.Vue.computed(() => {
 const descriptionField = useDescriptionEditor(
     updateNodeStore.activeNodeCopy?.description as string,
     ckeditorIdAttr.value,
-    isMaxCharCountExceeded
+    isMaxCharCountExceeded,
 );
 
 /**
@@ -84,8 +79,8 @@ window.Vue.watch(descriptionField, (newValue) => {
 /**
  * submit save
  */
-function onUpdateSelected() {
-    updateNodeStore.update();
+async function onUpdateSelected() {
+    await updateNodeStore.update();
 }
 
 /**
@@ -93,13 +88,13 @@ function onUpdateSelected() {
  */
 updateNodeStore.$onAction(({ name, after, onError }) => {
     if (name === "update") {
-        store.toastEl.value.activate("Updating...");
+        toast.activate("Updating...");
         after((result) => {
-            store.toastEl.value.timeout(result.message, true, 5000);
+            toast.timeout({ text: result.message, isSuccess: true });
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.value.timeout("Unable to update node", false, 5000);
+            console.error("Unable to update node", error);
+            toast.timeout({ text: "Unable to update node", isSuccess: false });
         });
     }
 });
@@ -122,15 +117,15 @@ function onCancelSelected() {
                         <label for="name" class="required">Name</label>
                         <input
                             id="name"
+                            v-model="updateNodeStore.activeNodeCopy.name"
                             maxlength="2048"
                             required
                             type="text"
-                            v-model="updateNodeStore.activeNodeCopy.name"
                         />
                     </div>
                     <div class="small-12 columns">
                         <label for="code">Code</label>
-                        <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64" />
+                        <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
@@ -140,21 +135,21 @@ function onCancelSelected() {
                         <ul class="flex-list">
                             <li>
                                 <button
+                                    class="button icon-close"
                                     :disabled="updateNodeStore.isProcessing"
                                     @click.prevent="onCancelSelected"
-                                    class="button icon-close"
                                 >
                                     Cancel
                                 </button>
                             </li>
                             <li>
                                 <button
+                                    ref="updateButton"
+                                    class="button icon-modify submit"
+                                    data-test-update-node
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isUpdateDisabled"
                                     @click.prevent="onUpdateSelected"
-                                    class="button icon-modify submit"
-                                    data-test-update-node
-                                    ref="updateButton"
                                 >
                                     {{ updateButtonText }}
                                 </button>

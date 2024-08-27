@@ -18,21 +18,18 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     /**
      * To only start showing search results once enough characters
      * have been added
-     *
      * @returns { boolean }
      */
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH);
 
     /**
      * add any filters, should we be showing existing results?
-     *
      * @returns { Node[] }
      */
     const filteredResults = window.Vue.computed(() => (isActive.value ? (results.value as Node[]) : []));
 
     /**
      * To show that no nodes match the current search
-     *
      * @returns { boolean }
      */
     const hasNoResults = window.Vue.computed(() => {
@@ -67,7 +64,7 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
             );
             results.value = (await response.json()) as Node[];
         } catch (error) {
-            console.warn(error);
+            console.error(error);
         } finally {
             isLoading.value = false;
         }

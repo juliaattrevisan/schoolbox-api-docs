@@ -8,8 +8,8 @@
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { PaperlyPayload } from "../js/types/PaperlyPayload";
+import type { UpcomingItem } from "../js/types/UpcomingItem";
 import PdcUpcomingItem from "./pdc-upcoming-item.vue";
-import { UpcomingItem } from "../js/types/UpcomingItem";
 
 interface Props {
     getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
@@ -58,7 +58,7 @@ window.Vue.onMounted(() => {
  * Lists the upcoming tasks
  * @returns {UpcomingItem[]} - the upcoming tasks
  */
-const upcoming = window.Vue.computed(() => {
+const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
     // if the payload is not loaded, return an empty array
     if (paperlyPayload.value === undefined) {
         return [];

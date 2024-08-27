@@ -134,7 +134,7 @@ export default {
                 this.$refs.toast.timeout(`Group ${currentGradeLevel.caption} successfully removed`, true);
 
                 this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter(
-                    (g, i) => i !== levelIndex
+                    (g, i) => i !== levelIndex,
                 );
                 this.closeDeleteGradeGroupModal();
                 this.applyValidator();
@@ -146,7 +146,7 @@ export default {
              * this grade level has been persisted, so we need to delete it
              */
             const adjustedGradeLevels = this.gradeGroups[groupIndex].levels.filter(
-                (v) => v.id !== currentGradeLevel.id
+                (v) => v.id !== currentGradeLevel.id,
             );
 
             try {

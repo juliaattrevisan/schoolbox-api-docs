@@ -1,10 +1,18 @@
+import type { FontColorConfig, FontFamilyConfig, FontSizeConfig } from "@ckeditor/ckeditor5-font";
 import { fontColourSwatches, fontBackgroundColourSwatches } from "./colourSettings";
+
+interface FontSettingsConfig {
+    fontFamily: FontFamilyConfig;
+    fontSize: FontSizeConfig;
+    fontColor: FontColorConfig;
+    fontBackgroundColor: FontColorConfig;
+}
 
 /**
  * Returns the settings for the font options
- * @returns { object } - the font settings
+ * @returns { FontSettingsConfig } - the font settings
  */
-export function getFontSettings() {
+export function getFontSettings(): FontSettingsConfig {
     return {
         fontFamily: {
             options: [

@@ -4,7 +4,7 @@
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
-import BadgeModal from "@schoolboxBadge/vue/badge-modal";
+import BadgeModal from "@schoolboxBadge/vue/badge-modal.vue";
 import SpResultsPrompt from "./results/sp-results-prompt.vue";
 import SpResultsError from "./results/sp-results-error.vue";
 import SpResultsNone from "./results/sp-results-none.vue";
@@ -34,7 +34,7 @@ store.init(
     props.filterDateRange,
     props.filterCreator as Creator,
     props.filterTypesAvailable,
-    props.filterTypesSelected
+    props.filterTypesSelected,
 ); // initialise the store
 
 const searchStore = useSearchStore();

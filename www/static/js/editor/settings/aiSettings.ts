@@ -1,17 +1,31 @@
-import {EditorConfig} from "@js/editor/types/editorTypes";
+import type { AIAssistantConfig } from "@ckeditor/ckeditor5-ai/src/aiassistant";
+
+interface SbxAIAssistantConfig {
+    ai: {
+        openAI: {
+            apiUrl: string;
+            requestParameters: {
+                model: string | undefined;
+            };
+        };
+        aiAssistant: AIAssistantConfig;
+        useTheme: boolean;
+    };
+}
 
 /**
  * Returns the settings for the AI assistant
- * @returns { object } - the font settings
+ * @param { string | undefined } model - the model to use for the AI assistant
+ * @returns { SbxAIAssistantConfig } - the AI Assistant settings
  */
-export function getAISettings(model: string | undefined) {
+export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
     return {
         ai: {
             openAI: {
                 apiUrl: "/openai",
                 requestParameters: {
-                    'model': model,
-                }
+                    model,
+                },
             },
             aiAssistant: {
                 // Define the commands list from scratch.

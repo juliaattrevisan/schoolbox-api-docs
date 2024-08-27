@@ -10,6 +10,7 @@ import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { DropdownView } from "@ckeditor/ckeditor5-ui";
 import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
 import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
+import type View from "@ckeditor/ckeditor5-ui/src/view";
 import { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 
 export default class PanelTweaks extends Plugin {
@@ -65,6 +66,8 @@ export default class PanelTweaks extends Plugin {
                 target: item.buttonView.element as HTMLElement,
                 fitInViewport: true,
                 limiter: document.getElementById("content"),
+                // @ts-expect-error - Acessing the private property is intentional here, for now
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 positions: item._panelPositions,
             }) as Position;
             item.panelView.position = optimalPosition.name as PanelPosition;
@@ -80,8 +83,10 @@ export default class PanelTweaks extends Plugin {
         if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
             const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
             // fired when the balloon is shown or hidden by any UI
-            contextualBalloon.on("change:visibleView", (eventInfo, name, value: null | HTMLElement) => {
-                const balloonElement = value?.element.parentElement.parentElement.parentElement as HTMLElement;
+            contextualBalloon.on("change:visibleView", (eventInfo, name, value: null | View<HTMLElement>) => {
+                if (value === null) return;
+
+                const balloonElement = value.element?.parentElement?.parentElement?.parentElement ?? null;
                 if (balloonElement && balloonElement.style.zIndex !== zIndex) {
                     balloonElement.style.zIndex = zIndex;
                     // we also need to add the editor id to the balloon so we can potentially access it later

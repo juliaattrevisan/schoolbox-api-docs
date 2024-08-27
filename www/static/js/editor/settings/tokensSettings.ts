@@ -2,7 +2,8 @@
  * Returns the tokens settings for the editor
  */
 
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import type { MentionConfig } from "@ckeditor/ckeditor5-mention";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import { replaceAllStringSections, StringSection } from "@js/util/stringUtils";
 
 const DEFAULT_TOKENS = [
@@ -22,10 +23,10 @@ const DEFAULT_TOKENS = [
 
 /**
  * If tokens are enabled, return the tokens settings
- * @param { EditorConfig } config - the config to use when creating the editor
- * @returns { object } - the tokens settings
+ * @param { SbxEditorConfig } config - the config to use when creating the editor
+ * @returns { { mention: MentionConfig } | Record<PropertyKey, never> } - the tokens settings if enabled
  */
-export function getTokensSettings(config: EditorConfig) {
+export function getTokensSettings(config: SbxEditorConfig): { mention: MentionConfig } | Record<PropertyKey, never> {
     if (config.hasTokens) {
         return {
             mention: {
@@ -103,10 +104,10 @@ function wrapToken(sourceElementContent: string, token: string): string {
  * with CKE5, tokens are now surrounded by a span element with a data-mention attribute
  * this function was added to help migrate text from CKE4 to CKE5, it will surround any tokens that are not already surrounded by a data-mention attribute
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
- * @param { EditorConfig } config - the config to use when creating the editor
+ * @param { SbxEditorConfig } config - the config to use when creating the editor
  * @returns { HTMLElement } - the html with the tokens surrounded by the span element
  */
-export function wrapTokens(sourceElementHTML: HTMLElement, config: EditorConfig): HTMLElement {
+export function wrapTokens(sourceElementHTML: HTMLElement, config: SbxEditorConfig): HTMLElement {
     const tokens = config.tokenList ? config.tokenList : DEFAULT_TOKENS;
     let updatedContent = sourceElementHTML.innerHTML;
     tokens.forEach((token) => {

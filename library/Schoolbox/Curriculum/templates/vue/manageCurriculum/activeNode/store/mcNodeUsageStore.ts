@@ -3,8 +3,9 @@
  */
 
 import { defineStore } from "pinia";
-import { useActiveNodeStore } from "./mcActiveNodeStore";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
+import { useActiveNodeStore } from "./mcActiveNodeStore";
 
 export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
     const isProcessing = window.Vue.ref(false);
@@ -20,15 +21,15 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
             const activeNodeStore = useActiveNodeStore();
             const usageResponse = await fetch(activeNodeStore.node._links.getUsage);
             if (usageResponse.ok) {
-                const usage = (await usageResponse.json()) as JSON;
+                const usage = (await usageResponse.json()) as { data: Usage[] };
                 // we are not currently displaying folders in the usage list
-                const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== "folder");
-                activeNodeStore.node.usage = withoutFolders as Usage[];
+                const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== ActivityTypes.FOLDER);
+                activeNodeStore.node.usage = withoutFolders;
             } else {
                 hasLoadError.value = true;
             }
         } catch (error) {
-            throw new Error(error.message, error.options);
+            throw new Error((error as Error).message);
         } finally {
             isProcessing.value = false;
         }
@@ -36,7 +37,6 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
 
     /**
      * to display all the nodes usage details
-     *
      * @param { Node } node - node to update
      */
     async function prompt(node: Node) {

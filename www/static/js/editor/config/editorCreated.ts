@@ -1,31 +1,32 @@
 /**
  * Once the editor has been created, we can add in any additional setup required
  */
-
-import { Editor, EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import type { SbxEditor, SbxEditorConfig, SbxEditorElement } from "@js/editor/types/editorTypes";
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
+import { getSourceElementIdentifier } from "./editorCheckData";
 
 /**
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
- * @param { Editor } editor - the CKEditor instance
- * @param { HTMLTextAreaElement | HTMLElement } sourceElement - the sourceElement the CKEditor will replace
+ * @param { SbxEditor } editor - the CKEditor instance
+ * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
  */
-function addToGlobalScope(editor: Editor, sourceElement: HTMLTextAreaElement | HTMLElement) {
-    if (sourceElement.id) {
-        window.sbProps.editors[sourceElement.id] = editor;
-    } else if (sourceElement instanceof HTMLTextAreaElement && sourceElement.name) {
-        window.sbProps.editors[sourceElement.name] = editor;
-    }
+function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement) {
+    const editorIdentifier = getSourceElementIdentifier(sourceElement);
+    if (editorIdentifier === null)
+        throw new Error("Editor must have an ID or name to be accessible in the global scope");
+
+    window.sbProps.editors[editorIdentifier] = editor;
 }
 
 /**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
- * @param { Editor } editor - the CKEditor instance
- * @param { EditorConfig } config - the CKEditor config object
+ * @param { SbxEditor } editor - the CKEditor instance
+ * @param { SbxEditorConfig } config - the CKEditor config object
  */
-function disableAutoMedia(editor: Editor, config: EditorConfig) {
+function disableAutoMedia(editor: SbxEditor, config: SbxEditorConfig) {
     if (config.toolbar === EditorToolbar.SIMPLE) {
         editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
         editor.plugins.get("AutoMediaEmbed").destroy();
@@ -38,8 +39,11 @@ function disableAutoMedia(editor: Editor, config: EditorConfig) {
  * @todo - review this, there may be a better way to handle this
  */
 function removeValidation() {
-    $("form").each(function () {
+    $("form").each(() => {
+        // @ts-expect-error - ignore the error as we're using jquery
         if ($(this).data("validator")) {
+            // @ts-expect-error - ignore the error as we're using jquery
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             $(this).data("validator").settings.ignore = ".ck";
         }
     });
@@ -47,9 +51,9 @@ function removeValidation() {
 
 /**
  * Once the iFramely script has loaded, we can add in the event listener
- * @param { Editor } editor - the CKEditor instance
+ * @param { SbxEditor } editor - the CKEditor instance
  */
-function configureIframelyListener(editor: Editor) {
+function configureIframelyListener(editor: SbxEditor) {
     /**
      * Track copy/paste to add an extra undo step if the link fails to unfurl
      */
@@ -86,22 +90,22 @@ function configureIframelyListener(editor: Editor) {
  * https://webpack.js.org/configuration/mode/
  * so it will only be imported in development mode, not in production
  * No longer used, but kept for any future debugging needs
- * @param { Editor } editor - the CKEditor instance
+ * @param { SbxEditor } editor - the CKEditor instance
  */
-async function attachInspector(editor: Editor) {
-    if (process.env.NODE_ENV === "development") {
-        const inspector = await import("@ckeditor/ckeditor5-inspector");
-        inspector.default.attach(editor);
-    }
-}
+// async function attachInspector(editor: SbxEditor) {
+//     if (process.env.NODE_ENV === "development") {
+//         const inspector = await import("@ckeditor/ckeditor5-inspector");
+//         inspector.default.attach(editor);
+//     }
+// }
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
- * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
- * @param { Editor } editor - the CKEditor instance
- * @param { EditorConfig } config - the CKEditor config object
+ * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
+ * @param { SbxEditor } editor - the CKEditor instance
+ * @param { SbxEditorConfig } config - the CKEditor config object
  */
-export function modifyEditor(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig) {
     addToGlobalScope(editor, sourceElement);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);

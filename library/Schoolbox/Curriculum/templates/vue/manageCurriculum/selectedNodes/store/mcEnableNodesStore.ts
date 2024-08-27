@@ -13,7 +13,6 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
 
     /**
      * to display a prompt to confirm a node enabled change
-     *
      * @param { boolean } newEnabled - whether to enable or disable the selected nodes
      */
     function prompt(newEnabled: boolean) {
@@ -31,34 +30,29 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-     *
-     * @returns { Array } - to individually enable/disable each node
+     * @returns { Promise<Response> } - to individually enable/disable each node
      */
-    function getFetches() {
-        const fetchList: Promise<string> = [];
+    function getFetches(): Promise<Response>[] {
         const selectedNodesStore = useSelectedNodesStore();
-        selectedNodesStore.nodes.forEach((node) => {
-            fetchList.push(
-                fetch(node._links.update, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        enabled: enabled.value,
-                    }),
+
+        return selectedNodesStore.nodes.map((node) => {
+            return fetch(node._links.update, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    enabled: enabled.value,
                 }),
-            );
+            });
         });
-        return fetchList;
     }
 
     /**
      * To notify the user of success status
-     *
      * @returns { string } the success message
      */
-    function getSuccessMessage() {
+    function getSuccessMessage(): string {
         const selectedNodesStore = useSelectedNodesStore();
         const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
         const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? "disabled" : "enabled"}`;
@@ -68,10 +62,10 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     /**
      * node enable/disable has been confirmed so notify the backend
      * and update the frontend to match
-     *
      * @todo - more extensive error checking needs to occur
+     * @returns { Promise<string> } the success message
      */
-    async function enable() {
+    async function enable(): Promise<string> {
         try {
             isProcessing.value = true;
             const nodeEnables = await Promise.all(getFetches());

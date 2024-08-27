@@ -52,7 +52,7 @@ function onDeleteNodesSelected() {
 <template>
     <div class="small-12 island">
         <bottom-drawer
-            :showDrawer="
+            :show-drawer="
                 selectedNodesStore.hasNodes &&
                 !updateNodeStore.isOpen &&
                 !addSubsectionStore.isOpen &&

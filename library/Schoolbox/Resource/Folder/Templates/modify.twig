@@ -39,13 +39,11 @@
 <script type="text/javascript">
     $(function() {
         document.dispatchEvent(
-            new CustomEvent("colourPickerInitialize", {
+            new CustomEvent("colourPickerInitialise", {
                 detail: {
-                    target: `#colour`,
-                    options: {
-                        alpha: false,
-                        clearButton: true
-                    },
+                    el: `#colour`,
+                    alpha: false,
+                    clearButton: true
                 },
             })
         );

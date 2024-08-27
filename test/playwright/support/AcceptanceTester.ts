@@ -140,8 +140,8 @@ export default class AcceptanceTester extends BaseTester {
         // Focus the editor, and clear all content
         await this.page.evaluate(
             ([_editorId]) => {
-                window.sbProps.editors[_editorId].focus();
-                window.sbProps.editors[_editorId].setData("");
+                window.sbProps.editors[_editorId]!.focus();
+                window.sbProps.editors[_editorId]!.setData("");
             },
             [editorId],
         );

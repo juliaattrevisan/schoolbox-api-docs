@@ -22,6 +22,7 @@ import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { WordCount } from "@ckeditor/ckeditor5-word-count";
 import { AIAssistant, OpenAITextAdapter } from "@ckeditor/ckeditor5-ai";
+import type { EditorConfig } from "@ckeditor/ckeditor5-core";
 import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
@@ -35,17 +36,17 @@ import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { getAISettings } from "@js/editor/settings/aiSettings";
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
 /**
  * Return the default configuration
- * @param { EditorConfig } config - the default config
- * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
+ * @param { SbxEditorConfig } config - the default config
+ * @returns { EditorConfig & { sbConfig: SbxEditorConfig } } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getConfig(config: EditorConfig): EditorConfig {
+export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: SbxEditorConfig } {
     return {
         plugins: [
             // list all the plugins we'll use in the default editor

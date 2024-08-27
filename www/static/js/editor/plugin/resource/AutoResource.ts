@@ -7,12 +7,13 @@
 import { Plugin } from "@ckeditor/ckeditor5-core";
 import { slideUp } from "@js/util/animateUtils";
 import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
+import type { ImageUploadCompleteEvent } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { SbxEditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
-import type { ClipboardInputEventData } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
+import type { ViewDocumentClipboardInputEvent } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
 import { createImageTypeRegExp } from "@ckeditor/ckeditor5-image/src/imageupload/utils";
 
 export default class ResourceEditing extends Plugin {
@@ -26,7 +27,7 @@ export default class ResourceEditing extends Plugin {
      * When files are added, upload them and add them to the editor
      */
     init() {
-        const config = this.editor.config.get("sbConfig") as EditorConfig;
+        const config = this.editor.config.get("sbConfig") as SbxEditorConfig;
         // prevent adding resources if the toolbar is set to simple
         if (config.toolbar === EditorToolbar.SIMPLE) {
             return;
@@ -34,7 +35,7 @@ export default class ResourceEditing extends Plugin {
         const { editor } = this;
         const fileRepository = editor.plugins.get("FileRepository");
         const resourceUI = editor.plugins.get("ResourceUI") as ResourceUI;
-        editor.editing.view.document.on("clipboardInput", (event, data: ClipboardInputEventData) => {
+        editor.editing.view.document.on<ViewDocumentClipboardInputEvent>("clipboardInput", (event, data) => {
             /**
              * Skip if non empty HTML data is included.
              * https://github.com/ckeditor/ckeditor5-upload/issues/68
@@ -45,7 +46,7 @@ export default class ResourceEditing extends Plugin {
                 return;
             }
             // Get the files from the clipboard dataTransfer object
-            let files = Array.from(data.dataTransfer._files);
+            let files = Array.from(data.dataTransfer.files);
             const imageTypes = createImageTypeRegExp(["jpeg", "png", "gif", "bmp", "webp", "tiff"]);
             files = files.filter((file) => !imageTypes.test(file.type)); // ensure images aren't uploaded
             // Ensure there are still files to upload after images have been filtered
@@ -56,21 +57,21 @@ export default class ResourceEditing extends Plugin {
                 // Set selection to paste target, to ensure files are most accurately placed
                 if (data.targetRanges) {
                     writer.setSelection(
-                        data.targetRanges.map((viewRange) => editor.editing.mapper.toModelRange(viewRange))
+                        data.targetRanges.map((viewRange) => editor.editing.mapper.toModelRange(viewRange)),
                     );
                 }
                 this.totalUploadCount = files.length;
                 this.uploadedCount = 0;
                 this.editor.enableReadOnlyMode("auto-resource");
                 files.forEach((file) => {
-                    void this.loadResource(fileRepository, resourceUI, file as File);
+                    void this.loadResource(fileRepository, resourceUI, file);
                 });
             });
         });
 
         // When an image is uploaded, add the alt and linkHref attributes (so the image has a link to the original file)
         const imageUploadEditing = this.editor.plugins.get("ImageUploadEditing");
-        imageUploadEditing.on("uploadComplete", (evt, { data, imageElement }) => {
+        imageUploadEditing.on<ImageUploadCompleteEvent>("uploadComplete", (evt, { data, imageElement }) => {
             this.editor.model.change((writer) => {
                 writer.setAttribute("alt", data.name, imageElement);
                 writer.setAttribute("linkHref", data.default, imageElement);
@@ -96,13 +97,13 @@ export default class ResourceEditing extends Plugin {
                 progressMeter.style.width = `${value}%`;
             });
             // www/static/js/editor/plugin/uploadAdapter/UploadAdapter.ts is the adapter that uploads files to the server
-            const resource: Resource = await loader.upload();
+            const resource = (await loader.upload()) as Resource;
             addResource(this.editor, resource);
             await this.removeUploadProgress(uploadElement);
         } catch (error) {
-            resourceUI.showUploadErrorElement(
+            ResourceUI.showUploadErrorElement(
                 uploadElement,
-                "Sorry, the file could not be uploaded as an unknown error has occurred."
+                "Sorry, the file could not be uploaded as an unknown error has occurred.",
             );
             const remove = uploadElement.querySelector("[data-remove-upload]") as HTMLDivElement;
             remove.addEventListener("click", () => {

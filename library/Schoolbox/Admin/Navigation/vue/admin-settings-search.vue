@@ -86,8 +86,9 @@ export default window.Vue.defineComponent({
             if (this.query.length < this.minQueryLength) {
                 return [];
             }
-            const matchedTitleList = this.settingsList.filter(this.searchForTitle);
-            const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
+
+            const matchedTitleList = this.settingsList.filter(this.searchForTitle.bind(this));
+            const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription.bind(this));
             return matchedTitleList.concat(matchedNameAndDescriptionList); // so those that have title matches take precedence
         },
     },
@@ -310,8 +311,9 @@ export default window.Vue.defineComponent({
          * @param {() => void} done - to be called once animation is complete
          */
         onEnter(element: Element, done: () => void) {
-            const delay = element.dataset.index * 0.025;
-            gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay: delay, onComplete: done });
+            const elementIndex = element.getAttribute("index") ?? "0";
+            const delay = parseInt(elementIndex, 10) * 0.025;
+            gsap.to(element, 0.3, { opacity: 1, y: 0, height: "auto", delay, onComplete: done });
         },
 
         /**
@@ -321,15 +323,6 @@ export default window.Vue.defineComponent({
          */
         onLeave(element: Element, done: () => void) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done });
-        },
-
-        /**
-         * how the element animates off
-         */
-        onAfterLeave() {
-            this.$refs.searchResults.forEach((searchResult) => {
-                searchResult.test();
-            });
         },
 
         /**
@@ -378,8 +371,7 @@ export default window.Vue.defineComponent({
             :readonly="!isLoaded"
             :placeholder="inputPlaceholder"
             type="text"
-            class=""
-            @input="$event.target.composing = false"
+            @input="query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
         />
         <scroll-fade-wrapper wrapper-tag="div" slotted-element-selector="ul">
             <transition-group

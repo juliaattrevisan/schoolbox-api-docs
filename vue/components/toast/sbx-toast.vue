@@ -38,18 +38,18 @@ function activate($text: string, $link: ToastLink | null) {
 /**
  * Display this toast with a timeout.
  * @param {string} $text - The text to put in it
- * @param {boolean} isSuccess -  Was the operation that displays this toast
- * @param {number} $duration - How long should the toast show?
- * @param {number} $fadeDuration - How long to wait before the toast disappears? (in ms)
- * @param {() => void|undefined} timeoutCallback If callable, call this
+ * @param {boolean} [isSuccess] -  Was the operation that displays this toast
+ * @param {number} [$duration] - How long should the toast show?
+ * @param {number} [$fadeDuration] - How long to wait before the toast disappears? (in ms)
+ * @param {() => void} [timeoutCallback] If callable, call this
  *                        when the toast times out
  */
 function timeout(
     $text: string,
-    isSuccess: boolean | undefined,
-    $duration: number | undefined,
-    $fadeDuration: number | undefined,
-    timeoutCallback: () => void | undefined,
+    isSuccess?: boolean,
+    $duration?: number,
+    $fadeDuration?: number,
+    timeoutCallback?: () => void,
 ) {
     text.value = $text;
     state.value = isSuccess || isSuccess === undefined ? STATE_DONE : STATE_FAILED;

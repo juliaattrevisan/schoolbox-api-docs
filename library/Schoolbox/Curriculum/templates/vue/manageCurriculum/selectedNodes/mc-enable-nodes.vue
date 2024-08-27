@@ -3,15 +3,14 @@
  * To be able to enabled a node on confirmation
  */
 
-import { useStore } from "../store/manageCurriculumStore";
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
-const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const enableNodesStore = useEnableNodesStore();
-const modalEl = window.Vue.ref(null);
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 /**
  * to open the modal when requested
@@ -19,15 +18,20 @@ const modalEl = window.Vue.ref(null);
 window.Vue.watch(
     () => enableNodesStore.isOpen,
     (isOpen) => {
-        isOpen ? modalEl.value.open() : modalEl.value.close();
+        if (modalEl.value === null) return; // no modal yet...
+        if (isOpen) {
+            modalEl.value.open();
+        } else {
+            modalEl.value.close();
+        }
     },
 );
 
 /**
  * enabled the node when confirmed
  */
-function onEnableSelected() {
-    enableNodesStore.enable();
+async function onEnableSelected() {
+    await enableNodesStore.enable();
 }
 
 /**
@@ -36,13 +40,14 @@ function onEnableSelected() {
  */
 enableNodesStore.$onAction(({ name, after, onError }) => {
     if (name === "enable") {
-        store.toastEl.value.activate("Processing...");
+        toast.activate("Processing...");
+
         after((result) => {
-            store.toastEl.value.timeout(result, true, 5000);
+            toast.timeout({ text: result, isSuccess: true });
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.value.timeout("Unable to process request", false, 5000);
+            console.error("Unable to process request", error);
+            toast.timeout({ text: "Unable to process request", isSuccess: false });
         });
     }
 });
@@ -50,24 +55,22 @@ enableNodesStore.$onAction(({ name, after, onError }) => {
 /**
  * To instantly notify the user that the node is being enabled / disabled
  * by updating the button text
- *
- * @returns { String }
+ * @returns { string }
  */
 const enabledButtonText = window.Vue.computed(() => {
     if (enableNodesStore.isProcessing && enableNodesStore.enabled) {
         return "Enabling...";
-    } else if (enableNodesStore.isProcessing && !enableNodesStore.enabled) {
-        return "Disabling...";
-    } else {
-        return "Yes";
     }
+    if (enableNodesStore.isProcessing && !enableNodesStore.enabled) {
+        return "Disabling...";
+    }
+    return "Yes";
 });
 
 /**
  * to prevent the user from moving away from the modal while
  * processing is taking place
- *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isModalDisabled = window.Vue.computed(() => enableNodesStore.isProcessing);
 

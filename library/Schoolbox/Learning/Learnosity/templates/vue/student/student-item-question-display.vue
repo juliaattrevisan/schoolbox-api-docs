@@ -175,6 +175,8 @@ window.Vue.onMounted(() => {
          * container is already present
          */
         if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
+            // @ts-expect-error - schoolboxResource is available here, but untyped.
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
 
@@ -186,7 +188,7 @@ window.Vue.onMounted(() => {
             .forEach((oEmbedEl) => {
                 window.iframely.load(
                     oEmbedEl,
-                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url"),
+                    oEmbedEl.getAttribute("data-oembed-url") || oEmbedEl.getAttribute("url") || undefined,
                 );
             });
 

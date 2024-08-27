@@ -4,9 +4,12 @@
  * It calls asyncUpload.php and then returns the resource object
  */
 
-import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import type { Editor } from "@js/editor/types/editorTypes";
-import type { FileLoader } from "@ckeditor/ckeditor5-upload/src/filerepository";
+import type { AsyncUploadResponse, Resource } from "@js/editor/plugin/resource/resourceUtils";
+import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { FileLoader, UploadResponse } from "@ckeditor/ckeditor5-upload/src/filerepository";
+
+type UploadResolve = (value: UploadResponse | PromiseLike<UploadResponse>) => void;
+type UploadReject = (reason?: string) => void;
 
 export default class UploadAdapter {
     loader: FileLoader;
@@ -53,13 +56,13 @@ export default class UploadAdapter {
      * at least the "default" URL, pointing to the image on the server.
      * This URL will be used to display the image in the content. Learn more in the
      * UploadAdapter#upload documentation.
-     * @param { Function } resolve - when the file uploads successfully
-     * @param { Function } reject - when the file fails
+     * @param { UploadResolve } resolve - when the file uploads successfully
+     * @param { UploadReject } reject - when the file fails
      * @param { string } genericErrorText - message to display when failed if a message isn't passed through
-     * @returns { Function | void } - return the reject if the the load has failed
+     * @returns { UploadReject | void } - return the reject if the the load has failed
      */
-    onLoaded(resolve: Function, reject: Function, genericErrorText: string) {
-        const response = this.xhr.response as JSON;
+    onLoaded(resolve: UploadResolve, reject: UploadReject, genericErrorText: string): void | UploadReject {
+        const response = this.xhr.response as AsyncUploadResponse;
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
@@ -72,15 +75,17 @@ export default class UploadAdapter {
             default: response.meta.file._links.fetch,
         };
         resolve(resource);
+
+        return undefined;
     }
 
     /**
      * Initializes XMLHttpRequest listeners.
-     * @param { Function } resolve - when the file uploads successfully
-     * @param { Function } reject - when the file fails
+     * @param { UploadResolve } resolve - when the file uploads successfully
+     * @param { UploadReject } reject - when the file fails
      * @param { File } file - the file being uploaded
      */
-    initListeners(resolve: Function, reject: Function, file: File) {
+    initListeners(resolve: UploadResolve, reject: UploadReject, file: File) {
         const genericErrorText = `Couldn't upload file: ${file.name}.`;
         this.xhr.addEventListener("error", () => reject(genericErrorText));
         this.xhr.addEventListener("abort", () => reject("aborted"));
@@ -106,17 +111,20 @@ export default class UploadAdapter {
 
     /**
      * Starts the upload process.
-     * @returns { Promise } - new Promise request
+     * @returns { Promise<UploadResponse> } - new Promise request
      */
-    upload() {
-        return this.loader.file.then(
-            (file: File) =>
-                new Promise((resolve, reject) => {
-                    this.initRequest();
-                    this.initListeners(resolve, reject, file);
-                    this.sendRequest(file);
-                }),
-        );
+    async upload(): Promise<UploadResponse> {
+        return this.loader.file.then((file: File | null) => {
+            if (!file) {
+                throw new Error("No file to upload");
+            }
+
+            return new Promise((resolve, reject) => {
+                this.initRequest();
+                this.initListeners(resolve, reject, file);
+                this.sendRequest(file);
+            });
+        });
     }
 
     /**

@@ -112,11 +112,11 @@ const debounceSearch = debounce(() => {
     <div ref="searchEl">
         <input
             id="search-text"
+            v-model="searchStore.query"
             type="text"
             data-test="manage-group-search-text"
-            v-model="searchStore.query"
             :placeholder="inputPlaceholder"
-            @input="$event.target.composing = false"
+            @input="searchStore.query = $event.target.value /* Fix Android events SA-12170 */"
         />
         <mg-search-results />
     </div>

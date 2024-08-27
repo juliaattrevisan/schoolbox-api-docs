@@ -30,7 +30,7 @@ const props = defineProps({
     },
 });
 
-const selectedNode = window.Vue.ref(getEmptyNode());
+const selectedNodeId = window.Vue.ref(null); // number|null
 const nodeModalEl = window.Vue.ref(null);
 
 /**
@@ -58,7 +58,7 @@ const singleBadge = window.Vue.computed(() => {
  * @pararm { object }
  */
 function onCodeSelected(node) {
-    selectedNode.value = node;
+    selectedNodeId.value = node.id;
     nodeModalEl.value.open();
 }
 
@@ -119,7 +119,7 @@ function onDetailModalClosed() {
         </div>
     </div>
     <reveal-modal ref="nodeModalEl">
-        <node-details :node="selectedNode" />
+        <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </reveal-modal>
     <badge-modal :isOpen="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
 </template>

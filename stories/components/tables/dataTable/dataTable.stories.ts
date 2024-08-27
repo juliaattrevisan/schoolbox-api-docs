@@ -1,6 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies -- storybook is a dev dependency, so it's okay */
+
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { http, HttpResponse } from "msw";
 import DataTable from "@schoolboxVue/components/dataTable/data-table.vue";
+import { ColumnConfig } from "@schoolboxVue/components/dataTable/types/dataTableTypes";
+import { TableOptions } from "@schoolboxVue/components/vueTables2/types/vueTables2Types";
 import { data } from "./dataTableMockData";
 
 /**
@@ -13,13 +17,14 @@ const mswHandlers = [
     }),
 ];
 
-const columnsConfig = [
+const columnsConfig: ColumnConfig[] = [
     {
         key: "portrait_url",
         heading: "Image",
         class: "portrait-td",
         isSortable: false,
         template: {
+            key: "portrait_url",
             component: "image",
             componentData: {
                 src: "portrait_url",
@@ -34,6 +39,7 @@ const columnsConfig = [
         key: "StaffFirstname",
         heading: "First name",
         template: {
+            key: "StaffFirstname",
             component: "link",
             componentData: {
                 text: "StaffFirstname",
@@ -47,6 +53,7 @@ const columnsConfig = [
         key: "StaffSurname",
         heading: "Surname",
         template: {
+            key: "StaffSurname",
             component: "link",
             componentData: {
                 text: "StaffSurname",
@@ -70,6 +77,7 @@ const columnsConfig = [
         key: "StaffOccupEmail",
         heading: "Email",
         template: {
+            key: "StaffOccupEmail",
             component: "link",
             componentData: {
                 text: "StaffOccupEmail",
@@ -82,7 +90,7 @@ const columnsConfig = [
     },
 ];
 
-const tableOptions = {
+const tableOptions: TableOptions = {
     orderBy: {
         ascending: true,
         column: "StaffSurname",

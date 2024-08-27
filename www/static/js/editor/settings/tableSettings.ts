@@ -1,10 +1,11 @@
+import type { TableConfig } from "@ckeditor/ckeditor5-table";
 import { tableBorderColourSwatches, tableBackgroundColourSwatches } from "./colourSettings";
 
 /**
  * Returns the settings for the tables
- * @returns { object } - the table settings
+ * @returns {{ table: TableConfig }} - the table settings
  */
-export function getTableSettings() {
+export function getTableSettings(): { table: TableConfig } {
     return {
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
@@ -28,7 +29,7 @@ export function getTableSettings() {
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - updated sourceElement content as HTML
  */
-export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
+export function addFullWidthStyle(sourceElementHTML: HTMLElement): HTMLElement {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
         if (!table.style.width.includes("px")) {
@@ -44,7 +45,7 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } -
  */
-export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
+export function addAlignLeftStyle(sourceElementHTML: HTMLElement): HTMLElement {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
         if (table.align === "" && table.parentElement && !table.parentElement.hasAttribute("data-is-ckeditor5-table")) {

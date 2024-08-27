@@ -3,7 +3,7 @@
  */
 
 import { ClientTable } from "v-tables-3-select-rows";
-import DataTable from "./data-table";
+import DataTable from "./data-table.vue";
 
 const app = window.Vue.createApp({
     components: {

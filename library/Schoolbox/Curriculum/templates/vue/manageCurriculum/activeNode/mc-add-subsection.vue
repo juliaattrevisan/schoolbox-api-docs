@@ -3,8 +3,8 @@
  * to show further info in a modal on a code that's been selected
  */
 
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
-import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
@@ -19,20 +19,17 @@ const props = defineProps({
     },
 });
 
-const store = useStore();
 const activeNodeStore = useActiveNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 
 /**
  * to gradually and more marginLeft to indicate node level depth
- *
  * @returns { number }
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
- *
  * @returns { string }
  */
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
@@ -41,7 +38,6 @@ const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
 /**
  * To update the button text as the component state changes.
- *
  * @returns { string }
  */
 const addButtonText = window.Vue.computed(() => {
@@ -49,12 +45,11 @@ const addButtonText = window.Vue.computed(() => {
         return "Adding...";
     }
 
-    return "Add" + (isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : "");
+    return `Add${isMaxCharCountExceeded.value ? getButtonTextDisabledDueToStorageLimitSuffix() : ""}`;
 });
 
 /**
  * Only enable the button once the conditions are met
- *
  * @returns { boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
@@ -71,7 +66,7 @@ const isAddDisabled = window.Vue.computed(() => {
 const descriptionField = useDescriptionEditor(
     addSubsectionStore.subsection?.description as string,
     ckeditorIdAttr.value,
-    isMaxCharCountExceeded
+    isMaxCharCountExceeded,
 );
 
 /**
@@ -84,8 +79,8 @@ window.Vue.watch(descriptionField, (newValue) => {
 /**
  * submit save
  */
-function onAddSubsectionSelected() {
-    addSubsectionStore.add();
+async function onAddSubsectionSelected() {
+    await addSubsectionStore.add();
 }
 
 /**
@@ -93,13 +88,14 @@ function onAddSubsectionSelected() {
  */
 addSubsectionStore.$onAction(({ name, after, onError }) => {
     if (name === "add") {
-        store.toastEl.value.activate("Adding...");
+        toast.activate("Adding...");
+
         after((result) => {
-            store.toastEl.value.timeout(result.message, true, 5000);
+            toast.timeout({ text: result.message, isSuccess: true });
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.value.timeout("Unable to add subsection", false, 5000);
+            console.error("Unable to add subsection", error);
+            toast.timeout({ text: "Unable to add subsection", isSuccess: false });
         });
     }
 });
@@ -122,15 +118,15 @@ function onCancelSelected() {
                         <label for="name" class="required">Name</label>
                         <input
                             id="name"
+                            v-model="addSubsectionStore.subsection.name"
                             maxlength="2048"
                             required
                             type="text"
-                            v-model="addSubsectionStore.subsection.name"
                         />
                     </div>
                     <div class="small-12 columns">
                         <label for="code">Code</label>
-                        <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64" />
+                        <input id="code" v-model="addSubsectionStore.subsection.code" type="text" maxlength="64" />
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
@@ -140,21 +136,21 @@ function onCancelSelected() {
                         <ul class="flex-list">
                             <li>
                                 <button
+                                    class="button icon-close"
                                     :disabled="addSubsectionStore.isProcessing"
                                     @click.prevent="onCancelSelected"
-                                    class="button icon-close"
                                 >
                                     Cancel
                                 </button>
                             </li>
                             <li>
                                 <button
+                                    ref="addButton"
+                                    class="button icon-add submit"
+                                    data-test-add-subsection
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
-                                    class="button icon-add submit"
-                                    data-test-add-subsection
-                                    ref="addButton"
                                 >
                                     {{ addButtonText }}
                                 </button>

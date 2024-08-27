@@ -8,11 +8,10 @@ import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
 /**
  * Create a copy so the data is only updated once actually saved
- *
  * @param { NodeToUpdate } node - the node to copy
  * @returns { Node } the copy of the node details
  */
-function getActiveNodeCopy(node: NodeToUpdate) {
+function getActiveNodeCopy(node: NodeToUpdate): NodeToUpdate {
     return {
         name: node.name,
         code: node.code,
@@ -22,11 +21,10 @@ function getActiveNodeCopy(node: NodeToUpdate) {
 
 /**
  * Get the data to pass to the backend
- *
  * @param { NodeToUpdate } node - the node details to pass to the backend
  * @returns { string } the JSON to pass
  */
-function getFormData(node: NodeToUpdate) {
+function getFormData(node: NodeToUpdate): string {
     return JSON.stringify({
         name: node.name,
         code: node.code,
@@ -41,12 +39,11 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
 
     /**
      * to display a prompt to update a nodes details
-     *
      * @param { Node } node - node to update
      */
     function prompt(node: Node) {
         useActiveNodeStore().set(node);
-        activeNodeCopy.value = getActiveNodeCopy(node as NodeToUpdate);
+        activeNodeCopy.value = getActiveNodeCopy(node);
         isOpen.value = true;
     }
 
@@ -60,8 +57,9 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
 
     /**
      * update the nodes details in the back end
+     * @returns { { id: number, message: string } } the id of the node and a message
      */
-    async function update() {
+    async function update(): Promise<{ id: number; message: string }> {
         try {
             isProcessing.value = true;
             const activeNodeStore = useActiveNodeStore();
@@ -72,16 +70,17 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
                 },
                 body: getFormData(activeNodeCopy.value),
             });
-            const responseJson: Node = (await response.json()) as Node;
+            const responseJson = (await response.json()) as Node | { title: string };
             if (response.ok) {
                 activeNodeStore.update(activeNodeCopy.value);
                 isProcessing.value = false;
                 cancel();
                 return { id: activeNodeStore.node.id, message: "Outcome successfully updated" };
             }
-            throw new Error(responseJson.title, { ...responseJson });
+
+            throw new Error((responseJson as { title: string }).title);
         } catch (error) {
-            throw new Error(error.message, error.options);
+            throw new Error((error as Error).message);
         }
     }
 

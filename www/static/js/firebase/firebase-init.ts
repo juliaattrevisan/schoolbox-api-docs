@@ -1,6 +1,32 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
 
+// See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
+interface SbxFirebaseNotificationPayload {
+    notification:
+        | {
+              title: string;
+              body: string;
+              icon: string;
+              timestamp: number;
+              href: string;
+              unread: number;
+              meta: unknown; // string|object
+          }
+        | undefined;
+    fcm_options: {
+        link: string;
+    };
+}
+
+// Additions to the NotificationOptions interface, as the default NotificationOptions
+// appears to differ from https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification#options
+interface SbxNotificationOptions extends NotificationOptions {
+    timestamp?: number;
+    image?: string;
+    renotify?: boolean;
+}
+
 window.sbProps.firebaseApps.forEach((app) => {
     if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
         const firebaseApp = initializeApp(app.publicConfiguration);
@@ -12,28 +38,31 @@ window.sbProps.firebaseApps.forEach((app) => {
 
             // Receipt of a message
             onMessage(messaging, (payload) => {
-                console.log("Message received. ", payload);
+                const notificationPayload = (payload as unknown as SbxFirebaseNotificationPayload).notification; // We don't use firebase's standard payload format
+                if (notificationPayload === undefined) {
+                    return; // No notification to display
+                }
 
-                const notificationOptions = {
-                    body: payload.notification.body,
+                const notificationOptions: SbxNotificationOptions = {
+                    body: notificationPayload.body,
                     icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: payload.notification.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    image: notificationPayload.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
                     badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
                     renotify: false,
                 };
-                if (payload.notification.timestamp !== "0") {
-                    notificationOptions.timestamp = payload.notification.timestamp;
+
+                if (notificationPayload.timestamp !== 0) {
+                    notificationOptions.timestamp = notificationPayload.timestamp;
                 }
-                let notif = new Notification(payload.notification.title, notificationOptions);
+
+                // TODO: Fall back to site name instead of "Notification" if no title is provided
+                const notificationTitle: string = notificationPayload.title ?? "Notification";
+
+                const notif = new Notification(notificationTitle, notificationOptions);
                 notif.onclick = (event) => {
-                    // debug log?
-                    console.log("On notification click: .ts");
                     event.preventDefault(); // prevent the browser from focusing the Notification's tab
                     // some notifications have a href, some don't just load the dashboard for those missing hrefs.
-                    const notifHref = payload.notification.href ?? "/";
-
-                    // debug log?
-                    console.log("opening: ", notifHref);
+                    const notifHref: string = notificationPayload.href ?? "/";
 
                     // open the notification destination
                     window.open(notifHref, "_blank");

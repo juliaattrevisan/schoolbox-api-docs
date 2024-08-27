@@ -4,10 +4,10 @@
  * From here curriclum codes can be selected for further travesal or editing
  */
 
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
 import { useSearchStore } from "../store/mcSearchStore";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import McViewNode from "./mc-view-node.vue";
 
 const nodesStore = useNodesStore();
@@ -34,7 +34,7 @@ window.Vue.watch(
             // may not always exists in the dom
             nodesContainerEl.value.scrollTop = 0;
         }
-    }
+    },
 );
 </script>
 

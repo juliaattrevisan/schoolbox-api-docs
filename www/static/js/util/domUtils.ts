@@ -12,8 +12,8 @@ import { escapeRegExp } from "@js/util/jsUtils";
  * @param {HTMLElement} element - the DOM element to find the index of
  * @returns {number} - position of the DOM element
  */
-export function getIndex(element: HTMLElement) {
-    if (!element || !element.parentNode) {
+export function getIndex(element: HTMLElement): number {
+    if (!element || !element.parentElement) {
         return -1;
     }
     return [...element.parentElement.children].indexOf(element);
@@ -93,7 +93,7 @@ export function insertBeforeFirstChild(element: HTMLElement) {
  * @param {HTMLElement} element - the element to get the left and mid height point of
  * @returns {object} - the left and mid height point of the element
  */
-export function getElementsLeftAndMidHeightPoint(element: HTMLElement) {
+export function getElementsLeftAndMidHeightPoint(element: HTMLElement): { left: number; top: number } {
     return {
         left: element.getBoundingClientRect().left,
         top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
@@ -106,7 +106,7 @@ export function getElementsLeftAndMidHeightPoint(element: HTMLElement) {
  * @param {HTMLElement[]} elements - the elements to search through
  * @returns {HTMLElement} - the closest element
  */
-export function getClosestElement(targetElement: HTMLElement, elements: HTMLElement[]) {
+export function getClosestElement(targetElement: HTMLElement, elements: HTMLElement[]): HTMLElement {
     const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
     let closestElement = elements[0];
     let minDistance = 99999; // if this doesn't get overwritten we got issues...
@@ -130,7 +130,7 @@ export function getClosestElement(targetElement: HTMLElement, elements: HTMLElem
  * @param {HTMLElement} element - the element to get the mid point of
  * @returns {object} - the mid point of the element
  */
-export function getElementsMidPoint(element: HTMLElement) {
+export function getElementsMidPoint(element: HTMLElement): { left: number; top: number } {
     return {
         left: element.getBoundingClientRect().left + element.offsetWidth / 2,
         top: element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2,
@@ -143,7 +143,7 @@ export function getElementsMidPoint(element: HTMLElement) {
  * @param {HTMLElement} secondElement - the element to check against
  * @returns {boolean} - true if the first element is above the second element
  */
-export function isElementAboveOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
+export function isElementAboveOtherElement(firstElement: HTMLElement, secondElement: HTMLElement): boolean {
     return getElementsMidPoint(firstElement).top > getElementsMidPoint(secondElement).top;
 }
 
@@ -153,7 +153,7 @@ export function isElementAboveOtherElement(firstElement: HTMLElement, secondElem
  * @param {HTMLElement} secondElement - the element to check against
  * @returns {boolean} - true if the first element is below the second element
  */
-export function isElementBelowOtherElement(firstElement: HTMLElement, secondElement: HTMLElement) {
+export function isElementBelowOtherElement(firstElement: HTMLElement, secondElement: HTMLElement): boolean {
     return getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top;
 }
 
@@ -162,7 +162,7 @@ export function isElementBelowOtherElement(firstElement: HTMLElement, secondElem
  * @param {HTMLElement} element - the element to add styles to
  * @param {object} styles - for example { position: 'absolute', top: '20px' }
  */
-export function setStylesOnElement(element: HTMLElement, styles: object) {
+export function setStylesOnElement(element: HTMLElement, styles: object): void {
     Object.assign(element.style, styles);
 }
 
@@ -171,9 +171,9 @@ export function setStylesOnElement(element: HTMLElement, styles: object) {
  * @param {HTMLElement} element - the element to set the attribute on
  * @param {string} attribute - the attribute to set
  * @param {string} value - the value to set the attribute to
- * @returns {string} - the value of the attribute
+ * @returns {string | null} - the value of the attribute
  */
-export function setAndGetAttribute(element: HTMLElement, attribute: string, value: string) {
+export function setAndGetAttribute(element: HTMLElement, attribute: string, value: string): string | null {
     element.setAttribute(attribute, value);
     return element.getAttribute(attribute);
 }
@@ -265,9 +265,9 @@ export function injectScript(src: string): Promise<void> {
  * When new HTML is added dynamically to page, we need to ensure any <script> tags
  * have been loaded prior to adding the new HTML to the page
  * @param {string} htmlString - note: the HTML shouldn't exist in the DOM yet, so we can load properly
- * @returns { Element } - the HTML as a DOM element
+ * @returns { Element | null } - the HTML as a DOM element, or null if it couldn't be loaded
  */
-export async function getLoadedHTML(htmlString: string) {
+export async function getLoadedHTML(htmlString: string): Promise<Element | null> {
     const documentFragment = document.createRange().createContextualFragment(htmlString); // createContextualFragment ensures any </script> tags within the element are run
     const scriptTags = documentFragment.querySelectorAll("script[src]:not([data-is-vue])"); // get each <script src></script> that isn't a vue component (which don't require preloading)
     const newScriptTags = Array.from(scriptTags).filter(
@@ -301,11 +301,13 @@ type InjectScriptsParams = {
 export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
     // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
     // Example: jstree.min.js must be added before jQuery.resourceTree.js.
-    for (const src of params.srcList) {
-        if (!isScriptLoaded(src)) {
-            await injectScript(src);
-        }
-    }
+    await Promise.all(
+        params.srcList.map(async (src) => {
+            if (!isScriptLoaded(src)) {
+                await injectScript(src);
+            }
+        }),
+    );
 
     if (params.onComplete !== undefined) {
         params.onComplete();
@@ -321,7 +323,7 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
  *                          any HTML special characters in `toMark` are escaped,
  *                          so output is known to be safe for v-html
  */
-export function addMarks(toMark: string, wordList: string[]) {
+export function addMarks(toMark: string, wordList: string[]): string {
     let marked = escape(toMark);
     wordList.forEach((wordInSearch) => {
         marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {

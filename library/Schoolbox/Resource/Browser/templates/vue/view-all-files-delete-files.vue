@@ -84,7 +84,7 @@ export default {
                     this.$refs.toast.timeout(
                         "Sorry, there was an error deleting all selected files. Please refresh the page to ensure your file list is up to date.",
                         false,
-                        5000
+                        5000,
                     );
                 } else {
                     //otherwise appears everything is aok
@@ -96,7 +96,7 @@ export default {
                 this.$refs.toast.timeout(
                     "Sorry, there was an error deleting all selected files. Please refresh the page and try again.",
                     false,
-                    3000
+                    3000,
                 );
             }
         },
@@ -116,7 +116,7 @@ export default {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                    })
+                    }),
                 );
             });
             return fetchList;

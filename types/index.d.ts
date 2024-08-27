@@ -5,8 +5,11 @@
 
 import Vue from "vue";
 import dayjs from "dayjs";
+import type { lightGallery } from "lightgallery";
+import type { LightGallery } from "lightgallery/lightgallery";
+import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
 import type { DefineComponent } from "vue";
-import type { Editor } from "@js/editor/types/editorTypes";
+import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { pwaConfig } from "@js/global/pwaConfig";
@@ -18,19 +21,29 @@ declare global {
         dateDisplayFormats: {
             dayjs: string;
         };
-        iframely: any;
+        iframely: {
+            load: (containerElement: Element, url?: string) => void;
+            on: (eventName: "cancel", callback: (url: string, parentNode: Element) => void) => void;
+            on: (eventName: "click", callback: (href: string) => void) => void;
+        };
+        jQuery: JQueryStatic;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
-            colourDefaults: { [key: string]: any };
-            editors: { [key: string]: Editor };
+            colourDefaults: {
+                skin: string[];
+                skinUnique: string[];
+                constant: string[];
+                swatches: string[];
+            };
+            editors: Partial<Record<string, SbxEditor>>;
             hasEditorAI: true | undefined; // to display the AI features within the editor
             openAIModel: string | undefined; // chosen open AI model to use
-            lightGallery: Function;
-            lightGalleryInit: Function;
-            lightGalleries: { [key: string]: any };
+            lightGallery: typeof lightGallery;
+            lightGalleryInit: InitLightGallery;
+            lightGalleries: Record<string, LightGallery | undefined>;
             imageLightboxLicenseKey: string;
-            imageSlideshows: { [key: string]: any };
+            imageSlideshowListenerExists?: true | undefined;
             injectScriptsIfNotLoaded: typeof injectScriptsIfNotLoaded;
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
@@ -38,9 +51,12 @@ declare global {
             pwaConfig: typeof pwaConfig;
             firebaseApps: Array<{
                 appIdentifier: string;
-                publicConfiguration: { [key: string]: any };
+                publicConfiguration: { [key: string]: unknown };
                 webPushPublicKey: string;
             }>;
+            // Curriculum nodes global storage
+            storedNodes?: string;
+            isStoringNodes?: boolean;
         };
         schoolboxUser: {
             id: number;
@@ -65,5 +81,10 @@ declare global {
     declare module "*.vue" {
         const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>;
         export default component;
+    }
+
+    declare module "*.svg" {
+        const content: string;
+        export default content;
     }
 }

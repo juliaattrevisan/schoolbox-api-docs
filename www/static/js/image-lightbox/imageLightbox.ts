@@ -5,13 +5,13 @@
  */
 
 import lightGallery from "lightgallery";
-import imageLightboxDefaults from "./imageLightboxDefaults";
+import type { LightGallery } from "lightgallery/lightgallery";
+import type { LightGallerySettings } from "lightgallery/lg-settings";
+import type { GalleryItem } from "lightgallery/lg-utils";
+import type { VideoSource } from "lightgallery/plugins/video/types";
 import "lightgallery/css/lightgallery-bundle.min.css";
+import imageLightboxDefaults from "./imageLightboxDefaults";
 import "./imageLightbox.css";
-
-window.sbProps.lightGallery = lightGallery;
-window.sbProps.lightGalleryInit = initLightGallery; // Allow other scripts to call this function to reinit lightGallery
-window.sbProps.lightGalleries = {};
 
 /**
  * Initialize lightGallery using a elements with rel="lightbox" as the source
@@ -20,8 +20,8 @@ window.sbProps.lightGalleries = {};
  */
 function initLightGallery(): void {
     // Group the images by their rel attribute
-    let lightboxGroups: { [key: string]: HTMLElement[] } = {};
-    let lightboxImages = document.querySelectorAll("a[rel^='lightbox']") as NodeListOf<HTMLElement>;
+    const lightboxGroups: { [key: string]: HTMLElement[] } = {};
+    const lightboxImages: NodeListOf<HTMLElement> = document.querySelectorAll("a[rel^='lightbox']");
     lightboxImages.forEach((image) => {
         const rel = image.getAttribute("rel");
         if (rel !== null) {
@@ -44,32 +44,36 @@ function initLightGallery(): void {
         }
 
         // Destroy the existing lightbox to avoid creating duplicate lightboxes
-        if (window.sbProps.lightGalleries[key]) {
-            window.sbProps.lightGalleries[key].destroy(true);
+        const existingLightGallery = window.sbProps.lightGalleries[key];
+        if (existingLightGallery !== undefined) {
+            existingLightGallery.destroy();
         }
         lightboxElement.setAttribute("data-lightbox-loaded", "true");
 
         // Initialize lightGallery on the new element
-        const lightboxSettings = {
+        const lightboxSettings: LightGallerySettings = {
             dynamic: true,
-            dynamicEl: lightboxGroups[key].map((image) => {
+            dynamicEl: lightboxGroups[key].map((image): GalleryItem => {
                 return {
-                    src: image.getAttribute("href") || image.getAttribute("data-src"),
-                    thumb: image.querySelector("img")?.getAttribute("src") || image.getAttribute("href"),
-                    subHtml: image.getAttribute("title"),
-                    video: image.getAttribute("data-video"),
-                    poster: image.getAttribute("data-poster"),
+                    src: image.getAttribute("href") || image.getAttribute("data-src") || undefined,
+                    thumb: image.querySelector("img")?.getAttribute("src") || image.getAttribute("href") || undefined,
+                    subHtml: image.getAttribute("title") || undefined,
+                    video: (image.getAttribute("data-video") as unknown as VideoSource | null) || undefined,
+                    poster: image.getAttribute("data-poster") || undefined,
                 };
             }),
         };
-        window.sbProps.lightGalleries[key] = window.sbProps.lightGallery(
+
+        window.sbProps.lightGalleries[key] = lightGallery(
             lightboxElement,
-            Object.assign(imageLightboxDefaults, lightboxSettings)
+            Object.assign(imageLightboxDefaults, lightboxSettings),
         );
 
         // For each image, add a click event to open the lightbox
         lightboxGroups[key].forEach((image, index) => {
             const selectedGallery = window.sbProps.lightGalleries[key];
+            if (selectedGallery === undefined) return; // no instance found
+
             const selectedIndex = index;
             image.addEventListener("click", (e: MouseEvent) => {
                 e.preventDefault();
@@ -77,6 +81,14 @@ function initLightGallery(): void {
             });
         });
     });
+}
+
+interface ImageLightboxCreateEvent extends CustomEvent {
+    detail: {
+        targetKey: string;
+        options: LightGallerySettings;
+        onCreated?: (gallery: LightGallery) => void;
+    };
 }
 
 /**
@@ -89,33 +101,42 @@ function initLightGallery(): void {
  * - options: options to pass to lightGallery
  */
 document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
-    let targetElement = document.querySelector("[data-image-lightbox='" + e.detail.targetKey + "']") as HTMLElement;
+    const eventDetail = (e as ImageLightboxCreateEvent).detail;
+    let targetElement = document.querySelector(`[data-image-lightbox='${eventDetail.targetKey}']`) as HTMLElement;
 
     // Create a new element for the lightbox, hidden on the page
     // this is to ensure that we have a usable element to pass to lightGallery
     if (targetElement === null) {
         targetElement = document.createElement("div");
-        targetElement.setAttribute("data-image-lightbox", e.detail.targetKey);
+        targetElement.setAttribute("data-image-lightbox", eventDetail.targetKey);
         targetElement.style.display = "none";
         document.body.appendChild(targetElement);
     }
 
     // Overwrite an existing lightbox to avoid creating duplicate lightboxes
-    if (window.sbProps.lightGalleries[e.detail.targetKey]) {
-        window.sbProps.lightGalleries[e.detail.targetKey].destroy(true);
+    const existingLightGallery = window.sbProps.lightGalleries[eventDetail.targetKey];
+    if (existingLightGallery !== undefined) {
+        existingLightGallery.destroy();
     }
 
     targetElement.setAttribute("data-lightbox-loaded", "true");
-    window.sbProps.lightGalleries[e.detail.targetKey] = window.sbProps.lightGallery(
-        targetElement,
-        Object.assign(imageLightboxDefaults, e.detail.options)
-    );
+    const newLightGallery = lightGallery(targetElement, Object.assign(imageLightboxDefaults, eventDetail.options));
 
-    document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATED", { detail: { targetKey: e.detail.targetKey } }));
+    window.sbProps.lightGalleries[eventDetail.targetKey] = newLightGallery;
+
+    document.dispatchEvent(
+        new CustomEvent("IMAGE-LIGHTBOX__CREATED", { detail: { targetKey: eventDetail.targetKey } }),
+    );
     // If the caller wants to do something after the lightbox is created, run the callback
-    if (e.detail.onCreated) {
-        e.detail.onCreated(window.sbProps.lightGalleries[e.detail.targetKey]);
+    if (eventDetail.onCreated) {
+        eventDetail.onCreated(newLightGallery);
     }
 });
+
+export type InitLightGallery = typeof initLightGallery;
+
+window.sbProps.lightGallery = lightGallery;
+window.sbProps.lightGalleryInit = initLightGallery; // Allow other scripts to call this function to reinit lightGallery
+window.sbProps.lightGalleries = {};
 
 document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__LOADED"));

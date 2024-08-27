@@ -11,7 +11,6 @@ import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 /**
@@ -79,7 +78,7 @@ export default {
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
-            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
+            selectedNodeId: null, // number|null, the selected curriculum code to display further details for
         };
     },
 
@@ -218,7 +217,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected(node) {
-            this.selectedNode = node;
+            this.selectedNodeId = node.id;
             this.isNextSelected = true;
         },
 
@@ -449,7 +448,7 @@ export default {
             </template>
         </template>
         <template v-slot:sequence-2>
-            <node-details :node="selectedNode" />
+            <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
         </template>
     </sequential-reveal-modal>
 </template>

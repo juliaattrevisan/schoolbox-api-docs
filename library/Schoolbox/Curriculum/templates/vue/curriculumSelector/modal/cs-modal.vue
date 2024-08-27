@@ -3,7 +3,7 @@
  * The modal that's used to help select curriculum
  */
 
-import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeDetail from "@schoolboxBadge/vue/badgeDetail.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
@@ -38,7 +38,7 @@ const modalStore = useModalStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
 const modalNodeUsageStore = useModalNodeUsageStore();
-const selectedNodeDetails = window.Vue.ref(getEmptyNode());
+const selectedNodeId = window.Vue.ref(null); // number|null
 
 /**
  * Pass the single select prop to the store
@@ -79,7 +79,7 @@ function onOpenPrevious(sequenceIndex) {
  * @param { object } node - the selected node
  */
 function onCodeSelected(node) {
-    selectedNodeDetails.value = node;
+    selectedNodeId.value = node.id;
     isNextSelected.value = true;
 }
 
@@ -118,7 +118,7 @@ function onModalClosed() {
             />
         </template>
         <template #sequence-3>
-            <node-details :node="selectedNodeDetails" />
+            <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
         </template>
     </sequential-reveal-modal>
 </template>

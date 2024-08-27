@@ -7,7 +7,7 @@ import { Plugin } from "@ckeditor/ckeditor5-core";
 import { ButtonView } from "@ckeditor/ckeditor5-ui";
 import { insertElementAfter } from "@js/util/domUtils";
 import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import InsertResourceCommand from "./InsertResourceCommand";
+import type InsertResourceCommand from "./InsertResourceCommand";
 
 export default class ResourceUI extends Plugin {
     uploadContainer!: HTMLDivElement; // the container for the upload progress bars
@@ -16,7 +16,7 @@ export default class ResourceUI extends Plugin {
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
      * @returns { string } the plugin name
      */
-    static get pluginName() {
+    static get pluginName(): string {
         return "ResourceUI";
     }
 
@@ -84,7 +84,7 @@ export default class ResourceUI extends Plugin {
      * @param { File } file - the file being uploaded
      * @returns { HTMLDivElement } the element to display the progress
      */
-    getUploadElement(file: File) {
+    getUploadElement(file: File): HTMLDivElement {
         const container = document.createElement("div");
         container.classList.add("card", "small-12", "sb-ck-resource-upload-container__upload");
         container.innerHTML = `
@@ -106,7 +106,7 @@ export default class ResourceUI extends Plugin {
      * @param { HTMLDivElement } element - the element to display the error
      * @param { string } error - the error message to display
      */
-    showUploadErrorElement(element: HTMLDivElement, error: string) {
+    static showUploadErrorElement(element: HTMLDivElement, error: string): void {
         element.setAttribute("data-has-error", "");
         const status = element.querySelector("[data-status]") as HTMLParagraphElement;
         status.innerText = error;

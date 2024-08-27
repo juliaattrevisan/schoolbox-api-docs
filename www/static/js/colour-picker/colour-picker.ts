@@ -1,9 +1,8 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
 import tinycolor from "tinycolor2";
+import { colourPickerInitialiseEventName, type ColourPickerInitialiseEvent } from "./colourPickerEvent";
 import "./colour-picker.css";
-
-const swatchColours: string[] = window.sbProps.colourDefaults["swatches"];
 
 const colorPickerDefaults = {
     theme: "default",
@@ -11,17 +10,20 @@ const colorPickerDefaults = {
     format: "hex",
     alpha: true,
     focusInput: true,
-    swatches: swatchColours,
+    swatches: window.sbProps.colourDefaults.swatches,
 };
 
 Coloris.init();
 
-document.addEventListener("colourPickerInitialize", (e) => {
-    const options = Object.assign(colorPickerDefaults, e.detail.options);
+document.addEventListener(colourPickerInitialiseEventName, (e) => {
+    const eventDetail = (e as ColourPickerInitialiseEvent).detail;
+    const colorisOptions: Coloris.ColorisOptions = Object.assign(colorPickerDefaults, eventDetail);
 
-    const targetEl = document.querySelector(e.detail.target);
-    if (!targetEl) {
-        console.warn(`colourPickerInitialize: target element ${e.detail.target} not found`);
+    const targetEl =
+        typeof colorisOptions.el === "string" ? document.querySelector(colorisOptions.el) : colorisOptions.el;
+
+    if (!(targetEl instanceof HTMLInputElement)) {
+        throw new Error(`colourPickerInitialise: target element ${colorisOptions.el} is not an input element`);
     }
 
     // If value is of format "ffffff" then append "#" to correct HEX format, otherwise leave as is
@@ -29,10 +31,7 @@ document.addEventListener("colourPickerInitialize", (e) => {
         targetEl.value = `#${targetEl.value}`;
     }
 
-    Coloris({
-        el: e.detail.target,
-        ...options,
-    });
+    Coloris(colorisOptions);
 });
 
 window.tinycolor = tinycolor;

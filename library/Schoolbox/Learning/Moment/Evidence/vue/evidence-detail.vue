@@ -7,7 +7,6 @@ import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 export default {
     /**
@@ -55,7 +54,7 @@ export default {
      */
     data() {
         return {
-            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
+            selectedNodeId: null, // number|null, the selected curriculum code to display further details for
         };
     },
 
@@ -125,7 +124,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected(node) {
-            this.selectedNode = node;
+            this.selectedNodeId = node.id;
             this.$refs.nodeDetailsModal.open();
         },
     },
@@ -212,6 +211,6 @@ export default {
         </div>
     </div>
     <reveal-modal ref="nodeDetailsModal">
-        <node-details :node="selectedNode" />
+        <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </reveal-modal>
 </template>

@@ -18,6 +18,19 @@ window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
 
 /**
+ * Assign defaults to sbProps to prevent errors in tests
+ * This isn't the full definition, it currently includes just the terms that are used in the tests
+ */
+window.sbProps = {
+    colourDefaults: {
+        constant: [],
+        skin: [],
+        skinUnique: [],
+        swatches: [],
+    }, // Since colourSettings.ts is used via an import chain, and directly accesses sbProps
+};
+
+/**
  * This is to handle any date display / manipulation within Schoolbox
  * As well as including the base package, any additional plugins that are
  * used within Schoolbox are also added.

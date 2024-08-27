@@ -10,6 +10,11 @@
  *  - Add resourceLinkCommand.isOn check into _hide()
  */
 
+// Ignore this file for TypeScript and ESLint checks for now (SA-18139)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
+// @ts-nocheck
+
 /**
  * @license Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
@@ -301,7 +306,7 @@ export default class LinkUI extends Plugin {
                 // than other feature's actions, e.g. list indentation.
                 // https://github.com/ckeditor/ckeditor5-link/issues/146
                 priority: "high",
-            }
+            },
         );
 
         // Close the panel on the Esc key press when the editable has focus and the balloon is visible.
@@ -612,11 +617,11 @@ export default class LinkUI extends Plugin {
         if (model.markers.has(VISUAL_SELECTION_MARKER_NAME)) {
             // There are cases when we highlight selection using a marker (#7705, #4721).
             const markerViewElements = Array.from(
-                this.editor.editing.mapper.markerNameToElements(VISUAL_SELECTION_MARKER_NAME)!
+                this.editor.editing.mapper.markerNameToElements(VISUAL_SELECTION_MARKER_NAME)!,
             );
             const newRange = view.createRange(
                 view.createPositionBefore(markerViewElements[0]),
-                view.createPositionAfter(markerViewElements[markerViewElements.length - 1])
+                view.createPositionAfter(markerViewElements[markerViewElements.length - 1]),
             );
 
             target = view.domConverter.viewRangeToDom(newRange);
@@ -693,7 +698,7 @@ export default class LinkUI extends Plugin {
                 if (range.start.isAtEnd) {
                     const startPosition = range.start.getLastMatchingPosition(
                         ({ item }) => !model.schema.isContent(item),
-                        { boundaries: range }
+                        { boundaries: range },
                     );
 
                     writer.addMarker(VISUAL_SELECTION_MARKER_NAME, {
