@@ -26,6 +26,17 @@ class Completion implements ISoftDeletable
     const STATUS_SELF_ASSESSED_COMPLETE    = 2;
     const STATUS_TEACHER_ASSESSED_COMPLETE = 3;
 
+
+    /**
+     * Maps consts to human-readable equivalents
+     */
+    public const STATUS_MAP = [
+        self::STATUS_INCOMPLETE => 'Incomplete',
+        self::STATUS_SELF_ASSESSED_COMPLETE => 'Self-assessed',
+        self::STATUS_TEACHER_ASSESSED_COMPLETE => 'Complete'
+    ];
+
+
     /**
      * @var Task
      */
