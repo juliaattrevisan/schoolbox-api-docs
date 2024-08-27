@@ -29,7 +29,7 @@ class Video extends Base
      * @return bool
      * @throws NotFound
      */
-    public function permissionCheckOwner(AbstractFile $file): bool
+    protected function permissionCheckOwner(AbstractFile $file): bool
     {
         /* If you are the owner
          * then you can view the content
@@ -97,7 +97,7 @@ class Video extends Base
         /* If the video was in a folder where you have read access,
          * then you can view the content
          */
-        if ($this->getAccess()->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+        if ($this->access->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
             return true;
         }
 

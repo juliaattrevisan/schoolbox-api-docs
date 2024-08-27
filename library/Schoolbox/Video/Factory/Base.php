@@ -31,26 +31,8 @@ abstract class Base
 {
     /**
      * Folder permission access
-     *
-     * @var Access
      */
-    protected $access;
-
-
-    /**
-     * The type of video (submission, sbfs, storage etc)
-     *
-     * @var string
-     */
-    protected $type;
-
-
-    /**
-     * The identifier of the file (could be a hash or numeric index)
-     *
-     * @var string
-     */
-    protected $id;
+    protected Access $access;
 
 
     /**
@@ -62,16 +44,37 @@ abstract class Base
 
 
     /**
+     * @var ResourceVideoMapper
+     */
+    protected ResourceVideoMapper $videoMapper;
+
+
+    /**
+     * @var FileMapper
+     */
+    protected FileMapper $fileMapper;
+
+
+    /**
+     * @var MyFileMapper
+     */
+    protected MyFileMapper $myFileMapper;
+
+
+    /**
      * Constructor
      *
-     * @param int $id
-     * @param string $type
+     * @param int $id The identifier of the file (could be a hash or numeric index)
+     * @param string $type The type of video (submission, sbfs, storage etc)
      */
-    public function __construct($id, $type)
+    public function __construct(protected int $id, protected string $type)
     {
-        $this->setAccess(Access::getInstance());
-        $this->setType($type);
-        $this->setId($id);
+        /* TODO Dependency inject these at some point
+         */
+        $this->access = Access::getInstance();
+        $this->videoMapper = ResourceVideoMapper::getInstance();
+        $this->fileMapper = FileMapper::getInstance();
+        $this->myFileMapper = MyFileMapper::getInstance();
 
         /* We're not in Aura, sorry
          */
@@ -91,27 +94,25 @@ abstract class Base
      */
     public function produce(): ResourceVideo
     {
-        $videoMapper = new ResourceVideoMapper();
-
-        switch ($this->getType()) {
+        switch ($this->type) {
             case QueueMapper::FILE_TYPE_STORAGE:
             case QueueMapper::FILE_TYPE_SUBMISSION:
-                return $videoMapper->findByStorageHash($this->getId());
+                return $this->videoMapper->findByStorageHash($this->id);
 
             case QueueMapper::FILE_TYPE_SBFS:
                 // For SBFS we must first load file, then resolve the hash
-                $file = FileMapper::getInstance()->findById($this->getId());
+                $file = $this->fileMapper->findById($this->id);
 
                 /* TODO Check Folder Perms prior to this PR
                  *  (whatever that was - check that)
                  */
                 $this->permissionCheckFolder($file);
 
-                return $videoMapper->findByStorageHash($file->getHash());
+                return $this->videoMapper->findByStorageHash($file->getHash());
 
             case QueueMapper::FILE_TYPE_MYFILE:
                 // For my files we must first load myfile, then resolve the hash
-                $file = MyFileMapper::getInstance()->findById($this->getId());
+                $file = $this->myFileMapper->findById($this->id);
 
                 /* Check owner perms
                  * Eportfolio access
@@ -124,11 +125,11 @@ abstract class Base
                  * is assumed to be accessible to everyone with READ access. This isn't correct when your
                  * file is a MyFile (it shouldn't be accessible to any old bro)
                  *
-                 * For this reason we skip the permissinoCheckFolder() call, which would have let anyone see
+                 * For this reason we skip the permissionCheckFolder() call, which would have let anyone see
                  * this MyFile.
                  */
 
-                return $videoMapper->findByStorageHash($file->getHash());
+                return $this->videoMapper->findByStorageHash($file->getHash());
         }
 
         throw new MapperException\NotFound();
@@ -162,66 +163,4 @@ abstract class Base
      * @return bool
      */
     abstract protected function permissionCheckFolder(AbstractFile $file): bool;
-
-
-    /**
-     * @return Access
-     */
-    public function getAccess()
-    {
-        return $this->access;
-    }
-
-
-    /**
-     * @param Access $access
-     */
-    public function setAccess($access)
-    {
-        $this->access = $access;
-    }
-
-
-    /**
-     * Set id
-     *
-     * @param string $id
-     */
-    protected function setId($id)
-    {
-        $this->id = $id;
-    }
-
-
-    /**
-     * Get id
-     *
-     * @return string
-     */
-    protected function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     */
-    protected function setType($type)
-    {
-        $this->type = $type;
-    }
-
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    protected function getType()
-    {
-        return $this->type;
-    }
 }

@@ -30,7 +30,7 @@ class Thumbnail extends Base
      */
     protected function permissionCheckFolder(AbstractFile $file): bool
     {
-        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+        if ($this->access->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
             return true;
         }
 
