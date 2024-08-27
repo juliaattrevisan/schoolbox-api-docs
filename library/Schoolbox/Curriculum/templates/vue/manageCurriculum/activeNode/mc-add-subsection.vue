@@ -93,7 +93,7 @@ addSubsectionStore.$onAction(({ name, after, onError }) => {
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });
         });
-        onError(() => {
+        onError((error) => {
             console.error("Unable to add subsection", error);
             toast.timeout({ text: "Unable to add subsection", isSuccess: false });
         });
