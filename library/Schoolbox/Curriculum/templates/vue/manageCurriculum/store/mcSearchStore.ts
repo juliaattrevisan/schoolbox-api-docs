@@ -63,6 +63,8 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
                 },
             );
             results.value = (await response.json()) as Node[];
+        } catch (error) {
+            console.error(error);
         } finally {
             isLoading.value = false;
         }

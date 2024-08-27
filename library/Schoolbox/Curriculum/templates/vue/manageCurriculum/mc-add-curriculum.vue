@@ -73,7 +73,8 @@ addCurriculumStore.$onAction(({ name, after, onError }) => {
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });
         });
-        onError(() => {
+        onError((error) => {
+            console.error("Unable to add Curriculum", error);
             toast.timeout({ text: "Unable to add Curriculum", isSuccess: false });
         });
     }

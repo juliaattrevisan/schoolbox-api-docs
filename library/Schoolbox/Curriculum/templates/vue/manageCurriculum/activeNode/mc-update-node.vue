@@ -92,7 +92,8 @@ updateNodeStore.$onAction(({ name, after, onError }) => {
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });
         });
-        onError(() => {
+        onError((error) => {
+            console.error("Unable to update node", error);
             toast.timeout({ text: "Unable to update node", isSuccess: false });
         });
     }

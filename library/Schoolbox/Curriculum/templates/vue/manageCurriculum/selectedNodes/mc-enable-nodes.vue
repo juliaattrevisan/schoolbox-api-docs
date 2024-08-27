@@ -45,7 +45,8 @@ enableNodesStore.$onAction(({ name, after, onError }) => {
         after((result) => {
             toast.timeout({ text: result, isSuccess: true });
         });
-        onError(() => {
+        onError((error) => {
+            console.error("Unable to process request", error);
             toast.timeout({ text: "Unable to process request", isSuccess: false });
         });
     }

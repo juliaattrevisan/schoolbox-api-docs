@@ -38,11 +38,11 @@ async function load(nodeId: number) {
                 breadcrumbs: getBreadcrumbs(nodeWithParents, []),
             };
         } else {
-            console.warn(response);
+            console.error(response);
             hasLoadError.value = true;
         }
     } catch (error) {
-        console.warn(error);
+        console.error(error);
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;

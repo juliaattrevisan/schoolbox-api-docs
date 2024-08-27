@@ -253,6 +253,7 @@ export function injectScript(src: string): Promise<void> {
             resolve();
         });
         script.addEventListener("error", (e) => {
+            console.error("injectScript failed for file ", src);
             reject(e.error);
         });
         script.src = src;

@@ -54,6 +54,7 @@ function initErrorListener() {
     useNodesStore().$onAction(({ name, onError }) => {
         if (name === "loadId") {
             onError((error) => {
+                console.error(error);
                 const errorMessage = (error as Error).message;
                 toast.activate(errorMessage);
                 toast.timeout({ text: errorMessage, isSuccess: false });
