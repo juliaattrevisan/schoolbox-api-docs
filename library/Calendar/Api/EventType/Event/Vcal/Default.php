@@ -189,13 +189,10 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
          */
-        if (
-            $this->getUser()->isSuperuser()
-            || $decodedConfig->hasPermissions(
-                $this->getUser()->getCampusCollection()->getPropertyValues('id'),
-                $this->getUser()->getRole()->getId()
-            )
-        ) {
+        if ($decodedConfig->hasPermissions(
+            $this->getUser()->getCampusCollection()->getPropertyValues('id'),
+            $this->getUser()->getRole()->getId()
+        )) {
             // Hit up the cache
             $cache = new Vcal(Redis::getCacheClientInstance());
 
