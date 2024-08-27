@@ -1,7 +1,7 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="island small-12">
 
             <!-- BEGIN empty_state -->
@@ -36,7 +36,7 @@
                             acceptedFiles: 'image/*',
                             createImageThumbnails: true,
                             dictDefaultMessage: 'You can drag images into this space.',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                             refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                             showIfEmpty: false,
                             sending: function (file, xhr, formData) {
@@ -103,7 +103,7 @@
                                     acceptedFiles: 'image/*',
                                     createImageThumbnails: true,
                                     dictDefaultMessage: 'You can drag images into this space.',
-                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                                    refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                                     refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                                     showIfEmpty: false,
                                     sending: function (file, xhr, formData) {

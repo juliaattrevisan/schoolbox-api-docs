@@ -21,7 +21,7 @@
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="small-12 island">
             <section>
                 <!-- BEGIN default_video -->
@@ -101,7 +101,7 @@
                         tplWrap: '<li class="dz-preview" />',
                         dictDefaultMessage: 'You can drag videos into this space',
                         refreshUrl: '/eportfolio/configForm.php',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                         refreshData: {
                             page_id: '{PAGE_ID}',
                             reload: '{COMPONENT_INSTANCE_ID}'

@@ -8,7 +8,7 @@
 
 	{CONFIGURATION}
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="small-12 island">
 
             <!-- BEGIN empty_state -->
@@ -49,7 +49,7 @@
                             previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                             previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                             dictDefaultMessage: 'You can drag audio files into this space.',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                             refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                             tplWrap: '<li class="dz-preview" />',
                             showIfEmpty: false,

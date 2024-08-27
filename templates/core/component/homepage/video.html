@@ -35,7 +35,7 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="small-12 island">
 
             <!-- BEGIN empty_state -->
@@ -74,7 +74,7 @@
                             previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                             tplWrap: '<li class="dz-preview" />',
                             dictDefaultMessage: 'You can drag videos into this space.',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                             refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                             showIfEmpty: false,
                             sending: function (file, xhr, formData) {
@@ -186,7 +186,7 @@
                         previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                         tplWrap: '<li class="dz-preview" />',
                         dictDefaultMessage: 'You can drag videos into this space.',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                         sending: function (file, xhr, formData) {
                             formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));

@@ -1,7 +1,7 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
         <div class="small-12 island">
 
             <!-- BEGIN empty_state -->
@@ -41,7 +41,7 @@
                             thumbnailWidth: null,
                             dictDefaultMessage: 'You can drag an image into this space.',
                             acceptedFiles: 'image/*',
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                             refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                             sending: function (file, xhr, formData) {
                                 $('#img{COMPONENT_INSTANCE_ID}').remove();
@@ -214,7 +214,7 @@
                         thumbnailWidth: null,
                         dictDefaultMessage: 'You can drag an image into this space.',
                         acceptedFiles: 'image/*',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                         sending: function (file, xhr, formData) {
                             $('#img{COMPONENT_INSTANCE_ID}').remove();
