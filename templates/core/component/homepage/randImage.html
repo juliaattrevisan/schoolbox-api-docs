@@ -2,7 +2,7 @@
 
     {CONFIGURATION}
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
+    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
 
             <!-- BEGIN empty_state -->
@@ -32,7 +32,7 @@
                             dictDefaultMessage: 'You can drag an image into this space.',
                             acceptedFiles: 'image/*',
                             showIfEmpty: false,
-                            refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                             refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                             tplWrap: '<li class="dz-preview" />',
                             addedfile: function (file) {
@@ -115,7 +115,7 @@
                         thumbnailWidth: null,
                         dictDefaultMessage: 'You can drag an image into this space.',
                         acceptedFiles: 'image/*',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                         tplWrap: '<li class="dz-preview" />',
                         sending: function (file, xhr, formData) {

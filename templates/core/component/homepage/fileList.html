@@ -1,18 +1,17 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
+    <script type="text/javascript">
+        $(function () {
+            $('[data-plugin="preview"]', '#component{COMPONENT_INSTANCE_ID}').preview();
+        });
+    </script>
 
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
-        <script type="text/javascript">
-            $(function () {
-                $('[data-plugin="preview"]', '#component{COMPONENT_INSTANCE_ID}').preview();
-            });
-        </script>
-
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <!-- BEGIN empty_state -->
             <section>
-                <article class="dropzone-wrap">
+                <article data-dz-wrap class="dropzone-wrap">
                     <ul class="action-list" data-dz-container></ul>
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
 
@@ -125,7 +124,7 @@
                         previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
                         previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
                         tplWrap: '<li class="dz-preview" />',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                         dictDefaultMessage: 'You can drag files into this space.',
                         showIfEmpty: false,

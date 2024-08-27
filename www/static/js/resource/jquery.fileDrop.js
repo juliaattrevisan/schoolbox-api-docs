@@ -211,11 +211,7 @@
                                  * With [SA-5443] for file components, we'll make the error messages is dismissible by the user.
                                  */
                                 if (self.options.reloadContent) {
-                                    $(self.options.refreshSelector).empty().append(
-                                        // Use the parentNode of the data (will be a document fragment) to ensure the querySelector
-                                        // has access to the top level element (e.g. the <div id="component....">)
-                                        $(data)[0].parentNode.querySelector(self.options.refreshSelector).innerHTML,
-                                    );
+                                    $(self.options.refreshSelector).empty().append($(data).children());
                                 }
                             });
                         }, self.options.refreshTimeout);
@@ -321,8 +317,8 @@
                 $('<div class="dz-details" />')
                     .append($('<div class="dz-filename" />').html("<span data-dz-name></span>"))
                     .append(
-                        '<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />',
-                    ),
+                        '<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />'
+                    )
             )
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 

@@ -1,7 +1,7 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component data-component-definition-id="{COMPONENT_DEFINITION_ID}">
     {CONFIGURATION}
 
-    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}" data-dz-wrap>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
                 <div class="dropzone-wrap">
@@ -49,7 +49,7 @@
                         thumbnailWidth: null,
                         dictDefaultMessage: 'You can drag images into this space',
                         refreshUrl: '/eportfolio/configForm.php',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID} [data-dz-wrap]',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: {
                             page_id: '{PAGE_ID}',
                             reload: '{COMPONENT_INSTANCE_ID}'
