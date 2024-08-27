@@ -20,7 +20,7 @@ function isValueNestedObject(value: unknown): value is NestedObject {
  * @param {unknown} value - The value to be converted to a string
  * @returns {string} - The value as a string
  */
-function setValue(value: unknown) {
+function setValue(value: unknown): string {
     if (typeof value === "string") {
         return value;
     }
@@ -36,14 +36,14 @@ function setValue(value: unknown) {
  * @param {NestedObject} obj - The object to be converted to key-value pairs
  * @returns {Record<string, string>} - The key-value pairs
  */
-export function getKeyValuePairs(obj: NestedObject) {
+export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
     const result: Record<string, string> = {};
     /**
      * Recursively converts an object to a collection of key-value pairs
      * @param {Record<string, string>} curr - The current object
      * @param {string} keyPath - The path of the current key
      */
-    function recurse(curr: NestedObject, keyPath = "") {
+    function recurse(curr: NestedObject, keyPath = ""): void {
         Object.keys(curr).forEach((key) => {
             if (Object.prototype.hasOwnProperty.call(curr, key)) {
                 const newKeyPath = keyPath ? `${keyPath}[${key}]` : key;
@@ -77,7 +77,7 @@ export function getKeyValuePairs(obj: NestedObject) {
  * @param {NestedObject} obj - The object to be converted to a search param string
  * @returns {string} - the URLSearchParams object as a string
  */
-export function getSearchString(obj: NestedObject) {
+export function getSearchString(obj: NestedObject): string {
     // first convert the object to key-value pairs
     const keyValuePairs = getKeyValuePairs(obj);
     const searchParams = new URLSearchParams();
@@ -95,7 +95,7 @@ export function getSearchString(obj: NestedObject) {
  * @param {NestedObject} obj - The object to be converted to a FormData
  * @returns {string} - the FormData object
  */
-export function getFormData(obj: NestedObject) {
+export function getFormData(obj: NestedObject): FormData {
     // first convert the object to key-value pairs
     const keyValuePairs = getKeyValuePairs(obj);
     const formData = new FormData();
