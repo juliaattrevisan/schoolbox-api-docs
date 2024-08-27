@@ -1,3 +1,5 @@
+/* eslint-disable import/no-extraneous-dependencies -- storybook is a dev dependency, so it's okay */
+
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { http, HttpResponse } from "msw";
 import DataTable from "@schoolboxVue/components/dataTable/data-table.vue";
