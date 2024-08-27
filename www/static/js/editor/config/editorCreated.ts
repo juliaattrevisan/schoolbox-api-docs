@@ -1,8 +1,8 @@
 /**
  * Once the editor has been created, we can add in any additional setup required
  */
-
-import { SbxEditor, SbxEditorConfig, EditorToolbar, SbxEditorElement } from "@js/editor/types/editorTypes";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import type { SbxEditor, SbxEditorConfig, SbxEditorElement } from "@js/editor/types/editorTypes";
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 import { getSourceElementIdentifier } from "./editorCheckData";
 

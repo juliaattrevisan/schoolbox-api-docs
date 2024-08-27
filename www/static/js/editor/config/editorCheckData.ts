@@ -1,5 +1,5 @@
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import { SbxEditorConfig, SbxEditorElement } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig, SbxEditorElement } from "@js/editor/types/editorTypes";
 import { addRelToNewTabLinks, addPrefixToElementIDs } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes, removeHeightFromVideoThumbs } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
