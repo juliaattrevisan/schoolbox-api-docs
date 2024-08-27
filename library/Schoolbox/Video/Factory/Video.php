@@ -38,6 +38,13 @@ class Video extends Base
             return;
         }
 
+        /* TODO Should supers be able to access this, as if they were the owner themselves?
+         *
+         * if ($this->user->isSuperuser()) {
+         *     return;
+         * }
+         */
+
         /* Every other use case: you get kicked out
          */
         throw new NotFound('You do not have permission to view this video.');
