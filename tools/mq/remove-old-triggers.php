@@ -73,7 +73,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         foreach ($search as $key) {
             $numKeysProcessed++;
             $progress = round(($numKeysProcessed / $numKeys) * 100, 2);
-            if ($progress % 10 === 0) {
+            if ((int)$progress % 10 === 0) {
                 $this->getLogger()->debug("{$progress} % processed");
             }
 
