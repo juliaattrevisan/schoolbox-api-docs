@@ -21,7 +21,6 @@ use TypeError;
  */
 class SubPredicatesTest extends TestCase
 {
-
     /** @var Mysql\Quoter */
     private $mySqlQuoter;
 
