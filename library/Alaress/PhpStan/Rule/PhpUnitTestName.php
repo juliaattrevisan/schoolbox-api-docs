@@ -69,6 +69,9 @@ class PhpUnitTestName implements Rule
         if (!$reflectionClass) {
             return [];
         }
+        if ($reflectionClass->isAnonymous()) {
+            return [];
+        }
 
         // Set up required data: file basename, whether this is a test case
         $filename = $reflectionClass->getFileName();
