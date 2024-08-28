@@ -76,7 +76,7 @@ class PhpUnitTestName implements Rule
             return [];
         }
         $basename   = basename($filename);
-        $isTestCase = $reflectionClass->isSubclassOf(TestCase::class);
+        $isTestCase = $reflectionClass->isSubclassOf(TestCase::class) && !$reflectionClass->isAbstract();
         $messages   = [];
 
         // Is there a prefix? If so test against it
