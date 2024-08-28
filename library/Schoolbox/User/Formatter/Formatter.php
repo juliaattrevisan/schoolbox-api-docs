@@ -66,13 +66,14 @@ class Formatter
      */
     public function formatArray(array $userInfo): string
     {
+        if (empty($userInfo)) {
+            return 'Unknown User';
+        }
+
         $format = $this->format;
 
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);
-        if (empty($tags) || empty($userInfo)) {
-            return 'Unknown User';
-        }
 
         // Modify $userInfo to something which matches possible format:
         // * "preferred_name" and "preferredname" are the same
