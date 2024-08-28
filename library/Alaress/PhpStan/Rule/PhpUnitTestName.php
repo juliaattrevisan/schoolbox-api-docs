@@ -70,45 +70,43 @@ class PhpUnitTestName implements Rule
             return [];
         }
 
-        // Extract basename from file
+        // Set up required data: file basename, whether this is a test case
         $filename = $reflectionClass->getFileName();
         if (!isset($filename)) {
             return [];
         }
-        $basename = basename($filename);
+        $basename   = basename($filename);
+        $isTestCase = $reflectionClass->isSubclassOf(TestCase::class);
+        $messages   = [];
 
-
-        $hasPrefix     = isset($this->prefix);
-        $hasSuffix     = isset($this->suffix);
-        $matchesPrefix = $hasPrefix && str_starts_with($basename, $this->prefix);
-        $matchesSuffix = $hasSuffix && str_starts_with($basename, $this->suffix);
-        $messages      = [];
-
-        // If a test case: filename must match prefix and suffix
-        if ($reflectionClass->isSubclassOf(TestCase::class)) {
-            if ($hasPrefix && !$matchesPrefix) {
+        // Is there a prefix? If so test against it
+        if (isset($this->prefix)) {
+            $matchesPrefix = str_starts_with($basename, $this->prefix);
+            if ($isTestCase && !$matchesPrefix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_TEST_PREFIX_MISMATCH, $basename, $this->prefix)
                 )->build();
             }
-            if ($hasSuffix && !$matchesSuffix) {
+            if (!$isTestCase && $matchesPrefix) {
+                $messages[] = RuleErrorBuilder::message(
+                    sprintf(self::ERROR_MESSAGE_NON_TEST_PREFIX_MISMATCH, $basename, $this->prefix)
+                )->build();
+            }
+        }
+
+        // Is there a suffix? If so test against it
+        if (isset($this->suffix)) {
+            $matchesSuffix = str_ends_with($basename, $this->suffix);
+            if ($isTestCase && !$matchesSuffix) {
                 $messages[] = RuleErrorBuilder::message(
                     sprintf(self::ERROR_MESSAGE_TEST_SUFFIX_MISMATCH, $basename, $this->suffix)
                 )->build();
             }
-            return $messages;
-        }
-
-        // If not a test case: filename must not match prefix and suffix
-        if ($hasPrefix && $matchesPrefix) {
-            $messages[] = RuleErrorBuilder::message(
-                sprintf(self::ERROR_MESSAGE_NON_TEST_PREFIX_MISMATCH, $basename, $this->prefix)
-            )->build();
-        }
-        if ($hasSuffix && $matchesSuffix) {
-            $messages[] = RuleErrorBuilder::message(
-                sprintf(self::ERROR_MESSAGE_NON_TEST_SUFFIX_MISMATCH, $basename, $this->suffix)
-            )->build();
+            if (!$isTestCase && $matchesSuffix) {
+                $messages[] = RuleErrorBuilder::message(
+                    sprintf(self::ERROR_MESSAGE_NON_TEST_SUFFIX_MISMATCH, $basename, $this->suffix)
+                )->build();
+            }
         }
 
         return $messages;
