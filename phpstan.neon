@@ -14,5 +14,8 @@ parameters:
         - test/*/_generated/*
     inferPrivatePropertyTypeFromConstructor: true
 
+rules:
+    - Alaress\PhpStan\Rule\PhpUnitTestName
+
 includes:
     - phpstan-baseline.neon
