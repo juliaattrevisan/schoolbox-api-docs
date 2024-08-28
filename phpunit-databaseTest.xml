@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         backupGlobals="false"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
          bootstrap="test/bootstrap/unit.php"
          defaultTestSuite="databaseTest"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false"
 >
   <testsuites>
     <testsuite name="databaseTest">
@@ -17,11 +16,11 @@
       <directory suffix=".php">library/Schoolbox/Database/Test</directory>
     </testsuite>
   </testsuites>
-    <php>
-        <!--
+  <php>
+    <!--
         Database tests require the Vagrant box's standard instance ID, in order
         to be granted access to the database.
         -->
-        <env name="INSTANCE_ID" value="vagrantx" force="true" />
-    </php>
+    <env name="INSTANCE_ID" value="vagrantx" force="true"/>
+  </php>
 </phpunit>
